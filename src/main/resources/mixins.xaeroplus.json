@@ -1,0 +1,10 @@
+{
+  "required": true,
+  "compatibilityLevel": "JAVA_8",
+  "package": "xaeroplus.mixin.client",
+  "refmap": "mixins.xaeroplus.refmap.json",
+  "client": [
+    "MixinGuiMap",
+    "MixinMinimapModSettings"
+  ]
+}

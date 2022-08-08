@@ -5,6 +5,7 @@
   "refmap": "mixins.xaeroplus.refmap.json",
   "client": [
     "MixinGuiMap",
-    "MixinMinimapModSettings"
+    "MixinMapProcessor",
+    "MixinWaypointsManager"
   ]
 }

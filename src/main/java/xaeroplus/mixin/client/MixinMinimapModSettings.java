@@ -7,7 +7,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.settings.ModSettings;
 
-// disabled for now
 @Mixin(value = ModSettings.class, remap = false)
 public class MixinMinimapModSettings {
 
@@ -20,8 +19,14 @@ public class MixinMinimapModSettings {
     @Shadow
     public float[] zooms;
 
+    @Shadow
+    public int caveMaps;
+
     @Inject(method = "<init>", at = @At(value = "TAIL"))
     private void init(CallbackInfo ci) {
-        zooms = new float[]{0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1.0F, 2.0F, 3.0F, 4.0F, 5.0F};
+//        zooms = new float[]{0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1.0F, 2.0F, 3.0F, 4.0F, 5.0F};
+
+        // don't show cave maps on minimap by default
+        caveMaps = 0;
     }
 }

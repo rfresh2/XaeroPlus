@@ -1,6 +1,5 @@
 package xaeroplus.mixin.client;
 
-import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -9,7 +8,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMap;
-import xaero.map.WorldMapSession;
 import xaero.map.file.MapRegionInfo;
 import xaero.map.file.MapSaveLoad;
 import xaero.map.file.RegionDetection;
@@ -19,37 +17,26 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Mixin(value = MapSaveLoad.class, remap = false)
 public abstract class MixinMapSaveLoad {
     private Instant start = Instant.now();
-    private Minecraft mc = Minecraft.getMinecraft();
-    private int syncedRegionDetectRadius = 20;
 
     private ExecutorService regionDetectionExecutor = Executors.newSingleThreadExecutor();
 
     @Shadow
     private MapProcessor mapProcessor;
-
-    @Shadow
-    private ArrayList<Path> cacheFolders;
-
-    @Shadow
-    public abstract Path getMWSubFolder(String world, String dim, String mw);
 
     @Shadow
     public abstract Path getCacheFolder(Path subFolder);
@@ -60,29 +47,8 @@ public abstract class MixinMapSaveLoad {
 
     }
 
-    private int getPlayerRegionX() {
-        if (mc.world != null && mc.player != null) {
-            return mc.player.getPosition().getX() / 512; // 512x512 blocks per region
-        } else {
-            return 0;
-        }
-    }
-
-    private int getPlayerRegionZ() {
-        if (mc.world != null && mc.player != null) {
-            return mc.player.getPosition().getZ() / 512;
-        } else {
-            return 0;
-        }
-    }
-
     @Inject(method = "detectRegions", at = @At("TAIL"))
     public void detectRegionsTail(CallbackInfo ci) {
-        // this goes insanely slow when you have many regions
-        // for me it takes 30+ seconds per dimension
-        // even worse because it doesn't interrupt when dimension is changed
-        // so on 2b2t if you quickly go through the queue, it'll finish loading the end regions before
-        // starting on your actual ingame dimension regions
         WorldMap.LOGGER.info("Regions detected in " + (Instant.now().getEpochSecond() - start.getEpochSecond()) + " seconds");
     }
 
@@ -100,47 +66,44 @@ public abstract class MixinMapSaveLoad {
                                        int xIndex,
                                        int zIndex,
                                        int emptySize) {
-        // this is a bit faster but hangs the whole process ><
-        // ideally we'd want regions loaded lazily based on player position without blocking anything
-        int xMin = getPlayerRegionX() - syncedRegionDetectRadius;
-        int xMax = getPlayerRegionX() + syncedRegionDetectRadius;
-        int zMin = getPlayerRegionZ() - syncedRegionDetectRadius;
-        int zMax = getPlayerRegionZ() + syncedRegionDetectRadius;
-
-        try {
-            Stream<Path> files = Files.list(folder);
-            Iterator iter = files.iterator();
-            while (!this.mapProcessor.isFinalizing() && iter.hasNext()) {
-                String regionName;
-                Path file = (Path)iter.next();
-                if (Files.isDirectory(file) || !(regionName = file.getFileName().toString()).matches(regex) || Files.size(file) <= (long)emptySize) continue;
+        // optimizations on top of region detection
+        // prefer detecting full regions first
+        // load all the cache files in the background
+        // this will reduce time for map to appear on screen
+        // very noticeable impact when you have a large amount of regions to load
+        // this does cause noticeably high IO impact
+        final List<RegionDetection> regionDetectionList = new ArrayList<>(1000);
+        Pattern p = Pattern.compile(regex);
+        try (DirectoryStream<Path> pathStream = Files.newDirectoryStream(folder, (entry -> {
+            Matcher m = p.matcher(entry.getFileName().toString());
+            return m.matches();
+        }))) {
+            pathStream.forEach(path -> {
+                String regionName = path.getFileName().toString();
                 String[] args = regionName.substring(0, regionName.lastIndexOf(46)).split(splitRegex);
                 int x = Integer.parseInt(args[xIndex]);
                 int z = Integer.parseInt(args[zIndex]);
-                RegionDetection regionDetection = new RegionDetection(worldId, dimId, mwId, x, z, file.toFile(), this.mapProcessor.getGlobalVersion(), true);
-                if ((x >= xMin && x <= xMax) && (z >= zMin && z <= zMax)) {
-                    File cacheFile = this.getCacheFile(regionDetection, true, true);
-                    regionDetection.setCacheFile(cacheFile);
-                    this.mapProcessor.addRegionDetection(mapDimension, regionDetection);
-                } else {
-                    regionDetectionExecutor.submit(() -> {
-                        try {
-                            File cacheFile = this.getCacheFile(regionDetection, true, true);
-                            regionDetection.setCacheFile(cacheFile);
-                            this.mapProcessor.addRegionDetection(mapDimension, regionDetection);
-                        } catch (final IOException e) {
-                            e.printStackTrace();
-                        }
-                    });
-                }
-            }
-            files.close();
-        }
-        catch (IOException e) {
-            WorldMap.LOGGER.error("suppressed exception", (Throwable)e);
-            return;
+                RegionDetection regionDetection = new RegionDetection(worldId, dimId, mwId, x, z, path.toFile(), this.mapProcessor.getGlobalVersion(), true);
+                regionDetectionList.add(regionDetection);
+                this.mapProcessor.addRegionDetection(mapDimension, regionDetection);
+            });
+        } catch (final Exception e) {
+            e.printStackTrace();
         }
 
+        // todo: we don't have a good way to stop this when dimension changes
+        // most of the IO is frontloaded so its not the worst, but can be improved.
+        regionDetectionExecutor.submit(() -> {
+            final Instant before = Instant.now();
+            Path cachePath = this.getCacheFolder(folder);
+            Map<String, Path> cacheFilesMap = resolveCacheFiles(cachePath);
+            regionDetectionList.forEach(regionDetection -> {
+                File cacheFile = getCacheFile(regionDetection, cacheFilesMap, cachePath, true);
+                regionDetection.setCacheFile(cacheFile);
+            });
+            final Instant after = Instant.now();
+            WorldMap.LOGGER.info("Cache files detected in " + (after.getEpochSecond() - before.getEpochSecond()) + " seconds");
+        });
     }
 
     // mfw finding cache files is slower than just reading the region
@@ -160,59 +123,18 @@ public abstract class MixinMapSaveLoad {
         }
     }
 
-    @Shadow
-    public abstract File getCacheFile(MapRegionInfo region, boolean checkOldFolders, boolean requestCache) throws IOException;
-
-
-//    public File getCacheFile(MapRegionInfo region, Map<String, Path> cacheFiles, Path cacheFilesPath, final boolean requestCache) {
-//        final String expectedCacheFileName = region.getRegionX() + "_" + region.getRegionZ() + ".xwmc";
-//        if (cacheFiles.containsKey(expectedCacheFileName)) {
-//            return cacheFiles.get(expectedCacheFileName).toFile();
-//        }
-//        if (requestCache) {
-//            region.setShouldCache(true, "cache file");
-//        }
-//        if (cacheFiles.containsKey(expectedCacheFileName + ".outdated")) {
-//            return cacheFiles.get(expectedCacheFileName + ".outdated").toFile();
-//        } else {
-//            return cacheFilesPath.resolve(region.getRegionX() + "_" + region.getRegionZ() + ".xwmc").toFile();
-//        }
-//    }
-
-    /**
-     * @author
-     */
-//    @Overwrite
-//    public File getCacheFile(MapRegionInfo region, boolean checkOldFolders, boolean requestCache) throws IOException {
-//        Path outdatedCacheFile;
-//        Path subFolder = this.getMWSubFolder(region.getWorldId(), region.getDimId(), region.getMwId());
-//        Path latestCacheFolder = this.getCacheFolder(subFolder);
-//        if (latestCacheFolder == null) {
-//            return null;
-//        }
-//        if (!Files.exists(latestCacheFolder)) {
-//            ForkJoinPool.commonPool().submit(() -> Files.createDirectories(latestCacheFolder));
-//        }
-//        Path cacheFile = latestCacheFolder.resolve(region.getRegionX() + "_" + region.getRegionZ() + ".xwmc");
-//        if (!checkOldFolders || Files.exists(cacheFile)) {
-//            return cacheFile.toFile();
-//        }
-//        if (requestCache) {
-//            region.setShouldCache(true, "cache file");
-//        }
-//
-//        if (Files.exists(outdatedCacheFile = cacheFile.resolveSibling(cacheFile.getFileName().toString() + ".outdated"))) {
-//            return outdatedCacheFile.toFile();
-//        }
-//        // why is this even here
-////        for (int i = 0; i < this.cacheFolders.size(); ++i) {
-////            Path oldCacheFolder = this.cacheFolders.get(i);
-////            Path oldCacheFile = oldCacheFolder.resolve(region.getRegionX() + "_" + region.getRegionZ() + ".xwmc");
-////            if (!Files.exists(oldCacheFile)) continue;
-////            return oldCacheFile.toFile();
-////        }
-//
-//        return cacheFile.toFile();
-//    }
-
+    public File getCacheFile(MapRegionInfo region, Map<String, Path> cacheFiles, Path cacheFilesPath, final boolean requestCache) {
+        final String expectedCacheFileName = region.getRegionX() + "_" + region.getRegionZ() + ".xwmc";
+        if (cacheFiles.containsKey(expectedCacheFileName)) {
+            return cacheFiles.get(expectedCacheFileName).toFile();
+        }
+        if (requestCache) {
+            region.setShouldCache(true, "cache file");
+        }
+        if (cacheFiles.containsKey(expectedCacheFileName + ".outdated")) {
+            return cacheFiles.get(expectedCacheFileName + ".outdated").toFile();
+        } else {
+            return cacheFilesPath.resolve(region.getRegionX() + "_" + region.getRegionZ() + ".xwmc").toFile();
+        }
+    }
 }

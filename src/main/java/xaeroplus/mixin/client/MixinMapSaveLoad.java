@@ -1,12 +1,15 @@
 package xaeroplus.mixin.client;
 
+import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMap;
+import xaero.map.WorldMapSession;
 import xaero.map.file.MapRegionInfo;
 import xaero.map.file.MapSaveLoad;
 import xaero.map.file.RegionDetection;
@@ -16,19 +19,28 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Mixin(value = MapSaveLoad.class, remap = false)
 public abstract class MixinMapSaveLoad {
     private Instant start = Instant.now();
+    private Minecraft mc = Minecraft.getMinecraft();
+    private int syncedRegionDetectRadius = 20;
+
+    private ExecutorService regionDetectionExecutor = Executors.newSingleThreadExecutor();
 
     @Shadow
     private MapProcessor mapProcessor;
@@ -45,6 +57,23 @@ public abstract class MixinMapSaveLoad {
     @Inject(method = "detectRegions", at = @At("HEAD"))
     public void detectRegionsHead(CallbackInfo ci) {
         start = Instant.now();
+
+    }
+
+    private int getPlayerRegionX() {
+        if (mc.world != null && mc.player != null) {
+            return mc.player.getPosition().getX() / 512; // 512x512 blocks per region
+        } else {
+            return 0;
+        }
+    }
+
+    private int getPlayerRegionZ() {
+        if (mc.world != null && mc.player != null) {
+            return mc.player.getPosition().getZ() / 512;
+        } else {
+            return 0;
+        }
     }
 
     @Inject(method = "detectRegions", at = @At("TAIL"))
@@ -60,7 +89,7 @@ public abstract class MixinMapSaveLoad {
     /**
      * @author
      */
-//    @Overwrite
+    @Overwrite
     public void detectRegionsFromFiles(MapDimension mapDimension,
                                        String worldId,
                                        String dimId,
@@ -73,29 +102,43 @@ public abstract class MixinMapSaveLoad {
                                        int emptySize) {
         // this is a bit faster but hangs the whole process ><
         // ideally we'd want regions loaded lazily based on player position without blocking anything
-        // todo: sync region loads around player position +- X regions, everything else load lazily
-        Pattern p = Pattern.compile(regex);
-        try (DirectoryStream<Path> pathStream = Files.newDirectoryStream(folder, (entry -> {
-            Matcher m = p.matcher(entry.getFileName().toString());
-            return m.matches();
-        }))) {
-            pathStream.forEach(path -> {
-                String regionName = path.getFileName().toString();
+        int xMin = getPlayerRegionX() - syncedRegionDetectRadius;
+        int xMax = getPlayerRegionX() + syncedRegionDetectRadius;
+        int zMin = getPlayerRegionZ() - syncedRegionDetectRadius;
+        int zMax = getPlayerRegionZ() + syncedRegionDetectRadius;
+
+        try {
+            Stream<Path> files = Files.list(folder);
+            Iterator iter = files.iterator();
+            while (!this.mapProcessor.isFinalizing() && iter.hasNext()) {
+                String regionName;
+                Path file = (Path)iter.next();
+                if (Files.isDirectory(file) || !(regionName = file.getFileName().toString()).matches(regex) || Files.size(file) <= (long)emptySize) continue;
                 String[] args = regionName.substring(0, regionName.lastIndexOf(46)).split(splitRegex);
                 int x = Integer.parseInt(args[xIndex]);
                 int z = Integer.parseInt(args[zIndex]);
-                RegionDetection regionDetection = new RegionDetection(worldId, dimId, mwId, x, z, path.toFile(), this.mapProcessor.getGlobalVersion(), true);
-                // this is stupidly IO expensive
-                try {
-                    regionDetection.setCacheFile(this.getCacheFile(regionDetection, true, true));
-                } catch (IOException e) {
-                    e.printStackTrace();
+                RegionDetection regionDetection = new RegionDetection(worldId, dimId, mwId, x, z, file.toFile(), this.mapProcessor.getGlobalVersion(), true);
+                if ((x >= xMin && x <= xMax) && (z >= zMin && z <= zMax)) {
+                    File cacheFile = this.getCacheFile(regionDetection, true, true);
+                    regionDetection.setCacheFile(cacheFile);
+                    this.mapProcessor.addRegionDetection(mapDimension, regionDetection);
+                } else {
+                    regionDetectionExecutor.submit(() -> {
+                        try {
+                            File cacheFile = this.getCacheFile(regionDetection, true, true);
+                            regionDetection.setCacheFile(cacheFile);
+                            this.mapProcessor.addRegionDetection(mapDimension, regionDetection);
+                        } catch (final IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
                 }
-                this.mapProcessor.addRegionDetection(mapDimension, regionDetection);
-//                total.getAndIncrement();
-            });
-        } catch (final Exception e) {
-            e.printStackTrace();
+            }
+            files.close();
+        }
+        catch (IOException e) {
+            WorldMap.LOGGER.error("suppressed exception", (Throwable)e);
+            return;
         }
 
     }
@@ -117,55 +160,59 @@ public abstract class MixinMapSaveLoad {
         }
     }
 
-    public File getCacheFile(MapRegionInfo region, Map<String, Path> cacheFiles, Path cacheFilesPath, final boolean requestCache) {
-        final String expectedCacheFileName = region.getRegionX() + "_" + region.getRegionZ() + ".xwmc";
-        if (cacheFiles.containsKey(expectedCacheFileName)) {
-            return cacheFiles.get(expectedCacheFileName).toFile();
-        }
-        if (requestCache) {
-            region.setShouldCache(true, "cache file");
-        }
-        if (cacheFiles.containsKey(expectedCacheFileName + ".outdated")) {
-            return cacheFiles.get(expectedCacheFileName + ".outdated").toFile();
-        } else {
-            return cacheFilesPath.resolve(region.getRegionX() + "_" + region.getRegionZ() + ".xwmc").toFile();
-        }
-    }
+    @Shadow
+    public abstract File getCacheFile(MapRegionInfo region, boolean checkOldFolders, boolean requestCache) throws IOException;
+
+
+//    public File getCacheFile(MapRegionInfo region, Map<String, Path> cacheFiles, Path cacheFilesPath, final boolean requestCache) {
+//        final String expectedCacheFileName = region.getRegionX() + "_" + region.getRegionZ() + ".xwmc";
+//        if (cacheFiles.containsKey(expectedCacheFileName)) {
+//            return cacheFiles.get(expectedCacheFileName).toFile();
+//        }
+//        if (requestCache) {
+//            region.setShouldCache(true, "cache file");
+//        }
+//        if (cacheFiles.containsKey(expectedCacheFileName + ".outdated")) {
+//            return cacheFiles.get(expectedCacheFileName + ".outdated").toFile();
+//        } else {
+//            return cacheFilesPath.resolve(region.getRegionX() + "_" + region.getRegionZ() + ".xwmc").toFile();
+//        }
+//    }
 
     /**
      * @author
      */
 //    @Overwrite
-    public File getCacheFile(MapRegionInfo region, boolean checkOldFolders, boolean requestCache) throws IOException {
-        Path outdatedCacheFile;
-        Path subFolder = this.getMWSubFolder(region.getWorldId(), region.getDimId(), region.getMwId());
-        Path latestCacheFolder = this.getCacheFolder(subFolder);
-        if (latestCacheFolder == null) {
-            return null;
-        }
-        if (!Files.exists(latestCacheFolder)) {
-            ForkJoinPool.commonPool().submit(() -> Files.createDirectories(latestCacheFolder));
-        }
-        Path cacheFile = latestCacheFolder.resolve(region.getRegionX() + "_" + region.getRegionZ() + ".xwmc");
-        if (!checkOldFolders || Files.exists(cacheFile)) {
-            return cacheFile.toFile();
-        }
-        if (requestCache) {
-            region.setShouldCache(true, "cache file");
-        }
-
-        if (Files.exists(outdatedCacheFile = cacheFile.resolveSibling(cacheFile.getFileName().toString() + ".outdated"))) {
-            return outdatedCacheFile.toFile();
-        }
-        // why is this even here
-//        for (int i = 0; i < this.cacheFolders.size(); ++i) {
-//            Path oldCacheFolder = this.cacheFolders.get(i);
-//            Path oldCacheFile = oldCacheFolder.resolve(region.getRegionX() + "_" + region.getRegionZ() + ".xwmc");
-//            if (!Files.exists(oldCacheFile)) continue;
-//            return oldCacheFile.toFile();
+//    public File getCacheFile(MapRegionInfo region, boolean checkOldFolders, boolean requestCache) throws IOException {
+//        Path outdatedCacheFile;
+//        Path subFolder = this.getMWSubFolder(region.getWorldId(), region.getDimId(), region.getMwId());
+//        Path latestCacheFolder = this.getCacheFolder(subFolder);
+//        if (latestCacheFolder == null) {
+//            return null;
 //        }
-
-        return cacheFile.toFile();
-    }
+//        if (!Files.exists(latestCacheFolder)) {
+//            ForkJoinPool.commonPool().submit(() -> Files.createDirectories(latestCacheFolder));
+//        }
+//        Path cacheFile = latestCacheFolder.resolve(region.getRegionX() + "_" + region.getRegionZ() + ".xwmc");
+//        if (!checkOldFolders || Files.exists(cacheFile)) {
+//            return cacheFile.toFile();
+//        }
+//        if (requestCache) {
+//            region.setShouldCache(true, "cache file");
+//        }
+//
+//        if (Files.exists(outdatedCacheFile = cacheFile.resolveSibling(cacheFile.getFileName().toString() + ".outdated"))) {
+//            return outdatedCacheFile.toFile();
+//        }
+//        // why is this even here
+////        for (int i = 0; i < this.cacheFolders.size(); ++i) {
+////            Path oldCacheFolder = this.cacheFolders.get(i);
+////            Path oldCacheFile = oldCacheFolder.resolve(region.getRegionX() + "_" + region.getRegionZ() + ".xwmc");
+////            if (!Files.exists(oldCacheFile)) continue;
+////            return oldCacheFile.toFile();
+////        }
+//
+//        return cacheFile.toFile();
+//    }
 
 }

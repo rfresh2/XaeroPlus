@@ -96,6 +96,13 @@ public abstract class MixinMapSaveLoad {
         regionDetectionExecutor.submit(() -> {
             final Instant before = Instant.now();
             Path cachePath = this.getCacheFolder(folder);
+            if (!Files.isDirectory(cachePath)) {
+                try {
+                    Files.createDirectory(cachePath);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
             Map<String, Path> cacheFilesMap = resolveCacheFiles(cachePath);
             regionDetectionList.forEach(regionDetection -> {
                 File cacheFile = getCacheFile(regionDetection, cacheFilesMap, cachePath, true);

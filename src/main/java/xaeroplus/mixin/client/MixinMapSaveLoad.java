@@ -113,6 +113,16 @@ public abstract class MixinMapSaveLoad {
         });
     }
 
+    /**
+     * @author
+     */
+    @Overwrite
+    public void updateCacheFolderList(Path subFolder) {
+        // kek
+        // overwriting this doesn't actually disable caching
+        // resolves massive hangs due to terrible original code in this method
+    }
+
     // mfw finding cache files is slower than just reading the region
     // only really a problem when cache is VERY populated. Mine has 6k entries
     // this is still very IO intensive

@@ -123,6 +123,18 @@ public abstract class MixinMapSaveLoad {
         // resolves massive hangs due to terrible original code in this method
     }
 
+    /**
+     * @author
+     */
+    @Overwrite
+    public Path getOldFolder(String oldUnfixedMainId, String dim) {
+        if (oldUnfixedMainId == null) {
+            return null;
+        }
+        String dimIdFixed = dim.equals("null") ? "0" : dim;
+        return WorldMap.saveFolder.toPath().resolve(oldUnfixedMainId + "_" + dimIdFixed);
+    }
+
     // mfw finding cache files is slower than just reading the region
     // only really a problem when cache is VERY populated. Mine has 6k entries
     // this is still very IO intensive

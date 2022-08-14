@@ -27,3 +27,5 @@ Using any version other than these two may cause crashes.
 
 * Improve WorldMap performance with very small zooms
   * With the unlocked zoom, loading many regions in view is very time (and VRAM) intensive. 
+* Display distance to waypoints on Waypoints GUI (like JourneyMap)
+* Option to show waypoints nether/overworld for both on Waypoints GUI with correct distance labels (8x or /8)

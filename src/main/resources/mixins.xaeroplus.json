@@ -8,6 +8,7 @@
     "MixinMapProcessor",
     "MixinWaypointsManager",
     "MixinMapSaveLoad",
-    "MixinMinimapModSettings"
+    "MixinMinimapModSettings",
+    "MixinLeveledRegion"
   ]
 }

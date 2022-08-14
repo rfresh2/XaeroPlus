@@ -19,10 +19,12 @@ public class MixinWaypointsManager {
     @Inject(method = "getMainContainer", at = @At("HEAD"), cancellable = true)
     private void getMainContainer(CallbackInfoReturnable<String> cir) {
         if (nonNull(mc.getCurrentServerData())) {
-            // use common directories based on server list name instead of IP
-            // good for proxies
-            cir.setReturnValue("Multiplayer_" + mc.getCurrentServerData().serverName);
-            cir.cancel();
+            if (nonNull(mc.getCurrentServerData().serverName) & mc.getCurrentServerData().serverName.length() > 0) {
+                // use common directories based on server list name instead of IP
+                // good for proxies
+                cir.setReturnValue("Multiplayer_" + mc.getCurrentServerData().serverName);
+                cir.cancel();
+            }
         }
     }
 }

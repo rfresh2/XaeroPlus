@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -32,8 +30,6 @@ import java.util.stream.Collectors;
 @Mixin(value = MapSaveLoad.class, remap = false)
 public abstract class MixinMapSaveLoad {
     private Instant start = Instant.now();
-
-    private ExecutorService regionDetectionExecutor = Executors.newSingleThreadExecutor();
 
     @Shadow
     private MapProcessor mapProcessor;
@@ -44,7 +40,6 @@ public abstract class MixinMapSaveLoad {
     @Inject(method = "detectRegions", at = @At("HEAD"))
     public void detectRegionsHead(CallbackInfo ci) {
         start = Instant.now();
-
     }
 
     @Inject(method = "detectRegions", at = @At("TAIL"))
@@ -53,7 +48,8 @@ public abstract class MixinMapSaveLoad {
     }
 
     /**
-     * @author
+     * @author rfresh2
+     * @reason Increase region detection speed
      */
     @Overwrite
     public void detectRegionsFromFiles(MapDimension mapDimension,
@@ -72,6 +68,8 @@ public abstract class MixinMapSaveLoad {
         // this will reduce time for map to appear on screen
         // very noticeable impact when you have a large amount of regions to load
         // this does cause noticeably high IO impact
+        // todo: we don't have a good way to stop this when dimension changes
+        // most of the IO is frontloaded so its not the worst, but can be improved.
         final List<RegionDetection> regionDetectionList = new ArrayList<>(1000);
         Pattern p = Pattern.compile(regex);
         try (DirectoryStream<Path> pathStream = Files.newDirectoryStream(folder, (entry -> {
@@ -91,30 +89,27 @@ public abstract class MixinMapSaveLoad {
             e.printStackTrace();
         }
 
-        // todo: we don't have a good way to stop this when dimension changes
-        // most of the IO is frontloaded so its not the worst, but can be improved.
-        regionDetectionExecutor.submit(() -> {
-            final Instant before = Instant.now();
-            Path cachePath = this.getCacheFolder(folder);
-            if (!Files.isDirectory(cachePath)) {
-                try {
-                    Files.createDirectory(cachePath);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        final Instant before = Instant.now();
+        Path cachePath = this.getCacheFolder(folder);
+        if (!Files.isDirectory(cachePath)) {
+            try {
+                Files.createDirectory(cachePath);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            Map<String, Path> cacheFilesMap = resolveCacheFiles(cachePath);
-            regionDetectionList.forEach(regionDetection -> {
-                File cacheFile = getCacheFile(regionDetection, cacheFilesMap, cachePath, true);
-                regionDetection.setCacheFile(cacheFile);
-            });
-            final Instant after = Instant.now();
-            WorldMap.LOGGER.info("Cache files detected in " + (after.getEpochSecond() - before.getEpochSecond()) + " seconds");
+        }
+        Map<String, Path> cacheFilesMap = resolveCacheFiles(cachePath);
+        regionDetectionList.forEach(regionDetection -> {
+            File cacheFile = getCacheFile(regionDetection, cacheFilesMap, cachePath, true);
+            regionDetection.setCacheFile(cacheFile);
         });
+        final Instant after = Instant.now();
+        WorldMap.LOGGER.info("Cache files detected in " + (after.getEpochSecond() - before.getEpochSecond()) + " seconds");
     }
 
     /**
-     * @author
+     * @author rfresh2
+     * @reason Remove unnecessary IO operations, increasing region detection performance
      */
     @Overwrite
     public void updateCacheFolderList(Path subFolder) {
@@ -124,7 +119,8 @@ public abstract class MixinMapSaveLoad {
     }
 
     /**
-     * @author
+     * @author rfresh2
+     * @reason Use DIM0 as overworld dimension directory instead of "null"
      */
     @Overwrite
     public Path getOldFolder(String oldUnfixedMainId, String dim) {

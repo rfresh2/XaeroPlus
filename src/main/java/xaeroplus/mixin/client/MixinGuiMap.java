@@ -5,11 +5,13 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.util.text.TextComponentString;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.map.WorldMap;
+import xaero.map.animation.SlowingAnimation;
 import xaero.map.gui.CursorBox;
 import xaero.map.gui.GuiMap;
 import xaero.map.gui.GuiTexturedButton;
@@ -23,6 +25,7 @@ import java.util.function.Consumer;
 @Mixin(value = GuiMap.class, remap = false)
 public abstract class MixinGuiMap extends ScreenBase implements IRightClickableElement {
 
+    // todo: make this gui a popout widget like waypoints
     GuiButton coordinateGotoButton;
     GuiTextField xTextEntryField;
     GuiTextField zTextEntryField;
@@ -33,20 +36,73 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Shadow
     private static double destScale;
+    @Shadow
+    public abstract void addGuiButton(GuiButton b);
+    @Shadow
+    private double cameraX;
+    @Shadow
+    private double cameraZ;
+    @Shadow
+    private int lastZoomMethod;
+    @Shadow
+    private SlowingAnimation cameraDestinationAnimX;
+    @Shadow
+    private SlowingAnimation cameraDestinationAnimZ;
+    @Shadow
+    public abstract void setFocused(GuiTextField field);
+    @Shadow
+    protected abstract void closeDropdowns();
 
-    @Shadow public abstract void addGuiButton(GuiButton b);
+    /**
+     * @author rfresh2
+     * @reason Unlock minimum zoom level on WorldMap GUI
+     */
+    @Overwrite
+    private void changeZoom(double factor, int zoomMethod) {
+        this.closeDropdowns();
+        this.lastZoomMethod = zoomMethod;
+        this.cameraDestinationAnimX = null;
+        this.cameraDestinationAnimZ = null;
+        if (GuiMap.isCtrlKeyDown()) {
+            double destScaleBefore = destScale;
+            if (destScale >= 1.0) {
+                if (factor > 0.0) {
+                    destScale = Math.ceil(destScale);
+                } else {
+                    destScale = Math.floor(destScale);
+                }
 
-    @Shadow private double cameraX;
+                if (destScaleBefore == destScale) {
+                    destScale += factor > 0.0 ? 1.0 : -1.0;
+                }
 
-    @Shadow private double cameraZ;
+                if (destScale == 0.0) {
+                    destScale = 0.5;
+                }
+            } else {
+                double reversedScale = 1.0 / destScale;
+                double log2 = Math.log(reversedScale) / Math.log(2.0);
+                if (factor > 0.0) {
+                    log2 = Math.floor(log2);
+                } else {
+                    log2 = Math.ceil(log2);
+                }
 
-    @Shadow public abstract void setFocused(GuiTextField field);
+                destScale = 1.0 / Math.pow(2.0, log2);
+                if (destScaleBefore == destScale) {
+                    destScale = 1.0 / Math.pow(2.0, log2 + (double)(factor > 0.0 ? -1 : 1));
+                }
+            }
+        } else {
+            destScale *= Math.pow(1.2, factor);
+        }
 
-    @Inject(method = "changeZoom", at = @At(value = "HEAD"), cancellable = true)
-    private void changeZoom(double factor, int zoomMethod, CallbackInfo ci) {
-        // todo: restore ctrl zoom
-        destScale *= Math.pow(1.2D, factor);
-        ci.cancel();
+        if (destScale < 0.0625) {
+            // remove min zoom
+//            destScale = 0.0625;
+        } else if (destScale > 50.0) {
+            destScale = 50.0;
+        }
     }
 
     @Inject(method = "initGui()V", at = @At(value = "TAIL"), remap = true)
@@ -65,7 +121,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "drawScreen(IIF)V", at = @At(value = "TAIL"), remap = true)
     public void customDrawScreen(int scaledMouseX, int scaledMouseY, float partialTicks, CallbackInfo ci) {
-
         if (mc.currentScreen != null && mc.currentScreen.getClass().equals(GuiMap.class)) {
             if (xTextEntryField.getText().isEmpty() && !this.xTextEntryField.isFocused()) {
                 Misc.setFieldText(xTextEntryField, "X:", -11184811);
@@ -101,7 +156,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     }
 
     public void onGotoCoordinatesButton(final GuiButton b) {
-        WorldMap.LOGGER.info("Go to coordinate button clicked!");
         try {
             int x = Integer.parseInt(xTextEntryField.getText());
             int z = Integer.parseInt(zTextEntryField.getText());

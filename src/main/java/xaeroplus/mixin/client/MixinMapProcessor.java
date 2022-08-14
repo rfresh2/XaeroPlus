@@ -17,7 +17,6 @@ import xaero.map.WorldMap;
 import xaero.map.cache.BlockStateColorTypeCache;
 import xaero.map.file.MapSaveLoad;
 import xaero.map.gui.GuiMap;
-import xaero.map.misc.Misc;
 import xaero.map.region.LeveledRegion;
 import xaero.map.world.MapWorld;
 
@@ -36,28 +35,13 @@ public abstract class MixinMapProcessor {
     public Object processorThreadPauseSync;
 
     @Shadow
-    public abstract boolean isProcessingPaused();
-
-    @Shadow
-    protected abstract void updateWorld();
-
-    @Shadow
     private WorldClient world;
-
-    @Shadow
-    public abstract void updateCaveStart(double playerX, double playerZ, World world);
     @Shadow
     public double mainPlayerX;
     @Shadow
-    public double mainPlayerY;
-    @Shadow
     public double mainPlayerZ;
-
-    @Shadow
-    public abstract void updateFootprints(World world, int step);
     @Shadow
     private boolean mapWorldUsable;
-
     @Shadow
     private MapLimiter mapLimiter;
     @Shadow
@@ -74,6 +58,14 @@ public abstract class MixinMapProcessor {
     protected abstract void releaseLocksIfNeeded();
     @Shadow
     protected abstract void forceClean();
+    @Shadow
+    public abstract void updateCaveStart(double playerX, double playerZ, World world);
+    @Shadow
+    public abstract void updateFootprints(World world, int step);
+    @Shadow
+    public abstract boolean isProcessingPaused();
+    @Shadow
+    protected abstract void updateWorld();
 
     @Inject(method = "getMainId", at = @At("HEAD"), cancellable = true)
     private void getMainId(boolean rootFolderFormat, CallbackInfoReturnable<String> cir) {
@@ -87,8 +79,8 @@ public abstract class MixinMapProcessor {
     }
 
     /**
-     * @author
-     * @reason
+     * @author rfresh2
+     * @reason Use DIM0 as overworld region directory name instead of "null"
      */
     @Overwrite
     public String getDimensionName(int id) {
@@ -96,8 +88,8 @@ public abstract class MixinMapProcessor {
     }
 
     /**
-     * @author
-     * @reason
+     * @author rfresh2
+     * @reason Reduce thread wait time to increase region load performance
      */
     @Overwrite
     public void run(MapRunner runner) {

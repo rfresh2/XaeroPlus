@@ -22,10 +22,10 @@ Using any version other than these two may cause crashes.
 * Increased region loading performance for large worlds. Fixes "hangs" on joining a server or switching dimensions.
   * Most noticeable when you have 50k+ regions per dimension.
 * GUI on WorldMap to pan the map to user entered coordinates.
+* Display distance to waypoints on Waypoints GUI (like JourneyMap)
 
 # Work In Progress
 
 * Improve WorldMap performance with very small zooms
-  * With the unlocked zoom, loading many regions in view is very time (and VRAM) intensive. 
-* Display distance to waypoints on Waypoints GUI (like JourneyMap)
-* Option to show waypoints nether/overworld for both on Waypoints GUI with correct distance labels (8x or /8)
+  * With the unlocked zoom, loading many regions in view is very time (and VRAM) intensive.
+

@@ -9,16 +9,28 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import xaero.map.MapLimiter;
-import xaero.map.MapProcessor;
-import xaero.map.MapRunner;
-import xaero.map.WorldMap;
+import xaero.deallocator.ByteBufferDeallocator;
+import xaero.map.*;
+import xaero.map.biome.BiomeColorCalculator;
+import xaero.map.biome.MapBiomes;
 import xaero.map.cache.BlockStateColorTypeCache;
+import xaero.map.cache.BlockStateShortShapeCache;
 import xaero.map.file.MapSaveLoad;
+import xaero.map.file.worldsave.WorldDataHandler;
+import xaero.map.graphics.TextureUploader;
 import xaero.map.gui.GuiMap;
+import xaero.map.gui.message.MessageBox;
+import xaero.map.gui.message.render.MessageBoxRenderer;
+import xaero.map.highlight.HighlighterRegistry;
+import xaero.map.highlight.MapRegionHighlightsPreparer;
+import xaero.map.pool.MapTilePool;
 import xaero.map.region.LeveledRegion;
+import xaero.map.region.OverlayManager;
+import xaero.map.region.texture.BranchTextureRenderer;
 import xaero.map.world.MapWorld;
+import xaeroplus.XaeroPlus;
 
 import java.util.ArrayList;
 
@@ -75,6 +87,15 @@ public abstract class MixinMapProcessor {
             // good for proxies
             cir.setReturnValue("Multiplayer_" + mc.getCurrentServerData().serverName);
             cir.cancel();
+        }
+    }
+
+    @Inject(method = "<init>", at = @At(value = "TAIL"))
+    public void init(MapSaveLoad mapSaveLoad, MapWriter mapWriter, MapLimiter mapLimiter, ByteBufferDeallocator bufferDeallocator, MapTilePool tilePool, OverlayManager overlayManager, TextureUploader textureUploader, WorldDataHandler worldDataHandler, MapBiomes mapBiomes, BranchTextureRenderer branchTextureRenderer, BiomeColorCalculator biomeColorCalculator, BlockStateColorTypeCache blockStateColorTypeCache, BlockStateShortShapeCache blockStateShortShapeCache, HighlighterRegistry highlighterRegistry, MapRegionHighlightsPreparer mapRegionHighlightsPreparer, MessageBox messageBox, MessageBoxRenderer messageBoxRenderer, CallbackInfo ci) throws NoSuchFieldException {
+        // Use variable to select cache level instead of hardcoded value
+        toProcessLevels = new ArrayList[XaeroPlus.MAX_LEVEL + 1];
+        for (int i = 0; i < this.toProcessLevels.length; ++i) {
+            this.toProcessLevels[i] = new ArrayList();
         }
     }
 

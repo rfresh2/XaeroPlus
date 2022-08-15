@@ -43,6 +43,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static xaeroplus.XaeroPlus.MAX_LEVEL;
+
 @Mixin(value = GuiMap.class, remap = false)
 public abstract class MixinGuiMap extends ScreenBase implements IRightClickableElement {
 
@@ -414,7 +416,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     if (this.userScale < 1.0) {
                         double reversedScale = 1.0 / this.userScale;
                         double log2 = Math.floor(Math.log(reversedScale) / Math.log(2.0));
-                        textureLevel = Math.min((int)log2, 3);
+                        /** Use max cache level variable instead of hardcoded value **/
+                        textureLevel = Math.min((int)log2, MAX_LEVEL);
                     }
                     this.mapProcessor.getMapSaveLoad().mainTextureLevel = textureLevel;
                     int leveledRegionShift = 9 + textureLevel;

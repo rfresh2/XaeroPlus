@@ -10,6 +10,10 @@ public class XaeroPlus {
     public static final String MODID = "xaeroplus";
     public static final String NAME = "XaeroPlus";
     public static final String VERSION = "1.12.2";
+    // keeping this at current 3 levels for now.
+    // needs testing around different levels
+    // cache sizes get increasingly large and time intensive to generate as levels increase
+    public static final int MAX_LEVEL = 3; // 5;
 
     @Mod.Instance
     public static XaeroPlus INSTANCE;

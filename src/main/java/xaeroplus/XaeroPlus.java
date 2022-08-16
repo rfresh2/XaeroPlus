@@ -13,7 +13,7 @@ public class XaeroPlus {
     // keeping this at current 3 levels for now.
     // needs testing around different levels
     // cache sizes get increasingly large and time intensive to generate as levels increase
-    public static final int MAX_LEVEL = 4;
+    public static final int MAX_LEVEL = 3;
 
     @Mod.Instance
     public static XaeroPlus INSTANCE;

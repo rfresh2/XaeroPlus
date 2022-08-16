@@ -4,38 +4,26 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMap;
 import xaero.map.cache.BlockStateColorTypeCache;
 import xaero.map.cache.BlockStateShortShapeCache;
-import xaero.map.file.MapRegionInfo;
 import xaero.map.file.MapSaveLoad;
 import xaero.map.file.RegionDetection;
 import xaero.map.file.worldsave.WorldDataHandler;
 import xaero.map.region.*;
-import xaero.map.world.MapDimension;
 
 import java.io.*;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.zip.ZipInputStream;
 
 import static xaeroplus.XaeroPlus.MAX_LEVEL;
 
 @Mixin(value = MapSaveLoad.class, remap = false)
 public abstract class MixinMapSaveLoad {
+    @Shadow
+    private MapProcessor mapProcessor;
     @Shadow
     public abstract File getFile(MapRegion region);
 
@@ -68,15 +56,16 @@ public abstract class MixinMapSaveLoad {
     @Overwrite
     public boolean loadRegion(World world, MapRegion region, BlockStateColorTypeCache colourTypeCache, int extraAttempts) {
         boolean multiplayer = region.isMultiplayer();
-        File file = this.getFile(region);
-        if (region.hasHadTerrain() && file != null && file.exists()) {
-            int saveVersion = -1;
-            boolean versionReached = false;
-            int[] biomeBuffer = new int[3];
+        int emptySize = multiplayer ? 0 : 8192;
+        int saveVersion = -1;
+        boolean versionReached = false;
+        int[] biomeBuffer = new int[3];
 
-            try {
-                synchronized(region) {
-                    region.setLoadState((byte)1);
+        try {
+            File file = this.getFile(region);
+            if (region.hasHadTerrain() && file != null && file.exists() && Files.size(file.toPath()) > (long) emptySize) {
+                synchronized (region) {
+                    region.setLoadState((byte) 1);
                 }
 
                 region.setSaveExists(true);
@@ -97,28 +86,28 @@ public abstract class MixinMapSaveLoad {
                                 in.close();
                                 WorldMap.LOGGER.info("Trying to load a newer region " + region + " save using an older version of Xaero's World Map!");
                                 this.backupFile(file, saveVersion);
-                                region.setSaveExists((Boolean)null);
-                                boolean var51 = false;
-                                return var51;
+                                region.setSaveExists(null);
+                                return false;
                             }
 
                             firstByte = -1;
                         }
+
                         versionReached = true;
-                        LeveledRegion leveledRegion = region.getLevel() == MAX_LEVEL ? region : region.getParent();
-                        synchronized (leveledRegion) {
-                            MapRegion mapRegion2 = region;
-                            synchronized (mapRegion2) {
+                        synchronized (region.getLevel() == MAX_LEVEL ? region : region.getParent()) { // replace hardcoded max level
+                            synchronized (region) {
                                 for (int o = 0; o < 8; ++o) {
                                     for (int p = 0; p < 8; ++p) {
-                                        MapTileChunk chunk2 = region.getChunk(o, p);
-                                        if (chunk2 == null) continue;
-                                        chunk2.setLoadState((byte)1);
+                                        MapTileChunk chunk = region.getChunk(o, p);
+                                        if (chunk != null) {
+                                            chunk.setLoadState((byte) 1);
+                                        }
                                     }
                                 }
                             }
                         }
-                        while(true) {
+
+                        while (true) {
                             int chunkCoords = firstByte == -1 ? in.read() : firstByte;
                             if (chunkCoords == -1) {
                                 zipIn.closeEntry();
@@ -131,7 +120,7 @@ public abstract class MixinMapSaveLoad {
                             MapTileChunk chunk = region.getChunk(o, p);
                             if (chunk == null) {
                                 region.setChunk(o, p, chunk = new MapTileChunk(region, region.getRegionX() * 8 + o, region.getRegionZ() * 8 + p));
-                                synchronized(region) {
+                                synchronized (region) {
                                     region.setAllCachePrepared(false);
                                 }
                             }
@@ -142,16 +131,18 @@ public abstract class MixinMapSaveLoad {
 
                             chunk.resetHeights();
 
-                            for(int i = 0; i < 4; ++i) {
-                                for(int j = 0; j < 4; ++j) {
+                            for (int i = 0; i < 4; ++i) {
+                                for (int j = 0; j < 4; ++j) {
                                     Integer nextTile = in.readInt();
                                     if (nextTile != -1) {
-                                        MapTile tile = this.mapProcessor.getTilePool().get(this.mapProcessor.getCurrentDimension(), chunk.getX() * 4 + i, chunk.getZ() * 4 + j);
+                                        MapTile tile = this.mapProcessor
+                                                .getTilePool()
+                                                .get(this.mapProcessor.getCurrentDimension(), chunk.getX() * 4 + i, chunk.getZ() * 4 + j);
 
-                                        for(int x = 0; x < 16; ++x) {
+                                        for (int x = 0; x < 16; ++x) {
                                             MapBlock[] c = tile.getBlockColumn(x);
 
-                                            for(int z = 0; z < 16; ++z) {
+                                            for (int z = 0; z < 16; ++z) {
                                                 if (c[z] == null) {
                                                     c[z] = new MapBlock();
                                                 } else {
@@ -175,15 +166,15 @@ public abstract class MixinMapSaveLoad {
 
                             if (!chunk.includeInSave()) {
                                 if (!chunk.hasHighlightsIfUndiscovered()) {
-                                    region.setChunk(o, p, (MapTileChunk)null);
+                                    region.setChunk(o, p, null);
                                     chunk.getLeafTexture().deleteTexturesAndBuffers();
-                                    chunk = null;
+                                    MapTileChunk var56 = null;
                                 }
                             } else {
                                 region.pushWriterPause();
                                 ++totalChunks;
                                 chunk.setToUpdateBuffers(true);
-                                chunk.setLoadState((byte)2);
+                                chunk.setLoadState((byte) 2);
                                 region.popWriterPause();
                             }
                         }
@@ -196,15 +187,28 @@ public abstract class MixinMapSaveLoad {
 
                     if (totalChunks > 0) {
                         if (WorldMap.settings.debug) {
-                            WorldMap.LOGGER.info("Region loaded: " + region + " " + region.getWorldId() + " " + region.getDimId() + " " + region.getMwId() + ", " + saveVersion);
+                            WorldMap.LOGGER
+                                    .info("Region loaded: " + region + " " + region.getWorldId() + " " + region.getDimId() + " " + region.getMwId() + ", " + saveVersion);
                         }
 
                         return true;
                     } else {
-                        region.setSaveExists((Boolean)null);
+                        region.setSaveExists(null);
                         this.safeDelete(file.toPath(), ".zip");
                         if (WorldMap.settings.debug) {
-                            WorldMap.LOGGER.info("Cancelled loading an empty region: " + region + " " + region.getWorldId() + " " + region.getDimId() + " " + region.getMwId() + ", " + saveVersion);
+                            WorldMap.LOGGER
+                                    .info(
+                                            "Cancelled loading an empty region: "
+                                                    + region
+                                                    + " "
+                                                    + region.getWorldId()
+                                                    + " "
+                                                    + region.getDimId()
+                                                    + " "
+                                                    + region.getMwId()
+                                                    + ", "
+                                                    + saveVersion
+                                    );
                         }
 
                         return false;
@@ -214,72 +218,94 @@ public abstract class MixinMapSaveLoad {
                     WorldDataHandler.Result buildResult = this.mapProcessor.getWorldDataHandler().buildRegion(region, world, true, chunkCount);
                     if (buildResult == WorldDataHandler.Result.CANCEL) {
                         if (region.hasHadTerrain()) {
-                            RegionDetection restoredDetection = new RegionDetection(region.getWorldId(), region.getDimId(), region.getMwId(), region.getRegionX(), region.getRegionZ(), region.getRegionFile(), this.mapProcessor.getGlobalVersion(), true);
+                            RegionDetection restoredDetection = new RegionDetection(
+                                    region.getWorldId(),
+                                    region.getDimId(),
+                                    region.getMwId(),
+                                    region.getRegionX(),
+                                    region.getRegionZ(),
+                                    region.getRegionFile(),
+                                    this.mapProcessor.getGlobalVersion(),
+                                    true
+                            );
                             restoredDetection.transferInfoFrom(region);
                             this.mapProcessor.addRegionDetection(region.getDim(), restoredDetection);
                         }
 
                         this.mapProcessor.removeMapRegion(region);
-                        WorldMap.LOGGER.info("Region cancelled from world save: " + region + " " + region.getWorldId() + " " + region.getDimId() + " " + region.getMwId());
+                        WorldMap.LOGGER
+                                .info("Region cancelled from world save: " + region + " " + region.getWorldId() + " " + region.getDimId() + " " + region.getMwId());
                         return false;
                     } else {
                         region.setRegionFile(file);
                         boolean result = buildResult == WorldDataHandler.Result.SUCCESS && chunkCount[0] > 0;
                         if (!result) {
-                            region.setSaveExists((Boolean)null);
+                            region.setSaveExists(null);
                             if (WorldMap.settings.debug) {
-                                WorldMap.LOGGER.info("Region failed to load from world save: " + region + " " + region.getWorldId() + " " + region.getDimId() + " " + region.getMwId());
+                                WorldMap.LOGGER
+                                        .info(
+                                                "Region failed to load from world save: "
+                                                        + region
+                                                        + " "
+                                                        + region.getWorldId()
+                                                        + " "
+                                                        + region.getDimId()
+                                                        + " "
+                                                        + region.getMwId()
+                                        );
                             }
                         } else if (WorldMap.settings.debug) {
-                            WorldMap.LOGGER.info("Region loaded from world save: " + region + " " + region.getWorldId() + " " + region.getDimId() + " " + region.getMwId());
+                            WorldMap.LOGGER
+                                    .info("Region loaded from world save: " + region + " " + region.getWorldId() + " " + region.getDimId() + " " + region.getMwId());
                         }
 
                         return result;
                     }
                 }
-            } catch (IOException var45) {
-                WorldMap.LOGGER.error("IO exception while trying to load " + region, var45);
-                if (extraAttempts > 0) {
-                    synchronized(region) {
-                        region.setLoadState((byte)4);
-                    }
-
-                    WorldMap.LOGGER.info("(World Map) Retrying...");
-
-                    try {
-                        Thread.sleep(20L);
-                    } catch (InterruptedException var37) {
-                    }
-
-                    return this.loadRegion(world, region, colourTypeCache, extraAttempts - 1);
-                } else {
-                    region.setSaveExists((Boolean)null);
-                    return false;
-                }
-            } catch (Throwable var46) {
-                region.setSaveExists((Boolean)null);
-                WorldMap.LOGGER.error("Region failed to load: " + region + (versionReached ? " " + saveVersion : ""), var46);
-                return false;
-            }
-        } else {
-            if (region.getLoadState() == 4) {
-                region.setSaveExists((Boolean)null);
-            }
-
-            if (region.hasHadTerrain()) {
-                return false;
             } else {
-                synchronized(region) {
-                    region.setLoadState((byte)1);
+                if (region.getLoadState() == 4) {
+                    region.setSaveExists(null);
                 }
 
-                region.restoreBufferUpdateObjects();
-                if (WorldMap.settings.debug) {
-                    WorldMap.LOGGER.info("Highlight region fake-loaded: " + region + " " + region.getWorldId() + " " + region.getDimId() + " " + region.getMwId());
-                }
+                if (region.hasHadTerrain()) {
+                    return false;
+                } else {
+                    synchronized (region) {
+                        region.setLoadState((byte) 1);
+                    }
 
-                return true;
+                    region.restoreBufferUpdateObjects();
+                    if (WorldMap.settings.debug) {
+                        WorldMap.LOGGER
+                                .info("Highlight region fake-loaded: " + region + " " + region.getWorldId() + " " + region.getDimId() + " " + region.getMwId());
+                    }
+
+                    return true;
+                }
             }
+        } catch (IOException var46) {
+            WorldMap.LOGGER.error("IO exception while trying to load " + region, var46);
+            if (extraAttempts > 0) {
+                synchronized (region) {
+                    region.setLoadState((byte) 4);
+                }
+
+                WorldMap.LOGGER.info("(World Map) Retrying...");
+
+                try {
+                    Thread.sleep(20L);
+                } catch (InterruptedException var38) {
+                }
+
+                return this.loadRegion(world, region, colourTypeCache, extraAttempts - 1);
+            } else {
+                region.setSaveExists(null);
+                return false;
+            }
+        } catch (Throwable var47) {
+            region.setSaveExists(null);
+            WorldMap.LOGGER.error("Region failed to load: " + region + (versionReached ? " " + saveVersion : ""), var47);
+            return false;
         }
     }
 }

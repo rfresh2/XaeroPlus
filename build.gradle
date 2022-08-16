@@ -11,7 +11,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:3.+'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:4.+'
         classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
     }
 }
@@ -105,7 +105,7 @@ dependencies {
     // Real examples
     // compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
     // compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
-    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.14.0'
+    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.14.0'
 
     jarLibs('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
         exclude module: 'commons-io'

@@ -115,8 +115,8 @@ dependencies {
         exclude module: 'log4j-core' // we want to exclude this as well because 0.7.11 includes it too new for MC
     }
 
-    implementation(fg.deobf("curse.maven:xaeros-world-map-317780:3935423"))
-    implementation(fg.deobf("curse.maven:xaeros-minimap-263420:3935437"))
+    implementation(fg.deobf("curse.maven:xaeros-world-map-317780:3937642"))
+    implementation(fg.deobf("curse.maven:xaeros-minimap-263420:3937622"))
 
     // Hacky way to get mixin work
     annotationProcessor('org.spongepowered:mixin:0.8.2:processor') {

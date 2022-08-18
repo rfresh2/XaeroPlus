@@ -9,7 +9,7 @@
     "MixinWaypointsManager",
     "MixinMapSaveLoad",
     "MixinMinimapModSettings",
-    "MixinGuiWaypoints",
+    "MixinGuiWaypointsList",
     "MixinLeveledRegionManager"
   ]
 }

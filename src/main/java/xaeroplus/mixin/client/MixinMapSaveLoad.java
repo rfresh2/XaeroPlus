@@ -16,6 +16,7 @@ import xaero.map.region.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.zip.ZipInputStream;
 
 import static xaeroplus.XaeroPlus.MAX_LEVEL;
@@ -45,7 +46,7 @@ public abstract class MixinMapSaveLoad {
         if (oldUnfixedMainId == null) {
             return null;
         }
-        String dimIdFixed = dim.equals("null") ? "0" : dim;
+        String dimIdFixed = Objects.equals(dim, "null") ? "0" : dim;
         return WorldMap.saveFolder.toPath().resolve(oldUnfixedMainId + "_" + dimIdFixed);
     }
 

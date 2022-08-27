@@ -8,7 +8,7 @@ Download the latest build in the Github actions here: [https://github.com/rfresh
 
 # Xaero Versions
 
-Xaero WorldMap version: [1.26.5](https://www.curseforge.com/minecraft/mc-mods/xaeros-world-map/files/3937642)
+Xaero WorldMap version: [1.26.6](https://www.curseforge.com/minecraft/mc-mods/xaeros-world-map/files/3948192)
 
 Xaero Minimap version: [22.13.2](https://www.curseforge.com/minecraft/mc-mods/xaeros-minimap/files/3937622)
 
@@ -34,4 +34,7 @@ Using any version other than these two may cause crashes.
 
 * Improve WorldMap performance with very small zooms
   * With the unlocked zoom, loading many regions in view is very time (and VRAM) intensive.
+* WorldMap Follow mode where it follows current player position
+  * And gui button to toggle
+* Render waypoint in nether when you're in overworld and vice versa
 

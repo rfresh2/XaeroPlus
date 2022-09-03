@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static java.util.Objects.isNull;
 import static xaero.map.gui.GuiMap.*;
 import static xaeroplus.XaeroPlus.MAX_LEVEL;
 
@@ -52,6 +53,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     GuiButton coordinateGotoButton;
     GuiTextField xTextEntryField;
     GuiTextField zTextEntryField;
+    GuiButton followButton;
+    // todo: autotoggle this off when there is some manual action taken to pan the map or go to waypoint
+    private boolean follow = true;
 
     protected MixinGuiMap(GuiScreen parent, GuiScreen escape) {
         super(parent, escape);
@@ -264,6 +268,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         addGuiButton(coordinateGotoButton);
         zTextEntryField = new GuiTextField(1, mc.fontRenderer, 2, h + 20, 50, 20);
         xTextEntryField = new GuiTextField(2, mc.fontRenderer, 2, h, 50, 20);
+        followButton = new GuiTexturedButton(0, h + 60 , 20, 20, this.follow ? 133 : 149, 16, 16, 16, WorldMap.guiTextures, new Consumer<GuiButton>() {
+            @Override
+            public void accept(GuiButton guiButton) {
+                onFollowButton(guiButton);
+            }
+        }, new CursorBox(new TextComponentString("Toggle Follow mode (" + (this.follow ? "On" : "Off") + ")")));
+        addGuiButton(followButton);
     }
 
     @Inject(method = "drawScreen(IIF)V", at = @At(value = "TAIL"), remap = true, cancellable = true)
@@ -297,6 +308,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         }
 
         this.lastStartTime = startTime;
+
+        if (this.follow && isNull(this.cameraDestinationAnimX) && isNull(this.cameraDestinationAnimZ)) {
+            this.cameraDestination = new int[]{(int) player.posX, (int) player.posZ};
+        }
         if (this.cameraDestination != null) {
             this.cameraDestinationAnimX = new SlowingAnimation(this.cameraX, (double)this.cameraDestination[0], 0.9, 0.01);
             this.cameraDestinationAnimZ = new SlowingAnimation(this.cameraZ, (double)this.cameraDestination[1], 0.9, 0.01);
@@ -1425,5 +1440,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             // todo: do some default action if we detect placeholder text like go to 0,0?
             WorldMap.LOGGER.warn("Go to coordinates failed" , e);
         }
+    }
+
+    public void onFollowButton(final GuiButton b) {
+        this.follow = !this.follow;
+        this.setWorldAndResolution(this.mc, width, height);
     }
 }

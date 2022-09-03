@@ -29,12 +29,12 @@ Using any version other than these two may cause crashes.
   * Now included in XaeroWorldMap 1.26.4
 * GUI on WorldMap to pan the map to user entered coordinates.
 * Display distance to waypoints on Waypoints GUI (like JourneyMap)
+* Always sort enabled waypoints before disabled waypoints
+* Worldmap Follow mode and GUI button
 
 # Work In Progress
 
 * Improve WorldMap performance with very small zooms
   * With the unlocked zoom, loading many regions in view is very time (and VRAM) intensive.
-* WorldMap Follow mode where it follows current player position
-  * And gui button to toggle
 * Render waypoint in nether when you're in overworld and vice versa
 

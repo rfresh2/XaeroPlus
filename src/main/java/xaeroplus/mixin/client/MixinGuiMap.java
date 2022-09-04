@@ -1436,6 +1436,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             int z = Integer.parseInt(zTextEntryField.getText());
             cameraX = x;
             cameraZ = z;
+            this.follow = false;
+            this.setWorldAndResolution(this.mc, width, height);
         } catch (final NumberFormatException e) {
             // todo: do some default action if we detect placeholder text like go to 0,0?
             WorldMap.LOGGER.warn("Go to coordinates failed" , e);

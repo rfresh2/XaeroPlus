@@ -55,7 +55,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     GuiTextField zTextEntryField;
     GuiButton followButton;
     // todo: autotoggle this off when there is some manual action taken to pan the map or go to waypoint
-    private boolean follow = true;
+    private boolean follow = false;
 
     protected MixinGuiMap(GuiScreen parent, GuiScreen escape) {
         super(parent, escape);

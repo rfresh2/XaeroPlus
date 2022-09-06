@@ -8,9 +8,9 @@ Download the latest build in the Github actions here: [https://github.com/rfresh
 
 # Xaero Versions
 
-Xaero WorldMap version: [1.26.6](https://www.curseforge.com/minecraft/mc-mods/xaeros-world-map/files/3948192)
+Xaero WorldMap version: [1.27.0](https://www.curseforge.com/minecraft/mc-mods/xaeros-world-map/files/3967757)
 
-Xaero Minimap version: [22.13.2](https://www.curseforge.com/minecraft/mc-mods/xaeros-minimap/files/3937622)
+Xaero Minimap version: [22.13.2](https://www.curseforge.com/minecraft/mc-mods/xaeros-minimap/files/3967730)
 
 Both mods must be downloaded and included by you in your Forge mods folder. 
 

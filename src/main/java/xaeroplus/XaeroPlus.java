@@ -14,6 +14,8 @@ public class XaeroPlus {
     // needs testing around different levels
     // cache sizes get increasingly large and time intensive to generate as levels increase
     public static final int MAX_LEVEL = 3;
+    // Map gui follow mode
+    public static boolean FOLLOW = false;
 
     @Mod.Instance
     public static XaeroPlus INSTANCE;

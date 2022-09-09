@@ -44,6 +44,7 @@ import java.util.function.Consumer;
 
 import static java.util.Objects.isNull;
 import static xaero.map.gui.GuiMap.*;
+import static xaeroplus.XaeroPlus.FOLLOW;
 import static xaeroplus.XaeroPlus.MAX_LEVEL;
 
 @Mixin(value = GuiMap.class, remap = false)
@@ -54,8 +55,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     GuiTextField xTextEntryField;
     GuiTextField zTextEntryField;
     GuiButton followButton;
-    // todo: autotoggle this off when there is some manual action taken to pan the map or go to waypoint
-    private boolean follow = false;
 
     protected MixinGuiMap(GuiScreen parent, GuiScreen escape) {
         super(parent, escape);
@@ -268,12 +267,12 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         addGuiButton(coordinateGotoButton);
         zTextEntryField = new GuiTextField(1, mc.fontRenderer, 2, h + 20, 50, 20);
         xTextEntryField = new GuiTextField(2, mc.fontRenderer, 2, h, 50, 20);
-        followButton = new GuiTexturedButton(0, h + 60 , 20, 20, this.follow ? 133 : 149, 16, 16, 16, WorldMap.guiTextures, new Consumer<GuiButton>() {
+        followButton = new GuiTexturedButton(0, h + 60 , 20, 20, FOLLOW ? 133 : 149, 16, 16, 16, WorldMap.guiTextures, new Consumer<GuiButton>() {
             @Override
             public void accept(GuiButton guiButton) {
                 onFollowButton(guiButton);
             }
-        }, new CursorBox(new TextComponentString("Toggle Follow mode (" + (this.follow ? "On" : "Off") + ")")));
+        }, new CursorBox(new TextComponentString("Toggle Follow mode (" + (FOLLOW ? "On" : "Off") + ")")));
         addGuiButton(followButton);
     }
 
@@ -309,7 +308,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
         this.lastStartTime = startTime;
 
-        if (this.follow && isNull(this.cameraDestinationAnimX) && isNull(this.cameraDestinationAnimZ)) {
+        if (FOLLOW && isNull(this.cameraDestinationAnimX) && isNull(this.cameraDestinationAnimZ)) {
             this.cameraDestination = new int[]{(int) player.posX, (int) player.posZ};
         }
         if (this.cameraDestination != null) {
@@ -1436,7 +1435,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             int z = Integer.parseInt(zTextEntryField.getText());
             cameraX = x;
             cameraZ = z;
-            this.follow = false;
+            FOLLOW = false;
             this.setWorldAndResolution(this.mc, width, height);
         } catch (final NumberFormatException e) {
             // todo: do some default action if we detect placeholder text like go to 0,0?
@@ -1445,7 +1444,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     }
 
     public void onFollowButton(final GuiButton b) {
-        this.follow = !this.follow;
+        FOLLOW = !FOLLOW;
         this.setWorldAndResolution(this.mc, width, height);
     }
 }

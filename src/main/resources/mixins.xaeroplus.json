@@ -11,6 +11,7 @@
     "MixinMinimapModSettings",
     "MixinGuiWaypointsList",
     "MixinGuiWaypoints",
-    "MixinLeveledRegionManager"
+    "MixinLeveledRegionManager",
+    "MixinMisc"
   ]
 }

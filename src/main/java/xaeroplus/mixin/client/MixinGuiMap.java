@@ -263,7 +263,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             public void accept(GuiButton guiButton) {
                 onGotoCoordinatesButton(guiButton);
             }
-        }, new CursorBox(new TextComponentString("Go to Coordinates")));
+        }, () -> new CursorBox(new TextComponentString("Go to Coordinates")));
         addGuiButton(coordinateGotoButton);
         zTextEntryField = new GuiTextField(1, mc.fontRenderer, 2, h + 20, 50, 20);
         xTextEntryField = new GuiTextField(2, mc.fontRenderer, 2, h, 50, 20);
@@ -272,7 +272,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             public void accept(GuiButton guiButton) {
                 onFollowButton(guiButton);
             }
-        }, new CursorBox(new TextComponentString("Toggle Follow mode (" + (FOLLOW ? "On" : "Off") + ")")));
+        }, () -> new CursorBox(new TextComponentString("Toggle Follow mode (" + (FOLLOW ? "On" : "Off") + ")")));
         addGuiButton(followButton);
     }
 

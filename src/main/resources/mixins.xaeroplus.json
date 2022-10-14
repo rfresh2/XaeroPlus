@@ -5,13 +5,14 @@
   "refmap": "mixins.xaeroplus.refmap.json",
   "client": [
     "MixinGuiMap",
+    "MixinGuiUpdateAll",
+    "MixinGuiWaypoints",
+    "MixinGuiWaypointsList",
+    "MixinLeveledRegionManager",
     "MixinMapProcessor",
-    "MixinWaypointsManager",
     "MixinMapSaveLoad",
     "MixinMinimapModSettings",
-    "MixinGuiWaypointsList",
-    "MixinGuiWaypoints",
-    "MixinLeveledRegionManager",
-    "MixinMisc"
+    "MixinMisc",
+    "MixinWaypointsManager"
   ]
 }

@@ -5,13 +5,13 @@ This is a Forge 1.12.2 mod that depends on and modifies Xaero's WorldMap and Min
 # Download
 
 Download the latest build from GitHub actions: [https://github.com/rfresh2/XaeroPlus/actions](https://github.com/rfresh2/XaeroPlus/actions) 
-Or without a GitHub account: [nightly.link](https://nightly.link/rfresh2/XaeroPlus/workflows/gradle/mainline/xaeroplus-27.zip)
+Or without a GitHub account: [nightly.link](https://nightly.link/rfresh2/XaeroPlus/workflows/gradle/mainline/xaeroplus-28.zip)
 
 # Xaero Versions
 
-Xaero WorldMap version: [1.28.0](https://www.curseforge.com/minecraft/mc-mods/xaeros-world-map/files/4010409)
+Xaero WorldMap version: [1.28.1](https://www.curseforge.com/minecraft/mc-mods/xaeros-world-map/files/4026495)
 
-Xaero Minimap version: [22.15.0](https://www.curseforge.com/minecraft/mc-mods/xaeros-minimap/files/4010396)
+Xaero Minimap version: [22.16.0](https://www.curseforge.com/minecraft/mc-mods/xaeros-minimap/files/4010396)
 
 Both mods must be downloaded and included by you in your Forge mods folder. 
 

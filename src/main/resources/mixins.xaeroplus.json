@@ -8,7 +8,6 @@
     "MixinGuiUpdateAll",
     "MixinGuiWaypoints",
     "MixinGuiWaypointsList",
-    "MixinLeveledRegionManager",
     "MixinMapProcessor",
     "MixinMapSaveLoad",
     "MixinMinimapModSettings",

@@ -6,7 +6,7 @@ This is a Forge 1.12.2 mod that depends on and modifies Xaero's WorldMap and Min
 
 Download the latest build from GitHub actions: [https://github.com/rfresh2/XaeroPlus/actions](https://github.com/rfresh2/XaeroPlus/actions) 
 
-Or without a GitHub account: [nightly.link](https://nightly.link/rfresh2/XaeroPlus/workflows/gradle/mainline/xaeroplus-29.zip)
+Or without a GitHub account: [nightly.link](https://nightly.link/rfresh2/XaeroPlus/workflows/gradle/mainline/xaeroplus-31.zip)
 
 # Xaero Versions
 
@@ -35,6 +35,7 @@ Using any version other than these two may cause crashes.
 * Always sort enabled waypoints before disabled waypoints
 * GUI button to enable/disable all waypoints
 * Minecraft world always renders in background while in a Xaero GUI (for client travel mods compatibility)
+* Faster map tile zip reads/writes
 
 # Work In Progress
 

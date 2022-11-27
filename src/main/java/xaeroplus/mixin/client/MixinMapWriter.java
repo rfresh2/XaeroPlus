@@ -1,9 +1,6 @@
 package xaeroplus.mixin.client;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockAir;
-import net.minecraft.block.BlockGlass;
-import net.minecraft.block.BlockLiquid;
+import net.minecraft.block.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockRenderLayer;
@@ -72,7 +69,7 @@ public abstract class MixinMapWriter {
                 return false;
             } else {
                 int lightOpacity = state.getLightOpacity(this.mapProcessor.getWorld(), BlockPos.ORIGIN);
-                return lightOpacity != 255 && lightOpacity != 0;
+                return lightOpacity != 0;  // deleted argument to render water under obsidian roof regardless of light opacity
             }
         } else {
             return true;
@@ -94,13 +91,19 @@ public abstract class MixinMapWriter {
         this.mutableGlobalPos.setPos((bchunk.getPos().x << 4) + insideX, lowY - 1, (bchunk.getPos().z << 4) + insideZ);
         boolean shouldExtendTillTheBottom = false;
         int transparentSkipY = 0;
+        boolean columnRoofObsidian = false;
 
         int h;
         IBlockState state;
         for (h = highY; h >= lowY; h = shouldExtendTillTheBottom ? transparentSkipY : h - 1) {
             this.mutableLocalPos.setPos(insideX, h, insideZ);
             state = bchunk.getBlockState(this.mutableLocalPos);
-            shouldExtendTillTheBottom = !shouldExtendTillTheBottom && !this.overlayBuilder.isEmpty() && this.firstTransparentStateY - h >= 255;
+            Block b = state.getBlock();
+            boolean roofObsidian = (h > 253 && b == Blocks.OBSIDIAN);
+            if (roofObsidian & !columnRoofObsidian) {
+                columnRoofObsidian = true;
+            }
+            shouldExtendTillTheBottom = !shouldExtendTillTheBottom && !this.overlayBuilder.isEmpty() && this.firstTransparentStateY - h >= 5 && !columnRoofObsidian;
             if (shouldExtendTillTheBottom) {
                 for (transparentSkipY = h - 1; transparentSkipY >= lowY; --transparentSkipY) {
                     IBlockState traceState = bchunk.getBlockState(mutableBlockPos3.setPos(insideX, transparentSkipY, insideZ));
@@ -109,8 +112,6 @@ public abstract class MixinMapWriter {
                     }
                 }
             }
-            Block b = state.getBlock();
-            boolean roofObsidian = (h > 253 && b == Blocks.OBSIDIAN);
             if (b instanceof BlockAir) {
                 underair = true;
             } else if (underair) {
@@ -118,7 +119,7 @@ public abstract class MixinMapWriter {
                 this.mutableLocalPos.setY(Math.min(255, h + 1));
                 workingLight = (byte) bchunk.getLightFor(EnumSkyBlock.BLOCK, this.mutableLocalPos);
                 if (!this.isInvisible(world, state, b, flowers)) {
-                    if (this.shouldOverlayCached(state)  || roofObsidian) {
+                    if (this.shouldOverlayCached(state) || roofObsidian) {
                         if (h > this.topH) {
                             this.topH = h;
                         }
@@ -132,7 +133,7 @@ public abstract class MixinMapWriter {
                         } else {
                             this.writerBiomeInfoSupplier.set(currentPixel, canReuseBiomeColours);
                             int stateId = Block.getStateId(state);
-                            int opacity = roofObsidian ? 50 : b.getLightOpacity(state, world, this.mutableGlobalPos);
+                            int opacity = roofObsidian ? 10 : b.getLightOpacity(state, world, this.mutableGlobalPos);
                             this.overlayBuilder.build(stateId, this.biomeBuffer, opacity, workingLight, world, this.mapProcessor, this.mutableGlobalPos, this.overlayBuilder.getOverlayBiome(), this.colorTypeCache, this.writerBiomeInfoSupplier);
                         }
                     } else if (this.hasVanillaColor(state, world, this.mutableGlobalPos)) {

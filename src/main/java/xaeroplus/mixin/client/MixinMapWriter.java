@@ -108,9 +108,6 @@ public abstract class MixinMapWriter {
         for (h = highY; h >= lowY; h = shouldExtendTillTheBottom ? transparentSkipY : h - 1) {
             this.mutableLocalPos.setPos(insideX, h, insideZ);
             state = bchunk.getBlockState(this.mutableLocalPos);
-            if (state.getBlock() instanceof BlockObsidian) { // babbaj - skip obsidian uwu
-                continue;
-            }
             shouldExtendTillTheBottom = !shouldExtendTillTheBottom && !this.overlayBuilder.isEmpty() && this.firstTransparentStateY - h >= 5;
             if (shouldExtendTillTheBottom) {
                 for (transparentSkipY = h - 1; transparentSkipY >= lowY; --transparentSkipY) {
@@ -120,8 +117,10 @@ public abstract class MixinMapWriter {
                     }
                 }
             }
-
             Block b = state.getBlock();
+            if (h == 255 && b == Blocks.OBSIDIAN) {
+                continue;
+            }
             if (b instanceof BlockAir) {
                 underair = true;
             } else if (underair) {

@@ -20,8 +20,6 @@ import xaero.map.misc.Misc;
 import xaero.map.region.MapBlock;
 import xaero.map.region.OverlayBuilder;
 
-import java.util.ArrayList;
-
 @Mixin(value = MapWriter.class, remap = false)
 public abstract class MixinMapWriter {
     @Shadow

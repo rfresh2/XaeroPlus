@@ -13,6 +13,7 @@
     "MixinMapSaveLoad",
     "MixinMinimapModSettings",
     "MixinMisc",
-    "MixinWaypointsManager"
+    "MixinWaypointsManager",
+    "MixinMapWriter"
   ]
 }

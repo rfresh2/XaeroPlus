@@ -1,10 +1,6 @@
 package xaeroplus.mixin.client;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockAir;
-import net.minecraft.block.BlockDoublePlant;
-import net.minecraft.block.BlockFlower;
-import net.minecraft.block.material.MapColor;
+import net.minecraft.block.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumBlockRenderType;
@@ -18,12 +14,8 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import xaero.map.MapProcessor;
 import xaero.map.MapWriter;
-import xaero.map.WorldMap;
 import xaero.map.biome.WriterBiomeInfoSupplier;
 import xaero.map.cache.BlockStateColorTypeCache;
-import xaero.map.cache.BlockStateShortShapeCache;
-import xaero.map.file.MapSaveLoad;
-import xaero.map.misc.CachedFunction;
 import xaero.map.misc.Misc;
 import xaero.map.region.MapBlock;
 import xaero.map.region.OverlayBuilder;
@@ -82,6 +74,7 @@ public abstract class MixinMapWriter {
             } else if ((b instanceof BlockFlower || b instanceof BlockDoublePlant) && !flowers) {
                 return true;
             } else {
+                //noinspection all
                 synchronized (this.buggedStates) {
                     return this.buggedStates.contains(state);
                 }
@@ -102,7 +95,6 @@ public abstract class MixinMapWriter {
     public void loadPixel(World world, MapBlock pixel, MapBlock currentPixel, Chunk bchunk, int insideX, int insideZ, int highY, int lowY, boolean cave, boolean canReuseBiomeColours, boolean flowers, BlockPos.MutableBlockPos mutableBlockPos3) {
         pixel.prepareForWriting();
         this.overlayBuilder.startBuilding();
-        IBlockState prevOverlay = null;
         boolean underair = !cave;
         IBlockState opaqueState = null;
         byte workingLight = -1;
@@ -116,6 +108,9 @@ public abstract class MixinMapWriter {
         for (h = highY; h >= lowY; h = shouldExtendTillTheBottom ? transparentSkipY : h - 1) {
             this.mutableLocalPos.setPos(insideX, h, insideZ);
             state = bchunk.getBlockState(this.mutableLocalPos);
+            if (state.getBlock() instanceof BlockObsidian) { // babbaj - skip obsidian uwu
+                continue;
+            }
             shouldExtendTillTheBottom = !shouldExtendTillTheBottom && !this.overlayBuilder.isEmpty() && this.firstTransparentStateY - h >= 5;
             if (shouldExtendTillTheBottom) {
                 for (transparentSkipY = h - 1; transparentSkipY >= lowY; --transparentSkipY) {

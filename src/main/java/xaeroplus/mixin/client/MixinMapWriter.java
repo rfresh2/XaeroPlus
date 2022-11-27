@@ -1,9 +1,9 @@
 package xaeroplus.mixin.client;
 
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockAir;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
@@ -24,8 +24,6 @@ import java.util.ArrayList;
 
 @Mixin(value = MapWriter.class, remap = false)
 public abstract class MixinMapWriter {
-    @Shadow
-    private ArrayList<IBlockState> buggedStates;
     @Shadow
     private OverlayBuilder overlayBuilder;
     @Shadow
@@ -56,33 +54,8 @@ public abstract class MixinMapWriter {
     @Shadow
     public abstract boolean hasVanillaColor(IBlockState state, World world, BlockPos pos);
 
-    /**
-     * @author Entropy5
-     * @reason obsidian roof
-     */
-    @Overwrite
-    public boolean isInvisible(World world, IBlockState state, Block b, boolean flowers) {
-        if (state.getRenderType() == EnumBlockRenderType.INVISIBLE) {
-            return true;
-        } else if (b == Blocks.TORCH) {
-            return true;
-        } else if (b == Blocks.TALLGRASS) {
-            return true;
-        } else if (b != Blocks.GLASS && b != Blocks.GLASS_PANE) {
-            if (b == Blocks.DOUBLE_PLANT) {
-                return true;
-            } else if ((b instanceof BlockFlower || b instanceof BlockDoublePlant) && !flowers) {
-                return true;
-            } else {
-                //noinspection all
-                synchronized (this.buggedStates) {
-                    return this.buggedStates.contains(state);
-                }
-            }
-        } else {
-            return true;
-        }
-    }
+    @Shadow
+    public abstract boolean isInvisible(World world, IBlockState state, Block b, boolean flowers);
 
     @Shadow
     public abstract boolean isGlowing(IBlockState state);
@@ -118,9 +91,7 @@ public abstract class MixinMapWriter {
                 }
             }
             Block b = state.getBlock();
-            if (h == 255 && b == Blocks.OBSIDIAN) {
-                continue;
-            }
+            boolean roofObsidian = h == 255 && b == Blocks.OBSIDIAN;
             if (b instanceof BlockAir) {
                 underair = true;
             } else if (underair) {
@@ -128,7 +99,7 @@ public abstract class MixinMapWriter {
                 this.mutableLocalPos.setY(Math.min(255, h + 1));
                 workingLight = (byte) bchunk.getLightFor(EnumSkyBlock.BLOCK, this.mutableLocalPos);
                 if (!this.isInvisible(world, state, b, flowers)) {
-                    if (this.shouldOverlayCached(state)) {
+                    if (this.shouldOverlayCached(state)  || roofObsidian) {
                         if (h > this.topH) {
                             this.topH = h;
                         }
@@ -142,7 +113,8 @@ public abstract class MixinMapWriter {
                         } else {
                             this.writerBiomeInfoSupplier.set(currentPixel, canReuseBiomeColours);
                             int stateId = Block.getStateId(state);
-                            this.overlayBuilder.build(stateId, this.biomeBuffer, b.getLightOpacity(state, world, this.mutableGlobalPos), workingLight, world, this.mapProcessor, this.mutableGlobalPos, this.overlayBuilder.getOverlayBiome(), this.colorTypeCache, this.writerBiomeInfoSupplier);
+                            int opacity = roofObsidian ? 0 : b.getLightOpacity(state, world, this.mutableGlobalPos);
+                            this.overlayBuilder.build(stateId, this.biomeBuffer, opacity, workingLight, world, this.mapProcessor, this.mutableGlobalPos, this.overlayBuilder.getOverlayBiome(), this.colorTypeCache, this.writerBiomeInfoSupplier);
                         }
                     } else if (this.hasVanillaColor(state, world, this.mutableGlobalPos)) {
                         if (h > this.topH) {

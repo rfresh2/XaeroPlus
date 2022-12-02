@@ -5,6 +5,8 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
+import java.util.UUID;
+
 @Mod(modid = XaeroPlus.MODID, name = XaeroPlus.NAME, version = XaeroPlus.VERSION)
 public class XaeroPlus {
     public static final String MODID = "xaeroplus";
@@ -12,6 +14,7 @@ public class XaeroPlus {
     public static final String VERSION = "1.12.2";
     // Map gui follow mode
     public static boolean FOLLOW = false;
+    public static String LOCK_ID = UUID.randomUUID().toString();
 
     @Mod.Instance
     public static XaeroPlus INSTANCE;

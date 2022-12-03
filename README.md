@@ -6,13 +6,13 @@ This is a Forge 1.12.2 mod that depends on and modifies Xaero's WorldMap and Min
 
 Download the latest build from GitHub actions: [https://github.com/rfresh2/XaeroPlus/actions](https://github.com/rfresh2/XaeroPlus/actions) 
 
-Or without a GitHub account: [nightly.link](https://nightly.link/rfresh2/XaeroPlus/workflows/gradle/mainline/xaeroplus-31.zip)
+Or without a GitHub account: [nightly.link](https://nightly.link/rfresh2/XaeroPlus/workflows/gradle/mainline/xaeroplus-32.zip)
 
 # Xaero Versions
 
-Xaero WorldMap version: [1.28.3](https://www.curseforge.com/minecraft/mc-mods/xaeros-world-map/files/4075414)
+Xaero WorldMap version: [1.28.4](https://www.curseforge.com/minecraft/mc-mods/xaeros-world-map/files/4127330)
 
-Xaero Minimap version: [22.16.2](https://www.curseforge.com/minecraft/mc-mods/xaeros-minimap/files/4075386)
+Xaero Minimap version: [22.16.3](https://www.curseforge.com/minecraft/mc-mods/xaeros-minimap/files/4127312)
 
 Both mods must be downloaded and included by you in your Forge mods folder. 
 
@@ -36,6 +36,7 @@ Using any version other than these two may cause crashes.
 * GUI button to enable/disable all waypoints
 * Minecraft world always renders in background while in a Xaero GUI (for client travel mods compatibility)
 * Faster map tile zip reads/writes
+* Allow multiple MC instances to read/write to the same map concurrently
 
 # Work In Progress
 

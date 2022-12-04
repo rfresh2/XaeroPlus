@@ -26,6 +26,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 
@@ -335,7 +336,7 @@ public abstract class MixinMapProcessor {
                 if (this.mapWorldUsable) {
                     Files.createDirectories(mapPath);
                     /** allow us to have multiple clients open on the same map ;) **/
-                    Path mapLockPath = mapPath.resolve(LOCK_ID + ".lock");
+                    Path mapLockPath = Paths.get(System.getProperty("java.io.tmpdir")).resolve(LOCK_ID + ".lock");
                     int totalLockAttempts = 10;
                     int lockAttempts = 10;
 

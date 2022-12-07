@@ -1,6 +1,9 @@
 package xaeroplus.mixin.client;
 
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockAir;
+import net.minecraft.block.BlockGlass;
+import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockRenderLayer;
@@ -14,11 +17,16 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import xaero.map.MapProcessor;
 import xaero.map.MapWriter;
+import xaero.map.WorldMap;
+import xaero.map.biome.BiomeColorCalculator;
 import xaero.map.biome.WriterBiomeInfoSupplier;
 import xaero.map.cache.BlockStateColorTypeCache;
+import xaero.map.core.XaeroWorldMapCore;
 import xaero.map.misc.Misc;
 import xaero.map.region.MapBlock;
+import xaero.map.region.MapRegion;
 import xaero.map.region.OverlayBuilder;
+import xaero.map.region.OverlayManager;
 
 @Mixin(value = MapWriter.class, remap = false)
 public abstract class MixinMapWriter {
@@ -42,6 +50,46 @@ public abstract class MixinMapWriter {
     @Shadow
     @Final
     private BlockPos.MutableBlockPos mutableGlobalPos;
+    @Shadow
+    private int endTileChunkX;
+    @Shadow
+    private int endTileChunkZ;
+    @Shadow
+    private int startTileChunkX;
+    @Shadow
+    private int startTileChunkZ;
+    @Shadow
+    private long lastWriteTry;
+    @Shadow
+    private long lastWrite;
+    @Shadow
+    private int writeFreeSizeTiles;
+    @Shadow
+    private int writeFreeFullUpdateTargetTime;
+    @Shadow
+    private int workingFrameCount;
+    @Shadow
+    private long framesFreedTime = -1L;
+    @Shadow
+    public long writeFreeSinceLastWrite;
+    @Final
+    @Shadow
+    private BlockPos.MutableBlockPos mutableBlockPos3;
+    @Shadow
+    public abstract boolean writeMap(
+            World world,
+            double playerX,
+            double playerY,
+            double playerZ,
+            BiomeColorCalculator biomeColorCalculator,
+            OverlayManager overlayManager,
+            boolean loadChunks,
+            boolean updateChunks,
+            boolean ignoreHeightmaps,
+            boolean flowers,
+            boolean detailedDebug,
+            BlockPos.MutableBlockPos mutableBlockPos3
+    );
 
     protected MixinMapWriter() {
     }
@@ -172,5 +220,141 @@ public abstract class MixinMapWriter {
         pixel.write(stateId, h, this.topH, this.biomeBuffer, light, glowing, cave);
     }
 
+    /**
+     * @author rfresh2
+     * @reason remove limiters on map write frequency
+     */
+    @Overwrite
+    public void onRender(BiomeColorCalculator biomeColorCalculator, OverlayManager overlayManager) {
+        long before = System.nanoTime();
+
+        try {
+            if (WorldMap.crashHandler.getCrashedBy() == null) {
+                synchronized(this.mapProcessor.renderThreadPauseSync) {
+                    if (!this.mapProcessor.isWritingPaused()
+                            && !this.mapProcessor.isWaitingForWorldUpdate()
+                            && this.mapProcessor.getMapSaveLoad().isRegionDetectionComplete()
+                            && this.mapProcessor.isCurrentMultiworldWritable()) {
+                        if (this.mapProcessor.getWorld() == null || !this.mapProcessor.caveStartIsDetermined() || this.mapProcessor.isCurrentMapLocked()) {
+                            return;
+                        }
+
+                        if (this.mapProcessor.getCurrentWorldId() != null
+                                && !this.mapProcessor.ignoreWorld(this.mapProcessor.getWorld())
+                                && (WorldMap.settings.updateChunks || WorldMap.settings.loadChunks)) {
+                            double playerX;
+                            double playerY;
+                            double playerZ;
+                            synchronized(this.mapProcessor.mainStuffSync) {
+                                if (this.mapProcessor.mainWorld != this.mapProcessor.getWorld()) {
+                                    return;
+                                }
+
+                                playerX = this.mapProcessor.mainPlayerX;
+                                playerY = this.mapProcessor.mainPlayerY;
+                                playerZ = this.mapProcessor.mainPlayerZ;
+                            }
+
+                            XaeroWorldMapCore.ensureField();
+                            int lengthX = this.endTileChunkX - this.startTileChunkX + 1;
+                            int lengthZ = this.endTileChunkZ - this.startTileChunkZ + 1;
+                            if (this.lastWriteTry == -1L) {
+                                lengthX = 3;
+                                lengthZ = 3;
+                            }
+
+                            int sizeTileChunks = lengthX * lengthZ;
+                            int sizeTiles = sizeTileChunks * 4 * 4;
+                            int sizeBasedTargetTime = sizeTiles * 1000 / 1500;
+                            int fullUpdateTargetTime = Math.max(100, sizeBasedTargetTime);
+                            long time = System.currentTimeMillis();
+                            long passed = this.lastWrite == -1L ? 0L : time - this.lastWrite;
+                            if (this.lastWriteTry == -1L
+                                    || this.writeFreeSizeTiles != sizeTiles
+                                    || this.writeFreeFullUpdateTargetTime != fullUpdateTargetTime
+                                    || this.workingFrameCount > 30) {
+                                this.framesFreedTime = time;
+                                this.writeFreeSizeTiles = sizeTiles;
+                                this.writeFreeFullUpdateTargetTime = fullUpdateTargetTime;
+                                this.workingFrameCount = 0;
+                            }
+
+                            long sinceLastWrite = Math.min(passed, this.writeFreeSinceLastWrite);
+                            if (this.framesFreedTime != -1L) {
+                                sinceLastWrite = time - this.framesFreedTime;
+                            }
+
+                            long tilesToUpdate = sizeTiles; /** setting this to always write all tiles (?) **/
+                            if (this.lastWrite == -1L || tilesToUpdate != 0L) {
+                                this.lastWrite = time;
+                            }
+
+                            if (tilesToUpdate != 0L) {
+                                if (this.framesFreedTime != -1L) {
+                                    this.writeFreeSinceLastWrite = sinceLastWrite;
+                                    this.framesFreedTime = -1L;
+                                } else {
+                                    int timeLimit = (int)(Math.min(sinceLastWrite, 50L) * 86960L);
+                                    long writeStartNano = System.nanoTime();
+                                    boolean loadChunks = WorldMap.settings.loadChunks;
+                                    boolean updateChunks = WorldMap.settings.updateChunks;
+                                    boolean ignoreHeightmaps = this.mapProcessor.getMapWorld().isIgnoreHeightmaps();
+                                    boolean flowers = WorldMap.settings.flowers;
+                                    boolean detailedDebug = WorldMap.settings.detailed_debug;
+                                    BlockPos.MutableBlockPos mutableBlockPos3 = this.mutableBlockPos3;
+
+                                    for(int i = 0; (long)i < tilesToUpdate; ++i) {
+                                        if (this.writeMap(
+                                                this.mapProcessor.getWorld(),
+                                                playerX,
+                                                playerY,
+                                                playerZ,
+                                                biomeColorCalculator,
+                                                overlayManager,
+                                                loadChunks,
+                                                updateChunks,
+                                                ignoreHeightmaps,
+                                                flowers,
+                                                detailedDebug,
+                                                mutableBlockPos3
+                                        )) {
+                                            --i;
+                                        }
+
+                                        /** removing time limit **/
+//                                        if (System.nanoTime() - writeStartNano >= (long)timeLimit) {
+//                                            break;
+//                                        }
+                                    }
+
+                                    ++this.workingFrameCount;
+                                }
+                            }
+
+                            this.lastWriteTry = time;
+                            int startRegionX = this.startTileChunkX >> 3;
+                            int startRegionZ = this.startTileChunkZ >> 3;
+                            int endRegionX = this.endTileChunkX >> 3;
+                            int endRegionZ = this.endTileChunkZ >> 3;
+
+                            for(int visitRegionX = startRegionX; visitRegionX <= endRegionX; ++visitRegionX) {
+                                for(int visitRegionZ = startRegionZ; visitRegionZ <= endRegionZ; ++visitRegionZ) {
+                                    MapRegion visitRegion = this.mapProcessor.getMapRegion(visitRegionX, visitRegionZ, false);
+                                    if (visitRegion != null && visitRegion.getLoadState() == 2) {
+                                        visitRegion.registerVisit();
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    return;
+                }
+            }
+        } catch (Throwable var39) {
+            WorldMap.crashHandler.setCrashedBy(var39);
+        }
+
+    }
 
 }

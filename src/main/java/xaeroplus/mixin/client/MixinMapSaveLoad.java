@@ -58,7 +58,7 @@ public abstract class MixinMapSaveLoad {
 
     /**
      * @author rfresh2
-     * @reason Replace hardcoded cache level with variable
+     * @reason faster zip writes
      */
     @Overwrite
     public boolean loadRegion(World world, MapRegion region, BlockStateColorTypeCache colourTypeCache, int extraAttempts) {
@@ -82,6 +82,7 @@ public abstract class MixinMapSaveLoad {
                     DataInputStream in = null;
 
                     try {
+                        // fast zip
                         in = new DataInputStream(new ByteArrayInputStream(decompressZipToBytes(file.toPath())));
                         int firstByte = in.read();
                         if (firstByte == 255) {
@@ -98,7 +99,7 @@ public abstract class MixinMapSaveLoad {
                         }
 
                         versionReached = true;
-                        synchronized (region.getLevel() == 3 ? region : region.getParent()) { // replace hardcoded max level
+                        synchronized (region.getLevel() == 3 ? region : region.getParent()) {
                             synchronized (region) {
                                 for (int o = 0; o < 8; ++o) {
                                     for (int p = 0; p < 8; ++p) {
@@ -312,6 +313,11 @@ public abstract class MixinMapSaveLoad {
         }
     }
 
+    /**
+     * @author rfresh2
+     * @reason zip fast
+     */
+    @Overwrite
     public boolean saveRegion(MapRegion region, int extraAttempts) {
         try {
             if (!region.hasHadTerrain()) {
@@ -342,6 +348,7 @@ public abstract class MixinMapSaveLoad {
                     ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
 
                     try {
+                        //zip fast
                         zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
                         out = new DataOutputStream(byteOut);
                         ZipEntry e = new ZipEntry("region.xaero");

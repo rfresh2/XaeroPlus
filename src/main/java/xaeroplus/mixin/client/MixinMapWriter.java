@@ -284,7 +284,7 @@ public abstract class MixinMapWriter {
                                 sinceLastWrite = time - this.framesFreedTime;
                             }
 
-                            long tilesToUpdate = sizeTiles; /** setting this to always write all tiles (?) **/
+                            long tilesToUpdate = sizeTiles; /** setting this to always write all tiles **/
                             if (this.lastWrite == -1L || tilesToUpdate != 0L) {
                                 this.lastWrite = time;
                             }

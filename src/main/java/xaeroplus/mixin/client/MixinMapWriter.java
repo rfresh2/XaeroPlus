@@ -1,5 +1,7 @@
 package xaeroplus.mixin.client;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockGlass;
@@ -15,6 +17,9 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.map.MapProcessor;
 import xaero.map.MapWriter;
 import xaero.map.WorldMap;
@@ -27,6 +32,11 @@ import xaero.map.region.MapBlock;
 import xaero.map.region.MapRegion;
 import xaero.map.region.OverlayBuilder;
 import xaero.map.region.OverlayManager;
+
+import java.time.Instant;
+import java.util.concurrent.TimeUnit;
+
+import static java.util.Objects.nonNull;
 
 @Mixin(value = MapWriter.class, remap = false)
 public abstract class MixinMapWriter {
@@ -90,6 +100,20 @@ public abstract class MixinMapWriter {
             boolean detailedDebug,
             BlockPos.MutableBlockPos mutableBlockPos3
     );
+
+    // insert our own limiter on new tiles being written but this one's keyed on the actual chunk
+    // tile "writes" also include a lot of extra operations and lookups before any writing is actually done
+    // when we remove existing limiters those extra operations add up to a lot of unnecessary cpu time
+    private final Cache<String, Instant> tileUpdateCache = CacheBuilder.newBuilder()
+            // this delay seems to be fine enough even at high speeds, its equal to 1 tick in-game so still shouldn't miss any chunks
+            // I would usually expect even second long expiration here to be fine
+            // but there are some operations that make repeat invocations actually required
+            // perhaps another time ill rewrite those. Or make the cache lock more aware of when we don't have any new updates to write/load
+            // there's still alot of performance and efficiency on the table to regain
+            // but i think this is a good middle ground for now
+            // todo: add a config option for this delay?
+            .expireAfterWrite(50, TimeUnit.MILLISECONDS)
+            .build();
 
     protected MixinMapWriter() {
     }
@@ -354,7 +378,16 @@ public abstract class MixinMapWriter {
         } catch (Throwable var39) {
             WorldMap.crashHandler.setCrashedBy(var39);
         }
-
     }
 
+    @Inject(method = "writeChunk", at = @At(value = "HEAD"), cancellable = true)
+    public void writeChunk(World world, int distance, boolean onlyLoad, BiomeColorCalculator biomeColorCalculator, OverlayManager overlayManager, boolean loadChunks, boolean updateChunks, boolean ignoreHeightmaps, boolean flowers, boolean detailedDebug, BlockPos.MutableBlockPos mutableBlockPos3, int tileChunkX, int tileChunkZ, int tileChunkLocalX, int tileChunkLocalZ, int chunkX, int chunkZ, CallbackInfoReturnable<Boolean> cir) {
+        final String cacheable = chunkX + " " + chunkZ;
+        if (nonNull(tileUpdateCache.getIfPresent(cacheable))) {
+            cir.setReturnValue(false);
+            cir.cancel();
+        } else {
+            tileUpdateCache.put(cacheable, Instant.now());
+        }
+    }
 }

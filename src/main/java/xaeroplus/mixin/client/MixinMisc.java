@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import xaero.map.misc.Misc;
 import xaeroplus.XaeroPlusSettingRegistry;
 
-@Mixin(value = Misc.class)
+@Mixin(value = Misc.class, remap = false)
 public class MixinMisc {
 
     /**

@@ -8,12 +8,14 @@
     "MixinGuiUpdateAll",
     "MixinGuiWaypoints",
     "MixinGuiWaypointsList",
+    "MixinGuiWorldMapSettings",
     "MixinLeveledRegion",
     "MixinMapProcessor",
     "MixinMapSaveLoad",
+    "MixinMapWriter",
     "MixinMinimapModSettings",
     "MixinMisc",
-    "MixinWaypointsManager",
-    "MixinMapWriter"
+    "MixinModSettings",
+    "MixinWaypointsManager"
   ]
 }

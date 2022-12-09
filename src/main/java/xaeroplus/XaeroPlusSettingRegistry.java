@@ -1,7 +1,9 @@
 package xaeroplus;
 
+import net.minecraft.util.text.TextComponentString;
 import sun.reflect.ConstructorAccessor;
 import xaero.map.gui.ConfigSettingEntry;
+import xaero.map.gui.CursorBox;
 import xaero.map.settings.ModOptions;
 
 import java.lang.reflect.Constructor;
@@ -20,8 +22,13 @@ import static xaeroplus.XaeroPlusSetting.SETTING_PREFIX;
  */
 public final class XaeroPlusSettingRegistry {
 
-    public static final XaeroPlusSetting fastMapSetting = XaeroPlusSetting.createBooleanSetting("Fast Mapping", true);
-    public static final XaeroPlusSetting mapWriterDelaySetting = XaeroPlusSetting.createFloatSetting("Fast Mapping Delay ms", 10, 2000, 10, 50);
+    public static final XaeroPlusSetting fastMapSetting = XaeroPlusSetting.createBooleanSetting("Fast Mapping",
+            new CursorBox(new TextComponentString("Fast Mapping will increase mapping speed in exchange for increased CPU load")),
+            true);
+    public static final XaeroPlusSetting mapWriterDelaySetting = XaeroPlusSetting.createFloatSetting("Fast Mapping Delay ms",
+            10, 2000, 10,
+            new CursorBox(new TextComponentString("Fast Mapping must be enabled. This is roughly the delay between minimap update operations, both render and actual file writes")),
+            50);
 
     public static final List<XaeroPlusSetting> XAERO_PLUS_SETTING_LIST = asList(
             // add settings here
@@ -53,7 +60,7 @@ public final class XaeroPlusSettingRegistry {
         for (Constructor<?> c : declaredConstructors) {
             // this one doesn't have a CursorBox parameter
             // if we want to use that, this can always be updated to that constructor instead
-            if (c.getParameterCount() == 10) {
+            if (c.getParameterCount() == 11) {
                 constructor = c;
                 break;
             }
@@ -83,6 +90,7 @@ public final class XaeroPlusSettingRegistry {
                     xaeroPlusSetting.getValueMin(),
                     xaeroPlusSetting.getValueMax(),
                     xaeroPlusSetting.getValueStep(),
+                    xaeroPlusSetting.getTooltip(),
                     xaeroPlusSetting.isIngameOnly(),
                     xaeroPlusSetting.isRequiresMinimap()});
         } catch (final Exception e) {

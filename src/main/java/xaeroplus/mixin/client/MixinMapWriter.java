@@ -34,8 +34,9 @@ import xaero.map.region.OverlayBuilder;
 import xaero.map.region.OverlayManager;
 import xaeroplus.XaeroPlusSettingRegistry;
 
+import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.Objects.nonNull;
 
@@ -106,13 +107,13 @@ public abstract class MixinMapWriter {
     // tile "writes" also include a lot of extra operations and lookups before any writing is actually done
     // when we remove existing limiters those extra operations add up to a lot of unnecessary cpu time
     private final Cache<String, Instant> tileUpdateCache = CacheBuilder.newBuilder()
-            // this delay seems to be fine enough even at high speeds, its equal to 1 tick in-game so still shouldn't miss any chunks
             // I would usually expect even second long expiration here to be fine
             // but there are some operations that make repeat invocations actually required
             // perhaps another time ill rewrite those. Or make the cache lock more aware of when we don't have any new updates to write/load
             // there's still alot of performance and efficiency on the table to regain
             // but i think this is a good middle ground for now
-            .maximumSize(100)
+            .maximumSize(1000)
+            .expireAfterWrite(5L, TimeUnit.SECONDS)
             .build();
 
     protected MixinMapWriter() {
@@ -392,8 +393,8 @@ public abstract class MixinMapWriter {
         final String cacheable = chunkX + " " + chunkZ;
         final Instant cacheValue = tileUpdateCache.getIfPresent(cacheable);
         if (nonNull(cacheValue)) {
-            if (cacheValue.isBefore(Instant.now().minus((long) XaeroPlusSettingRegistry.mapWriterDelaySetting.getFloatSettingValue(), ChronoUnit.MILLIS))) {
-                tileUpdateCache.invalidate(cacheable);
+            if (cacheValue.isBefore(Instant.now().minus(Duration.ofMillis((long) XaeroPlusSettingRegistry.mapWriterDelaySetting.getFloatSettingValue())))) {
+                tileUpdateCache.put(cacheable, Instant.now());
             } else {
                 cir.setReturnValue(false);
                 cir.cancel();

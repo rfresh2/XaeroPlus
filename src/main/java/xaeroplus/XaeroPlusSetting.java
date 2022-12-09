@@ -32,14 +32,16 @@ public class XaeroPlusSetting {
         this.tooltip = tooltip;
     }
 
-    public static XaeroPlusSetting createFloatSetting(String settingName, float valueMin, float valueMax, float valueStep, float defaultValue) {
-        final XaeroPlusSetting xaeroPlusSetting = new XaeroPlusSetting(SETTING_PREFIX + settingName, true, false, valueMin, valueMax, valueStep, null);
+    public static XaeroPlusSetting createFloatSetting(String settingName, float valueMin, float valueMax, float valueStep, CursorBox tooltip, float defaultValue) {
+        final XaeroPlusSetting xaeroPlusSetting = new XaeroPlusSetting(SETTING_PREFIX + settingName, true,
+                false, valueMin, valueMax, valueStep, tooltip);
         xaeroPlusSetting.setFloatSettingValue(defaultValue);
         return xaeroPlusSetting;
     }
 
-    public static XaeroPlusSetting createBooleanSetting(String settingName, boolean defaultValue) {
-        final XaeroPlusSetting xaeroPlusSetting = new XaeroPlusSetting(SETTING_PREFIX + settingName, false, true, 0, 0, 0, null);
+    public static XaeroPlusSetting createBooleanSetting(String settingName, CursorBox tooltip, boolean defaultValue) {
+        final XaeroPlusSetting xaeroPlusSetting = new XaeroPlusSetting(SETTING_PREFIX + settingName, false,
+                true, 0, 0, 0, tooltip);
         xaeroPlusSetting.setBooleanSettingValue(defaultValue);
         return xaeroPlusSetting;
     }

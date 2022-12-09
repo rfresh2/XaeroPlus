@@ -11,8 +11,6 @@ import xaero.map.gui.GuiWorldMapSettings;
 import xaero.map.gui.ISettingEntry;
 import xaeroplus.XaeroPlusSettingRegistry;
 
-import java.util.stream.Collectors;
-
 @Mixin(value = GuiWorldMapSettings.class, remap = false)
 public abstract class MixinGuiWorldMapSettings extends GuiSettings {
 
@@ -22,8 +20,7 @@ public abstract class MixinGuiWorldMapSettings extends GuiSettings {
 
     @Inject(method = "<init>(Lnet/minecraft/client/gui/GuiScreen;Lnet/minecraft/client/gui/GuiScreen;)V", at = @At("TAIL"))
     public void init(GuiScreen parent, GuiScreen escapeScreen, CallbackInfo ci) {
-        ConfigSettingEntry[] configSettingEntries = XaeroPlusSettingRegistry.SETTING_ENTRY_MAP.values().stream()
-                .collect(Collectors.toList())
+        final ConfigSettingEntry[] configSettingEntries = XaeroPlusSettingRegistry.getConfigSettingEntries()
                 .toArray(new ConfigSettingEntry[0]);
         final int oldLen = this.entries.length;
         final int newLen = configSettingEntries.length;

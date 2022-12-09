@@ -8,7 +8,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.lang.reflect.Modifier.FINAL;
@@ -44,30 +43,33 @@ public final class XaeroPlusSettingRegistry {
             transparentObsidianRoofDarkeningSetting
     );
 
-    public static final Map<ModOptions, ConfigSettingEntry> SETTING_ENTRY_MAP = constructXaeroPlusSettings();
+    public static final List<ModOptions> MOD_OPTIONS_LIST = constructXaeroPlusSettings();
 
-    private static int enumOrdinal = 29;
+    private static int enumOrdinal = 69; // needs to not overlap with existing enum indeces
 
-    private static Map<ModOptions, ConfigSettingEntry> constructXaeroPlusSettings() {
+    private static List<ModOptions> constructXaeroPlusSettings() {
         try {
             final ConstructorAccessor modOptionsConstructorAccessor = getModOptionsConstructorAccessor();
             final List<ModOptions> xaeroModOptions = XaeroPlusSettingRegistry.XAERO_PLUS_SETTING_LIST.stream()
                     .map(setting -> buildModOptions(modOptionsConstructorAccessor, setting, enumOrdinal++))
                     .collect(Collectors.toList());
             setEnumInternalFields(xaeroModOptions);
-            return xaeroModOptions.stream()
-                    .collect(Collectors.toMap(k -> k, XaeroPlusSettingRegistry::buildConfigSettingEntry, (v1, v2) -> v1));
+            return xaeroModOptions;
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static List<ConfigSettingEntry> getConfigSettingEntries() {
+        return MOD_OPTIONS_LIST.stream()
+                .map(XaeroPlusSettingRegistry::buildConfigSettingEntry)
+                .collect(Collectors.toList());
     }
 
     private static ConstructorAccessor getModOptionsConstructorAccessor() throws Exception {
         Constructor<?>[] declaredConstructors = ModOptions.class.getDeclaredConstructors();
         Constructor<?> constructor = declaredConstructors[0];
         for (Constructor<?> c : declaredConstructors) {
-            // this one doesn't have a CursorBox parameter
-            // if we want to use that, this can always be updated to that constructor instead
             if (c.getParameterCount() == 11) {
                 constructor = c;
                 break;

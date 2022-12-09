@@ -1,9 +1,7 @@
 package xaeroplus;
 
-import net.minecraft.util.text.TextComponentString;
 import sun.reflect.ConstructorAccessor;
 import xaero.map.gui.ConfigSettingEntry;
-import xaero.map.gui.CursorBox;
 import xaero.map.settings.ModOptions;
 
 import java.lang.reflect.Constructor;
@@ -23,17 +21,27 @@ import static xaeroplus.XaeroPlusSetting.SETTING_PREFIX;
 public final class XaeroPlusSettingRegistry {
 
     public static final XaeroPlusSetting fastMapSetting = XaeroPlusSetting.createBooleanSetting("Fast Mapping",
-            new CursorBox(new TextComponentString("Fast Mapping will increase mapping speed in exchange for increased CPU load")),
+            "Fast Mapping will increase mapping speed in exchange for increased CPU load",
             true);
     public static final XaeroPlusSetting mapWriterDelaySetting = XaeroPlusSetting.createFloatSetting("Fast Mapping Delay ms",
             10, 2000, 10,
-            new CursorBox(new TextComponentString("Fast Mapping must be enabled. This is roughly the delay between minimap update operations, both render and actual file writes")),
+            "Fast Mapping must be enabled. This is roughly the delay between minimap update operations, both render and actual file writes",
             50);
+    public static final XaeroPlusSetting transparentObsidianRoofSetting = XaeroPlusSetting.createBooleanSetting("Transparent Obsidian Roof",
+            "Makes obsidian placed at build height transparent. Does not update tiles already mapped - you need to remap them.",
+            true);
+    public static final XaeroPlusSetting transparentObsidianRoofDarkeningSetting = XaeroPlusSetting.createFloatSetting("Roof Obsidian Opacity",
+            // todo: I think a -1 setting here to make the obsidian completely invisible would be cool
+            0, 15, 1,
+            "Sets the opacity of the transparent obsidian roof tiles. Does not update tiles already mapped - you need to remap them.",
+            10);
 
     public static final List<XaeroPlusSetting> XAERO_PLUS_SETTING_LIST = asList(
             // add settings here
             fastMapSetting,
-            mapWriterDelaySetting
+            mapWriterDelaySetting,
+            transparentObsidianRoofSetting,
+            transparentObsidianRoofDarkeningSetting
     );
 
     public static final Map<ModOptions, ConfigSettingEntry> SETTING_ENTRY_MAP = constructXaeroPlusSettings();

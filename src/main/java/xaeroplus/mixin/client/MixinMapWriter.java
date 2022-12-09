@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.map.MapProcessor;
 import xaero.map.MapWriter;
@@ -135,17 +136,20 @@ public abstract class MixinMapWriter {
      * @author Entropy5
      * @reason obsidian roof
      */
-    @Overwrite
-    public boolean shouldOverlay(IBlockState state) {
+    @Inject(method = "shouldOverlay", at = @At("HEAD"), cancellable = true)
+    public void shouldOverlay(IBlockState state, CallbackInfoReturnable<Boolean> cir) {
+        if (!XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getBooleanSettingValue()) {
+            return;
+        }
         if (!(state.getBlock() instanceof BlockAir) && !(state.getBlock() instanceof BlockGlass) && state.getBlock().getBlockLayer() != BlockRenderLayer.TRANSLUCENT) {
             if (!(state.getBlock() instanceof BlockLiquid)) {
-                return false;
+                cir.setReturnValue(false);
             } else {
                 int lightOpacity = state.getLightOpacity(this.mapProcessor.getWorld(), BlockPos.ORIGIN);
-                return lightOpacity != 0;  // deleted argument to render water under obsidian roof regardless of light opacity
+                cir.setReturnValue(lightOpacity != 0); // deleted argument to render water under obsidian roof regardless of light opacity
             }
         } else {
-            return true;
+            cir.setReturnValue(true);
         }
     }
 
@@ -153,8 +157,13 @@ public abstract class MixinMapWriter {
      * @author Entropy5
      * @reason obsidian roof
      */
-    @Overwrite
-    public void loadPixel(World world, MapBlock pixel, MapBlock currentPixel, Chunk bchunk, int insideX, int insideZ, int highY, int lowY, boolean cave, boolean canReuseBiomeColours, boolean flowers, BlockPos.MutableBlockPos mutableBlockPos3) {
+    @Inject(method = "loadPixel", at = @At("HEAD"), cancellable = true)
+    public void loadPixel(World world, MapBlock pixel, MapBlock currentPixel, Chunk bchunk, int insideX, int insideZ, int highY, int lowY, boolean cave, boolean canReuseBiomeColours, boolean flowers, BlockPos.MutableBlockPos mutableBlockPos3, CallbackInfo ci) {
+        if (!XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getBooleanSettingValue()) {
+            return;
+        } else {
+            ci.cancel();
+        }
         pixel.prepareForWriting();
         this.overlayBuilder.startBuilding();
         boolean underair = !cave;
@@ -206,7 +215,7 @@ public abstract class MixinMapWriter {
                         } else {
                             this.writerBiomeInfoSupplier.set(currentPixel, canReuseBiomeColours);
                             int stateId = Block.getStateId(state);
-                            int opacity = roofObsidian ? 10 : b.getLightOpacity(state, world, this.mutableGlobalPos);
+                            int opacity = roofObsidian ? (int) XaeroPlusSettingRegistry.transparentObsidianRoofDarkeningSetting.getFloatSettingValue() : b.getLightOpacity(state, world, this.mutableGlobalPos);
                             this.overlayBuilder.build(stateId, this.biomeBuffer, opacity, workingLight, world, this.mapProcessor, this.mutableGlobalPos, this.overlayBuilder.getOverlayBiome(), this.colorTypeCache, this.writerBiomeInfoSupplier);
                         }
                     } else if (this.hasVanillaColor(state, world, this.mutableGlobalPos)) {

@@ -1,11 +1,12 @@
 package xaeroplus;
 
+import net.minecraft.util.text.TextComponentString;
 import xaero.map.gui.CursorBox;
 
 import java.util.Objects;
 
 public class XaeroPlusSetting {
-    public static final String SETTING_PREFIX = "[XaeroPlus] ";
+    public static final String SETTING_PREFIX = "[XP] ";
     private final boolean isFloatSetting; // enumFloat
     private final boolean isBooleanSetting; // enumBoolean
     private final String settingName; // enumString
@@ -32,16 +33,16 @@ public class XaeroPlusSetting {
         this.tooltip = tooltip;
     }
 
-    public static XaeroPlusSetting createFloatSetting(String settingName, float valueMin, float valueMax, float valueStep, CursorBox tooltip, float defaultValue) {
+    public static XaeroPlusSetting createFloatSetting(String settingName, float valueMin, float valueMax, float valueStep, String tooltip, float defaultValue) {
         final XaeroPlusSetting xaeroPlusSetting = new XaeroPlusSetting(SETTING_PREFIX + settingName, true,
-                false, valueMin, valueMax, valueStep, tooltip);
+                false, valueMin, valueMax, valueStep, new CursorBox(new TextComponentString(tooltip)));
         xaeroPlusSetting.setFloatSettingValue(defaultValue);
         return xaeroPlusSetting;
     }
 
-    public static XaeroPlusSetting createBooleanSetting(String settingName, CursorBox tooltip, boolean defaultValue) {
+    public static XaeroPlusSetting createBooleanSetting(String settingName, String tooltip, boolean defaultValue) {
         final XaeroPlusSetting xaeroPlusSetting = new XaeroPlusSetting(SETTING_PREFIX + settingName, false,
-                true, 0, 0, 0, tooltip);
+                true, 0, 0, 0, new CursorBox(new TextComponentString(tooltip)));
         xaeroPlusSetting.setBooleanSettingValue(defaultValue);
         return xaeroPlusSetting;
     }

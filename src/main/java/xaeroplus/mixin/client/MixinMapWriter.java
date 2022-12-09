@@ -303,12 +303,15 @@ public abstract class MixinMapWriter {
                                 this.workingFrameCount = 0;
                             }
 
-                            long sinceLastWrite = Math.min(passed, this.writeFreeSinceLastWrite);
+                            long sinceLastWrite = Math.min(passed, Math.max(this.writeFreeSinceLastWrite, 1));
                             if (this.framesFreedTime != -1L) {
                                 sinceLastWrite = time - this.framesFreedTime;
                             }
 
-                            long tilesToUpdate = sizeTiles; /** setting this to always write all tiles **/
+                            long tilesToUpdate = XaeroPlusSettingRegistry.fastMapSetting.getBooleanSettingValue()
+                                    ? sizeTiles /** always write all tiles **/
+                                    : Math.min(sinceLastWrite * (long)sizeTiles / (long)fullUpdateTargetTime, 100L); // default
+
                             if (this.lastWrite == -1L || tilesToUpdate != 0L) {
                                 this.lastWrite = time;
                             }
@@ -346,9 +349,11 @@ public abstract class MixinMapWriter {
                                         }
 
                                         /** removing time limit **/
-//                                        if (System.nanoTime() - writeStartNano >= (long)timeLimit) {
-//                                            break;
-//                                        }
+                                        if (!XaeroPlusSettingRegistry.fastMapSetting.getBooleanSettingValue()) {
+                                            if (System.nanoTime() - writeStartNano >= (long)timeLimit) {
+                                                break;
+                                            }
+                                        }
                                     }
 
                                     ++this.workingFrameCount;
@@ -382,6 +387,8 @@ public abstract class MixinMapWriter {
 
     @Inject(method = "writeChunk", at = @At(value = "HEAD"), cancellable = true)
     public void writeChunk(World world, int distance, boolean onlyLoad, BiomeColorCalculator biomeColorCalculator, OverlayManager overlayManager, boolean loadChunks, boolean updateChunks, boolean ignoreHeightmaps, boolean flowers, boolean detailedDebug, BlockPos.MutableBlockPos mutableBlockPos3, int tileChunkX, int tileChunkZ, int tileChunkLocalX, int tileChunkLocalZ, int chunkX, int chunkZ, CallbackInfoReturnable<Boolean> cir) {
+        if (!XaeroPlusSettingRegistry.fastMapSetting.getBooleanSettingValue()) return;
+
         final String cacheable = chunkX + " " + chunkZ;
         final Instant cacheValue = tileUpdateCache.getIfPresent(cacheable);
         if (nonNull(cacheValue)) {

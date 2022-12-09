@@ -7,7 +7,6 @@ import xaero.map.settings.ModOptions;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -21,10 +20,12 @@ import static xaeroplus.XaeroPlusSetting.SETTING_PREFIX;
  */
 public final class XaeroPlusSettingRegistry {
 
-    public static final XaeroPlusSetting mapWriterDelaySetting = XaeroPlusSetting.createFloatSetting("Map Write Delay ms", 10, 2000, 10, 50);
+    public static final XaeroPlusSetting fastMapSetting = XaeroPlusSetting.createBooleanSetting("Fast Mapping", true);
+    public static final XaeroPlusSetting mapWriterDelaySetting = XaeroPlusSetting.createFloatSetting("Fast Mapping Delay ms", 10, 2000, 10, 50);
 
     public static final List<XaeroPlusSetting> XAERO_PLUS_SETTING_LIST = asList(
             // add settings here
+            fastMapSetting,
             mapWriterDelaySetting
     );
 
@@ -50,8 +51,9 @@ public final class XaeroPlusSettingRegistry {
         Constructor<?>[] declaredConstructors = ModOptions.class.getDeclaredConstructors();
         Constructor<?> constructor = declaredConstructors[0];
         for (Constructor<?> c : declaredConstructors) {
+            // this one doesn't have a CursorBox parameter
+            // if we want to use that, this can always be updated to that constructor instead
             if (c.getParameterCount() == 10) {
-                System.out.println("Found constructor! " + Arrays.toString(c.getParameters()));
                 constructor = c;
                 break;
             }

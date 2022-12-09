@@ -34,13 +34,18 @@ public final class XaeroPlusSettingRegistry {
             0, 15, 1,
             "Sets the opacity of the transparent obsidian roof tiles. Does not update tiles already mapped - you need to remap them.",
             10);
+    public static final XaeroPlusSetting worldMapMinZoomSetting = XaeroPlusSetting.createFloatSetting("Min WorldMap Zoom",
+            0, 0.625f, 0.01f,
+            "Minimum WorldMap Zoom Setting. This is 10x what you see on the WorldMap.",
+            0.1f);
 
     public static final List<XaeroPlusSetting> XAERO_PLUS_SETTING_LIST = asList(
             // add settings here
             fastMapSetting,
             mapWriterDelaySetting,
             transparentObsidianRoofSetting,
-            transparentObsidianRoofDarkeningSetting
+            transparentObsidianRoofDarkeningSetting,
+            worldMapMinZoomSetting
     );
 
     public static final List<ModOptions> MOD_OPTIONS_LIST = constructXaeroPlusSettings();

@@ -36,6 +36,7 @@ import xaero.map.mods.gui.Waypoint;
 import xaero.map.region.*;
 import xaero.map.region.texture.RegionTexture;
 import xaero.map.settings.ModSettings;
+import xaeroplus.XaeroPlusSettingRegistry;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -246,9 +247,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             destScale *= Math.pow(1.2, factor);
         }
 
-        if (destScale < 0.0625) {
-            // remove min zoom
-//            destScale = 0.0625;
+        if (destScale < XaeroPlusSettingRegistry.worldMapMinZoomSetting.getFloatSettingValue() / 10.0f) {
+            // insert our own min zoom
+            destScale = XaeroPlusSettingRegistry.worldMapMinZoomSetting.getFloatSettingValue() / 10.0f;
         } else if (destScale > 50.0) {
             destScale = 50.0;
         }

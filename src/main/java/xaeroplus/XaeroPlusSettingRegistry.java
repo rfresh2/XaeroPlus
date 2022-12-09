@@ -42,7 +42,7 @@ public final class XaeroPlusSettingRegistry {
             0, 0.625f, 0.01f,
             "Minimum WorldMap Zoom Setting. This is 10x what you see on the WorldMap.",
             0.1f);
-    public static final XaeroPlusSetting skipWorldRenderSetting = XaeroPlusSetting.createBooleanSetting("Background World Render",
+    public static final XaeroPlusSetting skipWorldRenderSetting = XaeroPlusSetting.createBooleanSetting("Skip Background Render",
             "Skip MC world render while in a Xaero GUI. Having this on can cause issues with travel mods while you're in a Xaero GUI like the WorldMap.",
             false);
 

@@ -4,6 +4,9 @@ import net.minecraft.util.text.TextComponentString;
 import xaero.map.gui.CursorBox;
 
 import java.util.Objects;
+import java.util.function.Consumer;
+
+import static java.util.Objects.nonNull;
 
 public class XaeroPlusSetting {
     public static final String SETTING_PREFIX = "[XP] ";
@@ -19,6 +22,8 @@ public class XaeroPlusSetting {
     private static boolean switchScreen = false;
     private float floatSettingValue;
     private boolean booleanSettingValue;
+    private Consumer<Float> floatSettingChangeConsumer;
+    private Consumer<Boolean> booleanSettingChangeConsumer;
 
     public XaeroPlusSetting(String settingName, boolean isFloatSetting, boolean isBooleanSetting,
                             float valueMin, float valueMax, float valueStep, // only relevant for float settings
@@ -40,10 +45,23 @@ public class XaeroPlusSetting {
         return xaeroPlusSetting;
     }
 
+    public static XaeroPlusSetting createFloatSetting(String settingName, float valueMin, float valueMax, float valueStep, String tooltip, Consumer<Float> changeConsumer, float defaultValue) {
+        final XaeroPlusSetting xaeroPlusSetting = createFloatSetting(settingName, valueMin, valueMax, valueStep, tooltip, defaultValue);
+        xaeroPlusSetting.setFloatSettingChangeConsumer(changeConsumer);
+        return xaeroPlusSetting;
+    }
+
     public static XaeroPlusSetting createBooleanSetting(String settingName, String tooltip, boolean defaultValue) {
         final XaeroPlusSetting xaeroPlusSetting = new XaeroPlusSetting(SETTING_PREFIX + settingName, false,
                 true, 0, 0, 0, new CursorBox(new TextComponentString(tooltip)));
         xaeroPlusSetting.setBooleanSettingValue(defaultValue);
+        return xaeroPlusSetting;
+    }
+
+    public static XaeroPlusSetting createBooleanSetting(String settingName, String tooltip, Consumer<Boolean> settingChangeConsumer, boolean defaultValue) {
+        final XaeroPlusSetting xaeroPlusSetting = createBooleanSetting(settingName, tooltip, defaultValue);
+        xaeroPlusSetting.setBooleanSettingValue(defaultValue);
+        xaeroPlusSetting.setBooleanSettingChangeConsumer(settingChangeConsumer);
         return xaeroPlusSetting;
     }
 
@@ -121,6 +139,9 @@ public class XaeroPlusSetting {
 
     public void setFloatSettingValue(float floatSettingValue) {
         this.floatSettingValue = floatSettingValue;
+        if (nonNull(getFloatSettingChangeConsumer())) {
+            getFloatSettingChangeConsumer().accept(floatSettingValue);
+        }
     }
 
     public boolean getBooleanSettingValue() {
@@ -129,6 +150,25 @@ public class XaeroPlusSetting {
 
     public void setBooleanSettingValue(boolean booleanSettingValue) {
         this.booleanSettingValue = booleanSettingValue;
+        if (nonNull(getBooleanSettingChangeConsumer())) {
+            getBooleanSettingChangeConsumer().accept(booleanSettingValue);
+        }
+    }
+
+    public Consumer<Float> getFloatSettingChangeConsumer() {
+        return floatSettingChangeConsumer;
+    }
+
+    public void setFloatSettingChangeConsumer(Consumer<Float> floatSettingChangeConsumer) {
+        this.floatSettingChangeConsumer = floatSettingChangeConsumer;
+    }
+
+    public Consumer<Boolean> getBooleanSettingChangeConsumer() {
+        return booleanSettingChangeConsumer;
+    }
+
+    public void setBooleanSettingChangeConsumer(Consumer<Boolean> booleanSettingChangeConsumer) {
+        this.booleanSettingChangeConsumer = booleanSettingChangeConsumer;
     }
 
     @Override

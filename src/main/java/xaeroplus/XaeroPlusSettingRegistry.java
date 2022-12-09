@@ -1,6 +1,8 @@
 package xaeroplus;
 
+import net.minecraft.client.Minecraft;
 import sun.reflect.ConstructorAccessor;
+import xaero.map.WorldMapSession;
 import xaero.map.gui.ConfigSettingEntry;
 import xaero.map.settings.ModOptions;
 
@@ -28,11 +30,13 @@ public final class XaeroPlusSettingRegistry {
             50);
     public static final XaeroPlusSetting transparentObsidianRoofSetting = XaeroPlusSetting.createBooleanSetting("Transparent Obsidian Roof",
             "Makes obsidian placed at build height transparent. Does not update tiles already mapped - you need to remap them.",
+            (v) -> XaeroPlusSettingRegistry.markChunksDirtyInWriteDistance(),
             true);
     public static final XaeroPlusSetting transparentObsidianRoofDarkeningSetting = XaeroPlusSetting.createFloatSetting("Roof Obsidian Opacity",
             // todo: I think a -1 setting here to make the obsidian completely invisible would be cool
             0, 15, 1,
             "Sets the opacity of the transparent obsidian roof tiles. Does not update tiles already mapped - you need to remap them.",
+            (v) -> XaeroPlusSettingRegistry.markChunksDirtyInWriteDistance(),
             10);
     public static final XaeroPlusSetting worldMapMinZoomSetting = XaeroPlusSetting.createFloatSetting("Min WorldMap Zoom",
             0, 0.625f, 0.01f,
@@ -149,5 +153,15 @@ public final class XaeroPlusSettingRegistry {
         Field modifiersField = Field.class.getDeclaredField("modifiers");
         modifiersField.setAccessible(true);
         modifiersField.setInt(field, field.getModifiers() & ~ FINAL);
+    }
+
+    private static void markChunksDirtyInWriteDistance() {
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc.world != null && mc.player != null) {
+            WorldMapSession session = WorldMapSession.getCurrentSession();
+            if (session != null) {
+                session.getMapProcessor().getMapWriter().setDirtyInWriteDistance(mc.player, mc.world);
+            }
+        }
     }
 }

@@ -4,6 +4,7 @@ import net.minecraft.client.gui.GuiScreen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import xaero.map.misc.Misc;
+import xaeroplus.XaeroPlusSettingRegistry;
 
 @Mixin(value = Misc.class)
 public class MixinMisc {
@@ -14,6 +15,6 @@ public class MixinMisc {
      */
     @Overwrite
     public static boolean screenShouldSkipWorldRender(GuiScreen screen, boolean checkOtherMod) {
-        return false;
+        return XaeroPlusSettingRegistry.skipWorldRenderSetting.getBooleanSettingValue();
     }
 }

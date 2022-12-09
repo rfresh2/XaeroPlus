@@ -6,7 +6,7 @@ This is a Forge 1.12.2 mod that depends on and modifies Xaero's WorldMap and Min
 
 Download the latest build from GitHub actions: [https://github.com/rfresh2/XaeroPlus/actions](https://github.com/rfresh2/XaeroPlus/actions) 
 
-Or without a GitHub account: [nightly.link](https://nightly.link/rfresh2/XaeroPlus/workflows/gradle/mainline/xaeroplus-38.zip)
+Or without a GitHub account: [nightly.link](https://nightly.link/rfresh2/XaeroPlus/workflows/gradle/mainline/xaeroplus-39.zip)
 
 # Xaero Versions
 
@@ -37,8 +37,10 @@ Using any version other than these two may cause crashes.
 * Minecraft world always renders in background while in a Xaero GUI (for client travel mods compatibility)
 * Faster map tile zip reads/writes
 * Allow multiple MC instances to read/write to the same map concurrently
-* Transparent obsidian roof. Amazing for 2b2t spawn
+* Transparent obsidian roof. Useful for mapping 2b2t spawn.
 * Faster region writes to prevent missed chunks in map. Helpful if you're traveling at very high speeds.  
+
+Certain modifications have settings that can be changed in the normal Xaero WorldMap settings GUI.
 
 # Work In Progress
 

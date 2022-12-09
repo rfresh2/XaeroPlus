@@ -48,7 +48,8 @@ public final class XaeroPlusSettingRegistry {
             mapWriterDelaySetting,
             transparentObsidianRoofSetting,
             transparentObsidianRoofDarkeningSetting,
-            worldMapMinZoomSetting
+            worldMapMinZoomSetting,
+            skipWorldRenderSetting
     );
 
     public static final List<ModOptions> MOD_OPTIONS_LIST = constructXaeroPlusSettings();

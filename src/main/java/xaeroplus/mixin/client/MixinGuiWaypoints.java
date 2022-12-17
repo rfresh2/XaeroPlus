@@ -103,6 +103,9 @@ public class MixinGuiWaypoints extends ScreenBase {
                 case ANGLE:
                      sortVal = -w.getComparisonAngleCos(cameraPos, lookVector, GuiWaypoints.distanceDivided);
                      break;
+                case COLOR:
+                    sortVal = w.getColor();
+                    break;
                 case NAME:
                     sortVal = w.getComparisonName();
                     break;

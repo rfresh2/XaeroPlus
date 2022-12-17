@@ -105,7 +105,7 @@ dependencies {
     }
 
     implementation(fg.deobf("curse.maven:xaeros-world-map-317780:4127330"))
-    implementation(fg.deobf("curse.maven:xaeros-minimap-263420:4127312"))
+    implementation(fg.deobf("curse.maven:xaeros-minimap-263420:4181094"))
 
     annotationProcessor('org.spongepowered:mixin:0.8.5:processor') {
         exclude module: 'gson'
@@ -153,3 +153,62 @@ jar {
 }
 
 jar.finalizedBy('reobfJar')
+
+task setGameDir() {
+    // Check if custom gamedir has been passed, if not use default ones per platform
+    if (!project.hasProperty("gameDir")) {
+        if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
+            project.ext.gameDir = System.getenv("APPDATA") + "/.minecraft"
+        } else if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+            project.ext.gameDir = System.properties["user.home"] + "/Library/Application Support/minecraft"
+        } else {
+            project.ext.gameDir = System.properties["user.home"] + "/.minecraft"
+        }
+    }
+}
+
+/**
+ * Courtesy of ForgeHax.
+ * I symlink my vanilla mc launcher folder for MultiMC
+ * various hardcoded directories in here could be changed by preference if your main dir is a MultiMC one
+ */
+class CopyJarTask extends DefaultTask {
+    CopyJarTask() {
+        group = "build"
+    }
+    @TaskAction
+    protected void exec() {
+        project.copy {
+            final gameDir = project.ext.gameDir;
+            final modDir = "$gameDir/mods/1.12.2"
+
+            // find previous jar (if it exists)
+            final previousJars = project.fileTree(dir: modDir).matching {
+                include project.archivesBaseName + '*'
+            }.files
+
+            // change file name
+            if (previousJars) {
+                // create .backups folder
+                final backupDir = modDir + '/.backups/'
+                project.file(backupDir).mkdirs()
+
+                for (File previousJar : previousJars) {
+                    final n = modDir + '/.backups/' + previousJar.getName() + '.bk'
+                    def f = project.file(n)
+                    def i = 1
+                    while (f.exists()) {
+                        f = project.file(n + '_' + i)
+                        i++
+                    }
+                    previousJar.renameTo(f)
+                }
+            }
+
+            from project.jar
+            into "$gameDir/mods/1.12.2"
+        }
+    }
+}
+
+task copyJar(type: CopyJarTask, dependsOn: [setGameDir, build])

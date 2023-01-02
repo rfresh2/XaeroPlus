@@ -45,6 +45,17 @@ public final class XaeroPlusSettingRegistry {
     public static final XaeroPlusSetting skipWorldRenderSetting = XaeroPlusSetting.createBooleanSetting("Skip Background Render",
             "Skip MC world render while in a Xaero GUI. Having this on can cause issues with travel mods while you're in a Xaero GUI like the WorldMap.",
             false);
+    public static final XaeroPlusSetting newChunksMinimapSetting = XaeroPlusSetting.createBooleanSetting("Minimap NewChunks",
+            "Highlights NewChunks on the minimap",
+            true);
+    public static final XaeroPlusSetting worldMapNewChunksSetting = XaeroPlusSetting.createBooleanSetting("WorldMap NewChunks",
+            "Highlights NewChunks on the WorldMap",
+            true);
+    public static final XaeroPlusSetting newChunksAlphaSetting = XaeroPlusSetting.createFloatSetting("New Chunks Opacity",
+            10f, 255f, 10f,
+            "Changes the color opacity of NewChunks",
+            NewChunks::setAlpha,
+            100);
 
     public static final List<XaeroPlusSetting> XAERO_PLUS_SETTING_LIST = asList(
             // add settings here
@@ -53,7 +64,10 @@ public final class XaeroPlusSettingRegistry {
             transparentObsidianRoofSetting,
             transparentObsidianRoofDarkeningSetting,
             worldMapMinZoomSetting,
-            skipWorldRenderSetting
+            skipWorldRenderSetting,
+            newChunksMinimapSetting,
+            worldMapNewChunksSetting,
+            newChunksAlphaSetting
     );
 
     public static final List<ModOptions> MOD_OPTIONS_LIST = constructXaeroPlusSettings();

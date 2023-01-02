@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import org.lwjgl.opengl.GL11;
@@ -36,6 +37,7 @@ import xaero.map.mods.gui.Waypoint;
 import xaero.map.region.*;
 import xaero.map.region.texture.RegionTexture;
 import xaero.map.settings.ModSettings;
+import xaeroplus.NewChunks;
 import xaeroplus.XaeroPlusSettingRegistry;
 
 import java.io.IOException;
@@ -992,6 +994,37 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                         }
                                     }
 
+                                    GlStateManager.disableBlend();
+                                    setupTextureMatricesAndTextures(brightness);
+                                }
+
+                                if (XaeroPlusSettingRegistry.worldMapNewChunksSetting.getBooleanSettingValue()) {
+                                    restoreTextureStates();
+                                    // todo: might be able to optimize this, its checking every chunk on every frame
+                                    //  can become a problem at low zooms
+                                    for(int leafX = 0; leafX < leveledSideInRegions; ++leafX) {
+                                        for (int leafZ = 0; leafZ < leveledSideInRegions; ++leafZ) {
+                                            int regX = leafRegionMinX + leafX;
+                                            int regZ = leafRegionMinZ + leafZ;
+                                            for(int cx = 0; cx < 8; cx++) {
+                                                for (int cz = 0; cz < 8; cz++) {
+                                                    final int mapTileChunkX = regX * 8 + cx;
+                                                    final int mapTileChunkZ = regZ * 8 + cz;
+                                                    for (int t = 0; t < 16; ++t) {
+                                                        final ChunkPos chunkPos = new ChunkPos(mapTileChunkX * 4 + t % 4, mapTileChunkZ * 4 + t / 4);
+                                                        if (NewChunks.isNewChunk(chunkPos)) {
+                                                            GlStateManager.pushMatrix();
+                                                            GlStateManager.translate(
+                                                                    (float)(16 * chunkPos.x - flooredCameraX), (float)(16 * chunkPos.z - flooredCameraZ), 0.0F
+                                                            );
+                                                            drawRect(0, 0, 16, 16, NewChunks.getNewChunksColor());
+                                                            GlStateManager.popMatrix();
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                     GlStateManager.disableBlend();
                                     setupTextureMatricesAndTextures(brightness);
                                 }

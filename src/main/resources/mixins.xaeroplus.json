@@ -16,6 +16,9 @@
     "MixinMinimapModSettings",
     "MixinMisc",
     "MixinModSettings",
-    "MixinWaypointsManager"
+    "MixinSupportXaeroWorldmap",
+    "MixinWaypointsManager",
+    "mc.MixinMinecraft",
+    "mc.MixinNetworkManager"
   ]
 }

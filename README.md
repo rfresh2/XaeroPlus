@@ -6,7 +6,7 @@ This is a Forge 1.12.2 mod that depends on and modifies Xaero's WorldMap and Min
 
 Download the latest build from GitHub actions: [https://github.com/rfresh2/XaeroPlus/actions](https://github.com/rfresh2/XaeroPlus/actions) 
 
-Or without a GitHub account: [nightly.link](https://nightly.link/rfresh2/XaeroPlus/workflows/gradle/mainline/xaeroplus-47.zip)
+Or without a GitHub account: [nightly.link](https://nightly.link/rfresh2/XaeroPlus/workflows/gradle/mainline/xaeroplus-48.zip)
 
 # Xaero Versions
 
@@ -29,6 +29,8 @@ Using any version other than these two may cause crashes.
 * WorldMap zoom unlocked
 * Worldmap Follow mode and GUI button
 * NewChunks Highlighting in MiniMap and WorldMap.
+* [WorldDownloader](https://github.com/Pokechu22/WorldDownloader/) integration
+  * Highlights chunks as they are downloaded in the Minimap and WorldMap.
 * GUI on WorldMap to pan the map to user entered coordinates.
 * Display distance to waypoints on Waypoints GUI (like JourneyMap)
 * Always sort enabled waypoints before disabled waypoints

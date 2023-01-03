@@ -56,6 +56,17 @@ public final class XaeroPlusSettingRegistry {
             "Changes the color opacity of NewChunks",
             NewChunks::setAlpha,
             100);
+    public static final XaeroPlusSetting wdlMinimapEnabledSetting = XaeroPlusSetting.createBooleanSetting("Minimap WDL Highlight",
+            "Highlights chunks WDL mod has downloaded on the minimap",
+            true);
+    public static final XaeroPlusSetting wdlWorldmapEnabledSetting = XaeroPlusSetting.createBooleanSetting("Worldmap WDL Highlight",
+            "Highlights chunks WDL mod has downloaded on the WorldMap",
+            true);
+    public static final XaeroPlusSetting wdlAlphaSetting = XaeroPlusSetting.createFloatSetting("WDL Opacity",
+            10f, 255f, 10f,
+            "Changes the color opacity of WDL chunks",
+            WDLHelper::setAlpha,
+            100);
 
     public static final List<XaeroPlusSetting> XAERO_PLUS_SETTING_LIST = asList(
             // add settings here
@@ -67,7 +78,10 @@ public final class XaeroPlusSettingRegistry {
             skipWorldRenderSetting,
             newChunksMinimapSetting,
             worldMapNewChunksSetting,
-            newChunksAlphaSetting
+            newChunksAlphaSetting,
+            wdlMinimapEnabledSetting,
+            wdlWorldmapEnabledSetting,
+            wdlAlphaSetting
     );
 
     public static final List<ModOptions> MOD_OPTIONS_LIST = constructXaeroPlusSettings();

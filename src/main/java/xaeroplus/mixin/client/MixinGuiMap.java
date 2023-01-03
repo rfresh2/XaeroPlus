@@ -38,11 +38,13 @@ import xaero.map.region.*;
 import xaero.map.region.texture.RegionTexture;
 import xaero.map.settings.ModSettings;
 import xaeroplus.NewChunks;
+import xaeroplus.WDLHelper;
 import xaeroplus.XaeroPlusSettingRegistry;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import static java.util.Objects.isNull;
@@ -1018,6 +1020,39 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                                                     (float)(16 * chunkPos.x - flooredCameraX), (float)(16 * chunkPos.z - flooredCameraZ), 0.0F
                                                             );
                                                             drawRect(0, 0, 16, 16, NewChunks.getNewChunksColor());
+                                                            GlStateManager.popMatrix();
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    GlStateManager.disableBlend();
+                                    setupTextureMatricesAndTextures(brightness);
+                                }
+                                if (XaeroPlusSettingRegistry.wdlWorldmapEnabledSetting.getBooleanSettingValue()
+                                        && WDLHelper.isWdlPresent()
+                                        && WDLHelper.isDownloading()) {
+                                    restoreTextureStates();
+                                    final Set<ChunkPos> wdlSavedChunksWithCache = WDLHelper.getSavedChunksWithCache();
+                                    // todo: might be able to optimize this, its checking every chunk on every frame
+                                    //  can become a problem at low zooms
+                                    for(int leafX = 0; leafX < leveledSideInRegions; ++leafX) {
+                                        for (int leafZ = 0; leafZ < leveledSideInRegions; ++leafZ) {
+                                            int regX = leafRegionMinX + leafX;
+                                            int regZ = leafRegionMinZ + leafZ;
+                                            for(int cx = 0; cx < 8; cx++) {
+                                                for (int cz = 0; cz < 8; cz++) {
+                                                    final int mapTileChunkX = regX * 8 + cx;
+                                                    final int mapTileChunkZ = regZ * 8 + cz;
+                                                    for (int t = 0; t < 16; ++t) {
+                                                        final ChunkPos chunkPos = new ChunkPos(mapTileChunkX * 4 + t % 4, mapTileChunkZ * 4 + t / 4);
+                                                        if (wdlSavedChunksWithCache.contains(chunkPos)) {
+                                                            GlStateManager.pushMatrix();
+                                                            GlStateManager.translate(
+                                                                    (float)(16 * chunkPos.x - flooredCameraX), (float)(16 * chunkPos.z - flooredCameraZ), 0.0F
+                                                            );
+                                                            drawRect(0, 0, 16, 16, WDLHelper.getWdlColor());
                                                             GlStateManager.popMatrix();
                                                         }
                                                     }

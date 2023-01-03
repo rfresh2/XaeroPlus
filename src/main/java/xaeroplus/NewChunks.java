@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static xaeroplus.XaeroPlus.getColor;
+
 public class NewChunks {
 
     private static final ConcurrentHashMap<ChunkPos, Long> chunks = new ConcurrentHashMap<>();
@@ -52,9 +54,5 @@ public class NewChunks {
 
     public static void setAlpha(final float a) {
         newChunksColor = getColor(255, 0, 0, (int) a);
-    }
-
-    private static int getColor(final int r, final int g, final int b, final int a) {
-        return ((a & 255) << 24) | ((r & 255) << 16) | ((g & 255) << 8) | (b & 255);
     }
 }

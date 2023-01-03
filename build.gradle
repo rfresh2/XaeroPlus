@@ -115,8 +115,12 @@ dependencies {
 }
 
 sourceSets {
+    wdl {
+        compileClasspath += main.compileClasspath
+    }
     main {
         ext.refMap = "mixins.xaeroplus.refmap.json"
+        compileClasspath += wdl.output
     }
 }
 

@@ -22,10 +22,12 @@ import xaero.map.gui.GuiMap;
 import xaero.map.region.MapRegion;
 import xaero.map.region.MapTileChunk;
 import xaeroplus.NewChunks;
+import xaeroplus.WDLHelper;
 import xaeroplus.XaeroPlusSettingRegistry;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 @Mixin(value = SupportXaeroWorldmap.class, remap = false)
 public abstract class MixinSupportXaeroWorldmap {
@@ -205,6 +207,34 @@ public abstract class MixinSupportXaeroWorldmap {
                                                 GlStateManager.enableBlend();
                                             }
                                         }
+
+                                        if (XaeroPlusSettingRegistry.wdlMinimapEnabledSetting.getBooleanSettingValue()
+                                                && WDLHelper.isWdlPresent()
+                                                && WDLHelper.isDownloading()) {
+                                            GuiMap.restoreTextureStates();
+                                            final Set<ChunkPos> wdlSavedChunksWithCache = WDLHelper.getSavedChunksWithCache();
+                                            if (compatibilityVersion >= 7) {
+                                                GL14.glBlendFuncSeparate(770, 771, 1, 771);
+                                            }
+                                            for(int t = 0; t < 16; ++t) {
+                                                final ChunkPos chunkPos = new ChunkPos(chunk.getX() * 4 + t % 4, chunk.getZ() * 4 + t / 4);
+                                                if (wdlSavedChunksWithCache.contains(chunkPos)) {
+                                                    int wdlChunkDrawX = drawX + 16 * (t % 4);
+                                                    int wdlChunkDrawZ = drawZ + 16 * (t / 4);
+                                                    Gui.drawRect(wdlChunkDrawX, wdlChunkDrawZ, wdlChunkDrawX + 16, wdlChunkDrawZ + 16, WDLHelper.getWdlColor());
+                                                }
+                                            }
+
+                                            if (compatibilityVersion >= 6) {
+                                                GuiMap.setupTextures(brightness);
+                                            }
+
+                                            if (compatibilityVersion >= 7) {
+                                                GL14.glBlendFuncSeparate(1, 0, 0, 1);
+                                                GlStateManager.enableBlend();
+                                            }
+                                        }
+
                                         if (compatibilityVersion < 7) {
                                             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                                             GlStateManager.enableBlend();

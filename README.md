@@ -6,7 +6,7 @@ This is a Forge 1.12.2 mod that depends on and modifies Xaero's WorldMap and Min
 
 Download the latest build from GitHub actions: [https://github.com/rfresh2/XaeroPlus/actions](https://github.com/rfresh2/XaeroPlus/actions) 
 
-Or without a GitHub account: [nightly.link](https://nightly.link/rfresh2/XaeroPlus/workflows/gradle/mainline/xaeroplus-48.zip)
+Or without a GitHub account: [nightly.link](https://nightly.link/rfresh2/XaeroPlus/workflows/gradle/mainline/xaeroplus-49.zip)
 
 # Xaero Versions
 
@@ -44,6 +44,8 @@ Using any version other than these two may cause crashes.
   * Now included in XaeroWorldMap 1.26.4
 
 Configurations are in the normal Xaero WorldMap settings GUI.
+
+Toggleable settings support keybinds through the standard Minecraft Controls GUI.
 
 # Work In Progress
 

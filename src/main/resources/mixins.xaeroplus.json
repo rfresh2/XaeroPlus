@@ -4,6 +4,9 @@
   "package": "xaeroplus.mixin.client",
   "refmap": "mixins.xaeroplus.refmap.json",
   "client": [
+    "MixinCommonModSettings",
+    "MixinControlsHandler",
+    "MixinControlsRegister",
     "MixinGuiMap",
     "MixinGuiUpdateAll",
     "MixinGuiWaypoints",

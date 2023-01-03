@@ -1,6 +1,8 @@
 package xaeroplus;
 
+import com.google.common.base.Suppliers;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.settings.KeyBinding;
 import sun.reflect.ConstructorAccessor;
 import xaero.map.WorldMapSession;
 import xaero.map.gui.ConfigSettingEntry;
@@ -10,6 +12,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static java.lang.reflect.Modifier.FINAL;
@@ -100,6 +104,18 @@ public final class XaeroPlusSettingRegistry {
             throw new RuntimeException(e);
         }
     }
+
+    public static List<KeyBinding> getKeybinds() {
+        return memoizingKeybindsList.get();
+    }
+
+    private static final Supplier<List<KeyBinding>> memoizingKeybindsList = Suppliers.memoize(() ->
+        XAERO_PLUS_SETTING_LIST.stream()
+                .filter(XaeroPlusSetting::isBooleanSetting)
+                .map(XaeroPlusSetting::getKeyBinding)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList())
+    );
 
     public static List<ConfigSettingEntry> getConfigSettingEntries() {
         return MOD_OPTIONS_LIST.stream()

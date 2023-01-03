@@ -1,5 +1,6 @@
 package xaeroplus;
 
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.text.TextComponentString;
 import xaero.map.gui.CursorBox;
 
@@ -24,10 +25,12 @@ public class XaeroPlusSetting {
     private boolean booleanSettingValue;
     private Consumer<Float> floatSettingChangeConsumer;
     private Consumer<Boolean> booleanSettingChangeConsumer;
+    private KeyBinding keyBinding;
 
     public XaeroPlusSetting(String settingName, boolean isFloatSetting, boolean isBooleanSetting,
                             float valueMin, float valueMax, float valueStep, // only relevant for float settings
-                            CursorBox tooltip // nullable
+                            CursorBox tooltip, // nullable
+                            KeyBinding keyBinding // nullable
     ) {
         this.isFloatSetting = isFloatSetting;
         this.isBooleanSetting = isBooleanSetting;
@@ -36,11 +39,12 @@ public class XaeroPlusSetting {
         this.valueMax = valueMax;
         this.valueStep = valueStep;
         this.tooltip = tooltip;
+        this.keyBinding = keyBinding;
     }
 
     public static XaeroPlusSetting createFloatSetting(String settingName, float valueMin, float valueMax, float valueStep, String tooltip, float defaultValue) {
         final XaeroPlusSetting xaeroPlusSetting = new XaeroPlusSetting(SETTING_PREFIX + settingName, true,
-                false, valueMin, valueMax, valueStep, new CursorBox(new TextComponentString(tooltip)));
+                false, valueMin, valueMax, valueStep, new CursorBox(new TextComponentString(tooltip)), null);
         xaeroPlusSetting.setFloatSettingValue(defaultValue);
         return xaeroPlusSetting;
     }
@@ -53,14 +57,14 @@ public class XaeroPlusSetting {
 
     public static XaeroPlusSetting createBooleanSetting(String settingName, String tooltip, boolean defaultValue) {
         final XaeroPlusSetting xaeroPlusSetting = new XaeroPlusSetting(SETTING_PREFIX + settingName, false,
-                true, 0, 0, 0, new CursorBox(new TextComponentString(tooltip)));
+                true, 0, 0, 0, new CursorBox(new TextComponentString(tooltip)), null);
         xaeroPlusSetting.setBooleanSettingValue(defaultValue);
+        xaeroPlusSetting.setKeyBinding(new KeyBinding(settingName, 0, "XaeroPlus"));
         return xaeroPlusSetting;
     }
 
     public static XaeroPlusSetting createBooleanSetting(String settingName, String tooltip, Consumer<Boolean> settingChangeConsumer, boolean defaultValue) {
         final XaeroPlusSetting xaeroPlusSetting = createBooleanSetting(settingName, tooltip, defaultValue);
-        xaeroPlusSetting.setBooleanSettingValue(defaultValue);
         xaeroPlusSetting.setBooleanSettingChangeConsumer(settingChangeConsumer);
         return xaeroPlusSetting;
     }
@@ -169,6 +173,14 @@ public class XaeroPlusSetting {
 
     public void setBooleanSettingChangeConsumer(Consumer<Boolean> booleanSettingChangeConsumer) {
         this.booleanSettingChangeConsumer = booleanSettingChangeConsumer;
+    }
+
+    public KeyBinding getKeyBinding() {
+        return keyBinding;
+    }
+
+    public void setKeyBinding(KeyBinding keyBinding) {
+        this.keyBinding = keyBinding;
     }
 
     @Override

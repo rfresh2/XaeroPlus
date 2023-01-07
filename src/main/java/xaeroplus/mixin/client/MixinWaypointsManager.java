@@ -43,8 +43,12 @@ public abstract class MixinWaypointsManager {
      */
     @Overwrite
     private String getPotentialContainerID() {
+        int dimension = this.mc.world.provider.getDimension();
+        if (dimension == 0 || dimension == -1) {
+            dimension = 0;
+        }
         return this.ignoreContainerCase(
-                this.mainContainerID + "/" + this.getDimensionDirectoryName(0), this.containerIDIgnoreCaseCache
+                this.mainContainerID + "/" + this.getDimensionDirectoryName(dimension), this.containerIDIgnoreCaseCache
         );
     }
 

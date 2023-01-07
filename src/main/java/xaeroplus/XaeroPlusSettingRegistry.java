@@ -32,6 +32,10 @@ public final class XaeroPlusSettingRegistry {
             10, 2000, 10,
             "Fast Mapping must be enabled. This is roughly the delay between minimap update operations, both render and actual file writes",
             50);
+    public static final XaeroPlusSetting fastMapMaxTilesPerCycle = XaeroPlusSetting.createFloatSetting("Fast Mapping Max Tiles Per Cycle",
+            10, 120, 10,
+            "Limits how many chunks can be written in a single cycle. Lower values improve FPS at high render distances.",
+            50);
     public static final XaeroPlusSetting transparentObsidianRoofSetting = XaeroPlusSetting.createBooleanSetting("Transparent Obsidian Roof",
             "Makes obsidian placed at build height transparent. Does not update tiles already mapped - you need to remap them.",
             (v) -> XaeroPlusSettingRegistry.markChunksDirtyInWriteDistance(),
@@ -76,6 +80,7 @@ public final class XaeroPlusSettingRegistry {
             // add settings here
             fastMapSetting,
             mapWriterDelaySetting,
+            fastMapMaxTilesPerCycle,
             transparentObsidianRoofSetting,
             transparentObsidianRoofDarkeningSetting,
             worldMapMinZoomSetting,

@@ -321,7 +321,7 @@ public abstract class MixinMapWriter {
                             sinceLastWrite = Math.max(1L, sinceLastWrite);
 
                             long tilesToUpdate = XaeroPlusSettingRegistry.fastMapSetting.getBooleanSettingValue()
-                                    ? sizeTiles /** always write all tiles **/
+                                    ? (long) Math.min(sizeTiles, XaeroPlusSettingRegistry.fastMapMaxTilesPerCycle.getFloatSettingValue())
                                     : Math.min(sinceLastWrite * (long)sizeTiles / (long)fullUpdateTargetTime, 100L); // default
 
                             if (this.lastWrite == -1L || tilesToUpdate != 0L) {

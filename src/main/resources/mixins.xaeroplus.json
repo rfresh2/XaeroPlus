@@ -15,6 +15,7 @@
     "MixinLeveledRegion",
     "MixinMapProcessor",
     "MixinMapSaveLoad",
+    "MixinMapWorld",
     "MixinMapWriter",
     "MixinMinimapModSettings",
     "MixinMisc",

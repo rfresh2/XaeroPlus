@@ -182,7 +182,7 @@ public abstract class MixinMapWriter {
             state = bchunk.getBlockState(this.mutableLocalPos);
             Block b = state.getBlock();
             boolean roofObsidian = (h > 253 && b == Blocks.OBSIDIAN);
-            if (roofObsidian && XaeroPlusSettingRegistry.transparentObsidianRoofDarkeningSetting.getFloatSettingValue() < 0) {
+            if (roofObsidian && XaeroPlusSettingRegistry.transparentObsidianRoofDarkeningSetting.getFloatSettingValue() == -1) {
                 continue;  // skip over obsidian roof completely
             }
             if (roofObsidian & !columnRoofObsidian) {

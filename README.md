@@ -6,7 +6,7 @@ This is a Forge 1.12.2 mod that depends on and modifies Xaero's WorldMap and Min
 
 Download the latest build from GitHub actions: [https://github.com/rfresh2/XaeroPlus/actions](https://github.com/rfresh2/XaeroPlus/actions) 
 
-Or without a GitHub account: [nightly.link](https://nightly.link/rfresh2/XaeroPlus/workflows/gradle/mainline/xaeroplus-49.zip)
+Or without a GitHub account: [nightly.link](https://nightly.link/rfresh2/XaeroPlus/workflows/gradle/mainline/xaeroplus-52.zip)
 
 # Xaero Versions
 
@@ -16,7 +16,7 @@ Xaero Minimap version: [22.17.0](https://www.curseforge.com/minecraft/mc-mods/xa
 
 Both mods must be downloaded and included by you in your Forge mods folder. 
 
-Using any version other than these two may cause crashes. 
+Using any version other than these two may cause crashes.
 
 # Modifications
 
@@ -25,29 +25,26 @@ Using any version other than these two may cause crashes.
   * **You will need to manually change the name of any existing folder.** 
     * In both `.minecraft/XaeroWaypoints/` and `.minecraft/XaeroWorldMap/`
 * Overworld dimension is stored in the "DIM0" directory instead of "null"
-  * **You will need to manually change the name of any existing folder in** `.minecraft/XaeroWorldMap/Multiplayer_<server name>/`
+  * **You will need to manually change the name of any existing folder** 
+    * In `.minecraft/XaeroWorldMap/Multiplayer_<server name>/`
 * WorldMap zoom unlocked
 * Worldmap Follow mode and GUI button
 * NewChunks Highlighting in MiniMap and WorldMap.
 * [WorldDownloader](https://github.com/Pokechu22/WorldDownloader/) integration
   * Highlights chunks as they are downloaded in the Minimap and WorldMap.
+* Faster map tile zip reads/writes
+* Allow multiple MC instances to read/write to the same map concurrently
+* Transparent obsidian roof. Useful for mapping 2b2t spawn.
+* Faster region writes to prevent missed chunks in map while traveling at very high speeds.
+* Option to always view and create waypoints in the Overworld when in Nether.
 * GUI on WorldMap to pan the map to user entered coordinates.
 * Display distance to waypoints on Waypoints GUI (like JourneyMap)
 * Always sort enabled waypoints before disabled waypoints
 * GUI button to enable/disable all waypoints
 * Minecraft world always renders in background while in a Xaero GUI (for client travel mods compatibility)
-* Faster map tile zip reads/writes
-* Allow multiple MC instances to read/write to the same map concurrently
-* Transparent obsidian roof. Useful for mapping 2b2t spawn.
-* Faster region writes to prevent missed chunks in map while traveling at very high speeds.
 * ~~Increased region loading performance for large worlds. Fixes "hangs" on joining a server or switching dimensions.~~
   * Now included in XaeroWorldMap 1.26.4
 
 Configurations are in the normal Xaero WorldMap settings GUI.
 
 Toggleable settings support keybinds through the standard Minecraft Controls GUI.
-
-# Work In Progress
-
-* Improve WorldMap performance with very small zooms
-  * With the unlocked zoom, loading many regions in view is very time (and VRAM) intensive.

@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Replace HashTable with faster delegate hashmap
+ * Note there are missing Hashtable functions here but this is sufficient for current uses.
  */
 public class DelegatingHashTable<K, V> extends Hashtable<K, V> implements Map<K, V> {
 

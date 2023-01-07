@@ -2,12 +2,12 @@ package xaeroplus.mixin.client;
 
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.common.minimap.waypoints.WaypointsManager;
+import xaeroplus.XaeroPlusSettingRegistry;
 
 import static java.util.Objects.nonNull;
 
@@ -37,18 +37,15 @@ public abstract class MixinWaypointsManager {
         }
     }
 
-    /**
-     * @author rfresh2
-     * @reason overworld waypoint container always
-     */
-    @Overwrite
-    private String getPotentialContainerID() {
+    @Inject(method = "getPotentialContainerID", at = @At("HEAD"), cancellable = true)
+    private void getPotentialContainerID(CallbackInfoReturnable<String> cir) {
+        if (!XaeroPlusSettingRegistry.owAutoWaypointDimension.getBooleanSettingValue()) return;
         int dimension = this.mc.world.provider.getDimension();
         if (dimension == 0 || dimension == -1) {
             dimension = 0;
         }
-        return this.ignoreContainerCase(
-                this.mainContainerID + "/" + this.getDimensionDirectoryName(dimension), this.containerIDIgnoreCaseCache
+        cir.setReturnValue(this.ignoreContainerCase(
+                this.mainContainerID + "/" + this.getDimensionDirectoryName(dimension), this.containerIDIgnoreCaseCache)
         );
     }
 

@@ -75,6 +75,9 @@ public final class XaeroPlusSettingRegistry {
             "Changes the color opacity of WDL chunks",
             WDLHelper::setAlpha,
             100);
+    public static final XaeroPlusSetting owAutoWaypointDimension = XaeroPlusSetting.createBooleanSetting("Prefer Overworld Waypoints",
+            "Prefer creating and viewing Overworld waypoints when in the nether",
+            true);
 
     public static final List<XaeroPlusSetting> XAERO_PLUS_SETTING_LIST = asList(
             // add settings here
@@ -90,7 +93,8 @@ public final class XaeroPlusSettingRegistry {
             newChunksAlphaSetting,
             wdlMinimapEnabledSetting,
             wdlWorldmapEnabledSetting,
-            wdlAlphaSetting
+            wdlAlphaSetting,
+            owAutoWaypointDimension
     );
 
     public static final List<ModOptions> MOD_OPTIONS_LIST = constructXaeroPlusSettings();

@@ -42,9 +42,13 @@ public class XaeroPlusSetting {
         this.keyBinding = keyBinding;
     }
 
+    private static String defaultValueStr(final Object defaultVal) {
+        return " \\n Default: " + defaultVal;
+    }
+
     public static XaeroPlusSetting createFloatSetting(String settingName, float valueMin, float valueMax, float valueStep, String tooltip, float defaultValue) {
         final XaeroPlusSetting xaeroPlusSetting = new XaeroPlusSetting(SETTING_PREFIX + settingName, true,
-                false, valueMin, valueMax, valueStep, new CursorBox(new TextComponentString(tooltip)), null);
+                false, valueMin, valueMax, valueStep, new CursorBox(new TextComponentString(tooltip + defaultValueStr(defaultValue))), null);
         xaeroPlusSetting.setFloatSettingValue(defaultValue);
         return xaeroPlusSetting;
     }
@@ -57,7 +61,7 @@ public class XaeroPlusSetting {
 
     public static XaeroPlusSetting createBooleanSetting(String settingName, String tooltip, boolean defaultValue) {
         final XaeroPlusSetting xaeroPlusSetting = new XaeroPlusSetting(SETTING_PREFIX + settingName, false,
-                true, 0, 0, 0, new CursorBox(new TextComponentString(tooltip)), null);
+                true, 0, 0, 0, new CursorBox(new TextComponentString(tooltip + defaultValueStr(defaultValue))), null);
         xaeroPlusSetting.setBooleanSettingValue(defaultValue);
         xaeroPlusSetting.setKeyBinding(new KeyBinding(settingName, 0, "XaeroPlus"));
         return xaeroPlusSetting;

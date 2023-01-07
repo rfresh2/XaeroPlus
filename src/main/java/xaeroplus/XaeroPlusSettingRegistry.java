@@ -26,57 +26,73 @@ import static xaeroplus.XaeroPlusSetting.SETTING_PREFIX;
 public final class XaeroPlusSettingRegistry {
 
     public static final XaeroPlusSetting fastMapSetting = XaeroPlusSetting.createBooleanSetting("Fast Mapping",
-            "Fast Mapping will increase mapping speed in exchange for increased CPU load",
+            "Fast Mapping \\n " +
+                    "Increase mapping speed, might hurt FPS.",
             true);
-    public static final XaeroPlusSetting mapWriterDelaySetting = XaeroPlusSetting.createFloatSetting("Fast Mapping Delay ms",
-            10, 2000, 10,
-            "Fast Mapping must be enabled. This is roughly the delay between minimap update operations, both render and actual file writes",
+    public static final XaeroPlusSetting mapWriterDelaySetting = XaeroPlusSetting.createFloatSetting("Fast Mapping Delay",
+            10, 1000, 10,
+            "Fast Mapping Delay \\n " +
+                    "Fast Mapping must be enabled. \\n " +
+                    "This is roughly the delay in milliseconds between minimap update operations, both render and actual file writes.",
             50);
-    public static final XaeroPlusSetting fastMapMaxTilesPerCycle = XaeroPlusSetting.createFloatSetting("Fast Mapping Max Tiles Per Cycle",
+    public static final XaeroPlusSetting fastMapMaxTilesPerCycle = XaeroPlusSetting.createFloatSetting("Fast Mapping Rate Limit",
             10, 120, 10,
-            "Limits how many chunks can be written in a single cycle. Lower values improve FPS at high render distances.",
+            "Fast Mapping Rate Limit \\n " +
+                    "Fast Mapping must be enabled. \\n " +
+                    "Limits how many chunks can be written in a single cycle. Lower values improve FPS at high render distances.",
             50);
     public static final XaeroPlusSetting transparentObsidianRoofSetting = XaeroPlusSetting.createBooleanSetting("Transparent Obsidian Roof",
-            "Makes obsidian placed at build height transparent. Does not update tiles already mapped - you need to remap them.",
+            "Transparent Obsidian Roof \\n " +
+                    "Makes obsidian placed at build height transparent. Does not update tiles already mapped - you need to remap them.",
             (v) -> XaeroPlusSettingRegistry.markChunksDirtyInWriteDistance(),
             true);
     public static final XaeroPlusSetting transparentObsidianRoofDarkeningSetting = XaeroPlusSetting.createFloatSetting("Roof Obsidian Opacity",
-            // todo: I think a -1 setting here to make the obsidian completely invisible would be cool
-            0, 15, 1,
-            "Sets the opacity of the transparent obsidian roof tiles. Does not update tiles already mapped - you need to remap them.",
+            -1, 15, 1,
+            "Roof Obsidian Opacity \\n " +
+                    "Sets the opacity of the transparent obsidian roof tiles. Does not update tiles already mapped - you need to remap them. \\n " +
+                    "Change this to -1 to completely hide roof obsidian.",
             (v) -> XaeroPlusSettingRegistry.markChunksDirtyInWriteDistance(),
-            10);
+            5);
     public static final XaeroPlusSetting worldMapMinZoomSetting = XaeroPlusSetting.createFloatSetting("Min WorldMap Zoom",
             0, 0.625f, 0.01f,
-            "Minimum WorldMap Zoom Setting. This is 10x what you see on the WorldMap.",
+            "Min WorldMap Zoom \\n " +
+                    "Minimum WorldMap Zoom Setting. This is 10x what you see on the WorldMap.",
             0.1f);
     public static final XaeroPlusSetting skipWorldRenderSetting = XaeroPlusSetting.createBooleanSetting("Skip Background Render",
-            "Skip MC world render while in a Xaero GUI. Having this on can cause issues with travel mods while you're in a Xaero GUI like the WorldMap.",
+            "Skip Background Render \\n " +
+                    "Skip MC world render while in a Xaero GUI. Having this on can cause issues with travel mods while you're in a Xaero GUI like the WorldMap.",
             false);
     public static final XaeroPlusSetting newChunksMinimapSetting = XaeroPlusSetting.createBooleanSetting("Minimap NewChunks",
-            "Highlights NewChunks on the minimap",
+            "Minimap NewChunks \\n " +
+                    "Highlights NewChunks on the minimap.",
             true);
     public static final XaeroPlusSetting worldMapNewChunksSetting = XaeroPlusSetting.createBooleanSetting("WorldMap NewChunks",
-            "Highlights NewChunks on the WorldMap",
+            "WorldMap NewChunks \\n " +
+                    "Highlights NewChunks on the WorldMap.",
             true);
     public static final XaeroPlusSetting newChunksAlphaSetting = XaeroPlusSetting.createFloatSetting("New Chunks Opacity",
             10f, 255f, 10f,
-            "Changes the color opacity of NewChunks",
+            "New Chunks Opacity \\n " +
+                    "Changes the color opacity of NewChunks.",
             NewChunks::setAlpha,
             100);
     public static final XaeroPlusSetting wdlMinimapEnabledSetting = XaeroPlusSetting.createBooleanSetting("Minimap WDL Highlight",
-            "Highlights chunks WDL mod has downloaded on the minimap",
+            "Minimap WDL Highlight \\n " +
+                    "Highlights chunks WDL mod has downloaded on the minimap.",
             true);
-    public static final XaeroPlusSetting wdlWorldmapEnabledSetting = XaeroPlusSetting.createBooleanSetting("Worldmap WDL Highlight",
-            "Highlights chunks WDL mod has downloaded on the WorldMap",
+    public static final XaeroPlusSetting wdlWorldmapEnabledSetting = XaeroPlusSetting.createBooleanSetting("WorldMap WDL Highlight",
+            "WorldMap WDL Highlight \\n " +
+                    "Highlights chunks WDL mod has downloaded on the WorldMap.",
             true);
     public static final XaeroPlusSetting wdlAlphaSetting = XaeroPlusSetting.createFloatSetting("WDL Opacity",
             10f, 255f, 10f,
-            "Changes the color opacity of WDL chunks",
+            "WDL Opacity \\n " +
+                    "Changes the color opacity of WDL chunks.",
             WDLHelper::setAlpha,
             100);
     public static final XaeroPlusSetting owAutoWaypointDimension = XaeroPlusSetting.createBooleanSetting("Prefer Overworld Waypoints",
-            "Prefer creating and viewing Overworld waypoints when in the nether",
+            "Prefer Overworld Waypoints \\n " +
+                    "Prefer creating and viewing Overworld waypoints when in the nether.",
             true);
 
     public static final List<XaeroPlusSetting> XAERO_PLUS_SETTING_LIST = asList(

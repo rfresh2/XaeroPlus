@@ -105,7 +105,7 @@ dependencies {
     }
 
     implementation(fg.deobf("curse.maven:xaeros-world-map-317780:4127330"))
-    implementation(fg.deobf("curse.maven:xaeros-minimap-263420:4181094"))
+    implementation(fg.deobf("curse.maven:xaeros-minimap-263420:4338608"))
 
     annotationProcessor('org.spongepowered:mixin:0.8.5:processor') {
         exclude module: 'gson'

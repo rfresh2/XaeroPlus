@@ -81,6 +81,10 @@ public final class XaeroPlusSettingRegistry {
                     "Prefer creating and viewing Overworld waypoints when in the nether.",
             true);
 
+    public static final XaeroPlusSetting dimensionReloadNewChunks = XaeroPlusSetting.createBooleanSetting("Reload NewChunks",
+            "Reload all saved NewChunks on world or dimension change.",
+            false);
+
     public static final List<XaeroPlusSetting> XAERO_PLUS_SETTING_LIST = asList(
             // add settings here
             fastMapSetting,
@@ -96,7 +100,8 @@ public final class XaeroPlusSettingRegistry {
             wdlMinimapEnabledSetting,
             wdlWorldmapEnabledSetting,
             wdlAlphaSetting,
-            owAutoWaypointDimension
+            owAutoWaypointDimension,
+            dimensionReloadNewChunks
     );
 
     public static final List<ModOptions> MOD_OPTIONS_LIST = constructXaeroPlusSettings();

@@ -20,6 +20,8 @@ import xaero.map.region.LeveledRegion;
 import xaero.map.region.MapRegion;
 import xaero.map.world.MapDimension;
 import xaero.map.world.MapWorld;
+import xaeroplus.XaeroPlus;
+import xaeroplus.event.XaeroWorldChangeEvent;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
@@ -209,7 +211,6 @@ public abstract class MixinMapProcessor {
     /**
      * Reason: Allow multiple client instances to open the same map
      *
-     * May cause some crashes or data incoherence if updating the same tiles (?)
      */
     @Inject(method = "updateWorldSynced", at = @At("HEAD"), cancellable = true)
     synchronized void updateWorldSynced(final CallbackInfo ci) throws IOException {
@@ -385,6 +386,7 @@ public abstract class MixinMapProcessor {
                 if (WorldMap.settings.debug) {
                     WorldMap.LOGGER.info("World/dimension changed to: " + this.currentWorldId + " " + this.currentDimId + " " + this.currentMWId);
                 }
+                XaeroPlus.EVENT_BUS.dispatch(new XaeroWorldChangeEvent(this.currentWorldId, this.currentDimId, this.currentMWId));
 
                 this.worldDataHandler.prepareSingleplayer(this.world, (MapProcessor) (Object) this);
                 if (this.worldDataHandler.getWorldDir() == null && this.currentWorldId != null && !this.mapWorld.isMultiplayer()) {

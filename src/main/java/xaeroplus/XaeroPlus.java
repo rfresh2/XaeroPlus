@@ -5,8 +5,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import xaeroplus.module.ModuleManager;
 
 import java.util.UUID;
@@ -20,7 +20,7 @@ public class XaeroPlus {
     public static boolean FOLLOW = false;
     public static String LOCK_ID = UUID.randomUUID().toString();
     public static EventBus EVENT_BUS = new EventBus(Runnable::run);
-    public static Logger LOGGER = LoggerFactory.getLogger("XaeroPlus");
+    public static Logger LOGGER = LogManager.getLogger("XaeroPlus");
 
     @Mod.Instance
     public static XaeroPlus INSTANCE;

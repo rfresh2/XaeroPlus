@@ -109,6 +109,7 @@ dependencies {
     }
 
     jarLibs "com.github.collarmc:Pounce:13ef4ab90e"
+    jarLibs 'org.apache.commons:commons-compress:1.21'
 
     implementation(fg.deobf("curse.maven:xaeros-world-map-317780:4127330"))
     implementation(fg.deobf("curse.maven:xaeros-minimap-263420:4338608"))
@@ -160,6 +161,7 @@ jar {
             it.isDirectory() ? it : zipTree(it)
         }
     }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 jar.finalizedBy('reobfJar')

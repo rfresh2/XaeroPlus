@@ -21,10 +21,10 @@ import xaero.map.WorldMapSession;
 import xaero.map.gui.GuiMap;
 import xaero.map.region.MapRegion;
 import xaero.map.region.MapTileChunk;
-import xaeroplus.WDLHelper;
-import xaeroplus.XaeroPlusSettingRegistry;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.WDLHelper;
 
 import java.util.HashMap;
 import java.util.List;

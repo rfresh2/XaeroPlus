@@ -1,4 +1,4 @@
-package xaeroplus;
+package xaeroplus.settings;
 
 import com.google.common.base.Suppliers;
 import net.minecraft.client.Minecraft;
@@ -9,6 +9,7 @@ import xaero.map.gui.ConfigSettingEntry;
 import xaero.map.settings.ModOptions;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
+import xaeroplus.util.WDLHelper;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 
 import static java.lang.reflect.Modifier.FINAL;
 import static java.util.Arrays.asList;
-import static xaeroplus.XaeroPlusSetting.SETTING_PREFIX;
+import static xaeroplus.settings.XaeroPlusSetting.SETTING_PREFIX;
 
 /**
  * Registry for XaeroPlus-specific settings

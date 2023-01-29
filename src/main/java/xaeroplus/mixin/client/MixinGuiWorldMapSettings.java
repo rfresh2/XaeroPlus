@@ -9,7 +9,7 @@ import xaero.map.gui.ConfigSettingEntry;
 import xaero.map.gui.GuiSettings;
 import xaero.map.gui.GuiWorldMapSettings;
 import xaero.map.gui.ISettingEntry;
-import xaeroplus.XaeroPlusSettingRegistry;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 @Mixin(value = GuiWorldMapSettings.class, remap = false)
 public abstract class MixinGuiWorldMapSettings extends GuiSettings {

@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.common.settings.ModSettings;
-import xaeroplus.XaeroPlusSettingRegistry;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 @Mixin(value = ModSettings.class, remap = false)
 public class MixinCommonModSettings {

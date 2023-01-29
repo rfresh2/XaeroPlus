@@ -1,4 +1,4 @@
-package xaeroplus;
+package xaeroplus.util;
 
 import java.util.Collection;
 import java.util.Hashtable;

@@ -8,8 +8,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.map.WorldMap;
 import xaero.map.settings.ModOptions;
 import xaero.map.settings.ModSettings;
-import xaeroplus.XaeroPlusSetting;
-import xaeroplus.XaeroPlusSettingRegistry;
+import xaeroplus.settings.XaeroPlusSetting;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 import java.io.*;
 import java.util.Optional;

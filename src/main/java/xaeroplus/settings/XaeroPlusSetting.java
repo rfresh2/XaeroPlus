@@ -1,4 +1,4 @@
-package xaeroplus;
+package xaeroplus.settings;
 
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.text.TextComponentString;

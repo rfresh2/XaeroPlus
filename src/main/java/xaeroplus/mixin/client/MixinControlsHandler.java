@@ -6,8 +6,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.controls.ControlsHandler;
-import xaeroplus.XaeroPlusSetting;
-import xaeroplus.XaeroPlusSettingRegistry;
+import xaeroplus.settings.XaeroPlusSetting;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 import static java.util.Objects.nonNull;
 

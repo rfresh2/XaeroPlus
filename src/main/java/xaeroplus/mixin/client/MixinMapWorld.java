@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.map.MapProcessor;
 import xaero.map.world.MapDimension;
 import xaero.map.world.MapWorld;
-import xaeroplus.DelegatingHashTable;
+import xaeroplus.util.DelegatingHashTable;
 
 import java.util.Hashtable;
 

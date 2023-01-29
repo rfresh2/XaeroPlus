@@ -1,7 +1,7 @@
 package xaeroplus.module;
 
-import xaeroplus.ClassUtil;
 import xaeroplus.XaeroPlus;
+import xaeroplus.util.ClassUtil;
 
 import java.util.LinkedHashMap;
 

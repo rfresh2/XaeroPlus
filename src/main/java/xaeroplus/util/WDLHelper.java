@@ -1,9 +1,10 @@
-package xaeroplus;
+package xaeroplus.util;
 
 import com.google.common.base.Suppliers;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
 import wdl.WDL;
+import xaeroplus.XaeroPlus;
 
 import java.util.Collections;
 import java.util.HashSet;

@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.common.minimap.waypoints.WaypointsManager;
-import xaeroplus.XaeroPlusSettingRegistry;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 import static java.util.Objects.nonNull;
 

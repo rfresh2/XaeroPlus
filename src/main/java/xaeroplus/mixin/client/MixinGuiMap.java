@@ -37,10 +37,10 @@ import xaero.map.mods.gui.Waypoint;
 import xaero.map.region.*;
 import xaero.map.region.texture.RegionTexture;
 import xaero.map.settings.ModSettings;
-import xaeroplus.WDLHelper;
-import xaeroplus.XaeroPlusSettingRegistry;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.WDLHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;

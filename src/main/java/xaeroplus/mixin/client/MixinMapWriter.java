@@ -33,7 +33,7 @@ import xaero.map.region.MapBlock;
 import xaero.map.region.MapRegion;
 import xaero.map.region.OverlayBuilder;
 import xaero.map.region.OverlayManager;
-import xaeroplus.XaeroPlusSettingRegistry;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 import java.time.Duration;
 import java.time.Instant;

@@ -12,10 +12,10 @@ import org.apache.commons.compress.compressors.lz4.FramedLZ4CompressorOutputStre
 import xaero.map.WorldMap;
 import xaero.map.core.XaeroWorldMapCore;
 import xaeroplus.XaeroPlus;
-import xaeroplus.XaeroPlusSettingRegistry;
 import xaeroplus.event.PacketReceivedEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.module.Module;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;

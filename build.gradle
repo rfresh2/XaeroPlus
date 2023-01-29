@@ -36,6 +36,10 @@ repositories {
     maven {
         url "https://cursemaven.com"
     }
+    maven {
+        name = "jitpack.io"
+        url = "https://jitpack.io"
+    }
     jcenter()
     mavenCentral()
 }
@@ -103,6 +107,8 @@ dependencies {
         exclude module: 'launchwrapper'
         exclude module: 'log4j-core'
     }
+
+    jarLibs "com.github.collarmc:Pounce:13ef4ab90e"
 
     implementation(fg.deobf("curse.maven:xaeros-world-map-317780:4127330"))
     implementation(fg.deobf("curse.maven:xaeros-minimap-263420:4338608"))

@@ -37,9 +37,10 @@ import xaero.map.mods.gui.Waypoint;
 import xaero.map.region.*;
 import xaero.map.region.texture.RegionTexture;
 import xaero.map.settings.ModSettings;
-import xaeroplus.NewChunks;
 import xaeroplus.WDLHelper;
 import xaeroplus.XaeroPlusSettingRegistry;
+import xaeroplus.module.ModuleManager;
+import xaeroplus.module.impl.NewChunks;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -1000,7 +1001,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                     setupTextureMatricesAndTextures(brightness);
                                 }
 
-                                if (XaeroPlusSettingRegistry.worldMapNewChunksSetting.getBooleanSettingValue()) {
+                                if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getBooleanSettingValue()) {
                                     restoreTextureStates();
                                     // todo: might be able to optimize this, its checking every chunk on every frame
                                     //  can become a problem at low zooms
@@ -1014,12 +1015,12 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                                     final int mapTileChunkZ = regZ * 8 + cz;
                                                     for (int t = 0; t < 16; ++t) {
                                                         final ChunkPos chunkPos = new ChunkPos(mapTileChunkX * 4 + t % 4, mapTileChunkZ * 4 + t / 4);
-                                                        if (NewChunks.isNewChunk(chunkPos)) {
+                                                        if (ModuleManager.getModule(NewChunks.class).isNewChunk(chunkPos)) {
                                                             GlStateManager.pushMatrix();
                                                             GlStateManager.translate(
                                                                     (float)(16 * chunkPos.x - flooredCameraX), (float)(16 * chunkPos.z - flooredCameraZ), 0.0F
                                                             );
-                                                            drawRect(0, 0, 16, 16, NewChunks.getNewChunksColor());
+                                                            drawRect(0, 0, 16, 16, ModuleManager.getModule(NewChunks.class).getNewChunksColor());
                                                             GlStateManager.popMatrix();
                                                         }
                                                     }
@@ -1030,7 +1031,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                     GlStateManager.disableBlend();
                                     setupTextureMatricesAndTextures(brightness);
                                 }
-                                if (XaeroPlusSettingRegistry.wdlWorldmapEnabledSetting.getBooleanSettingValue()
+                                if (XaeroPlusSettingRegistry.wdlEnabledSetting.getBooleanSettingValue()
                                         && WDLHelper.isWdlPresent()
                                         && WDLHelper.isDownloading()) {
                                     restoreTextureStates();
@@ -1390,12 +1391,12 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     this.renderLoadingScreen();
                 } else if (isLocked) {
                     this.renderMessageScreen(
-                            I18n.format("gui.xaero_current_map_locked1", new Object[0]), I18n.format("gui.xaero_current_map_locked2", new Object[0])
+                            I18n.format("gui.xaero_current_map_locked1"), I18n.format("gui.xaero_current_map_locked2", new Object[0])
                     );
                 } else if (noWorldMapEffect) {
-                    this.renderMessageScreen(I18n.format("gui.xaero_no_world_map_message", new Object[0]));
+                    this.renderMessageScreen(I18n.format("gui.xaero_no_world_map_message"));
                 } else if (!allowedBasedOnItem) {
-                    this.renderMessageScreen(I18n.format("gui.xaero_no_world_map_item_message", new Object[0]), ModSettings.mapItem.getUnlocalizedName());
+                    this.renderMessageScreen(I18n.format("gui.xaero_no_world_map_item_message"), ModSettings.mapItem.getUnlocalizedName());
                 }
             }
 

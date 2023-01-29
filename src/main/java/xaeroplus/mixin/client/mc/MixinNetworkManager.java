@@ -7,13 +7,14 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xaeroplus.NewChunks;
+import xaeroplus.XaeroPlus;
+import xaeroplus.event.PacketReceivedEvent;
 
 @Mixin(value = NetworkManager.class)
 public class MixinNetworkManager {
 
     @Inject(method = "channelRead0(Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/Packet;)V", at = @At("RETURN"))
     private void channelReadPost(ChannelHandlerContext context, Packet<?> packet, CallbackInfo callbackInfo) {
-        NewChunks.handlePacketEvent(packet);
+        XaeroPlus.EVENT_BUS.dispatch(new PacketReceivedEvent(packet));
     }
 }

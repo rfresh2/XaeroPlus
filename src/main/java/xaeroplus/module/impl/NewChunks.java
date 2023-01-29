@@ -1,8 +1,11 @@
-package xaeroplus;
+package xaeroplus.module.impl;
 
-import net.minecraft.network.Packet;
+import com.collarmc.pounce.Subscribe;
 import net.minecraft.network.play.server.SPacketChunkData;
 import net.minecraft.util.math.ChunkPos;
+import xaeroplus.XaeroPlusSettingRegistry;
+import xaeroplus.event.PacketReceivedEvent;
+import xaeroplus.module.Module;
 
 import java.util.List;
 import java.util.Map;
@@ -11,17 +14,21 @@ import java.util.stream.Collectors;
 
 import static xaeroplus.XaeroPlus.getColor;
 
-public class NewChunks {
-
+@Module.ModuleInfo()
+public class NewChunks extends Module {
     private static final ConcurrentHashMap<ChunkPos, Long> chunks = new ConcurrentHashMap<>();
     private static int newChunksColor = getColor(255, 0, 0, 100);
     // somewhat arbitrary number but should be sufficient
     private static final int maxNumber = 5000;
 
-    public static void handlePacketEvent(final Packet<?> packet) {
-        if (packet instanceof SPacketChunkData
-                && (XaeroPlusSettingRegistry.newChunksMinimapSetting.getBooleanSettingValue() || XaeroPlusSettingRegistry.worldMapNewChunksSetting.getBooleanSettingValue())) {
-            final SPacketChunkData chunkData = (SPacketChunkData) packet;
+    public NewChunks() {
+        this.setEnabled(XaeroPlusSettingRegistry.newChunksEnabledSetting.getBooleanSettingValue());
+    }
+
+    @Subscribe
+    public void onPacketReceivedEvent(final PacketReceivedEvent event) {
+        if (event.packet instanceof SPacketChunkData) {
+            final SPacketChunkData chunkData = (SPacketChunkData) event.packet;
             if (!chunkData.isFullChunk()) {
                 final ChunkPos chunkPos = new ChunkPos(chunkData.getChunkX(), chunkData.getChunkZ());
                 synchronized (chunks) {
@@ -40,19 +47,19 @@ public class NewChunks {
         }
     }
 
-    public static boolean isNewChunk(final ChunkPos chunkPos) {
+    public boolean isNewChunk(final ChunkPos chunkPos) {
         return chunks.containsKey(chunkPos);
     }
 
-    public static int getNewChunksColor() {
+    public int getNewChunksColor() {
         return newChunksColor;
     }
 
-    public static void reset() {
+    public void reset() {
         chunks.clear();
     }
 
-    public static void setAlpha(final float a) {
+    public void setAlpha(final float a) {
         newChunksColor = getColor(255, 0, 0, (int) a);
     }
 }

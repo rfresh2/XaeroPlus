@@ -21,9 +21,10 @@ import xaero.map.WorldMapSession;
 import xaero.map.gui.GuiMap;
 import xaero.map.region.MapRegion;
 import xaero.map.region.MapTileChunk;
-import xaeroplus.NewChunks;
 import xaeroplus.WDLHelper;
 import xaeroplus.XaeroPlusSettingRegistry;
+import xaeroplus.module.ModuleManager;
+import xaeroplus.module.impl.NewChunks;
 
 import java.util.HashMap;
 import java.util.List;
@@ -184,17 +185,17 @@ public abstract class MixinSupportXaeroWorldmap {
                                             }
                                         }
 
-                                        if (XaeroPlusSettingRegistry.newChunksMinimapSetting.getBooleanSettingValue()) {
+                                        if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getBooleanSettingValue()) {
                                             GuiMap.restoreTextureStates();
                                             if (compatibilityVersion >= 7) {
                                                 GL14.glBlendFuncSeparate(770, 771, 1, 771);
                                             }
                                             for(int t = 0; t < 16; ++t) {
                                                 final ChunkPos chunkPos = new ChunkPos(chunk.getX() * 4 + t % 4, chunk.getZ() * 4 + t / 4);
-                                                if (NewChunks.isNewChunk(chunkPos)) {
+                                                if (ModuleManager.getModule(NewChunks.class).isNewChunk(chunkPos)) {
                                                     int newChunkDrawX = drawX + 16 * (t % 4);
                                                     int newChunkDrawZ = drawZ + 16 * (t / 4);
-                                                    Gui.drawRect(newChunkDrawX, newChunkDrawZ, newChunkDrawX + 16, newChunkDrawZ + 16, NewChunks.getNewChunksColor());
+                                                    Gui.drawRect(newChunkDrawX, newChunkDrawZ, newChunkDrawX + 16, newChunkDrawZ + 16, ModuleManager.getModule(NewChunks.class).getNewChunksColor());
                                                 }
                                             }
 
@@ -208,7 +209,7 @@ public abstract class MixinSupportXaeroWorldmap {
                                             }
                                         }
 
-                                        if (XaeroPlusSettingRegistry.wdlMinimapEnabledSetting.getBooleanSettingValue()
+                                        if (XaeroPlusSettingRegistry.wdlEnabledSetting.getBooleanSettingValue()
                                                 && WDLHelper.isWdlPresent()
                                                 && WDLHelper.isDownloading()) {
                                             GuiMap.restoreTextureStates();

@@ -48,3 +48,17 @@ Using any official Xaero mod version other than these two may cause crashes.
 Configurations are in the normal Xaero WorldMap settings GUI.
 
 Toggleable settings support keybinds through the standard Minecraft Controls GUI.
+
+# Other Useful Tools
+
+* Convert JourneyMap World Files to Xaero: [JMToXaero](https://github.com/Entropy5/JMtoXaero)
+* Convert JourneyMap Waypoints to Xaero: [JMWaypointsToXaero](https://github.com/rfresh2/JMWaypointsToXaero)
+* 2b2t Atlas Waypoints to Xaero: [JMWaypointsToXaero/atlas](https://github.com/rfresh2/JMWaypointsToXaero/tree/atlas)
+* Convert MC Region Files to Xaero: [JMToXaero/Region-Scripts](https://github.com/Entropy5/JMtoXaero/blob/Region-Scripts/src/main/java/com/github/entropy5/RegionToXaero.java)
+* 2b2t 256k WDL Xaero Map (20GB): [mc-archive](https://data.mc-archive.org/s/eFDEy2XKof83Kez)
+* Xaero World Merger: [JMToXaero/Region-Scripts](https://github.com/Entropy5/JMtoXaero/blob/Region-Scripts/src/main/java/com/github/entropy5/XaeroRegionMerger.java) 
+  * Can be used to merge 256k WDL into an existing world. With optional darkening only on tiles from 256K
+
+# Support
+
+Message me on Discord: `rfresh#2222`

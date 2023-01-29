@@ -19,7 +19,7 @@ public abstract class MixinControlsRegister {
     @Shadow
     public List<KeyBinding> keybindings;
 
-    @Inject(method = "<init>", at = @At("TAIL"))
+    @Inject(method = "<init>", at = @At("RETURN"))
     public void init(CallbackInfo ci) {
         List<KeyBinding> keybinds = XaeroPlusSettingRegistry.getKeybinds();
         this.keybindings.addAll(keybinds);

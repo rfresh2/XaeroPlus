@@ -22,7 +22,7 @@ public abstract class MixinGuiWaypointsList {
     private IXaeroMinimap modMain;
     private GuiWaypoints thisGuiWaypoints;
 
-    @Inject(method = "<init>", at = @At("TAIL"))
+    @Inject(method = "<init>", at = @At("RETURN"))
     public void init(GuiWaypoints this$0, CallbackInfo ci) throws NoSuchFieldException, IllegalAccessException {
         // god why make this an inner static class i hate these hacks
         thisGuiWaypoints = this$0;

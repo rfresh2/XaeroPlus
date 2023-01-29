@@ -18,7 +18,7 @@ public abstract class MixinGuiWorldMapSettings extends GuiSettings {
         super(title, backScreen, escScreen);
     }
 
-    @Inject(method = "<init>(Lnet/minecraft/client/gui/GuiScreen;Lnet/minecraft/client/gui/GuiScreen;)V", at = @At("TAIL"))
+    @Inject(method = "<init>(Lnet/minecraft/client/gui/GuiScreen;Lnet/minecraft/client/gui/GuiScreen;)V", at = @At("RETURN"))
     public void init(GuiScreen parent, GuiScreen escapeScreen, CallbackInfo ci) {
         final ConfigSettingEntry[] configSettingEntries = XaeroPlusSettingRegistry.getConfigSettingEntries()
                 .toArray(new ConfigSettingEntry[0]);

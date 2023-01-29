@@ -16,7 +16,7 @@ public class MixinMinecraft {
     @Inject(method = "loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", at = @At("TAIL"))
     public void loadWorld(WorldClient p_71353_1_, String p_71353_2_, CallbackInfo ci) {
         if (!XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.getBooleanSettingValue()) {
-            if (XaeroPlusSettingRegistry.dimensionReloadNewChunks.getBooleanSettingValue()) {
+            if (XaeroPlusSettingRegistry.newChunksDimensionReload.getBooleanSettingValue()) {
                 ModuleManager.getModule(NewChunks.class).reset();
             }
         }

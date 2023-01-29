@@ -69,6 +69,9 @@ public final class XaeroPlusSettingRegistry {
             "If we load a chunk in our NewChunk list again, reset it to an old chunk after this time period in seconds."
                     + " \\n 0 = never reset chunks",
             0f);
+    public static final XaeroPlusSetting newChunksDimensionReload = XaeroPlusSetting.createBooleanSetting("Reload NewChunks",
+            "If Save/Load disabled, reload all NewChunks on world or dimension change.",
+            false);
     public static final XaeroPlusSetting newChunksAlphaSetting = XaeroPlusSetting.createFloatSetting("New Chunks Opacity",
             10f, 255f, 10f,
                     "Changes the color opacity of NewChunks.",
@@ -86,10 +89,6 @@ public final class XaeroPlusSettingRegistry {
                     "Prefer creating and viewing Overworld waypoints when in the nether.",
             true);
 
-    public static final XaeroPlusSetting dimensionReloadNewChunks = XaeroPlusSetting.createBooleanSetting("Reload NewChunks",
-            "Reload all saved NewChunks on world or dimension change.",
-            false);
-
     public static final List<XaeroPlusSetting> XAERO_PLUS_SETTING_LIST = asList(
             // add settings here
             fastMapSetting,
@@ -103,10 +102,10 @@ public final class XaeroPlusSettingRegistry {
             newChunksSaveLoadToDisk,
             newChunksSeenResetTime,
             newChunksAlphaSetting,
+            newChunksDimensionReload,
             wdlEnabledSetting,
             wdlAlphaSetting,
-            owAutoWaypointDimension,
-            dimensionReloadNewChunks
+            owAutoWaypointDimension
     );
 
     public static final List<ModOptions> MOD_OPTIONS_LIST = constructXaeroPlusSettings();

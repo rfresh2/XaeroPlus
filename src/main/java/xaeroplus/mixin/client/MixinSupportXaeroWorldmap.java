@@ -191,8 +191,9 @@ public abstract class MixinSupportXaeroWorldmap {
                                                 GL14.glBlendFuncSeparate(770, 771, 1, 771);
                                             }
                                             for(int t = 0; t < 16; ++t) {
-                                                final ChunkPos chunkPos = new ChunkPos(chunk.getX() * 4 + t % 4, chunk.getZ() * 4 + t / 4);
-                                                if (ModuleManager.getModule(NewChunks.class).isNewChunk(chunkPos)) {
+                                                final int chunkPosX = chunk.getX() * 4 + t % 4;
+                                                final int chunkPosZ = chunk.getZ() * 4 + t / 4;
+                                                if (ModuleManager.getModule(NewChunks.class).isNewChunk(chunkPosX, chunkPosZ)) {
                                                     int newChunkDrawX = drawX + 16 * (t % 4);
                                                     int newChunkDrawZ = drawZ + 16 * (t / 4);
                                                     Gui.drawRect(newChunkDrawX, newChunkDrawZ, newChunkDrawX + 16, newChunkDrawZ + 16, ModuleManager.getModule(NewChunks.class).getNewChunksColor());

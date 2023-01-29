@@ -3,6 +3,7 @@ package xaeroplus.settings;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.text.TextComponentString;
 import xaero.map.gui.CursorBox;
+import xaeroplus.XaeroPlus;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -148,7 +149,11 @@ public class XaeroPlusSetting {
     public void setFloatSettingValue(float floatSettingValue) {
         this.floatSettingValue = floatSettingValue;
         if (nonNull(getFloatSettingChangeConsumer())) {
-            getFloatSettingChangeConsumer().accept(floatSettingValue);
+            try {
+                getFloatSettingChangeConsumer().accept(floatSettingValue);
+            } catch (final Exception e) {
+                XaeroPlus.LOGGER.warn("Error applying setting change consumer for {}", this.settingName, e);
+            }
         }
     }
 
@@ -159,7 +164,11 @@ public class XaeroPlusSetting {
     public void setBooleanSettingValue(boolean booleanSettingValue) {
         this.booleanSettingValue = booleanSettingValue;
         if (nonNull(getBooleanSettingChangeConsumer())) {
-            getBooleanSettingChangeConsumer().accept(booleanSettingValue);
+            try {
+                getBooleanSettingChangeConsumer().accept(booleanSettingValue);
+            } catch (final Exception e) {
+                XaeroPlus.LOGGER.warn("Error applying setting change consumer for {}", this.settingName, e);
+            }
         }
     }
 

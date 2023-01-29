@@ -1014,11 +1014,12 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                                     final int mapTileChunkX = regX * 8 + cx;
                                                     final int mapTileChunkZ = regZ * 8 + cz;
                                                     for (int t = 0; t < 16; ++t) {
-                                                        final ChunkPos chunkPos = new ChunkPos(mapTileChunkX * 4 + t % 4, mapTileChunkZ * 4 + t / 4);
-                                                        if (ModuleManager.getModule(NewChunks.class).isNewChunk(chunkPos)) {
+                                                        final int chunkPosX = mapTileChunkX * 4 + t % 4;
+                                                        final int chunkPosZ = mapTileChunkZ * 4 + t / 4;
+                                                        if (ModuleManager.getModule(NewChunks.class).isNewChunk(chunkPosX, chunkPosZ)) {
                                                             GlStateManager.pushMatrix();
                                                             GlStateManager.translate(
-                                                                    (float)(16 * chunkPos.x - flooredCameraX), (float)(16 * chunkPos.z - flooredCameraZ), 0.0F
+                                                                    (float)(16 * chunkPosX - flooredCameraX), (float)(16 * chunkPosZ - flooredCameraZ), 0.0F
                                                             );
                                                             drawRect(0, 0, 16, 16, ModuleManager.getModule(NewChunks.class).getNewChunksColor());
                                                             GlStateManager.popMatrix();

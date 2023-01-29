@@ -30,7 +30,7 @@ Using any official Xaero mod version other than these two may cause crashes.
 * WorldMap zoom unlocked
 * Worldmap Follow mode and GUI button
 * NewChunks Highlighting in MiniMap and WorldMap.
-* [WorldDownloader](https://github.com/Pokechu22/WorldDownloader/) integration
+* [WorldDownloader 4.1.1.0](https://github.com/Pokechu22/WorldDownloader/) integration
   * Highlights chunks as they are downloaded in the Minimap and WorldMap.
 * Faster map tile zip reads/writes
 * Allow multiple MC instances to read/write to the same map concurrently

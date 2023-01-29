@@ -57,8 +57,8 @@ public class NewChunks extends Module {
         try {
             if (event.packet instanceof SPacketChunkData) {
                 final SPacketChunkData chunkData = (SPacketChunkData) event.packet;
+                final Long chunkPosKey = chunkPosToLong(chunkData.getChunkX(), chunkData.getChunkZ());
                 if (!chunkData.isFullChunk()) {
-                    final ChunkPos chunkPos = new ChunkPos(chunkData.getChunkX(), chunkData.getChunkZ());
                     synchronized (chunks) {
                         // todo: find a way to limit our in-memory NewChunk data usage while having save/load enabled (without data loss)
                         //  some file type that allows us to select/write a subset of data? sqlite?
@@ -71,20 +71,20 @@ public class NewChunks extends Module {
                                     .collect(Collectors.toList());
                             toRemove.forEach(chunks::remove);
                         }
-                        chunks.put(chunkPosToLong(chunkPos), System.currentTimeMillis());
+                        chunks.put(chunkPosKey, System.currentTimeMillis());
                     }
                 } else if (XaeroPlusSettingRegistry.newChunksSeenResetTime.getFloatSettingValue() > 0) {
-                    final Long chunkKey = chunkPosToLong(new ChunkPos(chunkData.getChunkX(), chunkData.getChunkZ()));
-                    final Long chunkDataSeenTime = chunks.get(chunkKey);
+                    final Long chunkDataSeenTime = chunks.get(chunkPosKey);
                     if (nonNull(chunkDataSeenTime)) {
                         if (System.currentTimeMillis() - chunkDataSeenTime > XaeroPlusSettingRegistry.newChunksSeenResetTime.getFloatSettingValue() * 1000) {
-                            chunks.remove(chunkKey);
+                            chunks.remove(chunkPosKey);
                         }
                     }
                 }
             }
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error handling packet event in NewChunks", e);
+            // removing this log as it could possibly spam. we *shouldn't* reach this anyway
+//            XaeroPlus.LOGGER.error("Error handling packet event in NewChunks", e);
         }
     }
 
@@ -107,15 +107,19 @@ public class NewChunks extends Module {
     @Override
     public void onEnable() {
         if (XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.getBooleanSettingValue()) {
-            try {
-                final String worldId = XaeroWorldMapCore.currentSession.getMapProcessor().getCurrentWorldId();
-                final String dimensionId = XaeroWorldMapCore.currentSession.getMapProcessor().getCurrentDimension();
-                final String mwId = XaeroWorldMapCore.currentSession.getMapProcessor().getCurrentMWId();
-                this.currentSaveFile = getSavePath(worldId, dimensionId, mwId);
-                loadChunks(this.currentSaveFile);
-            } catch (final Exception e) {
-                // expected on game launch
-            }
+            loadChunksWithXaeroState();
+        }
+    }
+
+    private void loadChunksWithXaeroState() {
+        try {
+            final String worldId = XaeroWorldMapCore.currentSession.getMapProcessor().getCurrentWorldId();
+            final String dimensionId = XaeroWorldMapCore.currentSession.getMapProcessor().getCurrentDimId();
+            final String mwId = XaeroWorldMapCore.currentSession.getMapProcessor().getCurrentMWId();
+            this.currentSaveFile = getSavePath(worldId, dimensionId, mwId);
+            loadChunks(this.currentSaveFile);
+        } catch (final Exception e) {
+            // expected on game launch
         }
     }
 
@@ -137,12 +141,21 @@ public class NewChunks extends Module {
         return (long)chunkPos.x & 4294967295L | ((long)chunkPos.z & 4294967295L) << 32;
     }
 
+    public static Long chunkPosToLong(final int x, final int z) {
+        return (long)x & 4294967295L | ((long)z & 4294967295L) << 32;
+    }
+
     public static ChunkPos longToChunkPos(final Long l) {
         return new ChunkPos((int)(l & 4294967295L), (int)(l >> 32 & 4294967295L));
     }
 
     public boolean isNewChunk(final ChunkPos chunkPos) {
         return chunks.containsKey(chunkPosToLong(chunkPos));
+    }
+
+    // in chunkpos coordinates
+    public boolean isNewChunk(final int x, final int z) {
+        return chunks.containsKey(chunkPosToLong(x, z));
     }
 
     public int getNewChunksColor() {
@@ -165,11 +178,12 @@ public class NewChunks extends Module {
         try {
             final Path saveFile = mainXaeroWorldMapFolder.resolve(worldId).resolve(dimensionId).resolve(mwId).resolve(NEWCHUNKS_FILE_NAME);
             if (!saveFile.toFile().exists()) {
+                XaeroPlus.LOGGER.info("Creating NewChunks save file at {} ", saveFile);
                 saveFile.toFile().createNewFile();
             }
             return saveFile;
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error creating NewChunks save file", e);
+            XaeroPlus.LOGGER.error("Error creating NewChunks save file {}", e);
         }
         return null;
     }
@@ -182,11 +196,13 @@ public class NewChunks extends Module {
                 .map(e -> new NewChunkData(e.getKey(), e.getValue()))
                 .collect(Collectors.toList());
         final Gson gson = new GsonBuilder().create();
-        try (Writer writer = new OutputStreamWriter(new FramedLZ4CompressorOutputStream(Files.newOutputStream(saveFile.toFile().toPath())))) {
+        // todo: we should write to a temp file and then rename replace in case this fails mid-write for whatever reason
+        //  also we should do a quick check we aren't writing significantly fewer chunks than what are on disk just in case
+        try (Writer writer = new OutputStreamWriter(new FramedLZ4CompressorOutputStream(Files.newOutputStream(saveFile)))) {
             gson.toJson(chunkData, writer);
-            XaeroPlus.LOGGER.debug("Saved " + chunkData.size() + " NewChunks to disk");
+            XaeroPlus.LOGGER.info("Saved {} NewChunks to disk", chunkData.size());
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error saving new chunks to file", e);
+            XaeroPlus.LOGGER.error("Error saving new chunks to {}", saveFile,e);
         }
     }
 
@@ -204,10 +220,19 @@ public class NewChunks extends Module {
             final List<NewChunkData> chunkData = gson.fromJson(reader, newChunkDataType.getType());
             if (nonNull(chunkData)) {
                 chunkData.stream().forEach(d -> chunks.put(d.chunkPos, d.foundTime));
-                XaeroPlus.LOGGER.debug("Loaded " + chunkData.size() + " NewChunks from disk");
+                XaeroPlus.LOGGER.info("Loaded {} NewChunks from disk", chunkData.size());
             }
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error loading new chunks from file", e);
+        }
+    }
+
+    public void setSaveLoad(final Boolean b) {
+        if (b) {
+            loadChunksWithXaeroState();
+        } else {
+            // currentSaveFile should already be set here
+            saveChunks(this.currentSaveFile);
         }
     }
 
@@ -216,7 +241,7 @@ public class NewChunks extends Module {
         public final Long chunkPos;
         public final Long foundTime;
 
-        public NewChunkData(final Long chunkPos, final long foundTime) {
+        public NewChunkData(final Long chunkPos, final Long foundTime) {
             this.chunkPos = chunkPos;
             this.foundTime = foundTime;
         }

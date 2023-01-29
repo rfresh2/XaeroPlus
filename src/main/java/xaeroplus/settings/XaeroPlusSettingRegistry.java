@@ -64,6 +64,7 @@ public final class XaeroPlusSettingRegistry {
             true);
     public static final XaeroPlusSetting newChunksSaveLoadToDisk = XaeroPlusSetting.createBooleanSetting("Save/Load NewChunks to Disk",
             "Saves and loads NewChunk data to disk for each world and dimension. Requires NewChunk Highlighting to be enabled.",
+            (b) -> ModuleManager.getModule(NewChunks.class).setSaveLoad(b),
             false);
     public static final XaeroPlusSetting newChunksSeenResetTime = XaeroPlusSetting.createFloatSetting("Reset Seen Chunks Time",
             0, 1000f, 10f,

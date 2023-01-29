@@ -42,6 +42,7 @@ public abstract class Module {
     }
 
     public void enable() {
+        if (this.isEnabled()) return;
         this.enabled = true;
         XaeroPlus.EVENT_BUS.subscribe(this);
         try {
@@ -52,6 +53,7 @@ public abstract class Module {
     }
 
     public void disable() {
+        if (!this.isEnabled()) return;
         this.enabled = false;
         XaeroPlus.EVENT_BUS.unsubscribe(this);
         try {

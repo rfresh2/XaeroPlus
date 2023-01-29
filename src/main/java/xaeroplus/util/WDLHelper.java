@@ -27,10 +27,12 @@ public class WDLHelper {
             checkedWdlPresent = true;
             try {
                 Class.forName(WDL.class.getName());
+                Set<ChunkPos> savedChunks = WDL.getInstance().savedChunks;
+                WDL.getInstance().getChunkList();
                 isWdlPresent = true;
             } catch (final Throwable e) {
                 if (!hasLoggedFail) {
-                    System.out.println("[XaeroPlus] WDL mod not present, WDL features will be disabled.");
+                    XaeroPlus.LOGGER.error("WDL mod not present or has unsupported version, WDL features will be disabled.", e);
                     hasLoggedFail = true;
                 }
                 isWdlPresent = false;
@@ -59,8 +61,7 @@ public class WDLHelper {
             return savedChunks;
         } catch (final Throwable e) {
             if (!hasLoggedFail) {
-                System.out.println("[XaeroPlus] Error: Failed getting WDL chunks");
-                e.printStackTrace();
+                XaeroPlus.LOGGER.error("Error: Failed getting WDL chunks", e);
                 hasLoggedFail = true;
             }
         }

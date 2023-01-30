@@ -42,6 +42,7 @@ repositories {
     }
     jcenter()
     mavenCentral()
+    mavenLocal()
 }
 
 minecraft {
@@ -100,7 +101,7 @@ dependencies {
 
     implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.14.0'
 
-    jarLibs('org.spongepowered:mixin:0.8.5-SNAPSHOT') {
+    jarLibs('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
         exclude module: 'commons-io'
         exclude module: 'gson'
         exclude module: 'guava'

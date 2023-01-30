@@ -48,10 +48,6 @@ public class NewChunks extends Module {
     // I've added v1 as a suffix if we ever need to change file formats and want to convert these without data loss
     private static final String NEWCHUNKS_FILE_NAME = "XaeroPlusNewChunksV1.data";
 
-    public NewChunks() {
-        this.setEnabled(XaeroPlusSettingRegistry.newChunksEnabledSetting.getBooleanSettingValue());
-    }
-
     @Subscribe(value = Preference.CALLER)
     public void onPacketReceivedEvent(final PacketReceivedEvent event) {
         try {

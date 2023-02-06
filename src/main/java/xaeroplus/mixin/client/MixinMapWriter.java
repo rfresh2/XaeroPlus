@@ -132,6 +132,9 @@ public abstract class MixinMapWriter {
     @Shadow
     public abstract boolean isGlowing(IBlockState state);
 
+    @Shadow
+    protected abstract IBlockState unpackFramedBlocks(IBlockState original, World world, BlockPos globalPos);
+
     /**
      * @author Entropy5
      * @reason obsidian roof
@@ -179,7 +182,9 @@ public abstract class MixinMapWriter {
         IBlockState state;
         for (h = highY; h >= lowY; h = shouldExtendTillTheBottom ? transparentSkipY : h - 1) {
             this.mutableLocalPos.setPos(insideX, h, insideZ);
+            this.mutableGlobalPos.setY(h);
             state = bchunk.getBlockState(this.mutableLocalPos);
+            state = this.unpackFramedBlocks(state, world, this.mutableGlobalPos);
             Block b = state.getBlock();
             boolean roofObsidian = (h > 253 && b == Blocks.OBSIDIAN);
             if (roofObsidian && XaeroPlusSettingRegistry.transparentObsidianRoofDarkeningSetting.getFloatSettingValue() == -1) {
@@ -200,7 +205,6 @@ public abstract class MixinMapWriter {
             if (b instanceof BlockAir) {
                 underair = true;
             } else if (underair) {
-                this.mutableGlobalPos.setY(h);
                 this.mutableLocalPos.setY(Math.min(255, h + 1));
                 workingLight = (byte) bchunk.getLightFor(EnumSkyBlock.BLOCK, this.mutableLocalPos);
                 if (!this.isInvisible(world, state, b, flowers)) {

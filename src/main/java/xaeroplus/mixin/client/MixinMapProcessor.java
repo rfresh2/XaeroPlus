@@ -16,6 +16,7 @@ import xaero.map.cache.BlockStateColorTypeCache;
 import xaero.map.file.MapSaveLoad;
 import xaero.map.file.worldsave.WorldDataHandler;
 import xaero.map.gui.GuiMap;
+import xaero.map.mods.SupportMods;
 import xaero.map.region.LeveledRegion;
 import xaero.map.region.MapRegion;
 import xaero.map.world.MapDimension;
@@ -383,6 +384,10 @@ public abstract class MixinMapProcessor {
 
                 this.mapWriter.resetPosition();
                 this.world = this.newWorld;
+                if (SupportMods.framedBlocks()) {
+                    SupportMods.supportFramedBlocks.onWorldChange();
+                }
+
                 if (WorldMap.settings.debug) {
                     WorldMap.LOGGER.info("World/dimension changed to: " + this.currentWorldId + " " + this.currentDimId + " " + this.currentMWId);
                 }
@@ -400,6 +405,10 @@ public abstract class MixinMapProcessor {
             } else if (this.newWorld != this.world) {
                 this.pushWriterPause();
                 this.world = this.newWorld;
+                if (SupportMods.framedBlocks()) {
+                    SupportMods.supportFramedBlocks.onWorldChange();
+                }
+
                 this.popWriterPause();
             }
 

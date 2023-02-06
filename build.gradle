@@ -112,8 +112,8 @@ dependencies {
     jarLibs "com.github.collarmc:Pounce:5fddbfca2d"
     jarLibs 'org.apache.commons:commons-compress:1.21'
 
-    implementation(fg.deobf("curse.maven:xaeros-world-map-317780:4127330"))
-    implementation(fg.deobf("curse.maven:xaeros-minimap-263420:4338608"))
+    implementation(fg.deobf("curse.maven:xaeros-world-map-317780:4381131"))
+    implementation(fg.deobf("curse.maven:xaeros-minimap-263420:4381108"))
 
     annotationProcessor('org.spongepowered:mixin:0.8.5:processor') {
         exclude module: 'gson'

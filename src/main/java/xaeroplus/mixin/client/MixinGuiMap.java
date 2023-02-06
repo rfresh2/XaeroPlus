@@ -31,6 +31,7 @@ import xaero.map.element.HoveredMapElementHolder;
 import xaero.map.graphics.ImprovedFramebuffer;
 import xaero.map.graphics.MapRenderHelper;
 import xaero.map.gui.*;
+import xaero.map.gui.dropdown.rightclick.GuiRightClickMenu;
 import xaero.map.misc.Misc;
 import xaero.map.mods.SupportMods;
 import xaero.map.mods.gui.Waypoint;
@@ -145,10 +146,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     private int mouseBlockPosZ;
     @Shadow
     private long lastStartTime;
-    @Shadow
-    private List<GuiDropDown> dropdowns;
-    @Shadow
-    private List<GuiDropDown> dropdownsToRemove;
     @Shadow
     private GuiMapSwitching dimensionSettings;
     @Shadow
@@ -286,14 +283,12 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         while(GL11.glGetError() != 0) {
         }
 
-        this.dropdowns.removeAll(this.dropdownsToRemove);
-        this.dropdownsToRemove.clear();
         Minecraft mc = Minecraft.getMinecraft();
         double cameraXBefore = this.cameraX;
         double cameraZBefore = this.cameraZ;
         double scaleBefore = this.scale;
         long startTime = System.currentTimeMillis();
-        this.dimensionSettings.preMapRender((GuiMap)(Object) this, this.dropdowns, mc, this.width, this.height);
+        this.dimensionSettings.preMapRender((GuiMap)(Object) this, mc, this.width, this.height);
         long passed = this.lastStartTime == 0L ? 16L : startTime - this.lastStartTime;
         double passedScrolls = (double)((float)passed / 64.0F);
         int direction = this.buttonPressed != this.zoomInButton && !ControlsHandler.isDown(ControlsRegister.keyZoomIn)
@@ -1410,23 +1405,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         GlStateManager.pushMatrix();
         GlStateManager.translate(0.0F, 0.0F, 973.0F);
         super.drawScreen(scaledMouseX, scaledMouseY, partialTicks);
-        if (this.waypointMenu) {
-            SupportMods.xaeroMinimap.getWaypointMenuRenderer().postMapRender((GuiMap) (Object) this, scaledMouseX, scaledMouseY, this.width, this.height, partialTicks);
+        if (this.rightClickMenu != null) {
+            this.rightClickMenu.drawButton(mc, scaledMouseX, scaledMouseY, partialTicks);
         }
 
-        for(GuiDropDown d : this.dropdowns) {
-            if (d.isClosed()) {
-                d.drawButton(scaledMouseX, scaledMouseY, this.height);
-            }
-        }
-
-        for(GuiDropDown d : this.dropdowns) {
-            if (!d.isClosed()) {
-                d.drawButton(scaledMouseX, scaledMouseY, this.height);
-            }
-        }
-
-        this.dimensionSettings.postMapRender(mc, scaledMouseX, scaledMouseY, this.width, this.height);
         GlStateManager.translate(0.0F, 0.0F, 10.0F);
         if (mc.currentScreen == this) {
             if (!this.renderTooltips(scaledMouseX, scaledMouseY, partialTicks) && !this.leftMouseButton.isDown && !this.rightMouseButton.isDown) {

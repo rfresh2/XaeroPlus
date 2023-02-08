@@ -1,12 +1,11 @@
 package xaeroplus.module.impl;
 
-import com.collarmc.pounce.Preference;
-import com.collarmc.pounce.Subscribe;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.minecraft.network.play.server.SPacketChunkData;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.commons.compress.compressors.lz4.FramedLZ4CompressorInputStream;
 import org.apache.commons.compress.compressors.lz4.FramedLZ4CompressorOutputStream;
 import xaero.map.WorldMap;
@@ -48,7 +47,7 @@ public class NewChunks extends Module {
     // I've added v1 as a suffix if we ever need to change file formats and want to convert these without data loss
     private static final String NEWCHUNKS_FILE_NAME = "XaeroPlusNewChunksV1.data";
 
-    @Subscribe(value = Preference.CALLER)
+    @SubscribeEvent
     public void onPacketReceivedEvent(final PacketReceivedEvent event) {
         try {
             if (event.packet instanceof SPacketChunkData) {
@@ -84,7 +83,7 @@ public class NewChunks extends Module {
         }
     }
 
-    @Subscribe(value = Preference.CALLER)
+    @SubscribeEvent
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
         if (XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.getBooleanSettingValue()) {
             try {

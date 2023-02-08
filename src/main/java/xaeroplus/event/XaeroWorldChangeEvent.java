@@ -1,6 +1,8 @@
 package xaeroplus.event;
 
-public class XaeroWorldChangeEvent {
+import net.minecraftforge.fml.common.eventhandler.Event;
+
+public class XaeroWorldChangeEvent extends Event {
 
     public final String worldId;
     public final String dimId;

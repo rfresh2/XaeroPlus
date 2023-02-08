@@ -391,7 +391,7 @@ public abstract class MixinMapProcessor {
                 if (WorldMap.settings.debug) {
                     WorldMap.LOGGER.info("World/dimension changed to: " + this.currentWorldId + " " + this.currentDimId + " " + this.currentMWId);
                 }
-                XaeroPlus.EVENT_BUS.dispatch(new XaeroWorldChangeEvent(this.currentWorldId, this.currentDimId, this.currentMWId));
+                XaeroPlus.EVENT_BUS.post(new XaeroWorldChangeEvent(this.currentWorldId, this.currentDimId, this.currentMWId));
 
                 this.worldDataHandler.prepareSingleplayer(this.world, (MapProcessor) (Object) this);
                 if (this.worldDataHandler.getWorldDir() == null && this.currentWorldId != null && !this.mapWorld.isMultiplayer()) {

@@ -1,10 +1,11 @@
 package xaeroplus;
 
-import com.collarmc.pounce.EventBus;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.EventBus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import xaeroplus.module.ModuleManager;
@@ -19,7 +20,7 @@ public class XaeroPlus {
     // Map gui follow mode
     public static boolean FOLLOW = false;
     public static String LOCK_ID = UUID.randomUUID().toString();
-    public static EventBus EVENT_BUS = new EventBus(Runnable::run);
+    public static EventBus EVENT_BUS = MinecraftForge.EVENT_BUS;
     public static Logger LOGGER = LogManager.getLogger("XaeroPlus");
 
     @Mod.Instance

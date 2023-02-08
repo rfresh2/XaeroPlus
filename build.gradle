@@ -109,7 +109,6 @@ dependencies {
         exclude module: 'log4j-core'
     }
 
-    jarLibs "com.github.collarmc:Pounce:5fddbfca2d"
     jarLibs 'org.apache.commons:commons-compress:1.21'
 
     implementation(fg.deobf("curse.maven:xaeros-world-map-317780:4381131"))

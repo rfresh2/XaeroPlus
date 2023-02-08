@@ -15,6 +15,6 @@ public class MixinNetworkManager {
 
     @Inject(method = "channelRead0(Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/Packet;)V", at = @At("RETURN"))
     private void channelReadPost(ChannelHandlerContext context, Packet<?> packet, CallbackInfo callbackInfo) {
-        XaeroPlus.EVENT_BUS.dispatch(new PacketReceivedEvent(packet));
+        XaeroPlus.EVENT_BUS.post(new PacketReceivedEvent(packet));
     }
 }

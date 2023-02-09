@@ -1,5 +1,7 @@
 package xaeroplus.module.impl;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -22,9 +24,11 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
@@ -183,7 +187,7 @@ public class NewChunks extends Module {
         return null;
     }
 
-    public void saveChunks(final Path saveFile) {
+    private void saveChunks(final Path saveFile) {
         if (isNull(saveFile) || chunks.isEmpty()) {
             return;
         }
@@ -232,13 +236,94 @@ public class NewChunks extends Module {
     }
 
     // static POJO to help GSON with (de)serialization
-    public static class NewChunkData {
+    private static class NewChunkData {
         public final Long chunkPos;
         public final Long foundTime;
 
         public NewChunkData(final Long chunkPos, final Long foundTime) {
             this.chunkPos = chunkPos;
             this.foundTime = foundTime;
+        }
+    }
+
+    /**
+     * WorldMap Render caching
+     */
+
+    public final Cache<RegionRenderPos, List<NewChunkAtChunkPos>> regionRenderCache = CacheBuilder.newBuilder()
+            // Should be possible to async refresh using https://github.com/ben-manes/caffeine
+            // but would need to shade in the lib
+            .expireAfterWrite(500, TimeUnit.MILLISECONDS)
+            .build();
+
+    public List<NewChunkAtChunkPos> getNewChunksInRegion(final int leafRegionX, final int leafRegionZ, final int level) {
+        final RegionRenderPos regionRenderPos = new RegionRenderPos(leafRegionX, leafRegionZ, level);
+        try {
+            return regionRenderCache.get(regionRenderPos, loadNewChunksInRegion(leafRegionX, leafRegionZ, level));
+        } catch (ExecutionException e) {
+            XaeroPlus.LOGGER.error("Error handling NewChunks region lookup", e);
+        }
+        return Collections.emptyList();
+    }
+
+    private Callable<List<NewChunkAtChunkPos>> loadNewChunksInRegion(int leafRegionX, int leafRegionZ, int level) {
+        return () -> {
+            final List<NewChunkAtChunkPos> chunks = new ArrayList<>();
+            final int mx = leafRegionX + level;
+            final int mz = leafRegionZ + level;
+            for (int regX = leafRegionX; regX < mx; ++regX) {
+                for (int regZ = leafRegionZ; regZ < mz; ++regZ) {
+                    for (int cx = 0; cx < 8; cx++) {
+                        for (int cz = 0; cz < 8; cz++) {
+                            final int mapTileChunkX = (regX << 3) + cx;
+                            final int mapTileChunkZ = (regZ << 3) + cz;
+                            for (int t = 0; t < 16; ++t) {
+                                final int chunkPosX = (mapTileChunkX << 2) + t % 4;
+                                final int chunkPosZ = (mapTileChunkZ << 2) + (t >> 2);
+                                if (this.isNewChunk(chunkPosX, chunkPosZ)) {
+                                    chunks.add(new NewChunkAtChunkPos(chunkPosX, chunkPosZ));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return chunks;
+        };
+    }
+
+    public static class NewChunkAtChunkPos {
+        public final int x;
+        public final int z;
+
+        public NewChunkAtChunkPos(int x, int z) {
+            this.x = x;
+            this.z = z;
+        }
+    }
+
+    public static class RegionRenderPos {
+        public final int leafRegionX;
+        public final int leafRegionZ;
+        public final int level;
+
+        public RegionRenderPos(final int leafRegionX, final int leafRegionZ, final int level) {
+            this.leafRegionX = leafRegionX;
+            this.leafRegionZ = leafRegionZ;
+            this.level = level;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            RegionRenderPos that = (RegionRenderPos) o;
+            return leafRegionX == that.leafRegionX && leafRegionZ == that.leafRegionZ && level == that.level;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(leafRegionX, leafRegionZ, level);
         }
     }
 }

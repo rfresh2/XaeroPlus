@@ -998,31 +998,18 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
                                 if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getBooleanSettingValue()) {
                                     restoreTextureStates();
-                                    // todo: might be able to optimize this, its checking every chunk on every frame
-                                    //  can become a problem at low zooms
-                                    for(int leafX = 0; leafX < leveledSideInRegions; ++leafX) {
-                                        for (int leafZ = 0; leafZ < leveledSideInRegions; ++leafZ) {
-                                            int regX = leafRegionMinX + leafX;
-                                            int regZ = leafRegionMinZ + leafZ;
-                                            for(int cx = 0; cx < 8; cx++) {
-                                                for (int cz = 0; cz < 8; cz++) {
-                                                    final int mapTileChunkX = regX * 8 + cx;
-                                                    final int mapTileChunkZ = regZ * 8 + cz;
-                                                    for (int t = 0; t < 16; ++t) {
-                                                        final int chunkPosX = mapTileChunkX * 4 + t % 4;
-                                                        final int chunkPosZ = mapTileChunkZ * 4 + t / 4;
-                                                        if (ModuleManager.getModule(NewChunks.class).isNewChunk(chunkPosX, chunkPosZ)) {
-                                                            GlStateManager.pushMatrix();
-                                                            GlStateManager.translate(
-                                                                    (float)(16 * chunkPosX - flooredCameraX), (float)(16 * chunkPosZ - flooredCameraZ), 0.0F
-                                                            );
-                                                            drawRect(0, 0, 16, 16, ModuleManager.getModule(NewChunks.class).getNewChunksColor());
-                                                            GlStateManager.popMatrix();
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
+                                    final NewChunks newChunks = ModuleManager.getModule(NewChunks.class);
+                                    for (final NewChunks.NewChunkAtChunkPos c : newChunks.getNewChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions)) {
+                                        // todo: GL calls can be optimized further here by:
+                                        //  1. rendering rects as two triangles
+                                        //  2. rendering a buffer of all vertices rather than each 4 vertex rect individually
+                                        //  similar to https://github.com/lambda-client/lambda/commit/7b85616a8a94ebf7b9fe407b5b777303c2513f2b
+                                        GlStateManager.pushMatrix();
+                                        GlStateManager.translate(
+                                                (float)((c.x << 4) - flooredCameraX), (float)((c.z << 4) - flooredCameraZ), 0.0F
+                                        );
+                                        drawRect(0, 0, 16, 16, newChunks.getNewChunksColor());
+                                        GlStateManager.popMatrix();
                                     }
                                     GlStateManager.disableBlend();
                                     setupTextureMatricesAndTextures(brightness);
@@ -1032,22 +1019,22 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                         && WDLHelper.isDownloading()) {
                                     restoreTextureStates();
                                     final Set<ChunkPos> wdlSavedChunksWithCache = WDLHelper.getSavedChunksWithCache();
-                                    // todo: might be able to optimize this, its checking every chunk on every frame
-                                    //  can become a problem at low zooms
+                                    // todo: this is checking every chunk on every frame. We can optimize this like NewChunks with caching.
+                                    //  is only a problem at low zooms
                                     for(int leafX = 0; leafX < leveledSideInRegions; ++leafX) {
                                         for (int leafZ = 0; leafZ < leveledSideInRegions; ++leafZ) {
                                             int regX = leafRegionMinX + leafX;
                                             int regZ = leafRegionMinZ + leafZ;
                                             for(int cx = 0; cx < 8; cx++) {
                                                 for (int cz = 0; cz < 8; cz++) {
-                                                    final int mapTileChunkX = regX * 8 + cx;
-                                                    final int mapTileChunkZ = regZ * 8 + cz;
+                                                    final int mapTileChunkX = (regX << 3) + cx;
+                                                    final int mapTileChunkZ = (regZ << 3) + cz;
                                                     for (int t = 0; t < 16; ++t) {
-                                                        final ChunkPos chunkPos = new ChunkPos(mapTileChunkX * 4 + t % 4, mapTileChunkZ * 4 + t / 4);
+                                                        final ChunkPos chunkPos = new ChunkPos((mapTileChunkX << 2) + t % 4, (mapTileChunkZ << 2) + (t >> 2));
                                                         if (wdlSavedChunksWithCache.contains(chunkPos)) {
                                                             GlStateManager.pushMatrix();
                                                             GlStateManager.translate(
-                                                                    (float)(16 * chunkPos.x - flooredCameraX), (float)(16 * chunkPos.z - flooredCameraZ), 0.0F
+                                                                    (float)((chunkPos.x << 4) - flooredCameraX), (float)((chunkPos.z << 4) - flooredCameraZ), 0.0F
                                                             );
                                                             drawRect(0, 0, 16, 16, WDLHelper.getWdlColor());
                                                             GlStateManager.popMatrix();

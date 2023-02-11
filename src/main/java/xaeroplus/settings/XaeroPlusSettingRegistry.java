@@ -1,25 +1,28 @@
 package xaeroplus.settings;
 
 import com.google.common.base.Suppliers;
+import com.google.common.collect.Streams;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import sun.reflect.ConstructorAccessor;
 import xaero.map.WorldMapSession;
-import xaero.map.gui.ConfigSettingEntry;
-import xaero.map.settings.ModOptions;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
 import xaeroplus.util.WDLHelper;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.reflect.Modifier.FINAL;
+import static java.lang.reflect.Modifier.PRIVATE;
 import static java.util.Arrays.asList;
 import static xaeroplus.settings.XaeroPlusSetting.SETTING_PREFIX;
 
@@ -90,12 +93,18 @@ public final class XaeroPlusSettingRegistry {
     public static final XaeroPlusSetting owAutoWaypointDimension = XaeroPlusSetting.createBooleanSetting("Prefer Overworld Waypoints",
                     "Prefer creating and viewing Overworld waypoints when in the nether.",
             true);
-
     public static final XaeroPlusSetting showWaypointDistances = XaeroPlusSetting.createBooleanSetting("Show Waypoint Distances",
             "Display the distance to every waypoint in the full waypoint menu.",
             true);
+    public static final XaeroPlusSetting showRenderDistanceSetting = XaeroPlusSetting.createBooleanSetting("Show Render Distance",
+            "Show server side render distance (actually just another setting)",
+            false);
+    public static final XaeroPlusSetting assumedServerRenderDistanceSetting = XaeroPlusSetting.createFloatSetting("Server Render Distance",
+            1f, 32f, 1f,
+            "view-distance of the server",
+            4f); // 2b2t
 
-    public static final List<XaeroPlusSetting> XAERO_PLUS_SETTING_LIST = asList(
+    public static final List<XaeroPlusSetting> XAERO_PLUS_WORLDMAP_SETTINGS = asList(
             // add settings here
             fastMapSetting,
             mapWriterDelaySetting,
@@ -115,17 +124,29 @@ public final class XaeroPlusSettingRegistry {
             showWaypointDistances
     );
 
-    public static final List<ModOptions> MOD_OPTIONS_LIST = constructXaeroPlusSettings();
+    public static final List<XaeroPlusSetting> XAERO_PLUS_MINIMAP_SETTINGS = asList(
+            // add settings here
+            showRenderDistanceSetting,
+            assumedServerRenderDistanceSetting
+    );
+
+    private static List<xaero.map.settings.ModOptions> WORLDMAP_MOD_OPTIONS_LIST = null;
+    private static List<xaero.common.settings.ModOptions> MINIMAP_MOD_OPTIONS_LIST = null;
 
     private static int enumOrdinal = 69; // needs to not overlap with existing enum indeces
 
-    private static List<ModOptions> constructXaeroPlusSettings() {
+    private enum ModType {
+        WORLDMAP,
+        MINIMAP
+    }
+
+    private static <T extends Enum<T>> List<T> constructXaeroPlusSettings(Class<T> clazz, ModType type, List<XaeroPlusSetting> settings) {
         try {
-            final ConstructorAccessor modOptionsConstructorAccessor = getModOptionsConstructorAccessor();
-            final List<ModOptions> xaeroModOptions = XaeroPlusSettingRegistry.XAERO_PLUS_SETTING_LIST.stream()
-                    .map(setting -> buildModOptions(modOptionsConstructorAccessor, setting, enumOrdinal++))
+            final ConstructorAccessor modOptionsConstructorAccessor = getModOptionsConstructorAccessor(clazz, type);
+            final List<T> xaeroModOptions = settings.stream()
+                    .map(setting -> XaeroPlusSettingRegistry.<T>buildModOptions(type, modOptionsConstructorAccessor, setting, enumOrdinal++))
                     .collect(Collectors.toList());
-            setEnumInternalFields(xaeroModOptions);
+            setEnumInternalFields(clazz, xaeroModOptions);
             return xaeroModOptions;
         } catch (final Exception e) {
             throw new RuntimeException(e);
@@ -137,27 +158,48 @@ public final class XaeroPlusSettingRegistry {
     }
 
     private static final Supplier<List<KeyBinding>> memoizingKeybindsList = Suppliers.memoize(() ->
-        XAERO_PLUS_SETTING_LIST.stream()
+            Stream.concat(XAERO_PLUS_WORLDMAP_SETTINGS.stream(), XAERO_PLUS_MINIMAP_SETTINGS.stream())
                 .filter(XaeroPlusSetting::isBooleanSetting)
                 .map(XaeroPlusSetting::getKeyBinding)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList())
     );
 
-    public static List<ConfigSettingEntry> getConfigSettingEntries() {
-        return MOD_OPTIONS_LIST.stream()
-                .map(XaeroPlusSettingRegistry::buildConfigSettingEntry)
+    public static List<xaero.map.gui.ConfigSettingEntry> getWorldMapConfigSettingEntries() {
+        if (WORLDMAP_MOD_OPTIONS_LIST == null) {
+            WORLDMAP_MOD_OPTIONS_LIST = constructXaeroPlusSettings(xaero.map.settings.ModOptions.class, ModType.WORLDMAP, XAERO_PLUS_WORLDMAP_SETTINGS);
+        }
+        return WORLDMAP_MOD_OPTIONS_LIST.stream()
+                .map(xaero.map.gui.ConfigSettingEntry::new)
                 .collect(Collectors.toList());
     }
 
-    private static ConstructorAccessor getModOptionsConstructorAccessor() throws Exception {
-        Constructor<?>[] declaredConstructors = ModOptions.class.getDeclaredConstructors();
-        Constructor<?> constructor = declaredConstructors[0];
-        for (Constructor<?> c : declaredConstructors) {
-            if (c.getParameterCount() == 11) {
+    public static List<xaero.common.gui.ConfigSettingEntry> getMiniMapConfigSettingEntries() {
+        if (MINIMAP_MOD_OPTIONS_LIST == null) {
+            MINIMAP_MOD_OPTIONS_LIST = constructXaeroPlusSettings(xaero.common.settings.ModOptions.class, ModType.MINIMAP, XAERO_PLUS_MINIMAP_SETTINGS);
+        }
+        return MINIMAP_MOD_OPTIONS_LIST.stream()
+                .map(xaero.common.gui.ConfigSettingEntry::new)
+                .collect(Collectors.toList());
+    }
+
+    private static <T extends Enum<T>> ConstructorAccessor getModOptionsConstructorAccessor(Class<T> clazz, ModType type) throws Exception {
+        final int numArgs;
+        if (type == ModType.WORLDMAP) {
+            numArgs = 11;
+        } else {
+            numArgs = 10; // no "requiresMinimap" argument for minimap
+        }
+        Constructor<T>[] declaredConstructors = (Constructor<T>[]) clazz.getDeclaredConstructors();
+        Constructor<T> constructor = null;
+        for (Constructor<T> c : declaredConstructors) {
+            if (c.getParameterCount() == numArgs) {
                 constructor = c;
                 break;
             }
+        }
+        if (constructor == null) {
+            throw new IllegalStateException("No constructor found in " + clazz.getName() + " with " + numArgs + " args");
         }
 
         constructor.setAccessible(true);
@@ -173,9 +215,20 @@ public final class XaeroPlusSettingRegistry {
         return ca;
     }
 
-    private static ModOptions buildModOptions(final ConstructorAccessor ca, final XaeroPlusSetting xaeroPlusSetting, final int ordinal) {
+    private static <T extends Enum<T>> T buildModOptions(final ModType type, final ConstructorAccessor ca, final XaeroPlusSetting xaeroPlusSetting, final int ordinal) {
         try {
-            return (ModOptions) ca.newInstance(new Object[]{
+            final Object cursorBox;
+            if (xaeroPlusSetting.getTooltip() != null) {
+                if (type == ModType.WORLDMAP) {
+                    cursorBox = new xaero.map.gui.CursorBox(xaeroPlusSetting.getTooltip());
+                } else {
+                    cursorBox = new xaero.common.graphics.CursorBox(xaeroPlusSetting.getTooltip());
+                }
+            } else {
+                cursorBox = null;
+            }
+
+            Object[] args = new Object[] {
                     xaeroPlusSetting.getSettingName().replace(SETTING_PREFIX, ""),
                     ordinal,
                     xaeroPlusSetting.getSettingName(),
@@ -184,36 +237,37 @@ public final class XaeroPlusSettingRegistry {
                     xaeroPlusSetting.getValueMin(),
                     xaeroPlusSetting.getValueMax(),
                     xaeroPlusSetting.getValueStep(),
-                    xaeroPlusSetting.getTooltip(),
+                    cursorBox,
                     xaeroPlusSetting.isIngameOnly(),
-                    xaeroPlusSetting.isRequiresMinimap()});
+                    xaeroPlusSetting.isRequiresMinimap()
+            };
+            if (type == ModType.MINIMAP) {
+                args = Arrays.copyOf(args, args.length - 1);
+            }
+            return (T) ca.newInstance(args);
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static ConfigSettingEntry buildConfigSettingEntry(final ModOptions modOptions) {
-        return new ConfigSettingEntry(modOptions);
-    }
-
-    private static void setEnumInternalFields(final List<ModOptions> xaeroPlusModOptions) {
+    private static <T extends Enum<T>> void setEnumInternalFields(final Class<T> clazz, final List<T> xaeroPlusModOptions) {
         try {
-            Field valuesField = ModOptions.class.getDeclaredField("$VALUES");
+            Field valuesField = clazz.getDeclaredField("$VALUES");
             makeAccessible(valuesField);
-            ModOptions[] oldValues = (ModOptions[]) valuesField.get(null);
-            ModOptions[] newValues = new ModOptions[oldValues.length + xaeroPlusModOptions.size()];
+            T[] oldValues = (T[]) valuesField.get(null);
+            T[] newValues = (T[]) Array.newInstance(clazz, oldValues.length + xaeroPlusModOptions.size());
             System.arraycopy(oldValues, 0, newValues, 0, oldValues.length);
             for (int i = oldValues.length; i < newValues.length; i++) {
                 newValues[i] = xaeroPlusModOptions.get(i - oldValues.length);
             }
-            valuesField.set(ModOptions.class, newValues);
+            valuesField.set(clazz, newValues);
             Field enumConstantsField = Class.class.getDeclaredField("enumConstants");
             makeAccessible(enumConstantsField);
-            enumConstantsField.set(ModOptions.class, null);
+            enumConstantsField.set(clazz, null);
 
             Field enumConstantDirectoryField = Class.class.getDeclaredField("enumConstantDirectory");
             makeAccessible(enumConstantDirectoryField);
-            enumConstantDirectoryField.set(ModOptions.class, null);
+            enumConstantDirectoryField.set(clazz, null);
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }

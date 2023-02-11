@@ -259,15 +259,16 @@ public abstract class MixinSupportXaeroWorldmap {
                             GL14.glBlendFuncSeparate(770, 771, 1, 771);
                         }
 
-                        final int size = (int) XaeroPlusSettingRegistry.assumedServerRenderDistanceSetting.getFloatSettingValue();
+                        final int setting = (int) XaeroPlusSettingRegistry.assumedServerRenderDistanceSetting.getFloatSettingValue();
+                        final int width = setting * 2 + 1;
                         // origin of the chunk we are standing in
                         final int middleChunkX = -insideX;
                         final int middleChunkZ = -insideZ;
                         // this is biased to +x/+z for even sizes which im not certain is correct
-                        final int x0 = middleChunkX - (size / 2) * 16;
-                        final int z0 = middleChunkZ - (size / 2) * 16;
-                        final int x1 = x0 + size * 16;
-                        final int z1 = z0 + size * 16;
+                        final int x0 = middleChunkX - (width / 2) * 16;
+                        final int z0 = middleChunkZ - (width / 2) * 16;
+                        final int x1 = x0 + width * 16;
+                        final int z1 = z0 + width * 16;
 
                         Tessellator tessellator = Tessellator.getInstance();
                         BufferBuilder vertexBuffer = tessellator.getBuffer();

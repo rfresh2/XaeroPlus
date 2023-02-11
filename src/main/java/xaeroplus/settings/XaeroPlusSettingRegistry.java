@@ -101,8 +101,8 @@ public final class XaeroPlusSettingRegistry {
             false);
     public static final XaeroPlusSetting assumedServerRenderDistanceSetting = XaeroPlusSetting.createFloatSetting("Server Render Distance",
             1f, 32f, 1f,
-            "width of the square for displaying the render distance",
-            9f); // 2b2t currently returns a 9 wide square to the client
+            "view-distance of the server",
+            4f); // 2b2t
 
     public static final List<XaeroPlusSetting> XAERO_PLUS_WORLDMAP_SETTINGS = asList(
             // add settings here

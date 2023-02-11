@@ -91,6 +91,10 @@ public final class XaeroPlusSettingRegistry {
                     "Prefer creating and viewing Overworld waypoints when in the nether.",
             true);
 
+    public static final XaeroPlusSetting showWaypointDistances = XaeroPlusSetting.createBooleanSetting("Show Waypoint Distances",
+            "Display the distance to every waypoint in the full waypoint menu.",
+            true);
+
     public static final List<XaeroPlusSetting> XAERO_PLUS_SETTING_LIST = asList(
             // add settings here
             fastMapSetting,
@@ -107,7 +111,8 @@ public final class XaeroPlusSettingRegistry {
             newChunksDimensionReload,
             wdlEnabledSetting,
             wdlAlphaSetting,
-            owAutoWaypointDimension
+            owAutoWaypointDimension,
+            showWaypointDistances
     );
 
     public static final List<ModOptions> MOD_OPTIONS_LIST = constructXaeroPlusSettings();

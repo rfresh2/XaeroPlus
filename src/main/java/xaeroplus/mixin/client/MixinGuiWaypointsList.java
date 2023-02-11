@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.IXaeroMinimap;
 import xaero.common.gui.GuiWaypoints;
 import xaero.common.minimap.waypoints.Waypoint;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 import java.lang.reflect.Field;
 import java.text.NumberFormat;
@@ -68,17 +69,19 @@ public abstract class MixinGuiWaypointsList {
                                 rectX,
                                 rectY
                         );
-                Entity renderViewEntity = Minecraft.getMinecraft().getRenderViewEntity();
-                final double playerX = renderViewEntity.posX;
-                final double playerZ = renderViewEntity.posZ;
-                final double playerY = renderViewEntity.posY;
-                final double dimensionDivision = GuiWaypoints.distanceDivided;
-                final int wpX = w.getX(dimensionDivision);
-                final int wpY = w.getY();
-                final int wpZ = w.getZ(dimensionDivision);
-                final double distance = Math.sqrt(Math.pow(playerX - wpX, 2) + Math.pow(playerY - wpY, 2) + Math.pow(playerZ - wpZ, 2));
-                final String text = NumberFormat.getIntegerInstance().format(distance) + "m";
-                thisGuiWaypoints.drawString(fontRenderer, text, x + 250, y + 1, 0xFFFFFF);
+                if (XaeroPlusSettingRegistry.showWaypointDistances.getBooleanSettingValue()) {
+                    Entity renderViewEntity = Minecraft.getMinecraft().getRenderViewEntity();
+                    final double playerX = renderViewEntity.posX;
+                    final double playerZ = renderViewEntity.posZ;
+                    final double playerY = renderViewEntity.posY;
+                    final double dimensionDivision = GuiWaypoints.distanceDivided;
+                    final int wpX = w.getX(dimensionDivision);
+                    final int wpY = w.getY();
+                    final int wpZ = w.getZ(dimensionDivision);
+                    final double distance = Math.sqrt(Math.pow(playerX - wpX, 2) + Math.pow(playerY - wpY, 2) + Math.pow(playerZ - wpZ, 2));
+                    final String text = NumberFormat.getIntegerInstance().format(distance) + "m";
+                    thisGuiWaypoints.drawString(fontRenderer, text, x + 250, y + 1, 0xFFFFFF);
+                }
             }
     }
 }

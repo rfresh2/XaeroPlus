@@ -26,10 +26,7 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
@@ -43,6 +40,7 @@ public class NewChunks extends Module {
     // somewhat arbitrary number but should be sufficient
     private static final int maxNumber = 5000;
     private Path currentSaveFile;
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     // this is an lz4 compressed JSON file
     // I've added v1 as a suffix if we ever need to change file formats and want to convert these without data loss
@@ -179,7 +177,7 @@ public class NewChunks extends Module {
             }
             return saveFile;
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error creating NewChunks save file {}", e);
+            XaeroPlus.LOGGER.error("Error creating NewChunks save file", e);
         }
         return null;
     }
@@ -195,7 +193,7 @@ public class NewChunks extends Module {
     }
 
     private void writeAsync(final List<NewChunkData> chunkData, final Path saveFile) {
-        ForkJoinPool.commonPool().execute(() -> {
+        executorService.execute(() -> {
             final Gson gson = new GsonBuilder().create();
             // todo: we should write to a temp file and then rename replace in case this fails mid-write for whatever reason
             //  also we should do a quick check we aren't writing significantly fewer chunks than what are on disk just in case
@@ -220,7 +218,7 @@ public class NewChunks extends Module {
     }
 
     private void readAsync(final Path saveFile) {
-        ForkJoinPool.commonPool().execute(() -> {
+        executorService.execute(() -> {
             final Gson gson = new GsonBuilder().create();
             final TypeToken<List<NewChunkData>> newChunkDataType = new TypeToken<List<NewChunkData>>() { };
             try (Reader reader = new InputStreamReader(new FramedLZ4CompressorInputStream(Files.newInputStream(saveFile.toFile().toPath())))) {

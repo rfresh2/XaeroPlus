@@ -5,6 +5,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import net.minecraft.network.play.server.SPacketChunkData;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -26,8 +27,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -37,11 +38,7 @@ import static xaeroplus.XaeroPlus.getColor;
 
 @Module.ModuleInfo()
 public class NewChunks extends Module {
-    // todo: we *could* make save/load async
-    //      Although it might cause issues as ordering of operations will have to be handled.
-    //      Need user feedback and further testing on NewChunk files that get very big
-
-    private static final ConcurrentHashMap<Long, Long> chunks = new ConcurrentHashMap<>();
+    private static final Long2LongOpenHashMap chunks = new Long2LongOpenHashMap();
     private static int newChunksColor = getColor(255, 0, 0, 100);
     // somewhat arbitrary number but should be sufficient
     private static final int maxNumber = 5000;
@@ -56,7 +53,7 @@ public class NewChunks extends Module {
         try {
             if (event.packet instanceof SPacketChunkData) {
                 final SPacketChunkData chunkData = (SPacketChunkData) event.packet;
-                final Long chunkPosKey = chunkPosToLong(chunkData.getChunkX(), chunkData.getChunkZ());
+                final long chunkPosKey = chunkPosToLong(chunkData.getChunkX(), chunkData.getChunkZ());
                 if (!chunkData.isFullChunk()) {
                     synchronized (chunks) {
                         // todo: find a way to limit our in-memory NewChunk data usage while having save/load enabled (without data loss)
@@ -68,13 +65,13 @@ public class NewChunks extends Module {
                                     .limit(500)
                                     .map(Map.Entry::getKey)
                                     .collect(Collectors.toList());
-                            toRemove.forEach(chunks::remove);
+                            toRemove.forEach(l -> chunks.remove((long) l));
                         }
                         chunks.put(chunkPosKey, System.currentTimeMillis());
                     }
                 } else if (XaeroPlusSettingRegistry.newChunksSeenResetTime.getFloatSettingValue() > 0) {
-                    final Long chunkDataSeenTime = chunks.get(chunkPosKey);
-                    if (nonNull(chunkDataSeenTime)) {
+                    final long chunkDataSeenTime = chunks.get(chunkPosKey);
+                    if (chunks.defaultReturnValue() != chunkDataSeenTime) {
                         if (System.currentTimeMillis() - chunkDataSeenTime > XaeroPlusSettingRegistry.newChunksSeenResetTime.getFloatSettingValue() * 1000) {
                             chunks.remove(chunkPosKey);
                         }
@@ -194,15 +191,22 @@ public class NewChunks extends Module {
         final List<NewChunkData> chunkData = chunks.entrySet().stream()
                 .map(e -> new NewChunkData(e.getKey(), e.getValue()))
                 .collect(Collectors.toList());
-        final Gson gson = new GsonBuilder().create();
-        // todo: we should write to a temp file and then rename replace in case this fails mid-write for whatever reason
-        //  also we should do a quick check we aren't writing significantly fewer chunks than what are on disk just in case
-        try (Writer writer = new OutputStreamWriter(new FramedLZ4CompressorOutputStream(Files.newOutputStream(saveFile)))) {
-            gson.toJson(chunkData, writer);
-            XaeroPlus.LOGGER.info("Saved {} NewChunks to disk", chunkData.size());
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error saving new chunks to {}", saveFile,e);
-        }
+        writeAsync(chunkData, saveFile);
+    }
+
+    private void writeAsync(final List<NewChunkData> chunkData, final Path saveFile) {
+        ForkJoinPool.commonPool().execute(() -> {
+            final Gson gson = new GsonBuilder().create();
+            // todo: we should write to a temp file and then rename replace in case this fails mid-write for whatever reason
+            //  also we should do a quick check we aren't writing significantly fewer chunks than what are on disk just in case
+            try (Writer writer = new OutputStreamWriter(new FramedLZ4CompressorOutputStream(Files.newOutputStream(saveFile)))) {
+                gson.toJson(chunkData, writer);
+                XaeroPlus.LOGGER.info("Saved {} NewChunks to disk", chunkData.size());
+            } catch (final Exception e) {
+                XaeroPlus.LOGGER.error("Error saving new chunks to {}", saveFile,e);
+            }
+        });
+
     }
 
     private void loadChunks(final Path saveFile) {
@@ -212,18 +216,23 @@ public class NewChunks extends Module {
         if (!Files.exists(saveFile)) {
             return;
         }
+        readAsync(saveFile);
+    }
 
-        final Gson gson = new GsonBuilder().create();
-        final TypeToken<List<NewChunkData>> newChunkDataType = new TypeToken<List<NewChunkData>>() { };
-        try (Reader reader = new InputStreamReader(new FramedLZ4CompressorInputStream(Files.newInputStream(saveFile.toFile().toPath())))) {
-            final List<NewChunkData> chunkData = gson.fromJson(reader, newChunkDataType.getType());
-            if (nonNull(chunkData)) {
-                chunkData.stream().forEach(d -> chunks.put(d.chunkPos, d.foundTime));
-                XaeroPlus.LOGGER.info("Loaded {} NewChunks from disk", chunkData.size());
+    private void readAsync(final Path saveFile) {
+        ForkJoinPool.commonPool().execute(() -> {
+            final Gson gson = new GsonBuilder().create();
+            final TypeToken<List<NewChunkData>> newChunkDataType = new TypeToken<List<NewChunkData>>() { };
+            try (Reader reader = new InputStreamReader(new FramedLZ4CompressorInputStream(Files.newInputStream(saveFile.toFile().toPath())))) {
+                final List<NewChunkData> chunkData = gson.fromJson(reader, newChunkDataType.getType());
+                if (nonNull(chunkData)) {
+                    chunkData.stream().forEach(d -> chunks.put((long) d.chunkPos, (long) d.foundTime));
+                    XaeroPlus.LOGGER.info("Loaded {} NewChunks from disk", chunkData.size());
+                }
+            } catch (final Exception e) {
+                XaeroPlus.LOGGER.error("Error loading new chunks from file", e);
             }
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error loading new chunks from file", e);
-        }
+        });
     }
 
     public void setSaveLoad(final Boolean b) {

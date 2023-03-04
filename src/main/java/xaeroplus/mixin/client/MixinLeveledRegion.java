@@ -48,6 +48,12 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
             MapProcessor mapProcessor
     );
 
+    @Shadow
+    public abstract void saveBiomePalette(DataOutputStream output) throws IOException;
+
+    @Shadow
+    protected abstract void loadBiomePalette(DataInputStream input, int cacheSaveVersion, MapProcessor mapProcessor) throws IOException;
+
     /**
      * @author rfresh2
      * @reason efficient zip write
@@ -72,8 +78,9 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
                     zipOutput.putNextEntry(e);
                     byte[] usableBuffer = new byte[16384];
                     byte[] integerByteBuffer = new byte[4];
-                    output.writeInt(18);
+                    output.writeInt(22);
                     this.writeCacheMetaData(output, usableBuffer, integerByteBuffer);
+                    this.saveBiomePalette(output);
 
                     for (int i = 0; i < 8; ++i) {
                         for (int j = 0; j < 8; ++j) {
@@ -196,8 +203,8 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
                         try {
                             byte[] integerByteBuffer = new byte[4];
                             int cacheSaveVersion = input.readInt();
-                            if (cacheSaveVersion <= 18 && cacheSaveVersion != 7) {
-                                if (cacheSaveVersion < 18) {
+                            if (cacheSaveVersion <= 22 && cacheSaveVersion != 7 && cacheSaveVersion != 21) {
+                                if (cacheSaveVersion < 22) {
                                     this.shouldCache = true;
                                 }
 
@@ -212,6 +219,7 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
                                 }
 
                                 this.preCacheLoad();
+                                this.loadBiomePalette(input, cacheSaveVersion, mapProcessor);
                                 boolean leafShouldAffectBranches = !this.shouldCache && this.shouldLeafAffectCache(targetHighlightsHash);
                                 if (leafShouldAffectBranchesDest != null) {
                                     leafShouldAffectBranchesDest[0] = leafShouldAffectBranches;

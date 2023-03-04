@@ -10,13 +10,13 @@ Or from [GitHub actions](https://github.com/rfresh2/XaeroPlus/actions?query=bran
 
 # Xaero Versions
 
-Xaero WorldMap version: [1.28.9](https://www.curseforge.com/minecraft/mc-mods/xaeros-world-map/files/4381131)
+Xaero WorldMap version: [1.29.1](https://www.curseforge.com/minecraft/mc-mods/xaeros-world-map/files/4418385)
 
-Xaero Minimap version: [23.1.0](https://www.curseforge.com/minecraft/mc-mods/xaeros-minimap/files/4381108)
+Xaero Minimap version: [23.2.0](https://www.curseforge.com/minecraft/mc-mods/xaeros-minimap/files/4418085)
 
-You need to download and include these mods in your Forge mods folder **in addition** to `xaeroplus.jar` (3 jars total).
+Download and include these mods in your Forge mods folder **in addition** to `xaeroplus-xx.jar` (3 jars total).
 
-Using any official Xaero mod version other than these two may cause crashes.
+Any other Xaero WorldMap/Minimap version may cause crashes.
 
 # Modifications
 
@@ -45,7 +45,7 @@ Using any official Xaero mod version other than these two may cause crashes.
 * ~~Increased region loading performance for large worlds. Fixes "hangs" on joining a server or switching dimensions.~~
   * Now included in XaeroWorldMap 1.26.4
 
-Configurations are in the normal Xaero WorldMap settings GUI.
+Configurations are in the Xaero WorldMap and Minimap settings GUI.
 
 Toggleable settings support keybinds through the standard Minecraft Controls GUI.
 

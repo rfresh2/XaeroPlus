@@ -12,6 +12,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.biome.Biome;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -495,10 +496,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                 if (mouseTile != null) {
                                     MapBlock block = mouseTile.getBlock(this.mouseBlockPosX & 15, this.mouseBlockPosZ & 15);
                                     if (block != null) {
-                                        this.drawCenteredString(mc.fontRenderer, block.toString(), this.width / 2, 12, -1);
+                                        this.drawCenteredString(mc.fontRenderer, block.toString(), this.width / 2, 22, -1);
                                         if (block.getNumberOfOverlays() != 0) {
                                             for(int i = 0; i < block.getOverlays().size(); ++i) {
-                                                this.drawCenteredString(mc.fontRenderer, ((Overlay)block.getOverlays().get(i)).toString(), this.width / 2, 22 + i * 10, -1);
+                                                this.drawCenteredString(mc.fontRenderer, block.getOverlays().get(i).toString(), this.width / 2, 32 + i * 10, -1);
                                             }
                                         }
                                     }
@@ -563,50 +564,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     int pixelInsideTexX = mouseRegPixelX & 63;
                     int pixelInsideTexZ = mouseRegPixelZ & 63;
                     boolean hasAmbiguousHeight = false;
+                    int mouseBlockBottomY = -1;
                     int mouseBlockTopY = -1;
+                    int pointedAtBiome = -1;
                     if (tex != null) {
-                        this.mouseBlockPosY = tex.getHeight(pixelInsideTexX, pixelInsideTexZ);
+                        mouseBlockBottomY = this.mouseBlockPosY = tex.getHeight(pixelInsideTexX, pixelInsideTexZ);
                         mouseBlockTopY = tex.getTopHeight(pixelInsideTexX, pixelInsideTexZ);
                         hasAmbiguousHeight = this.mouseBlockPosY != mouseBlockTopY;
-                    }
-
-                    if (WorldMap.settings.coordinates) {
-                        String coordsString = "X: " + this.mouseBlockPosX;
-                        if (this.mouseBlockPosY != -1) {
-                            coordsString = coordsString + " Y: " + this.mouseBlockPosY;
-                        }
-
-                        if (hasAmbiguousHeight && mouseBlockTopY != -1) {
-                            coordsString = coordsString + " (" + mouseBlockTopY + ")";
-                        }
-
-                        coordsString = coordsString + " Z: " + this.mouseBlockPosZ;
-                        this.drawCenteredString(mc.fontRenderer, coordsString, this.width / 2, 2, -1);
-                    }
-
-                    int subtleTooltipOffset = 12;
-                    if (WorldMap.settings.displayZoom) {
-                        String zoomString = (double)Math.round(destScale * 1000.0) / 1000.0 + "x";
-                        this.drawCenteredString(mc.fontRenderer, zoomString, this.width / 2, this.height - subtleTooltipOffset, -1);
-                    }
-
-                    if (SupportMods.minimap()) {
-                        String subWorldNameToRender = SupportMods.xaeroMinimap.getSubWorldNameToRender();
-                        if (subWorldNameToRender != null) {
-                            subtleTooltipOffset += 24;
-                            this.drawCenteredString(mc.fontRenderer, subWorldNameToRender, this.width / 2, this.height - subtleTooltipOffset, -1);
-                        }
-                    }
-
-                    discoveredForHighlights = this.mouseBlockPosY != -1;
-                    ITextComponent subtleHighlightTooltip = this.mapProcessor
-                            .getMapWorld()
-                            .getCurrentDimension()
-                            .getHighlightHandler()
-                            .getBlockHighlightSubtleTooltip(this.mouseBlockPosX, this.mouseBlockPosZ, discoveredForHighlights);
-                    if (subtleHighlightTooltip != null) {
-                        subtleTooltipOffset += 12;
-                        this.drawCenteredString(mc.fontRenderer, subtleHighlightTooltip.getFormattedText(), this.width / 2, this.height - subtleTooltipOffset, -1);
+                        pointedAtBiome = tex.getBiome(pixelInsideTexX, pixelInsideTexZ);
                     }
 
                     if (hasAmbiguousHeight) {
@@ -1084,9 +1049,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                             }
                         }
 
+                        int var203 = 1;
                         counter = 0;
                         if (!prevWaitingForBranchCache) {
-                            for(int i = 0; i < this.regionBuffer.size() && counter < toRequest; ++i) {
+                            for(int i = 0; i < this.regionBuffer.size() && counter < var203; ++i) {
                                 MapRegion region = (MapRegion)this.regionBuffer.get(i);
                                 if (region != nextToLoad || this.regionBuffer.size() <= 1) { // allow check on region buffer
                                     synchronized(region) {
@@ -1171,9 +1137,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     drawRect(lineX, lineY, lineX + lineW, lineY + lineH, -16777216);
                     lineX = mc.displayWidth / 2 - 5;
                     lineY = -mc.displayHeight / 2;
-                    lineW = 6;
+                    int var223 = 6;
                     lineH = mc.displayHeight;
-                    drawRect(lineX, lineY, lineX + lineW, lineY + lineH, -16777216);
+                    drawRect(lineX, lineY, lineX + var223, lineY + lineH, -16777216);
                     GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                     GlStateManager.enableDepth();
                     if (SupportMods.vivecraft) {
@@ -1325,9 +1291,65 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                             this.drawFarArrowOnMap(arrowX - this.cameraX, arrowZ - this.cameraZ, a, scaleMultiplier / this.scale);
                         }
                     }
+                    GlStateManager.popMatrix();
+                    GlStateManager.popMatrix();
+                    int cursorDisplayOffset = 0;
+                    if (WorldMap.settings.coordinates) {
+                        String coordsString = "X: " + this.mouseBlockPosX;
+                        if (mouseBlockBottomY != -1) {
+                            coordsString = coordsString + " Y: " + mouseBlockBottomY;
+                        }
 
-                    GlStateManager.popMatrix();
-                    GlStateManager.popMatrix();
+                        if (hasAmbiguousHeight && mouseBlockTopY != -1) {
+                            coordsString = coordsString + " (" + mouseBlockTopY + ")";
+                        }
+
+                        coordsString = coordsString + " Z: " + this.mouseBlockPosZ;
+                        MapRenderHelper.drawCenteredStringWithBackground(
+                                this.fontRenderer, coordsString, this.width / 2, 2 + cursorDisplayOffset, -1, 0.0F, 0.0F, 0.0F, 0.4F
+                        );
+                        cursorDisplayOffset += 10;
+                    }
+
+                    if (WorldMap.settings.hoveredBiome && pointedAtBiome != -1) {
+                        Biome biome = Biome.getBiome(pointedAtBiome);
+                        String biomeText = biome == null ? I18n.format("gui.xaero_wm_unknown_biome", new Object[0]) : biome.getBiomeName();
+                        MapRenderHelper.drawCenteredStringWithBackground(
+                                this.fontRenderer, biomeText, this.width / 2, 2 + cursorDisplayOffset, -1, 0.0F, 0.0F, 0.0F, 0.4F
+                        );
+                    }
+
+                    int subtleTooltipOffset = 12;
+                    if (WorldMap.settings.displayZoom) {
+                        String zoomString = (double)Math.round(destScale * 1000.0) / 1000.0 + "x";
+                        MapRenderHelper.drawCenteredStringWithBackground(
+                                mc.fontRenderer, zoomString, this.width / 2, this.height - subtleTooltipOffset, -1, 0.0F, 0.0F, 0.0F, 0.4F
+                        );
+                    }
+
+                    if (SupportMods.minimap()) {
+                        String subWorldNameToRender = SupportMods.xaeroMinimap.getSubWorldNameToRender();
+                        if (subWorldNameToRender != null) {
+                            subtleTooltipOffset += 24;
+                            MapRenderHelper.drawCenteredStringWithBackground(
+                                    mc.fontRenderer, subWorldNameToRender, this.width / 2, this.height - subtleTooltipOffset, -1, 0.0F, 0.0F, 0.0F, 0.4F
+                            );
+                        }
+                    }
+
+                    discoveredForHighlights = mouseBlockBottomY != -1;
+                    ITextComponent subtleHighlightTooltip = this.mapProcessor
+                            .getMapWorld()
+                            .getCurrentDimension()
+                            .getHighlightHandler()
+                            .getBlockHighlightSubtleTooltip(this.mouseBlockPosX, this.mouseBlockPosZ, discoveredForHighlights);
+                    if (subtleHighlightTooltip != null) {
+                        subtleTooltipOffset += 12;
+                        MapRenderHelper.drawCenteredStringWithBackground(
+                                mc.fontRenderer, subtleHighlightTooltip, this.width / 2, this.height - subtleTooltipOffset, -1, 0.0F, 0.0F, 0.0F, 0.4F
+                        );
+                    }
+
                     this.overWaypointsMenu = false;
                     if (this.waypointMenu && SupportMods.xaeroMinimap.getWaypointsSorted() != null) {
                         GlStateManager.pushMatrix();

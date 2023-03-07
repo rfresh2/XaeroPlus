@@ -50,9 +50,10 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
 
     @Shadow
     public abstract void saveBiomePalette(DataOutputStream output) throws IOException;
-
     @Shadow
     protected abstract void loadBiomePalette(DataInputStream input, int cacheSaveVersion, MapProcessor mapProcessor) throws IOException;
+    @Shadow
+    protected abstract void onCacheLoadFailed(boolean[][] var1);
 
     /**
      * @author rfresh2
@@ -282,10 +283,12 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
 
                     this.cacheFile = null;
                     this.shouldCache = true;
+                    this.onCacheLoadFailed(textureLoaded);
                 } catch (Throwable var61) {
                     this.cacheFile = null;
                     this.shouldCache = true;
                     WorldMap.LOGGER.error("Failed to load cache for region " + this + "! " + this.cacheFile, var61);
+                    this.onCacheLoadFailed(textureLoaded);
                 }
             } else {
                 this.cacheFile = null;

@@ -10,7 +10,7 @@ Or from [GitHub actions](https://github.com/rfresh2/XaeroPlus/actions?query=bran
 
 # Xaero Versions
 
-Xaero WorldMap version: [1.29.1](https://www.curseforge.com/minecraft/mc-mods/xaeros-world-map/files/4418385)
+Xaero WorldMap version: [1.29.2](https://www.curseforge.com/minecraft/mc-mods/xaeros-world-map/files/4424616)
 
 Xaero Minimap version: [23.2.0](https://www.curseforge.com/minecraft/mc-mods/xaeros-minimap/files/4418085)
 
@@ -28,22 +28,19 @@ Any other Xaero WorldMap/Minimap version may cause crashes.
   * **You will need to manually change the name of any existing folder** 
     * In `.minecraft/XaeroWorldMap/Multiplayer_<server name>/`
 * WorldMap zoom unlocked
-* Worldmap Follow mode and GUI button
+* Fast map region writes. Prevent missed chunks in map while traveling at very high speeds.
+* WorldMap Follow mode and GUI button
 * NewChunks Highlighting in MiniMap and WorldMap.
-* [WorldDownloader 4.1.1.0](https://github.com/Pokechu22/WorldDownloader/) integration
+* [WorldDownloader 4.1.1.0](https://github.com/Pokechu22/WorldDownloader/) integration (does not work with Future's Forge WDL jar)
   * Highlights chunks as they are downloaded in the Minimap and WorldMap.
-* Faster map tile zip reads/writes
 * Allow multiple MC instances to read/write to the same map concurrently
-* Transparent obsidian roof (optional). Useful for mapping 2b2t spawn.
-* Faster region writes to prevent missed chunks in map while traveling at very high speeds.
+* Transparent obsidian roof. Useful for mapping 2b2t spawn.
 * Option to always view and create waypoints in the Overworld when in Nether.
 * GUI on WorldMap to pan the map to user entered coordinates.
-* Display distance to waypoints on Waypoints GUI (like JourneyMap)
+* Display distance to waypoints on Waypoints GUI
 * Always sort enabled waypoints before disabled waypoints
 * GUI button to enable/disable all waypoints
 * Minecraft world always renders in background while in a Xaero GUI (for client travel mods compatibility)
-* ~~Increased region loading performance for large worlds. Fixes "hangs" on joining a server or switching dimensions.~~
-  * Now included in XaeroWorldMap 1.26.4
 
 Configurations are in the Xaero WorldMap and Minimap settings GUI.
 

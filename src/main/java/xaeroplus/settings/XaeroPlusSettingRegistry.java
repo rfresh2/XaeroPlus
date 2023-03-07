@@ -1,7 +1,6 @@
 package xaeroplus.settings;
 
 import com.google.common.base.Suppliers;
-import com.google.common.collect.Streams;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import sun.reflect.ConstructorAccessor;
@@ -22,7 +21,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.reflect.Modifier.FINAL;
-import static java.lang.reflect.Modifier.PRIVATE;
 import static java.util.Arrays.asList;
 import static xaeroplus.settings.XaeroPlusSetting.SETTING_PREFIX;
 

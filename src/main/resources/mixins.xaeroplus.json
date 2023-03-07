@@ -8,11 +8,11 @@
     "MixinControlsHandler",
     "MixinControlsRegister",
     "MixinGuiMap",
+    "MixinGuiMinimapOverlaysSettings",
     "MixinGuiUpdateAll",
     "MixinGuiWaypoints",
     "MixinGuiWaypointsList",
     "MixinGuiWorldMapSettings",
-    "MixinGuiMinimapOverlaysSettings",
     "MixinLeveledRegion",
     "MixinMapProcessor",
     "MixinMapSaveLoad",
@@ -20,9 +20,9 @@
     "MixinMapWriter",
     "MixinMinimapModSettings",
     "MixinMisc",
-    "MixinWorldMapModSettings",
     "MixinSupportXaeroWorldmap",
     "MixinWaypointsManager",
+    "MixinWorldMapModSettings",
     "mc.MixinMinecraft",
     "mc.MixinNetworkManager"
   ]

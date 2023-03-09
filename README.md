@@ -1,6 +1,7 @@
 # XaeroPlus
 
-This is a Forge 1.12.2 mod that depends on and modifies Xaero's WorldMap and Minimap.
+XaeroPlus is a Forge 1.12.2 mod that depends on and modifies Xaero's WorldMap and Minimap with extra 
+features and performance improvements - particularly for use on anarchy servers like 2b2t.
 
 # Download
 

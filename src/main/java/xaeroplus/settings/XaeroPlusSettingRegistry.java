@@ -105,6 +105,12 @@ public final class XaeroPlusSettingRegistry {
             "Sets whether the overworld WorldMap directory is in DIM0 or null (null is the original Xaero name)"
                     + " \\n MC must be restarted for changes to take effect.",
             false);
+    public static final XaeroPlusSetting dataFolderResolutionMode = XaeroPlusSetting.createFloatSetting("Data Folder Resolve Mode",
+            0f, 2f, 1f,
+            "0 = Server IP (Xaero default)"
+                    + " \\n 1 = MC Server Entry Name (XaeroPlus Default)"
+                    + " \\n 2 = Base Server Domain Name",
+            1f);
 
     public static final List<XaeroPlusSetting> XAERO_PLUS_WORLDMAP_SETTINGS = asList(
             // add settings here

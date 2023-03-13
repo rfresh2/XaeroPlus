@@ -1,5 +1,6 @@
 package xaeroplus.mixin.client;
 
+import com.google.common.net.InternetDomainName;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.world.World;
@@ -131,13 +132,31 @@ public abstract class MixinMapProcessor {
 
     @Inject(method = "getMainId", at = @At("HEAD"), cancellable = true)
     private void getMainId(boolean rootFolderFormat, CallbackInfoReturnable<String> cir) {
-        Minecraft mc = Minecraft.getMinecraft();
-        if (nonNull(mc.getCurrentServerData())) {
-            // use common directories based on server list name instead of IP
-            // good for proxies
-            cir.setReturnValue("Multiplayer_" + mc.getCurrentServerData().serverName);
-            cir.cancel();
+        final XaeroPlus.DataFolderResolutionMode dataFolderResolutionMode = XaeroPlus.dataFolderResolutionMode;
+        if (dataFolderResolutionMode == XaeroPlus.DataFolderResolutionMode.SERVER_NAME) {
+            Minecraft mc = Minecraft.getMinecraft();
+            if (nonNull(mc.getCurrentServerData()) && mc.getCurrentServerData().serverName.length() > 0) {
+                // use common directories based on server list name instead of IP
+                // good for proxies
+                cir.setReturnValue("Multiplayer_" + mc.getCurrentServerData().serverName);
+                cir.cancel();
+            }
+        } else if (dataFolderResolutionMode == XaeroPlus.DataFolderResolutionMode.BASE_DOMAIN) {
+            Minecraft mc = Minecraft.getMinecraft();
+            if (nonNull(mc.getCurrentServerData())) {
+                // use the base domain name, e.g connect.2b2t.org -> 2b2t.org
+                String id;
+                try {
+                    id = InternetDomainName.from(mc.getCurrentServerData().serverIP).topPrivateDomain().toString();
+                } catch (IllegalArgumentException ex) { // not a domain
+                    id = mc.getCurrentServerData().serverIP;
+                }
+                id = "Multiplayer_" + id;
+                cir.setReturnValue(id);
+                cir.cancel();
+            }
         }
+
     }
 
     @Inject(method = "getDimensionName", at = @At(value = "HEAD"), cancellable = true)

@@ -22,6 +22,7 @@ public class XaeroPlus {
     public static boolean FOLLOW = false;
     // cache and only update this on new world loads
     public static boolean nullOverworldDimensionFolder = XaeroPlusSettingRegistry.nullOverworldDimensionFolder.getBooleanSettingValue();
+    public static DataFolderResolutionMode dataFolderResolutionMode = DataFolderResolutionMode.fromInt((int) XaeroPlusSettingRegistry.dataFolderResolutionMode.getFloatSettingValue());
     public static String LOCK_ID = UUID.randomUUID().toString();
     public static EventBus EVENT_BUS = MinecraftForge.EVENT_BUS;
     public static Logger LOGGER = LogManager.getLogger("XaeroPlus");
@@ -42,5 +43,22 @@ public class XaeroPlus {
 
     public static int getColor(final int r, final int g, final int b, final int a) {
         return ((a & 255) << 24) | ((r & 255) << 16) | ((g & 255) << 8) | (b & 255);
+    }
+
+    public enum DataFolderResolutionMode {
+        IP(0), SERVER_NAME(1), BASE_DOMAIN(2);
+        final int i;
+        DataFolderResolutionMode(final int i) {
+            this.i = i;
+        }
+
+        public static DataFolderResolutionMode fromInt(final int n) {
+            switch (n) {
+                case 0: return IP;
+                case 1: return SERVER_NAME;
+                case 2: return BASE_DOMAIN;
+                default: return SERVER_NAME;
+            }
+        }
     }
 }

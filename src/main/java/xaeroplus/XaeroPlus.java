@@ -9,6 +9,7 @@ import net.minecraftforge.fml.common.eventhandler.EventBus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import xaeroplus.module.ModuleManager;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 import java.util.UUID;
 
@@ -19,6 +20,8 @@ public class XaeroPlus {
     public static final String VERSION = "1.12.2";
     // Map gui follow mode
     public static boolean FOLLOW = false;
+    // cache and only update this on new world loads
+    public static boolean nullOverworldDimensionFolder = XaeroPlusSettingRegistry.nullOverworldDimensionFolder.getBooleanSettingValue();
     public static String LOCK_ID = UUID.randomUUID().toString();
     public static EventBus EVENT_BUS = MinecraftForge.EVENT_BUS;
     public static Logger LOGGER = LogManager.getLogger("XaeroPlus");

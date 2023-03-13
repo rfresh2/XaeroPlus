@@ -140,13 +140,11 @@ public abstract class MixinMapProcessor {
         }
     }
 
-    /**
-     * @author rfresh2
-     * @reason Use DIM0 as overworld region directory name instead of "null"
-     */
-    @Overwrite
-    public String getDimensionName(int id) {
-        return "DIM" + id; // remove backwards compatibility for "null" overworld dimension id
+    @Inject(method = "getDimensionName", at = @At(value = "HEAD"), cancellable = true)
+    public void getDimensionName(final int id, final CallbackInfoReturnable<String> cir) {
+        if (!XaeroPlus.nullOverworldDimensionFolder) {
+            cir.setReturnValue("DIM" + id);
+        }
     }
 
     /**
@@ -332,7 +330,7 @@ public abstract class MixinMapProcessor {
                 this.caveStartDetermined = false;
                 this.caveStart = -1;
                 this.currentWorldId = newWorldId;
-                this.currentDimId = !this.mapWorldUsableRequest ? null : this.getDimensionName(this.mapWorld.getFutureDimensionId());
+                this.currentDimId = !this.mapWorldUsableRequest ? null : ((MapProcessor) (Object) this).getDimensionName(this.mapWorld.getFutureDimensionId());
                 this.currentMWId = newMWId;
                 Path mapPath = this.mapSaveLoad.getMWSubFolder(this.currentWorldId, this.currentDimId, this.currentMWId);
                 if (this.mapWorldUsable) {

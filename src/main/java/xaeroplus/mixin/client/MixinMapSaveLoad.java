@@ -4,6 +4,9 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMap;
 import xaero.map.cache.BlockStateColorTypeCache;
@@ -12,6 +15,7 @@ import xaero.map.file.MapSaveLoad;
 import xaero.map.file.RegionDetection;
 import xaero.map.file.worldsave.WorldDataHandler;
 import xaero.map.region.*;
+import xaeroplus.XaeroPlus;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -43,17 +47,15 @@ public abstract class MixinMapSaveLoad {
     @Shadow
     public abstract void safeMoveAndReplace(Path fromPath, Path toPath, String fromExtension, String toExtension);
 
-    /**
-     * @author rfresh2
-     * @reason Use DIM0 as overworld dimension directory instead of "null"
-     */
-    @Overwrite
-    public Path getOldFolder(String oldUnfixedMainId, String dim) {
-        if (oldUnfixedMainId == null) {
-            return null;
+    @Inject(method = "getOldFolder", at = @At(value = "HEAD"), cancellable = true)
+    public void getOldFolder(final String oldUnfixedMainId, final String dim, final CallbackInfoReturnable<Path> cir) {
+        if (!XaeroPlus.nullOverworldDimensionFolder) {
+            if (oldUnfixedMainId == null) {
+                cir.setReturnValue(null);
+            }
+            String dimIdFixed = Objects.equals(dim, "null") ? "0" : dim;
+            cir.setReturnValue(WorldMap.saveFolder.toPath().resolve(oldUnfixedMainId + "_" + dimIdFixed));
         }
-        String dimIdFixed = Objects.equals(dim, "null") ? "0" : dim;
-        return WorldMap.saveFolder.toPath().resolve(oldUnfixedMainId + "_" + dimIdFixed);
     }
 
     /**

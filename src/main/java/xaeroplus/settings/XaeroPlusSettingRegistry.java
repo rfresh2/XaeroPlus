@@ -101,6 +101,10 @@ public final class XaeroPlusSettingRegistry {
             1f, 32f, 1f,
             "view-distance of the server",
             4f); // 2b2t
+    public static final XaeroPlusSetting nullOverworldDimensionFolder = XaeroPlusSetting.createBooleanSetting("null OW Dimension Dir",
+            "Sets whether the overworld WorldMap directory is in DIM0 or null (null is the original Xaero name)"
+                    + " \\n MC must be restarted for changes to take effect.",
+            false);
 
     public static final List<XaeroPlusSetting> XAERO_PLUS_WORLDMAP_SETTINGS = asList(
             // add settings here
@@ -119,7 +123,8 @@ public final class XaeroPlusSettingRegistry {
             wdlEnabledSetting,
             wdlAlphaSetting,
             owAutoWaypointDimension,
-            showWaypointDistances
+            showWaypointDistances,
+            nullOverworldDimensionFolder
     );
 
     public static final List<XaeroPlusSetting> XAERO_PLUS_MINIMAP_SETTINGS = asList(

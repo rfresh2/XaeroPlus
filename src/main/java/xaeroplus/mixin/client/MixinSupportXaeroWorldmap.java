@@ -5,7 +5,6 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.math.ChunkPos;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 import org.spongepowered.asm.mixin.Final;
@@ -27,6 +26,7 @@ import xaero.map.region.MapTileChunk;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.WDLHelper;
 
 import java.util.HashMap;
@@ -219,12 +219,12 @@ public abstract class MixinSupportXaeroWorldmap {
                                                 && WDLHelper.isWdlPresent()
                                                 && WDLHelper.isDownloading()) {
                                             GuiMap.restoreTextureStates();
-                                            final Set<ChunkPos> wdlSavedChunksWithCache = WDLHelper.getSavedChunksWithCache();
+                                            final Set<Long> wdlSavedChunksWithCache = WDLHelper.getSavedChunksWithCache();
                                             if (compatibilityVersion >= 7) {
                                                 GL14.glBlendFuncSeparate(770, 771, 1, 771);
                                             }
                                             for(int t = 0; t < 16; ++t) {
-                                                final ChunkPos chunkPos = new ChunkPos(chunk.getX() * 4 + t % 4, chunk.getZ() * 4 + t / 4);
+                                                final Long chunkPos = ChunkUtils.chunkPosToLong(chunk.getX() * 4 + t % 4, chunk.getZ() * 4 + t / 4);
                                                 if (wdlSavedChunksWithCache.contains(chunkPos)) {
                                                     int wdlChunkDrawX = drawX + 16 * (t % 4);
                                                     int wdlChunkDrawZ = drawZ + 16 * (t / 4);

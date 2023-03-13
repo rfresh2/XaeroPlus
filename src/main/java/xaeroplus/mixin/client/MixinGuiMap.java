@@ -9,7 +9,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.biome.Biome;
@@ -42,12 +41,12 @@ import xaero.map.settings.ModSettings;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.HighlightAtChunkPos;
 import xaeroplus.util.WDLHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 
 import static java.util.Objects.isNull;
@@ -964,7 +963,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                 if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getBooleanSettingValue()) {
                                     restoreTextureStates();
                                     final NewChunks newChunks = ModuleManager.getModule(NewChunks.class);
-                                    for (final NewChunks.NewChunkAtChunkPos c : newChunks.getNewChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions)) {
+                                    for (final HighlightAtChunkPos c : newChunks.getNewChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions)) {
                                         // todo: GL calls can be optimized further here by:
                                         //  1. rendering rects as two triangles
                                         //  2. rendering a buffer of all vertices rather than each 4 vertex rect individually
@@ -983,31 +982,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                         && WDLHelper.isWdlPresent()
                                         && WDLHelper.isDownloading()) {
                                     restoreTextureStates();
-                                    final Set<ChunkPos> wdlSavedChunksWithCache = WDLHelper.getSavedChunksWithCache();
-                                    // todo: this is checking every chunk on every frame. We can optimize this like NewChunks with caching.
-                                    //  is only a problem at low zooms
-                                    for(int leafX = 0; leafX < leveledSideInRegions; ++leafX) {
-                                        for (int leafZ = 0; leafZ < leveledSideInRegions; ++leafZ) {
-                                            int regX = leafRegionMinX + leafX;
-                                            int regZ = leafRegionMinZ + leafZ;
-                                            for(int cx = 0; cx < 8; cx++) {
-                                                for (int cz = 0; cz < 8; cz++) {
-                                                    final int mapTileChunkX = (regX << 3) + cx;
-                                                    final int mapTileChunkZ = (regZ << 3) + cz;
-                                                    for (int t = 0; t < 16; ++t) {
-                                                        final ChunkPos chunkPos = new ChunkPos((mapTileChunkX << 2) + t % 4, (mapTileChunkZ << 2) + (t >> 2));
-                                                        if (wdlSavedChunksWithCache.contains(chunkPos)) {
-                                                            GlStateManager.pushMatrix();
-                                                            GlStateManager.translate(
-                                                                    (float)((chunkPos.x << 4) - flooredCameraX), (float)((chunkPos.z << 4) - flooredCameraZ), 0.0F
-                                                            );
-                                                            drawRect(0, 0, 16, 16, WDLHelper.getWdlColor());
-                                                            GlStateManager.popMatrix();
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
+                                    for (final HighlightAtChunkPos c : WDLHelper.getSavedChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions)) {
+                                        GlStateManager.pushMatrix();
+                                        GlStateManager.translate(
+                                                (float)((c.x << 4) - flooredCameraX), (float)((c.z << 4) - flooredCameraZ), 0.0F
+                                        );
+                                        drawRect(0, 0, 16, 16, WDLHelper.getWdlColor());
+                                        GlStateManager.popMatrix();
                                     }
                                     GlStateManager.disableBlend();
                                     setupTextureMatricesAndTextures(brightness);

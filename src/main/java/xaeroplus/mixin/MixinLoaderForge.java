@@ -36,7 +36,6 @@ public class MixinLoaderForge implements IFMLLoadingPlugin {
 
     @Override
     public void injectData(Map<String, Object> data) {
-        boolean isObfuscatedEnvironment = (boolean) data.get("runtimeDeobfuscationEnabled");
     }
 
     @Override

@@ -1,6 +1,8 @@
 package xaeroplus.util;
 
 import com.google.common.base.Suppliers;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
 import wdl.WDL;
@@ -10,14 +12,17 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static xaeroplus.util.ChunkUtils.loadHighlightChunksAtRegion;
+
 public class WDLHelper {
     private static int wdlColor = XaeroPlus.getColor(0, 255, 0, 100);
     // getting the set of saved chunks is expensive. This supplier acts as a cache to speed things up.
-    private static final Supplier<Set<ChunkPos>> getChunkSupplier = Suppliers.memoizeWithExpiration(WDLHelper::getSavedChunks, 500, TimeUnit.MILLISECONDS);
+    private static final Supplier<Set<Long>> getChunkSupplier = Suppliers.memoizeWithExpiration(WDLHelper::getSavedChunks, 500, TimeUnit.MILLISECONDS);
     private static boolean hasLoggedFail = false;
     private static boolean checkedWdlPresent = false;
     private static boolean isWdlPresent = false;
@@ -49,16 +54,16 @@ public class WDLHelper {
         }
     }
 
-    public static Set<ChunkPos> getSavedChunksWithCache() {
+    public static Set<Long> getSavedChunksWithCache() {
         return getChunkSupplier.get();
     }
 
-    private static Set<ChunkPos> getSavedChunks() {
+    private static Set<Long> getSavedChunks() {
         try {
-            final List<ChunkPos> loadedChunks = WDL.getInstance().getChunkList().stream().map(Chunk::getPos).collect(Collectors.toList());
-            final Set<ChunkPos> savedChunks = new HashSet<>(WDL.getInstance().savedChunks);
-            savedChunks.addAll(loadedChunks);
-            return savedChunks;
+            final HashSet<Long> set = new HashSet<>();
+            set.addAll(WDL.getInstance().getChunkList().stream().map(Chunk::getPos).map(ChunkUtils::chunkPosToLong).collect(Collectors.toList()));
+            set.addAll(WDL.getInstance().savedChunks.stream().map(ChunkUtils::chunkPosToLong).collect(Collectors.toList()));
+            return set;
         } catch (final Throwable e) {
             if (!hasLoggedFail) {
                 XaeroPlus.LOGGER.error("Error: Failed getting WDL chunks", e);
@@ -74,5 +79,19 @@ public class WDLHelper {
 
     public static void setAlpha(float a) {
         wdlColor = XaeroPlus.getColor(0, 255, 0, (int) a);
+    }
+
+    private static final Cache<RegionRenderPos, List<HighlightAtChunkPos>> regionRenderCache = CacheBuilder.newBuilder()
+            .expireAfterWrite(500, TimeUnit.MILLISECONDS)
+            .build();
+    public static List<HighlightAtChunkPos> getSavedChunksInRegion(final int leafRegionX, final int leafRegionZ, final int level) {
+        final RegionRenderPos regionRenderPos = new RegionRenderPos(leafRegionX, leafRegionZ, level);
+        try {
+            return regionRenderCache.get(regionRenderPos, loadHighlightChunksAtRegion(leafRegionX, leafRegionZ, level,
+                    (chunkPos) -> getSavedChunksWithCache().contains(chunkPos)));
+        } catch (ExecutionException e) {
+            XaeroPlus.LOGGER.error("Error handling WDL region lookup", e);
+        }
+        return Collections.emptyList();
     }
 }

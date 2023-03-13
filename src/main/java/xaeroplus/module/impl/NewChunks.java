@@ -7,7 +7,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import net.minecraft.network.play.server.SPacketChunkData;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.commons.compress.compressors.lz4.FramedLZ4CompressorInputStream;
 import org.apache.commons.compress.compressors.lz4.FramedLZ4CompressorOutputStream;
@@ -18,6 +17,8 @@ import xaeroplus.event.PacketReceivedEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.module.Module;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.HighlightAtChunkPos;
+import xaeroplus.util.RegionRenderPos;
 
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -25,13 +26,20 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static xaeroplus.XaeroPlus.getColor;
+import static xaeroplus.util.ChunkUtils.chunkPosToLong;
+import static xaeroplus.util.ChunkUtils.loadHighlightChunksAtRegion;
 
 @Module.ModuleInfo()
 public class NewChunks extends Module {
@@ -131,25 +139,13 @@ public class NewChunks extends Module {
         }
     }
 
-    public static Long chunkPosToLong(final ChunkPos chunkPos) {
-        return (long)chunkPos.x & 4294967295L | ((long)chunkPos.z & 4294967295L) << 32;
-    }
-
-    public static Long chunkPosToLong(final int x, final int z) {
-        return (long)x & 4294967295L | ((long)z & 4294967295L) << 32;
-    }
-
-    public static ChunkPos longToChunkPos(final Long l) {
-        return new ChunkPos((int)(l & 4294967295L), (int)(l >> 32 & 4294967295L));
-    }
-
-    public boolean isNewChunk(final ChunkPos chunkPos) {
-        return chunks.containsKey(chunkPosToLong(chunkPos));
-    }
-
     // in chunkpos coordinates
     public boolean isNewChunk(final int x, final int z) {
         return chunks.containsKey(chunkPosToLong(x, z));
+    }
+
+    public boolean isNewChunk(final long chunkPos) {
+        return chunks.containsKey(chunkPos);
     }
 
     public int getNewChunksColor() {
@@ -204,7 +200,6 @@ public class NewChunks extends Module {
                 XaeroPlus.LOGGER.error("Error saving new chunks to {}", saveFile,e);
             }
         });
-
     }
 
     private void loadChunks(final Path saveFile) {
@@ -257,80 +252,18 @@ public class NewChunks extends Module {
      * WorldMap Render caching
      */
 
-    public final Cache<RegionRenderPos, List<NewChunkAtChunkPos>> regionRenderCache = CacheBuilder.newBuilder()
-            // Should be possible to async refresh using https://github.com/ben-manes/caffeine
-            // but would need to shade in the lib
+    private final Cache<RegionRenderPos, List<HighlightAtChunkPos>> regionRenderCache = CacheBuilder.newBuilder()
             .expireAfterWrite(500, TimeUnit.MILLISECONDS)
             .build();
 
-    public List<NewChunkAtChunkPos> getNewChunksInRegion(final int leafRegionX, final int leafRegionZ, final int level) {
+    public List<HighlightAtChunkPos> getNewChunksInRegion(final int leafRegionX, final int leafRegionZ, final int level) {
         final RegionRenderPos regionRenderPos = new RegionRenderPos(leafRegionX, leafRegionZ, level);
         try {
-            return regionRenderCache.get(regionRenderPos, loadNewChunksInRegion(leafRegionX, leafRegionZ, level));
+            return regionRenderCache.get(regionRenderPos, loadHighlightChunksAtRegion(leafRegionX, leafRegionZ, level, this::isNewChunk));
         } catch (ExecutionException e) {
             XaeroPlus.LOGGER.error("Error handling NewChunks region lookup", e);
         }
         return Collections.emptyList();
     }
 
-    private Callable<List<NewChunkAtChunkPos>> loadNewChunksInRegion(int leafRegionX, int leafRegionZ, int level) {
-        return () -> {
-            final List<NewChunkAtChunkPos> chunks = new ArrayList<>();
-            final int mx = leafRegionX + level;
-            final int mz = leafRegionZ + level;
-            for (int regX = leafRegionX; regX < mx; ++regX) {
-                for (int regZ = leafRegionZ; regZ < mz; ++regZ) {
-                    for (int cx = 0; cx < 8; cx++) {
-                        for (int cz = 0; cz < 8; cz++) {
-                            final int mapTileChunkX = (regX << 3) + cx;
-                            final int mapTileChunkZ = (regZ << 3) + cz;
-                            for (int t = 0; t < 16; ++t) {
-                                final int chunkPosX = (mapTileChunkX << 2) + t % 4;
-                                final int chunkPosZ = (mapTileChunkZ << 2) + (t >> 2);
-                                if (this.isNewChunk(chunkPosX, chunkPosZ)) {
-                                    chunks.add(new NewChunkAtChunkPos(chunkPosX, chunkPosZ));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            return chunks;
-        };
-    }
-
-    public static class NewChunkAtChunkPos {
-        public final int x;
-        public final int z;
-
-        public NewChunkAtChunkPos(int x, int z) {
-            this.x = x;
-            this.z = z;
-        }
-    }
-
-    public static class RegionRenderPos {
-        public final int leafRegionX;
-        public final int leafRegionZ;
-        public final int level;
-
-        public RegionRenderPos(final int leafRegionX, final int leafRegionZ, final int level) {
-            this.leafRegionX = leafRegionX;
-            this.leafRegionZ = leafRegionZ;
-            this.level = level;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            RegionRenderPos that = (RegionRenderPos) o;
-            return leafRegionX == that.leafRegionX && leafRegionZ == that.leafRegionZ && level == that.level;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(leafRegionX, leafRegionZ, level);
-        }
-    }
 }

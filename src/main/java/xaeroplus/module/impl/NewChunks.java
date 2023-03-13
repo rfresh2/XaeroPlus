@@ -20,12 +20,11 @@ import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.HighlightAtChunkPos;
 import xaeroplus.util.RegionRenderPos;
 
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -191,13 +190,17 @@ public class NewChunks extends Module {
     private void writeAsync(final List<NewChunkData> chunkData, final Path saveFile) {
         executorService.execute(() -> {
             final Gson gson = new GsonBuilder().create();
-            // todo: we should write to a temp file and then rename replace in case this fails mid-write for whatever reason
-            //  also we should do a quick check we aren't writing significantly fewer chunks than what are on disk just in case
-            try (Writer writer = new OutputStreamWriter(new FramedLZ4CompressorOutputStream(Files.newOutputStream(saveFile)))) {
-                gson.toJson(chunkData, writer);
-                XaeroPlus.LOGGER.info("Saved {} NewChunks to disk", chunkData.size());
-            } catch (final Exception e) {
-                XaeroPlus.LOGGER.error("Error saving new chunks to {}", saveFile,e);
+            try {
+                final Path tempFile = Files.createTempFile("XaeroPlusNewChunksTemp", ".data");
+                try (Writer writer = new OutputStreamWriter(new FramedLZ4CompressorOutputStream(Files.newOutputStream(tempFile, StandardOpenOption.WRITE)))) {
+                    gson.toJson(chunkData, writer);
+                    Files.move(tempFile, saveFile, StandardCopyOption.REPLACE_EXISTING);
+                    XaeroPlus.LOGGER.info("Saved {} NewChunks to disk", chunkData.size());
+                } catch (final Exception e) {
+                    XaeroPlus.LOGGER.error("Error saving new chunks to {}", saveFile,e);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         });
     }

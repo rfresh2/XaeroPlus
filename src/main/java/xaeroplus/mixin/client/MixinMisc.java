@@ -17,7 +17,7 @@ public class MixinMisc {
      */
     @Inject(method = "screenShouldSkipWorldRender", at = @At("HEAD"), cancellable = true)
     private static void screenShouldSkipWorldRender(GuiScreen screen, boolean checkOtherMod, CallbackInfoReturnable<Boolean> cir) {
-        if (!XaeroPlusSettingRegistry.skipWorldRenderSetting.getBooleanSettingValue()) {
+        if (!XaeroPlusSettingRegistry.skipWorldRenderSetting.getValue()) {
             cir.setReturnValue(false);
         }
     }

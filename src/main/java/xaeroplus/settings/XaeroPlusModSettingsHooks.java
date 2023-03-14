@@ -1,6 +1,7 @@
 package xaeroplus.settings;
 
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import xaeroplus.XaeroPlus;
 
 import java.io.*;
 import java.util.List;
@@ -11,7 +12,14 @@ public class XaeroPlusModSettingsHooks {
     public static void saveSettings(File configFile, List<XaeroPlusSetting> settings) throws IOException {
         try (PrintWriter writer = new PrintWriter(new FileWriter(configFile, true))) {
             settings.forEach(k -> {
-                writer.println(k.getSettingName() + ":" + (k.isBooleanSetting() ? k.getBooleanSettingValue() : k.getFloatSettingValue()));
+                writer.println(k.getSettingName() + ":" +
+                        ((k instanceof XaeroPlusBooleanSetting)
+                                ? ((XaeroPlusBooleanSetting) k).getValue()
+                                : (k instanceof XaeroPlusFloatSetting)
+                                    ? ((XaeroPlusFloatSetting) k).getValue()
+                                    : (k instanceof XaeroPlusEnumSetting)
+                                        ? ((XaeroPlusEnumSetting) k).getValueIndex()
+                                        : ""));
             });
         }
     }
@@ -26,47 +34,91 @@ public class XaeroPlusModSettingsHooks {
                         .findFirst();
                 if (settingOptional.isPresent()) {
                     final XaeroPlusSetting setting = settingOptional.get();
-                    if (setting.isBooleanSetting()) {
-                        setting.setBooleanSettingValue(Boolean.parseBoolean(args[1]));
-                    } else {
-                        setting.setFloatSettingValue(Float.parseFloat(args[1]));
+                    if (setting instanceof XaeroPlusBooleanSetting) {
+                        ((XaeroPlusBooleanSetting) setting).setValue(Boolean.parseBoolean(args[1]));
+                    } else if (setting instanceof XaeroPlusFloatSetting) {
+                        ((XaeroPlusFloatSetting) setting).setValue(Float.parseFloat(args[1]));
+                    } else if (setting instanceof XaeroPlusEnumSetting) {
+                        ((XaeroPlusEnumSetting) setting).setValueIndex((int) Float.parseFloat(args[1]));
                     }
                 }
             }
         }
+        XaeroPlus.onSettingLoad();
     }
 
     public static void getClientBooleanValue(String enumString, List<XaeroPlusSetting> settings, CallbackInfoReturnable<Boolean> cir) {
-        Optional<XaeroPlusSetting> settingOptional = settings.stream()
-                .filter(xaeroPlusSetting -> xaeroPlusSetting.getSettingName().equals(enumString) && xaeroPlusSetting.isBooleanSetting())
+        Optional<XaeroPlusBooleanSetting> settingOptional = settings.stream()
+                .filter(xaeroPlusSetting -> xaeroPlusSetting.getSettingName().equals(enumString) && xaeroPlusSetting instanceof XaeroPlusBooleanSetting)
+                .map(xaeroPlusSetting -> (XaeroPlusBooleanSetting) xaeroPlusSetting)
                 .findFirst();
         if (settingOptional.isPresent()) {
-            cir.setReturnValue(settingOptional.get().getBooleanSettingValue());
+            cir.setReturnValue(settingOptional.get().getValue());
             cir.cancel();
         }
     }
 
     public static void setOptionValue(String enumString, List<XaeroPlusSetting> settings) {
-        Optional<XaeroPlusSetting> settingOptional = settings.stream()
-                .filter(xaeroPlusSetting -> xaeroPlusSetting.getSettingName().equals(enumString) && xaeroPlusSetting.isBooleanSetting())
+        Optional<XaeroPlusBooleanSetting> settingOptional = settings.stream()
+                .filter(xaeroPlusSetting -> xaeroPlusSetting.getSettingName().equals(enumString) && xaeroPlusSetting instanceof XaeroPlusBooleanSetting)
+                .map(xaeroPlusSetting -> (XaeroPlusBooleanSetting) xaeroPlusSetting)
                 .findFirst();
-        settingOptional.ifPresent(xaeroPlusSetting -> xaeroPlusSetting.setBooleanSettingValue(!xaeroPlusSetting.getBooleanSettingValue()));
+        settingOptional.ifPresent(xaeroPlusSetting -> xaeroPlusSetting.setValue(!xaeroPlusSetting.getValue()));
     }
 
     public static void setOptionFloatValue(String enumString, double f, List<XaeroPlusSetting> settings) {
-        settings.stream()
-                .filter(xaeroPlusSetting -> xaeroPlusSetting.getSettingName().equals(enumString) && xaeroPlusSetting.isFloatSetting())
-                .findFirst()
-                .ifPresent(xaeroPlusSetting -> xaeroPlusSetting.setFloatSettingValue((float) f));
+        Optional<XaeroPlusSetting> foundSetting = settings.stream()
+                .filter(xaeroPlusSetting -> xaeroPlusSetting.getSettingName().equals(enumString))
+                .findFirst();
+        foundSetting
+                .filter(xaeroPlusSetting ->  xaeroPlusSetting instanceof XaeroPlusFloatSetting)
+                .map(xaeroPlusSetting -> (XaeroPlusFloatSetting) xaeroPlusSetting)
+                .ifPresent(xaeroPlusSetting -> xaeroPlusSetting.setValue((float) f));
+        // why does xaero not have proper enum settings??? They are "floats" but treated like int indeces. just...why...
+        foundSetting
+                .filter(xaeroPlusSetting ->  xaeroPlusSetting instanceof XaeroPlusEnumSetting)
+                .map(xaeroPlusSetting -> (XaeroPlusEnumSetting) xaeroPlusSetting)
+                .ifPresent(xaeroPlusEnumSetting -> xaeroPlusEnumSetting.setValueIndex((int) f));
     }
 
     public static void getOptionFloatValue(String enumString, CallbackInfoReturnable<Double> cir, List<XaeroPlusSetting> settings) {
         Optional<XaeroPlusSetting> settingOptional = settings.stream()
-                .filter(xaeroPlusSetting -> xaeroPlusSetting.getSettingName().equals(enumString) && xaeroPlusSetting.isFloatSetting())
+                .filter(xaeroPlusSetting -> xaeroPlusSetting.getSettingName().equals(enumString))
                 .findFirst();
-        if (settingOptional.isPresent()) {
-            cir.setReturnValue((double)settingOptional.get().getFloatSettingValue());
-            cir.cancel();
-        }
+        settingOptional
+                .filter(xaeroPlusSetting -> xaeroPlusSetting instanceof XaeroPlusFloatSetting)
+                .map(xaeroPlusSetting -> (XaeroPlusFloatSetting) xaeroPlusSetting)
+                .ifPresent(xaeroPlusSetting -> {
+                    cir.setReturnValue((double) xaeroPlusSetting.getValue());
+                    cir.cancel();
+                });
+        // i'm debating whether to continue this enum madness or just mixin config save/load to write enums as strings...
+        settingOptional
+                .filter(xaeroPlusSetting -> xaeroPlusSetting instanceof XaeroPlusEnumSetting)
+                .map(xaeroPlusSetting -> (XaeroPlusEnumSetting) xaeroPlusSetting)
+                .ifPresent(xaeroPlusEnumSetting -> {
+                    cir.setReturnValue((double) xaeroPlusEnumSetting.getValueIndex());
+                    cir.cancel();
+                });
+    }
+
+    public static void getKeybinding(final String enumString, final CallbackInfoReturnable<String> cir, final List<XaeroPlusSetting> settings) {
+        Optional<XaeroPlusSetting> foundSetting = settings.stream()
+                .filter(xaeroPlusSetting -> xaeroPlusSetting.getSettingName().equals(enumString))
+                .findFirst();
+        foundSetting
+                .filter(xaeroPlusSetting -> xaeroPlusSetting instanceof XaeroPlusEnumSetting)
+                .map(xaeroPlusSetting -> (XaeroPlusEnumSetting) xaeroPlusSetting)
+                .ifPresent(xaeroPlusEnumSetting -> cir.setReturnValue(enumString + ": " + xaeroPlusEnumSetting.getValue().toString()));
+        foundSetting
+                .filter(xaeroPlusSetting -> xaeroPlusSetting instanceof XaeroPlusFloatSetting)
+                .map(xaeroPlusSetting -> (XaeroPlusFloatSetting) xaeroPlusSetting)
+                .ifPresent(xaeroPlusFloatSetting -> {
+                    final int intCastStep = (int) xaeroPlusFloatSetting.getValueStep();
+                    if (xaeroPlusFloatSetting.getValueStep() - intCastStep <= 0) {
+                        // this float is equivalent to an int
+                        cir.setReturnValue(enumString + ": " + ((int) xaeroPlusFloatSetting.getValue()));
+                    }
+                });
     }
 }

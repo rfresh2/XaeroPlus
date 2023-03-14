@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.XaeroPlusSettingRegistry.DataFolderResolutionMode;
 
 import java.util.UUID;
 
@@ -21,8 +22,9 @@ public class XaeroPlus {
     // Map gui follow mode
     public static boolean FOLLOW = false;
     // cache and only update this on new world loads
-    public static boolean nullOverworldDimensionFolder = XaeroPlusSettingRegistry.nullOverworldDimensionFolder.getBooleanSettingValue();
-    public static DataFolderResolutionMode dataFolderResolutionMode = DataFolderResolutionMode.fromInt((int) XaeroPlusSettingRegistry.dataFolderResolutionMode.getFloatSettingValue());
+    public static boolean nullOverworldDimensionFolder = XaeroPlusSettingRegistry.nullOverworldDimensionFolder.getValue();
+    public static DataFolderResolutionMode dataFolderResolutionMode = XaeroPlusSettingRegistry.dataFolderResolutionMode.getValue();
+    public static boolean settingsLoadedInit = false;
     public static String LOCK_ID = UUID.randomUUID().toString();
     public static EventBus EVENT_BUS = MinecraftForge.EVENT_BUS;
     public static Logger LOGGER = LogManager.getLogger("XaeroPlus");
@@ -45,20 +47,11 @@ public class XaeroPlus {
         return ((a & 255) << 24) | ((r & 255) << 16) | ((g & 255) << 8) | (b & 255);
     }
 
-    public enum DataFolderResolutionMode {
-        IP(0), SERVER_NAME(1), BASE_DOMAIN(2);
-        final int i;
-        DataFolderResolutionMode(final int i) {
-            this.i = i;
-        }
-
-        public static DataFolderResolutionMode fromInt(final int n) {
-            switch (n) {
-                case 0: return IP;
-                case 1: return SERVER_NAME;
-                case 2: return BASE_DOMAIN;
-                default: return SERVER_NAME;
-            }
+    public static void onSettingLoad() {
+        if (!settingsLoadedInit) { // handle settings where we want them to take effect only on first load
+            nullOverworldDimensionFolder = XaeroPlusSettingRegistry.nullOverworldDimensionFolder.getValue();
+            dataFolderResolutionMode = XaeroPlusSettingRegistry.dataFolderResolutionMode.getValue();
+            settingsLoadedInit = true;
         }
     }
 }

@@ -9,7 +9,7 @@ import xaero.map.gui.ConfigSettingEntry;
 import xaero.map.gui.GuiSettings;
 import xaero.map.gui.GuiWorldMapSettings;
 import xaero.map.gui.ISettingEntry;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
 
 @Mixin(value = GuiWorldMapSettings.class, remap = false)
 public abstract class MixinGuiWorldMapSettings extends GuiSettings {
@@ -20,7 +20,7 @@ public abstract class MixinGuiWorldMapSettings extends GuiSettings {
 
     @Inject(method = "<init>(Lnet/minecraft/client/gui/GuiScreen;Lnet/minecraft/client/gui/GuiScreen;)V", at = @At("RETURN"))
     public void init(GuiScreen parent, GuiScreen escapeScreen, CallbackInfo ci) {
-        final ConfigSettingEntry[] configSettingEntries = XaeroPlusSettingRegistry.getWorldMapConfigSettingEntries()
+        final ConfigSettingEntry[] configSettingEntries = XaeroPlusSettingsReflectionHax.getWorldMapConfigSettingEntries()
                 .toArray(new ConfigSettingEntry[0]);
         final int oldLen = this.entries.length;
         final int newLen = configSettingEntries.length;

@@ -141,7 +141,7 @@ public abstract class MixinMapWriter {
      */
     @Inject(method = "shouldOverlay", at = @At("HEAD"), cancellable = true)
     public void shouldOverlay(IBlockState state, CallbackInfoReturnable<Boolean> cir) {
-        if (!XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getBooleanSettingValue()) {
+        if (!XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()) {
             return;
         }
         if (!(state.getBlock() instanceof BlockAir) && !(state.getBlock() instanceof BlockGlass) && state.getBlock().getBlockLayer() != BlockRenderLayer.TRANSLUCENT) {
@@ -162,7 +162,7 @@ public abstract class MixinMapWriter {
      */
     @Inject(method = "loadPixel", at = @At("HEAD"), cancellable = true)
     public void loadPixel(World world, MapBlock pixel, MapBlock currentPixel, Chunk bchunk, int insideX, int insideZ, int highY, int lowY, boolean cave, boolean canReuseBiomeColours, boolean flowers, BlockPos.MutableBlockPos mutableBlockPos3, CallbackInfo ci) {
-        if (!XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getBooleanSettingValue()) {
+        if (!XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()) {
             return;
         } else {
             ci.cancel();
@@ -187,7 +187,7 @@ public abstract class MixinMapWriter {
             state = this.unpackFramedBlocks(state, world, this.mutableGlobalPos);
             Block b = state.getBlock();
             boolean roofObsidian = (h > 253 && b == Blocks.OBSIDIAN);
-            if (roofObsidian && XaeroPlusSettingRegistry.transparentObsidianRoofDarkeningSetting.getFloatSettingValue() == -1) {
+            if (roofObsidian && XaeroPlusSettingRegistry.transparentObsidianRoofDarkeningSetting.getValue() == -1) {
                 continue;  // skip over obsidian roof completely
             }
             if (roofObsidian & !columnRoofObsidian) {
@@ -222,7 +222,7 @@ public abstract class MixinMapWriter {
                         } else {
                             this.writerBiomeInfoSupplier.set(currentPixel, canReuseBiomeColours);
                             int stateId = Block.getStateId(state);
-                            int opacity = roofObsidian ? (int) XaeroPlusSettingRegistry.transparentObsidianRoofDarkeningSetting.getFloatSettingValue() : b.getLightOpacity(state, world, this.mutableGlobalPos);
+                            int opacity = roofObsidian ? (int) XaeroPlusSettingRegistry.transparentObsidianRoofDarkeningSetting.getValue() : b.getLightOpacity(state, world, this.mutableGlobalPos);
                             this.overlayBuilder.build(stateId, this.biomeBuffer, opacity, workingLight, world, this.mapProcessor, this.mutableGlobalPos, this.overlayBuilder.getOverlayBiome(), this.colorTypeCache, this.writerBiomeInfoSupplier);
                         }
                     } else if (this.hasVanillaColor(state, world, this.mutableGlobalPos)) {
@@ -327,8 +327,8 @@ public abstract class MixinMapWriter {
                             }
                             sinceLastWrite = Math.max(1L, sinceLastWrite);
 
-                            long tilesToUpdate = XaeroPlusSettingRegistry.fastMapSetting.getBooleanSettingValue()
-                                    ? (long) Math.min(sizeTiles, XaeroPlusSettingRegistry.fastMapMaxTilesPerCycle.getFloatSettingValue())
+                            long tilesToUpdate = XaeroPlusSettingRegistry.fastMapSetting.getValue()
+                                    ? (long) Math.min(sizeTiles, XaeroPlusSettingRegistry.fastMapMaxTilesPerCycle.getValue())
                                     : Math.min(sinceLastWrite * (long)sizeTiles / (long)fullUpdateTargetTime, 100L); // default
 
                             if (this.lastWrite == -1L || tilesToUpdate != 0L) {
@@ -368,7 +368,7 @@ public abstract class MixinMapWriter {
                                         }
 
                                         /** removing time limit **/
-                                        if (!XaeroPlusSettingRegistry.fastMapSetting.getBooleanSettingValue()) {
+                                        if (!XaeroPlusSettingRegistry.fastMapSetting.getValue()) {
                                             if (System.nanoTime() - writeStartNano >= (long)timeLimit) {
                                                 break;
                                             }
@@ -406,12 +406,12 @@ public abstract class MixinMapWriter {
 
     @Inject(method = "writeChunk", at = @At(value = "HEAD"), cancellable = true)
     public void writeChunk(World world, int distance, boolean onlyLoad, BiomeColorCalculator biomeColorCalculator, OverlayManager overlayManager, boolean loadChunks, boolean updateChunks, boolean ignoreHeightmaps, boolean flowers, boolean detailedDebug, BlockPos.MutableBlockPos mutableBlockPos3, int tileChunkX, int tileChunkZ, int tileChunkLocalX, int tileChunkLocalZ, int chunkX, int chunkZ, CallbackInfoReturnable<Boolean> cir) {
-        if (!XaeroPlusSettingRegistry.fastMapSetting.getBooleanSettingValue()) return;
+        if (!XaeroPlusSettingRegistry.fastMapSetting.getValue()) return;
 
         final String cacheable = chunkX + " " + chunkZ;
         final Instant cacheValue = tileUpdateCache.getIfPresent(cacheable);
         if (nonNull(cacheValue)) {
-            if (cacheValue.isBefore(Instant.now().minus(Duration.ofMillis((long) XaeroPlusSettingRegistry.mapWriterDelaySetting.getFloatSettingValue())))) {
+            if (cacheValue.isBefore(Instant.now().minus(Duration.ofMillis((long) XaeroPlusSettingRegistry.mapWriterDelaySetting.getValue())))) {
                 tileUpdateCache.put(cacheable, Instant.now());
             } else {
                 cir.setReturnValue(false);

@@ -63,7 +63,7 @@ public class NewChunks extends Module {
                     synchronized (chunks) {
                         // todo: find a way to limit our in-memory NewChunk data usage while having save/load enabled (without data loss)
                         //  some file type that allows us to select/write a subset of data? sqlite?
-                        if (!XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.getBooleanSettingValue() && chunks.size() > maxNumber) {
+                        if (!XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.getValue() && chunks.size() > maxNumber) {
                             // remove oldest 500 chunks
                             final List<Long> toRemove = chunks.entrySet().stream()
                                     .sorted(Map.Entry.comparingByValue())
@@ -74,10 +74,10 @@ public class NewChunks extends Module {
                         }
                         chunks.put(chunkPosKey, System.currentTimeMillis());
                     }
-                } else if (XaeroPlusSettingRegistry.newChunksSeenResetTime.getFloatSettingValue() > 0) {
+                } else if (XaeroPlusSettingRegistry.newChunksSeenResetTime.getValue() > 0) {
                     final long chunkDataSeenTime = chunks.get(chunkPosKey);
                     if (chunks.defaultReturnValue() != chunkDataSeenTime) {
-                        if (System.currentTimeMillis() - chunkDataSeenTime > XaeroPlusSettingRegistry.newChunksSeenResetTime.getFloatSettingValue() * 1000) {
+                        if (System.currentTimeMillis() - chunkDataSeenTime > XaeroPlusSettingRegistry.newChunksSeenResetTime.getValue() * 1000) {
                             chunks.remove(chunkPosKey);
                         }
                     }
@@ -91,7 +91,7 @@ public class NewChunks extends Module {
 
     @SubscribeEvent
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
-        if (XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.getBooleanSettingValue()) {
+        if (XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.getValue()) {
             try {
                 synchronized (chunks) {
                     saveChunks(this.currentSaveFile);
@@ -107,7 +107,7 @@ public class NewChunks extends Module {
 
     @Override
     public void onEnable() {
-        if (XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.getBooleanSettingValue()) {
+        if (XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.getValue()) {
             loadChunksWithXaeroState();
         }
     }
@@ -126,7 +126,7 @@ public class NewChunks extends Module {
 
     @Override
     public void onDisable() {
-        if (XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.getBooleanSettingValue()) {
+        if (XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.getValue()) {
             synchronized (chunks) {
                 try {
                     saveChunks(this.currentSaveFile);

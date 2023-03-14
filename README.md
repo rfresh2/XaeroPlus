@@ -22,16 +22,15 @@ Any other Xaero WorldMap/Minimap version may cause crashes.
 # Modifications
 
 * WorldMap and Waypoint directories are indexed by:
-  * Default: Multiplayer server name. 
-    * e.g. "Multiplayer_connect.2b2t.org" -> "Multiplayer_2b2t"
+  * Default: Multiplayer server list name.
   * Optional: Server IP (Xaero's default)
   * Optional: Base Server Domain Name
-  * **The default setting (Multiplayer Server Name) requires you to manually change the name of existing folders.** 
+  * **The default setting requires you to manually change the name of existing folders.** 
     * In both `.minecraft/XaeroWaypoints/` and `.minecraft/XaeroWorldMap/`
 * Overworld dimension is stored in the "DIM0" directory instead of "null"
-  * **The default setting requires you to manually change the name of any existing folder** 
+  * **The default setting requires you to manually change the name of existing folders** 
     * In `.minecraft/XaeroWorldMap/Multiplayer_<server name>/`
-  * Or you can configure this setting to use the default directory name
+  * You can configure this setting to use the default "null" directory name
 * WorldMap zoom unlocked
 * Fast map region writes. Prevent missed chunks in map while traveling at very high speeds.
 * WorldMap Follow mode and GUI button

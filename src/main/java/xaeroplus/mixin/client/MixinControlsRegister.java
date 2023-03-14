@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.controls.ControlsRegister;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ public abstract class MixinControlsRegister {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     public void init(CallbackInfo ci) {
-        List<KeyBinding> keybinds = XaeroPlusSettingRegistry.getKeybinds();
+        List<KeyBinding> keybinds = XaeroPlusSettingsReflectionHax.getKeybinds();
         this.keybindings.addAll(keybinds);
         keybinds.forEach(ClientRegistry::registerKeyBinding);
     }

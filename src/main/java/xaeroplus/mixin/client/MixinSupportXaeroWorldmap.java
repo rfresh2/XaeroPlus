@@ -190,7 +190,7 @@ public abstract class MixinSupportXaeroWorldmap {
                                             }
                                         }
 
-                                        if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getBooleanSettingValue()) {
+                                        if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
                                             GuiMap.restoreTextureStates();
                                             if (compatibilityVersion >= 7) {
                                                 GL14.glBlendFuncSeparate(770, 771, 1, 771);
@@ -215,7 +215,7 @@ public abstract class MixinSupportXaeroWorldmap {
                                             }
                                         }
 
-                                        if (XaeroPlusSettingRegistry.wdlEnabledSetting.getBooleanSettingValue()
+                                        if (XaeroPlusSettingRegistry.wdlEnabledSetting.getValue()
                                                 && WDLHelper.isWdlPresent()
                                                 && WDLHelper.isDownloading()) {
                                             GuiMap.restoreTextureStates();
@@ -253,13 +253,13 @@ public abstract class MixinSupportXaeroWorldmap {
                     }
 
                     // TODO: moving this code to MinimapFBORenderer would allow it to render on top of grid lines
-                    if (XaeroPlusSettingRegistry.showRenderDistanceSetting.getBooleanSettingValue()) {
+                    if (XaeroPlusSettingRegistry.showRenderDistanceSetting.getValue()) {
                         GuiMap.restoreTextureStates();
                         if (compatibilityVersion >= 7) {
                             GL14.glBlendFuncSeparate(770, 771, 1, 771);
                         }
 
-                        final int setting = (int) XaeroPlusSettingRegistry.assumedServerRenderDistanceSetting.getFloatSettingValue();
+                        final int setting = (int) XaeroPlusSettingRegistry.assumedServerRenderDistanceSetting.getValue();
                         final int width = setting * 2 + 1;
                         // origin of the chunk we are standing in
                         final int middleChunkX = -insideX;

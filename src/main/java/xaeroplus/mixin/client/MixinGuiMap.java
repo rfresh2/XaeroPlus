@@ -249,9 +249,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             destScale *= Math.pow(1.2, factor);
         }
 
-        if (destScale < XaeroPlusSettingRegistry.worldMapMinZoomSetting.getFloatSettingValue() / 10.0f) {
+        if (destScale < XaeroPlusSettingRegistry.worldMapMinZoomSetting.getValue() / 10.0f) {
             // insert our own min zoom
-            destScale = XaeroPlusSettingRegistry.worldMapMinZoomSetting.getFloatSettingValue() / 10.0f;
+            destScale = XaeroPlusSettingRegistry.worldMapMinZoomSetting.getValue() / 10.0f;
         } else if (destScale > 50.0) {
             destScale = 50.0;
         }
@@ -960,7 +960,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                     setupTextureMatricesAndTextures(brightness);
                                 }
 
-                                if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getBooleanSettingValue()) {
+                                if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
                                     restoreTextureStates();
                                     final NewChunks newChunks = ModuleManager.getModule(NewChunks.class);
                                     for (final HighlightAtChunkPos c : newChunks.getNewChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions)) {
@@ -978,7 +978,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                     GlStateManager.disableBlend();
                                     setupTextureMatricesAndTextures(brightness);
                                 }
-                                if (XaeroPlusSettingRegistry.wdlEnabledSetting.getBooleanSettingValue()
+                                if (XaeroPlusSettingRegistry.wdlEnabledSetting.getValue()
                                         && WDLHelper.isWdlPresent()
                                         && WDLHelper.isDownloading()) {
                                     restoreTextureStates();

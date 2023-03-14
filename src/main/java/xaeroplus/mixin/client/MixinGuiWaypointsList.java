@@ -69,7 +69,7 @@ public abstract class MixinGuiWaypointsList {
                                 rectX,
                                 rectY
                         );
-                if (XaeroPlusSettingRegistry.showWaypointDistances.getBooleanSettingValue()) {
+                if (XaeroPlusSettingRegistry.showWaypointDistances.getValue()) {
                     Entity renderViewEntity = Minecraft.getMinecraft().getRenderViewEntity();
                     final double playerX = renderViewEntity.posX;
                     final double playerZ = renderViewEntity.posZ;

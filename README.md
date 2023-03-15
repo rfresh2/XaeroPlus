@@ -11,7 +11,7 @@ Or from [GitHub actions](https://github.com/rfresh2/XaeroPlus/actions?query=bran
 
 # Xaero Versions
 
-Xaero WorldMap version: [1.29.2](https://www.curseforge.com/minecraft/mc-mods/xaeros-world-map/files/4424616)
+Xaero WorldMap version: [1.29.3](https://www.curseforge.com/minecraft/mc-mods/xaeros-world-map/files/4436640)
 
 Xaero Minimap version: [23.3.0](https://www.curseforge.com/minecraft/mc-mods/xaeros-minimap/files/4430571)
 

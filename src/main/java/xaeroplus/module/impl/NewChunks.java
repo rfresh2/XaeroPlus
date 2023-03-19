@@ -191,7 +191,7 @@ public class NewChunks extends Module {
         executorService.execute(() -> {
             final Gson gson = new GsonBuilder().create();
             try {
-                final Path tempFile = Files.createTempFile("XaeroPlusNewChunksTemp", ".data");
+                final Path tempFile = Files.createFile(saveFile.getParent().resolve("XaeroPlusNewChunksData " + System.nanoTime() + ".temp"));
                 try (Writer writer = new OutputStreamWriter(new FramedLZ4CompressorOutputStream(Files.newOutputStream(tempFile, StandardOpenOption.WRITE)))) {
                     gson.toJson(chunkData, writer);
                     Files.move(tempFile, saveFile, StandardCopyOption.REPLACE_EXISTING);
@@ -219,14 +219,14 @@ public class NewChunks extends Module {
         executorService.execute(() -> {
             final Gson gson = new GsonBuilder().create();
             final TypeToken<List<NewChunkData>> newChunkDataType = new TypeToken<List<NewChunkData>>() { };
-            try (Reader reader = new InputStreamReader(new FramedLZ4CompressorInputStream(Files.newInputStream(saveFile.toFile().toPath())))) {
+            try (Reader reader = new InputStreamReader(new FramedLZ4CompressorInputStream(Files.newInputStream(saveFile)))) {
                 final List<NewChunkData> chunkData = gson.fromJson(reader, newChunkDataType.getType());
                 if (nonNull(chunkData)) {
                     chunkData.stream().forEach(d -> chunks.put((long) d.chunkPos, (long) d.foundTime));
                     XaeroPlus.LOGGER.info("Loaded {} NewChunks from disk", chunkData.size());
                 }
             } catch (final Exception e) {
-                XaeroPlus.LOGGER.error("Error loading new chunks from file", e);
+                XaeroPlus.LOGGER.error("Error loading new chunks from file {}", saveFile.toString(), e);
             }
         });
     }

@@ -18,6 +18,7 @@
     "MixinMapSaveLoad",
     "MixinMapWorld",
     "MixinMapWriter",
+    "MixinMinimapFBORenderer",
     "MixinMinimapModSettings",
     "MixinMisc",
     "MixinSupportXaeroWorldmap",

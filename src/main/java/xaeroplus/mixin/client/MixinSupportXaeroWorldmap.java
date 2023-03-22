@@ -23,6 +23,7 @@ import xaero.map.WorldMapSession;
 import xaero.map.gui.GuiMap;
 import xaero.map.region.MapRegion;
 import xaero.map.region.MapTileChunk;
+import xaeroplus.GuiHelper;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
@@ -33,7 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import static org.lwjgl.opengl.GL11.GL_LINE_LOOP;
+import static org.lwjgl.opengl.GL11.*;
 
 @Mixin(value = SupportXaeroWorldmap.class, remap = false)
 public abstract class MixinSupportXaeroWorldmap {
@@ -135,6 +136,12 @@ public abstract class MixinSupportXaeroWorldmap {
                                 if (i >= minViewX && i <= maxViewX && j >= minViewZ && j <= maxViewZ) {
                                     MapTileChunk chunk = region.getChunk(i & 7, j & 7);
                                     if (chunk != null && chunk.getGlColorTexture() != -1) {
+                                        drawX = 64 * (chunk.getX() - chunkX) - 16 * tileX - insideX;
+                                        drawZ = 64 * (chunk.getZ() - chunkZ) - 16 * tileZ - insideZ;
+
+                                        GuiHelper.drawMMBackground(drawX, drawZ, 64.0f, brightness, chunk);
+                                        GuiMap.setupTextureMatricesAndTextures(brightness);
+
                                         this.bindMapTextureWithLighting(compatibilityVersion, brightness, chunk, zooming);
                                         if (zooming && compatibilityVersion >= 12) {
                                             GlStateManager.setActiveTexture(33984);
@@ -142,10 +149,9 @@ public abstract class MixinSupportXaeroWorldmap {
                                         }
 
                                         GL11.glTexParameterf(3553, 33082, 0.0F);
-                                        drawX = 64 * (chunk.getX() - chunkX) - 16 * tileX - insideX;
-                                        drawZ = 64 * (chunk.getZ() - chunkZ) - 16 * tileZ - insideZ;
+
                                         if (compatibilityVersion < 7) {
-                                            GL14.glBlendFuncSeparate(770, 771, 1, 771);
+                                            GL14.glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
                                             GuiMap.renderTexturedModalRectWithLighting((float)drawX, (float)drawZ, 0, 0, 64.0F, 64.0F);
                                         } else {
                                             GuiMap.renderTexturedModalRectWithLighting((float)drawX, (float)drawZ, 64.0F, 64.0F);

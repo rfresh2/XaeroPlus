@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.lwjgl.opengl.GL11.*;
+import static xaeroplus.settings.XaeroPlusSettingRegistry.transparentMinimapBackground;
 
 @Mixin(value = SupportXaeroWorldmap.class, remap = false)
 public abstract class MixinSupportXaeroWorldmap {
@@ -139,8 +140,10 @@ public abstract class MixinSupportXaeroWorldmap {
                                         drawX = 64 * (chunk.getX() - chunkX) - 16 * tileX - insideX;
                                         drawZ = 64 * (chunk.getZ() - chunkZ) - 16 * tileZ - insideZ;
 
-                                        GuiHelper.drawMMBackground(drawX, drawZ, 64.0f, brightness, chunk);
-                                        GuiMap.setupTextureMatricesAndTextures(brightness);
+                                        if (transparentMinimapBackground.getValue()) {
+                                            GuiHelper.drawMMBackground(drawX, drawZ, 64.0f, brightness, chunk);
+                                            GuiMap.setupTextureMatricesAndTextures(brightness);
+                                        }
 
                                         this.bindMapTextureWithLighting(compatibilityVersion, brightness, chunk, zooming);
                                         if (zooming && compatibilityVersion >= 12) {

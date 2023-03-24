@@ -32,6 +32,7 @@ import xaero.common.misc.Misc;
 import xaero.common.misc.OptimizedMath;
 import xaero.common.settings.ModSettings;
 import xaeroplus.XaeroPlus;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 @Mixin(value = MinimapFBORenderer.class, remap = false)
 public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
@@ -118,7 +119,9 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
         GlStateManager.enableBlend();
         GlStateManager.translate(256.0F, 256.0F, -2000.0F);
         GlStateManager.scale(this.zoom, this.zoom, 1.0);
-        Gui.drawRect(-256, -256, 256, 256, XaeroPlus.getColor(0, 0, 0, 0));
+        if (!XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) {
+            Gui.drawRect(-256, -256, 256, 256, XaeroPlus.getColor(0, 0, 0, 255));
+        }
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         float chunkGridAlphaMultiplier = 1.0F;
         float minimapChunkRectSize = 16.0f;

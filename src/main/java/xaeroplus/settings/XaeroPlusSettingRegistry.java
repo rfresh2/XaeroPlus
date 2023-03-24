@@ -99,8 +99,10 @@ public final class XaeroPlusSettingRegistry {
                     + " \\n SERVER_NAME = MC Server Entry Name (XaeroPlus Default). Example: .minecraft/XaeroWorldMap/Multiplayer_2b2t"
                     + " \\n BASE_DOMAIN = Base Server Domain Name. Example: .minecraft/XaeroWorldMap/Multiplayer_2b2t.org",
             DataFolderResolutionMode.values(), DataFolderResolutionMode.SERVER_NAME, SettingLocation.WORLD_MAP_MAIN);
-
     public enum DataFolderResolutionMode {
         IP, SERVER_NAME, BASE_DOMAIN;
     }
+    public static final XaeroPlusBooleanSetting transparentMinimapBackground = XaeroPlusBooleanSetting.create("Transparent Minimap Background",
+            "Makes the minimap background transparent instead of black.",
+            false, SettingLocation.MINIMAP_OVERLAYS);
 }

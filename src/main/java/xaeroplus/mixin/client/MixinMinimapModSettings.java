@@ -14,7 +14,7 @@ import xaeroplus.settings.XaeroPlusModSettingsHooks;
 import java.io.File;
 import java.io.IOException;
 
-import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS;
+import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.ALL_MINIMAP_SETTINGS;
 
 @Mixin(value = ModSettings.class, remap = false)
 public class MixinMinimapModSettings {
@@ -45,36 +45,36 @@ public class MixinMinimapModSettings {
 
     @Inject(method = "saveSettings", at = @At("TAIL"))
     public void saveSettings(final CallbackInfo ci) throws IOException {
-        XaeroPlusModSettingsHooks.saveSettings(this.modMain.getConfigFile(), XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS);
+        XaeroPlusModSettingsHooks.saveSettings(this.modMain.getConfigFile(), ALL_MINIMAP_SETTINGS.get());
     }
 
     @Inject(method = "loadSettingsFile", at = @At("TAIL"))
     public void loadSettings(final File file, CallbackInfo ci) throws IOException {
-        XaeroPlusModSettingsHooks.loadSettings(file, XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS);
+        XaeroPlusModSettingsHooks.loadSettings(file, ALL_MINIMAP_SETTINGS.get());
     }
 
     @Inject(method = "getClientBooleanValue", at = @At("HEAD"), cancellable = true)
     public void getClientBooleanValue(ModOptions o, CallbackInfoReturnable<Boolean> cir) {
-        XaeroPlusModSettingsHooks.getClientBooleanValue(o.getEnumString(), XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS, cir);
+        XaeroPlusModSettingsHooks.getClientBooleanValue(o.getEnumString(), ALL_MINIMAP_SETTINGS.get(), cir);
     }
 
     @Inject(method = "setOptionValue", at = @At("HEAD"))
     public void setOptionValue(ModOptions o, int par2, final CallbackInfo ci) {
-        XaeroPlusModSettingsHooks.setOptionValue(o.getEnumString(), XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS);
+        XaeroPlusModSettingsHooks.setOptionValue(o.getEnumString(), ALL_MINIMAP_SETTINGS.get());
     }
 
     @Inject(method = "setOptionFloatValue", at = @At("HEAD"))
     public void setOptionFloatValue(ModOptions o, double f, CallbackInfo ci) {
-        XaeroPlusModSettingsHooks.setOptionFloatValue(o.getEnumString(), f, XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS);
+        XaeroPlusModSettingsHooks.setOptionFloatValue(o.getEnumString(), f, ALL_MINIMAP_SETTINGS.get());
     }
 
     @Inject(method = "getOptionFloatValue", at = @At("HEAD"), cancellable = true)
     public void getOptionFloatValue(ModOptions o, CallbackInfoReturnable<Double> cir) {
-        XaeroPlusModSettingsHooks.getOptionFloatValue(o.getEnumString(), cir, XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS);
+        XaeroPlusModSettingsHooks.getOptionFloatValue(o.getEnumString(), cir, ALL_MINIMAP_SETTINGS.get());
     }
 
     @Inject(method = "getKeyBinding", at = @At("HEAD"), cancellable = true)
     public void getKeybinding(final ModOptions par1EnumOptions, final CallbackInfoReturnable<String> cir) {
-        XaeroPlusModSettingsHooks.getKeybinding(par1EnumOptions.getEnumString(), cir, XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS);
+        XaeroPlusModSettingsHooks.getKeybinding(par1EnumOptions.getEnumString(), cir, ALL_MINIMAP_SETTINGS.get());
     }
 }

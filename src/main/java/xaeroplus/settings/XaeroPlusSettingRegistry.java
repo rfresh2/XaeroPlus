@@ -102,7 +102,7 @@ public final class XaeroPlusSettingRegistry {
     public enum DataFolderResolutionMode {
         IP, SERVER_NAME, BASE_DOMAIN;
     }
-    public static final XaeroPlusBooleanSetting transparentMinimapBackground = XaeroPlusBooleanSetting.create("Transparent Minimap Background",
+    public static final XaeroPlusBooleanSetting transparentMinimapBackground = XaeroPlusBooleanSetting.create("Transparent Background",
             "Makes the minimap background transparent instead of black.",
-            false, SettingLocation.MINIMAP_OVERLAYS);
+            false, SettingLocation.MINIMAP);
 }

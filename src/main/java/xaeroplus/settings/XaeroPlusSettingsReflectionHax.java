@@ -27,9 +27,13 @@ public class XaeroPlusSettingsReflectionHax {
     public static final List<XaeroPlusSetting> XAERO_PLUS_WORLDMAP_SETTINGS = new ArrayList<>();
 
     public static final List<XaeroPlusSetting> XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS = new ArrayList<>();
+    public static final List<XaeroPlusSetting> XAERO_PLUS_MINIMAP_SETTINGS = new ArrayList<>();
+    public static final Supplier<List<XaeroPlusSetting>> ALL_MINIMAP_SETTINGS = () -> Stream.of(XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS.stream(), XAERO_PLUS_MINIMAP_SETTINGS.stream())
+            .flatMap(x -> x)
+            .collect(Collectors.toList());
 
     public enum SettingLocation {
-        WORLD_MAP_MAIN(XAERO_PLUS_WORLDMAP_SETTINGS), MINIMAP_OVERLAYS(XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS);
+        WORLD_MAP_MAIN(XAERO_PLUS_WORLDMAP_SETTINGS), MINIMAP_OVERLAYS(XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS), MINIMAP(XAERO_PLUS_MINIMAP_SETTINGS);
         private final List<XaeroPlusSetting> settingsList;
 
         SettingLocation(final List<XaeroPlusSetting> settingsList) {
@@ -42,13 +46,15 @@ public class XaeroPlusSettingsReflectionHax {
     }
 
     private static final Supplier<List<KeyBinding>> memoizingKeybindsList = Suppliers.memoize(() ->
-            Stream.concat(XAERO_PLUS_WORLDMAP_SETTINGS.stream(), XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS.stream())
-                .filter(setting -> setting instanceof XaeroPlusBooleanSetting)
-                .map(XaeroPlusSetting::getKeyBinding)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList())
+            Stream.of(XAERO_PLUS_WORLDMAP_SETTINGS.stream(), XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS.stream(), XAERO_PLUS_MINIMAP_SETTINGS.stream())
+                    .flatMap(x -> x)
+                    .filter(setting -> setting instanceof XaeroPlusBooleanSetting)
+                    .map(XaeroPlusSetting::getKeyBinding)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList())
     );
     private static List<ModOptions> WORLDMAP_MOD_OPTIONS_LIST = null;
+    private static List<xaero.common.settings.ModOptions> MINIMAP_OVERLAY_MOD_OPTIONS_LIST = null;
     private static List<xaero.common.settings.ModOptions> MINIMAP_MOD_OPTIONS_LIST = null;
     private static int enumOrdinal = 69; // needs to not overlap with existing enum indeces
 
@@ -74,9 +80,18 @@ public class XaeroPlusSettingsReflectionHax {
                 .collect(Collectors.toList());
     }
 
+    public static List<xaero.common.gui.ConfigSettingEntry> getMiniMapOverlayConfigSettingEntries() {
+        if (MINIMAP_OVERLAY_MOD_OPTIONS_LIST == null) {
+            MINIMAP_OVERLAY_MOD_OPTIONS_LIST = constructXaeroPlusSettings(xaero.common.settings.ModOptions.class, ModType.MINIMAP, XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS);
+        }
+        return MINIMAP_OVERLAY_MOD_OPTIONS_LIST.stream()
+                .map(xaero.common.gui.ConfigSettingEntry::new)
+                .collect(Collectors.toList());
+    }
+
     public static List<xaero.common.gui.ConfigSettingEntry> getMiniMapConfigSettingEntries() {
         if (MINIMAP_MOD_OPTIONS_LIST == null) {
-            MINIMAP_MOD_OPTIONS_LIST = constructXaeroPlusSettings(xaero.common.settings.ModOptions.class, ModType.MINIMAP, XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS);
+            MINIMAP_MOD_OPTIONS_LIST = constructXaeroPlusSettings(xaero.common.settings.ModOptions.class, ModType.MINIMAP, XAERO_PLUS_MINIMAP_SETTINGS);
         }
         return MINIMAP_MOD_OPTIONS_LIST.stream()
                 .map(xaero.common.gui.ConfigSettingEntry::new)

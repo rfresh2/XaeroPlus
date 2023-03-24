@@ -3,6 +3,13 @@
 XaeroPlus is a Forge 1.12.2 mod that depends on and modifies Xaero's WorldMap and Minimap with extra 
 features and performance improvements - particularly for use on anarchy servers like 2b2t.
 
+<details>
+<summary>Example Map</summary>
+<p align="center">
+  <img src="https://i.imgur.com/oYYhDoS.jpeg">
+</p>
+</details>
+
 # Download
 
 Download from [Github Releases](https://github.com/rfresh2/XaeroPlus/releases) 
@@ -37,6 +44,7 @@ Any other Xaero WorldMap/Minimap version may cause crashes.
 * NewChunks Highlighting in MiniMap and WorldMap.
 * [WorldDownloader 4.1.1.0](https://github.com/Pokechu22/WorldDownloader/) integration (does not work with Future's Forge WDL jar)
   * Highlights chunks as they are downloaded in the Minimap and WorldMap.
+* Transparent minimap background instead of wasted black screen space.
 * Allow multiple MC instances to read/write to the same map concurrently
 * Transparent obsidian roof. Useful for mapping 2b2t spawn.
 * Option to always view and create waypoints in the Overworld when in Nether.

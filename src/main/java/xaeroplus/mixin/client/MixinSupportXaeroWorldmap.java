@@ -141,7 +141,7 @@ public abstract class MixinSupportXaeroWorldmap {
                                         drawZ = 64 * (chunk.getZ() - chunkZ) - 16 * tileZ - insideZ;
 
                                         if (transparentMinimapBackground.getValue()) {
-                                            GuiHelper.drawMMBackground(drawX, drawZ, 64.0f, brightness, chunk);
+                                            GuiHelper.drawMMBackground(drawX, drawZ, 64.0f, brightness, chunk, mapProcessor);
                                             GuiMap.setupTextureMatricesAndTextures(brightness);
                                         }
 
@@ -163,6 +163,10 @@ public abstract class MixinSupportXaeroWorldmap {
                                         if (zooming && compatibilityVersion >= 12) {
                                             GlStateManager.setActiveTexture(33984);
                                             GL11.glTexParameteri(3553, 10240, 9728);
+                                        }
+
+                                        if (XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) {
+                                            GuiHelper.finishMMSetup(compatibilityVersion, brightness, chunk, zooming);
                                         }
 
                                         if (slimeChunks) {

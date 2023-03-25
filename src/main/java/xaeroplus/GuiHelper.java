@@ -4,6 +4,8 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import xaero.map.MapProcessor;
+import xaero.map.gui.GuiMap;
 import xaero.map.region.MapTile;
 import xaero.map.region.MapTileChunk;
 
@@ -76,15 +78,15 @@ public class GuiHelper {
         tessellator.draw();
     }
 
-    public static void drawMMBackground(final float drawX, final float drawZ, final float minimapTileChunkSizeRect, final float brightness, final MapTileChunk chunk) {
+    public static void drawMMBackground(final float drawX, final float drawZ, final float minimapTileChunkSizeRect, final float brightness, final MapTileChunk chunk, final MapProcessor mapProcessor) {
         GlStateManager.disableBlend();
         GlStateManager.color(1.0f, 0f, 0f, 1.0F);
         final float minimapTileSizeRect = minimapTileChunkSizeRect / 4;
         for(int o = 0; o < 4; ++o) {
             for (int p = 0; p < 4; ++p) {
-                MapTile tile = chunk.getTile(o, p);
-                if (tile != null && tile.isLoaded()) {
-                    // draw background rect at x and z of the tile position
+                MapTile tile = mapProcessor.getTilePool().get(mapProcessor.getCurrentDimension(), chunk.getX() + o, chunk.getZ() + p);
+                MapTile chunkTile = chunk.getTile(o, p);
+                if ((chunkTile != null && chunkTile.isLoaded()) || (tile != null && tile.isLoaded())) {                    // draw background rect at x and z of the tile position
                     GuiHelper.drawRectSimple(drawX + (o * minimapTileSizeRect), drawZ + (p * minimapTileSizeRect),
                             drawX + ((o + 1) * minimapTileSizeRect), drawZ + ((p + 1) * minimapTileSizeRect),
                             // these color values get drawn on top of with the map textures, alpha is important though
@@ -95,5 +97,12 @@ public class GuiHelper {
         }
         GlStateManager.enableBlend();
         GlStateManager.color(brightness, brightness, brightness, 1.0F);
+    }
+
+    public static void finishMMSetup(final int compatibilityVersion, final float brightness, final MapTileChunk chunk, final boolean zooming) {
+        GuiMap.restoreTextureStates();
+        if (compatibilityVersion >= 6) {
+            GuiMap.setupTextures(brightness);
+        }
     }
 }

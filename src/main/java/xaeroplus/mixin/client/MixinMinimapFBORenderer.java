@@ -121,15 +121,15 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
         GlStateManager.scale(this.zoom, this.zoom, 1.0);
         if (!XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) {
             Gui.drawRect(-256, -256, 256, 256, XaeroPlus.getColor(0, 0, 0, 255));
+        } else {
+            Gui.drawRect(-256, -256, 256, 256, XaeroPlus.getColor(0, 0, 0, 0));
         }
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         float chunkGridAlphaMultiplier = 1.0F;
-        float minimapChunkRectSize = 16.0f;
-        int tileBound = 0;
-        int minX = playerChunkX + (int)Math.floor(((double)offsetX - radiusBlocks) / 64.0) - tileBound;
-        int minZ = playerChunkZ + (int)Math.floor(((double)offsetZ - radiusBlocks) / 64.0) - tileBound;
-        int maxX = playerChunkX + (int)Math.floor(((double)(offsetX + 1) + radiusBlocks) / 64.0) + tileBound;
-        int maxZ = playerChunkZ + (int)Math.floor(((double)(offsetZ + 1) + radiusBlocks) / 64.0) + tileBound;
+        int minX = playerChunkX + (int)Math.floor(((double)offsetX - radiusBlocks) / 64.0);
+        int minZ = playerChunkZ + (int)Math.floor(((double)offsetZ - radiusBlocks) / 64.0);
+        int maxX = playerChunkX + (int)Math.floor(((double)(offsetX + 1) + radiusBlocks) / 64.0);
+        int maxZ = playerChunkZ + (int)Math.floor(((double)(offsetZ + 1) + radiusBlocks) / 64.0);
 
         if (useWorldMap) {
             chunkGridAlphaMultiplier = this.modMain.getSupportMods().worldmapSupport.getMinimapBrightness();
@@ -211,11 +211,10 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
             int bias = (int)Math.ceil(this.zoom);
 
             for(int X = minX; X <= maxX; ++X) {
-                float drawX = ((X - playerChunkX + 1) * 64f - offsetX);
+                int drawX = (X - playerChunkX + 1) * 64 - offsetX;
 
                 for(int i = 0; i < 4; ++i) {
-                    float lineX = drawX - (minimapChunkRectSize * (float)i);
-
+                    float lineX = (float)drawX + (float)(-16 * i);
                     this.helper
                             .addColoredLineToExistingBuffer(
                                     vertexBuffer, lineX, -((float)halfMaxVisibleLength), lineX, (float)halfMaxVisibleLength + (float)bias, red, green, blue, alpha
@@ -224,17 +223,17 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
             }
 
             for(int Z = minZ; Z <= maxZ; ++Z) {
-                float drawZ = ((Z - playerChunkZ + 1) * 64f - offsetZ);
+                int drawZ = (Z - playerChunkZ + 1) * 64 - offsetZ;
 
                 for(int i = 0; i < 4; ++i) {
-                    float lineZ = drawZ - (minimapChunkRectSize * i) - 1;
-
+                    float lineZ = (float)drawZ + (float)((double)(-16 * i) - 1.0 / this.zoom);
                     this.helper
                             .addColoredLineToExistingBuffer(
                                     vertexBuffer, -((float)halfMaxVisibleLength), lineZ, (float)halfMaxVisibleLength + (float)bias, lineZ, red, green, blue, alpha
                             );
                 }
             }
+
 
             tessellator.draw();
             GlStateManager.disableBlend();

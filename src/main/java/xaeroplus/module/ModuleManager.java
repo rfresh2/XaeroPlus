@@ -11,10 +11,6 @@ public class ModuleManager {
     private static final String modulePackage = "xaeroplus.module.impl";
     private static final LinkedHashMap<Class<? extends Module>, Module> modulesClassMap = new LinkedHashMap<>();
 
-    static {
-        init();
-    }
-
     public static void init() {
         for (final Class<?> clazz : ClassUtil.findClassesInPath(modulePackage)) {
             if (isNull(clazz)) continue;

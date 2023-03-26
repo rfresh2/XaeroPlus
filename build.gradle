@@ -73,6 +73,10 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
         }
     }
+    legacy {
+        fixClasspath = false
+        extractMappings = false
+    }
 }
 
 configurations {

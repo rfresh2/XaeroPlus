@@ -23,24 +23,6 @@ import java.util.ArrayList;
 public abstract class MixinMapPixel {
 
     @Shadow
-    @Final
-    private static int VOID_COLOR;
-    @Final
-    @Shadow
-    private static float DEFAULT_AMBIENT_LIGHT;
-    @Final
-    @Shadow
-    private static float DEFAULT_AMBIENT_LIGHT_COLORED;
-    @Final
-    @Shadow
-    private static float DEFAULT_AMBIENT_LIGHT_WHITE;
-    @Final
-    @Shadow
-    private static float DEFAULT_MAX_DIRECT_LIGHT;
-    @Final
-    @Shadow
-    private static float GLOWING_MAX_DIRECT_LIGHT;
-    @Shadow
     protected int state = 0;
     @Shadow
     protected byte colourType;
@@ -54,22 +36,6 @@ public abstract class MixinMapPixel {
     public abstract float getBlockBrightness(float min, int l, int sun);
     @Shadow
     public abstract float getPixelLight(float min, int topLightValue);
-    @Shadow
-    public abstract int getState();
-    @Shadow
-    public abstract void setState(int state);
-    @Shadow
-    public abstract void setLight(byte light);
-    @Shadow
-    public abstract void setGlowing(boolean glowing);
-    @Shadow
-    public abstract byte getColourType();
-    @Shadow
-    public abstract void setColourType(byte colourType);
-    @Shadow
-    public abstract int getCustomColour();
-    @Shadow
-    public abstract void setCustomColour(int customColour);
 
     @Inject(method = "getPixelColours", at = @At("HEAD"), cancellable = true)
     public void getPixelColours(
@@ -112,8 +78,15 @@ public abstract class MixinMapPixel {
                 colour = mapWriter.loadBlockColourFromTexture(state, true, world, mutableGlobalPos);
             } else {
                 try {
+                    int a = 127;
                     Block b = blockState.getBlock();
-                    int a = b instanceof BlockLiquid ? 191 : (b instanceof BlockIce ? 216 : (b instanceof BlockObsidian ? 216 : 127));
+                    if (b instanceof BlockLiquid) {
+                        a = 191;
+                    } else if (b instanceof BlockIce) {
+                        a = 216;
+                    } else if (b instanceof BlockObsidian) {  // obsidian set to transparent so the old code works again
+                        a = 255;
+                    }
                     colour = blockState.getMapColor(world, mutableGlobalPos).colorValue;
                     if (!isFinalBlock && colour == 0) {
                         result_dest[0] = -1;
@@ -354,8 +327,4 @@ public abstract class MixinMapPixel {
             result_dest[2] = 255;
         }
     }
-
-
-
-
 }

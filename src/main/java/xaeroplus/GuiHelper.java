@@ -6,8 +6,8 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import xaero.map.MapProcessor;
 import xaero.map.gui.GuiMap;
-import xaero.map.region.MapTile;
 import xaero.map.region.MapTileChunk;
+import xaeroplus.util.SeenChunksTrackingMapTileChunk;
 
 public class GuiHelper {
     public static void drawRect(float left, float top, float right, float bottom, int color)
@@ -82,16 +82,14 @@ public class GuiHelper {
         GlStateManager.disableBlend();
         GlStateManager.color(1.0f, 0f, 0f, 1.0F);
         final float minimapTileSizeRect = minimapTileChunkSizeRect / 4;
+        boolean[][] seenTiles = ((SeenChunksTrackingMapTileChunk) (Object) chunk).getSeenTiles();
         for(int o = 0; o < 4; ++o) {
             for (int p = 0; p < 4; ++p) {
-                MapTile tile = mapProcessor.getTilePool().get(mapProcessor.getCurrentDimension(), chunk.getX() + o, chunk.getZ() + p);
-                MapTile chunkTile = chunk.getTile(o, p);
-                if ((chunkTile != null && chunkTile.isLoaded()) || (tile != null && tile.isLoaded())) {                    // draw background rect at x and z of the tile position
+                if (seenTiles[o][p]) {
                     GuiHelper.drawRectSimple(drawX + (o * minimapTileSizeRect), drawZ + (p * minimapTileSizeRect),
                             drawX + ((o + 1) * minimapTileSizeRect), drawZ + ((p + 1) * minimapTileSizeRect),
                             // these color values get drawn on top of with the map textures, alpha is important though
                             XaeroPlus.getColor(0, 0, 0, 255));
-
                 }
             }
         }

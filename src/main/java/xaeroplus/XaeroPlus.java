@@ -8,7 +8,6 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventBus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import xaeroplus.module.ModuleManager;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.settings.XaeroPlusSettingRegistry.DataFolderResolutionMode;
 
@@ -36,9 +35,7 @@ public class XaeroPlus {
     public void preInit(FMLPreInitializationEvent event) { }
 
     @Mod.EventHandler
-    public void init(FMLInitializationEvent event) {
-        ModuleManager.init();
-    }
+    public void init(FMLInitializationEvent event) { }
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) { }

@@ -17,6 +17,7 @@
     "MixinLeveledRegion",
     "MixinMapProcessor",
     "MixinMapSaveLoad",
+    "MixinMapTileChunk",
     "MixinMapWorld",
     "MixinMapWriter",
     "MixinMinimapFBORenderer",

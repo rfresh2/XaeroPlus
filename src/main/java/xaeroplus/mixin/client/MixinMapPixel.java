@@ -4,12 +4,9 @@ import net.minecraft.block.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.map.MapProcessor;
 import xaero.map.MapWriter;
 import xaero.map.WorldMap;
@@ -37,7 +34,11 @@ public abstract class MixinMapPixel {
     @Shadow
     public abstract float getPixelLight(float min, int topLightValue);
 
-    @Inject(method = "getPixelColours", at = @At("HEAD"), cancellable = true)
+    /**
+     * @author
+     * @reason
+     */
+    @Overwrite
     public void getPixelColours(
             int[] result_dest,
             MapWriter mapWriter,
@@ -59,8 +60,7 @@ public abstract class MixinMapPixel {
             BiomeColorCalculator biomeColorCalculator,
             MapProcessor mapProcessor,
             OverlayManager overlayManager,
-            BlockStateShortShapeCache blockStateShortShapeCache,
-            CallbackInfo ci
+            BlockStateShortShapeCache blockStateShortShapeCache
     ) {
         int colour = block != null && block.isCaveBlock() ? 0 : -16121833;
         int topLightValue = this.light;
@@ -72,10 +72,14 @@ public abstract class MixinMapPixel {
         int state = this.state;
         IBlockState blockState = Misc.getStateById(state);
         boolean isAir = blockState.getBlock() instanceof BlockAir;
+        boolean isObsidian = blockState.getBlock() instanceof BlockObsidian;
         boolean isFinalBlock = (MapPixel) (Object) this instanceof MapBlock;
         if (!isAir) {
             if (WorldMap.settings.colours == 0) {
                 colour = mapWriter.loadBlockColourFromTexture(state, true, world, mutableGlobalPos);
+                if (isObsidian) {
+                    colour = 0 << 24 | colour & 16777215;
+                }
             } else {
                 try {
                     int a = 127;
@@ -85,7 +89,7 @@ public abstract class MixinMapPixel {
                     } else if (b instanceof BlockIce) {
                         a = 216;
                     } else if (b instanceof BlockObsidian) {  // obsidian set to transparent so the old code works again
-                        a = 255;
+                        a = 0;
                     }
                     colour = blockState.getMapColor(world, mutableGlobalPos).colorValue;
                     if (!isFinalBlock && colour == 0) {

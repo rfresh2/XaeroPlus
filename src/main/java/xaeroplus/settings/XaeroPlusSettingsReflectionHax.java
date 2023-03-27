@@ -207,6 +207,7 @@ public class XaeroPlusSettingsReflectionHax {
             WorldMapSession session = WorldMapSession.getCurrentSession();
             if (session != null) {
                 session.getMapProcessor().getMapWriter().setDirtyInWriteDistance(mc.player, mc.world);
+                session.getMapProcessor().getMapWriter().requestCachedColoursClear();
             }
         }
     }

@@ -45,8 +45,9 @@ public class XaeroPlusEnumSetting<T extends Enum<T>> extends XaeroPlusSetting {
     }
 
     public void setValue(T newVal) {
+        final boolean changed = !newVal.equals(this.value);
         this.value = newVal;
-        if (nonNull(getSettingChangeConsumer())) {
+        if (changed && nonNull(getSettingChangeConsumer())) {
             try {
                 getSettingChangeConsumer().accept(newVal);
             } catch (final Exception e) {

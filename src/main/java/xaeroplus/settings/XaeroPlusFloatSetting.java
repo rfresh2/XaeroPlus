@@ -74,8 +74,9 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
     }
 
     public void setValue(final float value) {
+        final boolean changed = this.value != value;
         this.value = value;
-        if (nonNull(getSettingChangeConsumer())) {
+        if (changed && nonNull(getSettingChangeConsumer())) {
             try {
                 getSettingChangeConsumer().accept(value);
             } catch (final Exception e) {

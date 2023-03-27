@@ -48,8 +48,9 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
     }
 
     public void setValue(final boolean value) {
+        final boolean changed = this.value != value;
         this.value = value;
-        if (nonNull(getSettingChangeConsumer())) {
+        if (changed && nonNull(getSettingChangeConsumer())) {
             try {
                 getSettingChangeConsumer().accept(value);
             } catch (final Exception e) {

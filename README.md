@@ -18,9 +18,9 @@ Or from [GitHub actions](https://github.com/rfresh2/XaeroPlus/actions?query=bran
 
 # Xaero Versions
 
-Xaero WorldMap version: [1.29.3](https://www.curseforge.com/minecraft/mc-mods/xaeros-world-map/files/4436640)
+Xaero WorldMap version: [1.29.4](https://www.curseforge.com/minecraft/mc-mods/xaeros-world-map/files/4454651)
 
-Xaero Minimap version: [23.3.0](https://www.curseforge.com/minecraft/mc-mods/xaeros-minimap/files/4430571)
+Xaero Minimap version: [23.3.2](https://www.curseforge.com/minecraft/mc-mods/xaeros-minimap/files/4454626)
 
 Download and include these mods in your Forge mods folder **in addition** to `xaeroplus-xx.jar` (3 jars total).
 

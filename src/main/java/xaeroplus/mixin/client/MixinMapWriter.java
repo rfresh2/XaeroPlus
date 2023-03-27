@@ -187,7 +187,7 @@ public abstract class MixinMapWriter {
             state = this.unpackFramedBlocks(state, world, this.mutableGlobalPos);
             Block b = state.getBlock();
             boolean roofObsidian = (h > 253 && b == Blocks.OBSIDIAN);
-            if (roofObsidian && XaeroPlusSettingRegistry.transparentObsidianRoofDarkeningSetting.getValue() == -1) {
+            if (roofObsidian && XaeroPlusSettingRegistry.transparentObsidianRoofDarkeningSetting.getValue() == 0) {
                 continue;  // skip over obsidian roof completely
             }
             if (roofObsidian & !columnRoofObsidian) {
@@ -222,7 +222,7 @@ public abstract class MixinMapWriter {
                         } else {
                             this.writerBiomeInfoSupplier.set(currentPixel, canReuseBiomeColours);
                             int stateId = Block.getStateId(state);
-                            int opacity = roofObsidian ? (int) XaeroPlusSettingRegistry.transparentObsidianRoofDarkeningSetting.getValue() : b.getLightOpacity(state, world, this.mutableGlobalPos);
+                            int opacity = roofObsidian ? 0 : b.getLightOpacity(state, world, this.mutableGlobalPos);
                             this.overlayBuilder.build(stateId, this.biomeBuffer, opacity, workingLight, world, this.mapProcessor, this.mutableGlobalPos, this.overlayBuilder.getOverlayBiome(), this.colorTypeCache, this.writerBiomeInfoSupplier);
                         }
                     } else if (this.hasVanillaColor(state, world, this.mutableGlobalPos)) {
@@ -374,7 +374,6 @@ public abstract class MixinMapWriter {
                                             }
                                         }
                                     }
-
                                     ++this.workingFrameCount;
                                 }
                             }
@@ -395,7 +394,6 @@ public abstract class MixinMapWriter {
                             }
                         }
                     }
-
                     return;
                 }
             }

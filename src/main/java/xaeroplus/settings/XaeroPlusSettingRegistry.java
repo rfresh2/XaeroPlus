@@ -34,11 +34,10 @@ public final class XaeroPlusSettingRegistry {
             (v) -> markChunksDirtyInWriteDistance(),
             true, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting transparentObsidianRoofDarkeningSetting = XaeroPlusFloatSetting.create("Roof Obsidian Opacity",
-            -1, 15, 1,
-                    "Sets the opacity of the transparent obsidian roof tiles. Does not update tiles already mapped - you need to remap them. \\n " +
-                    "Change this to -1 to completely hide roof obsidian.",
+            0, 255, 5,
+                    "Sets the opacity of the transparent obsidian roof tiles.",
             (v) -> markChunksDirtyInWriteDistance(),
-            5, SettingLocation.WORLD_MAP_MAIN);
+            150, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting worldMapMinZoomSetting = XaeroPlusFloatSetting.create("Min WorldMap Zoom",
             0, 0.625f, 0.01f,
                     "Minimum WorldMap Zoom Setting. This is 10x what you see on the WorldMap.",

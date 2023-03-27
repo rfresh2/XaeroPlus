@@ -54,7 +54,7 @@ public abstract class MixinMapPixel {
             IBlockState blockState = Misc.getStateById(state);
             boolean isObsidian = blockState.getBlock() instanceof BlockObsidian;
             if (isObsidian) {
-                result_dest[3] = 0;
+                result_dest[3] = (int) XaeroPlusSettingRegistry.transparentObsidianRoofDarkeningSetting.getValue();
             }
         }
     }

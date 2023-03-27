@@ -222,7 +222,7 @@ public abstract class MixinMapWriter {
                         } else {
                             this.writerBiomeInfoSupplier.set(currentPixel, canReuseBiomeColours);
                             int stateId = Block.getStateId(state);
-                            int opacity = roofObsidian ? 0 : b.getLightOpacity(state, world, this.mutableGlobalPos);
+                            int opacity = roofObsidian ? 5 : b.getLightOpacity(state, world, this.mutableGlobalPos);
                             this.overlayBuilder.build(stateId, this.biomeBuffer, opacity, workingLight, world, this.mapProcessor, this.mutableGlobalPos, this.overlayBuilder.getOverlayBiome(), this.colorTypeCache, this.writerBiomeInfoSupplier);
                         }
                     } else if (this.hasVanillaColor(state, world, this.mutableGlobalPos)) {

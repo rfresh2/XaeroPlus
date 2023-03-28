@@ -43,10 +43,6 @@ public class XaeroPlus {
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) { }
 
-    public static int getColor(final int r, final int g, final int b, final int a) {
-        return ((a & 255) << 24) | ((r & 255) << 16) | ((g & 255) << 8) | (b & 255);
-    }
-
     public static void onSettingLoad() {
         if (!settingsLoadedInit) { // handle settings where we want them to take effect only on first load
             nullOverworldDimensionFolder = XaeroPlusSettingRegistry.nullOverworldDimensionFolder.getValue();

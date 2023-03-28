@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import xaero.map.MapProcessor;
 import xaero.map.gui.GuiMap;
 import xaero.map.region.MapTileChunk;
+import xaeroplus.util.ColorHelper;
 import xaeroplus.util.SeenChunksTrackingMapTileChunk;
 
 public class GuiHelper {
@@ -89,7 +90,7 @@ public class GuiHelper {
                     GuiHelper.drawRectSimple(drawX + (o * minimapTileSizeRect), drawZ + (p * minimapTileSizeRect),
                             drawX + ((o + 1) * minimapTileSizeRect), drawZ + ((p + 1) * minimapTileSizeRect),
                             // these color values get drawn on top of with the map textures, alpha is important though
-                            XaeroPlus.getColor(0, 0, 0, 255));
+                            ColorHelper.getColor(0, 0, 0, 255));
                 }
             }
         }

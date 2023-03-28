@@ -17,6 +17,7 @@ import xaeroplus.event.PacketReceivedEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.module.Module;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.ColorHelper;
 import xaeroplus.util.HighlightAtChunkPos;
 import xaeroplus.util.RegionRenderPos;
 
@@ -38,9 +39,9 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static xaeroplus.XaeroPlus.getColor;
 import static xaeroplus.util.ChunkUtils.chunkPosToLong;
 import static xaeroplus.util.ChunkUtils.loadHighlightChunksAtRegion;
+import static xaeroplus.util.ColorHelper.getColor;
 
 @Module.ModuleInfo()
 public class NewChunks extends Module {
@@ -184,10 +185,6 @@ public class NewChunks extends Module {
         }
     }
 
-    public void setAlpha(final float a) {
-        newChunksColor = getColor(255, 0, 0, (int) a);
-    }
-
     private Path getSavePath(final String worldId, final String dimensionId, final String mwId) {
         if (isNull(worldId) || isNull(dimensionId) || isNull(mwId)) {
             return null;
@@ -277,6 +274,14 @@ public class NewChunks extends Module {
             // currentSaveFile should already be set here
             saveChunks(this.currentSaveFile);
         }
+    }
+
+    public void setRgbColor(final int color) {
+        newChunksColor = ColorHelper.getColorWithAlpha(color, (int) XaeroPlusSettingRegistry.newChunksAlphaSetting.getValue());
+    }
+
+    public void setAlpha(final float a) {
+        newChunksColor = ColorHelper.getColorWithAlpha(newChunksColor, (int) (a));
     }
 
     // static POJO to help GSON with (de)serialization

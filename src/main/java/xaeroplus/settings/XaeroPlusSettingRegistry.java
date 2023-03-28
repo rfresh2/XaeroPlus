@@ -2,6 +2,7 @@ package xaeroplus.settings;
 
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
+import xaeroplus.util.ColorHelper;
 import xaeroplus.util.WDLHelper;
 
 import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.SettingLocation;
@@ -66,6 +67,11 @@ public final class XaeroPlusSettingRegistry {
                     "Changes the color opacity of NewChunks.",
             (b) -> ModuleManager.getModule(NewChunks.class).setAlpha(b),
             100, SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> newChunksColorSetting = XaeroPlusEnumSetting.create("New Chunks Color",
+            "Changes the color of NewChunks.",
+            (b) -> ModuleManager.getModule(NewChunks.class).setRgbColor(b.getColor()),
+            ColorHelper.HighlightColor.values(),
+            ColorHelper.HighlightColor.RED, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting wdlEnabledSetting = XaeroPlusBooleanSetting.create("WDL Highlight",
                     "Highlights chunks WDL mod has downloaded on the Minimap and WorldMap.",
             true, SettingLocation.WORLD_MAP_MAIN);
@@ -74,6 +80,11 @@ public final class XaeroPlusSettingRegistry {
                     "Changes the color opacity of WDL chunks.",
             WDLHelper::setAlpha,
             100, SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> wdlColorSetting = XaeroPlusEnumSetting.create("WDL Color",
+            "Changes the color of WDL chunks.",
+            (b) -> WDLHelper.setRgbColor(b.getColor()),
+            ColorHelper.HighlightColor.values(),
+            ColorHelper.HighlightColor.GREEN, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting owAutoWaypointDimension = XaeroPlusBooleanSetting.create("Prefer Overworld Waypoints",
                     "Prefer creating and viewing Overworld waypoints when in the nether.",
             true, SettingLocation.WORLD_MAP_MAIN);

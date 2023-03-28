@@ -7,6 +7,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
 import wdl.WDL;
 import xaeroplus.XaeroPlus;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 import static xaeroplus.util.ChunkUtils.loadHighlightChunksAtRegion;
 
 public class WDLHelper {
-    private static int wdlColor = XaeroPlus.getColor(0, 255, 0, 100);
+    private static int wdlColor = ColorHelper.getColor(0, 255, 0, 100);
     // getting the set of saved chunks is expensive. This supplier acts as a cache to speed things up.
     private static final Supplier<Set<Long>> getChunkSupplier = Suppliers.memoizeWithExpiration(WDLHelper::getSavedChunks, 500, TimeUnit.MILLISECONDS);
     private static boolean hasLoggedFail = false;
@@ -77,10 +78,6 @@ public class WDLHelper {
         return wdlColor;
     }
 
-    public static void setAlpha(float a) {
-        wdlColor = XaeroPlus.getColor(0, 255, 0, (int) a);
-    }
-
     private static final Cache<RegionRenderPos, List<HighlightAtChunkPos>> regionRenderCache = CacheBuilder.newBuilder()
             .expireAfterWrite(500, TimeUnit.MILLISECONDS)
             .build();
@@ -93,5 +90,13 @@ public class WDLHelper {
             XaeroPlus.LOGGER.error("Error handling WDL region lookup", e);
         }
         return Collections.emptyList();
+    }
+
+    public static void setRgbColor(final int color) {
+        wdlColor = ColorHelper.getColorWithAlpha(color, (int) XaeroPlusSettingRegistry.wdlAlphaSetting.getValue());
+    }
+
+    public static void setAlpha(float a) {
+        wdlColor = ColorHelper.getColorWithAlpha(wdlColor, (int) a);
     }
 }

@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import xaero.common.IXaeroMinimap;
+import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.graphics.ImprovedFramebuffer;
 import xaero.common.minimap.MinimapInterface;
@@ -25,6 +26,7 @@ import xaero.common.minimap.region.MinimapChunk;
 import xaero.common.minimap.render.MinimapFBORenderer;
 import xaero.common.minimap.render.MinimapRenderer;
 import xaero.common.minimap.render.radar.EntityIconManager;
+import xaero.common.minimap.render.radar.EntityIconPrerenderer;
 import xaero.common.minimap.render.radar.element.RadarRenderer;
 import xaero.common.minimap.waypoints.render.CompassRenderer;
 import xaero.common.minimap.waypoints.render.WaypointsGuiRenderer;
@@ -61,6 +63,37 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
      * @reason big minimap
      */
     @Overwrite
+    public void loadFrameBuffer(MinimapProcessor minimapProcessor) {
+        if (!minimapProcessor.canUseFrameBuffer()) {
+            MinimapLogs.LOGGER.info("FBO mode not supported! Using minimap safe mode.");
+        } else {
+            // double the framebuffer size
+            this.scalingFramebuffer = new ImprovedFramebuffer(1024, 1024, false);
+            this.rotationFramebuffer = new ImprovedFramebuffer(1024, 1024, false);
+            this.rotationFramebuffer.setFramebufferFilter(9729);
+            this.loadedFBO = this.scalingFramebuffer.framebufferObject != -1 && this.rotationFramebuffer.framebufferObject != -1;
+            this.entityIconManager = new EntityIconManager(this.modMain, new EntityIconPrerenderer(this.modMain));
+            this.minimapElementMapRendererHandler = MinimapElementMapRendererHandler.Builder.begin().build();
+            this.radarRenderer = RadarRenderer.Builder.begin()
+                    .setModMain(this.modMain)
+                    .setEntityIconManager(this.entityIconManager)
+                    .setMinimapInterface(this.minimapInterface)
+                    .build();
+            this.minimapElementMapRendererHandler.add(this.radarRenderer);
+            this.minimapInterface.getOverMapRendererHandler().add(this.radarRenderer);
+            if (this.modMain.getSupportMods().worldmap()) {
+                this.modMain.getSupportMods().worldmapSupport.createRadarRenderWrapper(this.radarRenderer);
+            }
+        }
+
+        this.triedFBO = true;
+    }
+
+    /**
+     * @author rfresh2
+     * @reason big minimap
+     */
+    @Overwrite
     public void renderChunksToFBO(
             XaeroMinimapSession minimapSession,
             MinimapProcessor minimap,
@@ -81,7 +114,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
             boolean circle,
             ScaledResolution scaledRes
     ) {
-
+        viewW *= 2;
         double maxVisibleLength = !lockedNorth && shape != 1 ? (double)viewW * Math.sqrt(2.0) : (double)viewW;
         double halfMaxVisibleLength = maxVisibleLength / 2.0;
         double radiusBlocks = maxVisibleLength / 2.0 /  this.zoom;
@@ -117,12 +150,13 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
         float halfWView = (float)viewW / 2.0F;
         float angle = (float)(90.0 - this.getRenderAngle(lockedNorth));
         GlStateManager.enableBlend();
-        GlStateManager.translate(256.0F, 256.0F, -2000.0F);
+        // update translation to 1024 buffer size
+        GlStateManager.translate(512f, 512f, -2000.0F);
         GlStateManager.scale(this.zoom, this.zoom, 1.0);
         if (!XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) {
-            Gui.drawRect(-256, -256, 256, 256, ColorHelper.getColor(0, 0, 0, 255));
+            Gui.drawRect(-512, -512, 512, 512, ColorHelper.getColor(0, 0, 0, 255));
         } else {
-            Gui.drawRect(-256, -256, 256, 256, ColorHelper.getColor(0, 0, 0, 0));
+            Gui.drawRect(-512, -512, 512, 512, ColorHelper.getColor(0, 0, 0, 0));
         }
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         float chunkGridAlphaMultiplier = 1.0F;
@@ -260,11 +294,10 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
             GL11.glRotatef(-angle, 0.0F, 0.0F, 1.0F);
         }
 
-        double z = this.zoom;
-        GlStateManager.translate(-xInsidePixel * z, -zInsidePixel * z, 0.0);
+        GlStateManager.translate(-xInsidePixel * this.zoom, -zInsidePixel * this.zoom, 0.0);
         GlStateManager.disableBlend();
         GlStateManager.color(1.0F, 1.0F, 1.0F, (float)(this.modMain.getSettings().minimapOpacity / 100.0));
-        this.helper.drawMyTexturedModalRect(-256.0F, -256.0F, 0, 0, 512.0F, 512.0F, 512.0F);
+        this.helper.drawMyTexturedModalRect(-512f, -512f, 0, 0, 1024f, 1024f, 1024f);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GL11.glPopMatrix();
         GlStateManager.disableAlpha();
@@ -291,7 +324,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
                         playerZ,
                         ps,
                         pc,
-                        z,
+                        this.zoom,
                         cave,
                         partial,
                         this.rotationFramebuffer,

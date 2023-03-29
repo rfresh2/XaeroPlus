@@ -82,10 +82,10 @@ public abstract class MixinSupportXaeroWorldmap {
                     int insideZ = zFloored & 15;
                     GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                     GlStateManager.enableBlend();
-                    int minX = (mapX >> 2) - 4;
-                    int maxX = (mapX >> 2) + 4;
-                    int minZ = (mapZ >> 2) - 4;
-                    int maxZ = (mapZ >> 2) + 4;
+                    int minX = (mapX >> 2) - 8;
+                    int maxX = (mapX >> 2) + 8;
+                    int minZ = (mapZ >> 2) - 8;
+                    int maxZ = (mapZ >> 2) + 8;
                     float brightness = this.getMinimapBrightness();
                     boolean wmUsesHashcodes = compatibilityVersion >= 5;
                     int globalRegionCacheHashCode = wmUsesHashcodes ? WorldMap.settings.getRegionCacheHashCode() : 0;
@@ -107,12 +107,15 @@ public abstract class MixinSupportXaeroWorldmap {
                         for(int j = minZ; j <= maxZ; ++j) {
                             MapRegion region = mapProcessor.getMapRegion(i >> 3, j >> 3, mapProcessor.regionExists(i >> 3, j >> 3));
                             if (region != null) {
-                                int drawX;
-                                int drawZ;
                                 synchronized(region) {
-                                    drawX = wmUsesHashcodes ? region.getCacheHashCode() : 0;
-                                    drawZ = wmUsesHashcodes ? region.getReloadVersion() : 0;
-                                    if (!region.recacheHasBeenRequested() && !region.reloadHasBeenRequested() && (region.getLoadState() == 0 || (region.getLoadState() == 4 || region.getLoadState() == 2 && region.isBeingWritten()) && (reloadEverything && drawZ != globalReloadVersion || drawX != globalRegionCacheHashCode || region.getVersion() != mapProcessor.getGlobalVersion() || compatibilityVersion >= 11 && (region.isMetaLoaded() || region.getLoadState() != 0 || !region.hasHadTerrain()) && region.getHighlightsHash() != region.getDim().getHighlightHandler().getRegionHash(region.getRegionX(), region.getRegionZ()) || region.getLoadState() != 2 && region.shouldCache()))) {
+                                    int regionHashCode = wmUsesHashcodes ? region.getCacheHashCode() : 0;
+                                    int regionReloadVersion = wmUsesHashcodes ? region.getReloadVersion() : 0;
+                                    if (!region.recacheHasBeenRequested() && !region.reloadHasBeenRequested()
+                                            && (region.getLoadState() == 0 || (region.getLoadState() == 4 || region.getLoadState() == 2 && region.isBeingWritten())
+                                            && (reloadEverything && regionReloadVersion != globalReloadVersion || regionHashCode != globalRegionCacheHashCode || region.getVersion() != mapProcessor.getGlobalVersion()
+                                            || compatibilityVersion >= 11 && (region.isMetaLoaded() || region.getLoadState() != 0 || !region.hasHadTerrain())
+                                            && region.getHighlightsHash() != region.getDim().getHighlightHandler().getRegionHash(region.getRegionX(), region.getRegionZ())
+                                            || region.getLoadState() != 2 && region.shouldCache()))) {
                                         if (region.getLoadState() == 2) {
                                             region.requestRefresh(mapProcessor);
                                         } else {
@@ -137,8 +140,8 @@ public abstract class MixinSupportXaeroWorldmap {
                                 if (i >= minViewX && i <= maxViewX && j >= minViewZ && j <= maxViewZ) {
                                     MapTileChunk chunk = region.getChunk(i & 7, j & 7);
                                     if (chunk != null && chunk.getGlColorTexture() != -1) {
-                                        drawX = 64 * (chunk.getX() - chunkX) - 16 * tileX - insideX;
-                                        drawZ = 64 * (chunk.getZ() - chunkZ) - 16 * tileZ - insideZ;
+                                        int drawX = 64 * (chunk.getX() - chunkX) - 16 * tileX - insideX;
+                                        int drawZ = 64 * (chunk.getZ() - chunkZ) - 16 * tileZ - insideZ;
 
                                         if (transparentMinimapBackground.getValue()) {
                                             GuiHelper.drawMMBackground(drawX, drawZ, 64.0f, brightness, chunk, mapProcessor);

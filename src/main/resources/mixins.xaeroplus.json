@@ -10,6 +10,7 @@
     "MixinGuiMap",
     "MixinGuiMinimapMain",
     "MixinGuiMinimapOverlaysSettings",
+    "MixinGuiSettingsWorldMap",
     "MixinGuiUpdateAll",
     "MixinGuiWaypoints",
     "MixinGuiWaypointsList",
@@ -27,6 +28,8 @@
     "MixinMisc",
     "MixinSupportXaeroWorldmap",
     "MixinWaypointsManager",
+    "MixinWidgetLoadingHandler",
+    "MixinWidgetScreenHandlerAccessor",
     "MixinWorldMapModSettings",
     "mc.MixinMinecraft",
     "mc.MixinNetworkManager"

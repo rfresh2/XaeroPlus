@@ -41,6 +41,7 @@ Any other Xaero WorldMap/Minimap version may cause crashes.
 * WorldMap zoom unlocked
 * Fast map region writes. Prevent missed chunks in map while traveling at very high speeds.
 * WorldMap Follow mode and GUI button
+* Adjustable minimap scaling that increases how many chunks are visible
 * NewChunks Highlighting in MiniMap and WorldMap.
 * [WorldDownloader 4.1.1.0](https://github.com/Pokechu22/WorldDownloader/) integration (does not work with Future's Forge WDL jar)
   * Highlights chunks as they are downloaded in the Minimap and WorldMap.

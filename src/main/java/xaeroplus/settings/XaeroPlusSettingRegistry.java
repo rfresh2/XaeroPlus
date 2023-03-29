@@ -115,4 +115,11 @@ public final class XaeroPlusSettingRegistry {
     public static final XaeroPlusBooleanSetting transparentMinimapBackground = XaeroPlusBooleanSetting.create("Transparent Background",
             "Makes the minimap background transparent instead of black.",
             false, SettingLocation.MINIMAP);
+    public static final XaeroPlusFloatSetting minimapScaling = XaeroPlusFloatSetting.create("Minimap Scaling Factor",
+            // todo: increase max but we need to start generating mipmaps and change the framebuffer filter for anti aliasing to work better
+            1f, 2f, 1f,
+            // todo: create a setting consumer that updates the framebuffer sizes so we don't need to restart
+            "Increases the base minimap scale beyond the default size."
+                    + " \\n MC must be restarted for changes to take effect.",
+            2f, SettingLocation.MINIMAP);
 }

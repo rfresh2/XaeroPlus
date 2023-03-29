@@ -14,7 +14,7 @@ import xaeroplus.settings.XaeroPlusSettingRegistry.DataFolderResolutionMode;
 
 import java.util.UUID;
 
-@Mod(modid = XaeroPlus.MODID, name = XaeroPlus.NAME, version = XaeroPlus.VERSION)
+@Mod(modid = XaeroPlus.MODID, name = XaeroPlus.NAME, version = XaeroPlus.VERSION, dependencies = "required-after:xaerominimap;required-after:xaeroworldmap;")
 public class XaeroPlus {
     public static final String MODID = "xaeroplus";
     public static final String NAME = "XaeroPlus";
@@ -24,6 +24,7 @@ public class XaeroPlus {
     // cache and only update this on new world loads
     public static boolean nullOverworldDimensionFolder = XaeroPlusSettingRegistry.nullOverworldDimensionFolder.getValue();
     public static DataFolderResolutionMode dataFolderResolutionMode = XaeroPlusSettingRegistry.dataFolderResolutionMode.getValue();
+    public static int minimapScalingFactor = (int) XaeroPlusSettingRegistry.minimapScaling.getValue();
     public static boolean settingsLoadedInit = false;
     public static String LOCK_ID = UUID.randomUUID().toString();
     public static EventBus EVENT_BUS = MinecraftForge.EVENT_BUS;
@@ -33,21 +34,23 @@ public class XaeroPlus {
     public static XaeroPlus INSTANCE;
 
     @Mod.EventHandler
-    public void preInit(FMLPreInitializationEvent event) { }
-
-    @Mod.EventHandler
-    public void init(FMLInitializationEvent event) {
+    public void preInit(FMLPreInitializationEvent event) {
         ModuleManager.init();
     }
 
     @Mod.EventHandler
-    public void postInit(FMLPostInitializationEvent event) { }
+    public void init(FMLInitializationEvent event) { }
+
+    @Mod.EventHandler
+    public void postInit(FMLPostInitializationEvent event) {
+        settingsLoadedInit = true;
+    }
 
     public static void onSettingLoad() {
         if (!settingsLoadedInit) { // handle settings where we want them to take effect only on first load
             nullOverworldDimensionFolder = XaeroPlusSettingRegistry.nullOverworldDimensionFolder.getValue();
             dataFolderResolutionMode = XaeroPlusSettingRegistry.dataFolderResolutionMode.getValue();
-            settingsLoadedInit = true;
+            minimapScalingFactor = (int) XaeroPlusSettingRegistry.minimapScaling.getValue();
         }
     }
 }

@@ -33,6 +33,7 @@ import xaero.common.minimap.waypoints.render.WaypointsGuiRenderer;
 import xaero.common.misc.Misc;
 import xaero.common.misc.OptimizedMath;
 import xaero.common.settings.ModSettings;
+import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ColorHelper;
 
@@ -68,8 +69,9 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
             MinimapLogs.LOGGER.info("FBO mode not supported! Using minimap safe mode.");
         } else {
             // double the framebuffer size
-            this.scalingFramebuffer = new ImprovedFramebuffer(1024, 1024, false);
-            this.rotationFramebuffer = new ImprovedFramebuffer(1024, 1024, false);
+            final int scaledSize = XaeroPlus.minimapScalingFactor * 512;
+            this.scalingFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, false);
+            this.rotationFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, false);
             this.rotationFramebuffer.setFramebufferFilter(9729);
             this.loadedFBO = this.scalingFramebuffer.framebufferObject != -1 && this.rotationFramebuffer.framebufferObject != -1;
             this.entityIconManager = new EntityIconManager(this.modMain, new EntityIconPrerenderer(this.modMain));
@@ -114,7 +116,8 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
             boolean circle,
             ScaledResolution scaledRes
     ) {
-        viewW *= 2;
+        viewW *= XaeroPlus.minimapScalingFactor;
+        final int scaledSize = 256 * XaeroPlus.minimapScalingFactor;
         double maxVisibleLength = !lockedNorth && shape != 1 ? (double)viewW * Math.sqrt(2.0) : (double)viewW;
         double halfMaxVisibleLength = maxVisibleLength / 2.0;
         double radiusBlocks = maxVisibleLength / 2.0 /  this.zoom;
@@ -151,12 +154,12 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
         float angle = (float)(90.0 - this.getRenderAngle(lockedNorth));
         GlStateManager.enableBlend();
         // update translation to 1024 buffer size
-        GlStateManager.translate(512f, 512f, -2000.0F);
+        GlStateManager.translate(scaledSize, scaledSize, -2000.0F);
         GlStateManager.scale(this.zoom, this.zoom, 1.0);
         if (!XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) {
-            Gui.drawRect(-512, -512, 512, 512, ColorHelper.getColor(0, 0, 0, 255));
+            Gui.drawRect(-scaledSize, -scaledSize, scaledSize, scaledSize, ColorHelper.getColor(0, 0, 0, 255));
         } else {
-            Gui.drawRect(-512, -512, 512, 512, ColorHelper.getColor(0, 0, 0, 0));
+            Gui.drawRect(-scaledSize, -scaledSize, scaledSize, scaledSize, ColorHelper.getColor(0, 0, 0, 0));
         }
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         float chunkGridAlphaMultiplier = 1.0F;
@@ -241,7 +244,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
             red *= chunkGridAlphaMultiplier;
             green *= chunkGridAlphaMultiplier;
             blue *= chunkGridAlphaMultiplier;
-            GlStateManager.glLineWidth((float)this.modMain.getSettings().chunkGridLineWidth);
+            GlStateManager.glLineWidth((float)this.modMain.getSettings().chunkGridLineWidth * XaeroPlus.minimapScalingFactor);
             int bias = (int)Math.ceil(this.zoom);
 
             for(int X = minX; X <= maxX; ++X) {
@@ -297,7 +300,8 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
         GlStateManager.translate(-xInsidePixel * this.zoom, -zInsidePixel * this.zoom, 0.0);
         GlStateManager.disableBlend();
         GlStateManager.color(1.0F, 1.0F, 1.0F, (float)(this.modMain.getSettings().minimapOpacity / 100.0));
-        this.helper.drawMyTexturedModalRect(-512f, -512f, 0, 0, 1024f, 1024f, 1024f);
+        final float scaledSizeM = XaeroPlus.minimapScalingFactor * 512f;
+        this.helper.drawMyTexturedModalRect(-scaledSize, -scaledSize, 0, 0, scaledSizeM, scaledSizeM, scaledSizeM);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GL11.glPopMatrix();
         GlStateManager.disableAlpha();

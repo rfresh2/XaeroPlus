@@ -24,6 +24,7 @@ import xaero.map.gui.GuiMap;
 import xaero.map.region.MapRegion;
 import xaero.map.region.MapTileChunk;
 import xaeroplus.GuiHelper;
+import xaeroplus.XaeroPlus;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
@@ -82,10 +83,11 @@ public abstract class MixinSupportXaeroWorldmap {
                     int insideZ = zFloored & 15;
                     GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                     GlStateManager.enableBlend();
-                    int minX = (mapX >> 2) - 8;
-                    int maxX = (mapX >> 2) + 8;
-                    int minZ = (mapZ >> 2) - 8;
-                    int maxZ = (mapZ >> 2) + 8;
+                    final int scaledSize = XaeroPlus.minimapScalingFactor * 4;
+                    int minX = (mapX >> 2) - scaledSize;
+                    int maxX = (mapX >> 2) + scaledSize;
+                    int minZ = (mapZ >> 2) - scaledSize;
+                    int maxZ = (mapZ >> 2) + scaledSize;
                     float brightness = this.getMinimapBrightness();
                     boolean wmUsesHashcodes = compatibilityVersion >= 5;
                     int globalRegionCacheHashCode = wmUsesHashcodes ? WorldMap.settings.getRegionCacheHashCode() : 0;
@@ -293,7 +295,7 @@ public abstract class MixinSupportXaeroWorldmap {
                         GlStateManager.enableBlend();
                         // yellow
                         GlStateManager.color(1.f, 1.f, 0.f, 0.8F);
-                        GlStateManager.glLineWidth((float)this.modMain.getSettings().chunkGridLineWidth);
+                        GlStateManager.glLineWidth((float)this.modMain.getSettings().chunkGridLineWidth * XaeroPlus.minimapScalingFactor);
                         vertexBuffer.pos(x0, z0, 0.0).endVertex();
                         vertexBuffer.pos(x1, z0, 0.0).endVertex();
                         vertexBuffer.pos(x1, z1, 0.0).endVertex();

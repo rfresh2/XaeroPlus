@@ -23,6 +23,7 @@
     "MixinMapWriter",
     "MixinMinimapFBORenderer",
     "MixinMinimapModSettings",
+    "MixinMinimapRenderer",
     "MixinMisc",
     "MixinSupportXaeroWorldmap",
     "MixinWaypointsManager",

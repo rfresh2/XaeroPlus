@@ -1,5 +1,6 @@
 package xaeroplus.settings;
 
+import xaeroplus.XaeroPlus;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
 import xaeroplus.util.ColorHelper;
@@ -118,8 +119,7 @@ public final class XaeroPlusSettingRegistry {
     public static final XaeroPlusFloatSetting minimapScaling = XaeroPlusFloatSetting.create("Minimap Scaling Factor",
             // todo: increase max but we need to start generating mipmaps and change the framebuffer filter for anti aliasing to work better
             1f, 2f, 1f,
-            // todo: create a setting consumer that updates the framebuffer sizes so we don't need to restart
-            "Increases the base minimap scale beyond the default size."
-                    + " \\n MC must be restarted for changes to take effect.",
+            "Increases the base minimap scale beyond the default size.",
+            (b) -> XaeroPlus.shouldResetFBO = true,
             2f, SettingLocation.MINIMAP);
 }

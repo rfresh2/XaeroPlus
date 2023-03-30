@@ -5,7 +5,10 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.Entity;
@@ -19,6 +22,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import xaero.common.XaeroMinimapSession;
+import xaero.common.misc.OptimizedMath;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMap;
 import xaero.map.animation.Animation;
@@ -50,6 +55,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static java.util.Objects.isNull;
+import static org.lwjgl.opengl.GL11.GL_LINE_LOOP;
 import static xaero.map.gui.GuiMap.*;
 import static xaeroplus.XaeroPlus.FOLLOW;
 
@@ -774,7 +780,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
                                 if (!this.mapProcessor.isUploadingPaused() && !WorldMap.settings.pauseRequests) {
                                     if (leveledRegion instanceof BranchLeveledRegion) {
-                                        BranchLeveledRegion branchRegion = (BranchLeveledRegion)leveledRegion;
+                                        BranchLeveledRegion branchRegion = (BranchLeveledRegion) leveledRegion;
                                         branchRegion.checkForUpdates(
                                                 this.mapProcessor,
                                                 prevWaitingForBranchCache,
@@ -792,7 +798,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                             && this.lastFrameRenderedRootTextures
                                             && rootLeveledRegion != null
                                             && rootLeveledRegion != lastUpdatedRootLeveledRegion) {
-                                        BranchLeveledRegion branchRegion = (BranchLeveledRegion)rootLeveledRegion;
+                                        BranchLeveledRegion branchRegion = (BranchLeveledRegion) rootLeveledRegion;
                                         branchRegion.checkForUpdates(
                                                 this.mapProcessor,
                                                 prevWaitingForBranchCache,
@@ -830,23 +836,23 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                 boolean hasTextures = leveledRegion.hasTextures();
                                 boolean rootHasTextures = rootLeveledRegion != null && rootLeveledRegion.hasTextures();
                                 if (hasTextures || rootHasTextures) {
-                                    for(int o = 0; o < 8; ++o) {
+                                    for (int o = 0; o < 8; ++o) {
                                         int textureX = minXBlocks + o * textureSize;
-                                        if (!((double)textureX > rightBorder) && !((double)(textureX + textureSize) < leftBorder)) {
-                                            for(int p = 0; p < 8; p += 1) {
+                                        if (!((double) textureX > rightBorder) && !((double) (textureX + textureSize) < leftBorder)) {
+                                            for (int p = 0; p < 8; p += 1) {
                                                 int textureZ = minZBlocks + p * textureSize;
-                                                if (!((double)textureZ > bottomBorder) && !((double)(textureZ + textureSize) < topBorder)) {
+                                                if (!((double) textureZ > bottomBorder) && !((double) (textureZ + textureSize) < topBorder)) {
                                                     RegionTexture<?> regionTexture = hasTextures ? leveledRegion.getTexture(o, p) : null;
                                                     if (regionTexture != null && regionTexture.getGlColorTexture() != -1) {
-                                                        synchronized(regionTexture) {
+                                                        synchronized (regionTexture) {
                                                             if (regionTexture.getGlColorTexture() != -1) {
                                                                 boolean hasLight = regionTexture.getTextureHasLight();
                                                                 bindMapTextureWithLighting3(regionTexture, 9728, oldMinimapMessesUpTextureFilter, 0, hasLight);
                                                                 renderTexturedModalRectWithLighting2(
-                                                                        (float)(textureX - flooredCameraX),
-                                                                        (float)(textureZ - flooredCameraZ),
-                                                                        (float)textureSize,
-                                                                        (float)textureSize,
+                                                                        (float) (textureX - flooredCameraX),
+                                                                        (float) (textureZ - flooredCameraZ),
+                                                                        (float) textureSize,
+                                                                        (float) textureSize,
                                                                         hasLight
                                                                 );
                                                             }
@@ -858,26 +864,26 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                                         int rootTextureZ = firstRootTextureZ + (insideZ >> levelDiff);
                                                         regionTexture = rootLeveledRegion.getTexture(rootTextureX, rootTextureZ);
                                                         if (regionTexture != null) {
-                                                            synchronized(regionTexture) {
+                                                            synchronized (regionTexture) {
                                                                 if (regionTexture.getGlColorTexture() != -1) {
                                                                     frameRenderedRootTextures = true;
                                                                     int insideTextureX = insideX & maxInsideCoord;
                                                                     int insideTextureZ = insideZ & maxInsideCoord;
-                                                                    float textureX1 = (float)insideTextureX / (float)rootSize;
-                                                                    float textureX2 = (float)(insideTextureX + 1) / (float)rootSize;
-                                                                    float textureY1 = (float)insideTextureZ / (float)rootSize;
-                                                                    float textureY2 = (float)(insideTextureZ + 1) / (float)rootSize;
+                                                                    float textureX1 = (float) insideTextureX / (float) rootSize;
+                                                                    float textureX2 = (float) (insideTextureX + 1) / (float) rootSize;
+                                                                    float textureY1 = (float) insideTextureZ / (float) rootSize;
+                                                                    float textureY2 = (float) (insideTextureZ + 1) / (float) rootSize;
                                                                     boolean hasLight = regionTexture.getTextureHasLight();
                                                                     bindMapTextureWithLighting3(regionTexture, 9728, oldMinimapMessesUpTextureFilter, 0, hasLight);
                                                                     renderTexturedModalSubRectWithLighting(
-                                                                            (float)(textureX - flooredCameraX),
-                                                                            (float)(textureZ - flooredCameraZ),
+                                                                            (float) (textureX - flooredCameraX),
+                                                                            (float) (textureZ - flooredCameraZ),
                                                                             textureX1,
                                                                             textureY1,
                                                                             textureX2,
                                                                             textureY2,
-                                                                            (float)textureSize,
-                                                                            (float)textureSize,
+                                                                            (float) textureSize,
+                                                                            (float) textureSize,
                                                                             hasLight
                                                                     );
                                                                 }
@@ -893,22 +899,22 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                 if (leveledRegion.loadingAnimation()) {
                                     GlStateManager.pushMatrix();
                                     GlStateManager.translate(
-                                            (double)leveledSideInBlocks * ((double)leveledRegX + 0.5) - (double)flooredCameraX,
-                                            (double)leveledSideInBlocks * ((double)leveledRegZ + 0.5) - (double)flooredCameraZ,
+                                            (double) leveledSideInBlocks * ((double) leveledRegX + 0.5) - (double) flooredCameraX,
+                                            (double) leveledSideInBlocks * ((double) leveledRegZ + 0.5) - (double) flooredCameraZ,
                                             0.0
                                     );
-                                    float loadingAnimationPassed = (float)(System.currentTimeMillis() - this.loadingAnimationStart);
+                                    float loadingAnimationPassed = (float) (System.currentTimeMillis() - this.loadingAnimationStart);
                                     if (loadingAnimationPassed > 0.0F) {
                                         restoreTextureStates();
                                         int period = 2000;
                                         int numbersOfActors = 3;
-                                        float loadingAnimation = loadingAnimationPassed % (float)period / (float)period * 360.0F;
-                                        float step = 360.0F / (float)numbersOfActors;
+                                        float loadingAnimation = loadingAnimationPassed % (float) period / (float) period * 360.0F;
+                                        float step = 360.0F / (float) numbersOfActors;
                                         GlStateManager.rotate(loadingAnimation, 0.0F, 0.0F, 1.0F);
-                                        int numberOfVisibleActors = 1 + (int)loadingAnimationPassed % (3 * period) / period;
-                                        GlStateManager.scale((float)leveledSideInRegions, (float)leveledSideInRegions, 1.0F);
+                                        int numberOfVisibleActors = 1 + (int) loadingAnimationPassed % (3 * period) / period;
+                                        GlStateManager.scale((float) leveledSideInRegions, (float) leveledSideInRegions, 1.0F);
 
-                                        for(int i = 0; i < numberOfVisibleActors; i += 1) {
+                                        for (int i = 0; i < numberOfVisibleActors; i += 1) {
                                             GlStateManager.rotate(step, 0.0F, 0.0F, 1.0F);
                                             drawRect(16, -8, 32, 8, -1);
                                         }
@@ -921,11 +927,11 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                 }
 
                                 if (WorldMap.settings.debug && leveledRegion instanceof MapRegion) {
-                                    MapRegion region = (MapRegion)leveledRegion;
+                                    MapRegion region = (MapRegion) leveledRegion;
                                     restoreTextureStates();
                                     GlStateManager.pushMatrix();
                                     GlStateManager.translate(
-                                            (float)(512 * region.getRegionX() + 32 - flooredCameraX), (float)(512 * region.getRegionZ() + 32 - flooredCameraZ), 0.0F
+                                            (float) (512 * region.getRegionX() + 32 - flooredCameraX), (float) (512 * region.getRegionZ() + 32 - flooredCameraZ), 0.0F
                                     );
                                     GlStateManager.scale(10.0F, 10.0F, 1.0F);
                                     this.drawString(mc.fontRenderer, "" + region.getLoadState(), 0, 0, -1);
@@ -937,8 +943,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                 if (WorldMap.settings.debug && textureLevel > 0) {
                                     restoreTextureStates();
 
-                                    for(int leafX = 0; leafX < leveledSideInRegions; ++leafX) {
-                                        for(int leafZ = 0; leafZ < leveledSideInRegions; ++leafZ) {
+                                    for (int leafX = 0; leafX < leveledSideInRegions; ++leafX) {
+                                        for (int leafZ = 0; leafZ < leveledSideInRegions; ++leafZ) {
                                             int regX = leafRegionMinX + leafX;
                                             int regZ = leafRegionMinZ + leafZ;
                                             MapRegion region = this.mapProcessor.getMapRegion(regX, regZ, false);
@@ -947,7 +953,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                                 if (currentlyLoading || region.isLoaded() || region.isMetaLoaded()) {
                                                     GlStateManager.pushMatrix();
                                                     GlStateManager.translate(
-                                                            (float)(512 * region.getRegionX() - flooredCameraX), (float)(512 * region.getRegionZ() - flooredCameraZ), 0.0F
+                                                            (float) (512 * region.getRegionX() - flooredCameraX), (float) (512 * region.getRegionZ() - flooredCameraZ), 0.0F
                                                     );
                                                     drawRect(0, 0, 512, 512, currentlyLoading ? 687800575 : (region.isLoaded() ? 671153920 : 687865600));
                                                     GlStateManager.popMatrix();
@@ -970,7 +976,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                         //  similar to https://github.com/lambda-client/lambda/commit/7b85616a8a94ebf7b9fe407b5b777303c2513f2b
                                         GlStateManager.pushMatrix();
                                         GlStateManager.translate(
-                                                (float)((c.x << 4) - flooredCameraX), (float)((c.z << 4) - flooredCameraZ), 0.0F
+                                                (float) ((c.x << 4) - flooredCameraX), (float) ((c.z << 4) - flooredCameraZ), 0.0F
                                         );
                                         drawRect(0, 0, 16, 16, newChunks.getNewChunksColor());
                                         GlStateManager.popMatrix();
@@ -985,7 +991,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                     for (final HighlightAtChunkPos c : WDLHelper.getSavedChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions)) {
                                         GlStateManager.pushMatrix();
                                         GlStateManager.translate(
-                                                (float)((c.x << 4) - flooredCameraX), (float)((c.z << 4) - flooredCameraZ), 0.0F
+                                                (float) ((c.x << 4) - flooredCameraX), (float) ((c.z << 4) - flooredCameraZ), 0.0F
                                         );
                                         drawRect(0, 0, 16, 16, WDLHelper.getWdlColor());
                                         GlStateManager.popMatrix();
@@ -1272,6 +1278,42 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                             this.drawFarArrowOnMap(arrowX - this.cameraX, arrowZ - this.cameraZ, a, scaleMultiplier / this.scale);
                         }
                     }
+                    if (XaeroPlusSettingRegistry.showRenderDistanceWorldMapSetting.getValue()) {
+                        final int setting = (int) XaeroPlusSettingRegistry.assumedServerRenderDistanceSetting.getValue();
+
+                        final int width = setting * 2 + 1;
+
+                        double playerX = player.posX;
+                        double playerZ = player.posZ;
+                        int xFloored = OptimizedMath.myFloor(playerX);
+                        int zFloored = OptimizedMath.myFloor(playerZ);
+                        int chunkLeftX = (xFloored >> 4) - (width / 2) << 4;
+                        int chunkRightX = (xFloored >> 4) + 1 + (width / 2) << 4;
+                        int chunkTopZ = (zFloored >> 4) - (width / 2) << 4;
+                        int chunkBottomZ = (zFloored >> 4) + 1 + (width / 2) << 4;
+                        final int x0 = chunkLeftX - flooredCameraX;
+                        final int x1 = chunkRightX - flooredCameraX;
+                        final int z0 = chunkTopZ - flooredCameraZ;
+                        final int z1 = chunkBottomZ - flooredCameraZ;
+
+                        Tessellator tessellator = Tessellator.getInstance();
+                        BufferBuilder vertexBuffer = tessellator.getBuffer();
+                        vertexBuffer.begin(GL_LINE_LOOP, DefaultVertexFormats.POSITION);
+                        GlStateManager.disableTexture2D();
+                        GlStateManager.enableBlend();
+                        // yellow
+                        GlStateManager.color(1.f, 1.f, 0.f, 0.8F);
+                        float settingWidth = (float) XaeroMinimapSession.getCurrentSession().getModMain().getSettings().chunkGridLineWidth;
+                        float lineScale = (float) Math.min(settingWidth * this.scale, settingWidth);
+                        GlStateManager.glLineWidth(lineScale);
+                        vertexBuffer.pos(x0, z0, 0.0).endVertex();
+                        vertexBuffer.pos(x1, z0, 0.0).endVertex();
+                        vertexBuffer.pos(x1, z1, 0.0).endVertex();
+                        vertexBuffer.pos(x0, z1, 0.0).endVertex();
+                        tessellator.draw();
+                        GlStateManager.enableTexture2D();
+                    }
+
                     GlStateManager.popMatrix();
                     GlStateManager.popMatrix();
                     int cursorDisplayOffset = 0;

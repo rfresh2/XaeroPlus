@@ -95,6 +95,9 @@ public final class XaeroPlusSettingRegistry {
     public static final XaeroPlusBooleanSetting showRenderDistanceSetting = XaeroPlusBooleanSetting.create("Show Render Distance",
             "Show server side render distance (actually just another setting)",
             false, SettingLocation.MINIMAP_OVERLAYS);
+    public static final XaeroPlusBooleanSetting showRenderDistanceWorldMapSetting = XaeroPlusBooleanSetting.create("Show Render Distance WorldMap",
+            "Show server side render distance on the WorldMap",
+            false, SettingLocation.MINIMAP_OVERLAYS);
     public static final XaeroPlusFloatSetting assumedServerRenderDistanceSetting = XaeroPlusFloatSetting.create("Server Render Distance",
             1f, 32f, 1f,
             "view-distance of the server",

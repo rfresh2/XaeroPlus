@@ -1,7 +1,5 @@
 package xaeroplus.mixin.client;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -58,7 +56,6 @@ import xaeroplus.util.WDLHelper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import static java.util.Objects.isNull;
@@ -74,8 +71,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     GuiTextField xTextEntryField;
     GuiTextField zTextEntryField;
     GuiButton followButton;
-    // todo: make 3 buttons, one for each dimension
-    GuiButton switchDimensionButton;
+    GuiButton switchToNetherButton;
+    GuiButton switchToOverworldButton;
+    GuiButton switchToEndButton;
 
     protected MixinGuiMap(GuiScreen parent, GuiScreen escape) {
         super(parent, escape);
@@ -291,13 +289,36 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             }
         }, () -> new CursorBox(new TextComponentString("Toggle Follow mode (" + (FOLLOW ? "On" : "Off") + ")")));
         addGuiButton(followButton);
-        this.switchDimensionButton = new GuiTexturedButton(0, (this.height / 2) + 90 , 20, 20,133, 16, 16, 16, WorldMap.guiTextures, new Consumer<GuiButton>() {
+        this.switchToNetherButton = new TooltipButton(
+          this.width - 20, (this.height / 2) + 110, 20, 20, "N",
+                () -> new CursorBox(new TextComponentString("Switch to Nether"))
+        ) {
             @Override
-            public void accept(GuiButton guiButton) {
-                onSwitchDimensionButton(guiButton);
+            protected void onPress() {
+                onSwitchDimensionButton(-1);
             }
-        }, () -> new CursorBox(new TextComponentString("Switch dimension")));
-        addGuiButton(switchDimensionButton);
+        };
+        this.switchToOverworldButton = new TooltipButton(
+                this.width - 20, (this.height / 2) + 90, 20, 20, "O",
+                () -> new CursorBox(new TextComponentString("Switch to Overworld"))
+        ) {
+            @Override
+            protected void onPress() {
+                onSwitchDimensionButton(0);
+            }
+        };
+        this.switchToEndButton = new TooltipButton(
+                this.width - 20, (this.height / 2) + 130, 20, 20, "E",
+                () -> new CursorBox(new TextComponentString("Switch to End"))
+        ) {
+            @Override
+            protected void onPress() {
+                onSwitchDimensionButton(1);
+            }
+        };
+        addGuiButton(switchToNetherButton);
+        addGuiButton(switchToOverworldButton);
+        addGuiButton(switchToEndButton);
     }
 
     @Inject(method = "onGuiClosed", at = @At(value = "RETURN"))
@@ -1581,20 +1602,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         this.setWorldAndResolution(this.mc, width, height);
     }
 
-    private final Map<Integer, List<Integer>> dimensionSwitchMap = ImmutableMap.of(
-            0, ImmutableList.of(-1, 1, 0),
-            -1, ImmutableList.of(0, 1, -1),
-            1, ImmutableList.of(0, -1, 1)
-    );
-    private int dimensionSwitchIndex = 0;
-
-    private void onSwitchDimensionButton(final GuiButton guiButton) {
-        int newDimId = dimensionSwitchMap.get(mc.world.provider.getDimension()).get(dimensionSwitchIndex);
-        // cycle dimensionSwitchIndex through dimensionSwitchMap value indeces
-        dimensionSwitchIndex = (dimensionSwitchIndex + 1) % dimensionSwitchMap.get(mc.world.provider.getDimension()).size();
-
-        System.out.println("Switching to dimension index " + dimensionSwitchIndex + " with id " + newDimId);
-
+    private void onSwitchDimensionButton(final int newDimId) {
         mapProcessor.getMapSaveLoad().setRegionDetectionComplete(false);
         MapDimension dimension = this.mapProcessor.getMapWorld().getDimension(newDimId);
         if (dimension == null) {

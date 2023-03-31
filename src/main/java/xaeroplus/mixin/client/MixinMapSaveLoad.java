@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMap;
@@ -15,7 +16,9 @@ import xaero.map.file.MapSaveLoad;
 import xaero.map.file.RegionDetection;
 import xaero.map.file.worldsave.WorldDataHandler;
 import xaero.map.region.*;
+import xaero.map.world.MapDimension;
 import xaeroplus.XaeroPlus;
+import xaeroplus.util.CustomDimensionMapSaveLoad;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -26,7 +29,7 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 @Mixin(value = MapSaveLoad.class, remap = false)
-public abstract class MixinMapSaveLoad {
+public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
     @Shadow
     private MapProcessor mapProcessor;
     @Shadow
@@ -46,6 +49,12 @@ public abstract class MixinMapSaveLoad {
     protected abstract void savePixel(MapBlock pixel, DataOutputStream out);
     @Shadow
     public abstract void safeMoveAndReplace(Path fromPath, Path toPath, String fromExtension, String toExtension);
+    @Shadow
+    public abstract Path getMWSubFolder(String world, String dim, String mw);
+    @Shadow
+    public abstract void detectRegionsFromFiles(
+            MapDimension mapDimension, String worldId, String dimId, String mwId, Path folder, String regex, int xIndex, int zIndex, int emptySize
+    );
 
     @Inject(method = "getOldFolder", at = @At(value = "HEAD"), cancellable = true)
     public void getOldFolder(final String oldUnfixedMainId, final String dim, final CallbackInfoReturnable<Path> cir) {
@@ -477,6 +486,12 @@ public abstract class MixinMapSaveLoad {
         }
     }
 
+    @Redirect(method = "run", at = @At(value = "INVOKE", target = "Lxaero/map/region/LeveledRegionManager;addLoadedRegion(Lxaero/map/region/LeveledRegion;)V"))
+    public void run(final LeveledRegionManager instance, final LeveledRegion<?> reg) {
+        XaeroPlus.LOGGER.info("Loading region in dimension: " + reg.getDim().getDimId());
+        reg.getDim().getMapRegions().addLoadedRegion(reg);
+    }
+
     private static byte[] decompressZipToBytes(final Path input) {
         try {
             return toUnzippedByteArray(Files.readAllBytes(input));
@@ -497,5 +512,35 @@ public abstract class MixinMapSaveLoad {
             return outputStream.toByteArray();
         }
         return new byte[0];
+    }
+
+    public void detectRegionsInDimension(final int dimId) {
+        MapDimension mapDimension = this.mapProcessor.getMapWorld().getDimension(dimId);
+        mapDimension.createDetectedRegions().clear();
+        String worldId = this.mapProcessor.getCurrentWorldId();
+        if (worldId != null && !this.mapProcessor.isCurrentMapLocked()) {
+            String dimIdStr = this.mapProcessor.getDimensionName(dimId);
+            String mwId = this.mapProcessor.getCurrentMWId();
+            if (this.mapProcessor.isWorldMultiplayer(this.mapProcessor.isWorldRealms(worldId), worldId)) {
+                Path mapFolder = this.getMWSubFolder(worldId, dimIdStr, mwId);
+                if (!mapFolder.toFile().exists()) {
+                    return;
+                }
+
+                this.detectRegionsFromFiles(mapDimension, worldId, dimIdStr, mwId, mapFolder, "^(-?\\d+)_(-?\\d+)\\.(zip|xaero)$", 1, 2, 0);
+            } else {
+                File worldDir = this.mapProcessor.getWorldDataHandler().getWorldDir();
+                if (worldDir == null) {
+                    return;
+                }
+
+                Path worldFolder = worldDir.toPath().resolve("region");
+                if (!worldFolder.toFile().exists()) {
+                    return;
+                }
+
+                this.detectRegionsFromFiles(mapDimension, worldId, dimIdStr, mwId, worldFolder, "^r\\.(-{0,1}[0-9]+)\\.(-{0,1}[0-9]+)\\.mc[ar]$", 1, 2, 8192);
+            }
+        }
     }
 }

@@ -1,5 +1,7 @@
 package xaeroplus.mixin.client;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -43,15 +45,20 @@ import xaero.map.mods.gui.Waypoint;
 import xaero.map.region.*;
 import xaero.map.region.texture.RegionTexture;
 import xaero.map.settings.ModSettings;
+import xaero.map.world.MapDimension;
+import xaeroplus.XaeroPlus;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.CustomDimensionMapProcessor;
+import xaeroplus.util.CustomDimensionMapSaveLoad;
 import xaeroplus.util.HighlightAtChunkPos;
 import xaeroplus.util.WDLHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import static java.util.Objects.isNull;
@@ -67,6 +74,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     GuiTextField xTextEntryField;
     GuiTextField zTextEntryField;
     GuiButton followButton;
+    // todo: make 3 buttons, one for each dimension
+    GuiButton switchDimensionButton;
 
     protected MixinGuiMap(GuiScreen parent, GuiScreen escape) {
         super(parent, escape);
@@ -282,10 +291,52 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             }
         }, () -> new CursorBox(new TextComponentString("Toggle Follow mode (" + (FOLLOW ? "On" : "Off") + ")")));
         addGuiButton(followButton);
+        this.switchDimensionButton = new GuiTexturedButton(0, (this.height / 2) + 90 , 20, 20,133, 16, 16, 16, WorldMap.guiTextures, new Consumer<GuiButton>() {
+            @Override
+            public void accept(GuiButton guiButton) {
+                onSwitchDimensionButton(guiButton);
+            }
+        }, () -> new CursorBox(new TextComponentString("Switch dimension")));
+        addGuiButton(switchDimensionButton);
     }
 
-    @Inject(method = "drawScreen(IIF)V", at = @At(value = "TAIL"), remap = true, cancellable = true)
+    @Inject(method = "onGuiClosed", at = @At(value = "RETURN"))
+    public void onGuiClosed(final CallbackInfo ci) {
+        XaeroPlus.customDimensionId = mc.world.provider.getDimension();
+    }
+
+    public double getPlayerX() {
+        int dim = mc.world.provider.getDimension();
+        // when player is in the nether or the custom dimension is the nether, perform coordinate translation
+        if ((dim == -1 || XaeroPlus.customDimensionId == -1) && dim != XaeroPlus.customDimensionId) {
+            if (XaeroPlus.customDimensionId == 0) {
+                return mc.player.posX * 8.0;
+            } else if (XaeroPlus.customDimensionId == -1 && dim == 0) {
+                return mc.player.posX / 8.0;
+            }
+        }
+
+        return player.posX;
+    }
+
+    public double getPlayerZ() {
+        int dim = mc.world.provider.getDimension();
+        // when player is in the nether or the custom dimension is the nether, perform coordinate translation
+        if ((dim == -1 || XaeroPlus.customDimensionId == -1) && dim != XaeroPlus.customDimensionId) {
+            if (XaeroPlus.customDimensionId == 0) {
+                return mc.player.posZ * 8.0;
+            } else if (XaeroPlus.customDimensionId == -1 && dim == 0) {
+                return mc.player.posZ / 8.0;
+            }
+        }
+
+        return player.posZ;
+    }
+
+    @Inject(method = "drawScreen(IIF)V", at = @At(value = "HEAD"), remap = true, cancellable = true)
     public void customDrawScreen(int scaledMouseX, int scaledMouseY, float partialTicks, CallbackInfo ci) {
+        // hacky overwrite
+        ci.cancel();
         while(GL11.glGetError() != 0) {
         }
 
@@ -477,7 +528,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     this.mouseBlockPosZ = (int)Math.floor(mousePosZ);
                     int mouseRegX = this.mouseBlockPosX >> leveledRegionShift;
                     int mouseRegZ = this.mouseBlockPosZ >> leveledRegionShift;
-                    LeveledRegion<?> reg = this.mapProcessor.getLeveledRegion(mouseRegX, mouseRegZ, textureLevel);
+                    final CustomDimensionMapProcessor customMapProcessor = (CustomDimensionMapProcessor) this.mapProcessor;
+                    LeveledRegion<?> reg = customMapProcessor.getLeveledRegionCustomDimension(mouseRegX, mouseRegZ, textureLevel, XaeroPlus.customDimensionId);
                     int maxRegBlockCoord = (1 << leveledRegionShift) - 1;
                     int mouseRegPixelX = (this.mouseBlockPosX & maxRegBlockCoord) >> textureLevel;
                     int mouseRegPixelZ = (this.mouseBlockPosZ & maxRegBlockCoord) >> textureLevel;
@@ -487,7 +539,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                         this.mapTileSelection.setEnd(this.mouseBlockPosX >> 4, this.mouseBlockPosZ >> 4);
                     }
 
-                    MapRegion leafRegion = this.mapProcessor.getMapRegion(this.mouseBlockPosX >> 9, this.mouseBlockPosZ >> 9, false);
+                    MapRegion leafRegion = customMapProcessor.getMapRegionCustomDimension(this.mouseBlockPosX >> 9, this.mouseBlockPosZ >> 9, false, XaeroPlus.customDimensionId);
                     MapTileChunk chunk = leafRegion == null ? null : leafRegion.getChunk(this.mouseBlockPosX >> 6 & 7, this.mouseBlockPosZ >> 6 & 7);
                     int debugTextureX = this.mouseBlockPosX >> leveledRegionShift - 3 & 7;
                     int debugTextureY = this.mouseBlockPosZ >> leveledRegionShift - 3 & 7;
@@ -708,14 +760,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                     if (regX >= minLeafRegX && regX <= maxLeafRegX) {
                                         int regZ = leafRegionMinZ + leafZ;
                                         if (regZ >= minLeafRegZ && regZ <= maxLeafRegZ) {
-                                            MapRegion region = this.mapProcessor.getMapRegion(regX, regZ, false);
+                                            MapRegion region = customMapProcessor.getMapRegionCustomDimension(regX, regZ, false, XaeroPlus.customDimensionId);
                                             if (region == null) {
-                                                region = this.mapProcessor.getMapRegion(regX, regZ, this.mapProcessor.regionExists(regX, regZ));
+                                                region = customMapProcessor.getMapRegionCustomDimension(regX, regZ, customMapProcessor.regionExistsCustomDimension(regX, regZ, XaeroPlus.customDimensionId), XaeroPlus.customDimensionId);
                                             }
 
                                             if (region != null) {
                                                 if (leveledRegion == null) {
-                                                    leveledRegion = this.mapProcessor.getLeveledRegion(leveledRegX, leveledRegZ, textureLevel);
+                                                    leveledRegion = customMapProcessor.getLeveledRegionCustomDimension(leveledRegX, leveledRegZ, textureLevel, XaeroPlus.customDimensionId);
                                                 }
 
                                                 if (!prevWaitingForBranchCache) {
@@ -1193,10 +1245,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     }
 
                     if (WorldMap.settings.renderArrow) {
-                        boolean toTheLeft = this.player.posX < leftBorder;
-                        boolean toTheRight = this.player.posX > rightBorder;
-                        boolean down = this.player.posZ > bottomBorder;
-                        boolean up = this.player.posZ < topBorder;
+                        boolean toTheLeft = getPlayerX() < leftBorder;
+                        boolean toTheRight = getPlayerX() > rightBorder;
+                        boolean down = getPlayerZ() > bottomBorder;
+                        boolean up = getPlayerZ() < topBorder;
                         GlStateManager.enableBlend();
                         float configuredR = 1.0F;
                         float configuredG = 1.0F;
@@ -1241,18 +1293,18 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                         if (!toTheLeft && !toTheRight && !up && !down) {
                             this.setColourBuffer(0.0F, 0.0F, 0.0F, 0.9F);
                             this.drawArrowOnMap(
-                                    this.player.posX - this.cameraX,
-                                    this.player.posZ + 2.0 * scaleMultiplier / this.scale - this.cameraZ,
+                                    getPlayerX() - this.cameraX,
+                                    getPlayerZ() + 2.0 * scaleMultiplier / this.scale - this.cameraZ,
                                     this.player.rotationYaw,
                                     scaleMultiplier / this.scale
                             );
                             this.setColourBuffer(configuredR, configuredG, configuredB, 1.0F);
                             this.drawArrowOnMap(
-                                    this.player.posX - this.cameraX, this.player.posZ - this.cameraZ, this.player.rotationYaw, scaleMultiplier / this.scale
+                                    getPlayerX() - this.cameraX, getPlayerZ() - this.cameraZ, this.player.rotationYaw, scaleMultiplier / this.scale
                             );
                         } else {
-                            double arrowX = this.player.posX;
-                            double arrowZ = this.player.posZ;
+                            double arrowX = getPlayerX();
+                            double arrowZ = getPlayerZ();
                             float a = 0.0F;
                             if (toTheLeft) {
                                 a = up ? 1.5F : (down ? 0.5F : 1.0F);
@@ -1486,8 +1538,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             }
             zTextEntryField.drawTextBox();
         }
-        // hacky overwrite
-        ci.cancel();
     }
 
     @Inject(method = "mouseClicked(III)V", at = @At(value = "TAIL"), remap = true)
@@ -1529,5 +1579,39 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     public void onFollowButton(final GuiButton b) {
         FOLLOW = !FOLLOW;
         this.setWorldAndResolution(this.mc, width, height);
+    }
+
+    private final Map<Integer, List<Integer>> dimensionSwitchMap = ImmutableMap.of(
+            0, ImmutableList.of(-1, 1, 0),
+            -1, ImmutableList.of(0, 1, -1),
+            1, ImmutableList.of(0, -1, 1)
+    );
+    private int dimensionSwitchIndex = 0;
+
+    private void onSwitchDimensionButton(final GuiButton guiButton) {
+        int newDimId = dimensionSwitchMap.get(mc.world.provider.getDimension()).get(dimensionSwitchIndex);
+        // cycle dimensionSwitchIndex through dimensionSwitchMap value indeces
+        dimensionSwitchIndex = (dimensionSwitchIndex + 1) % dimensionSwitchMap.get(mc.world.provider.getDimension()).size();
+
+        System.out.println("Switching to dimension index " + dimensionSwitchIndex + " with id " + newDimId);
+
+        mapProcessor.getMapSaveLoad().setRegionDetectionComplete(false);
+        MapDimension dimension = this.mapProcessor.getMapWorld().getDimension(newDimId);
+        if (dimension == null) {
+            dimension = this.mapProcessor.getMapWorld().createDimensionUnsynced(mapProcessor.mainWorld, newDimId);
+        }
+        if (dimension.getDetectedRegions() == null) {
+            ((CustomDimensionMapSaveLoad) mapProcessor.getMapSaveLoad()).detectRegionsInDimension(newDimId);
+        }
+        mapProcessor.getMapSaveLoad().setRegionDetectionComplete(true);
+        // kind of shit but its ok. need to reset setting when GuiMap closes
+        if (mc.world.provider.getDimension() != newDimId) {
+            WorldMap.settings.minimapRadar = false;
+        } else {
+            WorldMap.settings.minimapRadar = true;
+        }
+        XaeroPlus.customDimensionId = newDimId;
+
+        // todo: pan the map to the player's position in the new dimension
     }
 }

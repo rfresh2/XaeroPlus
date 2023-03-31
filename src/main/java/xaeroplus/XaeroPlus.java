@@ -28,6 +28,7 @@ public class XaeroPlus {
     public static boolean settingsLoadedInit = false;
     public static boolean shouldResetFBO = false;
     public static String LOCK_ID = UUID.randomUUID().toString();
+    public static int customDimensionId = 0;
     public static EventBus EVENT_BUS = MinecraftForge.EVENT_BUS;
     public static Logger LOGGER = LogManager.getLogger("XaeroPlus");
 

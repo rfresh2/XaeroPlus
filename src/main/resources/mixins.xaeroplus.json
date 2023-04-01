@@ -26,6 +26,7 @@
     "MixinMinimapModSettings",
     "MixinMinimapRenderer",
     "MixinMisc",
+    "MixinRadarRenderer",
     "MixinSupportXaeroWorldmap",
     "MixinWaypointsManager",
     "MixinWidgetLoadingHandler",

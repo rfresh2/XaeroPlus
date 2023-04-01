@@ -29,6 +29,7 @@ import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ChunkUtils;
+import xaeroplus.util.CustomDimensionMapProcessor;
 import xaeroplus.util.WDLHelper;
 
 import java.util.HashMap;
@@ -107,7 +108,8 @@ public abstract class MixinSupportXaeroWorldmap {
 
                     for(int i = minX; i <= maxX; ++i) {
                         for(int j = minZ; j <= maxZ; ++j) {
-                            MapRegion region = mapProcessor.getMapRegion(i >> 3, j >> 3, mapProcessor.regionExists(i >> 3, j >> 3));
+                            CustomDimensionMapProcessor customDimensionMapProcessor = (CustomDimensionMapProcessor) mapProcessor;
+                            MapRegion region = customDimensionMapProcessor.getMapRegionCustomDimension(i >> 3, j >> 3, customDimensionMapProcessor.regionExistsCustomDimension(i >> 3, j >> 3, XaeroPlus.customDimensionId), XaeroPlus.customDimensionId);
                             if (region != null) {
                                 synchronized(region) {
                                     int regionHashCode = wmUsesHashcodes ? region.getCacheHashCode() : 0;
@@ -130,10 +132,10 @@ public abstract class MixinSupportXaeroWorldmap {
                                 if (!mapProcessor.isUploadingPaused()) {
                                     if (compatibilityVersion >= 7) {
                                         if (region.isLoaded()) {
-                                            mapProcessor.getMapWorld().getCurrentDimension().getMapRegions().bumpLoadedRegion(region);
+                                            mapProcessor.getMapWorld().getDimension(XaeroPlus.customDimensionId).getMapRegions().bumpLoadedRegion(region);
                                         }
                                     } else {
-                                        List<MapRegion> regions = mapProcessor.getMapWorld().getCurrentDimension().getMapRegionsList();
+                                        List<MapRegion> regions = mapProcessor.getMapWorld().getDimension(XaeroPlus.customDimensionId).getMapRegionsList();
                                         regions.remove(region);
                                         regions.add(region);
                                     }

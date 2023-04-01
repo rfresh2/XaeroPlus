@@ -125,4 +125,16 @@ public final class XaeroPlusSettingRegistry {
             "Increases the base minimap scale beyond the default size.",
             (b) -> XaeroPlus.shouldResetFBO = true,
             2f, SettingLocation.MINIMAP);
+    public static final XaeroPlusBooleanSetting switchToNetherSetting = XaeroPlusBooleanSetting.create("Switch to Nether",
+            "Switches to the nether map.",
+            (b) -> XaeroPlus.switchToDimension(-1),
+            false, SettingLocation.KEYBINDS);
+    public static final XaeroPlusBooleanSetting switchToOverworldSetting = XaeroPlusBooleanSetting.create("Switch to Overworld",
+            "Switches to the overworld map.",
+            (b) -> XaeroPlus.switchToDimension(0),
+            false, SettingLocation.KEYBINDS);
+    public static final XaeroPlusBooleanSetting switchToEndSetting = XaeroPlusBooleanSetting.create("Switch to End",
+            "Switches to the end map.",
+            (b) -> XaeroPlus.switchToDimension(1),
+            false, SettingLocation.KEYBINDS);
 }

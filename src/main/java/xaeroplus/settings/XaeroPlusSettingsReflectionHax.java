@@ -31,9 +31,14 @@ public class XaeroPlusSettingsReflectionHax {
     public static final Supplier<List<XaeroPlusSetting>> ALL_MINIMAP_SETTINGS = () -> Stream.of(XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS.stream(), XAERO_PLUS_MINIMAP_SETTINGS.stream())
             .flatMap(x -> x)
             .collect(Collectors.toList());
+    public static final List<XaeroPlusSetting> XAERO_PLUS_KEYBIND_SETTINGS = new ArrayList<>();
 
     public enum SettingLocation {
-        WORLD_MAP_MAIN(XAERO_PLUS_WORLDMAP_SETTINGS), MINIMAP_OVERLAYS(XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS), MINIMAP(XAERO_PLUS_MINIMAP_SETTINGS);
+        WORLD_MAP_MAIN(XAERO_PLUS_WORLDMAP_SETTINGS),
+        MINIMAP_OVERLAYS(XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS),
+        MINIMAP(XAERO_PLUS_MINIMAP_SETTINGS),
+        KEYBINDS(XAERO_PLUS_KEYBIND_SETTINGS);
+
         private final List<XaeroPlusSetting> settingsList;
 
         SettingLocation(final List<XaeroPlusSetting> settingsList) {
@@ -46,7 +51,10 @@ public class XaeroPlusSettingsReflectionHax {
     }
 
     private static final Supplier<List<KeyBinding>> memoizingKeybindsList = Suppliers.memoize(() ->
-            Stream.of(XAERO_PLUS_WORLDMAP_SETTINGS.stream(), XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS.stream(), XAERO_PLUS_MINIMAP_SETTINGS.stream())
+            Stream.of(XAERO_PLUS_WORLDMAP_SETTINGS.stream(),
+                            XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS.stream(),
+                            XAERO_PLUS_MINIMAP_SETTINGS.stream(),
+                            XAERO_PLUS_KEYBIND_SETTINGS.stream())
                     .flatMap(x -> x)
                     .filter(setting -> setting instanceof XaeroPlusBooleanSetting)
                     .map(XaeroPlusSetting::getKeyBinding)
@@ -56,6 +64,7 @@ public class XaeroPlusSettingsReflectionHax {
     private static List<ModOptions> WORLDMAP_MOD_OPTIONS_LIST = null;
     private static List<xaero.common.settings.ModOptions> MINIMAP_OVERLAY_MOD_OPTIONS_LIST = null;
     private static List<xaero.common.settings.ModOptions> MINIMAP_MOD_OPTIONS_LIST = null;
+
     private static int enumOrdinal = 69; // needs to not overlap with existing enum indeces
 
     private static <T extends Enum<T>> List<T> constructXaeroPlusSettings(Class<T> clazz, ModType type, List<XaeroPlusSetting> settings) {

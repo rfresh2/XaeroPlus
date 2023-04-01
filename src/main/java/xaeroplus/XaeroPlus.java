@@ -1,5 +1,6 @@
 package xaeroplus;
 
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -8,9 +9,15 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventBus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import xaero.map.MapProcessor;
+import xaero.map.WorldMap;
+import xaero.map.WorldMapSession;
+import xaero.map.mods.SupportMods;
+import xaero.map.world.MapDimension;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.settings.XaeroPlusSettingRegistry.DataFolderResolutionMode;
+import xaeroplus.util.CustomDimensionMapSaveLoad;
 
 import java.util.UUID;
 
@@ -54,5 +61,27 @@ public class XaeroPlus {
             dataFolderResolutionMode = XaeroPlusSettingRegistry.dataFolderResolutionMode.getValue();
             minimapScalingFactor = (int) XaeroPlusSettingRegistry.minimapScaling.getValue();
         }
+    }
+
+    public static void switchToDimension(final int newDimId) {
+        MapProcessor mapProcessor = WorldMapSession.getCurrentSession().getMapProcessor();
+        mapProcessor.getMapSaveLoad().setRegionDetectionComplete(false);
+        MapDimension dimension = mapProcessor.getMapWorld().getDimension(newDimId);
+        if (dimension == null) {
+            dimension = mapProcessor.getMapWorld().createDimensionUnsynced(mapProcessor.mainWorld, newDimId);
+        }
+        if (dimension.getDetectedRegions() == null) {
+            ((CustomDimensionMapSaveLoad) mapProcessor.getMapSaveLoad()).detectRegionsInDimension(newDimId);
+        }
+        mapProcessor.getMapSaveLoad().setRegionDetectionComplete(true);
+        // kind of shit but its ok. need to reset setting when GuiMap closes
+        int worldDim = Minecraft.getMinecraft().world.provider.getDimension();
+        if (worldDim != newDimId) {
+            WorldMap.settings.minimapRadar = false;
+        } else {
+            WorldMap.settings.minimapRadar = true;
+        }
+        customDimensionId = newDimId;
+        SupportMods.xaeroMinimap.requestWaypointsRefresh();
     }
 }

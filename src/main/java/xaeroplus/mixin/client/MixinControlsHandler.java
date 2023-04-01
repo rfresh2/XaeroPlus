@@ -11,8 +11,7 @@ import xaeroplus.settings.XaeroPlusBooleanSetting;
 import java.util.stream.Stream;
 
 import static java.util.Objects.nonNull;
-import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS;
-import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.XAERO_PLUS_WORLDMAP_SETTINGS;
+import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.*;
 
 @Mixin(value = ControlsHandler.class, remap = false)
 public class MixinControlsHandler {
@@ -20,7 +19,11 @@ public class MixinControlsHandler {
     @Inject(method = "keyDown", at = @At("TAIL"))
     public void keyDown(KeyBinding kb, boolean tickEnd, boolean isRepeat, CallbackInfo ci) {
         if (!tickEnd) {
-            Stream.concat(XAERO_PLUS_WORLDMAP_SETTINGS.stream(), XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS.stream())
+            Stream.of(XAERO_PLUS_WORLDMAP_SETTINGS.stream(),
+                            XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS.stream(),
+                            XAERO_PLUS_MINIMAP_SETTINGS.stream(),
+                            XAERO_PLUS_KEYBIND_SETTINGS.stream())
+                    .flatMap(x -> x)
                     .filter(xaeroPlusSetting -> xaeroPlusSetting instanceof XaeroPlusBooleanSetting)
                     .map(xaeroPlusSetting -> (XaeroPlusBooleanSetting) xaeroPlusSetting)
                     .filter(s -> nonNull(s.getKeyBinding()))

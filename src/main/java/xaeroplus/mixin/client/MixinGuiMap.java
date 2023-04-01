@@ -289,8 +289,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             }
         }, () -> new CursorBox(new TextComponentString("Toggle Follow mode (" + (FOLLOW ? "On" : "Off") + ")")));
         addGuiButton(followButton);
+        // todo: create textures for these buttons. Existing xaero textures don't really fit well here so these are just normal buttons for now
         this.switchToNetherButton = new TooltipButton(
-          this.width - 20, (this.height / 2) + 110, 20, 20, "N",
+          this.width - 20, (this.height / 2) + 90, 20, 20, "N",
                 () -> new CursorBox(new TextComponentString("Switch to Nether"))
         ) {
             @Override
@@ -299,7 +300,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             }
         };
         this.switchToOverworldButton = new TooltipButton(
-                this.width - 20, (this.height / 2) + 90, 20, 20, "O",
+                this.width - 20, (this.height / 2) + 110, 20, 20, "O",
                 () -> new CursorBox(new TextComponentString("Switch to Overworld"))
         ) {
             @Override

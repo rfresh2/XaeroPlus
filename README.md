@@ -39,6 +39,7 @@ Any other Xaero WorldMap/Minimap version may cause crashes.
     * In `.minecraft/XaeroWorldMap/Multiplayer_<server name>/`
   * You can configure this setting to use the default "null" directory name
 * WorldMap zoom unlocked
+* Dimension hot-switching on WorldMap and Minimap
 * Fast map region writes. Prevent missed chunks in map while traveling at very high speeds.
 * WorldMap Follow mode and GUI button
 * Adjustable minimap scaling that increases how many chunks are visible

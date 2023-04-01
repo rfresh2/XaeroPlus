@@ -57,6 +57,10 @@ public class NewChunks extends Module {
     // I've added v1 as a suffix if we ever need to change file formats and want to convert these without data loss
     private static final String NEWCHUNKS_FILE_NAME = "XaeroPlusNewChunksV1.data";
 
+    // todo: handle save load on custom dimension switch
+    //   we need to ensure we don't write over the current dimension and that when we switch dimensions we correctly save
+    //   ideally we'd also queue up the newchunks in our actual dimension and save them when we switch back
+
     @SubscribeEvent
     public void onPacketReceivedEvent(final PacketReceivedEvent event) {
         try {

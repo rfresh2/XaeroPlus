@@ -361,6 +361,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         ci.cancel();
         while(GL11.glGetError() != 0) {
         }
+        final boolean isDimensionSwitched = XaeroPlus.customDimensionId != Minecraft.getMinecraft().player.dimension;
 
         Minecraft mc = Minecraft.getMinecraft();
         double cameraXBefore = this.cameraX;
@@ -1040,7 +1041,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                     setupTextureMatricesAndTextures(brightness);
                                 }
 
-                                if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
+                                if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue() && !isDimensionSwitched) {
                                     restoreTextureStates();
                                     final NewChunks newChunks = ModuleManager.getModule(NewChunks.class);
                                     for (final HighlightAtChunkPos c : newChunks.getNewChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions)) {
@@ -1060,7 +1061,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                 }
                                 if (XaeroPlusSettingRegistry.wdlEnabledSetting.getValue()
                                         && WDLHelper.isWdlPresent()
-                                        && WDLHelper.isDownloading()) {
+                                        && WDLHelper.isDownloading()
+                                        && !isDimensionSwitched) {
                                     restoreTextureStates();
                                     for (final HighlightAtChunkPos c : WDLHelper.getSavedChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions)) {
                                         GlStateManager.pushMatrix();

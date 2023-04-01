@@ -324,6 +324,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Inject(method = "onGuiClosed", at = @At(value = "RETURN"))
     public void onGuiClosed(final CallbackInfo ci) {
         XaeroPlus.customDimensionId = mc.world.provider.getDimension();
+        WorldMap.settings.minimapRadar = true; // todo: restore previous value before custom dimension was entered (if at all)
     }
 
     public double getPlayerX() {
@@ -386,8 +387,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
         this.lastStartTime = startTime;
 
-        if (FOLLOW && isNull(this.cameraDestinationAnimX) && isNull(this.cameraDestinationAnimZ)) {
-            this.cameraDestination = new int[]{(int) player.posX, (int) player.posZ};
+        if (FOLLOW && isNull(this.cameraDestination) && isNull(this.cameraDestinationAnimX) && isNull(this.cameraDestinationAnimZ)) {
+            this.cameraDestination = new int[]{(int) getPlayerX(), (int) getPlayerZ()};
         }
         if (this.cameraDestination != null) {
             this.cameraDestinationAnimX = new SlowingAnimation(this.cameraX, (double)this.cameraDestination[0], 0.9, 0.01);
@@ -1618,8 +1619,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         } else {
             WorldMap.settings.minimapRadar = true;
         }
+        if (XaeroPlus.customDimensionId != newDimId) {
+            if (XaeroPlus.customDimensionId == -1) {
+                this.cameraDestination = new int[] {(int) (cameraX * 8), (int) (cameraZ * 8)};
+            } else if (newDimId == -1) {
+                this.cameraDestination = new int[] {(int) (cameraX / 8), (int) (cameraZ / 8)};
+            }
+        }
         XaeroPlus.customDimensionId = newDimId;
-
-        // todo: pan the map to the player's position in the new dimension
+        SupportMods.xaeroMinimap.requestWaypointsRefresh();
     }
 }

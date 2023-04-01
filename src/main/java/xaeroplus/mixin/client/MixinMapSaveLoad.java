@@ -488,7 +488,6 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
 
     @Redirect(method = "run", at = @At(value = "INVOKE", target = "Lxaero/map/region/LeveledRegionManager;addLoadedRegion(Lxaero/map/region/LeveledRegion;)V"))
     public void run(final LeveledRegionManager instance, final LeveledRegion<?> reg) {
-        XaeroPlus.LOGGER.info("Loading region in dimension: " + reg.getDim().getDimId());
         reg.getDim().getMapRegions().addLoadedRegion(reg);
     }
 

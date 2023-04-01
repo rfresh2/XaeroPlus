@@ -37,6 +37,8 @@ import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ColorHelper;
 
+import static xaeroplus.XaeroPlus.customDimensionId;
+
 @Mixin(value = MinimapFBORenderer.class, remap = false)
 public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
 
@@ -91,6 +93,34 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
         this.triedFBO = true;
     }
 
+    public double getRenderEntityX(MinimapProcessor minimap, Entity renderEntity, float partial) {
+        int dim = mc.world.provider.getDimension();
+        // when player is in the nether or the custom dimension is the nether, perform coordinate translation
+        if ((dim == -1 || customDimensionId == -1) && dim != customDimensionId) {
+            if (customDimensionId == 0) {
+                return minimap.getEntityRadar().getEntityX(renderEntity, partial) * 8.0;
+            } else if (customDimensionId == -1 && dim == 0) {
+                return minimap.getEntityRadar().getEntityX(renderEntity, partial) / 8.0;
+            }
+        }
+
+        return minimap.getEntityRadar().getEntityX(renderEntity, partial);
+    }
+
+    public double getRenderEntityZ(MinimapProcessor minimap, Entity renderEntity, float partial) {
+        int dim = mc.world.provider.getDimension();
+        // when player is in the nether or the custom dimension is the nether, perform coordinate translation
+        if ((dim == -1 || customDimensionId == -1) && dim != customDimensionId) {
+            if (customDimensionId == 0) {
+                return minimap.getEntityRadar().getEntityZ(renderEntity, partial) * 8.0;
+            } else if (customDimensionId == -1 && dim == 0) {
+                return minimap.getEntityRadar().getEntityZ(renderEntity, partial) / 8.0;
+            }
+        }
+
+        return minimap.getEntityRadar().getEntityZ(renderEntity, partial);
+    }
+
     /**
      * @author rfresh2
      * @reason big minimap
@@ -121,8 +151,8 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
         double maxVisibleLength = !lockedNorth && shape != 1 ? (double)viewW * Math.sqrt(2.0) : (double)viewW;
         double halfMaxVisibleLength = maxVisibleLength / 2.0;
         double radiusBlocks = maxVisibleLength / 2.0 /  this.zoom;
-        double playerX = minimap.getEntityRadar().getEntityX(renderEntity, partial);
-        double playerZ = minimap.getEntityRadar().getEntityZ(renderEntity, partial);
+        double playerX = getRenderEntityX(minimap, renderEntity, partial);
+        double playerZ = getRenderEntityZ(minimap, renderEntity, partial);
         int xFloored = OptimizedMath.myFloor(playerX);
         int zFloored = OptimizedMath.myFloor(playerZ);
         int playerChunkX = xFloored >> 6;
@@ -140,12 +170,12 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
         GlStateManager.matrixMode(5888);
         GL11.glPushMatrix();
         GlStateManager.loadIdentity();
-        double xInsidePixel = minimap.getEntityRadar().getEntityX(renderEntity, partial) - (double)xFloored;
+        double xInsidePixel = getRenderEntityX(minimap, renderEntity, partial) - (double)xFloored;
         if (xInsidePixel < 0.0) {
             ++xInsidePixel;
         }
 
-        double zInsidePixel = minimap.getEntityRadar().getEntityZ(renderEntity, partial) - (double)zFloored;
+        double zInsidePixel = getRenderEntityZ(minimap, renderEntity, partial) - (double)zFloored;
         if (zInsidePixel < 0.0) {
             ++zInsidePixel;
         }

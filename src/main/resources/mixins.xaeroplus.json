@@ -28,6 +28,7 @@
     "MixinMisc",
     "MixinRadarRenderer",
     "MixinSupportXaeroWorldmap",
+    "MixinWaypointsIngameRenderer",
     "MixinWaypointsManager",
     "MixinWidgetLoadingHandler",
     "MixinWidgetScreenHandlerAccessor",

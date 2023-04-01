@@ -421,6 +421,11 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
         }
     }
 
+    @Inject(method = "changeWorld", at = @At(value = "INVOKE", target = "Lxaero/map/world/MapDimension;resetCustomMultiworldUnsynced()V", shift = At.Shift.AFTER))
+    public synchronized void changeWorld(final WorldClient world, final CallbackInfo ci) {
+        XaeroPlus.customDimensionId = world.provider.getDimension();
+    }
+
     public boolean regionExistsCustomDimension(int x, int z, int dimId) {
         return this.regionDetectionExistsCustomDimension(x, z, dimId) || this.mapWorld.getDimension(dimId).getHighlightHandler().shouldApplyRegionHighlights(x, z, false);
     }

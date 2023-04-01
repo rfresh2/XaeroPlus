@@ -1353,39 +1353,39 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                         }
                     }
                     if (XaeroPlusSettingRegistry.showRenderDistanceWorldMapSetting.getValue()) {
-                        final int setting = (int) XaeroPlusSettingRegistry.assumedServerRenderDistanceSetting.getValue();
+                        if (Minecraft.getMinecraft().world.provider.getDimension() == XaeroPlus.customDimensionId) {
+                            final int setting = (int) XaeroPlusSettingRegistry.assumedServerRenderDistanceSetting.getValue();
+                            int width = setting * 2 + 1;
+                            double playerX = getPlayerX();
+                            double playerZ = getPlayerZ();
+                            int xFloored = OptimizedMath.myFloor(playerX);
+                            int zFloored = OptimizedMath.myFloor(playerZ);
+                            int chunkLeftX = (xFloored >> 4) - (width / 2) << 4;
+                            int chunkRightX = (xFloored >> 4) + 1 + (width / 2) << 4;
+                            int chunkTopZ = (zFloored >> 4) - (width / 2) << 4;
+                            int chunkBottomZ = (zFloored >> 4) + 1 + (width / 2) << 4;
+                            final int x0 = chunkLeftX - flooredCameraX;
+                            final int x1 = chunkRightX - flooredCameraX;
+                            final int z0 = chunkTopZ - flooredCameraZ;
+                            final int z1 = chunkBottomZ - flooredCameraZ;
 
-                        final int width = setting * 2 + 1;
-
-                        double playerX = player.posX;
-                        double playerZ = player.posZ;
-                        int xFloored = OptimizedMath.myFloor(playerX);
-                        int zFloored = OptimizedMath.myFloor(playerZ);
-                        int chunkLeftX = (xFloored >> 4) - (width / 2) << 4;
-                        int chunkRightX = (xFloored >> 4) + 1 + (width / 2) << 4;
-                        int chunkTopZ = (zFloored >> 4) - (width / 2) << 4;
-                        int chunkBottomZ = (zFloored >> 4) + 1 + (width / 2) << 4;
-                        final int x0 = chunkLeftX - flooredCameraX;
-                        final int x1 = chunkRightX - flooredCameraX;
-                        final int z0 = chunkTopZ - flooredCameraZ;
-                        final int z1 = chunkBottomZ - flooredCameraZ;
-
-                        Tessellator tessellator = Tessellator.getInstance();
-                        BufferBuilder vertexBuffer = tessellator.getBuffer();
-                        vertexBuffer.begin(GL_LINE_LOOP, DefaultVertexFormats.POSITION);
-                        GlStateManager.disableTexture2D();
-                        GlStateManager.enableBlend();
-                        // yellow
-                        GlStateManager.color(1.f, 1.f, 0.f, 0.8F);
-                        float settingWidth = (float) XaeroMinimapSession.getCurrentSession().getModMain().getSettings().chunkGridLineWidth;
-                        float lineScale = (float) Math.min(settingWidth * this.scale, settingWidth);
-                        GlStateManager.glLineWidth(lineScale);
-                        vertexBuffer.pos(x0, z0, 0.0).endVertex();
-                        vertexBuffer.pos(x1, z0, 0.0).endVertex();
-                        vertexBuffer.pos(x1, z1, 0.0).endVertex();
-                        vertexBuffer.pos(x0, z1, 0.0).endVertex();
-                        tessellator.draw();
-                        GlStateManager.enableTexture2D();
+                            Tessellator tessellator = Tessellator.getInstance();
+                            BufferBuilder vertexBuffer = tessellator.getBuffer();
+                            vertexBuffer.begin(GL_LINE_LOOP, DefaultVertexFormats.POSITION);
+                            GlStateManager.disableTexture2D();
+                            GlStateManager.enableBlend();
+                            // yellow
+                            GlStateManager.color(1.f, 1.f, 0.f, 0.8F);
+                            float settingWidth = (float) XaeroMinimapSession.getCurrentSession().getModMain().getSettings().chunkGridLineWidth;
+                            float lineScale = (float) Math.min(settingWidth * this.scale, settingWidth);
+                            GlStateManager.glLineWidth(lineScale);
+                            vertexBuffer.pos(x0, z0, 0.0).endVertex();
+                            vertexBuffer.pos(x1, z0, 0.0).endVertex();
+                            vertexBuffer.pos(x1, z1, 0.0).endVertex();
+                            vertexBuffer.pos(x0, z1, 0.0).endVertex();
+                            tessellator.draw();
+                            GlStateManager.enableTexture2D();
+                        }
                     }
 
                     GlStateManager.popMatrix();

@@ -1,5 +1,6 @@
 package xaeroplus.mixin.client;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -274,45 +275,47 @@ public abstract class MixinSupportXaeroWorldmap {
 
                     // TODO: moving this code to MinimapFBORenderer would allow it to render on top of grid lines
                     if (XaeroPlusSettingRegistry.showRenderDistanceSetting.getValue()) {
-                        GuiMap.restoreTextureStates();
-                        if (compatibilityVersion >= 7) {
-                            GL14.glBlendFuncSeparate(770, 771, 1, 771);
-                        }
+                        if (Minecraft.getMinecraft().world.provider.getDimension() == XaeroPlus.customDimensionId) {
+                            GuiMap.restoreTextureStates();
+                            if (compatibilityVersion >= 7) {
+                                GL14.glBlendFuncSeparate(770, 771, 1, 771);
+                            }
 
-                        final int setting = (int) XaeroPlusSettingRegistry.assumedServerRenderDistanceSetting.getValue();
-                        final int width = setting * 2 + 1;
-                        // origin of the chunk we are standing in
-                        final int middleChunkX = -insideX;
-                        final int middleChunkZ = -insideZ;
-                        // this is biased to +x/+z for even sizes which im not certain is correct
-                        final int x0 = middleChunkX - (width / 2) * 16;
-                        final int z0 = middleChunkZ - (width / 2) * 16;
-                        final int x1 = x0 + width * 16;
-                        final int z1 = z0 + width * 16;
+                            final int setting = (int) XaeroPlusSettingRegistry.assumedServerRenderDistanceSetting.getValue();
+                            int width = setting * 2 + 1;
+                            // origin of the chunk we are standing in
+                            final int middleChunkX = -insideX;
+                            final int middleChunkZ = -insideZ;
+                            // this is biased to +x/+z for even sizes which im not certain is correct
+                            final int x0 = middleChunkX - (width / 2) * 16;
+                            final int z0 = middleChunkZ - (width / 2) * 16;
+                            final int x1 = x0 + width * 16;
+                            final int z1 = z0 + width * 16;
 
-                        Tessellator tessellator = Tessellator.getInstance();
-                        BufferBuilder vertexBuffer = tessellator.getBuffer();
-                        vertexBuffer.begin(GL_LINE_LOOP, DefaultVertexFormats.POSITION);
-                        GlStateManager.disableTexture2D();
-                        GlStateManager.enableBlend();
-                        // yellow
-                        GlStateManager.color(1.f, 1.f, 0.f, 0.8F);
-                        GlStateManager.glLineWidth((float)this.modMain.getSettings().chunkGridLineWidth * XaeroPlus.minimapScalingFactor);
-                        vertexBuffer.pos(x0, z0, 0.0).endVertex();
-                        vertexBuffer.pos(x1, z0, 0.0).endVertex();
-                        vertexBuffer.pos(x1, z1, 0.0).endVertex();
-                        vertexBuffer.pos(x0, z1, 0.0).endVertex();
-                        tessellator.draw();
-                        GlStateManager.enableTexture2D();
-                        GlStateManager.disableBlend();
-
-                        if (compatibilityVersion >= 6) {
-                            GuiMap.setupTextures(brightness);
-                        }
-
-                        if (compatibilityVersion >= 7) {
-                            GL14.glBlendFuncSeparate(1, 0, 0, 1);
+                            Tessellator tessellator = Tessellator.getInstance();
+                            BufferBuilder vertexBuffer = tessellator.getBuffer();
+                            vertexBuffer.begin(GL_LINE_LOOP, DefaultVertexFormats.POSITION);
+                            GlStateManager.disableTexture2D();
                             GlStateManager.enableBlend();
+                            // yellow
+                            GlStateManager.color(1.f, 1.f, 0.f, 0.8F);
+                            GlStateManager.glLineWidth((float)this.modMain.getSettings().chunkGridLineWidth * XaeroPlus.minimapScalingFactor);
+                            vertexBuffer.pos(x0, z0, 0.0).endVertex();
+                            vertexBuffer.pos(x1, z0, 0.0).endVertex();
+                            vertexBuffer.pos(x1, z1, 0.0).endVertex();
+                            vertexBuffer.pos(x0, z1, 0.0).endVertex();
+                            tessellator.draw();
+                            GlStateManager.enableTexture2D();
+                            GlStateManager.disableBlend();
+
+                            if (compatibilityVersion >= 6) {
+                                GuiMap.setupTextures(brightness);
+                            }
+
+                            if (compatibilityVersion >= 7) {
+                                GL14.glBlendFuncSeparate(1, 0, 0, 1);
+                                GlStateManager.enableBlend();
+                            }
                         }
                     }
 
@@ -320,10 +323,7 @@ public abstract class MixinSupportXaeroWorldmap {
                     GL14.glBlendFuncSeparate(770, 771, 1, 0);
                     GlStateManager.disableBlend();
                 }
-
             }
         }
     }
-
-
 }

@@ -22,6 +22,14 @@ public class ChunkUtils {
         return new ChunkPos((int)(l & 4294967295L), (int)(l >> 32 & 4294967295L));
     }
 
+    public static int longToChunkX(final long l) {
+        return (int)(l & 4294967295L);
+    }
+
+    public static int longToChunkZ(final long l) {
+        return (int)(l >> 32 & 4294967295L);
+    }
+
     public static Callable<List<HighlightAtChunkPos>> loadHighlightChunksAtRegion(
             final int leafRegionX, final int leafRegionZ, final int level,
             final Function<Long, Boolean> highlightChunkPosFunction) {

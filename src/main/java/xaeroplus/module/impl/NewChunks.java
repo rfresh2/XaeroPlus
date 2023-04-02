@@ -2,14 +2,10 @@ package xaeroplus.module.impl;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.play.server.SPacketChunkData;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import org.apache.commons.compress.compressors.lz4.FramedLZ4CompressorInputStream;
-import org.apache.commons.compress.compressors.lz4.FramedLZ4CompressorOutputStream;
 import xaero.map.WorldMap;
 import xaero.map.core.XaeroWorldMapCore;
 import xaeroplus.XaeroPlus;
@@ -17,18 +13,13 @@ import xaeroplus.event.PacketReceivedEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.module.Module;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.ColorHelper;
-import xaeroplus.util.HighlightAtChunkPos;
-import xaeroplus.util.RegionRenderPos;
+import xaeroplus.util.*;
 
-import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardOpenOption;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -49,13 +40,16 @@ public class NewChunks extends Module {
     private int newChunksColor = getColor(255, 0, 0, 100);
     // somewhat arbitrary number but should be sufficient
     private static final int maxNumber = 5000;
-    private Path currentSaveFile;
+//    private Path currentSaveFile;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private int currentDimension = 0;
+    private NewChunksDatabase newChunksDatabase;
 
     // this is an lz4 compressed JSON file
     // I've added v1 as a suffix if we ever need to change file formats and want to convert these without data loss
     private static final String NEWCHUNKS_FILE_NAME = "XaeroPlusNewChunksV1.data";
+    private String currentWorldId;
 
     // todo: handle save load on custom dimension switch
     //   we need to ensure we don't write over the current dimension and that when we switch dimensions we correctly save
@@ -114,13 +108,37 @@ public class NewChunks extends Module {
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
         if (XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.getValue()) {
             try {
-                saveChunks(this.currentSaveFile);
+                saveChunks();
                 reset();
-                this.currentSaveFile = getSavePath(event.worldId, event.dimId, event.mwId);
-                loadChunks(this.currentSaveFile);
+                // check if we are changing dimensions or changing worlds
+                // if we are changing worlds we need to create a new database connection
+                // if we are changing dimensions, update the current dimension
+                if (!Objects.equals(event.worldId, currentWorldId)) {
+                    if (event.worldId == null) {
+                        // we are disconnecting
+                        currentWorldId = null;
+                        return;
+                    }
+                    currentWorldId = event.worldId;
+                    newChunksDatabase = new NewChunksDatabase(currentWorldId);
+                }
+                if (currentDimension != getMCDimension()) {
+                    currentDimension = getMCDimension();
+                }
+//                this.currentSaveFile = getSavePath(event.worldId, event.dimId, event.mwId);
+                this.currentDimension = getMCDimension();
+                loadChunks();
             } catch (final Exception e) {
                 XaeroPlus.LOGGER.error("Error handling Xaero world change in NewChunks", e);
             }
+        }
+    }
+
+    public int getMCDimension() {
+        try {
+            return Minecraft.getMinecraft().world.provider.getDimension();
+        } catch (final Exception e) {
+            return 0;
         }
     }
 
@@ -136,8 +154,9 @@ public class NewChunks extends Module {
             final String worldId = XaeroWorldMapCore.currentSession.getMapProcessor().getCurrentWorldId();
             final String dimensionId = XaeroWorldMapCore.currentSession.getMapProcessor().getCurrentDimId();
             final String mwId = XaeroWorldMapCore.currentSession.getMapProcessor().getCurrentMWId();
-            this.currentSaveFile = getSavePath(worldId, dimensionId, mwId);
-            loadChunks(this.currentSaveFile);
+            this.newChunksDatabase = new NewChunksDatabase(worldId);
+            this.currentDimension = getMCDimension();
+            loadChunks();
         } catch (final Exception e) {
             // expected on game launch
         }
@@ -147,7 +166,7 @@ public class NewChunks extends Module {
     public void onDisable() {
         if (XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.getValue()) {
             try {
-                saveChunks(this.currentSaveFile);
+                saveChunks();
                 reset();
             } catch (final Exception e) {
                 // expected on game launch
@@ -207,8 +226,8 @@ public class NewChunks extends Module {
         return null;
     }
 
-    private void saveChunks(final Path saveFile) {
-        if (isNull(saveFile) || chunks.isEmpty()) {
+    private void saveChunks() {
+        if (chunks.isEmpty()) {
             return;
         }
         try {
@@ -217,56 +236,37 @@ public class NewChunks extends Module {
                         .map(e -> new NewChunkData(e.getKey(), e.getValue()))
                         .collect(Collectors.toList());
                 lock.readLock().unlock();
-                writeAsync(chunkData, saveFile);
+                writeAsync(chunkData, currentDimension, newChunksDatabase);
             }
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error saving NewChunks", e);
         }
     }
 
-    private void writeAsync(final List<NewChunkData> chunkData, final Path saveFile) {
+    private void writeAsync(final List<NewChunkData> chunkData, final int currentDimension, final NewChunksDatabase newChunksDatabase) {
         executorService.execute(() -> {
-            final Gson gson = new GsonBuilder().create();
-            try {
-                final Path tempFile = Files.createFile(saveFile.getParent().resolve("XaeroPlusNewChunksData " + System.nanoTime() + ".temp"));
-                try (Writer writer = new OutputStreamWriter(new FramedLZ4CompressorOutputStream(Files.newOutputStream(tempFile, StandardOpenOption.WRITE)))) {
-                    gson.toJson(chunkData, writer);
-                    Files.move(tempFile, saveFile, StandardCopyOption.REPLACE_EXISTING);
-                    XaeroPlus.LOGGER.info("Saved {} NewChunks to disk", chunkData.size());
-                } catch (final Exception e) {
-                    XaeroPlus.LOGGER.error("Error saving new chunks to {}", saveFile,e);
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+           newChunksDatabase.insertNewChunkList(chunkData, currentDimension);
         });
     }
 
-    private void loadChunks(final Path saveFile) {
-        if (isNull(saveFile)) {
-            return;
-        }
-        if (!Files.exists(saveFile)) {
-            return;
-        }
-        readAsync(saveFile);
+    private void loadChunks() {
+        readAsync(currentDimension, newChunksDatabase);
     }
 
-    private void readAsync(final Path saveFile) {
+    private void readAsync(final int currentDimension, final NewChunksDatabase newChunksDatabase) {
         executorService.execute(() -> {
-            final Gson gson = new GsonBuilder().create();
-            final TypeToken<List<NewChunkData>> newChunkDataType = new TypeToken<List<NewChunkData>>() { };
-            try (Reader reader = new InputStreamReader(new FramedLZ4CompressorInputStream(Files.newInputStream(saveFile)))) {
-                final List<NewChunkData> chunkData = gson.fromJson(reader, newChunkDataType.getType());
-                if (nonNull(chunkData)) {
+            final List<NewChunkData> chunkData = newChunksDatabase.getNewChunks(currentDimension);
+            if (nonNull(chunkData) && !chunkData.isEmpty()) {
+                try {
                     if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
-                        chunkData.stream().forEach(d -> chunks.put((long) d.chunkPos, (long) d.foundTime));
+                        chunkData.stream().forEach(d -> chunks.put(chunkPosToLong(d.x, d.z), d.foundTime));
                         lock.writeLock().unlock();
                     }
                     XaeroPlus.LOGGER.info("Loaded {} NewChunks from disk", chunkData.size());
+                } catch (final Exception e) {
+                    XaeroPlus.LOGGER.error("Error loading NewChunks", e);
                 }
-            } catch (final Exception e) {
-                XaeroPlus.LOGGER.error("Error loading new chunks from file {}", saveFile.toString(), e);
+
             }
         });
     }
@@ -276,7 +276,7 @@ public class NewChunks extends Module {
             loadChunksWithXaeroState();
         } else {
             // currentSaveFile should already be set here
-            saveChunks(this.currentSaveFile);
+            saveChunks();
         }
     }
 
@@ -286,17 +286,6 @@ public class NewChunks extends Module {
 
     public void setAlpha(final float a) {
         newChunksColor = ColorHelper.getColorWithAlpha(newChunksColor, (int) (a));
-    }
-
-    // static POJO to help GSON with (de)serialization
-    private static class NewChunkData {
-        public final Long chunkPos;
-        public final Long foundTime;
-
-        public NewChunkData(final Long chunkPos, final Long foundTime) {
-            this.chunkPos = chunkPos;
-            this.foundTime = foundTime;
-        }
     }
 
     /**

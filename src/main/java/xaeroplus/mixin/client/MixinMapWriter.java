@@ -184,6 +184,9 @@ public abstract class MixinMapWriter {
             this.mutableLocalPos.setPos(insideX, h, insideZ);
             this.mutableGlobalPos.setY(h);
             state = bchunk.getBlockState(this.mutableLocalPos);
+            if (state == null) {
+                state = Blocks.AIR.getDefaultState();
+            }
             state = this.unpackFramedBlocks(state, world, this.mutableGlobalPos);
             Block b = state.getBlock();
             boolean roofObsidian = (h > 253 && b == Blocks.OBSIDIAN);

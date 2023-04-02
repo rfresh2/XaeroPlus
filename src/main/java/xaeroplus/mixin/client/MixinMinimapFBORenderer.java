@@ -358,7 +358,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
                         playerZ,
                         ps,
                         pc,
-                        this.zoom,
+                        this.zoom / (XaeroPlus.minimapScalingFactor),
                         cave,
                         partial,
                         this.rotationFramebuffer,

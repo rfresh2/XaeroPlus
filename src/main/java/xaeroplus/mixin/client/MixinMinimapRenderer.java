@@ -1,19 +1,25 @@
 package xaeroplus.mixin.client;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.MinimapInterface;
 import xaero.common.minimap.MinimapProcessor;
+import xaero.common.minimap.element.render.over.MinimapElementOverMapRendererHandler;
 import xaero.common.minimap.radar.MinimapRadar;
 import xaero.common.minimap.render.MinimapRenderer;
+import xaero.common.minimap.render.MinimapRendererHelper;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 
@@ -43,6 +49,34 @@ public class MixinMinimapRenderer {
     @Redirect(method = "renderMinimap", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/radar/MinimapRadar;getEntityZ(Lnet/minecraft/entity/Entity;F)D"))
     public double getEntityZ(final MinimapRadar instance, final Entity e, final float partial) {
         return getPlayerZ();
+    }
+
+    @Redirect(method = "renderMinimap", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/element/render/over/MinimapElementOverMapRendererHandler;render(Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/player/EntityPlayer;DDDDDDZFLnet/minecraft/client/shader/Framebuffer;Lxaero/common/IXaeroMinimap;Lxaero/common/minimap/render/MinimapRendererHelper;Lnet/minecraft/client/gui/FontRenderer;Lnet/minecraft/client/gui/ScaledResolution;IIIIZF)D"))
+    public double editOvermapRender(final MinimapElementOverMapRendererHandler instance, final Entity renderEntity, final EntityPlayer player, final double renderX, final double renderY, final double renderZ, final double ps, final double pc, final double zoom, final boolean cave, final float partialTicks, final Framebuffer framebuffer, final IXaeroMinimap modMain, final MinimapRendererHelper helper, final FontRenderer font, final ScaledResolution scaledRes, final int specW, final int specH, final int halfViewW, final int halfViewH, final boolean circle, final float minimapScale) {
+        double customZoom = zoom / XaeroPlus.minimapScalingFactor;
+        return instance.render(
+                renderEntity,
+                player,
+                renderX,
+                renderY,
+                renderZ,
+                ps,
+                pc,
+                customZoom,
+                cave,
+                partialTicks,
+                null,
+                modMain,
+                helper,
+                font,
+                scaledRes,
+                specW,
+                specW,
+                halfViewW,
+                halfViewH,
+                circle,
+                minimapScale
+        );
     }
 
     public double getPlayerX() {

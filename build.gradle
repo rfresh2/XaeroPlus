@@ -16,6 +16,10 @@ buildscript {
     }
 }
 
+plugins {
+    id "com.github.johnrengelman.shadow" version "7.1.2"
+}
+
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
@@ -130,35 +134,51 @@ mixin {
     add sourceSets.main, 'mixins.xaeroplus.refmap.json'
 }
 
-jar {
+jar.enabled(false)
+
+shadowJar {
+    configurations = [project.configurations.jarLibs]
+    archiveClassifier.set('')
+
     manifest {
         attributes([
-            'Manifest-Version': 1.1,
-            'MixinConfigs': 'mixins.xaeroplus.json',
-            'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
-            'TweakOrder': 0,
-            'FMLCorePluginContainsFMLMod': 'true',
-            'FMLCorePlugin': 'xaeroplus.mixin.MixinLoaderForge',
-            'ForceLoadAsMod': 'true',
-            "Specification-Title": "XaeroPlus",
-            "Specification-Vendor": "rfresh2",
-            "Specification-Version": "1",
-            "Implementation-Title": project.name,
-            "Implementation-Version": "${version}",
-            "Implementation-Vendor" :"rfresh",
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+                'Manifest-Version': 1.1,
+                'MixinConfigs': 'mixins.xaeroplus.json',
+                'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
+                'TweakOrder': 0,
+                'FMLCorePluginContainsFMLMod': 'true',
+                'FMLCorePlugin': 'xaeroplus.mixin.MixinLoaderForge',
+                'ForceLoadAsMod': 'true',
+                "Specification-Title": "XaeroPlus",
+                "Specification-Vendor": "rfresh2",
+                "Specification-Version": "1",
+                "Implementation-Title": project.name,
+                "Implementation-Version": "${version}",
+                "Implementation-Vendor" :"rfresh",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
-    // Copy needed libs to jar
-    from {
-        configurations.jarLibs.collect {
-            it.isDirectory() ? it : zipTree(it)
-        }
-    }
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    exclude 'org/sqlite/native/FreeBSD/**'
+    exclude 'org/sqlite/native/Linux-Android/**'
+    exclude 'org/sqlite/native/Linux-Musl/**'
+    exclude 'org/sqlite/native/**/aarch64/**'
+    exclude 'org/sqlite/native/**/armv6/**'
+    exclude 'org/sqlite/native/**/armv7/**'
+    exclude 'org/sqlite/native/**/arm/**'
+    exclude 'org/sqlite/native/**/ppc64/**'
+    exclude 'org/sqlite/native/**/aarch64/**'
+    finalizedBy 'configureReobfTaskForReobfShadowJar', 'reobfShadowJar'
+    mustRunAfter 'jar'
 }
 
-jar.finalizedBy('reobfJar')
+reobf {
+    shadowJar {}
+    jar {
+        enabled = false
+    }
+}
+
+build.dependsOn shadowJar
 
 task setGameDir() {
     // Check if custom gamedir has been passed, if not use default ones per platform

@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.map.*;
@@ -424,6 +425,11 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
     @Inject(method = "changeWorld", at = @At(value = "INVOKE", target = "Lxaero/map/world/MapDimension;resetCustomMultiworldUnsynced()V", shift = At.Shift.AFTER))
     public synchronized void changeWorld(final WorldClient world, final CallbackInfo ci) {
         XaeroPlus.customDimensionId = world.provider.getDimension();
+    }
+
+    @Redirect(method = "onRenderProcess", at = @At(value = "INVOKE", target = "Lxaero/map/world/MapWorld;getCurrentDimension()Lxaero/map/world/MapDimension;"))
+    public MapDimension getCustomDimension(final MapWorld mapWorld) {
+        return mapWorld.getDimension(XaeroPlus.customDimensionId);
     }
 
     public boolean regionExistsCustomDimension(int x, int z, int dimId) {

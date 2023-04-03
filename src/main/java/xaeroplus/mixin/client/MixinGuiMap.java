@@ -601,7 +601,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                 this.drawString(mc.fontRenderer, "MultiWorld ID: " + this.mapProcessor.getMapWorld().getCurrentMultiworld(), 5, 255, -1);
                             }
 
-                            LeveledRegionManager regions = this.mapProcessor.getMapWorld().getCurrentDimension().getMapRegions();
+                            LeveledRegionManager regions = this.mapProcessor.getMapWorld().getDimension(XaeroPlus.customDimensionId).getMapRegions();
                             this.drawString(
                                     mc.fontRenderer,
                                     String.format(
@@ -890,9 +890,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                             lastUpdatedRootLeveledRegion = rootLeveledRegion;
                                         }
 
-                                        this.mapProcessor.getMapWorld().getCurrentDimension().getMapRegions().bumpLoadedRegion(leveledRegion);
+                                        this.mapProcessor.getMapWorld().getDimension(XaeroPlus.customDimensionId).getMapRegions().bumpLoadedRegion(leveledRegion);
                                         if (rootLeveledRegion != null) {
-                                            this.mapProcessor.getMapWorld().getCurrentDimension().getMapRegions().bumpLoadedRegion(rootLeveledRegion);
+                                            this.mapProcessor.getMapWorld().getDimension(XaeroPlus.customDimensionId).getMapRegions().bumpLoadedRegion(rootLeveledRegion);
                                         }
                                     } else {
                                         this.waitingForBranchCache[0] = prevWaitingForBranchCache;
@@ -1441,7 +1441,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                         discoveredForHighlights = mouseBlockBottomY != -1;
                         ITextComponent subtleHighlightTooltip = this.mapProcessor
                                 .getMapWorld()
-                                .getCurrentDimension()
+                                .getDimension(XaeroPlus.customDimensionId)
                                 .getHighlightHandler()
                                 .getBlockHighlightSubtleTooltip(this.mouseBlockPosX, this.mouseBlockPosZ, discoveredForHighlights);
                         if (subtleHighlightTooltip != null) {
@@ -1534,7 +1534,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                     && this.mapProcessor.getMapSaveLoad().isRegionDetectionComplete()) {
                                 ITextComponent bluntHighlightTooltip = this.mapProcessor
                                         .getMapWorld()
-                                        .getCurrentDimension()
+                                        .getDimension(XaeroPlus.customDimensionId)
                                         .getHighlightHandler()
                                         .getBlockHighlightBluntTooltip(this.mouseBlockPosX, this.mouseBlockPosZ, discoveredForHighlights);
                                 if (bluntHighlightTooltip != null) {

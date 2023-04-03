@@ -152,7 +152,7 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                                     if (nextTile != -1) {
                                         MapTile tile = this.mapProcessor
                                                 .getTilePool()
-                                                .get(this.mapProcessor.getCurrentDimension(), chunk.getX() * 4 + i, chunk.getZ() * 4 + j);
+                                                .get(this.mapProcessor.getDimensionName(XaeroPlus.customDimensionId), chunk.getX() * 4 + i, chunk.getZ() * 4 + j);
 
                                         for (int x = 0; x < 16; ++x) {
                                             MapBlock[] c = tile.getBlockColumn(x);

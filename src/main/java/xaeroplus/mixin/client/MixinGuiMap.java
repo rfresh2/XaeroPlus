@@ -270,6 +270,25 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         }
     }
 
+    @Inject(method = "<init>", at = @At("RETURN"))
+    public void constructorInject(final GuiScreen parent, final GuiScreen escape, final MapProcessor mapProcessor, final Entity player, final CallbackInfo ci) {
+        int dim = Minecraft.getMinecraft().world.provider.getDimension();
+        if ((dim == -1 || XaeroPlus.customDimensionId == -1) && dim != XaeroPlus.customDimensionId) {
+            if (XaeroPlus.customDimensionId == 0) {
+                this.cameraX = player.posX * 8.0;
+            } else if (XaeroPlus.customDimensionId == -1 && dim == 0) {
+                this.cameraX = player.posX / 8.0;
+            }
+        }
+        if ((dim == -1 || XaeroPlus.customDimensionId == -1) && dim != XaeroPlus.customDimensionId) {
+            if (XaeroPlus.customDimensionId == 0) {
+                this.cameraZ = player.posZ * 8.0;
+            } else if (XaeroPlus.customDimensionId == -1 && dim == 0) {
+                this.cameraZ = player.posZ / 8.0;
+            }
+        }
+    }
+
     @Inject(method = "initGui()V", at = @At(value = "TAIL"), remap = true)
     public void customInitGui(CallbackInfo ci) {
         int h = this.height / 2;

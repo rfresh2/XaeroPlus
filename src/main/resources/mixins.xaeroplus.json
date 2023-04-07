@@ -9,6 +9,7 @@
     "MixinControlsHandler",
     "MixinControlsRegister",
     "MixinGuiMap",
+    "MixinGuiMapAccessor",
     "MixinGuiMinimapMain",
     "MixinGuiMinimapOverlaysSettings",
     "MixinGuiSettingsWorldMap",

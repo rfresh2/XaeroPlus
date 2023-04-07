@@ -211,7 +211,7 @@ public abstract class MixinSupportXaeroWorldmap {
                                                 GlStateManager.enableBlend();
                                             }
                                         }
-                                        if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue() && !isDimensionSwitched) {
+                                        if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
                                             GuiMap.restoreTextureStates();
                                             if (compatibilityVersion >= 7) {
                                                 GL14.glBlendFuncSeparate(770, 771, 1, 771);
@@ -219,7 +219,7 @@ public abstract class MixinSupportXaeroWorldmap {
                                             for(int t = 0; t < 16; ++t) {
                                                 final int chunkPosX = chunk.getX() * 4 + t % 4;
                                                 final int chunkPosZ = chunk.getZ() * 4 + t / 4;
-                                                if (ModuleManager.getModule(NewChunks.class).isNewChunk(chunkPosX, chunkPosZ)) {
+                                                if (ModuleManager.getModule(NewChunks.class).isNewChunk(chunkPosX, chunkPosZ, XaeroPlus.customDimensionId)) {
                                                     int newChunkDrawX = drawX + 16 * (t % 4);
                                                     int newChunkDrawZ = drawZ + 16 * (t / 4);
                                                     Gui.drawRect(newChunkDrawX, newChunkDrawZ, newChunkDrawX + 16, newChunkDrawZ + 16, ModuleManager.getModule(NewChunks.class).getNewChunksColor());

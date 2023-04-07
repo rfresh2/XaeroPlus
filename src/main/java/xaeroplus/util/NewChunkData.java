@@ -19,4 +19,10 @@ public class NewChunkData {
         this.z = z;
         this.foundTime = (long) foundTime;
     }
+
+    public NewChunkData(final int x, final int z, final long foundTime) {
+        this.x = x;
+        this.z = z;
+        this.foundTime = foundTime;
+    }
 }

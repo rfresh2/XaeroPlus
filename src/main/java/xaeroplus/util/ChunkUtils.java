@@ -1,5 +1,6 @@
 package xaeroplus.util;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.ChunkPos;
 
 import java.util.ArrayList;
@@ -28,6 +29,36 @@ public class ChunkUtils {
 
     public static int longToChunkZ(final long l) {
         return (int)(l >> 32 & 4294967295L);
+    }
+    public static int currentPlayerChunkX() {
+        return Minecraft.getMinecraft().player.chunkCoordX;
+    }
+    public static int currentPlayerChunkZ() {
+        return Minecraft.getMinecraft().player.chunkCoordZ;
+    }
+    public static int currentPlayerRegionX() {
+        return currentPlayerChunkX() >> 5;
+    }
+    public static int currentPlayerRegionZ() {
+        return currentPlayerChunkZ() >> 5;
+    }
+    public static int coordToChunkCoord(final double coord) {
+        return ((int)coord) >> 4;
+    }
+    public static int coordToRegionCoord(final double coord) {
+        return ((int)coord) >> 9;
+    }
+    public static int chunkCoordToCoord(final int chunkCoord) {
+        return chunkCoord << 4;
+    }
+    public static int chunkCoordToRegionCoord(final int chunkCoord) {
+        return chunkCoord >> 5;
+    }
+    public static int regionCoordToChunkCoord(final int regionCoord) {
+        return regionCoord << 5;
+    }
+    public static int regionCoordToCoord(final int regionCoord) {
+        return regionCoord << 9;
     }
 
     public static Callable<List<HighlightAtChunkPos>> loadHighlightChunksAtRegion(

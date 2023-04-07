@@ -1,13 +1,11 @@
 package xaeroplus.module.impl;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.play.server.SPacketChunkData;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import xaero.map.WorldMap;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import xaero.map.core.XaeroWorldMapCore;
+import xaero.map.gui.GuiMap;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.PacketReceivedEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
@@ -15,41 +13,48 @@ import xaeroplus.module.Module;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.*;
 
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ExecutionException;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
-import static xaeroplus.util.ChunkUtils.chunkPosToLong;
-import static xaeroplus.util.ChunkUtils.loadHighlightChunksAtRegion;
 import static xaeroplus.util.ColorHelper.getColor;
+import static xaeroplus.util.GuiMapHelper.*;
 
 @Module.ModuleInfo()
 public class NewChunks extends Module {
-    private final Long2LongOpenHashMap chunks = new Long2LongOpenHashMap();
+    // idea: store a "window" of x and z range around the player or current map center
+    //  we want to constantly adjust that window and load in new chunks as we move around
+    //  and save chunks that are no longer in the window
+    //  we should also have a map for each dimension so we can have multiple dimensions open concurrently
+    //  the active dimension to write to we can determine based on the player's actual dimension
+    //  that one always needs to be opened and available for writes
+
+    private Optional<NewChunksLocalCache> netherCache = Optional.empty();
+    private Optional<NewChunksLocalCache> overworldCache = Optional.empty();
+    private Optional<NewChunksLocalCache> endCache = Optional.empty();
+    private Optional<NewChunksDatabase> newChunksDatabase = Optional.empty();
+
+    private boolean worldCacheInitialized = false;
+
+    // only used when we aren't writing chunks to disk
+    // todo: create an interface for chunk storage and in-memory vs disk be two implementations
+//    private final Long2LongOpenHashMap chunks = new Long2LongOpenHashMap();
     private int newChunksColor = getColor(255, 0, 0, 100);
     // somewhat arbitrary number but should be sufficient
     private static final int maxNumber = 5000;
-//    private Path currentSaveFile;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private final ReadWriteLock lock = new ReentrantReadWriteLock();
-    private int currentDimension = 0;
-    private NewChunksDatabase newChunksDatabase;
 
     // this is an lz4 compressed JSON file
     // I've added v1 as a suffix if we ever need to change file formats and want to convert these without data loss
+    // todo: convert these into the sqlite db on startup, then move file to a backup location
     private static final String NEWCHUNKS_FILE_NAME = "XaeroPlusNewChunksV1.data";
     private String currentWorldId;
+    private static final int defaultRegionWindowSize = 3;
+
 
     // todo: handle save load on custom dimension switch
     //   we need to ensure we don't write over the current dimension and that when we switch dimensions we correctly save
@@ -57,45 +62,12 @@ public class NewChunks extends Module {
 
     @SubscribeEvent
     public void onPacketReceivedEvent(final PacketReceivedEvent event) {
+        if (!worldCacheInitialized) return;
         try {
             if (event.packet instanceof SPacketChunkData) {
                 final SPacketChunkData chunkData = (SPacketChunkData) event.packet;
-                final long chunkPosKey = chunkPosToLong(chunkData.getChunkX(), chunkData.getChunkZ());
                 if (!chunkData.isFullChunk()) {
-                    // todo: find a way to limit our in-memory NewChunk data usage while having save/load enabled (without data loss)
-                    //  some file type that allows us to select/write a subset of data? sqlite?
-                    if (!XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.getValue() && chunks.size() > maxNumber) {
-                        if (lock.readLock().tryLock(1, TimeUnit.SECONDS)) {
-                            // remove oldest 500 chunks
-                            final List<Long> toRemove = chunks.entrySet().stream()
-                                    .sorted(Map.Entry.comparingByValue())
-                                    .limit(500)
-                                    .map(Map.Entry::getKey)
-                                    .collect(Collectors.toList());
-                            lock.readLock().unlock();
-                            if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
-                                toRemove.forEach(l -> chunks.remove((long) l));
-                                lock.writeLock().unlock();
-                            }
-                        }
-                    }
-                    if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
-                        chunks.put(chunkPosKey, System.currentTimeMillis());
-                        lock.writeLock().unlock();
-                    }
-                } else if (XaeroPlusSettingRegistry.newChunksSeenResetTime.getValue() > 0) {
-                    if (lock.readLock().tryLock(1, TimeUnit.SECONDS)) {
-                        final long chunkDataSeenTime = chunks.get(chunkPosKey);
-                        lock.readLock().unlock();
-                        if (chunks.defaultReturnValue() != chunkDataSeenTime) {
-                            if (System.currentTimeMillis() - chunkDataSeenTime > XaeroPlusSettingRegistry.newChunksSeenResetTime.getValue() * 1000) {
-                                if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
-                                    chunks.remove(chunkPosKey);
-                                    lock.writeLock().unlock();
-                                }
-                            }
-                        }
-                    }
+                    getCacheForCurrentDimension().ifPresent(c -> c.addNewChunk(chunkData.getChunkX(), chunkData.getChunkZ()));
                 }
             }
         } catch (final Exception e) {
@@ -106,31 +78,52 @@ public class NewChunks extends Module {
 
     @SubscribeEvent
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
-        if (XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.getValue()) {
+        try {
+            saveAllChunks();
+            reset();
+            initializeWorld();
+            loadChunksInCurrentDimension();
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Error handling Xaero world change in NewChunks", e);
+        }
+    }
+
+    private void saveAllChunks() {
+        getAllCaches().forEach(cache -> {
             try {
-                saveChunks();
-                reset();
-                // check if we are changing dimensions or changing worlds
-                // if we are changing worlds we need to create a new database connection
-                // if we are changing dimensions, update the current dimension
-                if (!Objects.equals(event.worldId, currentWorldId)) {
-                    if (event.worldId == null) {
-                        // we are disconnecting
-                        currentWorldId = null;
-                        return;
-                    }
-                    currentWorldId = event.worldId;
-                    newChunksDatabase = new NewChunksDatabase(currentWorldId);
-                }
-                if (currentDimension != getMCDimension()) {
-                    currentDimension = getMCDimension();
-                }
-//                this.currentSaveFile = getSavePath(event.worldId, event.dimId, event.mwId);
-                this.currentDimension = getMCDimension();
-                loadChunks();
+                cache.writeAllChunksToDatabase();
             } catch (final Exception e) {
-                XaeroPlus.LOGGER.error("Error handling Xaero world change in NewChunks", e);
+                XaeroPlus.LOGGER.error("Error saving NewChunks ", e);
             }
+        });
+    }
+
+    int tickCounter = 0;
+    @SubscribeEvent
+    public void onClientTickEvent(final TickEvent.ClientTickEvent event) {
+        if (!worldCacheInitialized) return;
+        // probably don't need to run this on every tick
+        // might be off by 1 tick but that's fine
+        if (tickCounter > 2000) tickCounter = 0;
+        if (tickCounter++ % 10 != 0) {
+            return;
+        }
+        if (tickCounter % 1000 == 0) {
+            getAllCaches().forEach(NewChunksLocalCache::writeAllChunksToDatabase);
+        }
+
+        Optional<GuiMap> guiMapOptional = getGuiMap();
+        if (guiMapOptional.isPresent()) {
+            final GuiMap guiMap = guiMapOptional.get();
+            final int mapDimension = getCurrentlyViewedDimension();
+            final int mapCenterX = getGuiMapCenterRegionX(guiMap);
+            final int mapCenterZ = getGuiMapCenterRegionZ(guiMap);
+            final int mapSize = getGuiMapRegionSize(guiMap);
+            getCacheForDimension(mapDimension).ifPresent(c -> c.setWindow(mapCenterX, mapCenterZ, mapSize));
+            getCachesExceptDimension(mapDimension).forEach(cache -> cache.setWindow(0, 0, 0));
+        } else {
+            getCachesExceptDimension(getCurrentlyViewedDimension()).forEach(cache -> cache.setWindow(0, 0, 0));
+            getCacheForCurrentDimension().ifPresent(c -> c.setWindow(ChunkUtils.currentPlayerRegionX(), ChunkUtils.currentPlayerRegionZ(), defaultRegionWindowSize));
         }
     }
 
@@ -142,55 +135,85 @@ public class NewChunks extends Module {
         }
     }
 
-    @Override
-    public void onEnable() {
-        if (XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.getValue()) {
-            loadChunksWithXaeroState();
+    public Optional<NewChunksLocalCache> getCacheForCurrentDimension() {
+        switch (getMCDimension()) {
+            case -1:
+                return netherCache;
+            case 0:
+                return overworldCache;
+            case 1:
+                return endCache;
+            default:
+                throw new RuntimeException("Unknown dimension: " + getMCDimension());
         }
     }
 
-    private void loadChunksWithXaeroState() {
+    public Optional<NewChunksLocalCache> getCacheForDimension(final int dimension) {
+        switch (dimension) {
+            case -1:
+                return netherCache;
+            case 0:
+                return overworldCache;
+            case 1:
+                return endCache;
+            default:
+                throw new RuntimeException("Unknown dimension: " + dimension);
+        }
+    }
+
+    private List<NewChunksLocalCache> getAllCaches() {
+        return Stream.of(netherCache, overworldCache, endCache).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+    }
+
+    public List<NewChunksLocalCache> getCachesExceptDimension(final int dimension) {
+        switch (dimension) {
+            case -1:
+                return Stream.of(overworldCache, endCache).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+            case 0:
+                return Stream.of(netherCache, endCache).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+            case 1:
+                return Stream.of(netherCache, overworldCache).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+            default:
+                throw new RuntimeException("Unknown dimension: " + dimension);
+        }
+    }
+
+    @Override
+    public void onEnable() {
+        initializeWorld();
+    }
+
+    private void initializeWorld() {
         try {
             final String worldId = XaeroWorldMapCore.currentSession.getMapProcessor().getCurrentWorldId();
-            final String dimensionId = XaeroWorldMapCore.currentSession.getMapProcessor().getCurrentDimId();
-            final String mwId = XaeroWorldMapCore.currentSession.getMapProcessor().getCurrentMWId();
-            this.newChunksDatabase = new NewChunksDatabase(worldId);
-            this.currentDimension = getMCDimension();
-            loadChunks();
+            if (worldId == null) return;
+            this.currentWorldId = worldId;
+            final NewChunksDatabase db = new NewChunksDatabase(worldId);
+            this.newChunksDatabase = Optional.of(db);
+            this.netherCache = Optional.of(new NewChunksLocalCache(-1, db));
+            this.overworldCache = Optional.of(new NewChunksLocalCache(0, db));
+            this.endCache = Optional.of(new NewChunksLocalCache(1, db));
+            this.worldCacheInitialized = true;
+            loadChunksInCurrentDimension();
         } catch (final Exception e) {
             // expected on game launch
         }
     }
 
+    private void loadChunksInCurrentDimension() {
+        getCacheForCurrentDimension()
+                .ifPresent(c ->
+                        c.setWindow(ChunkUtils.currentPlayerRegionX(), ChunkUtils.currentPlayerRegionZ(), defaultRegionWindowSize));
+    }
+
     @Override
     public void onDisable() {
-        if (XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.getValue()) {
-            try {
-                saveChunks();
-                reset();
-            } catch (final Exception e) {
-                // expected on game launch
-            }
-        }
-
-    }
-
-    // in chunkpos coordinates
-    public boolean isNewChunk(final int x, final int z) {
-        return isNewChunk(chunkPosToLong(x, z));
-    }
-
-    public boolean isNewChunk(final long chunkPos) {
         try {
-            if (lock.readLock().tryLock(1, TimeUnit.SECONDS)) {
-                boolean containsKey = chunks.containsKey(chunkPos);
-                lock.readLock().unlock();
-                return containsKey;
-            }
+            saveAllChunks();
+            reset();
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error checking if chunk is new", e);
+            // expected on game launch
         }
-        return false;
     }
 
     public int getNewChunksColor() {
@@ -198,86 +221,13 @@ public class NewChunks extends Module {
     }
 
     public void reset() {
-        try {
-            if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
-                chunks.clear();
-                lock.writeLock().unlock();
-            }
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error resetting NewChunks", e);
-        }
-    }
-
-    private Path getSavePath(final String worldId, final String dimensionId, final String mwId) {
-        if (isNull(worldId) || isNull(dimensionId) || isNull(mwId)) {
-            return null;
-        }
-        final Path mainXaeroWorldMapFolder = WorldMap.saveFolder.toPath();
-        try {
-            final Path saveFile = mainXaeroWorldMapFolder.resolve(worldId).resolve(dimensionId).resolve(mwId).resolve(NEWCHUNKS_FILE_NAME);
-            if (!saveFile.toFile().exists()) {
-                XaeroPlus.LOGGER.info("Creating NewChunks save file at {} ", saveFile);
-                saveFile.toFile().createNewFile();
-            }
-            return saveFile;
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error creating NewChunks save file", e);
-        }
-        return null;
-    }
-
-    private void saveChunks() {
-        if (chunks.isEmpty()) {
-            return;
-        }
-        try {
-            if (lock.readLock().tryLock(1, TimeUnit.SECONDS)) {
-                final List<NewChunkData> chunkData = chunks.entrySet().stream()
-                        .map(e -> new NewChunkData(e.getKey(), e.getValue()))
-                        .collect(Collectors.toList());
-                lock.readLock().unlock();
-                writeAsync(chunkData, currentDimension, newChunksDatabase);
-            }
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error saving NewChunks", e);
-        }
-    }
-
-    private void writeAsync(final List<NewChunkData> chunkData, final int currentDimension, final NewChunksDatabase newChunksDatabase) {
-        executorService.execute(() -> {
-           newChunksDatabase.insertNewChunkList(chunkData, currentDimension);
-        });
-    }
-
-    private void loadChunks() {
-        readAsync(currentDimension, newChunksDatabase);
-    }
-
-    private void readAsync(final int currentDimension, final NewChunksDatabase newChunksDatabase) {
-        executorService.execute(() -> {
-            final List<NewChunkData> chunkData = newChunksDatabase.getNewChunks(currentDimension);
-            if (nonNull(chunkData) && !chunkData.isEmpty()) {
-                try {
-                    if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
-                        chunkData.stream().forEach(d -> chunks.put(chunkPosToLong(d.x, d.z), d.foundTime));
-                        lock.writeLock().unlock();
-                    }
-                    XaeroPlus.LOGGER.info("Loaded {} NewChunks from disk", chunkData.size());
-                } catch (final Exception e) {
-                    XaeroPlus.LOGGER.error("Error loading NewChunks", e);
-                }
-
-            }
-        });
-    }
-
-    public void setSaveLoad(final Boolean b) {
-        if (b) {
-            loadChunksWithXaeroState();
-        } else {
-            // currentSaveFile should already be set here
-            saveChunks();
-        }
+        this.worldCacheInitialized = false;
+        this.currentWorldId = null;
+        this.netherCache = Optional.empty();
+        this.overworldCache = Optional.empty();
+        this.endCache = Optional.empty();
+        this.newChunksDatabase.ifPresent(NewChunksDatabase::close);
+        this.newChunksDatabase = Optional.empty();
     }
 
     public void setRgbColor(final int color) {
@@ -288,22 +238,18 @@ public class NewChunks extends Module {
         newChunksColor = ColorHelper.getColorWithAlpha(newChunksColor, (int) (a));
     }
 
-    /**
-     * WorldMap Render caching
-     */
-
-    private final Cache<RegionRenderPos, List<HighlightAtChunkPos>> regionRenderCache = CacheBuilder.newBuilder()
-            .expireAfterWrite(500, TimeUnit.MILLISECONDS)
-            .build();
-
-    public List<HighlightAtChunkPos> getNewChunksInRegion(final int leafRegionX, final int leafRegionZ, final int level) {
-        final RegionRenderPos regionRenderPos = new RegionRenderPos(leafRegionX, leafRegionZ, level);
-        try {
-            return regionRenderCache.get(regionRenderPos, loadHighlightChunksAtRegion(leafRegionX, leafRegionZ, level, this::isNewChunk));
-        } catch (ExecutionException e) {
-            XaeroPlus.LOGGER.error("Error handling NewChunks region lookup", e);
-        }
-        return Collections.emptyList();
+    public List<HighlightAtChunkPos> getNewChunksInRegion(
+            final int leafRegionX, final int leafRegionZ,
+            final int level,
+            final int dimension) {
+        return getCacheForDimension(dimension)
+                .map(c -> c.getNewChunksInRegion(leafRegionX, leafRegionZ, level))
+                .orElse(Collections.emptyList());
     }
 
+    public boolean isNewChunk(final int chunkPosX, final int chunkPosZ, final int dimensionId) {
+        return getCacheForDimension(dimensionId)
+                .map(c -> c.isNewChunk(chunkPosX, chunkPosZ))
+                .orElse(false);
+    }
 }

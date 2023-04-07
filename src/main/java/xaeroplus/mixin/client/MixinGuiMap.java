@@ -343,7 +343,12 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "onGuiClosed", at = @At(value = "RETURN"))
     public void onGuiClosed(final CallbackInfo ci) {
-        XaeroPlus.customDimensionId = mc.world.provider.getDimension();
+        try {
+            XaeroPlus.customDimensionId = mc.world.provider.getDimension();
+        } catch (final Exception e) {
+            XaeroPlus.customDimensionId = 0;
+        }
+
         WorldMap.settings.minimapRadar = true; // todo: restore previous value before custom dimension was entered (if at all)
     }
 
@@ -1062,10 +1067,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                         setupTextureMatricesAndTextures(brightness);
                                     }
 
-                                    if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue() && !isDimensionSwitched) {
+                                    if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
                                         restoreTextureStates();
                                         final NewChunks newChunks = ModuleManager.getModule(NewChunks.class);
-                                        for (final HighlightAtChunkPos c : newChunks.getNewChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions)) {
+                                        for (final HighlightAtChunkPos c : newChunks.getNewChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions, XaeroPlus.customDimensionId)) {
                                             // todo: GL calls can be optimized further here by:
                                             //  1. rendering rects as two triangles
                                             //  2. rendering a buffer of all vertices rather than each 4 vertex rect individually

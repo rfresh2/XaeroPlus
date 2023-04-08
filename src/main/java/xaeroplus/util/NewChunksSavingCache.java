@@ -29,7 +29,11 @@ public class NewChunksSavingCache implements NewChunksCache {
 
     @Override
     public void addNewChunk(final int x, final int z) {
-        getCacheForCurrentDimension().ifPresent(c -> c.addNewChunk(x, z));
+        try {
+            getCacheForCurrentDimension().ifPresent(c -> c.addNewChunk(x, z));
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Error adding new chunk to saving cache", e);
+        }
     }
 
     public void addNewChunk(final int x, final int z, final long foundTime, final int dimension) {

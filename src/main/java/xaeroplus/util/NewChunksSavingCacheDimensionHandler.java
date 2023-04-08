@@ -50,10 +50,12 @@ public class NewChunksSavingCacheDimensionHandler {
     public void addNewChunk(final int x, final int z, final long foundTime) {
         final long chunkPos = chunkPosToLong(x, z);
         try {
-            lock.writeLock().lock();
-            chunks.put(chunkPos, foundTime);
-        } finally {
-            lock.writeLock().unlock();
+            if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
+                chunks.put(chunkPos, foundTime);
+                lock.writeLock().unlock();
+            }
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Failed to add new chunk", e);
         }
     }
 

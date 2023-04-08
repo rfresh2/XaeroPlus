@@ -17,18 +17,8 @@ import static xaeroplus.util.ColorHelper.getColor;
 
 @Module.ModuleInfo()
 public class NewChunks extends Module {
-    // todo:
-    //  add back disk saving option and in-memory cache only
-    //  async loading/saving
-    //  transfer V1 NewChunks to V2 on startup
-
     private NewChunksCache newChunksCache = new NewChunksLocalCache();
     private int newChunksColor = getColor(255, 0, 0, 100);
-
-    // this is an lz4 compressed JSON file
-    // I've added v1 as a suffix if we ever need to change file formats and want to convert these without data loss
-    // todo: convert these into the sqlite db on startup, then move file to a backup location
-    private static final String NEWCHUNKS_FILE_NAME = "XaeroPlusNewChunksV1.data";
 
     public void setNewChunksCache(boolean disk) {
         try {
@@ -39,29 +29,22 @@ public class NewChunks extends Module {
             } else {
                 newChunksCache = new NewChunksLocalCache();
             }
-            newChunksCache.loadPreviousState(map);
+            if (this.isEnabled()) {
+                newChunksCache.onEnable();
+                newChunksCache.loadPreviousState(map);
+            }
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error closing new chunks cache", e);
         }
     }
 
-
-    // todo: handle save load on custom dimension switch
-    //   we need to ensure we don't write over the current dimension and that when we switch dimensions we correctly save
-    //   ideally we'd also queue up the newchunks in our actual dimension and save them when we switch back
-
     @SubscribeEvent
     public void onPacketReceivedEvent(final PacketReceivedEvent event) {
-        try {
-            if (event.packet instanceof SPacketChunkData) {
-                final SPacketChunkData chunkData = (SPacketChunkData) event.packet;
-                if (!chunkData.isFullChunk()) {
-                    newChunksCache.addNewChunk(chunkData.getChunkX(), chunkData.getChunkZ());
-                }
+        if (event.packet instanceof SPacketChunkData) {
+            final SPacketChunkData chunkData = (SPacketChunkData) event.packet;
+            if (!chunkData.isFullChunk()) {
+                newChunksCache.addNewChunk(chunkData.getChunkX(), chunkData.getChunkZ());
             }
-        } catch (final Exception e) {
-            // removing this log as it could possibly spam. we *shouldn't* reach this anyway
-//            XaeroPlus.LOGGER.error("Error handling packet event in NewChunks", e);
         }
     }
 

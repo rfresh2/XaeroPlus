@@ -18,12 +18,12 @@ import static xaeroplus.util.GuiMapHelper.*;
 
 public class NewChunksSavingCache implements NewChunksCache {
 
+    // these are initialized async
     private Optional<NewChunksSavingCacheDimensionHandler> netherCache = Optional.empty();
     private Optional<NewChunksSavingCacheDimensionHandler> overworldCache = Optional.empty();
     private Optional<NewChunksSavingCacheDimensionHandler> endCache = Optional.empty();
-
     private Optional<NewChunksDatabase> newChunksDatabase = Optional.empty();
-    private static final int defaultRegionWindowSize = 3;
+    private static final int defaultRegionWindowSize = 2; // when we are only viewing the minimap
     private String currentWorldId;
     private boolean worldCacheInitialized = false;
 
@@ -69,7 +69,7 @@ public class NewChunksSavingCache implements NewChunksCache {
         if (!worldCacheInitialized) return;
         // limit so we don't overflow
         if (tickCounter > 2400) tickCounter = 0;
-        if (tickCounter++ % 60 != 0) { // run once every 3 seconds
+        if (tickCounter++ % 30 != 0) { // run once every 1.5 seconds
             return;
         }
         // autosave current window every 60 seconds

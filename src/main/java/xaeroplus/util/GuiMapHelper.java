@@ -28,7 +28,7 @@ public class GuiMapHelper {
     }
     public static int getGuiMapRegionSize(final GuiMap guiMap) {
         // this is intentionally overestimating as we prefer to have a few more chunks than less
-        return (int) (5.0 / getDestScale(guiMap));
+        return (int) Math.max((5.0 / getDestScale(guiMap)), 3);
     }
 
     public static int getGuiMapLoadedDimension() {

@@ -60,6 +60,13 @@ public class ChunkUtils {
     public static int regionCoordToCoord(final int regionCoord) {
         return regionCoord << 9;
     }
+    public static int getMCDimension() {
+        try {
+            return Minecraft.getMinecraft().world.provider.getDimension();
+        } catch (final Exception e) {
+            return 0;
+        }
+    }
 
     public static Callable<List<HighlightAtChunkPos>> loadHighlightChunksAtRegion(
             final int leafRegionX, final int leafRegionZ, final int level,

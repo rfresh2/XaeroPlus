@@ -51,18 +51,10 @@ public final class XaeroPlusSettingRegistry {
                     "Highlights NewChunks on the Minimap and WorldMap.",
             (b) -> ModuleManager.getModule(NewChunks.class).setEnabled(b),
             true, SettingLocation.WORLD_MAP_MAIN);
-//    public static final XaeroPlusBooleanSetting newChunksSaveLoadToDisk = XaeroPlusBooleanSetting.create("Save/Load NewChunks to Disk",
-//            "Saves and loads NewChunk data to disk for each world and dimension. Requires NewChunk Highlighting to be enabled.",
-//            (b) -> ModuleManager.getModule(NewChunks.class).setSaveLoad(b),
-//            false, SettingLocation.WORLD_MAP_MAIN);
-//    public static final XaeroPlusFloatSetting newChunksSeenResetTime = XaeroPlusFloatSetting.create("Reset Seen Chunks Time",
-//            0, 1000f, 10f,
-//            "If we load a chunk in our NewChunk list again, reset it to an old chunk after this time period in seconds."
-//                    + " \\n 0 = never reset chunks",
-//            0f, SettingLocation.WORLD_MAP_MAIN);
-//    public static final XaeroPlusBooleanSetting newChunksDimensionReload = XaeroPlusBooleanSetting.create("Reload NewChunks",
-//            "If Save/Load disabled, reload all NewChunks on world or dimension change.",
-//            false, SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting newChunksSaveLoadToDisk = XaeroPlusBooleanSetting.create("Save/Load NewChunks to Disk",
+            "Saves and loads NewChunk data to disk for each world and dimension. Requires NewChunk Highlighting to be enabled.",
+            (b) -> ModuleManager.getModule(NewChunks.class).setNewChunksCache(b),
+            true, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting newChunksAlphaSetting = XaeroPlusFloatSetting.create("New Chunks Opacity",
             10f, 255f, 10f,
                     "Changes the color opacity of NewChunks.",

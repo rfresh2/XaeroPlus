@@ -72,7 +72,9 @@ public class NewChunks extends Module {
 
     @SubscribeEvent
     public void onClientTickEvent(final TickEvent.ClientTickEvent event) {
-        newChunksCache.handleTick();
+        if (event.phase == TickEvent.Phase.END) {
+            newChunksCache.handleTick();
+        }
     }
 
     @Override

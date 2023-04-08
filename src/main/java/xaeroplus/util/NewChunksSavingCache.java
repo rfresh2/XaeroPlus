@@ -5,6 +5,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import xaero.map.core.XaeroWorldMapCore;
 import xaero.map.gui.GuiMap;
+import xaeroplus.XaeroPlus;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,10 +27,15 @@ public class NewChunksSavingCache implements NewChunksCache {
     private String currentWorldId;
     private boolean worldCacheInitialized = false;
 
-
     @Override
     public void addNewChunk(final int x, final int z) {
         getCacheForCurrentDimension().ifPresent(c -> c.addNewChunk(x, z));
+    }
+
+    public void addNewChunk(final int x, final int z, final long foundTime, final int dimension) {
+        getCacheForDimension(dimension)
+                .orElseThrow(() -> new RuntimeException("Dimension not found: " + dimension))
+                .addNewChunk(x, z, foundTime);
     }
 
     @Override
@@ -61,14 +67,15 @@ public class NewChunksSavingCache implements NewChunksCache {
     @Override
     public void handleTick() {
         if (!worldCacheInitialized) return;
-        // probably don't need to run this on every tick
-        // might be off by 1 tick but that's fine
-        if (tickCounter > 2000) tickCounter = 0;
-        if (tickCounter++ % 10 != 0) {
+        // limit so we don't overflow
+        if (tickCounter > 2400) tickCounter = 0;
+        if (tickCounter++ % 60 != 0) { // run once every 3 seconds
             return;
         }
-        if (tickCounter % 1000 == 0) {
+        // autosave current window every 60 seconds
+        if (tickCounter % 1200 == 0) {
             getAllCaches().forEach(NewChunksSavingCacheDimensionHandler::writeAllChunksToDatabase);
+            return;
         }
 
         Optional<GuiMap> guiMapOptional = getGuiMap();
@@ -171,7 +178,8 @@ public class NewChunksSavingCache implements NewChunksCache {
     private void initializeWorld() {
         try {
             final String worldId = XaeroWorldMapCore.currentSession.getMapProcessor().getCurrentWorldId();
-            if (worldId == null) return;
+            final String mwId = XaeroWorldMapCore.currentSession.getMapProcessor().getCurrentMWId();
+            if (worldId == null || mwId == null) return;
             this.currentWorldId = worldId;
             final NewChunksDatabase db = new NewChunksDatabase(worldId);
             this.newChunksDatabase = Optional.of(db);
@@ -179,9 +187,10 @@ public class NewChunksSavingCache implements NewChunksCache {
             this.overworldCache = Optional.of(new NewChunksSavingCacheDimensionHandler(0, db));
             this.endCache = Optional.of(new NewChunksSavingCacheDimensionHandler(1, db));
             this.worldCacheInitialized = true;
+            NewChunksV1Converter.convert(this, worldId, mwId);
             loadChunksInCurrentDimension();
         } catch (final Exception e) {
-            // expected on game launch
+            XaeroPlus.LOGGER.error("Failed to initialize new chunks saving cache", e);
         }
     }
 

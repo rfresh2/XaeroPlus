@@ -1,4 +1,4 @@
-package xaeroplus.util;
+package xaeroplus.util.newchunks;
 
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -6,6 +6,8 @@ import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import xaero.map.core.XaeroWorldMapCore;
 import xaero.map.gui.GuiMap;
 import xaeroplus.XaeroPlus;
+import xaeroplus.util.ChunkUtils;
+import xaeroplus.util.HighlightAtChunkPos;
 
 import java.util.Collections;
 import java.util.List;
@@ -112,7 +114,7 @@ public class NewChunksSavingCache implements NewChunksCache {
 
     @Override
     public Long2LongOpenHashMap getNewChunksState() {
-        return getCacheForCurrentDimension().map(NewChunksSavingCacheDimensionHandler::getState).orElse(new Long2LongOpenHashMap());
+        return getCacheForCurrentDimension().map(NewChunksSavingCacheDimensionHandler::getNewChunksState).orElse(new Long2LongOpenHashMap());
     }
 
     @Override
@@ -194,7 +196,7 @@ public class NewChunksSavingCache implements NewChunksCache {
             NewChunksV1Converter.convert(this, worldId, mwId);
             loadChunksInCurrentDimension();
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Failed to initialize new chunks saving cache", e);
+            // expected on game launch
         }
     }
 

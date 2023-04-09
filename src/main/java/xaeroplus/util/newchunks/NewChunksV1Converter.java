@@ -1,4 +1,4 @@
-package xaeroplus.util;
+package xaeroplus.util.newchunks;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

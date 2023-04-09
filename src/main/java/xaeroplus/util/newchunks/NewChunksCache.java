@@ -1,6 +1,7 @@
-package xaeroplus.util;
+package xaeroplus.util.newchunks;
 
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
+import xaeroplus.util.HighlightAtChunkPos;
 
 import java.util.List;
 

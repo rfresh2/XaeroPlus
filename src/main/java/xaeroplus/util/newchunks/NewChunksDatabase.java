@@ -1,8 +1,10 @@
-package xaeroplus.util;
+package xaeroplus.util.newchunks;
 
+import xaero.map.WorldMap;
 import xaeroplus.XaeroPlus;
 
 import java.io.Closeable;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -15,14 +17,13 @@ import static xaeroplus.util.ChunkUtils.regionCoordToChunkCoord;
 
 public class NewChunksDatabase implements Closeable {
     private final Connection connection;
-    private final String worldId;
-
     public NewChunksDatabase(String worldId) {
-        this.worldId = worldId;
         try {
-            connection = DriverManager.getConnection("jdbc:sqlite:XaeroWorldMap/" + worldId + "/XaeroPlusNewChunks.db");
+            final Path dbPath = WorldMap.saveFolder.toPath().resolve(worldId).resolve("XaeroPlusNewChunks.db");
+            connection = DriverManager.getConnection("jdbc:sqlite:" + dbPath);
             createNewChunksTable();
         } catch (Exception e) {
+            XaeroPlus.LOGGER.error("Error while creating new chunks database", e);
             throw new RuntimeException(e);
         }
     }
@@ -40,14 +41,6 @@ public class NewChunksDatabase implements Closeable {
         }
     }
 
-    public void insertNewChunk(int x, int z, long foundTime, int dimension) {
-        try {
-            connection.createStatement().execute("INSERT OR IGNORE INTO \"" + dimension + "\" VALUES (" + x + ", " + z + ", " + foundTime + ")");
-        } catch (Exception e) {
-            XaeroPlus.LOGGER.error("Error while inserting new chunk into database", e);
-        }
-    }
-
     public void insertNewChunkList(final List<NewChunkData> newChunks, final int dimension) {
         if (newChunks.isEmpty()) {
             return;
@@ -62,24 +55,6 @@ public class NewChunksDatabase implements Closeable {
         } catch (Exception e) {
             XaeroPlus.LOGGER.error("Error inserting new chunks into database", e);
         }
-    }
-
-    public List<NewChunkData> getNewChunks(int dimension) {
-        try {
-            ResultSet resultSet = connection.createStatement().executeQuery("SELECT * FROM \"" + dimension + "\"");
-            List<NewChunkData> newChunks = new ArrayList<>();
-            while (resultSet.next()) {
-                newChunks.add(new NewChunkData(
-                        resultSet.getInt("x"),
-                        resultSet.getInt("z"),
-                        resultSet.getInt("foundTime")));
-            }
-            return newChunks;
-        } catch (Exception e) {
-            XaeroPlus.LOGGER.error("Error while getting new chunks from database", e);
-            // fall through
-        }
-        return Collections.emptyList();
     }
 
     public List<NewChunkData> getNewChunksInWindow(
@@ -110,7 +85,7 @@ public class NewChunksDatabase implements Closeable {
         try {
             connection.close();
         } catch (Exception e) {
-            XaeroPlus.LOGGER.warn("Failed closing NewChunks database connection for world: " + worldId, e);
+            XaeroPlus.LOGGER.warn("Failed closing NewChunks database connection", e);
         }
     }
 }

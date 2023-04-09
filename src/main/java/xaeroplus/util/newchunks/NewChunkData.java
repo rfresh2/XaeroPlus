@@ -1,4 +1,4 @@
-package xaeroplus.util;
+package xaeroplus.util.newchunks;
 
 import static xaeroplus.util.ChunkUtils.longToChunkX;
 import static xaeroplus.util.ChunkUtils.longToChunkZ;

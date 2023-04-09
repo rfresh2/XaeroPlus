@@ -9,7 +9,11 @@ import xaeroplus.event.PacketReceivedEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.module.Module;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.*;
+import xaeroplus.util.ColorHelper;
+import xaeroplus.util.HighlightAtChunkPos;
+import xaeroplus.util.newchunks.NewChunksCache;
+import xaeroplus.util.newchunks.NewChunksLocalCache;
+import xaeroplus.util.newchunks.NewChunksSavingCache;
 
 import java.util.List;
 

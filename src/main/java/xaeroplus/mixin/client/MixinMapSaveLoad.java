@@ -513,6 +513,7 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
         return new byte[0];
     }
 
+    @Override
     public void detectRegionsInDimension(final int dimId) {
         MapDimension mapDimension = this.mapProcessor.getMapWorld().getDimension(dimId);
         mapDimension.createDetectedRegions().clear();

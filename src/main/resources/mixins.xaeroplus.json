@@ -37,7 +37,6 @@
     "MixinWidgetScreenHandlerAccessor",
     "MixinWorldDataReader",
     "MixinWorldMapModSettings",
-    "mc.MixinMinecraft",
     "mc.MixinNetworkManager"
   ]
 }

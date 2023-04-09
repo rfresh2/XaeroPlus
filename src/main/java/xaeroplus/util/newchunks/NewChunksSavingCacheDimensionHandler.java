@@ -15,13 +15,11 @@ import static xaeroplus.util.ChunkUtils.chunkPosToLong;
 import static xaeroplus.util.ChunkUtils.regionCoordToChunkCoord;
 
 public class NewChunksSavingCacheDimensionHandler extends NewChunksBaseCacheHandler {
-//    private final Long2LongOpenHashMap chunks = new Long2LongOpenHashMap();
     private final int dimension;
     private int windowRegionX = 0;
     private int windowRegionZ = 0;
     // square centered at windowX, windowZ with size windowSize
     private int windowRegionSize = 0;
-//    private final ReadWriteLock lock = new ReentrantReadWriteLock();
     private final NewChunksDatabase database;
     private final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(Executors.newSingleThreadExecutor());
 

@@ -432,10 +432,12 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
         return mapWorld.getDimension(XaeroPlus.customDimensionId);
     }
 
+    @Override
     public boolean regionExistsCustomDimension(int x, int z, int dimId) {
         return this.regionDetectionExistsCustomDimension(x, z, dimId) || this.mapWorld.getDimension(dimId).getHighlightHandler().shouldApplyRegionHighlights(x, z, false);
     }
 
+    @Override
     public boolean regionDetectionExistsCustomDimension(int x, int z, int dimId) {
         if (!this.mapSaveLoad.isRegionDetectionComplete()) {
             return false;
@@ -453,10 +455,14 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
             return false;
         }
     }
+
+    @Override
     public RegionDetection getRegionDetectionCustomDimension(int x, int z, int dimId) {
         Hashtable<Integer, RegionDetection> column = this.mapWorld.getDimension(dimId).getDetectedRegions().get(x);
         return column != null ? column.get(z) : null;
     }
+
+    @Override
     public void removeRegionDetectionCustomDimension(int x, int z, int dimId) {
         Hashtable<Integer, Hashtable<Integer, RegionDetection>> current = this.mapWorld.getDimension(dimId).getDetectedRegions();
         Hashtable<Integer, RegionDetection> column = current.get(x);
@@ -468,6 +474,8 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
             current.remove(x);
         }
     }
+
+    @Override
     public LeveledRegion<?> getLeveledRegionCustomDimension(int leveledRegX, int leveledRegZ, int level, int dimId) {
         MapDimension mapDimension = this.mapWorld.getDimension(dimId);
         if (mapDimension == null) {
@@ -476,6 +484,8 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
         LeveledRegionManager regions = mapDimension.getMapRegions();
         return regions.get(leveledRegX, leveledRegZ, level);
     }
+
+    @Override
     public MapRegion getMapRegionCustomDimension(int regX, int regZ, boolean create, int dimId) {
         if (!this.mapSaveLoad.isRegionDetectionComplete()) {
             return null;

@@ -58,13 +58,9 @@ public class NewChunksV1Converter {
                 }
             });
             XaeroPlus.LOGGER.info("Converted new chunks file for dimension " + dimensionId);
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error converting new chunks file for dimension " + dimensionId, e);
-        }
-        try {
             moveFileToBackup(saveFile);
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error moving old new chunks file to backup", e);
+            XaeroPlus.LOGGER.error("Error converting new chunks file for dimension " + dimensionId, e);
         }
     }
 

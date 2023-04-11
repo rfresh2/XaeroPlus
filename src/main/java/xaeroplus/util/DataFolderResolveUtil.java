@@ -27,7 +27,10 @@ public class DataFolderResolveUtil {
                     return;
                 }
             }
-            XaeroPlus.LOGGER.error("Unable to resolve valid MC Server Name. Falling back to default Xaero data folder resolution");
+            // expected case if we're in singleplayer
+            if (!mc.isIntegratedServerRunning()) {
+                XaeroPlus.LOGGER.error("Unable to resolve valid MC Server Name. Falling back to default Xaero data folder resolution");
+            }
         } else if (dataFolderResolutionMode == XaeroPlusSettingRegistry.DataFolderResolutionMode.BASE_DOMAIN) {
             Minecraft mc = Minecraft.getMinecraft();
             if (nonNull(mc.getCurrentServerData())) {
@@ -51,7 +54,10 @@ public class DataFolderResolveUtil {
                     cir.cancel();
                     return;
                 }
-                XaeroPlus.LOGGER.error("Unable to resolve valid Base domain. Falling back to default Xaero data folder resolution");
+                // expected case if we're in singleplayer
+                if (!mc.isIntegratedServerRunning()) {
+                    XaeroPlus.LOGGER.error("Unable to resolve valid Base domain. Falling back to default Xaero data folder resolution");
+                }
             }
         }
     }

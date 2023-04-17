@@ -80,6 +80,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     }
 
     @Shadow
+    private MapDimension dimension;
+    @Shadow
     private static int lastAmountOfRegionsViewed;
     @Shadow
     private long loadingAnimationStart;
@@ -394,6 +396,12 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             double cameraZBefore = this.cameraZ;
             double scaleBefore = this.scale;
             long startTime = System.currentTimeMillis();
+            MapDimension currentDim = !this.mapProcessor.isMapWorldUsable() ? null : this.mapProcessor.getMapWorld().getCurrentDimension();
+            if (currentDim != this.dimension) {
+                // todo: check if dimension switching works with this or we need to modify/remove
+                this.dimensionSettings.active = false;
+                this.setWorldAndResolution(mc, this.width, this.height);
+            }
             this.dimensionSettings.preMapRender((GuiMap)(Object) this, mc, this.width, this.height);
             long passed = this.lastStartTime == 0L ? 16L : startTime - this.lastStartTime;
             double passedScrolls = (double)((float)passed / 64.0F);
@@ -457,7 +465,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                             GL11.glClearColor(0.0F, 0.0F, 0.0F, 1.0F);
                             GlStateManager.clear(16384);
                         }
-
+                        this.mapProcessor.updateCaveStart();
                         this.lastViewedDimensionId = this.mapProcessor.getMapWorld().getCurrentDimension().getDimId();
                         this.lastViewedMultiworldId = this.mapProcessor.getMapWorld().getCurrentDimension().getCurrentMultiworld();
                         if (SupportMods.minimap()) {
@@ -577,6 +585,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                         this.mouseBlockPosZ = (int)Math.floor(mousePosZ);
                         int mouseRegX = this.mouseBlockPosX >> leveledRegionShift;
                         int mouseRegZ = this.mouseBlockPosZ >> leveledRegionShift;
+                        int renderedCaveLayer = this.mapProcessor.getCurrentCaveLayer();
+                        // todo: come back here
                         final CustomDimensionMapProcessor customMapProcessor = (CustomDimensionMapProcessor) this.mapProcessor;
                         LeveledRegion<?> reg = customMapProcessor.getLeveledRegionCustomDimension(mouseRegX, mouseRegZ, textureLevel, XaeroPlus.customDimensionId);
                         int maxRegBlockCoord = (1 << leveledRegionShift) - 1;
@@ -625,7 +635,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                 this.drawString(mc.fontRenderer, "MultiWorld ID: " + this.mapProcessor.getMapWorld().getCurrentMultiworld(), 5, 255, -1);
                             }
 
-                            LeveledRegionManager regions = this.mapProcessor.getMapWorld().getDimension(XaeroPlus.customDimensionId).getMapRegions();
+                            LayeredRegionManager regions = this.mapProcessor.getMapWorld().getCurrentDimension().getLayeredMapRegions();
                             this.drawString(
                                     mc.fontRenderer,
                                     String.format(

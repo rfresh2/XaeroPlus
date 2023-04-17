@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
+import xaero.common.effect.Effects;
 import xaero.common.graphics.ImprovedFramebuffer;
 import xaero.common.minimap.MinimapInterface;
 import xaero.common.minimap.MinimapProcessor;
@@ -198,62 +199,62 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
         int maxX = playerChunkX + (int)Math.floor(((double)(offsetX + 1) + radiusBlocks) / 64.0);
         int maxZ = playerChunkZ + (int)Math.floor(((double)(offsetZ + 1) + radiusBlocks) / 64.0);
 
-        if (useWorldMap) {
-            chunkGridAlphaMultiplier = this.modMain.getSupportMods().worldmapSupport.getMinimapBrightness();
-            this.modMain
-                    .getSupportMods()
-                    .worldmapSupport
-                    .drawMinimap(minimapSession, this.helper, xFloored, zFloored, minX, minZ, maxX, maxZ, zooming, this.zoom);
-        } else if (minimap.getMinimapWriter().getLoadedBlocks() != null && level >= 0) {
-            int loadedLevels = minimap.getMinimapWriter().getLoadedLevels();
-            chunkGridAlphaMultiplier = loadedLevels <= 1 ? 1.0F : 0.375F + 0.625F * (1.0F - (float)level / (float)(loadedLevels - 1));
-            int loadedMapChunkX = minimap.getMinimapWriter().getLoadedMapChunkX();
-            int loadedMapChunkZ = minimap.getMinimapWriter().getLoadedMapChunkZ();
-            int loadedWidth = minimap.getMinimapWriter().getLoadedBlocks().length;
-            boolean slimeChunks = this.modMain.getSettings().getSlimeChunks(minimapSession.getWaypointsManager());
-            minX = Math.max(minX, loadedMapChunkX);
-            minZ = Math.max(minZ, loadedMapChunkZ);
-            maxX = Math.min(maxX, loadedMapChunkX + loadedWidth - 1);
-            maxZ = Math.min(maxZ, loadedMapChunkZ + loadedWidth - 1);
+        if (!cave || !this.mc.player.isPotionActive(Effects.NO_CAVE_MAPS) && !this.mc.player.isPotionActive(Effects.NO_CAVE_MAPS_HARMFUL)) {
+            if (useWorldMap) {
+                chunkGridAlphaMultiplier = this.modMain.getSupportMods().worldmapSupport.getMinimapBrightness();
+                this.modMain
+                        .getSupportMods()
+                        .worldmapSupport
+                        .drawMinimap(minimapSession, this.helper, xFloored, zFloored, minX, minZ, maxX, maxZ, zooming, this.zoom);
+            } else if (minimap.getMinimapWriter().getLoadedBlocks() != null && level >= 0) {
+                int loadedLevels = minimap.getMinimapWriter().getLoadedLevels();
+                chunkGridAlphaMultiplier = loadedLevels <= 1 ? 1.0F : 0.375F + 0.625F * (1.0F - (float)level / (float)(loadedLevels - 1));
+                int loadedMapChunkX = minimap.getMinimapWriter().getLoadedMapChunkX();
+                int loadedMapChunkZ = minimap.getMinimapWriter().getLoadedMapChunkZ();
+                int loadedWidth = minimap.getMinimapWriter().getLoadedBlocks().length;
+                boolean slimeChunks = this.modMain.getSettings().getSlimeChunks(minimapSession.getWaypointsManager());
+                minX = Math.max(minX, loadedMapChunkX);
+                minZ = Math.max(minZ, loadedMapChunkZ);
+                maxX = Math.min(maxX, loadedMapChunkX + loadedWidth - 1);
+                maxZ = Math.min(maxZ, loadedMapChunkZ + loadedWidth - 1);
 
-            for(int X = minX; X <= maxX; ++X) {
-                int canvasX = X - minimap.getMinimapWriter().getLoadedMapChunkX();
+                for(int X = minX; X <= maxX; ++X) {
+                    int canvasX = X - minimap.getMinimapWriter().getLoadedMapChunkX();
 
-                for(int Z = minZ; Z <= maxZ; ++Z) {
-                    int canvasZ = Z - minimap.getMinimapWriter().getLoadedMapChunkZ();
-                    MinimapChunk mchunk = minimap.getMinimapWriter().getLoadedBlocks()[canvasX][canvasZ];
-                    if (mchunk != null) {
-                        mchunk.bindTexture(level);
-                        if (mchunk.isHasSomething() && level < mchunk.getLevelsBuffered() && mchunk.getGlTexture(level) != 0) {
-                            if (!zooming) {
+                    for(int Z = minZ; Z <= maxZ; ++Z) {
+                        int canvasZ = Z - minimap.getMinimapWriter().getLoadedMapChunkZ();
+                        MinimapChunk mchunk = minimap.getMinimapWriter().getLoadedBlocks()[canvasX][canvasZ];
+                        if (mchunk != null) {
+                            mchunk.bindTexture(level);
+                            if (mchunk.isHasSomething() && level < mchunk.getLevelsBuffered() && mchunk.getGlTexture(level) != 0) {
+                                if (!zooming) {
+                                    GL11.glTexParameteri(3553, 10240, 9728);
+                                } else {
+                                    GL11.glTexParameteri(3553, 10240, 9729);
+                                }
+
+                                int drawX = (X - playerChunkX) * 64 - offsetX;
+                                int drawZ = (Z - playerChunkZ) * 64 - offsetZ;
+                                GlStateManager.enableBlend();
+                                GL14.glBlendFuncSeparate(770, 771, 1, 771);
+                                this.helper.drawMyTexturedModalRect((float)drawX, (float)drawZ, 0, 64, 64.0F, 64.0F, -64.0F, 64.0F);
                                 GL11.glTexParameteri(3553, 10240, 9728);
-                            } else {
-                                GL11.glTexParameteri(3553, 10240, 9729);
-                            }
-
-                            int drawX = (X - playerChunkX) * 64 - offsetX;
-                            int drawZ = (Z - playerChunkZ) * 64 - offsetZ;
-                            GlStateManager.enableBlend();
-                            GL14.glBlendFuncSeparate(770, 771, 1, 771);
-                            this.helper.drawMyTexturedModalRect((float)drawX, (float)drawZ, 0, 64, 64.0F, 64.0F, -64.0F, 64.0F);
-                            GL11.glTexParameteri(3553, 10240, 9728);
-                            if (slimeChunks) {
-                                for(int t = 0; t < 16; ++t) {
-                                    if (mchunk.getTile(t % 4, t / 4) != null && mchunk.getTile(t % 4, t / 4).isSlimeChunk()) {
-                                        int slimeDrawX = drawX + 16 * (t % 4);
-                                        int slimeDrawZ = drawZ + 16 * (t / 4);
-                                        Gui.drawRect(slimeDrawX, slimeDrawZ, slimeDrawX + 16, slimeDrawZ + 16, -2142047936);
+                                if (slimeChunks) {
+                                    for(int t = 0; t < 16; ++t) {
+                                        if (mchunk.getTile(t % 4, t / 4) != null && mchunk.getTile(t % 4, t / 4).isSlimeChunk()) {
+                                            int slimeDrawX = drawX + 16 * (t % 4);
+                                            int slimeDrawZ = drawZ + 16 * (t / 4);
+                                            Gui.drawRect(slimeDrawX, slimeDrawZ, slimeDrawX + 16, slimeDrawZ + 16, -2142047936);
+                                        }
                                     }
                                 }
+                                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                             }
-
-                            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                         }
                     }
                 }
+                GL14.glBlendFuncSeparate(770, 771, 1, 0);
             }
-
-            GL14.glBlendFuncSeparate(770, 771, 1, 0);
         }
 
         if (this.modMain.getSettings().chunkGrid > -1) {

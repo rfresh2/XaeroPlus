@@ -2,6 +2,7 @@ package xaeroplus.util;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.ChunkPos;
+import xaeroplus.XaeroPlus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,5 +95,33 @@ public class ChunkUtils {
             }
             return chunks;
         };
+    }
+
+    public static double getPlayerX() {
+        int dim = Minecraft.getMinecraft().world.provider.getDimension();
+        // when player is in the nether or the custom dimension is the nether, perform coordinate translation
+        if ((dim == -1 || XaeroPlus.customDimensionId == -1) && dim != XaeroPlus.customDimensionId) {
+            if (XaeroPlus.customDimensionId == 0) {
+                return Minecraft.getMinecraft().player.posX * 8.0;
+            } else if (XaeroPlus.customDimensionId == -1 && dim == 0) {
+                return Minecraft.getMinecraft().player.posX / 8.0;
+            }
+        }
+
+        return Minecraft.getMinecraft().player.posX;
+    }
+
+    public static double getPlayerZ() {
+        int dim = Minecraft.getMinecraft().world.provider.getDimension();
+        // when player is in the nether or the custom dimension is the nether, perform coordinate translation
+        if ((dim == -1 || XaeroPlus.customDimensionId == -1) && dim != XaeroPlus.customDimensionId) {
+            if (XaeroPlus.customDimensionId == 0) {
+                return Minecraft.getMinecraft().player.posZ * 8.0;
+            } else if (XaeroPlus.customDimensionId == -1 && dim == 0) {
+                return Minecraft.getMinecraft().player.posZ / 8.0;
+            }
+        }
+
+        return Minecraft.getMinecraft().player.posZ;
     }
 }

@@ -29,20 +29,22 @@ import xaero.map.biome.WriterBiomeInfoSupplier;
 import xaero.map.cache.BlockStateColorTypeCache;
 import xaero.map.core.XaeroWorldMapCore;
 import xaero.map.misc.Misc;
-import xaero.map.region.MapBlock;
-import xaero.map.region.MapRegion;
-import xaero.map.region.OverlayBuilder;
-import xaero.map.region.OverlayManager;
+import xaero.map.region.*;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.Objects.nonNull;
 
 @Mixin(value = MapWriter.class, remap = false)
 public abstract class MixinMapWriter {
+    @Shadow
+    private int playerChunkX;
+    @Shadow
+    private int playerChunkZ;
     @Shadow
     private OverlayBuilder overlayBuilder;
     @Shadow
@@ -89,6 +91,11 @@ public abstract class MixinMapWriter {
     @Shadow
     private BlockPos.MutableBlockPos mutableBlockPos3;
     @Shadow
+    private ArrayList<MapRegion> regionBuffer;
+    @Shadow
+    private int writingLayer;
+
+    @Shadow
     public abstract boolean writeMap(
             World world,
             double playerX,
@@ -101,7 +108,8 @@ public abstract class MixinMapWriter {
             boolean ignoreHeightmaps,
             boolean flowers,
             boolean detailedDebug,
-            BlockPos.MutableBlockPos mutableBlockPos3
+            BlockPos.MutableBlockPos mutableBlockPos3,
+            int caveDepth
     );
 
     // insert our own limiter on new tiles being written but this one's keyed on the actual chunk
@@ -161,7 +169,16 @@ public abstract class MixinMapWriter {
      * @reason obsidian roof
      */
     @Inject(method = "loadPixel", at = @At("HEAD"), cancellable = true)
-    public void loadPixel(World world, MapBlock pixel, MapBlock currentPixel, Chunk bchunk, int insideX, int insideZ, int highY, int lowY, boolean cave, boolean canReuseBiomeColours, boolean flowers, BlockPos.MutableBlockPos mutableBlockPos3, CallbackInfo ci) {
+    public void loadPixel(World world, MapBlock pixel, MapBlock currentPixel,
+                          Chunk bchunk, int insideX, int insideZ,
+                          int highY, int lowY, boolean cave,
+                          boolean fullCave,
+                          int mappedHeight,
+                          boolean canReuseBiomeColours,
+                          boolean ignoreHeightmaps,
+                          boolean flowers,
+                          BlockPos.MutableBlockPos mutableBlockPos3,
+                          CallbackInfo ci) {
         if (!XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()) {
             return;
         } else {
@@ -169,14 +186,19 @@ public abstract class MixinMapWriter {
         }
         pixel.prepareForWriting();
         this.overlayBuilder.startBuilding();
-        boolean underair = !cave;
+        boolean underair = !cave || fullCave;
+        boolean shouldEnterGround = fullCave;
         IBlockState opaqueState = null;
         byte workingLight = -1;
+        boolean worldHasSkyLight = world.provider.hasSkyLight();
+        byte workingSkyLight = (byte)(worldHasSkyLight ? 15 : 0);
         this.topH = lowY;
         this.mutableGlobalPos.setPos((bchunk.getPos().x << 4) + insideX, lowY - 1, (bchunk.getPos().z << 4) + insideZ);
         boolean shouldExtendTillTheBottom = false;
         int transparentSkipY = 0;
         boolean columnRoofObsidian = false;
+
+        // todo: figure out if this still works
 
         int h;
         IBlockState state;
@@ -207,17 +229,28 @@ public abstract class MixinMapWriter {
             }
             if (b instanceof BlockAir) {
                 underair = true;
-            } else if (underair) {
-                this.mutableLocalPos.setY(Math.min(255, h + 1));
-                workingLight = (byte) bchunk.getLightFor(EnumSkyBlock.BLOCK, this.mutableLocalPos);
-                if (!this.isInvisible(world, state, b, flowers)) {
+            } else if (underair && !this.isInvisible(world, state, b, flowers)) {
+                if (!cave || !shouldEnterGround) {
+                    this.mutableLocalPos.setY(Math.min(255, h + 1));
+                    workingLight = (byte)bchunk.getLightFor(EnumSkyBlock.BLOCK, this.mutableLocalPos);
+                    if (cave && workingLight < 15 && worldHasSkyLight) {
+                        if (!ignoreHeightmaps && !fullCave && highY >= mappedHeight) {
+                            workingSkyLight = 15;
+                        } else {
+                            workingSkyLight = (byte)bchunk.getLightFor(EnumSkyBlock.SKY, this.mutableLocalPos);
+                        }
+                    }
                     if (this.shouldOverlayCached(state) || roofObsidian) {
                         if (h > this.topH) {
                             this.topH = h;
                         }
 
+                        byte overlayLight = workingLight;
                         if (this.overlayBuilder.isEmpty()) {
                             this.firstTransparentStateY = h;
+                            if (cave && workingSkyLight > workingLight) {
+                                overlayLight = workingSkyLight;
+                            }
                         }
 
                         if (shouldExtendTillTheBottom) {
@@ -226,7 +259,7 @@ public abstract class MixinMapWriter {
                             this.writerBiomeInfoSupplier.set(currentPixel, canReuseBiomeColours);
                             int stateId = Block.getStateId(state);
                             int opacity = roofObsidian ? 5 : b.getLightOpacity(state, world, this.mutableGlobalPos);
-                            this.overlayBuilder.build(stateId, this.biomeBuffer, opacity, workingLight, world, this.mapProcessor, this.mutableGlobalPos, this.overlayBuilder.getOverlayBiome(), this.colorTypeCache, this.writerBiomeInfoSupplier);
+                            this.overlayBuilder.build(stateId, this.biomeBuffer, opacity, overlayLight, world, this.mapProcessor, this.mutableGlobalPos, this.overlayBuilder.getOverlayBiome(), this.colorTypeCache, this.writerBiomeInfoSupplier);
                         }
                     } else if (this.hasVanillaColor(state, world, this.mutableGlobalPos)) {
                         if (h > this.topH) {
@@ -236,6 +269,9 @@ public abstract class MixinMapWriter {
                         opaqueState = state;
                         break;
                     }
+                } else if (state.getMaterial().isSolid() && !state.getMaterial().getCanBurn() && !state.getMaterial().isReplaceable()) {
+                    underair = false;
+                    shouldEnterGround = false;
                 }
             }
         }
@@ -246,8 +282,16 @@ public abstract class MixinMapWriter {
 
         state = opaqueState == null ? Blocks.AIR.getDefaultState() : opaqueState;
         int stateId = Block.getStateId(state);
-        byte light = opaqueState == null ? 0 : workingLight;
         this.overlayBuilder.finishBuilding(pixel);
+        byte light = 0;
+        if (opaqueState != null) {
+            light = workingLight;
+            if (cave && workingLight < 15 && pixel.getNumberOfOverlays() == 0 && workingSkyLight > workingLight) {
+                light = workingSkyLight;
+            }
+        } else {
+            h = 0;
+        }
         if (canReuseBiomeColours && currentPixel != null && currentPixel.getState() == stateId) {
             this.biomeBuffer[0] = currentPixel.getColourType();
             this.biomeBuffer[1] = currentPixel.getBiome();
@@ -279,13 +323,13 @@ public abstract class MixinMapWriter {
                             && !this.mapProcessor.isWaitingForWorldUpdate()
                             && this.mapProcessor.getMapSaveLoad().isRegionDetectionComplete()
                             && this.mapProcessor.isCurrentMultiworldWritable()) {
-                        if (this.mapProcessor.getWorld() == null || !this.mapProcessor.caveStartIsDetermined() || this.mapProcessor.isCurrentMapLocked()) {
+                        if (this.mapProcessor.getWorld() == null || this.mapProcessor.isCurrentMapLocked()) {
                             return;
                         }
 
                         if (this.mapProcessor.getCurrentWorldId() != null
                                 && !this.mapProcessor.ignoreWorld(this.mapProcessor.getWorld())
-                                && (WorldMap.settings.updateChunks || WorldMap.settings.loadChunks)) {
+                                && (WorldMap.settings.updateChunks || WorldMap.settings.loadChunks || !this.mapProcessor.getMapWorld().isMultiplayer())) {
                             double playerX;
                             double playerY;
                             double playerZ;
@@ -345,11 +389,12 @@ public abstract class MixinMapWriter {
                                 } else {
                                     int timeLimit = (int)(Math.min(sinceLastWrite, 50L) * 86960L);
                                     long writeStartNano = System.nanoTime();
-                                    boolean loadChunks = WorldMap.settings.loadChunks;
-                                    boolean updateChunks = WorldMap.settings.updateChunks;
+                                    boolean loadChunks = WorldMap.settings.loadChunks || !this.mapProcessor.getMapWorld().isMultiplayer();
+                                    boolean updateChunks = WorldMap.settings.updateChunks || !this.mapProcessor.getMapWorld().isMultiplayer();
                                     boolean ignoreHeightmaps = this.mapProcessor.getMapWorld().isIgnoreHeightmaps();
                                     boolean flowers = WorldMap.settings.flowers;
                                     boolean detailedDebug = WorldMap.settings.detailed_debug;
+                                    int caveDepth = WorldMap.settings.caveModeDepth;
                                     BlockPos.MutableBlockPos mutableBlockPos3 = this.mutableBlockPos3;
 
                                     for(int i = 0; (long)i < tilesToUpdate; ++i) {
@@ -365,7 +410,8 @@ public abstract class MixinMapWriter {
                                                 ignoreHeightmaps,
                                                 flowers,
                                                 detailedDebug,
-                                                mutableBlockPos3
+                                                mutableBlockPos3,
+                                                caveDepth
                                         )) {
                                             --i;
                                         }
@@ -386,12 +432,65 @@ public abstract class MixinMapWriter {
                             int startRegionZ = this.startTileChunkZ >> 3;
                             int endRegionX = this.endTileChunkX >> 3;
                             int endRegionZ = this.endTileChunkZ >> 3;
+                            boolean shouldRequestLoading = false;
+                            LeveledRegion<?> nextToLoad = this.mapProcessor.getMapSaveLoad().getNextToLoadByViewing();
+                            if (nextToLoad != null) {
+                                synchronized(nextToLoad) {
+                                    if (!nextToLoad.reloadHasBeenRequested()
+                                            && !nextToLoad.hasRemovableSourceData()
+                                            && (!(nextToLoad instanceof MapRegion) || !((MapRegion)nextToLoad).isRefreshing())) {
+                                        shouldRequestLoading = true;
+                                    }
+                                }
+                            } else {
+                                shouldRequestLoading = true;
+                            }
+
+                            this.regionBuffer.clear();
+                            int comparisonChunkX = this.playerChunkX - 16;
+                            int comparisonChunkZ = this.playerChunkZ - 16;
+                            LeveledRegion.setComparison(comparisonChunkX, comparisonChunkZ, 0, comparisonChunkX, comparisonChunkZ);
 
                             for(int visitRegionX = startRegionX; visitRegionX <= endRegionX; ++visitRegionX) {
                                 for(int visitRegionZ = startRegionZ; visitRegionZ <= endRegionZ; ++visitRegionZ) {
-                                    MapRegion visitRegion = this.mapProcessor.getMapRegion(visitRegionX, visitRegionZ, false);
+                                    MapRegion visitRegion = this.mapProcessor.getMapRegion(this.writingLayer, visitRegionX, visitRegionZ, true);
                                     if (visitRegion != null && visitRegion.getLoadState() == 2) {
                                         visitRegion.registerVisit();
+                                    }
+                                    synchronized(visitRegion) {
+                                        if (visitRegion.isResting()
+                                                && shouldRequestLoading
+                                                && !visitRegion.reloadHasBeenRequested()
+                                                && !visitRegion.recacheHasBeenRequested()
+                                                && (visitRegion.getLoadState() == 0 || visitRegion.getLoadState() == 4)) {
+                                            visitRegion.calculateSortingChunkDistance();
+                                            Misc.addToListOfSmallest(10, this.regionBuffer, visitRegion);
+                                        }
+                                    }
+                                }
+                            }
+
+                            int toRequest = 1;
+                            int counter = 0;
+
+                            for(int i = 0; i < this.regionBuffer.size() && counter < toRequest; ++i) {
+                                MapRegion region = this.regionBuffer.get(i);
+                                if (region != nextToLoad || this.regionBuffer.size() <= 1) {
+                                    synchronized(region) {
+                                        if (!region.reloadHasBeenRequested()
+                                                && !region.recacheHasBeenRequested()
+                                                && (region.getLoadState() == 0 || region.getLoadState() == 4)) {
+                                            region.setBeingWritten(true);
+                                            this.mapProcessor.getMapSaveLoad().requestLoad(region, "writing");
+                                            if (counter == 0) {
+                                                this.mapProcessor.getMapSaveLoad().setNextToLoadByViewing((LeveledRegion<?>)region);
+                                            }
+
+                                            ++counter;
+                                            if (region.getLoadState() == 4) {
+                                                return;
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -406,7 +505,20 @@ public abstract class MixinMapWriter {
     }
 
     @Inject(method = "writeChunk", at = @At(value = "HEAD"), cancellable = true)
-    public void writeChunk(World world, int distance, boolean onlyLoad, BiomeColorCalculator biomeColorCalculator, OverlayManager overlayManager, boolean loadChunks, boolean updateChunks, boolean ignoreHeightmaps, boolean flowers, boolean detailedDebug, BlockPos.MutableBlockPos mutableBlockPos3, int tileChunkX, int tileChunkZ, int tileChunkLocalX, int tileChunkLocalZ, int chunkX, int chunkZ, CallbackInfoReturnable<Boolean> cir) {
+    public void writeChunk(World world, int distance, boolean onlyLoad,
+                           BiomeColorCalculator biomeColorCalculator,
+                           OverlayManager overlayManager,
+                           boolean loadChunks, boolean updateChunks,
+                           boolean ignoreHeightmaps, boolean flowers,
+                           boolean detailedDebug,
+                           BlockPos.MutableBlockPos mutableBlockPos3,
+                           int caveDepth,
+                           int caveStart,
+                           int layerToWrite,
+                           int tileChunkX, int tileChunkZ,
+                           int tileChunkLocalX, int tileChunkLocalZ,
+                           int chunkX, int chunkZ,
+                           CallbackInfoReturnable<Boolean> cir) {
         if (!XaeroPlusSettingRegistry.fastMapSetting.getValue()) return;
 
         final String cacheable = chunkX + " " + chunkZ;

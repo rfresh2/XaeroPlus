@@ -109,8 +109,8 @@ dependencies {
     jarLibs 'org.apache.commons:commons-compress:1.21'
     jarLibs 'org.xerial:sqlite-jdbc:3.41.2.1'
 
-    implementation(fg.deobf("curse.maven:xaeros-world-map-317780:4470064"))
-    implementation(fg.deobf("curse.maven:xaeros-minimap-263420:4470040"))
+    implementation(fg.deobf("curse.maven:xaeros-world-map-317780:4492941"))
+    implementation(fg.deobf("curse.maven:xaeros-minimap-263420:4492916"))
 
     annotationProcessor('org.spongepowered:mixin:0.8.5:processor') {
         exclude module: 'gson'

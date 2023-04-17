@@ -18,9 +18,12 @@ import xaero.map.file.MapSaveLoad;
 import xaero.map.file.RegionDetection;
 import xaero.map.file.worldsave.WorldDataHandler;
 import xaero.map.gui.GuiMap;
+import xaero.map.misc.CaveStartCalculator;
 import xaero.map.mods.SupportMods;
+import xaero.map.region.LayeredRegionManager;
 import xaero.map.region.LeveledRegion;
 import xaero.map.region.LeveledRegionManager;
+import xaero.map.region.MapLayer;
 import xaero.map.region.MapRegion;
 import xaero.map.world.MapDimension;
 import xaero.map.world.MapWorld;
@@ -29,6 +32,7 @@ import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.util.CustomDimensionMapProcessor;
 import xaeroplus.util.DataFolderResolveUtil;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
@@ -82,12 +86,11 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
     private FileChannel mapLockChannelToClose;
     @Shadow
     private FileChannel currentMapLockChannel;
+    @Final
+    @Shadow
+    private CaveStartCalculator caveStartCalculator;
     @Shadow
     private boolean currentMapNeedsDeletion;
-    @Shadow
-    private boolean caveStartDetermined;
-    @Shadow
-    private int caveStart;
     @Shadow
     private String currentWorldId;
     @Shadow
@@ -104,6 +107,14 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
     private WorldDataHandler worldDataHandler;
     @Shadow
     private boolean waitingForWorldUpdate;
+    @Shadow
+    private int currentCaveLayer;
+    @Shadow
+    private long lastLocalCaveModeToggle;
+    @Shadow
+    private int nextLocalCaveMode;
+    @Shadow
+    private int localCaveMode;
 
     @Shadow
     protected abstract void handleRefresh(World world);
@@ -112,7 +123,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
     @Shadow
     protected abstract void forceClean();
     @Shadow
-    public abstract void updateCaveStart(double playerX, double playerZ, World world);
+    public abstract void updateCaveStart();
     @Shadow
     public abstract void updateFootprints(World world, int step);
     @Shadow
@@ -137,6 +148,11 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
     public abstract int getGlobalVersion();
     @Shadow
     public abstract String getDimensionName(int id);
+
+//    @Redirect(method = "updateCaveStart", at = @At(value = "INVOKE", target = "Lxaero/map/world/MapWorld;getCurrentDimension()Lxaero/map/world/MapDimension;"))
+//    public MapDimension redirectGetCurrentDimension(MapWorld mapWorld) {
+//        return mapWorld.getDimension(XaeroPlus.customDimensionId);
+//    }
 
     @Inject(method = "getMainId", at = @At("HEAD"), cancellable = true)
     private void getMainId(boolean rootFolderFormat, CallbackInfoReturnable<String> cir) {
@@ -163,7 +179,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                         if (!this.isProcessingPaused()) {
                             this.updateWorld();
                             if (this.world != null) {
-                                this.updateCaveStart(this.mainPlayerX, this.mainPlayerZ, this.world);
+                                this.updateCaveStart();
                                 this.updateFootprints(this.world, Minecraft.getMinecraft().currentScreen instanceof GuiMap ? 1 : 10);
                             }
                             if (this.mapWorldUsable) {
@@ -180,8 +196,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                                             }
                                             leveledRegion = regionsToProcess.get(i);
                                         }
-                                        this.mapSaveLoad.updateSave(leveledRegion, currentTime);
-                                    }
+                                        this.mapSaveLoad.updateSave(leveledRegion, currentTime, this.currentCaveLayer);                                    }
                                 }
                             }
                             this.mapSaveLoad.run(this.world, this.blockStateColorTypeCache);
@@ -253,15 +268,25 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                     }
 
                     if (shouldFinishCurrentDim || shouldClearNewDimension && reqDim == currentDim) {
-                        for(LeveledRegion<?> region : currentDim.getMapRegions().getUnsyncedList()) {
+                        for(LeveledRegion<?> region : currentDim.getLayeredMapRegions().getUnsyncedList()) {
                             if (shouldFinishCurrentDim) {
-                                if (region.getLevel() == 0 && region.recacheHasBeenRequested() && region.getCacheFile() != null) {
-                                    ((MapRegion)region).convertCacheToOutdated(this.mapSaveLoad, "might be outdated");
-                                    if (WorldMap.settings.debug) {
-                                        WorldMap.LOGGER.info(String.format("Converting cache for region %s because it might be outdated.", region));
+                                if (region.getLevel() == 0) {
+                                    MapRegion leafRegion = (MapRegion) region;
+                                    if (!leafRegion.isMultiplayer() && !leafRegion.hasLookedForCache() && leafRegion.isOutdatedWithOtherLayers()) {
+                                        File potentialCacheFile = this.mapSaveLoad.getCacheFile(leafRegion, leafRegion.getCaveLayer(), false, false);
+                                        if (potentialCacheFile.exists()) {
+                                            leafRegion.setCacheFile(potentialCacheFile);
+                                            leafRegion.setLookedForCache(true);
+                                        }
+                                    }
+
+                                    if (leafRegion.shouldConvertCacheToOutdatedOnFinishDim() && leafRegion.getCacheFile() != null) {
+                                        leafRegion.convertCacheToOutdated(this.mapSaveLoad, "might be outdated");
+                                        if (WorldMap.settings.debug) {
+                                            WorldMap.LOGGER.info(String.format("Converting cache for region %s because it might be outdated.", leafRegion));
+                                        }
                                     }
                                 }
-
                                 region.setReloadHasBeenRequested(false, "world/dim change");
                                 region.onCurrentDimFinish(this.mapSaveLoad, (MapProcessor) (Object) this);
                             }
@@ -275,7 +300,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                     }
 
                     if (reqDim != currentDim && shouldClearNewDimension) {
-                        for(LeveledRegion<?> region : reqDim.getMapRegions().getUnsyncedList()) {
+                        for(LeveledRegion<?> region : reqDim.getLayeredMapRegions().getUnsyncedList()) {
                             region.onDimensionClear((MapProcessor) (Object) this);
                         }
                     }
@@ -283,7 +308,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                     if (shouldClearAllDimensions) {
                         for(MapDimension dim : this.mapWorld.getDimensionsList()) {
                             if (!currentDimChecked || dim != currentDim) {
-                                for(LeveledRegion<?> region : dim.getMapRegions().getUnsyncedList()) {
+                                for(LeveledRegion<?> region : dim.getLayeredMapRegions().getUnsyncedList()) {
                                     region.onDimensionClear((MapProcessor) (Object) this);
                                 }
                             }
@@ -330,8 +355,6 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                     this.mapWorld.switchToFutureUnsynced();
                 }
 
-                this.caveStartDetermined = false;
-                this.caveStart = -1;
                 this.currentWorldId = newWorldId;
                 this.currentDimId = !this.mapWorldUsableRequest ? null : ((MapProcessor) (Object) this).getDimensionName(this.mapWorld.getFutureDimensionId());
                 this.currentMWId = newMWId;
@@ -376,7 +399,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                 }
 
                 if (this.mapWorldUsable && !this.isCurrentMapLocked()) {
-                    for(LeveledRegion<?> region : this.mapWorld.getCurrentDimension().getMapRegions().getUnsyncedList()) {
+                    for(LeveledRegion<?> region : this.mapWorld.getCurrentDimension().getLayeredMapRegions().getUnsyncedList()) {
                         if (region.shouldBeProcessed()) {
                             this.addToProcess(region);
                         }
@@ -399,8 +422,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                     this.currentWorldId = this.currentDimId = null;
                 }
 
-                boolean shouldDetect = this.mapWorldUsable && this.mapWorld.getCurrentDimension().getDetectedRegions() == null;
-                this.mapSaveLoad.setRegionDetectionComplete(!shouldDetect);
+                boolean shouldDetect = this.mapWorldUsable && !this.mapWorld.getCurrentDimension().hasDoneRegionDetection();                this.mapSaveLoad.setRegionDetectionComplete(!shouldDetect);
                 this.popRenderPause(true, true);
                 this.popWriterPause();
             } else if (this.newWorld != this.world) {
@@ -433,66 +455,53 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
     }
 
     @Override
-    public boolean regionExistsCustomDimension(int x, int z, int dimId) {
-        return this.regionDetectionExistsCustomDimension(x, z, dimId) || this.mapWorld.getDimension(dimId).getHighlightHandler().shouldApplyRegionHighlights(x, z, false);
+    public boolean regionExistsCustomDimension(int caveLayer, int x, int z, int dimId) {
+        return this.regionDetectionExistsCustomDimension(caveLayer, x, z, dimId) || this.mapWorld.getDimension(dimId).getHighlightHandler().shouldApplyRegionHighlights(x, z, false);
     }
 
     @Override
-    public boolean regionDetectionExistsCustomDimension(int x, int z, int dimId) {
-        if (!this.mapSaveLoad.isRegionDetectionComplete()) {
-            return false;
-        } else {
-            MapDimension dimension = this.mapWorld.getDimension(dimId);
-            if (dimension != null) {
-                Hashtable<Integer, Hashtable<Integer, RegionDetection>> detectedRegions = dimension.getDetectedRegions();
-                if (detectedRegions != null) {
-                    Hashtable<Integer, RegionDetection> column = detectedRegions.get(x);
-                    if (column != null) {
-                        return column != null && column.containsKey(z);
-                    }
-                }
-            }
-            return false;
-        }
+    public boolean regionDetectionExistsCustomDimension(int caveLayer, int x, int z, int dimId) {
+        return !this.mapSaveLoad.isRegionDetectionComplete()
+                ? false
+                : this.mapWorld.getDimension(dimId).getLayeredMapRegions().getLayer(caveLayer).regionDetectionExists(x, z);
     }
 
-    @Override
-    public RegionDetection getRegionDetectionCustomDimension(int x, int z, int dimId) {
-        Hashtable<Integer, RegionDetection> column = this.mapWorld.getDimension(dimId).getDetectedRegions().get(x);
-        return column != null ? column.get(z) : null;
-    }
+//    @Override
+//    public RegionDetection getRegionDetectionCustomDimension(int x, int z, int dimId) {
+//        Hashtable<Integer, RegionDetection> column = this.mapWorld.getDimension(dimId).getDetectedRegions().get(x);
+//        return column != null ? column.get(z) : null;
+//    }
+
+//    public void removeRegionDetectionCustomDimension(int x, int z, int dimId) {
+//        Hashtable<Integer, Hashtable<Integer, RegionDetection>> current = this.mapWorld.getDimension(dimId).getDetectedRegions();
+//        Hashtable<Integer, RegionDetection> column = current.get(x);
+//        if (column != null) {
+//            column.remove(z);
+//        }
+//
+//        if (column.isEmpty()) {
+//            current.remove(x);
+//        }
+//    }
 
     @Override
-    public void removeRegionDetectionCustomDimension(int x, int z, int dimId) {
-        Hashtable<Integer, Hashtable<Integer, RegionDetection>> current = this.mapWorld.getDimension(dimId).getDetectedRegions();
-        Hashtable<Integer, RegionDetection> column = current.get(x);
-        if (column != null) {
-            column.remove(z);
-        }
-
-        if (column.isEmpty()) {
-            current.remove(x);
-        }
-    }
-
-    @Override
-    public LeveledRegion<?> getLeveledRegionCustomDimension(int leveledRegX, int leveledRegZ, int level, int dimId) {
+    public LeveledRegion<?> getLeveledRegionCustomDimension(int caveLayer, int leveledRegX, int leveledRegZ, int level, int dimId) {
         MapDimension mapDimension = this.mapWorld.getDimension(dimId);
         if (mapDimension == null) {
             mapDimension = this.mapWorld.createDimensionUnsynced(world, dimId);
         }
-        LeveledRegionManager regions = mapDimension.getMapRegions();
-        return regions.get(leveledRegX, leveledRegZ, level);
+        LayeredRegionManager regions = mapDimension.getLayeredMapRegions();
+        return regions.get(caveLayer, leveledRegX, leveledRegZ, level);
     }
 
     @Override
-    public MapRegion getMapRegionCustomDimension(int regX, int regZ, boolean create, int dimId) {
+    public MapRegion getMapRegionCustomDimension(int caveLayer, int regX, int regZ, boolean create, int dimId) {
         if (!this.mapSaveLoad.isRegionDetectionComplete()) {
             return null;
         } else {
             MapDimension mapDimension = this.mapWorld.getDimension(dimId);
-            LeveledRegionManager regions = mapDimension.getMapRegions();
-            MapRegion region = regions.getLeaf(regX, regZ);
+            LayeredRegionManager regions = mapDimension.getLayeredMapRegions();
+            MapRegion region = regions.getLeaf(caveLayer, regX, regZ);
             if (region == null) {
                 if (!create) {
                     return null;
@@ -503,17 +512,40 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                 }
 
                 region = new MapRegion(
-                        this.currentWorldId, getDimensionName(dimId), this.currentMWId, mapDimension, regX, regZ, this.getGlobalVersion(), this.mapWorld.isMultiplayer()
+                        this.currentWorldId,
+                        this.currentDimId,
+                        this.currentMWId,
+                        mapDimension,
+                        regX,
+                        regZ,
+                        caveLayer,
+                        this.getGlobalVersion(),
+                        this.mapWorld.isMultiplayer()
                 );
-                RegionDetection regionDetection = this.getRegionDetectionCustomDimension(regX, regZ, dimId);
+                MapLayer mapLayer = regions.getLayer(caveLayer);
+                region.updateCaveMode();
+                RegionDetection regionDetection = mapLayer.getRegionDetection(regX, regZ);
                 if (regionDetection != null) {
                     regionDetection.transferInfoTo(region);
-                    this.removeRegionDetectionCustomDimension(regX, regZ, dimId);
+                    // todo: custom dimension interface
+                    mapLayer.removeRegionDetection(regX, regZ);
+                } else if (!region.isMultiplayer() && mapDimension.getWorldSaveRegionDetection(regX, regZ) == null) {
+                    RegionDetection worldSaveRegionDetection = new RegionDetection(
+                            region.getWorldId(),
+                            region.getDimId(),
+                            region.getMwId(),
+                            region.getRegionX(),
+                            region.getRegionZ(),
+                            region.getRegionFile(),
+                            this.getGlobalVersion(),
+                            true
+                    );
+                    mapDimension.addWorldSaveRegionDetection(worldSaveRegionDetection);
+                    mapLayer.removeRegionDetection(regX, regZ);
                 }
 
                 if (!region.hasHadTerrain()) {
-                    mapDimension.getHighlightHandler().getRegionHighlightExistenceTracker().stopTracking(regX, regZ);
-                    region.setVersion(this.getGlobalVersion());
+                    regions.getLayer(caveLayer).getRegionHighlightExistenceTracker().stopTracking(regX, regZ);                    region.setVersion(this.getGlobalVersion());
                     region.setCacheHashCode(WorldMap.settings.getRegionCacheHashCode());
                     region.setReloadVersion(WorldMap.settings.reloadVersion);
                 }

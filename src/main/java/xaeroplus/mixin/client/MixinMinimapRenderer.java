@@ -1,6 +1,5 @@
 package xaeroplus.mixin.client;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.shader.Framebuffer;
@@ -22,6 +21,9 @@ import xaero.common.minimap.render.MinimapRenderer;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.ChunkUtils;
+
+import static xaeroplus.util.ChunkUtils.*;
 
 @Mixin(value = MinimapRenderer.class, remap = false)
 public class MixinMinimapRenderer {
@@ -79,31 +81,4 @@ public class MixinMinimapRenderer {
         );
     }
 
-    public double getPlayerX() {
-        int dim = Minecraft.getMinecraft().world.provider.getDimension();
-        // when player is in the nether or the custom dimension is the nether, perform coordinate translation
-        if ((dim == -1 || XaeroPlus.customDimensionId == -1) && dim != XaeroPlus.customDimensionId) {
-            if (XaeroPlus.customDimensionId == 0) {
-                return Minecraft.getMinecraft().player.posX * 8.0;
-            } else if (XaeroPlus.customDimensionId == -1 && dim == 0) {
-                return Minecraft.getMinecraft().player.posX / 8.0;
-            }
-        }
-
-        return Minecraft.getMinecraft().player.posX;
-    }
-
-    public double getPlayerZ() {
-        int dim = Minecraft.getMinecraft().world.provider.getDimension();
-        // when player is in the nether or the custom dimension is the nether, perform coordinate translation
-        if ((dim == -1 || XaeroPlus.customDimensionId == -1) && dim != XaeroPlus.customDimensionId) {
-            if (XaeroPlus.customDimensionId == 0) {
-                return Minecraft.getMinecraft().player.posZ * 8.0;
-            } else if (XaeroPlus.customDimensionId == -1 && dim == 0) {
-                return Minecraft.getMinecraft().player.posZ / 8.0;
-            }
-        }
-
-        return Minecraft.getMinecraft().player.posZ;
-    }
 }

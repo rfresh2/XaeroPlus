@@ -79,7 +79,7 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
                     zipOutput.putNextEntry(e);
                     byte[] usableBuffer = new byte[16384];
                     byte[] integerByteBuffer = new byte[4];
-                    output.writeInt(22);
+                    output.writeInt(24);
                     this.writeCacheMetaData(output, usableBuffer, integerByteBuffer);
                     this.saveBiomePalette(output);
 
@@ -204,8 +204,8 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
                         try {
                             byte[] integerByteBuffer = new byte[4];
                             int cacheSaveVersion = input.readInt();
-                            if (cacheSaveVersion <= 22 && cacheSaveVersion != 7 && cacheSaveVersion != 21) {
-                                if (cacheSaveVersion < 22) {
+                            if (cacheSaveVersion <= 24 && cacheSaveVersion != 7 && cacheSaveVersion != 21) {
+                                if (cacheSaveVersion < 24) {
                                     this.shouldCache = true;
                                 }
 

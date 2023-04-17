@@ -341,7 +341,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         addGuiButton(switchToEndButton);
     }
 
-    @Inject(method = "onGuiClosed", at = @At(value = "RETURN"))
+    @Inject(method = "onGuiClosed", at = @At(value = "RETURN"), remap = true)
     public void onGuiClosed(final CallbackInfo ci) {
         try {
             XaeroPlus.customDimensionId = mc.world.provider.getDimension();

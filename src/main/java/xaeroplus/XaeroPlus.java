@@ -71,7 +71,7 @@ public class XaeroPlus {
             dimension = mapProcessor.getMapWorld().createDimensionUnsynced(mapProcessor.mainWorld, newDimId);
         }
         if (dimension.getWorldSaveDetectedRegions() == null) {
-            ((CustomDimensionMapSaveLoad) mapProcessor.getMapSaveLoad()).detectRegionsInDimension(newDimId);
+            ((CustomDimensionMapSaveLoad) mapProcessor.getMapSaveLoad()).detectRegionsInDimension(10, newDimId);
         }
         mapProcessor.getMapSaveLoad().setRegionDetectionComplete(true);
         // kind of shit but its ok. need to reset setting when GuiMap closes

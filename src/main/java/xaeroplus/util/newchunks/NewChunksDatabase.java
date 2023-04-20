@@ -1,5 +1,6 @@
 package xaeroplus.util.newchunks;
 
+import com.google.common.collect.Lists;
 import xaero.map.WorldMap;
 import xaeroplus.XaeroPlus;
 
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 import static xaeroplus.util.ChunkUtils.regionCoordToChunkCoord;
 
 public class NewChunksDatabase implements Closeable {
+    public static final int MAX_NEWCHUNKS_LIST_SIZE = 25000;
     private final Connection connection;
     public NewChunksDatabase(String worldId) {
         try {
@@ -45,6 +47,14 @@ public class NewChunksDatabase implements Closeable {
         if (newChunks.isEmpty()) {
             return;
         }
+        if (newChunks.size() > MAX_NEWCHUNKS_LIST_SIZE) {
+            Lists.partition(newChunks, MAX_NEWCHUNKS_LIST_SIZE).forEach(l -> insertNewChunksListInternal(l, dimension));
+        } else {
+            insertNewChunksListInternal(newChunks, dimension);
+        }
+    }
+
+    private void insertNewChunksListInternal(final List<NewChunkData> newChunks, final int dimension) {
         try {
             String statement = "INSERT OR IGNORE INTO \"" + dimension + "\" VALUES ";
             statement += newChunks.stream()

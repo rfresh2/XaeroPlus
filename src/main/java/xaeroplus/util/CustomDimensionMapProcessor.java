@@ -9,4 +9,5 @@ public interface CustomDimensionMapProcessor {
     boolean regionDetectionExistsCustomDimension(int caveLayer, int x, int z, int dimId);
     LeveledRegion<?> getLeveledRegionCustomDimension(int caveLayer, int leveledRegX, int leveledRegZ, int level, int dimId);
     MapRegion getMapRegionCustomDimension(int caveLayer, int regX, int regZ, boolean create, int dimId);
+    MapRegion getMapRegionCustomDimension(int regX, int regZ, boolean create, int dimId);
 }

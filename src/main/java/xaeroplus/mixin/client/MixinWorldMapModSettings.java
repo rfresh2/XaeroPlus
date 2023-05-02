@@ -1,6 +1,7 @@
 package xaeroplus.mixin.client;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -17,6 +18,14 @@ import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.XAERO_PLUS_WORLD
 
 @Mixin(value = ModSettings.class, remap = false)
 public class MixinWorldMapModSettings {
+
+    @Shadow
+    public int defaultCaveModeType;
+
+    @Inject(method = "<init>", at = @At("RETURN"))
+    public void initInject(final CallbackInfo ci) {
+        this.defaultCaveModeType = 0; // set default cave mode type to 0
+    }
 
     @Inject(method = "saveSettings", at = @At("TAIL"))
     public void saveSettings(final CallbackInfo ci) throws IOException {

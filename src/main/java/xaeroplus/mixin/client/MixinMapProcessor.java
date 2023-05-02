@@ -120,34 +120,49 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
 
     @Shadow
     protected abstract void updateWorld();
+
     @Shadow
     protected abstract void handleRefresh(World world);
+
     @Shadow
     protected abstract void releaseLocksIfNeeded();
+
     @Shadow
     protected abstract void forceClean();
+
     @Shadow
     public abstract void updateFootprints(World world, int step);
+
     @Shadow
     public abstract boolean isProcessingPaused();
+
     @Shadow
     public abstract void popWriterPause();
+
     @Shadow
     public abstract void popRenderPause(boolean b, boolean b1);
+
     @Shadow
     public abstract void addToProcess(LeveledRegion<?> region);
+
     @Shadow
     public abstract boolean isCurrentMapLocked();
+
     @Shadow
     protected abstract void clearToRefresh();
+
     @Shadow
     public abstract void pushWriterPause();
+
     @Shadow
     public abstract void pushRenderPause(boolean b, boolean b1);
+
     @Shadow
     public abstract int getGlobalVersion();
+
     @Shadow
     public abstract String getDimensionName(int id);
+
     @Shadow
     protected abstract int getCaveLayer(int caveStart);
 
@@ -245,7 +260,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                                 this.updateFootprints(this.world, Minecraft.getMinecraft().currentScreen instanceof GuiMap ? 1 : 10);
                             }
                             if (this.mapWorldUsable) {
-                                this.mapLimiter.applyLimit(this.mapWorld, (MapProcessor) (Object)this);
+                                this.mapLimiter.applyLimit(this.mapWorld, (MapProcessor) (Object) this);
                                 long currentTime = System.currentTimeMillis();
                                 block11:
                                 for (ArrayList<LeveledRegion<?>> regionsToProcess : this.toProcessLevels) {
@@ -258,7 +273,8 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                                             }
                                             leveledRegion = regionsToProcess.get(i);
                                         }
-                                        this.mapSaveLoad.updateSave(leveledRegion, currentTime, this.currentCaveLayer);                                    }
+                                        this.mapSaveLoad.updateSave(leveledRegion, currentTime, this.currentCaveLayer);
+                                    }
                                 }
                             }
                             this.mapSaveLoad.run(this.world, this.blockStateColorTypeCache);
@@ -270,11 +286,10 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                     try {
                         // reduce artificial 1 second thread pause between region loads on login
                         Thread.sleep(10L);
+                    } catch (InterruptedException interruptedException) {
                     }
-                    catch (InterruptedException interruptedException) {}
                 }
-            }
-            catch (Throwable e) {
+            } catch (Throwable e) {
                 WorldMap.crashHandler.setCrashedBy(e);
             }
             if (this.state < 2) {
@@ -289,14 +304,13 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
 
     /**
      * Reason: Allow multiple client instances to open the same map
-     *
      */
     @Inject(method = "updateWorldSynced", at = @At("HEAD"), cancellable = true)
     synchronized void updateWorldSynced(final CallbackInfo ci) throws IOException {
         // @Overwrite kinda weird with these synchronized methods
         // this gets the same effect with inject
         ci.cancel();
-        synchronized(this.uiSync) {
+        synchronized (this.uiSync) {
             if (this.mapWorldUsable != this.mapWorldUsableRequest
                     || this.mapWorldUsableRequest
                     && (
@@ -330,7 +344,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                     }
 
                     if (shouldFinishCurrentDim || shouldClearNewDimension && reqDim == currentDim) {
-                        for(LeveledRegion<?> region : currentDim.getLayeredMapRegions().getUnsyncedList()) {
+                        for (LeveledRegion<?> region : currentDim.getLayeredMapRegions().getUnsyncedList()) {
                             if (shouldFinishCurrentDim) {
                                 if (region.getLevel() == 0) {
                                     MapRegion leafRegion = (MapRegion) region;
@@ -362,15 +376,15 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                     }
 
                     if (reqDim != currentDim && shouldClearNewDimension) {
-                        for(LeveledRegion<?> region : reqDim.getLayeredMapRegions().getUnsyncedList()) {
+                        for (LeveledRegion<?> region : reqDim.getLayeredMapRegions().getUnsyncedList()) {
                             region.onDimensionClear((MapProcessor) (Object) this);
                         }
                     }
 
                     if (shouldClearAllDimensions) {
-                        for(MapDimension dim : this.mapWorld.getDimensionsList()) {
+                        for (MapDimension dim : this.mapWorld.getDimensionsList()) {
                             if (!currentDimChecked || dim != currentDim) {
-                                for(LeveledRegion<?> region : dim.getLayeredMapRegions().getUnsyncedList()) {
+                                for (LeveledRegion<?> region : dim.getLayeredMapRegions().getUnsyncedList()) {
                                     region.onDimensionClear((MapProcessor) (Object) this);
                                 }
                             }
@@ -393,7 +407,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                     }
                 } else {
                     if (this.mapWorld.getCurrentDimensionId() != null) {
-                        for(MapDimension dim : this.mapWorld.getDimensionsList()) {
+                        for (MapDimension dim : this.mapWorld.getDimensionsList()) {
                             dim.clear();
                         }
                     }
@@ -428,7 +442,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                     int totalLockAttempts = 10;
                     int lockAttempts = 10;
 
-                    while(lockAttempts-- > 0) {
+                    while (lockAttempts-- > 0) {
                         if (lockAttempts < 9) {
                             WorldMap.LOGGER.info("Failed attempt to lock the current world map! Retrying in 50 ms... " + lockAttempts);
 
@@ -453,15 +467,15 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
 
                 this.footprints.clear();
                 this.mapSaveLoad.clearToLoad();
-                this.mapSaveLoad.setNextToLoadByViewing((LeveledRegion<?>)null);
+                this.mapSaveLoad.setNextToLoadByViewing((LeveledRegion<?>) null);
                 this.clearToRefresh();
 
-                for(int i = 0; i < this.toProcessLevels.length; ++i) {
+                for (int i = 0; i < this.toProcessLevels.length; ++i) {
                     this.toProcessLevels[i].clear();
                 }
 
                 if (this.mapWorldUsable && !this.isCurrentMapLocked()) {
-                    for(LeveledRegion<?> region : this.mapWorld.getCurrentDimension().getLayeredMapRegions().getUnsyncedList()) {
+                    for (LeveledRegion<?> region : this.mapWorld.getCurrentDimension().getLayeredMapRegions().getUnsyncedList()) {
                         if (region.shouldBeProcessed()) {
                             this.addToProcess(region);
                         }
@@ -484,7 +498,8 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                     this.currentWorldId = this.currentDimId = null;
                 }
 
-                boolean shouldDetect = this.mapWorldUsable && !this.mapWorld.getCurrentDimension().hasDoneRegionDetection();                this.mapSaveLoad.setRegionDetectionComplete(!shouldDetect);
+                boolean shouldDetect = this.mapWorldUsable && !this.mapWorld.getCurrentDimension().hasDoneRegionDetection();
+                this.mapSaveLoad.setRegionDetectionComplete(!shouldDetect);
                 this.popRenderPause(true, true);
                 this.popWriterPause();
             } else if (this.newWorld != this.world) {
@@ -605,5 +620,10 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
 
             return region;
         }
+    }
+
+    @Override
+    public MapRegion getMapRegionCustomDimension(int regX, int regZ, boolean create, int dimId) {
+        return this.getMapRegionCustomDimension(Integer.MAX_VALUE, regX, regZ, create, dimId);
     }
 }

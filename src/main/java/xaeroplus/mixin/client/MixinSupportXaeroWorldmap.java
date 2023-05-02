@@ -125,7 +125,7 @@ public abstract class MixinSupportXaeroWorldmap {
 
                     int renderedCaveLayer = wmHasCaveLayers ? mapProcessor.getCurrentCaveLayer() : 0;
                     int globalCaveStart = wmHasCaveLayers
-                            ? mapProcessor.getMapWorld().getCurrentDimension().getLayeredMapRegions().getLayer(renderedCaveLayer).getCaveStart()
+                            ? mapProcessor.getMapWorld().getDimension(XaeroPlus.customDimensionId).getLayeredMapRegions().getLayer(renderedCaveLayer).getCaveStart()
                             : 0;
                     int globalCaveDepth = wmHasCaveLayers ? WorldMap.settings.caveModeDepth : 0;
                     float brightness = this.getMinimapBrightness();
@@ -186,12 +186,12 @@ public abstract class MixinSupportXaeroWorldmap {
                             if (wmHasCaveLayers) {
                                 region = customDimensionMapProcessor.getMapRegionCustomDimension(
                                         renderedCaveLayer, i >> 3, j >> 3,
-                                        customDimensionMapProcessor.regionExistsCustomDimension(
+                                        !customDimensionMapProcessor.regionExistsCustomDimension(
                                                 renderedCaveLayer, i >> 3, j >> 3,
                                                 XaeroPlus.customDimensionId),
                                         XaeroPlus.customDimensionId);
                             } else {
-                                region = mapProcessor.getMapRegion(i >> 3, j >> 3, mapProcessor.regionExists(i >> 3, j >> 3));
+                                region = customDimensionMapProcessor.getMapRegionCustomDimension( i >> 3, j >> 3, !customDimensionMapProcessor.regionExistsCustomDimension(i >> 3, j >> 3, XaeroPlus.customDimensionId), XaeroPlus.customDimensionId);
                             }
 
                             if (region != null && region != prevRegion) {

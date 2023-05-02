@@ -70,7 +70,7 @@ public class XaeroPlus {
         if (dimension == null) {
             dimension = mapProcessor.getMapWorld().createDimensionUnsynced(mapProcessor.mainWorld, newDimId);
         }
-        if (dimension.getWorldSaveDetectedRegions() == null) {
+        if (!dimension.hasDoneRegionDetection()) {
             ((CustomDimensionMapSaveLoad) mapProcessor.getMapSaveLoad()).detectRegionsInDimension(10, newDimId);
         }
         mapProcessor.getMapSaveLoad().setRegionDetectionComplete(true);

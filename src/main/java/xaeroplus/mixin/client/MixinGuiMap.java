@@ -49,7 +49,6 @@ import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.CustomDimensionMapProcessor;
-import xaeroplus.util.CustomDimensionMapSaveLoad;
 import xaeroplus.util.HighlightAtChunkPos;
 import xaeroplus.util.WDLHelper;
 
@@ -1661,21 +1660,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     }
 
     private void onSwitchDimensionButton(final int newDimId) {
-        mapProcessor.getMapSaveLoad().setRegionDetectionComplete(false);
-        MapDimension dimension = this.mapProcessor.getMapWorld().getDimension(newDimId);
-        if (dimension == null) {
-            dimension = this.mapProcessor.getMapWorld().createDimensionUnsynced(mapProcessor.mainWorld, newDimId);
-        }
-        if (dimension.getWorldSaveDetectedRegions() == null || !dimension.hasDoneRegionDetection()) {
-            ((CustomDimensionMapSaveLoad) mapProcessor.getMapSaveLoad()).detectRegionsInDimension(10, newDimId);
-        }
-        mapProcessor.getMapSaveLoad().setRegionDetectionComplete(true);
-        // kind of shit but its ok. need to reset setting when GuiMap closes
-        if (mc.world.provider.getDimension() != newDimId) {
-            WorldMap.settings.minimapRadar = false;
-        } else {
-            WorldMap.settings.minimapRadar = true;
-        }
         if (XaeroPlus.customDimensionId != newDimId) {
             if (XaeroPlus.customDimensionId == -1) {
                 this.cameraDestination = new int[] {(int) (cameraX * 8), (int) (cameraZ * 8)};
@@ -1683,7 +1667,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 this.cameraDestination = new int[] {(int) (cameraX / 8), (int) (cameraZ / 8)};
             }
         }
-        XaeroPlus.customDimensionId = newDimId;
-        SupportMods.xaeroMinimap.requestWaypointsRefresh();
+        XaeroPlus.switchToDimension(newDimId);
     }
 }

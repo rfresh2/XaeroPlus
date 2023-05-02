@@ -55,6 +55,8 @@ Any other Xaero WorldMap/Minimap version may cause crashes.
 * Always sort enabled waypoints before disabled waypoints
 * GUI button to enable/disable all waypoints
 * Minecraft world always renders in background while in a Xaero GUI (for client travel mods compatibility)
+* WorldMap 1.30.0 added cave data saving and rendering. There is a config on by default in XaeroPlus that changes how the nether is rendered with cave mode off to be as it was previously.
+  * This removes the need to manually move existing world data files. But without XaeroPlus you will need to fix this manually.
 
 Configurations are in the Xaero WorldMap and Minimap settings GUI.
 

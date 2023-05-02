@@ -129,4 +129,8 @@ public final class XaeroPlusSettingRegistry {
             "Switches to the end map.",
             (b) -> XaeroPlus.switchToDimension(1),
             false, SettingLocation.KEYBINDS);
+    public static final XaeroPlusBooleanSetting netherCaveFix = XaeroPlusBooleanSetting.create("Nether Cave Fix",
+            "Forces full cave maps to be written and rendered when cave mode is \"off\" in the nether."
+                    + " \\n Without this, you have to manually move region files pre WorldMap 1.30.0 to the correct cave folder",
+            true, SettingLocation.WORLD_MAP_MAIN);
 }

@@ -17,6 +17,7 @@ import xaero.map.file.RegionDetection;
 import xaero.map.file.worldsave.WorldDataHandler;
 import xaero.map.region.*;
 import xaero.map.world.MapDimension;
+import xaero.map.world.MapWorld;
 import xaeroplus.XaeroPlus;
 import xaeroplus.util.CustomDimensionMapSaveLoad;
 
@@ -496,9 +497,15 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
     }
 
     @Redirect(method = "run", at = @At(value = "INVOKE", target = "Lxaero/map/region/LayeredRegionManager;addLoadedRegion(Lxaero/map/region/LeveledRegion;)V"))
-    public void run(LayeredRegionManager instance, LeveledRegion<?> reg) {
+    public void redirectAddLoadedRegionDimension(LayeredRegionManager instance, LeveledRegion<?> reg) {
         reg.getDim().getLayeredMapRegions().addLoadedRegion(reg);
     }
+
+    @Redirect(method = "run", at = @At(value = "INVOKE", target = "Lxaero/map/world/MapWorld;getCurrentDimension()Lxaero/map/world/MapDimension;"))
+    public MapDimension redirectGetCurrentDimension(MapWorld instance) {
+        return instance.getDimension(XaeroPlus.customDimensionId);
+    }
+
 
     private static byte[] decompressZipToBytes(final Path input) {
         try {
@@ -524,9 +531,9 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
 
     @Override
     public void detectRegionsInDimension(int attempts, final int dimId) {
-        MapDimension mapDimension = this.mapProcessor.getMapWorld().getDimension(dimId);
+        final MapDimension mapDimension = this.mapProcessor.getMapWorld().getDimension(dimId);
         mapDimension.preDetection();
-        String worldId = this.mapProcessor.getCurrentWorldId();
+        final String worldId = this.mapProcessor.getCurrentWorldId();
         if (worldId != null && !this.mapProcessor.isCurrentMapLocked()) {
             final String dimIdStr = this.mapProcessor.getDimensionName(dimId);
             final String mwId = this.mapProcessor.getCurrentMWId();
@@ -538,7 +545,7 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
             if (multiplayer) {
                 if (mapFolderExists) {
                     this.detectRegionsFromFiles(
-                            mapDimension, worldId, dimIdStr, mwId, mapFolder, multiplayerMapRegex, 1, 2, 0, 20, new Consumer<RegionDetection>() {
+                            mapDimension, worldId, dimIdStr, mwId, mapFolder, "^(-?\\d+)_(-?\\d+)\\.(zip|xaero)$", 1, 2, 0, 20, new Consumer<RegionDetection>() {
                                 public void accept(RegionDetection detect) {
                                     mainLayer.addRegionDetection(detect);
                                 }
@@ -567,13 +574,10 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                         2,
                         8192,
                         20,
-                        new Consumer<RegionDetection>() {
-                            public void accept(RegionDetection detect) {
-                                mapDimension.addWorldSaveRegionDetection(detect);
-                            }
-                        }
+                        mapDimension::addWorldSaveRegionDetection
                 );
             }
+
             if (mapFolderExists) {
                 Path cavesFolder = mapFolder.resolve("caves");
 

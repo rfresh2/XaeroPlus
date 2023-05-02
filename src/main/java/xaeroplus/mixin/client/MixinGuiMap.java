@@ -398,7 +398,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             long startTime = System.currentTimeMillis();
             MapDimension currentDim = !this.mapProcessor.isMapWorldUsable() ? null : this.mapProcessor.getMapWorld().getCurrentDimension();
             if (currentDim != this.dimension) {
-                // todo: check if dimension switching works with this or we need to modify/remove
                 this.dimensionSettings.active = false;
                 this.setWorldAndResolution(mc, this.width, this.height);
             }
@@ -786,7 +785,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                         this.branchRegionBuffer.clear();
                         float brightness = this.mapProcessor.getBrightness();
                         int globalRegionCacheHashCode = WorldMap.settings.getRegionCacheHashCode();
-                        int globalCaveStart = this.mapProcessor.getMapWorld().getCurrentDimension().getLayeredMapRegions().getLayer(renderedCaveLayer).getCaveStart();
+                        int globalCaveStart = this.mapProcessor.getMapWorld().getDimension(XaeroPlus.customDimensionId).getLayeredMapRegions().getLayer(renderedCaveLayer).getCaveStart();
                         int globalCaveDepth = WorldMap.settings.caveModeDepth;
                         boolean reloadEverything = WorldMap.settings.reloadEverything;
                         int globalReloadVersion = WorldMap.settings.reloadVersion;
@@ -822,7 +821,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                             if (regZ >= minLeafRegZ && regZ <= maxLeafRegZ) {
                                                 MapRegion region = customMapProcessor.getMapRegionCustomDimension(renderedCaveLayer, regX, regZ, false, XaeroPlus.customDimensionId);
                                                 if (region == null) {
-                                                    region = customMapProcessor.getMapRegionCustomDimension(renderedCaveLayer, regX, regZ, customMapProcessor.regionExistsCustomDimension(renderedCaveLayer, regX, regZ, XaeroPlus.customDimensionId), XaeroPlus.customDimensionId);
+                                                    region = customMapProcessor.getMapRegionCustomDimension(renderedCaveLayer, regX, regZ, !customMapProcessor.regionExistsCustomDimension(renderedCaveLayer, regX, regZ, XaeroPlus.customDimensionId), XaeroPlus.customDimensionId);
                                                 }
 
                                                 if (region != null) {

@@ -10,6 +10,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -19,6 +20,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.map.MapProcessor;
@@ -532,6 +534,34 @@ public abstract class MixinMapWriter {
             }
         } else {
             tileUpdateCache.put(cacheable, Instant.now());
+        }
+    }
+
+    @Redirect(method = "writeChunk", at = @At(value = "INVOKE", target = "Lxaero/map/MapWriter;loadPixel(Lnet/minecraft/world/World;Lxaero/map/region/MapBlock;Lxaero/map/region/MapBlock;Lnet/minecraft/world/chunk/Chunk;IIIIZZIZZZLnet/minecraft/util/math/BlockPos$MutableBlockPos;)V"))
+    public void redirectLoadPixelForNetherFix(MapWriter instance, World world,
+                                              MapBlock pixel,
+                                              MapBlock currentPixel,
+                                              Chunk bchunk,
+                                              int insideX,
+                                              int insideZ,
+                                              int highY,
+                                              int lowY,
+                                              boolean cave,
+                                              boolean fullCave,
+                                              int mappedHeight,
+                                              boolean canReuseBiomeColours,
+                                              boolean ignoreHeightmaps,
+                                              boolean flowers,
+                                              BlockPos.MutableBlockPos mutableBlockPos3) {
+        if (XaeroPlusSettingRegistry.netherCaveFix.getValue()) {
+            final boolean nether = world.provider.getDimensionType() == DimensionType.NETHER;
+            final boolean shouldForceFullInNether = !cave && nether;
+            instance.loadPixel(world, pixel, currentPixel, bchunk, insideX, insideZ, highY, lowY,
+                    shouldForceFullInNether || cave,
+                    shouldForceFullInNether || fullCave,
+                    mappedHeight, canReuseBiomeColours, ignoreHeightmaps, flowers, mutableBlockPos3);
+        } else {
+            instance.loadPixel(world, pixel, currentPixel, bchunk, insideX, insideZ, highY, lowY, cave, fullCave, mappedHeight, canReuseBiomeColours, ignoreHeightmaps, flowers, mutableBlockPos3);
         }
     }
 }

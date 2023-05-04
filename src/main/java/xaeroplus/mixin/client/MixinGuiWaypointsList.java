@@ -12,10 +12,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.IXaeroMinimap;
 import xaero.common.gui.GuiWaypoints;
 import xaero.common.minimap.waypoints.Waypoint;
+import xaero.common.minimap.waypoints.WaypointWorld;
+import xaero.common.minimap.waypoints.WaypointsManager;
+import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 import java.lang.reflect.Field;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 
 @Mixin(targets = "xaero.common.gui.GuiWaypoints$List", remap = false)
 public abstract class MixinGuiWaypointsList {
@@ -30,6 +34,57 @@ public abstract class MixinGuiWaypointsList {
         final Field modMainField = this$0.getClass().getSuperclass().getDeclaredField("modMain");
         modMainField.setAccessible(true);
         this.modMain = (IXaeroMinimap) modMainField.get(this$0);
+    }
+
+    public ArrayList<Waypoint> getSearchFilteredWaypointList() {
+        ArrayList<Waypoint> filteredWaypoints = new ArrayList<>();
+        try {
+            final Field displayedWorldField = thisGuiWaypoints.getClass().getDeclaredField("displayedWorld");
+            displayedWorldField.setAccessible(true);
+            final WaypointWorld displayedWorldValue = (WaypointWorld) displayedWorldField.get(thisGuiWaypoints);
+            for(Waypoint w : displayedWorldValue.getCurrentSet().getList()) {
+                if (w.getName().toLowerCase().contains(XaeroPlus.waypointsSearchFilter.toLowerCase())) {
+                    filteredWaypoints.add(w);
+                }
+            }
+            final Field waypointsManagerField = thisGuiWaypoints.getClass().getDeclaredField("waypointsManager");
+            waypointsManagerField.setAccessible(true);
+            final WaypointsManager waypointsManagerValue = (WaypointsManager) waypointsManagerField.get(thisGuiWaypoints);
+            if (waypointsManagerValue.getServerWaypoints() != null) {
+                for(Waypoint w : waypointsManagerValue.getServerWaypoints()) {
+                    if (w.getName().toLowerCase().contains(XaeroPlus.waypointsSearchFilter.toLowerCase())) {
+                        filteredWaypoints.add(w);
+                    }
+                }
+            }
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Error filtering waypoints list", e);
+        }
+
+        return filteredWaypoints;
+    }
+
+    /**
+     * @author rfresh2
+     * @reason search support
+     */
+    @Overwrite(remap = true)
+    public int getSize() {
+        return getSearchFilteredWaypointList().size();
+    }
+
+    /**
+     * @author rfresh2
+     * @reason search support
+     */
+    @Overwrite
+    private Waypoint getWaypoint(int slotIndex) {
+        ArrayList<Waypoint> searchFilteredWaypointList = getSearchFilteredWaypointList();
+        if (slotIndex < searchFilteredWaypointList.size()) {
+            return searchFilteredWaypointList.get(slotIndex);
+        } else {
+            return null;
+        }
     }
 
     /**

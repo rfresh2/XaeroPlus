@@ -388,6 +388,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         try {
             while(GL11.glGetError() != 0) {
             }
+            GlStateManager.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
+            GL11.glClearColor(0.0F, 0.0F, 0.0F, 0.0F);
             final boolean isDimensionSwitched = XaeroPlus.customDimensionId != Minecraft.getMinecraft().player.dimension;
 
             Minecraft mc = Minecraft.getMinecraft();

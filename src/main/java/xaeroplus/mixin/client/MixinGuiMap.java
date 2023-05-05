@@ -1656,10 +1656,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     private void handleTextFieldClick(int x, int y, GuiTextField guiTextField) {
         if ((x >= guiTextField.x && x <= guiTextField.x + guiTextField.width) && (y >= guiTextField.y && y <= guiTextField.y + xTextEntryField.height)) {
             guiTextField.setFocused(true);
-            if (guiTextField.getText().startsWith("X:") || guiTextField.getText().startsWith("Z:")) {
-                guiTextField.setText("");
-                guiTextField.setTextColor(14737632);
-            }
+            onTextFieldFocus(guiTextField);
             this.setFocused(guiTextField);
             guiTextField.mouseClicked(x, y, 0);
         } else {
@@ -1671,6 +1668,21 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     public void keyTyped(char typedChar, int keyCode, CallbackInfo ci) throws IOException {
         if (keyCode == 59) {
             mc.gameSettings.hideGUI = !mc.gameSettings.hideGUI;
+            ci.cancel();
+        } else if (keyCode == 15) {
+            if (xTextEntryField.isFocused()) {
+                xTextEntryField.setFocused(false);
+                zTextEntryField.setFocused(true);
+                this.setFocused(zTextEntryField);
+                this.onTextFieldFocus(zTextEntryField);
+                ci.cancel();
+            } else if (zTextEntryField.isFocused()) {
+                zTextEntryField.setFocused(false);
+                xTextEntryField.setFocused(true);
+                this.setFocused(xTextEntryField);
+                this.onTextFieldFocus(xTextEntryField);
+                ci.cancel();
+            }
         }
     }
 
@@ -1683,8 +1695,16 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             FOLLOW = false;
             this.setWorldAndResolution(this.mc, width, height);
         } catch (final NumberFormatException e) {
-            // todo: do some default action if we detect placeholder text like go to 0,0?
+            xTextEntryField.setText("");
+            zTextEntryField.setText("");
             WorldMap.LOGGER.warn("Go to coordinates failed" , e);
+        }
+    }
+
+    private void onTextFieldFocus(GuiTextField guiTextField) {
+        if (guiTextField.getText().startsWith("X:") || guiTextField.getText().startsWith("Z:")) {
+            guiTextField.setText("");
+            guiTextField.setTextColor(14737632);
         }
     }
 

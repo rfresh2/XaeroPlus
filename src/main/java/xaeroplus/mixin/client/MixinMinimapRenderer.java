@@ -19,11 +19,11 @@ import xaero.common.minimap.element.render.over.MinimapElementOverMapRendererHan
 import xaero.common.minimap.radar.MinimapRadar;
 import xaero.common.minimap.render.MinimapRenderer;
 import xaero.common.minimap.render.MinimapRendererHelper;
-import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.ChunkUtils;
+import xaeroplus.util.Shared;
 
-import static xaeroplus.util.ChunkUtils.*;
+import static xaeroplus.util.ChunkUtils.getPlayerX;
+import static xaeroplus.util.ChunkUtils.getPlayerZ;
 
 @Mixin(value = MinimapRenderer.class, remap = false)
 public class MixinMinimapRenderer {
@@ -35,11 +35,11 @@ public class MixinMinimapRenderer {
     public void renderMinimap(
             final XaeroMinimapSession minimapSession, final MinimapProcessor minimap, final int x, final int y, final int width, final int height, final ScaledResolution scaledRes, final int size, final float partial, final CallbackInfo ci
     ) {
-        if (this.minimapInterface.usingFBO() && XaeroPlus.shouldResetFBO) {
+        if (this.minimapInterface.usingFBO() && Shared.shouldResetFBO) {
             this.minimapInterface.getMinimapFBORenderer().deleteFramebuffers();
             this.minimapInterface.getMinimapFBORenderer().loadFrameBuffer(minimap);
-            XaeroPlus.minimapScalingFactor = (int) XaeroPlusSettingRegistry.minimapScaling.getValue();
-            XaeroPlus.shouldResetFBO = false;
+            Shared.minimapScalingFactor = (int) XaeroPlusSettingRegistry.minimapScaling.getValue();
+            Shared.shouldResetFBO = false;
         }
     }
 
@@ -55,7 +55,7 @@ public class MixinMinimapRenderer {
 
     @Redirect(method = "renderMinimap", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/element/render/over/MinimapElementOverMapRendererHandler;render(Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/player/EntityPlayer;DDDDDDZFLnet/minecraft/client/shader/Framebuffer;Lxaero/common/IXaeroMinimap;Lxaero/common/minimap/render/MinimapRendererHelper;Lnet/minecraft/client/gui/FontRenderer;Lnet/minecraft/client/gui/ScaledResolution;IIIIZF)D"))
     public double editOvermapRender(final MinimapElementOverMapRendererHandler instance, final Entity renderEntity, final EntityPlayer player, final double renderX, final double renderY, final double renderZ, final double ps, final double pc, final double zoom, final boolean cave, final float partialTicks, final Framebuffer framebuffer, final IXaeroMinimap modMain, final MinimapRendererHelper helper, final FontRenderer font, final ScaledResolution scaledRes, final int specW, final int specH, final int halfViewW, final int halfViewH, final boolean circle, final float minimapScale) {
-        double customZoom = zoom / XaeroPlus.minimapScalingFactor;
+        double customZoom = zoom / Shared.minimapScalingFactor;
         return instance.render(
                 renderEntity,
                 player,

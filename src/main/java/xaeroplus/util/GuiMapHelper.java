@@ -4,7 +4,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import xaero.map.core.XaeroWorldMapCore;
 import xaero.map.gui.GuiMap;
-import xaeroplus.XaeroPlus;
 import xaeroplus.mixin.client.MixinGuiMapAccessor;
 
 import java.util.Optional;
@@ -35,7 +34,7 @@ public class GuiMapHelper {
         return XaeroWorldMapCore.currentSession.getMapProcessor().getMapWorld().getCurrentDimension().getDimId();
     }
     public static int getCurrentlyViewedDimension() {
-        return XaeroPlus.customDimensionId;
+        return Shared.customDimensionId;
     }
 
     public static boolean isGuiMapLoaded() {

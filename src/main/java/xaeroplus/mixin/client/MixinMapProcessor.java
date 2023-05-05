@@ -34,6 +34,7 @@ import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.util.CustomDimensionMapProcessor;
 import xaeroplus.util.CustomDimensionMapSaveLoad;
 import xaeroplus.util.DataFolderResolveUtil;
+import xaeroplus.util.Shared;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,7 +46,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 
-import static xaeroplus.XaeroPlus.LOCK_ID;
+import static xaeroplus.util.Shared.LOCK_ID;
 
 @Mixin(value = MapProcessor.class, remap = false)
 public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
@@ -173,7 +174,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
     @Overwrite
     public void updateCaveStart() {
         Minecraft mc = Minecraft.getMinecraft();
-        MapDimension dimension = this.mapWorld.getDimension(XaeroPlus.customDimensionId);
+        MapDimension dimension = this.mapWorld.getDimension(Shared.customDimensionId);
         int newCaveStart;
         // cave mode type = 2 means "Full"
         if (WorldMap.settings.isCaveMapsAllowed() && dimension.getCaveModeType() != 0) {
@@ -228,7 +229,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
 
     @Redirect(method = "updateWorld", at = @At(value = "INVOKE", target = "Lxaero/map/file/MapSaveLoad;detectRegions(I)V"))
     public void updateWorldDetectRegionsRedirect(MapSaveLoad mapSaveLoad, int step) {
-        ((CustomDimensionMapSaveLoad) mapSaveLoad).detectRegionsInDimension(step, XaeroPlus.customDimensionId);
+        ((CustomDimensionMapSaveLoad) mapSaveLoad).detectRegionsInDimension(step, Shared.customDimensionId);
     }
 
     @Inject(method = "getMainId", at = @At("HEAD"), cancellable = true)
@@ -238,7 +239,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
 
     @Inject(method = "getDimensionName", at = @At(value = "HEAD"), cancellable = true)
     public void getDimensionName(final int id, final CallbackInfoReturnable<String> cir) {
-        if (!XaeroPlus.nullOverworldDimensionFolder) {
+        if (!Shared.nullOverworldDimensionFolder) {
             cir.setReturnValue("DIM" + id);
         }
     }
@@ -523,12 +524,12 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
 
     @Inject(method = "changeWorld", at = @At(value = "INVOKE", target = "Lxaero/map/world/MapDimension;resetCustomMultiworldUnsynced()V", shift = At.Shift.AFTER))
     public synchronized void changeWorld(final WorldClient world, final CallbackInfo ci) {
-        XaeroPlus.customDimensionId = world.provider.getDimension();
+        Shared.customDimensionId = world.provider.getDimension();
     }
 
     @Redirect(method = "onRenderProcess", at = @At(value = "INVOKE", target = "Lxaero/map/world/MapWorld;getCurrentDimension()Lxaero/map/world/MapDimension;"))
     public MapDimension getCustomDimension(final MapWorld mapWorld) {
-        return mapWorld.getDimension(XaeroPlus.customDimensionId);
+        return mapWorld.getDimension(Shared.customDimensionId);
     }
 
     @Override

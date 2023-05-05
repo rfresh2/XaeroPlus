@@ -9,9 +9,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.common.minimap.waypoints.WaypointsManager;
-import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.DataFolderResolveUtil;
+import xaeroplus.util.Shared;
 
 @Mixin(value = WaypointsManager.class, remap = false)
 public abstract class MixinWaypointsManager {
@@ -58,8 +58,8 @@ public abstract class MixinWaypointsManager {
             if (dimKey != null && (dimKey == -1 || dimKey == 0 || dimKey == 1)) {
                 double currentDimDiv = Minecraft.getMinecraft().world.provider.getDimensionType() == DimensionType.NETHER ? 8.0 : 1.0;
                 double selectedDimDiv = dimKey == -1 ? 8.0 : 1.0;
-                if (Minecraft.getMinecraft().world.provider.getDimension() != XaeroPlus.customDimensionId) {
-                    double customDimDiv = XaeroPlus.customDimensionId == -1 ? 8.0 : 1.0;
+                if (Minecraft.getMinecraft().world.provider.getDimension() != Shared.customDimensionId) {
+                    double customDimDiv = Shared.customDimensionId == -1 ? 8.0 : 1.0;
                     return customDimDiv / selectedDimDiv;
                 }
                 return currentDimDiv / selectedDimDiv;

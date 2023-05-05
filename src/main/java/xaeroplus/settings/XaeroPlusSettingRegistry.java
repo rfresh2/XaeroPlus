@@ -1,9 +1,9 @@
 package xaeroplus.settings;
 
-import xaeroplus.XaeroPlus;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
 import xaeroplus.util.ColorHelper;
+import xaeroplus.util.Shared;
 import xaeroplus.util.WDLHelper;
 
 import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.SettingLocation;
@@ -115,19 +115,19 @@ public final class XaeroPlusSettingRegistry {
             // todo: increase max but we need to start generating mipmaps and change the framebuffer filter for anti aliasing to work better
             1f, 2f, 1f,
             "Increases the base minimap scale beyond the default size.",
-            (b) -> XaeroPlus.shouldResetFBO = true,
+            (b) -> Shared.shouldResetFBO = true,
             2f, SettingLocation.MINIMAP);
     public static final XaeroPlusBooleanSetting switchToNetherSetting = XaeroPlusBooleanSetting.create("Switch to Nether",
             "Switches to the nether map.",
-            (b) -> XaeroPlus.switchToDimension(-1),
+            (b) -> Shared.switchToDimension(-1),
             false, SettingLocation.KEYBINDS);
     public static final XaeroPlusBooleanSetting switchToOverworldSetting = XaeroPlusBooleanSetting.create("Switch to Overworld",
             "Switches to the overworld map.",
-            (b) -> XaeroPlus.switchToDimension(0),
+            (b) -> Shared.switchToDimension(0),
             false, SettingLocation.KEYBINDS);
     public static final XaeroPlusBooleanSetting switchToEndSetting = XaeroPlusBooleanSetting.create("Switch to End",
             "Switches to the end map.",
-            (b) -> XaeroPlus.switchToDimension(1),
+            (b) -> Shared.switchToDimension(1),
             false, SettingLocation.KEYBINDS);
     public static final XaeroPlusBooleanSetting netherCaveFix = XaeroPlusBooleanSetting.create("Nether Cave Fix",
             "Forces full cave maps to be written and rendered when cave mode is \"off\" in the nether."

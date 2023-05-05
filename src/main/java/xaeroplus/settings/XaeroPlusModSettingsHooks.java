@@ -1,7 +1,7 @@
 package xaeroplus.settings;
 
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import xaeroplus.XaeroPlus;
+import xaeroplus.util.Shared;
 
 import java.io.*;
 import java.util.List;
@@ -44,7 +44,7 @@ public class XaeroPlusModSettingsHooks {
                 }
             }
         }
-        XaeroPlus.onSettingLoad();
+        Shared.onSettingLoad();
     }
 
     public static void getClientBooleanValue(String enumString, List<XaeroPlusSetting> settings, CallbackInfoReturnable<Boolean> cir) {

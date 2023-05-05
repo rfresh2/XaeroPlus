@@ -34,11 +34,11 @@ import xaero.common.minimap.waypoints.render.WaypointsGuiRenderer;
 import xaero.common.misc.Misc;
 import xaero.common.misc.OptimizedMath;
 import xaero.common.settings.ModSettings;
-import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ColorHelper;
+import xaeroplus.util.Shared;
 
-import static xaeroplus.XaeroPlus.customDimensionId;
+import static xaeroplus.util.Shared.customDimensionId;
 
 @Mixin(value = MinimapFBORenderer.class, remap = false)
 public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
@@ -72,7 +72,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
             MinimapLogs.LOGGER.info("FBO mode not supported! Using minimap safe mode.");
         } else {
             // double the framebuffer size
-            final int scaledSize = XaeroPlus.minimapScalingFactor * 512;
+            final int scaledSize = Shared.minimapScalingFactor * 512;
             this.scalingFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, false);
             this.rotationFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, false);
             this.rotationFramebuffer.setFramebufferFilter(9729);
@@ -147,8 +147,8 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
             boolean circle,
             ScaledResolution scaledRes
     ) {
-        viewW *= XaeroPlus.minimapScalingFactor;
-        final int scaledSize = 256 * XaeroPlus.minimapScalingFactor;
+        viewW *= Shared.minimapScalingFactor;
+        final int scaledSize = 256 * Shared.minimapScalingFactor;
         double maxVisibleLength = !lockedNorth && shape != 1 ? (double)viewW * Math.sqrt(2.0) : (double)viewW;
         double halfMaxVisibleLength = maxVisibleLength / 2.0;
         double radiusBlocks = maxVisibleLength / 2.0 /  this.zoom;
@@ -275,7 +275,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
             red *= chunkGridAlphaMultiplier;
             green *= chunkGridAlphaMultiplier;
             blue *= chunkGridAlphaMultiplier;
-            GlStateManager.glLineWidth((float)this.modMain.getSettings().chunkGridLineWidth * XaeroPlus.minimapScalingFactor);
+            GlStateManager.glLineWidth((float)this.modMain.getSettings().chunkGridLineWidth * Shared.minimapScalingFactor);
             int bias = (int)Math.ceil(this.zoom);
 
             for(int X = minX; X <= maxX; ++X) {
@@ -331,7 +331,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
         GlStateManager.translate(-xInsidePixel * this.zoom, -zInsidePixel * this.zoom, 0.0);
         GlStateManager.disableBlend();
         GlStateManager.color(1.0F, 1.0F, 1.0F, (float)(this.modMain.getSettings().minimapOpacity / 100.0));
-        final float scaledSizeM = XaeroPlus.minimapScalingFactor * 512f;
+        final float scaledSizeM = Shared.minimapScalingFactor * 512f;
         this.helper.drawMyTexturedModalRect(-scaledSize, -scaledSize, 0, 0, scaledSizeM, scaledSizeM, scaledSizeM);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GL11.glPopMatrix();
@@ -359,7 +359,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
                         playerZ,
                         ps,
                         pc,
-                        this.zoom / (XaeroPlus.minimapScalingFactor),
+                        this.zoom / (Shared.minimapScalingFactor),
                         cave,
                         partial,
                         this.rotationFramebuffer,

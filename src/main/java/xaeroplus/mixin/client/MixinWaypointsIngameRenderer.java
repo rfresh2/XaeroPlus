@@ -9,7 +9,7 @@ import xaero.common.minimap.waypoints.render.WaypointsIngameRenderer;
 
 import java.util.Objects;
 
-import static xaeroplus.XaeroPlus.customDimensionId;
+import static xaeroplus.util.Shared.customDimensionId;
 
 @Mixin(value = WaypointsIngameRenderer.class, remap = false)
 public class MixinWaypointsIngameRenderer {

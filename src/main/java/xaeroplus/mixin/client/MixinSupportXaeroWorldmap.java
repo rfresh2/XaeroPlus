@@ -30,12 +30,12 @@ import xaero.map.region.LeveledRegion;
 import xaero.map.region.MapRegion;
 import xaero.map.region.MapTileChunk;
 import xaeroplus.GuiHelper;
-import xaeroplus.XaeroPlus;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.CustomDimensionMapProcessor;
+import xaeroplus.util.Shared;
 import xaeroplus.util.WDLHelper;
 
 import java.util.ArrayList;
@@ -107,7 +107,7 @@ public abstract class MixinSupportXaeroWorldmap {
                     int insideZ = zFloored & 15;
                     GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                     GlStateManager.enableBlend();
-                    final int scaledSize = XaeroPlus.minimapScalingFactor * 4;
+                    final int scaledSize = Shared.minimapScalingFactor * 4;
                     int minX = (mapX >> 2) - scaledSize;
                     int maxX = (mapX >> 2) + scaledSize;
                     int minZ = (mapZ >> 2) - scaledSize;
@@ -125,7 +125,7 @@ public abstract class MixinSupportXaeroWorldmap {
 
                     int renderedCaveLayer = wmHasCaveLayers ? mapProcessor.getCurrentCaveLayer() : 0;
                     int globalCaveStart = wmHasCaveLayers
-                            ? mapProcessor.getMapWorld().getDimension(XaeroPlus.customDimensionId).getLayeredMapRegions().getLayer(renderedCaveLayer).getCaveStart()
+                            ? mapProcessor.getMapWorld().getDimension(Shared.customDimensionId).getLayeredMapRegions().getLayer(renderedCaveLayer).getCaveStart()
                             : 0;
                     int globalCaveDepth = wmHasCaveLayers ? WorldMap.settings.caveModeDepth : 0;
                     float brightness = this.getMinimapBrightness();
@@ -174,7 +174,7 @@ public abstract class MixinSupportXaeroWorldmap {
                     if (compatibilityVersion >= 6) {
                         GuiMap.setupTextureMatricesAndTextures(brightness);
                     }
-                    final boolean isDimensionSwitched = XaeroPlus.customDimensionId != Minecraft.getMinecraft().player.dimension;
+                    final boolean isDimensionSwitched = Shared.customDimensionId != Minecraft.getMinecraft().player.dimension;
 
                     WaypointWorld world = minimapSession.getWaypointsManager().getAutoWorld();
                     Long seed = slimeChunks && world != null ? this.modMain.getSettings().getSlimeChunksSeed(world.getFullId()) : null;
@@ -188,10 +188,10 @@ public abstract class MixinSupportXaeroWorldmap {
                                         renderedCaveLayer, i >> 3, j >> 3,
                                         !customDimensionMapProcessor.regionExistsCustomDimension(
                                                 renderedCaveLayer, i >> 3, j >> 3,
-                                                XaeroPlus.customDimensionId),
-                                        XaeroPlus.customDimensionId);
+                                                Shared.customDimensionId),
+                                        Shared.customDimensionId);
                             } else {
-                                region = customDimensionMapProcessor.getMapRegionCustomDimension( i >> 3, j >> 3, !customDimensionMapProcessor.regionExistsCustomDimension(i >> 3, j >> 3, XaeroPlus.customDimensionId), XaeroPlus.customDimensionId);
+                                region = customDimensionMapProcessor.getMapRegionCustomDimension( i >> 3, j >> 3, !customDimensionMapProcessor.regionExistsCustomDimension(i >> 3, j >> 3, Shared.customDimensionId), Shared.customDimensionId);
                             }
 
                             if (region != null && region != prevRegion) {
@@ -236,7 +236,7 @@ public abstract class MixinSupportXaeroWorldmap {
                                 MapTileChunk chunk = region == null ? null : region.getChunk(i & 7, j & 7);
                                 boolean chunkIsVisible = chunk != null && chunk.getGlColorTexture() != -1;
                                 if (wmHasCaveLayers && !chunkIsVisible && (!noCaveMaps || this.previousRenderedCaveLayer == Integer.MAX_VALUE)) {
-                                    MapRegion previousLayerRegion = customDimensionMapProcessor.getMapRegionCustomDimension(this.previousRenderedCaveLayer, i >> 3, j >> 3, false, XaeroPlus.customDimensionId);
+                                    MapRegion previousLayerRegion = customDimensionMapProcessor.getMapRegionCustomDimension(this.previousRenderedCaveLayer, i >> 3, j >> 3, false, Shared.customDimensionId);
                                     if (previousLayerRegion != null) {
                                         MapTileChunk previousLayerChunk = previousLayerRegion.getChunk(i & 7, j & 7);
                                         if (previousLayerChunk != null && previousLayerChunk.getGlColorTexture() != -1) {
@@ -251,13 +251,13 @@ public abstract class MixinSupportXaeroWorldmap {
                                         if (compatibilityVersion >= 7) {
                                             if (region.isLoaded()) {
                                                 if (wmHasCaveLayers) {
-                                                    mapProcessor.getMapWorld().getDimension(XaeroPlus.customDimensionId).getLayeredMapRegions().bumpLoadedRegion(region);
+                                                    mapProcessor.getMapWorld().getDimension(Shared.customDimensionId).getLayeredMapRegions().bumpLoadedRegion(region);
                                                 } else {
-                                                    mapProcessor.getMapWorld().getDimension(XaeroPlus.customDimensionId).getMapRegions().bumpLoadedRegion(region);
+                                                    mapProcessor.getMapWorld().getDimension(Shared.customDimensionId).getMapRegions().bumpLoadedRegion(region);
                                                 }
                                             }
                                         } else {
-                                            List<MapRegion> regions = mapProcessor.getMapWorld().getDimension(XaeroPlus.customDimensionId).getMapRegionsList();
+                                            List<MapRegion> regions = mapProcessor.getMapWorld().getDimension(Shared.customDimensionId).getMapRegionsList();
                                             regions.remove(region);
                                             regions.add(region);
                                         }
@@ -333,7 +333,7 @@ public abstract class MixinSupportXaeroWorldmap {
                                         for (int t = 0; t < 16; ++t) {
                                             final int chunkPosX = chunk.getX() * 4 + t % 4;
                                             final int chunkPosZ = chunk.getZ() * 4 + t / 4;
-                                            if (ModuleManager.getModule(NewChunks.class).isNewChunk(chunkPosX, chunkPosZ, XaeroPlus.customDimensionId)) {
+                                            if (ModuleManager.getModule(NewChunks.class).isNewChunk(chunkPosX, chunkPosZ, Shared.customDimensionId)) {
                                                 int newChunkDrawX = drawX + 16 * (t % 4);
                                                 int newChunkDrawZ = drawZ + 16 * (t / 4);
                                                 Gui.drawRect(newChunkDrawX, newChunkDrawZ, newChunkDrawX + 16, newChunkDrawZ + 16, ModuleManager.getModule(NewChunks.class).getNewChunksColor());
@@ -413,7 +413,7 @@ public abstract class MixinSupportXaeroWorldmap {
                         GlStateManager.enableBlend();
                         // yellow
                         GlStateManager.color(1.f, 1.f, 0.f, 0.8F);
-                        GlStateManager.glLineWidth((float) this.modMain.getSettings().chunkGridLineWidth * XaeroPlus.minimapScalingFactor);
+                        GlStateManager.glLineWidth((float) this.modMain.getSettings().chunkGridLineWidth * Shared.minimapScalingFactor);
                         vertexBuffer.pos(x0, z0, 0.0).endVertex();
                         vertexBuffer.pos(x1, z0, 0.0).endVertex();
                         vertexBuffer.pos(x1, z1, 0.0).endVertex();

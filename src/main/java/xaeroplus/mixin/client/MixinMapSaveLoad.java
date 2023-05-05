@@ -18,8 +18,8 @@ import xaero.map.file.worldsave.WorldDataHandler;
 import xaero.map.region.*;
 import xaero.map.world.MapDimension;
 import xaero.map.world.MapWorld;
-import xaeroplus.XaeroPlus;
 import xaeroplus.util.CustomDimensionMapSaveLoad;
+import xaeroplus.util.Shared;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -71,7 +71,7 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
 
     @Inject(method = "getOldFolder", at = @At(value = "HEAD"), cancellable = true)
     public void getOldFolder(final String oldUnfixedMainId, final String dim, final CallbackInfoReturnable<Path> cir) {
-        if (!XaeroPlus.nullOverworldDimensionFolder) {
+        if (!Shared.nullOverworldDimensionFolder) {
             if (oldUnfixedMainId == null) {
                 cir.setReturnValue(null);
             }
@@ -165,7 +165,7 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                                     if (nextTile != -1) {
                                         MapTile tile = this.mapProcessor
                                                 .getTilePool()
-                                                .get(this.mapProcessor.getDimensionName(XaeroPlus.customDimensionId), chunk.getX() * 4 + i, chunk.getZ() * 4 + j);
+                                                .get(this.mapProcessor.getDimensionName(Shared.customDimensionId), chunk.getX() * 4 + i, chunk.getZ() * 4 + j);
 
                                         for (int x = 0; x < 16; ++x) {
                                             MapBlock[] c = tile.getBlockColumn(x);
@@ -503,7 +503,7 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
 
     @Redirect(method = "run", at = @At(value = "INVOKE", target = "Lxaero/map/world/MapWorld;getCurrentDimension()Lxaero/map/world/MapDimension;"))
     public MapDimension redirectGetCurrentDimension(MapWorld instance) {
-        return instance.getDimension(XaeroPlus.customDimensionId);
+        return instance.getDimension(Shared.customDimensionId);
     }
 
 

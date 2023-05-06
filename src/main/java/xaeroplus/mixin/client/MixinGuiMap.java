@@ -1307,7 +1307,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                         GlStateManager.enableBlend();
                         GlStateManager.pushMatrix();
                         GlStateManager.translate(0.0F, 0.0F, 970.0F);
-                        if (WorldMap.settings.footsteps && !mc.gameSettings.hideGUI) {
+                        if (WorldMap.settings.footsteps && !mc.gameSettings.hideGUI && !isDimensionSwitched) {
                             ArrayList<Double[]> footprints = this.mapProcessor.getFootprints();
                             synchronized(footprints) {
                                 for(int i = 0; i < footprints.size(); ++i) {

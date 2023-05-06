@@ -36,12 +36,13 @@ import xaero.common.misc.OptimizedMath;
 import xaero.common.settings.ModSettings;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ColorHelper;
+import xaeroplus.util.CustomMinimapFBORenderer;
 import xaeroplus.util.Shared;
 
 import static xaeroplus.util.Shared.customDimensionId;
 
 @Mixin(value = MinimapFBORenderer.class, remap = false)
-public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
+public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements CustomMinimapFBORenderer {
 
     @Shadow
     private ImprovedFramebuffer scalingFramebuffer;
@@ -71,12 +72,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
         if (!minimapProcessor.canUseFrameBuffer()) {
             MinimapLogs.LOGGER.info("FBO mode not supported! Using minimap safe mode.");
         } else {
-            // double the framebuffer size
-            final int scaledSize = Shared.minimapScalingFactor * 512;
-            this.scalingFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, false);
-            this.rotationFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, false);
-            this.rotationFramebuffer.setFramebufferFilter(9729);
-            this.loadedFBO = this.scalingFramebuffer.framebufferObject != -1 && this.rotationFramebuffer.framebufferObject != -1;
+            reloadMapFrameBuffers();
             this.entityIconManager = new EntityIconManager(this.modMain, new EntityIconPrerenderer(this.modMain));
             this.minimapElementMapRendererHandler = MinimapElementMapRendererHandler.Builder.begin().build();
             this.radarRenderer = RadarRenderer.Builder.begin()
@@ -92,6 +88,24 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
         }
 
         this.triedFBO = true;
+    }
+
+    @Override
+    public void reloadMapFrameBuffers() {
+        if (!XaeroMinimapSession.getCurrentSession().getMinimapProcessor().canUseFrameBuffer()) {
+            MinimapLogs.LOGGER.info("FBO mode not supported! Using minimap safe mode.");
+        } else {
+            if (this.scalingFramebuffer != null)
+                this.scalingFramebuffer.deleteFramebuffer();
+            if (this.rotationFramebuffer != null)
+                this.rotationFramebuffer.deleteFramebuffer();
+            // double the framebuffer size
+            final int scaledSize = Shared.minimapScalingFactor * 512;
+            this.scalingFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, false);
+            this.rotationFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, false);
+            this.rotationFramebuffer.setFramebufferFilter(9729);
+            this.loadedFBO = this.scalingFramebuffer.framebufferObject != -1 && this.rotationFramebuffer.framebufferObject != -1;
+        }
     }
 
     public double getRenderEntityX(MinimapProcessor minimap, Entity renderEntity, float partial) {

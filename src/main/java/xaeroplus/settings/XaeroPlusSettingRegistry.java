@@ -133,4 +133,13 @@ public final class XaeroPlusSettingRegistry {
             "Forces full cave maps to be written and rendered when cave mode is \"off\" in the nether."
                     + " \\n Without this, you have to manually move region files pre WorldMap 1.30.0 to the correct cave folder",
             true, SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting alwaysRenderPlayerWithNameOnRadar = XaeroPlusBooleanSetting.create("Always Render Player Name",
+            "Always render player name on the radar.",
+            true, SettingLocation.MINIMAP_ENTITY_RADAR);
+    public static final XaeroPlusBooleanSetting alwaysRenderPlayerIconOnRadar = XaeroPlusBooleanSetting.create("Always Render Player Icon",
+            "Always render player icon on the radar.",
+            true, SettingLocation.MINIMAP_ENTITY_RADAR);
+    public static final XaeroPlusBooleanSetting fixMainEntityDot = XaeroPlusBooleanSetting.create("Fix Main Entity Dot",
+            "Fixes the main entity dot rendering on the radar when arrow is rendered.",
+            true, SettingLocation.MINIMAP_ENTITY_RADAR);
 }

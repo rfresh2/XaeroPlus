@@ -359,7 +359,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer {
                         playerZ,
                         ps,
                         pc,
-                        this.zoom / (Shared.minimapScalingFactor),
+                        this.zoom,
                         cave,
                         partial,
                         this.rotationFramebuffer,

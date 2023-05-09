@@ -110,28 +110,31 @@ public class MixinMinimapRenderer {
                                             final ModSettings settings,
                                             final ScaledResolution scaledRes,
                                             final float minimapScale) {
-        if (XaeroPlusSettingRegistry.fixMainEntityDot.getValue() && modMain.getSettings().mainEntityAs != 2 && !lockedNorth) {
-            instance.renderMainEntityDot(
-                    minimap,
-                    p,
-                    renderEntity,
-                    ps,
-                    pc,
-                    playerX,
-                    playerZ,
-                    partial,
-                    minimapRadar,
-                    lockedNorth,
-                    style,
-                    smooth,
-                    debug,
-                    cave,
-                    dotNameScale,
-                    settings,
-                    scaledRes,
-                    minimapScale
-            );
+        if (XaeroPlusSettingRegistry.fixMainEntityDot.getValue()) {
+            if (!(modMain.getSettings().mainEntityAs != 2 && !lockedNorth)) {
+                return;
+            }
         }
+        instance.renderMainEntityDot(
+                minimap,
+                p,
+                renderEntity,
+                ps,
+                pc,
+                playerX,
+                playerZ,
+                partial,
+                minimapRadar,
+                lockedNorth,
+                style,
+                smooth,
+                debug,
+                cave,
+                dotNameScale,
+                settings,
+                scaledRes,
+                minimapScale
+        );
     }
 
     @ModifyVariable(method = "drawArrow", name = "offsetY", ordinal = 0, at = @At(value = "STORE"))

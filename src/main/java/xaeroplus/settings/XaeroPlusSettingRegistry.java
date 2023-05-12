@@ -95,16 +95,16 @@ public final class XaeroPlusSettingRegistry {
             "view-distance of the server",
             4f, SettingLocation.MINIMAP_OVERLAYS); // 2b2t
     public static final XaeroPlusBooleanSetting nullOverworldDimensionFolder = XaeroPlusBooleanSetting.create("null OW Dim Dir",
-            "Sets whether the overworld WorldMap directory is in DIM0 or null (null is the original Xaero name)"
+            "Sets whether the overworld WorldMap directory is in DIM0 or null (default)"
                     + " \\n MC must be restarted for changes to take effect.",
-            false, SettingLocation.WORLD_MAP_MAIN);
+            true, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusEnumSetting<DataFolderResolutionMode> dataFolderResolutionMode = XaeroPlusEnumSetting.create("Data Dir Mode",
             "Sets how the WorldMap and Waypoints data folders are resolved."
                     + " \\n MC must be restarted for changes to take effect."
                     + " \\n IP = Server IP (Xaero Default). Example: .minecraft/XaeroWorldMap/Multiplayer_connect.2b2t.org"
-                    + " \\n SERVER_NAME = MC Server Entry Name (XaeroPlus Default). Example: .minecraft/XaeroWorldMap/Multiplayer_2b2t"
+                    + " \\n SERVER_NAME = MC Server Entry Name. Example: .minecraft/XaeroWorldMap/Multiplayer_2b2t"
                     + " \\n BASE_DOMAIN = Base Server Domain Name. Example: .minecraft/XaeroWorldMap/Multiplayer_2b2t.org",
-            DataFolderResolutionMode.values(), DataFolderResolutionMode.SERVER_NAME, SettingLocation.WORLD_MAP_MAIN);
+            DataFolderResolutionMode.values(), DataFolderResolutionMode.IP, SettingLocation.WORLD_MAP_MAIN);
     public enum DataFolderResolutionMode {
         IP, SERVER_NAME, BASE_DOMAIN;
     }

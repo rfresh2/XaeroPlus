@@ -28,16 +28,6 @@ Any other Xaero WorldMap/Minimap version may cause crashes.
 
 # Modifications
 
-* WorldMap and Waypoint directories are indexed by:
-  * Default: Multiplayer server list name.
-  * Optional: Server IP (Xaero's default)
-  * Optional: Base Server Domain Name
-  * **The default setting requires you to manually change the name of existing folders.** 
-    * In both `.minecraft/XaeroWaypoints/` and `.minecraft/XaeroWorldMap/`
-* Overworld dimension is stored in the "DIM0" directory instead of "null"
-  * **The default setting requires you to manually change the name of existing folders** 
-    * In `.minecraft/XaeroWorldMap/Multiplayer_<server name>/`
-  * You can configure this setting to use the default "null" directory name
 * WorldMap zoom unlocked
 * Dimension hot-switching on WorldMap and Minimap
 * Fast map region writes. Prevent missed chunks in map while traveling at very high speeds.
@@ -51,14 +41,22 @@ Any other Xaero WorldMap/Minimap version may cause crashes.
 * Transparent obsidian roof. Useful for mapping 2b2t spawn.
 * Option to always view and create waypoints in the Overworld when in Nether.
 * GUI on WorldMap to pan the map to user entered coordinates.
+* F1 on WorldMap hides GUI and overlays
 * Waypoints GUI:
   * Search
   * Display distance to waypoints on Waypoints GUI
   * Always sort enabled waypoints before disabled waypoints
   * GUI button to enable/disable all waypoints
 * Minecraft world always renders in background while in a Xaero GUI (for client travel mods compatibility)
-* WorldMap 1.30.0 added cave data saving and rendering. There is a config on by default in XaeroPlus that changes how the nether is rendered with cave mode off to be as it was previously.
-  * This removes the need to manually move existing world data files. But without XaeroPlus you will need to fix this manually.
+* WorldMap and Waypoint directories optionally indexed by:
+  * Multiplayer server list name.
+  * Base Server Domain Name
+  * Server IP (Xaero's default)
+  * **Changing this setting requires you to manually rename existing folders in `.minecraft/XaeroWaypoints/` and `.minecraft/XaeroWorldMap/`**
+* Overworld dimension optionally stored in the "DIM0" directory instead of "null"
+  * **Changing this setting requires you to manually rename existing folders in `.minecraft/XaeroWorldMap/Multiplayer_<server name>/`**
+* WorldMap 1.30.0 added cave data saving and rendering. There is a setting on by default in XaeroPlus that changes how the nether is rendered with cave mode off to be as it was previously.
+  * This removes the need to manually move existing world data files. 
 
 Configurations are in the Xaero WorldMap and Minimap settings GUI.
 

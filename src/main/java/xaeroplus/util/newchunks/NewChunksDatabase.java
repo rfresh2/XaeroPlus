@@ -61,7 +61,6 @@ public class NewChunksDatabase implements Closeable {
                     .map(chunk -> "(" + chunk.x + ", " + chunk.z + ", " + chunk.foundTime + ")")
                     .collect(Collectors.joining(", "));
             connection.createStatement().execute(statement);
-            XaeroPlus.LOGGER.info("Saved {} NewChunks to db", newChunks.size());
         } catch (Exception e) {
             XaeroPlus.LOGGER.error("Error inserting new chunks into database", e);
         }

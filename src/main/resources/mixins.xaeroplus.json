@@ -4,6 +4,7 @@
   "package": "xaeroplus.mixin.client",
   "refmap": "mixins.xaeroplus.refmap.json",
   "client": [
+    "MixinBlockStateColorTypeCache",
     "MixinBranchLeveledRegion",
     "MixinCommonModSettings",
     "MixinControlsHandler",

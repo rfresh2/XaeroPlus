@@ -1152,7 +1152,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                 }
                             }
 
-                            int var207 = 1;
+                            int var207 = 10; // increase limit
                             counter = 0;
                             if (!prevWaitingForBranchCache) {
                                 for(int i = 0; i < this.regionBuffer.size() && counter < var207; ++i) {

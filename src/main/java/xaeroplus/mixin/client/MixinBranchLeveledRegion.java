@@ -26,8 +26,7 @@ public abstract class MixinBranchLeveledRegion extends LeveledRegion<BranchRegio
 
     @Redirect(method = "checkForUpdates", at = @At(value = "INVOKE", target = "Lxaero/map/MapProcessor;getMapRegion(IIIZ)Lxaero/map/region/MapRegion;"))
     public MapRegion redirectGetMapRegion(MapProcessor mapProcessor, int caveLayer, int regX, int regZ, boolean create) {
-        ((CustomDimensionMapProcessor) mapProcessor).getMapRegionCustomDimension(caveLayer, regX, regZ, create, dim.getDimId());
-        return null;
+        return ((CustomDimensionMapProcessor) mapProcessor).getMapRegionCustomDimension(caveLayer, regX, regZ, create, dim.getDimId());
     }
 
 }

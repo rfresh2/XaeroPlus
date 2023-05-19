@@ -147,10 +147,7 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                             int p = chunkCoords & 15;
                             MapTileChunk chunk = region.getChunk(o, p);
                             if (chunk == null) {
-                                region.setChunk(o, p, chunk = new MapTileChunk(region, region.getRegionX() * 8 + o, region.getRegionZ() * 8 + p));
-                                synchronized (region) {
-                                    region.setAllCachePrepared(false);
-                                }
+                                region.setChunk(o, p, chunk = new MapTileChunk(region, (region.getRegionX() << 3) + o, (region.getRegionZ() << 3) + p));
                             }
 
                             if (region.isMetaLoaded()) {
@@ -200,7 +197,6 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                                 if (!chunk.hasHighlightsIfUndiscovered()) {
                                     region.setChunk(o, p, null);
                                     chunk.getLeafTexture().deleteTexturesAndBuffers();
-                                    MapTileChunk var56 = null;
                                 }
                             } else {
                                 region.pushWriterPause();
@@ -214,7 +210,6 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                         if (in != null) {
                             in.close();
                         }
-
                     }
 
                     if (totalChunks > 0) {
@@ -275,7 +270,16 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                             region.setSaveExists(null);
                             if (WorldMap.settings.debug) {
                                 WorldMap.LOGGER
-                                        .info("Region failed to load from world save: " + region + " " + region.getWorldId() + " " + region.getDimId() + " " + region.getMwId());
+                                        .info(
+                                                "Region failed to load from world save: "
+                                                        + region
+                                                        + " "
+                                                        + region.getWorldId()
+                                                        + " "
+                                                        + region.getDimId()
+                                                        + " "
+                                                        + region.getMwId()
+                                        );
                             }
                         } else if (WorldMap.settings.debug) {
                             WorldMap.LOGGER
@@ -286,7 +290,7 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                     }
                 }
             } else {
-                if (region.getLoadState() == 4) {
+                if (region.getLoadState() == 4 || region.hasHadTerrain()) {
                     region.setSaveExists(null);
                 }
 
@@ -306,8 +310,8 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                     return true;
                 }
             }
-        } catch (IOException var46) {
-            WorldMap.LOGGER.error("IO exception while trying to load " + region, var46);
+        } catch (IOException var44) {
+            WorldMap.LOGGER.error("IO exception while trying to load " + region, var44);
             if (extraAttempts > 0) {
                 synchronized (region) {
                     region.setLoadState((byte) 4);
@@ -317,7 +321,7 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
 
                 try {
                     Thread.sleep(20L);
-                } catch (InterruptedException var38) {
+                } catch (InterruptedException var37) {
                 }
 
                 return this.loadRegion(world, region, colourTypeCache, extraAttempts - 1);
@@ -325,9 +329,9 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                 region.setSaveExists(null);
                 return false;
             }
-        } catch (Throwable var47) {
+        } catch (Throwable var45) {
             region.setSaveExists(null);
-            WorldMap.LOGGER.error("Region failed to load: " + region + (versionReached ? " " + saveVersion : ""), var47);
+            WorldMap.LOGGER.error("Region failed to load: " + region + (versionReached ? " " + saveVersion : ""), var45);
             return false;
         }
     }
@@ -361,7 +365,8 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                         file.createNewFile();
                     }
 
-                    boolean regionIsEmpty = true;
+                    boolean hasAnything = false;
+                    boolean regionWasSavedEmpty = true;
                     DataOutputStream out = null;
                     ZipOutputStream zipOut = null;
                     ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
@@ -379,6 +384,7 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                             for(int p = 0; p < 8; ++p) {
                                 MapTileChunk chunk = region.getChunk(o, p);
                                 if (chunk != null) {
+                                    hasAnything = true;
                                     if (!chunk.includeInSave()) {
                                         if (!chunk.hasHighlightsIfUndiscovered()) {
                                             region.setChunk(o, p, null);
@@ -419,7 +425,7 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                                         }
 
                                         if (!chunkIsEmpty) {
-                                            regionIsEmpty = false;
+                                            regionWasSavedEmpty = false;
                                         }
                                     }
                                 }
@@ -439,13 +445,13 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
 
                     }
 
-                    if (regionIsEmpty) {
+                    if (regionWasSavedEmpty) {
                         this.safeDelete(permFile.toPath(), ".zip");
                         this.safeDelete(file.toPath(), ".temp");
                         if (WorldMap.settings.debug) {
                             WorldMap.LOGGER
                                     .info(
-                                            "Save cancelled because the region is empty: "
+                                            "Save cancelled because the region would be saved empty: "
                                                     + region
                                                     + " "
                                                     + region.getWorldId()
@@ -456,7 +462,7 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                                     );
                         }
 
-                        return false;
+                        return hasAnything;
                     } else {
                         this.safeMoveAndReplace(file.toPath(), permFile.toPath(), ".temp", ".zip");
                         if (WorldMap.settings.debug) {

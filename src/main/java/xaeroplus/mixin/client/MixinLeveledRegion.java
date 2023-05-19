@@ -151,8 +151,6 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
                     }
                 }
                 byteOut.close();
-
-
             }
 
             return success;
@@ -214,8 +212,7 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
                                     this.readCacheMetaData(input, cacheSaveVersion, usableBuffer, integerByteBuffer, textureLoaded, mapProcessor);
                                     metaLoadedDest[0] = true;
                                     if (justMetaData && (cacheSaveVersion == 8 || cacheSaveVersion >= 12)) {
-                                        boolean leafShouldAffectBranches = true;
-                                        return leafShouldAffectBranches;
+                                        return true;
                                     }
                                 }
 

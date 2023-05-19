@@ -286,7 +286,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                     }
                     try {
                         // reduce artificial 1 second thread pause between region loads on login
-                        Thread.sleep(10L);
+                        Thread.sleep(5L);
                     } catch (InterruptedException interruptedException) {
                     }
                 }

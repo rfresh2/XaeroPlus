@@ -262,11 +262,11 @@ public abstract class MixinSupportXaeroWorldmap {
                                             regions.add(region);
                                         }
                                     }
-                                    int drawX = 64 * (chunk.getX() - chunkX) - 16 * tileX - insideX;
-                                    int drawZ = 64 * (chunk.getZ() - chunkZ) - 16 * tileZ - insideZ;
+                                    int drawX = ((chunk.getX() - chunkX) << 6) - (tileX << 4) - insideX;
+                                    int drawZ = ((chunk.getZ() - chunkZ) << 6) - (tileZ << 4) - insideZ;
 
                                     if (transparentMinimapBackground.getValue()) {
-                                        GuiHelper.drawMMBackground(drawX, drawZ, 64.0f, brightness, chunk, mapProcessor);
+                                        GuiHelper.drawMMBackground(drawX, drawZ, brightness, chunk);
                                         GuiMap.setupTextureMatricesAndTextures(brightness);
                                     }
 
@@ -301,7 +301,7 @@ public abstract class MixinSupportXaeroWorldmap {
                                         if (newSeed) {
                                             seedsUsed.put(chunk, seed);
                                         }
-                                        final List<GuiHelper.Rect> rects = new ArrayList<>();
+                                        final List<GuiHelper.Rect> rects = new ArrayList<>(32);
                                         for (int t = 0; t < 16; ++t) {
                                             if (newSeed || (chunk.getTileGridsCache()[t % 4][t / 4] & 1) == 0) {
                                                 chunk.getTileGridsCache()[t % 4][t / 4] = (byte) (1 | (MinimapTile.isSlimeChunk(this.modMain.getSettings(), chunk.getX() * 4 + t % 4, chunk.getZ() * 4 + t / 4, seed) ? 2 : 0));
@@ -318,7 +318,7 @@ public abstract class MixinSupportXaeroWorldmap {
                                         GuiHelper.drawRectList(rects, -2142047936);
                                     }
                                     if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
-                                        final List<GuiHelper.Rect> rects = new ArrayList<>();
+                                        final List<GuiHelper.Rect> rects = new ArrayList<>(32);
                                         for (int t = 0; t < 16; ++t) {
                                             final int chunkPosX = chunk.getX() * 4 + t % 4;
                                             final int chunkPosZ = chunk.getZ() * 4 + t / 4;
@@ -333,7 +333,7 @@ public abstract class MixinSupportXaeroWorldmap {
                                         GuiHelper.drawRectList(rects, ModuleManager.getModule(NewChunks.class).getNewChunksColor());
                                     }
                                     if (XaeroPlusSettingRegistry.portalSkipDetectionEnabledSetting.getValue() && XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
-                                        final List<GuiHelper.Rect> rects = new ArrayList<>();
+                                        final List<GuiHelper.Rect> rects = new ArrayList<>(32);
                                         for (int t = 0; t < 16; ++t) {
                                             final int chunkPosX = chunk.getX() * 4 + t % 4;
                                             final int chunkPosZ = chunk.getZ() * 4 + t / 4;
@@ -351,7 +351,7 @@ public abstract class MixinSupportXaeroWorldmap {
                                             && WDLHelper.isWdlPresent()
                                             && WDLHelper.isDownloading()
                                             && !isDimensionSwitched) {
-                                        final List<GuiHelper.Rect> rects = new ArrayList<>();
+                                        final List<GuiHelper.Rect> rects = new ArrayList<>(32);
                                         final Set<Long> wdlSavedChunksWithCache = WDLHelper.getSavedChunksWithCache();
                                         for (int t = 0; t < 16; ++t) {
                                             final Long chunkPos = ChunkUtils.chunkPosToLong(chunk.getX() * 4 + t % 4, chunk.getZ() * 4 + t / 4);

@@ -1056,9 +1056,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                     restoreTextureStates();
 
                                     if (WorldMap.settings.debug && textureLevel > 0 && !mc.gameSettings.hideGUI) {
-                                        final List<GuiHelper.Rect> currentlyLoadingRects = new ArrayList<>();
-                                        final List<GuiHelper.Rect> currentlyLoadedRects = new ArrayList<>();
-                                        final List<GuiHelper.Rect> metaLoadedRects = new ArrayList<>();
+                                        final List<GuiHelper.Rect> currentlyLoadingRects = new ArrayList<>(32);
+                                        final List<GuiHelper.Rect> currentlyLoadedRects = new ArrayList<>(32);
+                                        final List<GuiHelper.Rect> metaLoadedRects = new ArrayList<>(32);
                                         for(int leafX = 0; leafX < leveledSideInRegions; leafX += 1) {
                                             for(int leafZ = 0; leafZ < leveledSideInRegions; leafZ += 1) {
                                                 int regX = leafRegionMinX + leafX;
@@ -1088,7 +1088,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                         GuiHelper.drawRectList(metaLoadedRects, 687865600);
                                     }
                                     if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue() && !mc.gameSettings.hideGUI) {
-                                        final List<GuiHelper.Rect> rects = new ArrayList<>();
+                                        final List<GuiHelper.Rect> rects = new ArrayList<>(32);
                                         final NewChunks newChunks = ModuleManager.getModule(NewChunks.class);
                                         for (final HighlightAtChunkPos c : newChunks.getNewChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions, Shared.customDimensionId)) {
                                             final float left = (float) ((c.x << 4) - flooredCameraX);
@@ -1100,7 +1100,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                         GuiHelper.drawRectList(rects, newChunks.getNewChunksColor());
                                     }
                                     if (XaeroPlusSettingRegistry.portalSkipDetectionEnabledSetting.getValue() && !mc.gameSettings.hideGUI && XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
-                                        final List<GuiHelper.Rect> rects = new ArrayList<>();
+                                        final List<GuiHelper.Rect> rects = new ArrayList<>(32);
                                         final PortalSkipDetection portalSkipDetection = ModuleManager.getModule(PortalSkipDetection.class);
                                         for (final HighlightAtChunkPos c : portalSkipDetection.getPortalSkipChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions)) {
                                             final float left = (float) ((c.x << 4) - flooredCameraX);
@@ -1116,7 +1116,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                             && WDLHelper.isWdlPresent()
                                             && WDLHelper.isDownloading()
                                             && !isDimensionSwitched) {
-                                        final List<GuiHelper.Rect> rects = new ArrayList<>();
+                                        final List<GuiHelper.Rect> rects = new ArrayList<>(32);
                                         for (final HighlightAtChunkPos c : WDLHelper.getSavedChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions)) {
                                             final float left = (float) ((c.x << 4) - flooredCameraX);
                                             final float top = (float) ((c.z << 4) - flooredCameraZ);

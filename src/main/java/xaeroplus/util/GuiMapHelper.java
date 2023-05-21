@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import xaero.map.core.XaeroWorldMapCore;
 import xaero.map.gui.GuiMap;
+import xaero.map.gui.GuiSettings;
 import xaeroplus.mixin.client.MixinGuiMapAccessor;
 
 import java.util.Optional;
@@ -13,6 +14,8 @@ public class GuiMapHelper {
         GuiScreen currentScreen = Minecraft.getMinecraft().currentScreen;
         if (currentScreen instanceof GuiMap) {
             return Optional.of((GuiMap) currentScreen);
+        } else if (currentScreen instanceof GuiSettings && ((GuiSettings) currentScreen).parent instanceof GuiMap) {
+            return Optional.of((GuiMap) ((GuiSettings) currentScreen).parent);
         }
         return Optional.empty();
     }

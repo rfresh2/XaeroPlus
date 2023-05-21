@@ -38,7 +38,7 @@ public class WDLHelper {
                 isWdlPresent = true;
             } catch (final Throwable e) {
                 if (!hasLoggedFail) {
-                    XaeroPlus.LOGGER.error("WDL mod not present or has unsupported version, WDL features will be disabled.", e);
+                    XaeroPlus.LOGGER.error("WDL mod not present or has unsupported version, WDL features will be disabled.");
                     hasLoggedFail = true;
                 }
                 isWdlPresent = false;

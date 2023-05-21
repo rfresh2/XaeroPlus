@@ -47,6 +47,7 @@ import xaero.map.world.MapDimension;
 import xaeroplus.XaeroPlus;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
+import xaeroplus.module.impl.PortalSkipDetection;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.CustomDimensionMapProcessor;
 import xaeroplus.util.HighlightAtChunkPos;
@@ -219,6 +220,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     protected abstract <E, C> CursorBox hoveredElementTooltipHelper(HoveredMapElementHolder<E, C> hovered, boolean viewedInList);
     @Shadow
     public abstract void addGuiButton(GuiButton b);
+
+    @Shadow
+    public static void restoreTextureStates() {}
 
     /**
      * @author rfresh2
@@ -1051,10 +1055,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                         GlStateManager.disableBlend();
                                         setupTextureMatricesAndTextures(brightness);
                                     }
+                                    restoreTextureStates();
 
                                     if (WorldMap.settings.debug && textureLevel > 0 && !mc.gameSettings.hideGUI) {
-                                        restoreTextureStates();
-
                                         for(int leafX = 0; leafX < leveledSideInRegions; leafX += 1) {
                                             for(int leafZ = 0; leafZ < leveledSideInRegions; leafZ += 1) {
                                                 int regX = leafRegionMinX + leafX;
@@ -1073,13 +1076,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                                 }
                                             }
                                         }
-
-                                        GlStateManager.disableBlend();
-                                        setupTextureMatricesAndTextures(brightness);
                                     }
-
                                     if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue() && !mc.gameSettings.hideGUI) {
-                                        restoreTextureStates();
                                         final NewChunks newChunks = ModuleManager.getModule(NewChunks.class);
                                         for (final HighlightAtChunkPos c : newChunks.getNewChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions, Shared.customDimensionId)) {
                                             // todo: GL calls can be optimized further here by:
@@ -1093,15 +1091,23 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                             drawRect(0, 0, 16, 16, newChunks.getNewChunksColor());
                                             GlStateManager.popMatrix();
                                         }
-                                        GlStateManager.disableBlend();
-                                        setupTextureMatricesAndTextures(brightness);
+                                    }
+                                    if (XaeroPlusSettingRegistry.portalSkipDetectionEnabledSetting.getValue() && !mc.gameSettings.hideGUI && XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
+                                        final PortalSkipDetection portalSkipDetection = ModuleManager.getModule(PortalSkipDetection.class);
+                                        for (final HighlightAtChunkPos c : portalSkipDetection.getPortalSkipChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions)) {
+                                            GlStateManager.pushMatrix();
+                                            GlStateManager.translate(
+                                                    (float) ((c.x << 4) - flooredCameraX), (float) ((c.z << 4) - flooredCameraZ), 0.0F
+                                            );
+                                            drawRect(0, 0, 16, 16, portalSkipDetection.getPortalSkipChunksColor());
+                                            GlStateManager.popMatrix();
+                                        }
                                     }
                                     if (XaeroPlusSettingRegistry.wdlEnabledSetting.getValue()
                                             && !mc.gameSettings.hideGUI
                                             && WDLHelper.isWdlPresent()
                                             && WDLHelper.isDownloading()
                                             && !isDimensionSwitched) {
-                                        restoreTextureStates();
                                         for (final HighlightAtChunkPos c : WDLHelper.getSavedChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions)) {
                                             GlStateManager.pushMatrix();
                                             GlStateManager.translate(
@@ -1110,9 +1116,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                             drawRect(0, 0, 16, 16, WDLHelper.getWdlColor());
                                             GlStateManager.popMatrix();
                                         }
-                                        GlStateManager.disableBlend();
-                                        setupTextureMatricesAndTextures(brightness);
                                     }
+                                    GlStateManager.disableBlend();
+                                    setupTextureMatricesAndTextures(brightness);
                                 }
                             }
                         }

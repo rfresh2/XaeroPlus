@@ -32,6 +32,7 @@ import xaero.map.region.MapTileChunk;
 import xaeroplus.GuiHelper;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
+import xaeroplus.module.impl.PortalSkipDetection;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.CustomDimensionMapProcessor;
@@ -291,13 +292,11 @@ public abstract class MixinSupportXaeroWorldmap {
                                         GlStateManager.setActiveTexture(33984);
                                         GL11.glTexParameteri(3553, 10240, 9728);
                                     }
-
+                                    GuiMap.restoreTextureStates();
+                                    if (compatibilityVersion >= 7) {
+                                        GL14.glBlendFuncSeparate(770, 771, 1, 771);
+                                    }
                                     if (slimeChunks && !isDimensionSwitched) {
-                                        GuiMap.restoreTextureStates();
-                                        if (compatibilityVersion >= 7) {
-                                            GL14.glBlendFuncSeparate(770, 771, 1, 771);
-                                        }
-
                                         Long savedSeed = (Long) seedsUsed.get(chunk);
                                         boolean newSeed = seed == null && savedSeed != null || seed != null && !seed.equals(savedSeed);
                                         if (newSeed) {
@@ -315,21 +314,8 @@ public abstract class MixinSupportXaeroWorldmap {
                                                 Gui.drawRect(slimeDrawX, slimeDrawZ, slimeDrawX + 16, slimeDrawZ + 16, -2142047936);
                                             }
                                         }
-
-                                        if (compatibilityVersion >= 6) {
-                                            GuiMap.setupTextures(brightness);
-                                        }
-
-                                        if (compatibilityVersion >= 7) {
-                                            GL14.glBlendFuncSeparate(1, 0, 0, 1);
-                                            GlStateManager.enableBlend();
-                                        }
                                     }
                                     if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
-                                        GuiMap.restoreTextureStates();
-                                        if (compatibilityVersion >= 7) {
-                                            GL14.glBlendFuncSeparate(770, 771, 1, 771);
-                                        }
                                         for (int t = 0; t < 16; ++t) {
                                             final int chunkPosX = chunk.getX() * 4 + t % 4;
                                             final int chunkPosZ = chunk.getZ() * 4 + t / 4;
@@ -339,26 +325,23 @@ public abstract class MixinSupportXaeroWorldmap {
                                                 Gui.drawRect(newChunkDrawX, newChunkDrawZ, newChunkDrawX + 16, newChunkDrawZ + 16, ModuleManager.getModule(NewChunks.class).getNewChunksColor());
                                             }
                                         }
-
-                                        if (compatibilityVersion >= 6) {
-                                            GuiMap.setupTextures(brightness);
-                                        }
-
-                                        if (compatibilityVersion >= 7) {
-                                            GL14.glBlendFuncSeparate(1, 0, 0, 1);
-                                            GlStateManager.enableBlend();
+                                    }
+                                    if (XaeroPlusSettingRegistry.portalSkipDetectionEnabledSetting.getValue() && XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
+                                        for (int t = 0; t < 16; ++t) {
+                                            final int chunkPosX = chunk.getX() * 4 + t % 4;
+                                            final int chunkPosZ = chunk.getZ() * 4 + t / 4;
+                                            if (ModuleManager.getModule(PortalSkipDetection.class).isPortalSkipChunk(chunkPosX, chunkPosZ)) {
+                                                int portalDrawX = drawX + 16 * (t % 4);
+                                                int portalDrawZ = drawZ + 16 * (t / 4);
+                                                Gui.drawRect(portalDrawX, portalDrawZ, portalDrawX + 16, portalDrawZ + 16, ModuleManager.getModule(PortalSkipDetection.class).getPortalSkipChunksColor());
+                                            }
                                         }
                                     }
-
                                     if (XaeroPlusSettingRegistry.wdlEnabledSetting.getValue()
                                             && WDLHelper.isWdlPresent()
                                             && WDLHelper.isDownloading()
                                             && !isDimensionSwitched) {
-                                        GuiMap.restoreTextureStates();
                                         final Set<Long> wdlSavedChunksWithCache = WDLHelper.getSavedChunksWithCache();
-                                        if (compatibilityVersion >= 7) {
-                                            GL14.glBlendFuncSeparate(770, 771, 1, 771);
-                                        }
                                         for (int t = 0; t < 16; ++t) {
                                             final Long chunkPos = ChunkUtils.chunkPosToLong(chunk.getX() * 4 + t % 4, chunk.getZ() * 4 + t / 4);
                                             if (wdlSavedChunksWithCache.contains(chunkPos)) {
@@ -367,15 +350,14 @@ public abstract class MixinSupportXaeroWorldmap {
                                                 Gui.drawRect(wdlChunkDrawX, wdlChunkDrawZ, wdlChunkDrawX + 16, wdlChunkDrawZ + 16, WDLHelper.getWdlColor());
                                             }
                                         }
+                                    }
+                                    if (compatibilityVersion >= 6) {
+                                        GuiMap.setupTextures(brightness);
+                                    }
 
-                                        if (compatibilityVersion >= 6) {
-                                            GuiMap.setupTextures(brightness);
-                                        }
-
-                                        if (compatibilityVersion >= 7) {
-                                            GL14.glBlendFuncSeparate(1, 0, 0, 1);
-                                            GlStateManager.enableBlend();
-                                        }
+                                    if (compatibilityVersion >= 7) {
+                                        GL14.glBlendFuncSeparate(1, 0, 0, 1);
+                                        GlStateManager.enableBlend();
                                     }
 
                                     if (compatibilityVersion < 7) {

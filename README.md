@@ -28,19 +28,20 @@ Any other Xaero WorldMap/Minimap version may cause crashes.
 
 # Modifications
 
-* WorldMap zoom unlocked
 * Dimension hot-switching on WorldMap and Minimap
-* Fast map region writes. Prevent missed chunks in map while traveling at very high speeds.
-* WorldMap Follow mode and GUI button
 * Adjustable minimap scaling that increases how many chunks are visible
 * NewChunks Highlighting in MiniMap and WorldMap.
 * [WorldDownloader 4.1.1.0](https://github.com/Pokechu22/WorldDownloader/) integration (does not work with Future's Forge WDL jar)
   * Highlights chunks as they are downloaded in the Minimap and WorldMap.
+* Portal Skip Highlighting in Minimap and WorldMap. Detects chunks where a portal could have been loaded.
 * Transparent minimap background instead of wasted black screen space.
+* WorldMap zoom unlocked
+* Fast map region writes. Prevent missed chunks in map while traveling at very high speeds.
 * Allow multiple MC instances to read/write to the same map concurrently
 * Transparent obsidian roof. Useful for mapping 2b2t spawn.
 * Option to always view and create waypoints in the Overworld when in Nether.
 * GUI on WorldMap to pan the map to user entered coordinates.
+* WorldMap Follow mode and GUI button
 * F1 on WorldMap hides GUI and overlays
 * Waypoints GUI:
   * Search

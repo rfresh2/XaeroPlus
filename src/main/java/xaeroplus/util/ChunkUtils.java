@@ -31,10 +31,18 @@ public class ChunkUtils {
         return (int)(l >> 32 & 4294967295L);
     }
     public static int currentPlayerChunkX() {
-        return Minecraft.getMinecraft().player.chunkCoordX;
+        try {
+            return Minecraft.getMinecraft().player.chunkCoordX;
+        } catch (final NullPointerException e) {
+            return 0;
+        }
     }
     public static int currentPlayerChunkZ() {
-        return Minecraft.getMinecraft().player.chunkCoordZ;
+        try {
+            return Minecraft.getMinecraft().player.chunkCoordZ;
+        } catch (final NullPointerException e) {
+            return 0;
+        }
     }
     public static int currentPlayerRegionX() {
         return currentPlayerChunkX() >> 5;
@@ -60,6 +68,97 @@ public class ChunkUtils {
     public static int regionCoordToCoord(final int regionCoord) {
         return regionCoord << 9;
     }
+
+    /**
+     * MCRegion Format:
+     *   Region = 32x32 Chunks
+     *   Chunk = 16x16 Blocks
+     *
+     * XaeroRegion Format:
+     *   MapRegion = 8x8 MapTileChunks
+     *   MapTileChunk = 4x4 Tiles
+     *   Tile = 16x16 Blocks
+     */
+
+    public static int coordToMapRegionCoord(final int coord) {
+        return coord >> 9;
+    }
+    public static int mapRegionCoordToCoord(final int mapRegionCoord) {
+        return mapRegionCoord << 9;
+    }
+    public static int mapTileChunkCoordToMapRegionCoord(final int mapTileChunkCoord) {
+        return mapTileChunkCoord >> 3;
+    }
+    public static int mapRegionCoordToMapTileChunkCoord(final int mapRegionCoord) {
+        return mapRegionCoord << 3;
+    }
+    public static int mapTileCoordToMapTileChunkCoord(final int mapTileCoord) {
+        return mapTileCoord >> 2;
+    }
+    public static int mapTileChunkCoordToMapTileCoord(final int mapTileChunkCoord) {
+        return mapTileChunkCoord << 2;
+    }
+    public static int mapTileCoordToCoord(final int mapTileCoord) {
+        return mapTileCoord << 4;
+    }
+    public static int coordToMapTileCoord(final int coord) {
+        return coord >> 4;
+    }
+    public static int mapTileCoordToMapRegionCoord(final int mapTileCoord) {
+        return mapTileCoord >> 6;
+    }
+    public static int mapRegionCoordToMapTileCoord(final int mapRegionCoord) {
+        return mapRegionCoord << 6;
+    }
+    public static int mapTileChunkCoordToCoord(final int mapTileChunkCoord) {
+        return mapTileChunkCoord << 6;
+    }
+    public static int coordToMapTileChunkCoord(final int coord) {
+        return coord >> 6;
+    }
+    public static int chunkCoordToMapRegionCoord(final int chunkCoord) {
+        return chunkCoord >> 5;
+    }
+    public static int mapRegionCoordToChunkCoord(final int mapRegionCoord) {
+        return mapRegionCoord << 5;
+    }
+    public static int chunkCoordToMapTileChunkCoord(final int chunkCoord) {
+        return chunkCoord >> 2;
+    }
+    public static int mapTileChunkCoordToChunkCoord(final int mapTileChunkCoord) {
+        return mapTileChunkCoord << 2;
+    }
+    public static int chunkCoordToMapTileCoord(final int chunkCoord) {
+        return chunkCoord;
+    }
+    public static int mapTileCoordToChunkCoord(final int mapTileCoord) {
+        return mapTileCoord;
+    }
+    public static int regionCoordToMapRegionCoord(final int regionCoord) {
+        return regionCoord;
+    }
+    public static int mapRegionCoordToRegionCoord(final int mapRegionCoord) {
+        return mapRegionCoord;
+    }
+    public static int regionCoordToMapTileChunkCoord(final int regionCoord) {
+        return regionCoord << 3;
+    }
+    public static int mapTileChunkCoordToRegionCoord(final int mapTileChunkCoord) {
+        return mapTileChunkCoord >> 3;
+    }
+    public static int regionCoordToMapTileCoord(final int regionCoord) {
+        return regionCoord << 6;
+    }
+    public static int mapTileCoordToRegionCoord(final int mapTileCoord) {
+        return mapTileCoord >> 6;
+    }
+    public static int chunkCoordToMapTileChunkCoordLocal(final int chunkCoord) {
+        return chunkCoordToMapTileChunkCoord(chunkCoord) & 7;
+    }
+    public static int chunkCoordToMapTileCoordLocal(final int chunkCoord) {
+        return chunkCoordToMapTileCoord(chunkCoord) & 3;
+    }
+
     public static int getMCDimension() {
         try {
             return Minecraft.getMinecraft().world.provider.getDimension();

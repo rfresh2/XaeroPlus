@@ -106,6 +106,7 @@ dependencies {
         exclude module: 'log4j-core'
     }
 
+    jarLibs 'com.github.ben-manes.caffeine:caffeine:2.9.3'
     jarLibs 'org.apache.commons:commons-compress:1.21'
     jarLibs 'org.xerial:sqlite-jdbc:3.41.2.1'
 

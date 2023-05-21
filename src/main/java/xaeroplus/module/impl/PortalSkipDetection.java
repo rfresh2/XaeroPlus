@@ -1,7 +1,7 @@
 package xaeroplus.module.impl;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -22,7 +22,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
@@ -37,9 +40,10 @@ public class PortalSkipDetection extends Module {
     private int portalSkipChunksColor = ColorHelper.getColor(255, 255, 255, 100);
     private final LongOpenHashSet portalSkipChunks = new LongOpenHashSet();
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
-    private final Cache<RegionRenderPos, List<HighlightAtChunkPos>> regionRenderCache = CacheBuilder.newBuilder()
-            .expireAfterWrite(500, TimeUnit.MILLISECONDS)
-            .build();
+    private final LoadingCache<RegionRenderPos, List<HighlightAtChunkPos>> regionRenderCache = Caffeine.newBuilder()
+            .expireAfterWrite(3000L, TimeUnit.MILLISECONDS)
+            .refreshAfterWrite(500L, TimeUnit.MILLISECONDS)
+            .build(key -> loadHighlightChunksAtRegion(key.leafRegionX, key.leafRegionZ, key.level, this::isPortalSkipChunk).call());
     private int windowRegionX = 0;
     private int windowRegionZ = 0;
     private int windowRegionSize = 0;
@@ -218,8 +222,8 @@ public class PortalSkipDetection extends Module {
             final int leafRegionX, final int leafRegionZ,
             final int level) {
         try {
-            return regionRenderCache.get(new RegionRenderPos(leafRegionX, leafRegionZ, level), loadHighlightChunksAtRegion(leafRegionX, leafRegionZ, level, this::isPortalSkipChunk));
-        } catch (ExecutionException e) {
+            return regionRenderCache.get(new RegionRenderPos(leafRegionX, leafRegionZ, level));
+        } catch (Exception e) {
             XaeroPlus.LOGGER.error("Error loading portal skip chunks", e);
         }
         return Collections.emptyList();

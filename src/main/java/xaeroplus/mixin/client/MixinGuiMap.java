@@ -44,15 +44,13 @@ import xaero.map.region.*;
 import xaero.map.region.texture.RegionTexture;
 import xaero.map.settings.ModSettings;
 import xaero.map.world.MapDimension;
+import xaeroplus.GuiHelper;
 import xaeroplus.XaeroPlus;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
 import xaeroplus.module.impl.PortalSkipDetection;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.CustomDimensionMapProcessor;
-import xaeroplus.util.HighlightAtChunkPos;
-import xaeroplus.util.Shared;
-import xaeroplus.util.WDLHelper;
+import xaeroplus.util.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -1058,6 +1056,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                     restoreTextureStates();
 
                                     if (WorldMap.settings.debug && textureLevel > 0 && !mc.gameSettings.hideGUI) {
+                                        final List<GuiHelper.Rect> currentlyLoadingRects = new ArrayList<>();
+                                        final List<GuiHelper.Rect> currentlyLoadedRects = new ArrayList<>();
+                                        final List<GuiHelper.Rect> metaLoadedRects = new ArrayList<>();
                                         for(int leafX = 0; leafX < leveledSideInRegions; leafX += 1) {
                                             for(int leafZ = 0; leafZ < leveledSideInRegions; leafZ += 1) {
                                                 int regX = leafRegionMinX + leafX;
@@ -1066,56 +1067,64 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                                 if (region != null) {
                                                     boolean currentlyLoading = this.mapProcessor.getMapSaveLoad().getNextToLoadByViewing() == region;
                                                     if (currentlyLoading || region.isLoaded() || region.isMetaLoaded()) {
-                                                        GlStateManager.pushMatrix();
-                                                        GlStateManager.translate(
-                                                                (float) (512 * region.getRegionX() - flooredCameraX), (float) (512 * region.getRegionZ() - flooredCameraZ), 0.0F
-                                                        );
-                                                        drawRect(0, 0, 512, 512, currentlyLoading ? 687800575 : (region.isLoaded() ? 671153920 : 687865600));
-                                                        GlStateManager.popMatrix();
+                                                        final GuiHelper.Rect rect = new GuiHelper.Rect(
+                                                                ChunkUtils.mapRegionCoordToCoord(region.getRegionX()) - flooredCameraX,
+                                                                ChunkUtils.mapRegionCoordToCoord(region.getRegionZ()) - flooredCameraZ,
+                                                                ChunkUtils.mapRegionCoordToCoord(region.getRegionX() + 1) - flooredCameraX,
+                                                                ChunkUtils.mapRegionCoordToCoord(region.getRegionZ() + 1) - flooredCameraZ);
+                                                        if (currentlyLoading) {
+                                                            currentlyLoadingRects.add(rect);
+                                                        } else if (region.isLoaded()) {
+                                                            currentlyLoadedRects.add(rect);
+                                                        } else {
+                                                            metaLoadedRects.add(rect);
+                                                        }
                                                     }
                                                 }
                                             }
                                         }
+                                        GuiHelper.drawRectList(currentlyLoadingRects, 687800575);
+                                        GuiHelper.drawRectList(currentlyLoadedRects, 671153920);
+                                        GuiHelper.drawRectList(metaLoadedRects, 687865600);
                                     }
                                     if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue() && !mc.gameSettings.hideGUI) {
+                                        final List<GuiHelper.Rect> rects = new ArrayList<>();
                                         final NewChunks newChunks = ModuleManager.getModule(NewChunks.class);
                                         for (final HighlightAtChunkPos c : newChunks.getNewChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions, Shared.customDimensionId)) {
-                                            // todo: GL calls can be optimized further here by:
-                                            //  1. rendering rects as two triangles
-                                            //  2. rendering a buffer of all vertices rather than each 4 vertex rect individually
-                                            //  similar to https://github.com/lambda-client/lambda/commit/7b85616a8a94ebf7b9fe407b5b777303c2513f2b
-                                            GlStateManager.pushMatrix();
-                                            GlStateManager.translate(
-                                                    (float) ((c.x << 4) - flooredCameraX), (float) ((c.z << 4) - flooredCameraZ), 0.0F
-                                            );
-                                            drawRect(0, 0, 16, 16, newChunks.getNewChunksColor());
-                                            GlStateManager.popMatrix();
+                                            final float left = (float) ((c.x << 4) - flooredCameraX);
+                                            final float top = (float) ((c.z << 4) - flooredCameraZ);
+                                            final float right = left + 16;
+                                            final float bottom = top + 16;
+                                            rects.add(new GuiHelper.Rect(left, top, right, bottom));
                                         }
+                                        GuiHelper.drawRectList(rects, newChunks.getNewChunksColor());
                                     }
                                     if (XaeroPlusSettingRegistry.portalSkipDetectionEnabledSetting.getValue() && !mc.gameSettings.hideGUI && XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
+                                        final List<GuiHelper.Rect> rects = new ArrayList<>();
                                         final PortalSkipDetection portalSkipDetection = ModuleManager.getModule(PortalSkipDetection.class);
                                         for (final HighlightAtChunkPos c : portalSkipDetection.getPortalSkipChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions)) {
-                                            GlStateManager.pushMatrix();
-                                            GlStateManager.translate(
-                                                    (float) ((c.x << 4) - flooredCameraX), (float) ((c.z << 4) - flooredCameraZ), 0.0F
-                                            );
-                                            drawRect(0, 0, 16, 16, portalSkipDetection.getPortalSkipChunksColor());
-                                            GlStateManager.popMatrix();
+                                            final float left = (float) ((c.x << 4) - flooredCameraX);
+                                            final float top = (float) ((c.z << 4) - flooredCameraZ);
+                                            final float right = left + 16;
+                                            final float bottom = top + 16;
+                                            rects.add(new GuiHelper.Rect(left, top, right, bottom));
                                         }
+                                        GuiHelper.drawRectList(rects, portalSkipDetection.getPortalSkipChunksColor());
                                     }
                                     if (XaeroPlusSettingRegistry.wdlEnabledSetting.getValue()
                                             && !mc.gameSettings.hideGUI
                                             && WDLHelper.isWdlPresent()
                                             && WDLHelper.isDownloading()
                                             && !isDimensionSwitched) {
+                                        final List<GuiHelper.Rect> rects = new ArrayList<>();
                                         for (final HighlightAtChunkPos c : WDLHelper.getSavedChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions)) {
-                                            GlStateManager.pushMatrix();
-                                            GlStateManager.translate(
-                                                    (float) ((c.x << 4) - flooredCameraX), (float) ((c.z << 4) - flooredCameraZ), 0.0F
-                                            );
-                                            drawRect(0, 0, 16, 16, WDLHelper.getWdlColor());
-                                            GlStateManager.popMatrix();
+                                            final float left = (float) ((c.x << 4) - flooredCameraX);
+                                            final float top = (float) ((c.z << 4) - flooredCameraZ);
+                                            final float right = left + 16;
+                                            final float bottom = top + 16;
+                                            rects.add(new GuiHelper.Rect(left, top, right, bottom));
                                         }
+                                        GuiHelper.drawRectList(rects, WDLHelper.getWdlColor());
                                     }
                                     GlStateManager.disableBlend();
                                     setupTextureMatricesAndTextures(brightness);

@@ -1,7 +1,6 @@
 package xaeroplus.mixin.client;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -302,54 +301,69 @@ public abstract class MixinSupportXaeroWorldmap {
                                         if (newSeed) {
                                             seedsUsed.put(chunk, seed);
                                         }
-
+                                        final List<GuiHelper.Rect> rects = new ArrayList<>();
                                         for (int t = 0; t < 16; ++t) {
                                             if (newSeed || (chunk.getTileGridsCache()[t % 4][t / 4] & 1) == 0) {
                                                 chunk.getTileGridsCache()[t % 4][t / 4] = (byte) (1 | (MinimapTile.isSlimeChunk(this.modMain.getSettings(), chunk.getX() * 4 + t % 4, chunk.getZ() * 4 + t / 4, seed) ? 2 : 0));
                                             }
 
                                             if ((chunk.getTileGridsCache()[t % 4][t / 4] & 2) != 0) {
-                                                int slimeDrawX = drawX + 16 * (t % 4);
-                                                int slimeDrawZ = drawZ + 16 * (t / 4);
-                                                Gui.drawRect(slimeDrawX, slimeDrawZ, slimeDrawX + 16, slimeDrawZ + 16, -2142047936);
+                                                final float left = drawX + 16 * (t % 4);
+                                                final float top = drawZ + 16 * (t / 4);
+                                                final float right = left + 16;
+                                                final float bottom = top + 16;
+                                                rects.add(new GuiHelper.Rect(left, top, right, bottom));
                                             }
                                         }
+                                        GuiHelper.drawRectList(rects, -2142047936);
                                     }
                                     if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
+                                        final List<GuiHelper.Rect> rects = new ArrayList<>();
                                         for (int t = 0; t < 16; ++t) {
                                             final int chunkPosX = chunk.getX() * 4 + t % 4;
                                             final int chunkPosZ = chunk.getZ() * 4 + t / 4;
                                             if (ModuleManager.getModule(NewChunks.class).isNewChunk(chunkPosX, chunkPosZ, Shared.customDimensionId)) {
-                                                int newChunkDrawX = drawX + 16 * (t % 4);
-                                                int newChunkDrawZ = drawZ + 16 * (t / 4);
-                                                Gui.drawRect(newChunkDrawX, newChunkDrawZ, newChunkDrawX + 16, newChunkDrawZ + 16, ModuleManager.getModule(NewChunks.class).getNewChunksColor());
+                                                final float left = drawX + 16 * (t % 4);
+                                                final float top = drawZ + 16 * (t / 4);
+                                                final float right = left + 16;
+                                                final float bottom = top + 16;
+                                                rects.add(new GuiHelper.Rect(left, top, right, bottom));
                                             }
                                         }
+                                        GuiHelper.drawRectList(rects, ModuleManager.getModule(NewChunks.class).getNewChunksColor());
                                     }
                                     if (XaeroPlusSettingRegistry.portalSkipDetectionEnabledSetting.getValue() && XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
+                                        final List<GuiHelper.Rect> rects = new ArrayList<>();
                                         for (int t = 0; t < 16; ++t) {
                                             final int chunkPosX = chunk.getX() * 4 + t % 4;
                                             final int chunkPosZ = chunk.getZ() * 4 + t / 4;
                                             if (ModuleManager.getModule(PortalSkipDetection.class).isPortalSkipChunk(chunkPosX, chunkPosZ)) {
-                                                int portalDrawX = drawX + 16 * (t % 4);
-                                                int portalDrawZ = drawZ + 16 * (t / 4);
-                                                Gui.drawRect(portalDrawX, portalDrawZ, portalDrawX + 16, portalDrawZ + 16, ModuleManager.getModule(PortalSkipDetection.class).getPortalSkipChunksColor());
+                                                final float left = drawX + 16 * (t % 4);
+                                                final float top = drawZ + 16 * (t / 4);
+                                                final float right = left + 16;
+                                                final float bottom = top + 16;
+                                                rects.add(new GuiHelper.Rect(left, top, right, bottom));
                                             }
                                         }
+                                        GuiHelper.drawRectList(rects, ModuleManager.getModule(PortalSkipDetection.class).getPortalSkipChunksColor());
                                     }
                                     if (XaeroPlusSettingRegistry.wdlEnabledSetting.getValue()
                                             && WDLHelper.isWdlPresent()
                                             && WDLHelper.isDownloading()
                                             && !isDimensionSwitched) {
+                                        final List<GuiHelper.Rect> rects = new ArrayList<>();
                                         final Set<Long> wdlSavedChunksWithCache = WDLHelper.getSavedChunksWithCache();
                                         for (int t = 0; t < 16; ++t) {
                                             final Long chunkPos = ChunkUtils.chunkPosToLong(chunk.getX() * 4 + t % 4, chunk.getZ() * 4 + t / 4);
                                             if (wdlSavedChunksWithCache.contains(chunkPos)) {
-                                                int wdlChunkDrawX = drawX + 16 * (t % 4);
-                                                int wdlChunkDrawZ = drawZ + 16 * (t / 4);
-                                                Gui.drawRect(wdlChunkDrawX, wdlChunkDrawZ, wdlChunkDrawX + 16, wdlChunkDrawZ + 16, WDLHelper.getWdlColor());
+                                                final float left = drawX + 16 * (t % 4);
+                                                final float top = drawZ + 16 * (t / 4);
+                                                final float right = left + 16;
+                                                final float bottom = top + 16;
+                                                rects.add(new GuiHelper.Rect(left, top, right, bottom));
                                             }
                                         }
+                                        GuiHelper.drawRectList(rects, WDLHelper.getWdlColor());
                                     }
                                     if (compatibilityVersion >= 6) {
                                         GuiMap.setupTextures(brightness);

@@ -1689,6 +1689,11 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 this.onTextFieldFocus(xTextEntryField);
                 ci.cancel();
             }
+        } else if (keyCode == 28) {
+            if (xTextEntryField.isFocused() || zTextEntryField.isFocused()) {
+                this.onGotoCoordinatesButton(null);
+                ci.cancel();
+            }
         }
     }
 

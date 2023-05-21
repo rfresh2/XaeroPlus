@@ -347,12 +347,12 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "onGuiClosed", at = @At(value = "RETURN"), remap = true)
     public void onGuiClosed(final CallbackInfo ci) {
+        if (XaeroPlusSettingRegistry.persistMapDimensionSwitchSetting.getValue()) return;
         try {
             Shared.customDimensionId = mc.world.provider.getDimension();
         } catch (final Exception e) {
             Shared.customDimensionId = 0;
         }
-
         WorldMap.settings.minimapRadar = true; // todo: restore previous value before custom dimension was entered (if at all)
     }
 

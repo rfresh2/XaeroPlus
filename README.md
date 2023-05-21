@@ -28,25 +28,26 @@ Any other Xaero WorldMap/Minimap version may cause crashes.
 
 # Modifications
 
-* Dimension hot-switching on WorldMap and Minimap. 
+* [Dimension hot-switching on WorldMap and Minimap.](https://cdn.discordapp.com/attachments/971140948593635335/1109733484144107572/Temurin-1.8.0_352_2023.03.31_-_20.11.27.50.mp4) 
   * Recommended: Create keybinds for Minimap dimension switching.
-* Adjustable minimap scaling that increases how many chunks are visible
-* NewChunks Highlighting in MiniMap and WorldMap.
+* [Adjustable minimap scaling that increases how many chunks are visible](https://cdn.discordapp.com/attachments/971140948593635335/1109734742842146937/Temurin-1.8.0_352_2023.03.29_-_16.16.08.32.DVR.mp4)
+* [NewChunks Highlighting in MiniMap and WorldMap.](https://cdn.discordapp.com/attachments/971140948593635335/1109735633045434408/Base_Profile_2023.01.02_-_11.26.22.02.DVR.mp4)
 * [WorldDownloader 4.1.1.0](https://github.com/Pokechu22/WorldDownloader/) integration (does not work with Future's Forge WDL jar)
-  * Highlights chunks as they are downloaded in the Minimap and WorldMap.
-* Portal Skip Highlighting in Minimap and WorldMap. Detects chunks where a portal could have been loaded.
-* Transparent minimap background instead of wasted black screen space.
-* Fast map region writes. Prevent missed chunks in map while traveling at very high speeds.
+  * [Highlights chunks as they are downloaded in the Minimap and WorldMap.](https://cdn.discordapp.com/attachments/971140948593635335/1109735287006961705/Temurin-1.8.0_352_2023.01.02_-_18.54.28.04.DVR.mp4)
+* [Portal Skip Highlighting in Minimap and WorldMap](https://cdn.discordapp.com/attachments/1029572347818151947/1109656254265163816/Base_Profile_2023.05.20_-_18.34.34.34.DVR.mp4). Detects chunks where a portal could have been loaded.
+* [Transparent minimap background instead of wasted black screen space.](https://cdn.discordapp.com/attachments/963821382569979904/1088651890335686716/2023-03-23_19.26.36.png)
+* [Fast map region writes](https://cdn.discordapp.com/attachments/963821382569979904/1049947847467995196/Temurin-1.8.0_345_2022.12.06_-_22.44.28.05.DVR.mp4). Prevent missed chunks in map while traveling at very high speeds.
 * Allow multiple MC instances to read/write to the same map concurrently
 * Transparent obsidian roof. Useful for mapping 2b2t spawn.
-* Option to always view and create waypoints in the Overworld when in Nether.
+* Setting to always view and create waypoints in the Overworld when in Nether.
+* [Render server view distance square around the player.](https://cdn.discordapp.com/attachments/971140948593635335/1109733753686851594/Temurin-1.8.0_352_2023.03.29_-_21.37.26.35.DVR.mp4)
 * WorldMap GUI:
   * WorldMap zoom unlocked
   * GUI on WorldMap to pan the map to user entered coordinates.
   * WorldMap Follow mode and GUI button
   * F1 on WorldMap hides GUI and overlays
 * Waypoints GUI:
-  * Search
+  * [Search](https://cdn.discordapp.com/attachments/971140948593635335/1109736194163617842/Base_Profile_2023.05.04_-_16.48.38.73.DVR.mp4)
   * Display distance to waypoints on Waypoints GUI
   * Always sort enabled waypoints before disabled waypoints
   * GUI button to enable/disable all waypoints

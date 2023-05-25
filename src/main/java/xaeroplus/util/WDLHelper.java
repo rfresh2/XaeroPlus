@@ -1,7 +1,7 @@
 package xaeroplus.util;
 
+import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.base.Suppliers;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -77,15 +78,21 @@ public class WDLHelper {
         return wdlColor;
     }
 
-    private static final LoadingCache<RegionRenderPos, List<HighlightAtChunkPos>> regionRenderCache = Caffeine.newBuilder()
+    private static final AsyncLoadingCache<RegionRenderPos, List<HighlightAtChunkPos>> regionRenderCache = Caffeine.newBuilder()
             .expireAfterWrite(3000, TimeUnit.MILLISECONDS)
             .refreshAfterWrite(500, TimeUnit.MILLISECONDS)
-            .build(key -> loadHighlightChunksAtRegion(key.leafRegionX, key.leafRegionZ, key.level,
+            .executor(Shared.cacheRefreshExecutorService)
+            .buildAsync(key -> loadHighlightChunksAtRegion(key.leafRegionX, key.leafRegionZ, key.level,
                     (chunkPos) -> getSavedChunksWithCache().contains(chunkPos)).call());
     public static List<HighlightAtChunkPos> getSavedChunksInRegion(final int leafRegionX, final int leafRegionZ, final int level) {
         final RegionRenderPos regionRenderPos = new RegionRenderPos(leafRegionX, leafRegionZ, level);
         try {
-            return regionRenderCache.get(regionRenderPos);
+            CompletableFuture<List<HighlightAtChunkPos>> future = regionRenderCache.get(regionRenderPos);
+            if (future.isDone()) {
+                return future.get();
+            } else {
+                return Collections.emptyList();
+            }
         } catch (Exception e) {
             XaeroPlus.LOGGER.error("Error handling WDL region lookup", e);
         }

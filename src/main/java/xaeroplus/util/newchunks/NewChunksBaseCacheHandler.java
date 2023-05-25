@@ -1,14 +1,16 @@
 package xaeroplus.util.newchunks;
 
+import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import xaeroplus.XaeroPlus;
 import xaeroplus.util.HighlightAtChunkPos;
 import xaeroplus.util.RegionRenderPos;
+import xaeroplus.util.Shared;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -19,10 +21,11 @@ import static xaeroplus.util.ChunkUtils.loadHighlightChunksAtRegion;
 public abstract class NewChunksBaseCacheHandler {
     final Long2LongOpenHashMap chunks = new Long2LongOpenHashMap();
     final ReadWriteLock lock = new ReentrantReadWriteLock();
-    private final LoadingCache<RegionRenderPos, List<HighlightAtChunkPos>> regionRenderCache = Caffeine.newBuilder()
+    private final AsyncLoadingCache<RegionRenderPos, List<HighlightAtChunkPos>> regionRenderCache = Caffeine.newBuilder()
             .expireAfterWrite(3000, TimeUnit.MILLISECONDS)
             .refreshAfterWrite(500, TimeUnit.MILLISECONDS)
-            .build(key -> loadHighlightChunksAtRegion(key.leafRegionX, key.leafRegionZ, key.level, this::isNewChunk).call());
+            .executor(Shared.cacheRefreshExecutorService)
+            .buildAsync(key -> loadHighlightChunksAtRegion(key.leafRegionX, key.leafRegionZ, key.level, this::isNewChunk).call());
 
     public void addNewChunk(final int x, final int z, final long foundTime) {
         final long chunkPos = chunkPosToLong(x, z);
@@ -75,7 +78,12 @@ public abstract class NewChunksBaseCacheHandler {
 
     public List<HighlightAtChunkPos> getNewChunksInRegion(final int leafRegionX, final int leafRegionZ, final int level) {
         try {
-            return regionRenderCache.get(new RegionRenderPos(leafRegionX, leafRegionZ, level));
+            final CompletableFuture<List<HighlightAtChunkPos>> future = regionRenderCache.get(new RegionRenderPos(leafRegionX, leafRegionZ, level));
+            if (future.isDone()) {
+                return future.get();
+            } else {
+                return Collections.emptyList();
+            }
         } catch (Exception e) {
             XaeroPlus.LOGGER.error("Error handling NewChunks region lookup", e);
         }

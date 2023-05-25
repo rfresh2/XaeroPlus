@@ -12,6 +12,8 @@ import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * static variables and functions to share or persist across mixins
@@ -30,6 +32,9 @@ public class Shared {
     public static int customDimensionId = 0;
     public static String waypointsSearchFilter = "";
     public static List<GuiButton> guiMapButtonTempList = Lists.<GuiButton>newArrayList();
+    public static ExecutorService cacheRefreshExecutorService = Executors.newFixedThreadPool(
+            // limited benefits by refreshing on more threads as it will consume the entire CPU and start lagging the game
+            Math.max(1, Math.min(Runtime.getRuntime().availableProcessors() / 2, 4)));
 
     public static void onSettingLoad() {
         if (!settingsLoadedInit) { // handle settings where we want them to take effect only on first load

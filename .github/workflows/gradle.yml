@@ -35,6 +35,15 @@ jobs:
         name: xaeroplus-${{ github.run_number }}
         path: xaeroplus-${{ github.run_number }}.jar
 
+    - name: Download Xaero WorldMap
+      run: wget https://chocolateminecraft.com/mods2/worldmap/XaerosWorldMap_1.30.3_Forge_1.12.jar --no-check-certificate
+
+    - name: Download Xaero Minimap
+      run: wget https://chocolateminecraft.com/mods2/minimap/Xaeros_Minimap_23.4.4_Forge_1.12.jar --no-check-certificate
+
+    - name: Create modpack zip
+      run: tar -czvf xaeroplus-modpack-${{ github.run_number }}.zip xaeroplus-${{ github.run_number }}.jar XaerosWorldMap_1.30.3_Forge_1.12.jar Xaeros_Minimap_23.4.4_Forge_1.12.jar
+
     - name: Release Artifact
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
@@ -44,3 +53,4 @@ jobs:
         title: "Latest Release - ${{ github.run_number }}"
         files: |
           xaeroplus-*.jar
+          xaeroplus-modpack-*.zip

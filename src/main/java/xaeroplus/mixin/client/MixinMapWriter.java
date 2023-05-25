@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockGlass;
 import net.minecraft.block.BlockLiquid;
+import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockRenderLayer;
@@ -271,7 +272,10 @@ public abstract class MixinMapWriter {
                         opaqueState = state;
                         break;
                     }
-                } else if (state.getMaterial().isSolid() && !state.getMaterial().getCanBurn() && !state.getMaterial().isReplaceable()) {
+                } else if (!state.getMaterial().getCanBurn()
+                        && !state.getMaterial().isReplaceable()
+                        && state.getMaterial().getMobilityFlag() != EnumPushReaction.DESTROY
+                        && !this.shouldOverlayCached(state)) {
                     underair = false;
                     shouldEnterGround = false;
                 }

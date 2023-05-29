@@ -11,7 +11,12 @@ import org.apache.logging.log4j.Logger;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.util.Shared;
 
-@Mod(modid = XaeroPlus.MODID, name = XaeroPlus.NAME, version = XaeroPlus.VERSION, dependencies = "required-after:xaerominimap;required-after:xaeroworldmap;")
+@Mod(
+        modid = XaeroPlus.MODID,
+        name = XaeroPlus.NAME,
+        version = XaeroPlus.VERSION,
+        dependencies = "required-after:xaerominimap@[23.4.4];required-after:xaeroworldmap@[1.30.3];"
+)
 public class XaeroPlus {
     public static final String MODID = "xaeroplus";
     public static final String NAME = "XaeroPlus";

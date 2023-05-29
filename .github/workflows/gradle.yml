@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - "mainline"
+env:
+  WORLDMAP_VERSION: "1.30.3"
+  MINIMAP_VERSION: "23.4.4"
 
 jobs:
   build:
@@ -27,30 +30,50 @@ jobs:
       run: ./gradlew build
 
     - name: Rename built mod
-      run: mv build/libs/xaeroplus-*.jar xaeroplus-${{ github.run_number }}.jar
+      run: mv build/libs/xaeroplus-*.jar xaeroplus-${{ github.run_number }}-WM${{ WORLDMAP_VERSION }}-MM${{ MINIMAP_VERSION }}.jar
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
-        name: xaeroplus-${{ github.run_number }}
-        path: xaeroplus-${{ github.run_number }}.jar
+        name: xaeroplus-${{ github.run_number }}-WM${{ WORLDMAP_VERSION }}-MM${{ MINIMAP_VERSION }}
+        path: xaeroplus-*.jar
 
     - name: Download Xaero WorldMap
-      run: wget https://chocolateminecraft.com/mods2/worldmap/XaerosWorldMap_1.30.3_Forge_1.12.jar --no-check-certificate
+      run: wget https://chocolateminecraft.com/mods2/worldmap/XaerosWorldMap_${{ WORLDMAP_VERSION }}_Forge_1.12.jar --no-check-certificate
 
     - name: Download Xaero Minimap
-      run: wget https://chocolateminecraft.com/mods2/minimap/Xaeros_Minimap_23.4.4_Forge_1.12.jar --no-check-certificate
+      run: wget https://chocolateminecraft.com/mods2/minimap/Xaeros_Minimap_${{ MINIMAP_VERSION }}_Forge_1.12.jar --no-check-certificate
 
     - name: Create modpack zip
-      run: tar -czvf xaeroplus-modpack-${{ github.run_number }}.zip xaeroplus-${{ github.run_number }}.jar XaerosWorldMap_1.30.3_Forge_1.12.jar Xaeros_Minimap_23.4.4_Forge_1.12.jar
+      run: tar -czvf xaeroplus-modpack-${{ github.run_number }}.zip xaeroplus-${{ github.run_number }}-WM${{ WORLDMAP_VERSION }}-MM${{ MINIMAP_VERSION }}.jar XaerosWorldMap_${{ WORLDMAP_VERSION }}_Forge_1.12.jar Xaeros_Minimap_${{ MINIMAP_VERSION }}_Forge_1.12.jar
 
-    - name: Release Artifact
-      uses: "marvinpinto/action-automatic-releases@latest"
+    # todo: for future auto-update check feature
+#    - name: Create version identifier file
+#      run: echo ${{ github.run_number }} > version.txt
+
+    - name: Release
+      uses: Kir-Antipov/mc-publish@v3.3
       with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        prerelease: false
-        automatic_release_tag: "latest"
-        title: "Latest Release - ${{ github.run_number }}"
-        files: |
+        curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+        curseforge-project-id: 866084
+
+        modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+        modrinth-project-id: EnPUzSTg
+
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-files: |
           xaeroplus-*.jar
           xaeroplus-modpack-*.zip
+        github-tag: latest
+
+        files: |
+          xaeroplus-*.jar
+        name: ${{ github.run_number }}-WM${{ WORLDMAP_VERSION }}-MM${{ MINIMAP_VERSION }}
+        version: ${{ github.run_number }}-WM${{ WORLDMAP_VERSION }}-MM${{ MINIMAP_VERSION }}
+        loaders: |
+          forge
+        game-versions: |
+          1.12.2
+        dependencies: |
+          xaerominimap@${{ MINIMAP_VERSION }}(required){modrinth:1bokaNcj}{curseforge:263420}
+          xaeroworldmap@${{ WORLDMAP_VERSION }}(required){modrinth:NcUtCpym}{curseforge:317780}

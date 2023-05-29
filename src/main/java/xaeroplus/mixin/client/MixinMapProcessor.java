@@ -291,7 +291,11 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                     }
                 }
             } catch (Throwable e) {
-                WorldMap.crashHandler.setCrashedBy(e);
+                if (e instanceof RuntimeException && e.getMessage().startsWith("Trying to save cache for a region with cache not prepared:")) {
+                    XaeroPlus.LOGGER.error("Caught exception while processing map. Preventing crash.", e);
+                } else {
+                    WorldMap.crashHandler.setCrashedBy(e);
+                }
             }
             if (this.state < 2) {
                 this.forceClean();

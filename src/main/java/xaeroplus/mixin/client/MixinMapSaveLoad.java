@@ -18,6 +18,7 @@ import xaero.map.file.worldsave.WorldDataHandler;
 import xaero.map.region.*;
 import xaero.map.world.MapDimension;
 import xaero.map.world.MapWorld;
+import xaeroplus.XaeroPlus;
 import xaeroplus.util.CustomDimensionMapSaveLoad;
 import xaeroplus.util.Shared;
 
@@ -510,6 +511,17 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
     @Redirect(method = "run", at = @At(value = "INVOKE", target = "Lxaero/map/world/MapWorld;getCurrentDimension()Lxaero/map/world/MapDimension;"))
     public MapDimension redirectGetCurrentDimension(MapWorld instance) {
         return instance.getDimension(Shared.customDimensionId);
+    }
+
+    @Redirect(method = "run", at = @At(value = "INVOKE", target = "Lxaero/map/region/LeveledRegion;isAllCachePrepared()Z", ordinal = 0))
+    public boolean redirectCacheSaveFailCrash(final LeveledRegion instance) {
+        final boolean value = instance.isAllCachePrepared();
+        if (!value) {
+            XaeroPlus.LOGGER.warn("LeveledRegion cache not prepared. Attempting to repair crash");
+            instance.setRecacheHasBeenRequested(false, "crash fix");
+            // See MixinMapProcessor for where we catch the exception (which is still thrown)
+        }
+        return value;
     }
 
 

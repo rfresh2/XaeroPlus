@@ -12,15 +12,18 @@ features and performance improvements - particularly for use on anarchy servers 
 
 # Download
 
-Download from [Github Releases](https://github.com/rfresh2/XaeroPlus/releases) 
+Available on:
 
-Or from [GitHub actions](https://github.com/rfresh2/XaeroPlus/actions?query=branch%3Amainline+)
+* [Github Releases](https://github.com/rfresh2/XaeroPlus/releases)
+* [Modrinth](https://modrinth.com/mod/xaeroplus)
+* [CurseForge](https://legacy.curseforge.com/minecraft/mc-mods/xaeroplus)
+* [GitHub Actions](https://github.com/rfresh2/XaeroPlus/actions?query=branch%3Amainline+)
 
 # Xaero Versions
 
-Xaero WorldMap version: [1.30.3](https://www.curseforge.com/minecraft/mc-mods/xaeros-world-map/files/4550322)
+Xaero WorldMap version: [1.30.3](https://chocolateminecraft.com/mods2/worldmap/XaerosWorldMap_1.30.3_Forge_1.12.jar)
 
-Xaero Minimap version: [23.4.4](https://www.curseforge.com/minecraft/mc-mods/xaeros-minimap/files/4550305)
+Xaero Minimap version: [23.4.4](https://chocolateminecraft.com/mods2/minimap/Xaeros_Minimap_23.4.4_Forge_1.12.jar)
 
 Download and include these mods in your Forge mods folder **in addition** to `xaeroplus-xx.jar` (3 jars total).
 

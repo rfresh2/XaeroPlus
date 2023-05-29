@@ -11,7 +11,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:5.+'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:6.+'
         classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
     }
 }
@@ -39,6 +39,10 @@ repositories {
     }
     maven {
         url "https://cursemaven.com"
+    }
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
     }
     maven {
         name = "jitpack.io"
@@ -85,6 +89,7 @@ minecraft {
 
 configurations {
     jarLibs
+    implementation.extendsFrom jarLibs
     // Force choosing the correct nightly build because Mac OS chooses an invalid one
     all {
         resolutionStrategy {
@@ -110,14 +115,12 @@ dependencies {
     jarLibs 'org.apache.commons:commons-compress:1.21'
     jarLibs 'org.xerial:sqlite-jdbc:3.41.2.1'
 
-    implementation(fg.deobf("curse.maven:xaeros-world-map-317780:4550322"))
-    implementation(fg.deobf("curse.maven:xaeros-minimap-263420:4550305"))
+    implementation(fg.deobf("maven.modrinth:xaeros-world-map:1.30.3_Forge_1.12"))
+    implementation(fg.deobf("maven.modrinth:xaeros-minimap:23.4.4_Forge_1.12"))
 
     annotationProcessor('org.spongepowered:mixin:0.8.5:processor') {
         exclude module: 'gson'
     }
-
-    implementation configurations.jarLibs
 }
 
 sourceSets {
@@ -168,6 +171,7 @@ shadowJar {
     exclude 'org/sqlite/native/**/arm/**'
     exclude 'org/sqlite/native/**/ppc64/**'
     exclude 'org/sqlite/native/**/aarch64/**'
+    exclude 'META-INF/versions/**'
     finalizedBy 'configureReobfTaskForReobfShadowJar', 'reobfShadowJar'
     mustRunAfter 'jar'
 }

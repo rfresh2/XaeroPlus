@@ -10,10 +10,16 @@ import xaero.map.mods.SupportMods;
 import xaero.map.world.MapDimension;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.zip.ZipInputStream;
 
 /**
  * static variables and functions to share or persist across mixins
@@ -64,5 +70,29 @@ public class Shared {
         }
         customDimensionId = newDimId;
         SupportMods.xaeroMinimap.requestWaypointsRefresh();
+    }
+
+    public static byte[] decompressZipToBytes(final Path input) {
+        try {
+            return toUnzippedByteArray(Files.readAllBytes(input));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static byte[] toUnzippedByteArray(byte[] zippedBytes) throws IOException {
+        try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(zippedBytes))) {
+            final byte[] buff = new byte[1024];
+            if (zipInputStream.getNextEntry() != null) {
+                final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                int l;
+                while ((l = zipInputStream.read(buff)) > 0) {
+                    outputStream.write(buff, 0, l);
+                }
+                return outputStream.toByteArray();
+            }
+        } catch (final Throwable ignored) {
+        }
+        return new byte[0];
     }
 }

@@ -15,8 +15,7 @@ public class ClassUtil {
         String resource = ClassUtil.class.getClassLoader().getResource(classPath.replace(".", "/")).getPath();
 
         if (resource.contains("!")) {
-            try {
-                ZipInputStream file = new ZipInputStream(new URL(resource.substring(0, resource.lastIndexOf('!'))).openStream());
+            try (ZipInputStream file = new ZipInputStream(new URL(resource.substring(0, resource.lastIndexOf('!'))).openStream())) {
                 ZipEntry entry;
                 while ((entry = file.getNextEntry()) != null) {
                     String name = entry.getName();

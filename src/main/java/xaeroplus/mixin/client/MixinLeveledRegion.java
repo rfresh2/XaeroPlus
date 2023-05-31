@@ -10,10 +10,10 @@ import xaero.map.region.texture.RegionTexture;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+
+import static xaeroplus.util.Shared.decompressZipToBytes;
 
 @Mixin(value = LeveledRegion.class, remap = false)
 public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
@@ -64,96 +64,52 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
         if (WorldMap.settings.debug) {
             WorldMap.LOGGER.info("(World Map) Saving cache: " + this);
         }
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        try(ZipOutputStream zipOutput = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(tempFile.toPath())))) {
+            try(DataOutputStream output = new DataOutputStream(byteOut)) {
+                ZipEntry e = new ZipEntry("cache.xaero");
+                zipOutput.putNextEntry(e);
+                byte[] usableBuffer = new byte[16384];
+                byte[] integerByteBuffer = new byte[4];
+                output.writeInt(24);
+                this.writeCacheMetaData(output, usableBuffer, integerByteBuffer);
+                this.saveBiomePalette(output);
 
-        try {
-            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-            ZipOutputStream zipOutput = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(tempFile)));
-            Throwable var4 = null;
-
-            boolean success = false;
-            try {
-                DataOutputStream output = new DataOutputStream(byteOut);
-                Throwable var6 = null;
-                try {
-                    ZipEntry e = new ZipEntry("cache.xaero");
-                    zipOutput.putNextEntry(e);
-                    byte[] usableBuffer = new byte[16384];
-                    byte[] integerByteBuffer = new byte[4];
-                    output.writeInt(24);
-                    this.writeCacheMetaData(output, usableBuffer, integerByteBuffer);
-                    this.saveBiomePalette(output);
-
-                    for (int i = 0; i < 8; ++i) {
-                        for (int j = 0; j < 8; ++j) {
-                            T texture = this.getTexture(i, j);
-                            if (texture != null && texture.shouldIncludeInCache()) {
-                                if (!texture.isCachePrepared()) {
-                                    throw new RuntimeException("Trying to save cache but " + i + " " + j + " in " + this + " is not prepared.");
-                                }
-
-                                output.write(i << 4 | j);
-                                texture.writeCacheMapData(output, usableBuffer, integerByteBuffer, (LeveledRegion<T>) (Object) this);
+                for (int i = 0; i < 8; ++i) {
+                    for (int j = 0; j < 8; ++j) {
+                        T texture = this.getTexture(i, j);
+                        if (texture != null && texture.shouldIncludeInCache()) {
+                            if (!texture.isCachePrepared()) {
+                                throw new RuntimeException("Trying to save cache but " + i + " " + j + " in " + this + " is not prepared.");
                             }
-                        }
-                    }
 
-                    output.write(255);
-                    zipOutput.write(byteOut.toByteArray());
-                    zipOutput.closeEntry();
-                    synchronized (this) {
-                        this.setAllCachePrepared(false);
-                    }
-
-                    for (int i = 0; i < 8; ++i) {
-                        for (int j = 0; j < 8; ++j) {
-                            T texture = this.getTexture(i, j);
-                            if (texture != null && texture.shouldIncludeInCache()) {
-                                texture.deleteColorBuffer();
-                                synchronized (this) {
-                                    texture.setCachePrepared(false);
-                                    this.setAllCachePrepared(false);
-                                }
-                            }
+                            output.write(i << 4 | j);
+                            texture.writeCacheMapData(output, usableBuffer, integerByteBuffer, (LeveledRegion<T>) (Object) this);
                         }
-                    }
-
-                    success = true;
-                } catch (Throwable var47) {
-                    var6 = var47;
-                    throw var47;
-                } finally {
-                    if (output != null) {
-                        if (var6 != null) {
-                            try {
-                                output.close();
-                            } catch (Throwable var44) {
-                                var6.addSuppressed(var44);
-                            }
-                        } else {
-                            output.close();
-                        }
-                    }
-
-                }
-            } catch (Throwable var49) {
-                var4 = var49;
-                throw var49;
-            } finally {
-                if (zipOutput != null) {
-                    if (var4 != null) {
-                        try {
-                            zipOutput.close();
-                        } catch (Throwable var43) {
-                            var4.addSuppressed(var43);
-                        }
-                    } else {
-                        zipOutput.close();
                     }
                 }
-                byteOut.close();
+
+                output.write(255);
+                zipOutput.write(byteOut.toByteArray());
+                zipOutput.closeEntry();
+                synchronized (this) {
+                    this.setAllCachePrepared(false);
+                }
+
+                for (int i = 0; i < 8; ++i) {
+                    for (int j = 0; j < 8; ++j) {
+                        T texture = this.getTexture(i, j);
+                        if (texture != null && texture.shouldIncludeInCache()) {
+                            texture.deleteColorBuffer();
+                            synchronized (this) {
+                                texture.setCachePrepared(false);
+                                this.setAllCachePrepared(false);
+                            }
+                        }
+                    }
+                }
+                return true;
             }
-
-            return success;
         } catch (IOException var51) {
             WorldMap.LOGGER.info("(World Map) IO exception while trying to save cache textures for " + this);
             if (extraAttempts > 0) {
@@ -162,12 +118,12 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
 
                 try {
                     Thread.sleep(20L);
-                } catch (InterruptedException var42) {
+                } catch (InterruptedException ignored) {
                 }
 
                 return this.saveCacheTextures(tempFile, extraAttempts - 1);
             } else {
-                throw var51;
+                return false;
             }
         }
     }
@@ -186,135 +142,66 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
             boolean[] metaLoadedDest,
             int extraAttempts
     ) {
-        if (this.cacheFile == null) {
-            return false;
-        } else {
-            if (this.cacheFile.exists()) {
-                try {
+        if (this.cacheFile != null && this.cacheFile.exists()) {
+            try (DataInputStream input = new DataInputStream(new ByteArrayInputStream(decompressZipToBytes(this.cacheFile.toPath())))) {
+                byte[] integerByteBuffer = new byte[4];
+                int cacheSaveVersion = input.readInt();
+                if (cacheSaveVersion <= 24 && cacheSaveVersion != 7 && cacheSaveVersion != 21) {
+                    if (cacheSaveVersion < 24) {
+                        this.shouldCache = true;
+                    }
 
-                    Throwable var9 = null;
-                    byte[] usableBuffer;
-                    DataInputStream input = null;
-                    try {
-                        input = new DataInputStream(new ByteArrayInputStream(decompressZipToBytes(this.cacheFile.toPath())));
-                        Throwable var11 = null;
-
-                        try {
-                            byte[] integerByteBuffer = new byte[4];
-                            int cacheSaveVersion = input.readInt();
-                            if (cacheSaveVersion <= 24 && cacheSaveVersion != 7 && cacheSaveVersion != 21) {
-                                if (cacheSaveVersion < 24) {
-                                    this.shouldCache = true;
-                                }
-
-                                usableBuffer = new byte[16384];
-                                if (cacheSaveVersion >= 8) {
-                                    this.readCacheMetaData(input, cacheSaveVersion, usableBuffer, integerByteBuffer, textureLoaded, mapProcessor);
-                                    metaLoadedDest[0] = true;
-                                    if (justMetaData && (cacheSaveVersion == 8 || cacheSaveVersion >= 12)) {
-                                        return true;
-                                    }
-                                }
-
-                                this.preCacheLoad();
-                                this.loadBiomePalette(input, cacheSaveVersion, mapProcessor);
-                                boolean leafShouldAffectBranches = !this.shouldCache && this.shouldLeafAffectCache(targetHighlightsHash);
-                                if (leafShouldAffectBranchesDest != null) {
-                                    leafShouldAffectBranchesDest[0] = leafShouldAffectBranches;
-                                }
-
-                                this.readCacheInput(
-                                        false, input, cacheSaveVersion, usableBuffer, integerByteBuffer, textureLoaded, leafShouldAffectBranches, mapProcessor
-                                );
-                                metaLoadedDest[0] = true;
-                                return false;
-                            }
-
-                            input.close();
-                            WorldMap.LOGGER.info("(World Map) Trying to load newer region cache " + this + " using an older version of Xaero's World Map!");
-                            mapProcessor.getMapSaveLoad().backupFile(this.cacheFile, cacheSaveVersion);
-                            this.cacheFile = null;
-                            this.shouldCache = true;
-                        } catch (Throwable var56) {
-                            var11 = var56;
-                            throw var56;
-                        } finally {
-                            if (input != null) {
-                                if (var11 != null) {
-                                    try {
-                                        input.close();
-                                    } catch (Throwable var55) {
-                                        var11.addSuppressed(var55);
-                                    }
-                                } else {
-                                    input.close();
-                                }
-                            }
-
-                        }
-                    } catch (Throwable var58) {
-                        var9 = var58;
-                        throw var58;
-                    } finally {
-                        if (input != null) {
-                            input.close();
+                    byte[] usableBuffer = new byte[16384];
+                    if (cacheSaveVersion >= 8) {
+                        this.readCacheMetaData(input, cacheSaveVersion, usableBuffer, integerByteBuffer, textureLoaded, mapProcessor);
+                        metaLoadedDest[0] = true;
+                        if (justMetaData && (cacheSaveVersion == 8 || cacheSaveVersion >= 12)) {
+                            return true;
                         }
                     }
 
-                    return true;
-                } catch (IOException var60) {
-                    WorldMap.LOGGER.error("IO exception while trying to load cache for region " + this + "! " + this.cacheFile, var60);
-                    if (extraAttempts > 0) {
-                        WorldMap.LOGGER.info("(World Map) Retrying...");
-
-                        try {
-                            Thread.sleep(20L);
-                        } catch (InterruptedException var53) {
-                        }
-
-                        metaLoadedDest[0] = false;
-                        return this.loadCacheTextures(
-                                mapProcessor, justMetaData, textureLoaded, targetHighlightsHash, leafShouldAffectBranchesDest, metaLoadedDest, extraAttempts - 1
-                        );
+                    this.preCacheLoad();
+                    this.loadBiomePalette(input, cacheSaveVersion, mapProcessor);
+                    boolean leafShouldAffectBranches = !this.shouldCache && this.shouldLeafAffectCache(targetHighlightsHash);
+                    if (leafShouldAffectBranchesDest != null) {
+                        leafShouldAffectBranchesDest[0] = leafShouldAffectBranches;
                     }
 
-                    this.cacheFile = null;
-                    this.shouldCache = true;
-                    this.onCacheLoadFailed(textureLoaded);
-                } catch (Throwable var61) {
-                    this.cacheFile = null;
-                    this.shouldCache = true;
-                    WorldMap.LOGGER.error("Failed to load cache for region " + this + "! " + this.cacheFile, var61);
-                    this.onCacheLoadFailed(textureLoaded);
+                    this.readCacheInput(
+                            false, input, cacheSaveVersion, usableBuffer, integerByteBuffer, textureLoaded, leafShouldAffectBranches, mapProcessor
+                    );
+                    metaLoadedDest[0] = true;
+                    return false;
                 }
-            } else {
+
+                WorldMap.LOGGER.info("(World Map) Trying to load newer region cache " + this + " using an older version of Xaero's World Map!");
+                mapProcessor.getMapSaveLoad().backupFile(this.cacheFile, cacheSaveVersion);
                 this.cacheFile = null;
                 this.shouldCache = true;
+                return true;
+            } catch (IOException var60) {
+                WorldMap.LOGGER.error("IO exception while trying to load cache for region " + this + "! " + this.cacheFile, var60);
+                if (extraAttempts > 0) {
+                    WorldMap.LOGGER.info("(World Map) Retrying...");
+
+                    try {
+                        Thread.sleep(20L);
+                    } catch (InterruptedException ignored) {
+                    }
+
+                    metaLoadedDest[0] = false;
+                    return this.loadCacheTextures(
+                            mapProcessor, justMetaData, textureLoaded, targetHighlightsHash, leafShouldAffectBranchesDest, metaLoadedDest, extraAttempts - 1
+                    );
+                }
+                this.onCacheLoadFailed(textureLoaded);
+            } catch (Throwable var61) {
+                WorldMap.LOGGER.error("Failed to load cache for region " + this + "! " + this.cacheFile, var61);
+                this.onCacheLoadFailed(textureLoaded);
             }
-
-            return false;
         }
-    }
-
-    private static byte[] decompressZipToBytes(final Path input) {
-        try {
-            return toUnzippedByteArray(Files.readAllBytes(input));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static byte[] toUnzippedByteArray(byte[] zippedBytes) throws IOException {
-        final ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(zippedBytes));
-        final byte[] buff = new byte[1024];
-        if (zipInputStream.getNextEntry() != null) {
-            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            int l;
-            while ((l = zipInputStream.read(buff)) > 0) {
-                outputStream.write(buff, 0, l);
-            }
-            return outputStream.toByteArray();
-        }
-        return new byte[0];
+        this.cacheFile = null;
+        this.shouldCache = true;
+        return false;
     }
 }

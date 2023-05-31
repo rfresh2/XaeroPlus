@@ -29,8 +29,9 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+
+import static xaeroplus.util.Shared.decompressZipToBytes;
 
 @Mixin(value = MapSaveLoad.class, remap = false)
 public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
@@ -104,11 +105,9 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                 region.restoreBufferUpdateObjects();
                 int totalChunks = 0;
                 if (multiplayer) {
-                    DataInputStream in = null;
 
-                    try {
+                    try (DataInputStream in = new DataInputStream(new ByteArrayInputStream(decompressZipToBytes(file.toPath())))) {
                         // fast zip
-                        in = new DataInputStream(new ByteArrayInputStream(decompressZipToBytes(file.toPath())));
                         int firstByte = in.read();
                         if (firstByte == 255) {
                             saveVersion = in.readInt();
@@ -206,10 +205,6 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                                 chunk.setLoadState((byte) 2);
                                 region.popWriterPause();
                             }
-                        }
-                    } finally {
-                        if (in != null) {
-                            in.close();
                         }
                     }
 
@@ -363,19 +358,18 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                     return true;
                 } else {
                     if (!file.exists()) {
-                        file.createNewFile();
+                        if (!file.createNewFile()) {
+                            throw new IOException("Failed to create temp region file: " + file);
+                        }
                     }
 
                     boolean hasAnything = false;
                     boolean regionWasSavedEmpty = true;
-                    DataOutputStream out = null;
-                    ZipOutputStream zipOut = null;
-                    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+                    ByteArrayOutputStream byteOut = new ByteArrayOutputStream(); // does not need to be closed
 
-                    try {
+                    try(DataOutputStream out = new DataOutputStream(byteOut);
+                        ZipOutputStream zipOut = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(file.toPath())))) {
                         //zip fast
-                        zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
-                        out = new DataOutputStream(byteOut);
                         ZipEntry e = new ZipEntry("region.xaero");
                         zipOut.putNextEntry(e);
                         out.write(255);
@@ -432,18 +426,6 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                                 }
                             }
                         }
-
-                    } finally {
-                        if (out != null) {
-                            if (zipOut != null && byteOut != null) {
-                                zipOut.write(byteOut.toByteArray());
-                                zipOut.closeEntry();
-                                zipOut.close();
-                            }
-                            byteOut.close();
-                            out.close();
-                        }
-
                     }
 
                     if (regionWasSavedEmpty) {
@@ -524,29 +506,6 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
         return value;
     }
 
-
-    private static byte[] decompressZipToBytes(final Path input) {
-        try {
-            return toUnzippedByteArray(Files.readAllBytes(input));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static byte[] toUnzippedByteArray(byte[] zippedBytes) throws IOException {
-        final ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(zippedBytes));
-        final byte[] buff = new byte[1024];
-        if (zipInputStream.getNextEntry() != null) {
-            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            int l;
-            while ((l = zipInputStream.read(buff)) > 0) {
-                outputStream.write(buff, 0, l);
-            }
-            return outputStream.toByteArray();
-        }
-        return new byte[0];
-    }
-
     @Override
     public void detectRegionsInDimension(int attempts, final int dimId) {
         final MapDimension mapDimension = this.mapProcessor.getMapWorld().getDimension(dimId);
@@ -563,7 +522,7 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
             if (multiplayer) {
                 if (mapFolderExists) {
                     this.detectRegionsFromFiles(
-                            mapDimension, worldId, dimIdStr, mwId, mapFolder, "^(-?\\d+)_(-?\\d+)\\.(zip|xaero)$", 1, 2, 0, 20, new Consumer<RegionDetection>() {
+                            mapDimension, worldId, dimIdStr, mwId, mapFolder, multiplayerMapRegex, 1, 2, 0, 20, new Consumer<RegionDetection>() {
                                 public void accept(RegionDetection detect) {
                                     mainLayer.addRegionDetection(detect);
                                 }
@@ -621,7 +580,7 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                                                             dimIdStr,
                                                             mwId,
                                                             layerFolder,
-                                                            "^(-?\\d+)_(-?\\d+)\\.(zip|xaero)$",
+                                                            multiplayerMapRegex,
                                                             1,
                                                             2,
                                                             0,

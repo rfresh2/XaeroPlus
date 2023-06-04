@@ -185,6 +185,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Shadow
     private GuiRightClickMenu rightClickMenu;
     @Shadow
+    private GuiButton caveModeButton;
+    @Shadow
     private boolean lastFrameRenderedRootTextures;
     @Shadow
     private MapTileSelection mapTileSelection;
@@ -296,22 +298,24 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Inject(method = "initGui()V", at = @At(value = "TAIL"), remap = true)
     public void customInitGui(CallbackInfo ci) {
         int h = this.height / 2;
-        coordinateGotoButton = new GuiTexturedButton(0, h + 40 , 20, 20, 229, 16, 16, 16, WorldMap.guiTextures, new Consumer<GuiButton>() {
-            @Override
-            public void accept(GuiButton guiButton) {
-                onGotoCoordinatesButton(guiButton);
-            }
-        }, () -> new CursorBox(new TextComponentString("Go to Coordinates")));
-        addGuiButton(coordinateGotoButton);
-        zTextEntryField = new GuiTextField(1, mc.fontRenderer, 2, h + 20, 50, 20);
-        xTextEntryField = new GuiTextField(2, mc.fontRenderer, 2, h, 50, 20);
-        followButton = new GuiTexturedButton(0, h + 60 , 20, 20, FOLLOW ? 133 : 149, 16, 16, 16, WorldMap.guiTextures, new Consumer<GuiButton>() {
+        followButton = new GuiTexturedButton(0, this.caveModeButton.y - 20 , 20, 20, FOLLOW ? 133 : 149, 16, 16, 16, WorldMap.guiTextures, new Consumer<GuiButton>() {
             @Override
             public void accept(GuiButton guiButton) {
                 onFollowButton(guiButton);
             }
         }, () -> new CursorBox(new TextComponentString("Toggle Follow mode (" + (FOLLOW ? "On" : "Off") + ")")));
         addGuiButton(followButton);
+        coordinateGotoButton = new GuiTexturedButton(0, followButton.y - 20 , 20, 20, 229, 16, 16, 16, WorldMap.guiTextures, new Consumer<GuiButton>() {
+            @Override
+            public void accept(GuiButton guiButton) {
+                onGotoCoordinatesButton(guiButton);
+            }
+        }, () -> new CursorBox(new TextComponentString("Go to Coordinates")));
+        addGuiButton(coordinateGotoButton);
+        xTextEntryField = new GuiTextField(2, mc.fontRenderer, 20, coordinateGotoButton.y - 10, 50, 20);
+        xTextEntryField.setVisible(false);
+        zTextEntryField = new GuiTextField(1, mc.fontRenderer, 20, xTextEntryField.y + 20, 50, 20);
+        zTextEntryField.setVisible(false);
         // todo: create textures for these buttons. Existing xaero textures don't really fit well here so these are just normal buttons for now
         this.switchToNetherButton = new TooltipButton(
           this.width - 20, (this.height / 2) + 90, 20, 20, "N",
@@ -1665,6 +1669,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if (button == 0) {
             handleTextFieldClick(x, y, xTextEntryField);
             handleTextFieldClick(x, y, zTextEntryField);
+            if (!xTextEntryField.isFocused() && !zTextEntryField.isFocused()) {
+                xTextEntryField.setVisible(false);
+                zTextEntryField.setVisible(false);
+            }
         }
     }
 
@@ -1707,17 +1715,25 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     }
 
     public void onGotoCoordinatesButton(final GuiButton b) {
-        try {
-            int x = Integer.parseInt(xTextEntryField.getText());
-            int z = Integer.parseInt(zTextEntryField.getText());
-            cameraX = x;
-            cameraZ = z;
-            FOLLOW = false;
-            this.setWorldAndResolution(this.mc, width, height);
-        } catch (final NumberFormatException e) {
-            xTextEntryField.setText("");
-            zTextEntryField.setText("");
-            WorldMap.LOGGER.warn("Go to coordinates failed" , e);
+        if (xTextEntryField.getVisible() && zTextEntryField.getVisible()) {
+            try {
+                int x = Integer.parseInt(xTextEntryField.getText());
+                int z = Integer.parseInt(zTextEntryField.getText());
+                cameraX = x;
+                cameraZ = z;
+                FOLLOW = false;
+                this.setWorldAndResolution(this.mc, width, height);
+            } catch (final NumberFormatException e) {
+                xTextEntryField.setText("");
+                zTextEntryField.setText("");
+                WorldMap.LOGGER.warn("Go to coordinates failed" , e);
+            }
+        } else {
+            xTextEntryField.setVisible(true);
+            zTextEntryField.setVisible(true);
+            xTextEntryField.setFocused(true);
+            this.setFocused(xTextEntryField);
+            this.onTextFieldFocus(xTextEntryField);
         }
     }
 

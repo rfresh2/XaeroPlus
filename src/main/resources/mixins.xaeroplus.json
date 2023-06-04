@@ -41,6 +41,7 @@
     "MixinWidgetScreenHandlerAccessor",
     "MixinWorldDataReader",
     "MixinWorldMapModSettings",
-    "mc.MixinNetworkManager"
+    "mc.MixinNetworkManager",
+    "mc.MixinRenderGlobal"
   ]
 }

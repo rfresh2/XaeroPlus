@@ -55,10 +55,10 @@ jobs:
       uses: Kir-Antipov/mc-publish@v3.3
       with:
         curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
-        curseforge-project-id: 866084
+        curseforge-id: 866084
 
         modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-        modrinth-project-id: EnPUzSTg
+        modrinth-id: EnPUzSTg
 
         github-token: ${{ secrets.GITHUB_TOKEN }}
         github-files: |

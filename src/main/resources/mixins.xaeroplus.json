@@ -39,6 +39,7 @@
     "MixinWaypointsManager",
     "MixinWidgetLoadingHandler",
     "MixinWidgetScreenHandlerAccessor",
+    "MixinWorldDataHandler",
     "MixinWorldDataReader",
     "MixinWorldMapModSettings",
     "mc.MixinNetworkManager",

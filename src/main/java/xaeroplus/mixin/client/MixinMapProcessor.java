@@ -298,7 +298,11 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                 }
             }
             if (this.state < 2) {
-                this.forceClean();
+                try {
+                    this.forceClean();
+                } catch (final Throwable e) {
+                    WorldMap.crashHandler.setCrashedBy(e);
+                }
             }
         }
         if (this.state == 2) {

@@ -20,6 +20,7 @@ import xaero.map.world.MapDimension;
 import xaero.map.world.MapWorld;
 import xaeroplus.XaeroPlus;
 import xaeroplus.util.CustomDimensionMapSaveLoad;
+import xaeroplus.util.CustomWorldDataHandler;
 import xaeroplus.util.Shared;
 
 import java.io.*;
@@ -531,7 +532,7 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                     );
                 }
             } else {
-                File worldDir = this.mapProcessor.getWorldDataHandler().getWorldDir();
+                File worldDir = ((CustomWorldDataHandler) this.mapProcessor.getWorldDataHandler()).getWorldDir(dimId);
                 if (worldDir == null) {
                     return;
                 }

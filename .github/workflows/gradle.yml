@@ -30,22 +30,22 @@ jobs:
       run: ./gradlew build
 
     - name: Rename built mod
-      run: mv build/libs/xaeroplus-*.jar xaeroplus-${{ github.run_number }}-WM${{ WORLDMAP_VERSION }}-MM${{ MINIMAP_VERSION }}.jar
+      run: mv build/libs/xaeroplus-*.jar xaeroplus-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar
 
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
-        name: xaeroplus-${{ github.run_number }}-WM${{ WORLDMAP_VERSION }}-MM${{ MINIMAP_VERSION }}
+        name: xaeroplus-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}
         path: xaeroplus-*.jar
 
     - name: Download Xaero WorldMap
-      run: wget https://chocolateminecraft.com/mods2/worldmap/XaerosWorldMap_${{ WORLDMAP_VERSION }}_Forge_1.12.jar --no-check-certificate
+      run: wget https://chocolateminecraft.com/mods2/worldmap/XaerosWorldMap_${{ env.WORLDMAP_VERSION }}_Forge_1.12.jar --no-check-certificate
 
     - name: Download Xaero Minimap
-      run: wget https://chocolateminecraft.com/mods2/minimap/Xaeros_Minimap_${{ MINIMAP_VERSION }}_Forge_1.12.jar --no-check-certificate
+      run: wget https://chocolateminecraft.com/mods2/minimap/Xaeros_Minimap_${{ env.MINIMAP_VERSION }}_Forge_1.12.jar --no-check-certificate
 
     - name: Create modpack zip
-      run: tar -czvf xaeroplus-modpack-${{ github.run_number }}.zip xaeroplus-${{ github.run_number }}-WM${{ WORLDMAP_VERSION }}-MM${{ MINIMAP_VERSION }}.jar XaerosWorldMap_${{ WORLDMAP_VERSION }}_Forge_1.12.jar Xaeros_Minimap_${{ MINIMAP_VERSION }}_Forge_1.12.jar
+      run: tar -czvf xaeroplus-modpack-${{ github.run_number }}.zip xaeroplus-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar XaerosWorldMap_${{ env.WORLDMAP_VERSION }}_Forge_1.12.jar Xaeros_Minimap_${{ env.MINIMAP_VERSION }}_Forge_1.12.jar
 
     # todo: for future auto-update check feature
 #    - name: Create version identifier file
@@ -68,12 +68,12 @@ jobs:
 
         files: |
           xaeroplus-*.jar
-        name: ${{ github.run_number }}-WM${{ WORLDMAP_VERSION }}-MM${{ MINIMAP_VERSION }}
-        version: ${{ github.run_number }}-WM${{ WORLDMAP_VERSION }}-MM${{ MINIMAP_VERSION }}
+        name: ${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}
+        version: ${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}
         loaders: |
           forge
         game-versions: |
           1.12.2
         dependencies: |
-          xaerominimap@${{ MINIMAP_VERSION }}(required){modrinth:1bokaNcj}{curseforge:263420}
-          xaeroworldmap@${{ WORLDMAP_VERSION }}(required){modrinth:NcUtCpym}{curseforge:317780}
+          xaerominimap@${{ env.MINIMAP_VERSION }}(required){modrinth:1bokaNcj}{curseforge:263420}
+          xaeroworldmap@${{ env.WORLDMAP_VERSION }}(required){modrinth:NcUtCpym}{curseforge:317780}

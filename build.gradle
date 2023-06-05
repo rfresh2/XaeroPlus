@@ -130,6 +130,7 @@ sourceSets {
     main {
         ext.refMap = "mixins.xaeroplus.refmap.json"
         compileClasspath += wdl.output
+        output.resourcesDir = output.getClassesDirs().getSingleFile()
     }
 }
 

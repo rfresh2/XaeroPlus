@@ -316,34 +316,27 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         xTextEntryField.setVisible(false);
         zTextEntryField = new GuiTextField(1, mc.fontRenderer, 20, xTextEntryField.y + 20, 50, 20);
         zTextEntryField.setVisible(false);
-        // todo: create textures for these buttons. Existing xaero textures don't really fit well here so these are just normal buttons for now
-        this.switchToNetherButton = new TooltipButton(
-          this.width - 20, (this.height / 2) + 90, 20, 20, "N",
-                () -> new CursorBox(new TextComponentString("Switch to Nether"))
-        ) {
+        this.switchToEndButton = new GuiTexturedButton(
+                this.width - 20, zoomInButton.y - 20, 20, 20, 31, 0, 16, 16, Shared.xpGuiTextures, new Consumer<GuiButton>() {
             @Override
-            protected void onPress() {
-                onSwitchDimensionButton(-1);
-            }
-        };
-        this.switchToOverworldButton = new TooltipButton(
-                this.width - 20, (this.height / 2) + 110, 20, 20, "O",
-                () -> new CursorBox(new TextComponentString("Switch to Overworld"))
-        ) {
-            @Override
-            protected void onPress() {
-                onSwitchDimensionButton(0);
-            }
-        };
-        this.switchToEndButton = new TooltipButton(
-                this.width - 20, (this.height / 2) + 130, 20, 20, "E",
-                () -> new CursorBox(new TextComponentString("Switch to End"))
-        ) {
-            @Override
-            protected void onPress() {
+            public void accept(final GuiButton button) {
                 onSwitchDimensionButton(1);
             }
-        };
+        }, () -> new CursorBox(new TextComponentString("Switch to End")));
+        this.switchToOverworldButton = new GuiTexturedButton(
+                this.width - 20, this.switchToEndButton.y - 20, 20, 20, 16, 0, 16, 16, Shared.xpGuiTextures, new Consumer<GuiButton>() {
+            @Override
+            public void accept(final GuiButton button) {
+                onSwitchDimensionButton(0);
+            }
+        }, () -> new CursorBox(new TextComponentString("Switch to Overworld")));
+        this.switchToNetherButton = new GuiTexturedButton(
+                this.width - 20, this.switchToOverworldButton.y - 20, 20, 20, 0, 0, 16, 16, Shared.xpGuiTextures, new Consumer<GuiButton>() {
+            @Override
+            public void accept(final GuiButton button) {
+                onSwitchDimensionButton(-1);
+            }
+        }, () -> new CursorBox(new TextComponentString("Switch to Nether")));
         addGuiButton(switchToNetherButton);
         addGuiButton(switchToOverworldButton);
         addGuiButton(switchToEndButton);

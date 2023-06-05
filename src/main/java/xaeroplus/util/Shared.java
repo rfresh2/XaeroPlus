@@ -3,6 +3,7 @@ package xaeroplus.util;
 import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.util.ResourceLocation;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMap;
 import xaero.map.WorldMapSession;
@@ -41,6 +42,7 @@ public class Shared {
     public static ExecutorService cacheRefreshExecutorService = Executors.newFixedThreadPool(
             // limited benefits by refreshing on more threads as it will consume the entire CPU and start lagging the game
             Math.max(1, Math.min(Runtime.getRuntime().availableProcessors() / 2, 4)));
+    public static final ResourceLocation xpGuiTextures = new ResourceLocation("xaeroplus", "gui/xpgui.png");
 
     public static void onSettingLoad() {
         if (!settingsLoadedInit) { // handle settings where we want them to take effect only on first load

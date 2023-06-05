@@ -1,6 +1,6 @@
 # XaeroPlus
 
-XaeroPlus is a Forge 1.12.2 mod that depends on and modifies Xaero's WorldMap and Minimap with extra 
+XaeroPlus is a Forge 1.12.2 mod that depends on and modifies Xaero's WorldMap and Minimap with extra
 features and performance improvements - particularly for use on anarchy servers like 2b2t.
 
 <details>
@@ -12,15 +12,18 @@ features and performance improvements - particularly for use on anarchy servers 
 
 # Download
 
-Download from [Github Releases](https://github.com/rfresh2/XaeroPlus/releases) 
+Available on:
 
-Or from [GitHub actions](https://github.com/rfresh2/XaeroPlus/actions?query=branch%3Amainline+)
+* [Github Releases](https://github.com/rfresh2/XaeroPlus/releases)
+* [Modrinth](https://modrinth.com/mod/xaeroplus)
+* [CurseForge](https://legacy.curseforge.com/minecraft/mc-mods/xaeroplus)
+* [GitHub Actions](https://github.com/rfresh2/XaeroPlus/actions?query=branch%3Amainline+)
 
 # Xaero Versions
 
-Xaero WorldMap version: [1.30.3](https://www.curseforge.com/minecraft/mc-mods/xaeros-world-map/files/4550322)
+Xaero WorldMap version: [1.30.3](https://chocolateminecraft.com/mods2/worldmap/XaerosWorldMap_1.30.3_Forge_1.12.jar)
 
-Xaero Minimap version: [23.4.4](https://www.curseforge.com/minecraft/mc-mods/xaeros-minimap/files/4550305)
+Xaero Minimap version: [23.4.4](https://chocolateminecraft.com/mods2/minimap/Xaeros_Minimap_23.4.4_Forge_1.12.jar)
 
 Download and include these mods in your Forge mods folder **in addition** to `xaeroplus-xx.jar` (3 jars total).
 
@@ -28,7 +31,7 @@ Any other Xaero WorldMap/Minimap version may cause crashes.
 
 # Modifications
 
-* [Dimension hot-switching on WorldMap and Minimap.](https://cdn.discordapp.com/attachments/971140948593635335/1109733484144107572/Temurin-1.8.0_352_2023.03.31_-_20.11.27.50.mp4) 
+* [Dimension hot-switching on WorldMap and Minimap.](https://cdn.discordapp.com/attachments/971140948593635335/1109733484144107572/Temurin-1.8.0_352_2023.03.31_-_20.11.27.50.mp4)
   * Recommended: Create keybinds for Minimap dimension switching.
 * [Adjustable minimap scaling that increases how many chunks are visible](https://cdn.discordapp.com/attachments/971140948593635335/1109734742842146937/Temurin-1.8.0_352_2023.03.29_-_16.16.08.32.DVR.mp4)
 * [NewChunks Highlighting in MiniMap and WorldMap.](https://cdn.discordapp.com/attachments/971140948593635335/1109735633045434408/Base_Profile_2023.01.02_-_11.26.22.02.DVR.mp4)
@@ -60,7 +63,7 @@ Any other Xaero WorldMap/Minimap version may cause crashes.
 * Overworld dimension optionally stored in the "DIM0" directory instead of "null"
   * **Changing this setting requires you to manually rename existing folders in `.minecraft/XaeroWorldMap/Multiplayer_<server name>/`**
 * WorldMap 1.30.0 added cave data saving and rendering. There is a setting on by default in XaeroPlus that changes how the nether is rendered with cave mode off to be as it was previously.
-  * This removes the need to manually move existing world data files. 
+  * This removes the need to manually move existing world data files.
 
 Configurations are in the Xaero WorldMap and Minimap settings GUI.
 
@@ -73,7 +76,8 @@ Toggleable settings support keybinds through the standard Minecraft Controls GUI
 * 2b2t Atlas Waypoints to Xaero: [JMWaypointsToXaero/atlas](https://github.com/rfresh2/JMWaypointsToXaero/tree/atlas)
 * Convert MC Region Files to Xaero: [JMToXaero/Region-Scripts](https://github.com/Entropy5/JMtoXaero/blob/Region-Scripts/src/main/java/com/github/entropy5/RegionToXaero.java)
 * 2b2t 256k WDL Xaero Map (20GB): [mc-archive](https://data.mc-archive.org/s/eFDEy2XKof83Kez)
-* Xaero World Merger: [JMToXaero/Region-Scripts](https://github.com/Entropy5/JMtoXaero/blob/Region-Scripts/src/main/java/com/github/entropy5/XaeroRegionMerger.java) 
+* Xaero World
+  Merger: [JMToXaero/Region-Scripts](https://github.com/Entropy5/JMtoXaero/blob/Region-Scripts/src/main/java/com/github/entropy5/XaeroRegionMerger.java)
   * Can be used to merge 256k WDL into an existing world. With optional darkening only on tiles from 256K
 
 # Support

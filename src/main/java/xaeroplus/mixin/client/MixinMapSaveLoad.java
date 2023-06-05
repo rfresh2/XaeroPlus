@@ -112,7 +112,6 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                         if (firstByte == 255) {
                             saveVersion = in.readInt();
                             if (7 < saveVersion) {
-                                in.close();
                                 WorldMap.LOGGER.info("Trying to load a newer region " + region + " save using an older version of Xaero's World Map!");
                                 this.backupFile(file, saveVersion);
                                 region.setSaveExists(null);
@@ -426,6 +425,8 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                                 }
                             }
                         }
+                        zipOut.write(byteOut.toByteArray());
+                        zipOut.closeEntry();
                     }
 
                     if (regionWasSavedEmpty) {

@@ -64,12 +64,11 @@ jobs:
         github-files: |
           xaeroplus-*.jar
           xaeroplus-modpack-*.zip
-        github-tag: latest
 
         files: |
           xaeroplus-*.jar
-        name: ${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}
-        version: ${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}
+        name: xaeroplus-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}
+        version: xaeroplus-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}
         loaders: |
           forge
         game-versions: |

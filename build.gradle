@@ -163,7 +163,6 @@ shadowJar {
     exclude 'org/sqlite/native/FreeBSD/**'
     exclude 'org/sqlite/native/Linux-Android/**'
     exclude 'org/sqlite/native/Linux-Musl/**'
-    exclude 'org/sqlite/native/**/aarch64/**'
     exclude 'org/sqlite/native/**/armv6/**'
     exclude 'org/sqlite/native/**/armv7/**'
     exclude 'org/sqlite/native/**/arm/**'

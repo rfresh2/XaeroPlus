@@ -168,7 +168,6 @@ shadowJar {
     exclude 'org/sqlite/native/**/armv7/**'
     exclude 'org/sqlite/native/**/arm/**'
     exclude 'org/sqlite/native/**/ppc64/**'
-    exclude 'org/sqlite/native/**/aarch64/**'
     finalizedBy 'configureReobfTaskForReobfShadowJar', 'reobfShadowJar'
     mustRunAfter 'jar'
 }

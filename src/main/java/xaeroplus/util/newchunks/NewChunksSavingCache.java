@@ -125,8 +125,11 @@ public class NewChunksSavingCache implements NewChunksCache {
     public void reset() {
         this.worldCacheInitialized = false;
         this.currentWorldId = null;
+        this.netherCache.ifPresent(NewChunksSavingCacheDimensionHandler::close);
         this.netherCache = Optional.empty();
+        this.overworldCache.ifPresent(NewChunksSavingCacheDimensionHandler::close);
         this.overworldCache = Optional.empty();
+        this.endCache.ifPresent(NewChunksSavingCacheDimensionHandler::close);
         this.endCache = Optional.empty();
         this.newChunksDatabase.ifPresent(NewChunksDatabase::close);
         this.newChunksDatabase = Optional.empty();

@@ -102,4 +102,8 @@ public class NewChunksSavingCacheDimensionHandler extends NewChunksBaseCacheHand
         });
     }
 
+    public void close() {
+        executorService.shutdown();
+    }
+
 }

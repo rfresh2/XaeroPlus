@@ -189,6 +189,12 @@ public class NewChunksSavingCache implements NewChunksCache {
             final String worldId = XaeroWorldMapCore.currentSession.getMapProcessor().getCurrentWorldId();
             final String mwId = XaeroWorldMapCore.currentSession.getMapProcessor().getCurrentMWId();
             if (worldId == null || mwId == null) return;
+            final int dimension = getMCDimension();
+            if (dimension != 0 && dimension != -1 && dimension != 1) {
+                XaeroPlus.LOGGER.error("Unexpected dimension ID: " + dimension + ". Disable Save/Load NewChunks to Disk to restore functionality.");
+                return;
+            }
+            ;
             this.currentWorldId = worldId;
             final NewChunksDatabase db = new NewChunksDatabase(worldId);
             this.newChunksDatabase = Optional.of(db);

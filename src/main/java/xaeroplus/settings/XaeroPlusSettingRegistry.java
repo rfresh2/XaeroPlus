@@ -49,12 +49,12 @@ public final class XaeroPlusSettingRegistry {
                     "Minimum WorldMap Zoom Setting. This is 10x what you see on the WorldMap.",
             0.1f, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting skipWorldRenderSetting = XaeroPlusBooleanSetting.create("Skip Background Render",
-                    "Skip MC world render while in a Xaero GUI. Having this on can cause issues with travel mods while you're in a Xaero GUI like the WorldMap.",
+            "Skip MC world render while in a Xaero GUI. Having this on can cause issues with travel mods while you're in a Xaero GUI like the WorldMap.",
             false, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting newChunksEnabledSetting = XaeroPlusBooleanSetting.create("NewChunks Highlighting",
-                    "Highlights NewChunks on the Minimap and WorldMap.",
+            "Highlights NewChunks on the Minimap and WorldMap.",
             (b) -> ModuleManager.getModule(NewChunks.class).setEnabled(b),
-            true, SettingLocation.WORLD_MAP_MAIN);
+            false, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting newChunksSaveLoadToDisk = XaeroPlusBooleanSetting.create("Save/Load NewChunks to Disk",
             "Saves and loads NewChunk data to disk for each world and dimension. Requires NewChunk Highlighting to be enabled.",
             (b) -> ModuleManager.getModule(NewChunks.class).setNewChunksCache(b),
@@ -92,11 +92,11 @@ public final class XaeroPlusSettingRegistry {
             (b) -> ModuleManager.getModule(PortalSkipDetection.class).setSearchDelayTicks(b),
             10, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting wdlEnabledSetting = XaeroPlusBooleanSetting.create("WDL Highlight",
-                    "Highlights chunks WDL mod has downloaded on the Minimap and WorldMap.",
-            true, SettingLocation.WORLD_MAP_MAIN);
+            "Highlights chunks WDL mod has downloaded on the Minimap and WorldMap.",
+            false, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting wdlAlphaSetting = XaeroPlusFloatSetting.create("WDL Opacity",
             10f, 255f, 10f,
-                    "Changes the color opacity of WDL chunks.",
+            "Changes the color opacity of WDL chunks.",
             WDLHelper::setAlpha,
             100, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> wdlColorSetting = XaeroPlusEnumSetting.create("WDL Color",

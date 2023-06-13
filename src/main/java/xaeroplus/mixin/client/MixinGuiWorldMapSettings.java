@@ -1,4 +1,4 @@
-package xaeroplus.mixin;
+package xaeroplus.mixin.client;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;

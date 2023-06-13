@@ -6,18 +6,15 @@ import net.minecraft.client.option.KeyBinding;
 import xaero.map.WorldMapSession;
 import xaero.map.gui.CursorBox;
 import xaero.map.settings.ModOptions;
-import xaeroplus.mixin.MixinMinimapModOptionsAccessor;
-import xaeroplus.mixin.MixinWorldMapModOptionsAccessor;
+import xaeroplus.mixin.client.MixinMinimapModOptionsAccessor;
+import xaeroplus.mixin.client.MixinWorldMapModOptionsAccessor;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static java.lang.reflect.Modifier.FINAL;
 
 // yucky reflection and utils so our settings can be in xaero's gui's
 public class XaeroPlusSettingsReflectionHax {

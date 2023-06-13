@@ -1,9 +1,7 @@
 {
 	"required": true,
-	"package": "xaeroplus.mixin",
+	"package": "xaeroplus.mixin.client",
 	"compatibilityLevel": "JAVA_17",
-	"mixins": [
-	],
 	"injectors": {
 		"defaultRequire": 1
 	},
@@ -14,8 +12,11 @@
 		"MixinGuiMinimapMain",
 		"MixinGuiMinimapOverlaysSettings",
 		"MixinGuiSettingsWorldMap",
-		"MixinMapWriter",
+		"MixinGuiWaypoints",
+		"MixinGuiWaypointsAccessor",
+		"MixinGuiWaypointsList",
 		"MixinGuiWorldMapSettings",
+		"MixinMapWriter",
 		"MixinMinimapModOptionsAccessor",
 		"MixinMinimapModSettings",
 		"MixinWidgetLoadingHandler",

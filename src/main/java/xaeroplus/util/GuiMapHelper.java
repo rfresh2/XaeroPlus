@@ -7,7 +7,7 @@ import net.minecraft.world.World;
 import xaero.map.core.XaeroWorldMapCore;
 import xaero.map.gui.GuiMap;
 import xaero.map.gui.GuiSettings;
-import xaeroplus.mixin.MixinGuiMapAccessor;
+import xaeroplus.mixin.client.MixinGuiMapAccessor;
 
 import java.util.Optional;
 

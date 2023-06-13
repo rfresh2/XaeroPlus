@@ -1,4 +1,4 @@
-package xaeroplus.mixin;
+package xaeroplus.mixin.client;
 
 import net.minecraft.client.option.KeyBinding;
 import org.spongepowered.asm.mixin.Mixin;

@@ -1,4 +1,4 @@
-package xaeroplus.mixin;
+package xaeroplus.mixin.client;
 
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.option.KeyBinding;

@@ -1,32 +1,33 @@
 {
-	"required": true,
-	"package": "xaeroplus.mixin.client",
-	"compatibilityLevel": "JAVA_17",
-	"injectors": {
-		"defaultRequire": 1
-	},
-	"client": [
-		"MixinControlsHandler",
-		"MixinControlsRegister",
-		"MixinGuiMapAccessor",
-		"MixinGuiMinimapMain",
-		"MixinGuiMinimapOverlaysSettings",
-		"MixinGuiSettingsWorldMap",
-		"MixinGuiWaypoints",
-		"MixinGuiWaypointsAccessor",
-		"MixinGuiWaypointsList",
-		"MixinGuiWorldMapSettings",
-		"MixinMapWriter",
-		"MixinMinimapModOptionsAccessor",
-		"MixinMinimapModSettings",
-		"MixinWidgetLoadingHandler",
-		"MixinWidgetScreenHandlerAccessor",
-		"MixinWorldMapModOptionsAccessor",
-		"MixinWorldMapModSettings"
-	],
-	"mixins": [
-		"MixinMapProcessor",
-		"MixinWaypointsManager",
-		"MixinWorldMapClient"
-	]
+  "required": true,
+  "package": "xaeroplus.mixin.client",
+  "compatibilityLevel": "JAVA_17",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "MixinControlsHandler",
+    "MixinControlsRegister",
+    "MixinGuiMapAccessor",
+    "MixinGuiMinimapMain",
+    "MixinGuiMinimapOverlaysSettings",
+    "MixinGuiSettingsWorldMap",
+    "MixinGuiWaypoints",
+    "MixinGuiWaypointsAccessor",
+    "MixinGuiWaypointsList",
+    "MixinGuiWorldMapSettings",
+    "MixinMapWriter",
+    "MixinMinimapModOptionsAccessor",
+    "MixinMinimapModSettings",
+    "MixinWidgetLoadingHandler",
+    "MixinWidgetScreenHandlerAccessor",
+    "MixinWorldMapModOptionsAccessor",
+    "MixinWorldMapModSettings"
+  ],
+  "mixins": [
+    "MixinMapProcessor",
+    "MixinMisc",
+    "MixinWaypointsManager",
+    "MixinWorldMapClient"
+  ]
 }

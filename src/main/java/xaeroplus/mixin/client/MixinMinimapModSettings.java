@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.ALL_MINIMAP_SETTINGS;
+import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.XAERO_PLUS_WORLDMAP_SETTINGS;
 
 @Mixin(value = ModSettings.class, remap = false)
 public class MixinMinimapModSettings {
@@ -49,17 +50,27 @@ public class MixinMinimapModSettings {
 
     @Inject(method = "setOptionValue", at = @At("HEAD"))
     public void setOptionValue(ModOptions o, Object value, final CallbackInfo ci) {
-        XaeroPlusModSettingsHooks.setOptionValue(o.getEnumString(), ALL_MINIMAP_SETTINGS.get());
+        XaeroPlusModSettingsHooks.setOptionValue(o.getEnumString(), value, ALL_MINIMAP_SETTINGS.get());
+    }
+
+    @Inject(method = "getOptionValue", at = @At("HEAD"), cancellable = true)
+    public void getOptionValue(final ModOptions o, final CallbackInfoReturnable<Object> cir) {
+        XaeroPlusModSettingsHooks.getOptionValue(o.getEnumString(), cir, ALL_MINIMAP_SETTINGS.get());
     }
 
     @Inject(method = "setOptionDoubleValue", at = @At("HEAD"))
     public void setOptionFloatValue(ModOptions o, double f, CallbackInfo ci) {
-        XaeroPlusModSettingsHooks.setOptionFloatValue(o.getEnumString(), f, ALL_MINIMAP_SETTINGS.get());
+        XaeroPlusModSettingsHooks.setOptionDoubleValue(o.getEnumString(), f, ALL_MINIMAP_SETTINGS.get());
     }
 
     @Inject(method = "getOptionDoubleValue", at = @At("HEAD"), cancellable = true)
     public void getOptionFloatValue(ModOptions o, CallbackInfoReturnable<Double> cir) {
-        XaeroPlusModSettingsHooks.getOptionFloatValue(o.getEnumString(), cir, ALL_MINIMAP_SETTINGS.get());
+        XaeroPlusModSettingsHooks.getOptionDoubleValue(o.getEnumString(), cir, ALL_MINIMAP_SETTINGS.get());
+    }
+
+    @Inject(method = "getOptionValueName", at = @At("HEAD"), cancellable = true)
+    public void getOptionValueName(ModOptions o, CallbackInfoReturnable<String> cir) {
+        XaeroPlusModSettingsHooks.getOptionValueName(o.getEnumString(), cir, ALL_MINIMAP_SETTINGS.get());
     }
 }
 

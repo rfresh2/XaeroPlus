@@ -23,5 +23,10 @@
 		"MixinWidgetScreenHandlerAccessor",
 		"MixinWorldMapModOptionsAccessor",
 		"MixinWorldMapModSettings"
+	],
+	"mixins": [
+		"MixinMapProcessor",
+		"MixinWaypointsManager",
+		"MixinWorldMapClient"
 	]
 }

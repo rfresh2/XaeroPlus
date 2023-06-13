@@ -58,30 +58,55 @@ public class XaeroPlusModSettingsHooks {
         }
     }
 
-    public static void setOptionValue(String enumString, List<XaeroPlusSetting> settings) {
-        Optional<XaeroPlusBooleanSetting> settingOptional = settings.stream()
-                .filter(xaeroPlusSetting -> xaeroPlusSetting.getSettingName().equals(enumString) && xaeroPlusSetting instanceof XaeroPlusBooleanSetting)
-                .map(xaeroPlusSetting -> (XaeroPlusBooleanSetting) xaeroPlusSetting)
-                .findFirst();
-        settingOptional.ifPresent(xaeroPlusSetting -> xaeroPlusSetting.setValue(!xaeroPlusSetting.getValue()));
-    }
-
-    public static void setOptionFloatValue(String enumString, double f, List<XaeroPlusSetting> settings) {
+    // boolean or enum...
+    public static void setOptionValue(String enumString, final Object value, List<XaeroPlusSetting> settings) {
         Optional<XaeroPlusSetting> foundSetting = settings.stream()
                 .filter(xaeroPlusSetting -> xaeroPlusSetting.getSettingName().equals(enumString))
                 .findFirst();
         foundSetting
-                .filter(xaeroPlusSetting ->  xaeroPlusSetting instanceof XaeroPlusFloatSetting)
-                .map(xaeroPlusSetting -> (XaeroPlusFloatSetting) xaeroPlusSetting)
-                .ifPresent(xaeroPlusSetting -> xaeroPlusSetting.setValue((float) f));
-        // why does xaero not have proper enum settings??? They are "floats" but treated like int indeces. just...why...
+                .filter(xaeroPlusSetting -> xaeroPlusSetting instanceof XaeroPlusBooleanSetting && value instanceof Boolean)
+                .map(xaeroPlusSetting -> (XaeroPlusBooleanSetting) xaeroPlusSetting)
+                .ifPresent(xaeroPlusBooleanSetting -> {
+                    xaeroPlusBooleanSetting.setValue((Boolean) value);
+                });
         foundSetting
-                .filter(xaeroPlusSetting ->  xaeroPlusSetting instanceof XaeroPlusEnumSetting)
+                .filter(xaeroPlusSetting -> xaeroPlusSetting instanceof XaeroPlusEnumSetting && value instanceof Integer && (Integer) value <= ((XaeroPlusEnumSetting<?>) xaeroPlusSetting).getIndexMax() && (Integer) value >= 0)
                 .map(xaeroPlusSetting -> (XaeroPlusEnumSetting) xaeroPlusSetting)
-                .ifPresent(xaeroPlusEnumSetting -> xaeroPlusEnumSetting.setValueIndex((int) f));
+                .ifPresent(xaeroPlusEnumSetting -> {
+                    xaeroPlusEnumSetting.setValueIndex((Integer) value);
+                });
     }
 
-    public static void getOptionFloatValue(String enumString, CallbackInfoReturnable<Double> cir, List<XaeroPlusSetting> settings) {
+    // boolean or enum...
+    public static void getOptionValue(final String enumString, final CallbackInfoReturnable<Object> cir, final List<XaeroPlusSetting> settings) {
+        Optional<XaeroPlusSetting> foundSetting = settings.stream()
+                .filter(xaeroPlusSetting -> xaeroPlusSetting.getSettingName().equals(enumString))
+                .findFirst();
+        foundSetting
+                .filter(xaeroPlusSetting -> xaeroPlusSetting instanceof XaeroPlusBooleanSetting)
+                .map(xaeroPlusSetting -> (XaeroPlusBooleanSetting) xaeroPlusSetting)
+                .ifPresent(xaeroPlusBooleanSetting -> {
+                    cir.setReturnValue(xaeroPlusBooleanSetting.getValue());
+                });
+        foundSetting
+                .filter(xaeroPlusSetting -> xaeroPlusSetting instanceof XaeroPlusEnumSetting)
+                .map(xaeroPlusSetting -> (XaeroPlusEnumSetting) xaeroPlusSetting)
+                .ifPresent(xaeroPlusEnumSetting -> {
+                    cir.setReturnValue(xaeroPlusEnumSetting.getValueIndex());
+                });
+    }
+
+    public static void setOptionDoubleValue(String enumString, double f, List<XaeroPlusSetting> settings) {
+        Optional<XaeroPlusSetting> foundSetting = settings.stream()
+                .filter(xaeroPlusSetting -> xaeroPlusSetting.getSettingName().equals(enumString))
+                .findFirst();
+        foundSetting
+                .filter(xaeroPlusSetting -> xaeroPlusSetting instanceof XaeroPlusFloatSetting)
+                .map(xaeroPlusSetting -> (XaeroPlusFloatSetting) xaeroPlusSetting)
+                .ifPresent(xaeroPlusSetting -> xaeroPlusSetting.setValue((float) f));
+    }
+
+    public static void getOptionDoubleValue(String enumString, CallbackInfoReturnable<Double> cir, List<XaeroPlusSetting> settings) {
         Optional<XaeroPlusSetting> settingOptional = settings.stream()
                 .filter(xaeroPlusSetting -> xaeroPlusSetting.getSettingName().equals(enumString))
                 .findFirst();
@@ -92,13 +117,17 @@ public class XaeroPlusModSettingsHooks {
                     cir.setReturnValue((double) xaeroPlusSetting.getValue());
                     cir.cancel();
                 });
-        // i'm debating whether to continue this enum madness or just mixin config save/load to write enums as strings...
+    }
+
+    public static void getOptionValueName(final String enumString, final CallbackInfoReturnable<String> cir, final List<XaeroPlusSetting> settings) {
+        Optional<XaeroPlusSetting> settingOptional = settings.stream()
+                .filter(xaeroPlusSetting -> xaeroPlusSetting.getSettingName().equals(enumString))
+                .findFirst();
         settingOptional
                 .filter(xaeroPlusSetting -> xaeroPlusSetting instanceof XaeroPlusEnumSetting)
                 .map(xaeroPlusSetting -> (XaeroPlusEnumSetting) xaeroPlusSetting)
                 .ifPresent(xaeroPlusEnumSetting -> {
-                    cir.setReturnValue((double) xaeroPlusEnumSetting.getValueIndex());
-                    cir.cancel();
+                    cir.setReturnValue(xaeroPlusEnumSetting.getValue().name());
                 });
     }
 

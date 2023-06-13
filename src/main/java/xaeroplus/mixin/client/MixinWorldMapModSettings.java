@@ -44,16 +44,26 @@ public class MixinWorldMapModSettings {
 
     @Inject(method = "setOptionValue", at = @At("HEAD"))
     public void setOptionValue(ModOptions o, Object value, final CallbackInfo ci) {
-        XaeroPlusModSettingsHooks.setOptionValue(o.getEnumString(), XAERO_PLUS_WORLDMAP_SETTINGS);
+        XaeroPlusModSettingsHooks.setOptionValue(o.getEnumString(), value, XAERO_PLUS_WORLDMAP_SETTINGS);
+    }
+
+    @Inject(method = "getOptionValue", at = @At("HEAD"), cancellable = true)
+    public void getOptionValue(final ModOptions o, final CallbackInfoReturnable<Object> cir) {
+        XaeroPlusModSettingsHooks.getOptionValue(o.getEnumString(), cir, XAERO_PLUS_WORLDMAP_SETTINGS);
     }
 
     @Inject(method = "setOptionDoubleValue", at = @At("HEAD"))
     public void setOptionDoubleValue(ModOptions o, double f, CallbackInfo ci) {
-        XaeroPlusModSettingsHooks.setOptionFloatValue(o.getEnumString(), f, XAERO_PLUS_WORLDMAP_SETTINGS);
+        XaeroPlusModSettingsHooks.setOptionDoubleValue(o.getEnumString(), f, XAERO_PLUS_WORLDMAP_SETTINGS);
     }
 
     @Inject(method = "getOptionDoubleValue", at = @At("HEAD"), cancellable = true)
     public void getOptionDoubleValue(ModOptions o, CallbackInfoReturnable<Double> cir) {
-        XaeroPlusModSettingsHooks.getOptionFloatValue(o.getEnumString(), cir, XAERO_PLUS_WORLDMAP_SETTINGS);
+        XaeroPlusModSettingsHooks.getOptionDoubleValue(o.getEnumString(), cir, XAERO_PLUS_WORLDMAP_SETTINGS);
+    }
+
+    @Inject(method = "getOptionValueName", at = @At("HEAD"), cancellable = true)
+    public void getOptionValueName(ModOptions o, CallbackInfoReturnable<String> cir) {
+        XaeroPlusModSettingsHooks.getOptionValueName(o.getEnumString(), cir, XAERO_PLUS_WORLDMAP_SETTINGS);
     }
 }

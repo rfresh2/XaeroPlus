@@ -8,6 +8,7 @@
   "client": [
     "MixinControlsHandler",
     "MixinControlsRegister",
+    "MixinGuiMap",
     "MixinGuiMapAccessor",
     "MixinGuiMinimapMain",
     "MixinGuiMinimapOverlaysSettings",

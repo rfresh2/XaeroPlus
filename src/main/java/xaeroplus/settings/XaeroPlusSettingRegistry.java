@@ -3,7 +3,6 @@ package xaeroplus.settings;
 import xaeroplus.util.Shared;
 
 import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.SettingLocation;
-import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.markChunksDirtyInWriteDistance;
 
 /**
  * Registry for XaeroPlus-specific settings
@@ -27,18 +26,18 @@ public final class XaeroPlusSettingRegistry {
             "Fast Mapping must be enabled. \n " +
                     "Limits how many chunks can be written in a single cycle. Lower values improve FPS at high render distances.",
             50, SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusBooleanSetting persistMapDimensionSwitchSetting = XaeroPlusBooleanSetting.create("Persist WM Dim Switch",
-                    "If enabled, the dimension will not be switched back to current when the WorldMap GUI is closed.",
-            false, SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusBooleanSetting transparentObsidianRoofSetting = XaeroPlusBooleanSetting.create("Transparent Obsidian Roof",
-                    "Makes obsidian placed at build height transparent. Does not update tiles already mapped - you need to remap them.",
-            (v) -> markChunksDirtyInWriteDistance(),
-            true, SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusFloatSetting transparentObsidianRoofDarkeningSetting = XaeroPlusFloatSetting.create("Roof Obsidian Opacity",
-            0, 255, 5,
-            "Sets the opacity of the transparent obsidian roof tiles.",
-            (v) -> markChunksDirtyInWriteDistance(),
-            150, SettingLocation.WORLD_MAP_MAIN);
+//    public static final XaeroPlusBooleanSetting persistMapDimensionSwitchSetting = XaeroPlusBooleanSetting.create("Persist WM Dim Switch",
+//                    "If enabled, the dimension will not be switched back to current when the WorldMap GUI is closed.",
+//            false, SettingLocation.WORLD_MAP_MAIN);
+//    public static final XaeroPlusBooleanSetting transparentObsidianRoofSetting = XaeroPlusBooleanSetting.create("Transparent Obsidian Roof",
+//                    "Makes obsidian placed at build height transparent. Does not update tiles already mapped - you need to remap them.",
+//            (v) -> markChunksDirtyInWriteDistance(),
+//            true, SettingLocation.WORLD_MAP_MAIN);
+//    public static final XaeroPlusFloatSetting transparentObsidianRoofDarkeningSetting = XaeroPlusFloatSetting.create("Roof Obsidian Opacity",
+//            0, 255, 5,
+//            "Sets the opacity of the transparent obsidian roof tiles.",
+//            (v) -> markChunksDirtyInWriteDistance(),
+//            150, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting worldMapMinZoomSetting = XaeroPlusFloatSetting.create("Min WorldMap Zoom",
             0, 0.625f, 0.01f,
             "Minimum WorldMap Zoom Setting. This is 10x what you see on the WorldMap.",
@@ -105,16 +104,16 @@ public final class XaeroPlusSettingRegistry {
     public static final XaeroPlusBooleanSetting showWaypointDistances = XaeroPlusBooleanSetting.create("Show Waypoint Distances",
             "Display the distance to every waypoint in the full waypoint menu.",
             true, SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusBooleanSetting showRenderDistanceSetting = XaeroPlusBooleanSetting.create("Show Render Distance",
-            "Show server side render distance (actually just another setting)",
-            false, SettingLocation.MINIMAP_OVERLAYS);
-    public static final XaeroPlusBooleanSetting showRenderDistanceWorldMapSetting = XaeroPlusBooleanSetting.create("Show Render Distance WorldMap",
-            "Show server side render distance on the WorldMap",
-            false, SettingLocation.MINIMAP_OVERLAYS);
-    public static final XaeroPlusFloatSetting assumedServerRenderDistanceSetting = XaeroPlusFloatSetting.create("Server Render Distance",
-            1f, 32f, 1f,
-            "view-distance of the server",
-            4f, SettingLocation.MINIMAP_OVERLAYS); // 2b2t
+//    public static final XaeroPlusBooleanSetting showRenderDistanceSetting = XaeroPlusBooleanSetting.create("Show Render Distance",
+//            "Show server side render distance (actually just another setting)",
+//            false, SettingLocation.MINIMAP_OVERLAYS);
+//    public static final XaeroPlusBooleanSetting showRenderDistanceWorldMapSetting = XaeroPlusBooleanSetting.create("Show Render Distance WorldMap",
+//            "Show server side render distance on the WorldMap",
+//            false, SettingLocation.MINIMAP_OVERLAYS);
+//    public static final XaeroPlusFloatSetting assumedServerRenderDistanceSetting = XaeroPlusFloatSetting.create("Server Render Distance",
+//            1f, 32f, 1f,
+//            "view-distance of the server",
+//            4f, SettingLocation.MINIMAP_OVERLAYS); // 2b2t
     public static final XaeroPlusBooleanSetting nullOverworldDimensionFolder = XaeroPlusBooleanSetting.create("null OW Dim Dir",
             "Sets whether the overworld WorldMap directory is in DIM0 or null (default)"
                     + " \n MC must be restarted for changes to take effect.",
@@ -130,9 +129,9 @@ public final class XaeroPlusSettingRegistry {
         IP, SERVER_NAME, BASE_DOMAIN;
     }
 
-    public static final XaeroPlusBooleanSetting transparentMinimapBackground = XaeroPlusBooleanSetting.create("Transparent Background",
-            "Makes the minimap background transparent instead of black.",
-            false, SettingLocation.MINIMAP);
+//    public static final XaeroPlusBooleanSetting transparentMinimapBackground = XaeroPlusBooleanSetting.create("Transparent Background",
+//            "Makes the minimap background transparent instead of black.",
+//            false, SettingLocation.MINIMAP);
     public static final XaeroPlusFloatSetting minimapScaling = XaeroPlusFloatSetting.create("Minimap Scaling Factor",
             // todo: increase max but we need to start generating mipmaps and change the framebuffer filter for anti aliasing to work better
             1f, 2f, 1f,

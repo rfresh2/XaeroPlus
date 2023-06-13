@@ -24,7 +24,7 @@ public abstract class XaeroPlusSetting {
     }
 
     protected static String defaultValueStr(final String settingName, final Object defaultVal) {
-        return settingName + " \\n    Default: " + defaultVal + " \\n ";
+        return settingName + " \n    Default: " + defaultVal + " \n ";
     }
 
     public String getSettingName() {

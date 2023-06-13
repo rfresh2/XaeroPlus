@@ -19,12 +19,12 @@ public final class XaeroPlusSettingRegistry {
             true, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting mapWriterDelaySetting = XaeroPlusFloatSetting.create("Fast Mapping Delay",
             10, 1000, 10,
-                    "Fast Mapping must be enabled. \\n " +
-                    "This is roughly the delay in milliseconds between minimap update operations, both render and actual file writes.",
+                    "Fast Mapping must be enabled. \n " +
+                            "This is roughly the delay in milliseconds between minimap update operations, both render and actual file writes.",
             50, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting fastMapMaxTilesPerCycle = XaeroPlusFloatSetting.create("Fast Mapping Rate Limit",
             10, 120, 10,
-                    "Fast Mapping must be enabled. \\n " +
+            "Fast Mapping must be enabled. \n " +
                     "Limits how many chunks can be written in a single cycle. Lower values improve FPS at high render distances.",
             50, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting persistMapDimensionSwitchSetting = XaeroPlusBooleanSetting.create("Persist WM Dim Switch",
@@ -65,8 +65,8 @@ public final class XaeroPlusSettingRegistry {
 //            ColorHelper.HighlightColor.values(),
 //            ColorHelper.HighlightColor.RED, SettingLocation.WORLD_MAP_MAIN);
 //    public static final XaeroPlusBooleanSetting portalSkipDetectionEnabledSetting = XaeroPlusBooleanSetting.create("PortalSkip Detection",
-//                    "Highlights chunks where portals could have been loaded into. \\n "
-//                            + "This is useful for basehunting to detect where players could switch dimensions along a trail to avoid hunters. \\n "
+//                    "Highlights chunks where portals could have been loaded into. \n "
+//                            + "This is useful for basehunting to detect where players could switch dimensions along a trail to avoid hunters. \n "
 //                            + "One thing to note: 2b2t's view distance is not large enough to detect portal skip areas. You need to load surrounding chunks - specifically a 15x15 chunk area",
 //            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setEnabled(b),
 //            false, SettingLocation.WORLD_MAP_MAIN);
@@ -82,7 +82,7 @@ public final class XaeroPlusSettingRegistry {
 //            ColorHelper.HighlightColor.WHITE, SettingLocation.WORLD_MAP_MAIN);
 //    public static final XaeroPlusFloatSetting portalSkipDetectionSearchDelayTicksSetting = XaeroPlusFloatSetting.create("PortalSkip Search Delay",
 //            0, 100, 1,
-//            "Portal Skip Detection must be enabled. \\n " +
+//            "Portal Skip Detection must be enabled. \n " +
 //                    "This is the delay in ticks between Portal Skip Detection search operations.",
 //            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setSearchDelayTicks(b),
 //            10, SettingLocation.WORLD_MAP_MAIN);
@@ -117,14 +117,14 @@ public final class XaeroPlusSettingRegistry {
             4f, SettingLocation.MINIMAP_OVERLAYS); // 2b2t
     public static final XaeroPlusBooleanSetting nullOverworldDimensionFolder = XaeroPlusBooleanSetting.create("null OW Dim Dir",
             "Sets whether the overworld WorldMap directory is in DIM0 or null (default)"
-                    + " \\n MC must be restarted for changes to take effect.",
+                    + " \n MC must be restarted for changes to take effect.",
             true, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusEnumSetting<DataFolderResolutionMode> dataFolderResolutionMode = XaeroPlusEnumSetting.create("Data Dir Mode",
             "Sets how the WorldMap and Waypoints data folders are resolved."
-                    + " \\n MC must be restarted for changes to take effect."
-                    + " \\n IP = Server IP (Xaero Default). Example: .minecraft/XaeroWorldMap/Multiplayer_connect.2b2t.org"
-                    + " \\n SERVER_NAME = MC Server Entry Name. Example: .minecraft/XaeroWorldMap/Multiplayer_2b2t"
-                    + " \\n BASE_DOMAIN = Base Server Domain Name. Example: .minecraft/XaeroWorldMap/Multiplayer_2b2t.org",
+                    + " \n MC must be restarted for changes to take effect."
+                    + " \n IP = Server IP (Xaero Default). Example: .minecraft/XaeroWorldMap/Multiplayer_connect.2b2t.org"
+                    + " \n SERVER_NAME = MC Server Entry Name. Example: .minecraft/XaeroWorldMap/Multiplayer_2b2t"
+                    + " \n BASE_DOMAIN = Base Server Domain Name. Example: .minecraft/XaeroWorldMap/Multiplayer_2b2t.org",
             DataFolderResolutionMode.values(), DataFolderResolutionMode.IP, SettingLocation.WORLD_MAP_MAIN);
     public enum DataFolderResolutionMode {
         IP, SERVER_NAME, BASE_DOMAIN;
@@ -153,7 +153,7 @@ public final class XaeroPlusSettingRegistry {
 //            false, SettingLocation.KEYBINDS);
     public static final XaeroPlusBooleanSetting netherCaveFix = XaeroPlusBooleanSetting.create("Nether Cave Fix",
             "Forces full cave maps to be written and rendered when cave mode is \"off\" in the nether."
-                    + " \\n Without this, you have to manually move region files pre WorldMap 1.30.0 to the correct cave folder",
+                    + " \n Without this, you have to manually move region files pre WorldMap 1.30.0 to the correct cave folder",
             true, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting alwaysRenderPlayerWithNameOnRadar = XaeroPlusBooleanSetting.create("Always Render Player Name",
             "Always render player name on the radar.",

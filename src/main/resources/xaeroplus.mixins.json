@@ -27,9 +27,12 @@
   ],
   "mixins": [
     "MixinMapProcessor",
+    "MixinMinimapElementOverMapRendererHandler",
+    "MixinMinimapFBORenderer",
     "MixinMinimapRenderer",
     "MixinMisc",
     "MixinRadarRenderProvider",
+    "MixinSupportXaeroWorldmap",
     "MixinWaypointsManager",
     "MixinWorldMapClient"
   ]

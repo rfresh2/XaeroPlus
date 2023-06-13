@@ -1,8 +1,9 @@
 package xaeroplus.settings;
 
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.text.LiteralTextContent;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax.SettingLocation;
 
@@ -19,11 +20,11 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
     private Consumer<Float> settingChangeConsumer;
 
     private XaeroPlusFloatSetting(final String settingName,
-                                 final float valueMin, final float valueMax, final float valueStep,
-                                 final float defaultValue,
-                                 final ITextComponent tooltip,
-                                 final Consumer<Float> settingChangeConsumer,
-                                 final KeyBinding keyBinding) {
+                                  final float valueMin, final float valueMax, final float valueStep,
+                                  final float defaultValue,
+                                  final Text tooltip,
+                                  final Consumer<Float> settingChangeConsumer,
+                                  final KeyBinding keyBinding) {
         super(settingName, tooltip, keyBinding);
         this.valueMin = valueMin;
         this.valueMax = valueMax;
@@ -37,7 +38,7 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
         final XaeroPlusFloatSetting setting = new XaeroPlusFloatSetting(
                 SETTING_PREFIX + settingName,
                 valueMin, valueMax, valueStep, defaultValue,
-                new TextComponentString(defaultValueStr(settingName, defaultValue) + tooltip),
+                MutableText.of(new LiteralTextContent(defaultValueStr(settingName, defaultValue) + tooltip)),
                 null,
                 null);
         settingLocation.getSettingsList().add(setting);
@@ -50,7 +51,7 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
         final XaeroPlusFloatSetting setting = new XaeroPlusFloatSetting(
                 SETTING_PREFIX + settingName,
                 valueMin, valueMax, valueStep, defaultValue,
-                new TextComponentString(defaultValueStr(settingName, defaultValue) + tooltip),
+                MutableText.of(new LiteralTextContent(defaultValueStr(settingName, defaultValue) + tooltip)),
                 changeConsumer,
                 null);
         settingLocation.getSettingsList().add(setting);

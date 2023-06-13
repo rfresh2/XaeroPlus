@@ -1,12 +1,13 @@
 package xaeroplus.settings;
 
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.util.text.ITextComponent;
+
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.text.Text;
 
 public abstract class XaeroPlusSetting {
     public static final String SETTING_PREFIX = "[XP] ";
     private final String settingName; // enumString
-    private ITextComponent tooltip;
+    private Text tooltip;
     private static boolean ingameOnly = false;
     private static boolean requiresMinimap = false;
     private static boolean switchScreen = false;
@@ -14,7 +15,7 @@ public abstract class XaeroPlusSetting {
     private KeyBinding keyBinding;
 
     public XaeroPlusSetting(String settingName,
-                            ITextComponent tooltip, // nullable
+                            Text tooltip, // nullable
                             KeyBinding keyBinding // nullable
     ) {
         this.settingName = settingName;
@@ -30,9 +31,10 @@ public abstract class XaeroPlusSetting {
         return settingName;
     }
 
-    public ITextComponent getTooltip() {
+    public Text getTooltip() {
         return tooltip;
     }
+
     public boolean isIngameOnly() {
         return ingameOnly;
     }

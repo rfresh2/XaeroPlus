@@ -1,8 +1,10 @@
 package xaeroplus.settings;
 
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.text.LiteralTextContent;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import xaero.common.graphics.CursorBox;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax.SettingLocation;
 
@@ -15,8 +17,8 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
     private boolean value;
     private Consumer<Boolean> settingChangeConsumer;
 
-    private XaeroPlusBooleanSetting(final String settingName, final boolean value, final ITextComponent tooltip,
-                                   final Consumer<Boolean> settingChangeConsumer, final KeyBinding keyBinding) {
+    private XaeroPlusBooleanSetting(final String settingName, final boolean value, final Text tooltip,
+                                    final Consumer<Boolean> settingChangeConsumer, final KeyBinding keyBinding) {
         super(settingName, tooltip, keyBinding);
         this.value = value;
         this.settingChangeConsumer = settingChangeConsumer;
@@ -25,7 +27,7 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
     public static XaeroPlusBooleanSetting create(String settingName, String tooltip, boolean defaultValue, final SettingLocation settingLocation) {
         final XaeroPlusBooleanSetting setting = new XaeroPlusBooleanSetting(SETTING_PREFIX + settingName,
                 defaultValue,
-                new TextComponentString(tooltip),
+                MutableText.of(new LiteralTextContent(tooltip)),
                 null,
                 new KeyBinding(settingName, 0, "XaeroPlus"));
         settingLocation.getSettingsList().add(setting);
@@ -36,7 +38,7 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
                                                  boolean defaultValue, final SettingLocation settingLocation) {
         final XaeroPlusBooleanSetting setting = new XaeroPlusBooleanSetting(SETTING_PREFIX + settingName,
                 defaultValue,
-                new TextComponentString(tooltip),
+                MutableText.of(new LiteralTextContent(tooltip)),
                 settingChangeConsumer,
                 new KeyBinding(settingName, 0, "XaeroPlus"));
         settingLocation.getSettingsList().add(setting);

@@ -1,26 +1,33 @@
 package xaeroplus.util;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
 
+import static net.minecraft.world.World.NETHER;
+import static net.minecraft.world.World.OVERWORLD;
+
 public class ChunkUtils {
 
-    /** Caching helpers **/
+    /**
+     * Caching helpers
+     **/
     public static long chunkPosToLong(final ChunkPos chunkPos) {
-        return (long)chunkPos.x & 4294967295L | ((long)chunkPos.z & 4294967295L) << 32;
+        return (long) chunkPos.x & 4294967295L | ((long) chunkPos.z & 4294967295L) << 32;
     }
 
     public static long chunkPosToLong(final int x, final int z) {
-        return (long)x & 4294967295L | ((long)z & 4294967295L) << 32;
+        return (long) x & 4294967295L | ((long) z & 4294967295L) << 32;
     }
 
     public static ChunkPos longToChunkPos(final long l) {
-        return new ChunkPos((int)(l & 4294967295L), (int)(l >> 32 & 4294967295L));
+        return new ChunkPos((int) (l & 4294967295L), (int) (l >> 32 & 4294967295L));
     }
 
     public static int longToChunkX(final long l) {
@@ -32,14 +39,14 @@ public class ChunkUtils {
     }
     public static int currentPlayerChunkX() {
         try {
-            return Minecraft.getMinecraft().player.chunkCoordX;
+            return MinecraftClient.getInstance().player.getChunkPos().x;
         } catch (final NullPointerException e) {
             return 0;
         }
     }
     public static int currentPlayerChunkZ() {
         try {
-            return Minecraft.getMinecraft().player.chunkCoordZ;
+            return MinecraftClient.getInstance().player.getChunkPos().z;
         } catch (final NullPointerException e) {
             return 0;
         }
@@ -159,11 +166,11 @@ public class ChunkUtils {
         return chunkCoordToMapTileCoord(chunkCoord) & 3;
     }
 
-    public static int getMCDimension() {
+    public static RegistryKey<World> getMCDimension() {
         try {
-            return Minecraft.getMinecraft().world.provider.getDimension();
+            return MinecraftClient.getInstance().world.getRegistryKey();
         } catch (final Exception e) {
-            return 0;
+            return OVERWORLD;
         }
     }
 
@@ -196,30 +203,30 @@ public class ChunkUtils {
     }
 
     public static double getPlayerX() {
-        int dim = Minecraft.getMinecraft().world.provider.getDimension();
+        RegistryKey<World> dim = MinecraftClient.getInstance().world.getRegistryKey();
         // when player is in the nether or the custom dimension is the nether, perform coordinate translation
-        if ((dim == -1 || Shared.customDimensionId == -1) && dim != Shared.customDimensionId) {
-            if (Shared.customDimensionId == 0) {
-                return Minecraft.getMinecraft().player.posX * 8.0;
-            } else if (Shared.customDimensionId == -1 && dim == 0) {
-                return Minecraft.getMinecraft().player.posX / 8.0;
+        if ((dim == NETHER || Shared.customDimensionId == NETHER) && dim != Shared.customDimensionId) {
+            if (Shared.customDimensionId == OVERWORLD) {
+                return MinecraftClient.getInstance().player.getX() * 8.0;
+            } else if (Shared.customDimensionId == NETHER && dim == OVERWORLD) {
+                return MinecraftClient.getInstance().player.getX() / 8.0;
             }
         }
 
-        return Minecraft.getMinecraft().player.posX;
+        return MinecraftClient.getInstance().player.getX();
     }
 
     public static double getPlayerZ() {
-        int dim = Minecraft.getMinecraft().world.provider.getDimension();
+        RegistryKey<World> dim = MinecraftClient.getInstance().world.getRegistryKey();
         // when player is in the nether or the custom dimension is the nether, perform coordinate translation
-        if ((dim == -1 || Shared.customDimensionId == -1) && dim != Shared.customDimensionId) {
-            if (Shared.customDimensionId == 0) {
-                return Minecraft.getMinecraft().player.posZ * 8.0;
-            } else if (Shared.customDimensionId == -1 && dim == 0) {
-                return Minecraft.getMinecraft().player.posZ / 8.0;
+        if ((dim == NETHER || Shared.customDimensionId == NETHER) && dim != Shared.customDimensionId) {
+            if (Shared.customDimensionId == OVERWORLD) {
+                return MinecraftClient.getInstance().player.getZ() * 8.0;
+            } else if (Shared.customDimensionId == NETHER && dim == OVERWORLD) {
+                return MinecraftClient.getInstance().player.getZ() / 8.0;
             }
         }
 
-        return Minecraft.getMinecraft().player.posZ;
+        return MinecraftClient.getInstance().player.getZ();
     }
 }

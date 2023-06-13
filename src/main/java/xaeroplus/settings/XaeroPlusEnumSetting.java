@@ -1,8 +1,9 @@
 package xaeroplus.settings;
 
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.text.LiteralTextContent;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import org.apache.commons.lang3.ArrayUtils;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax.SettingLocation;
@@ -16,7 +17,7 @@ public class XaeroPlusEnumSetting<T extends Enum<T>> extends XaeroPlusSetting {
     private T value;
     private Consumer<T> settingChangeConsumer;
 
-    private XaeroPlusEnumSetting(final String settingName, final ITextComponent tooltip, final Consumer<T> settingChangeConsumer,
+    private XaeroPlusEnumSetting(final String settingName, final Text tooltip, final Consumer<T> settingChangeConsumer,
                                  final KeyBinding keyBinding, final T[] enumValues, final T defaultValue) {
         super(settingName, tooltip, keyBinding);
         this.enumValues = enumValues;
@@ -27,7 +28,7 @@ public class XaeroPlusEnumSetting<T extends Enum<T>> extends XaeroPlusSetting {
     public static <E extends Enum<E>> XaeroPlusEnumSetting<E> create(String settingName, String tooltip,
                                              E[] values, E defaultValue, final SettingLocation settingLocation) {
         final XaeroPlusEnumSetting<E> setting = new XaeroPlusEnumSetting<>(SETTING_PREFIX + settingName,
-                new TextComponentString(tooltip), null, null, values, defaultValue);
+                MutableText.of(new LiteralTextContent(tooltip)), null, null, values, defaultValue);
         settingLocation.getSettingsList().add(setting);
         return setting;
     }
@@ -35,7 +36,7 @@ public class XaeroPlusEnumSetting<T extends Enum<T>> extends XaeroPlusSetting {
     public static <E extends Enum<E>> XaeroPlusEnumSetting<E> create(String settingName, String tooltip, Consumer<E> settingChangeConsumer,
                                                                      E[] values, E defaultValue, final SettingLocation settingLocation) {
         final XaeroPlusEnumSetting<E> setting = new XaeroPlusEnumSetting<>(SETTING_PREFIX + settingName,
-                new TextComponentString(tooltip), settingChangeConsumer, null, values, defaultValue);
+                MutableText.of(new LiteralTextContent(tooltip)), settingChangeConsumer, null, values, defaultValue);
         settingLocation.getSettingsList().add(setting);
         return setting;
     }

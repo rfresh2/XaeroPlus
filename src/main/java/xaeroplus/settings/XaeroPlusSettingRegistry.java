@@ -1,11 +1,6 @@
 package xaeroplus.settings;
 
-import xaeroplus.module.ModuleManager;
-import xaeroplus.module.impl.NewChunks;
-import xaeroplus.module.impl.PortalSkipDetection;
-import xaeroplus.util.ColorHelper;
 import xaeroplus.util.Shared;
-import xaeroplus.util.WDLHelper;
 
 import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.SettingLocation;
 import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.markChunksDirtyInWriteDistance;
@@ -41,71 +36,71 @@ public final class XaeroPlusSettingRegistry {
             true, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting transparentObsidianRoofDarkeningSetting = XaeroPlusFloatSetting.create("Roof Obsidian Opacity",
             0, 255, 5,
-                    "Sets the opacity of the transparent obsidian roof tiles.",
+            "Sets the opacity of the transparent obsidian roof tiles.",
             (v) -> markChunksDirtyInWriteDistance(),
             150, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting worldMapMinZoomSetting = XaeroPlusFloatSetting.create("Min WorldMap Zoom",
             0, 0.625f, 0.01f,
-                    "Minimum WorldMap Zoom Setting. This is 10x what you see on the WorldMap.",
+            "Minimum WorldMap Zoom Setting. This is 10x what you see on the WorldMap.",
             0.1f, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting skipWorldRenderSetting = XaeroPlusBooleanSetting.create("Skip Background Render",
             "Skip MC world render while in a Xaero GUI. Having this on can cause issues with travel mods while you're in a Xaero GUI like the WorldMap.",
             false, SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusBooleanSetting newChunksEnabledSetting = XaeroPlusBooleanSetting.create("NewChunks Highlighting",
-            "Highlights NewChunks on the Minimap and WorldMap.",
-            (b) -> ModuleManager.getModule(NewChunks.class).setEnabled(b),
-            false, SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusBooleanSetting newChunksSaveLoadToDisk = XaeroPlusBooleanSetting.create("Save/Load NewChunks to Disk",
-            "Saves and loads NewChunk data to disk for each world and dimension. Requires NewChunk Highlighting to be enabled.",
-            (b) -> ModuleManager.getModule(NewChunks.class).setNewChunksCache(b),
-            true, SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusFloatSetting newChunksAlphaSetting = XaeroPlusFloatSetting.create("New Chunks Opacity",
-            10f, 255f, 10f,
-                    "Changes the color opacity of NewChunks.",
-            (b) -> ModuleManager.getModule(NewChunks.class).setAlpha(b),
-            100, SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> newChunksColorSetting = XaeroPlusEnumSetting.create("New Chunks Color",
-            "Changes the color of NewChunks.",
-            (b) -> ModuleManager.getModule(NewChunks.class).setRgbColor(b.getColor()),
-            ColorHelper.HighlightColor.values(),
-            ColorHelper.HighlightColor.RED, SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusBooleanSetting portalSkipDetectionEnabledSetting = XaeroPlusBooleanSetting.create("PortalSkip Detection",
-                    "Highlights chunks where portals could have been loaded into. \\n "
-                            + "This is useful for basehunting to detect where players could switch dimensions along a trail to avoid hunters. \\n "
-                            + "One thing to note: 2b2t's view distance is not large enough to detect portal skip areas. You need to load surrounding chunks - specifically a 15x15 chunk area",
-            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setEnabled(b),
-            false, SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusFloatSetting portalSkipDetectionAlphaSetting = XaeroPlusFloatSetting.create("PortalSkip Opacity",
-            10f, 255f, 10f,
-            "Changes the color opacity of Portal Skip Detection.",
-            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setAlpha(b),
-            100, SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> portalSkipDetectionColorSetting = XaeroPlusEnumSetting.create("PortalSkip Color",
-            "Changes the color of Portal Skip Detection.",
-            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setRgbColor(b.getColor()),
-            ColorHelper.HighlightColor.values(),
-            ColorHelper.HighlightColor.WHITE, SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusFloatSetting portalSkipDetectionSearchDelayTicksSetting = XaeroPlusFloatSetting.create("PortalSkip Search Delay",
-            0, 100, 1,
-            "Portal Skip Detection must be enabled. \\n " +
-                    "This is the delay in ticks between Portal Skip Detection search operations.",
-            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setSearchDelayTicks(b),
-            10, SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusBooleanSetting wdlEnabledSetting = XaeroPlusBooleanSetting.create("WDL Highlight",
-            "Highlights chunks WDL mod has downloaded on the Minimap and WorldMap.",
-            false, SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusFloatSetting wdlAlphaSetting = XaeroPlusFloatSetting.create("WDL Opacity",
-            10f, 255f, 10f,
-            "Changes the color opacity of WDL chunks.",
-            WDLHelper::setAlpha,
-            100, SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> wdlColorSetting = XaeroPlusEnumSetting.create("WDL Color",
-            "Changes the color of WDL chunks.",
-            (b) -> WDLHelper.setRgbColor(b.getColor()),
-            ColorHelper.HighlightColor.values(),
-            ColorHelper.HighlightColor.GREEN, SettingLocation.WORLD_MAP_MAIN);
+    //    public static final XaeroPlusBooleanSetting newChunksEnabledSetting = XaeroPlusBooleanSetting.create("NewChunks Highlighting",
+//            "Highlights NewChunks on the Minimap and WorldMap.",
+//            (b) -> ModuleManager.getModule(NewChunks.class).setEnabled(b),
+//            false, SettingLocation.WORLD_MAP_MAIN);
+//    public static final XaeroPlusBooleanSetting newChunksSaveLoadToDisk = XaeroPlusBooleanSetting.create("Save/Load NewChunks to Disk",
+//            "Saves and loads NewChunk data to disk for each world and dimension. Requires NewChunk Highlighting to be enabled.",
+//            (b) -> ModuleManager.getModule(NewChunks.class).setNewChunksCache(b),
+//            true, SettingLocation.WORLD_MAP_MAIN);
+//    public static final XaeroPlusFloatSetting newChunksAlphaSetting = XaeroPlusFloatSetting.create("New Chunks Opacity",
+//            10f, 255f, 10f,
+//                    "Changes the color opacity of NewChunks.",
+//            (b) -> ModuleManager.getModule(NewChunks.class).setAlpha(b),
+//            100, SettingLocation.WORLD_MAP_MAIN);
+//    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> newChunksColorSetting = XaeroPlusEnumSetting.create("New Chunks Color",
+//            "Changes the color of NewChunks.",
+//            (b) -> ModuleManager.getModule(NewChunks.class).setRgbColor(b.getColor()),
+//            ColorHelper.HighlightColor.values(),
+//            ColorHelper.HighlightColor.RED, SettingLocation.WORLD_MAP_MAIN);
+//    public static final XaeroPlusBooleanSetting portalSkipDetectionEnabledSetting = XaeroPlusBooleanSetting.create("PortalSkip Detection",
+//                    "Highlights chunks where portals could have been loaded into. \\n "
+//                            + "This is useful for basehunting to detect where players could switch dimensions along a trail to avoid hunters. \\n "
+//                            + "One thing to note: 2b2t's view distance is not large enough to detect portal skip areas. You need to load surrounding chunks - specifically a 15x15 chunk area",
+//            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setEnabled(b),
+//            false, SettingLocation.WORLD_MAP_MAIN);
+//    public static final XaeroPlusFloatSetting portalSkipDetectionAlphaSetting = XaeroPlusFloatSetting.create("PortalSkip Opacity",
+//            10f, 255f, 10f,
+//            "Changes the color opacity of Portal Skip Detection.",
+//            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setAlpha(b),
+//            100, SettingLocation.WORLD_MAP_MAIN);
+//    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> portalSkipDetectionColorSetting = XaeroPlusEnumSetting.create("PortalSkip Color",
+//            "Changes the color of Portal Skip Detection.",
+//            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setRgbColor(b.getColor()),
+//            ColorHelper.HighlightColor.values(),
+//            ColorHelper.HighlightColor.WHITE, SettingLocation.WORLD_MAP_MAIN);
+//    public static final XaeroPlusFloatSetting portalSkipDetectionSearchDelayTicksSetting = XaeroPlusFloatSetting.create("PortalSkip Search Delay",
+//            0, 100, 1,
+//            "Portal Skip Detection must be enabled. \\n " +
+//                    "This is the delay in ticks between Portal Skip Detection search operations.",
+//            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setSearchDelayTicks(b),
+//            10, SettingLocation.WORLD_MAP_MAIN);
+//    public static final XaeroPlusBooleanSetting wdlEnabledSetting = XaeroPlusBooleanSetting.create("WDL Highlight",
+//            "Highlights chunks WDL mod has downloaded on the Minimap and WorldMap.",
+//            false, SettingLocation.WORLD_MAP_MAIN);
+//    public static final XaeroPlusFloatSetting wdlAlphaSetting = XaeroPlusFloatSetting.create("WDL Opacity",
+//            10f, 255f, 10f,
+//            "Changes the color opacity of WDL chunks.",
+//            WDLHelper::setAlpha,
+//            100, SettingLocation.WORLD_MAP_MAIN);
+//    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> wdlColorSetting = XaeroPlusEnumSetting.create("WDL Color",
+//            "Changes the color of WDL chunks.",
+//            (b) -> WDLHelper.setRgbColor(b.getColor()),
+//            ColorHelper.HighlightColor.values(),
+//            ColorHelper.HighlightColor.GREEN, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting owAutoWaypointDimension = XaeroPlusBooleanSetting.create("Prefer Overworld Waypoints",
-                    "Prefer creating and viewing Overworld waypoints when in the nether.",
+            "Prefer creating and viewing Overworld waypoints when in the nether.",
             true, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting showWaypointDistances = XaeroPlusBooleanSetting.create("Show Waypoint Distances",
             "Display the distance to every waypoint in the full waypoint menu.",
@@ -134,6 +129,7 @@ public final class XaeroPlusSettingRegistry {
     public enum DataFolderResolutionMode {
         IP, SERVER_NAME, BASE_DOMAIN;
     }
+
     public static final XaeroPlusBooleanSetting transparentMinimapBackground = XaeroPlusBooleanSetting.create("Transparent Background",
             "Makes the minimap background transparent instead of black.",
             false, SettingLocation.MINIMAP);
@@ -143,18 +139,18 @@ public final class XaeroPlusSettingRegistry {
             "Increases the base minimap scale beyond the default size.",
             (b) -> Shared.shouldResetFBO = true,
             2f, SettingLocation.MINIMAP);
-    public static final XaeroPlusBooleanSetting switchToNetherSetting = XaeroPlusBooleanSetting.create("Switch to Nether",
-            "Switches to the nether map.",
-            (b) -> Shared.switchToDimension(-1),
-            false, SettingLocation.KEYBINDS);
-    public static final XaeroPlusBooleanSetting switchToOverworldSetting = XaeroPlusBooleanSetting.create("Switch to Overworld",
-            "Switches to the overworld map.",
-            (b) -> Shared.switchToDimension(0),
-            false, SettingLocation.KEYBINDS);
-    public static final XaeroPlusBooleanSetting switchToEndSetting = XaeroPlusBooleanSetting.create("Switch to End",
-            "Switches to the end map.",
-            (b) -> Shared.switchToDimension(1),
-            false, SettingLocation.KEYBINDS);
+    //    public static final XaeroPlusBooleanSetting switchToNetherSetting = XaeroPlusBooleanSetting.create("Switch to Nether",
+//            "Switches to the nether map.",
+//            (b) -> Shared.switchToDimension(-1),
+//            false, SettingLocation.KEYBINDS);
+//    public static final XaeroPlusBooleanSetting switchToOverworldSetting = XaeroPlusBooleanSetting.create("Switch to Overworld",
+//            "Switches to the overworld map.",
+//            (b) -> Shared.switchToDimension(0),
+//            false, SettingLocation.KEYBINDS);
+//    public static final XaeroPlusBooleanSetting switchToEndSetting = XaeroPlusBooleanSetting.create("Switch to End",
+//            "Switches to the end map.",
+//            (b) -> Shared.switchToDimension(1),
+//            false, SettingLocation.KEYBINDS);
     public static final XaeroPlusBooleanSetting netherCaveFix = XaeroPlusBooleanSetting.create("Nether Cave Fix",
             "Forces full cave maps to be written and rendered when cave mode is \"off\" in the nether."
                     + " \\n Without this, you have to manually move region files pre WorldMap 1.30.0 to the correct cave folder",
@@ -168,11 +164,4 @@ public final class XaeroPlusSettingRegistry {
     public static final XaeroPlusBooleanSetting fixMainEntityDot = XaeroPlusBooleanSetting.create("Fix Main Entity Dot",
             "Fixes the main entity dot rendering on the radar when arrow is rendered.",
             true, SettingLocation.MINIMAP_ENTITY_RADAR);
-    public static final XaeroPlusBooleanSetting mcLightingLimiter = XaeroPlusBooleanSetting.create("MC Light Limiter",
-            "Experimental. Limits the amount of queued light updates. Might prevent crashes on low memory systems when loading many chunks at fast rates",
-            false, SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusFloatSetting mcLightingLimiterLimit = XaeroPlusFloatSetting.create("MC Light Crash Limit Num",
-            1000000f, 10000000f, 100000f,
-            "Experimental. The max number of queued lighting updates. Might prevent crashes on low memory systems when loading many chunks at fast rates",
-            1000000f, SettingLocation.WORLD_MAP_MAIN);
 }

@@ -1,17 +1,19 @@
 package xaeroplus.util;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.world.World;
 import xaero.map.core.XaeroWorldMapCore;
 import xaero.map.gui.GuiMap;
 import xaero.map.gui.GuiSettings;
-import xaeroplus.mixin.client.MixinGuiMapAccessor;
+import xaeroplus.mixin.MixinGuiMapAccessor;
 
 import java.util.Optional;
 
 public class GuiMapHelper {
     public static Optional<GuiMap> getGuiMap() {
-        GuiScreen currentScreen = Minecraft.getMinecraft().currentScreen;
+        Screen currentScreen = MinecraftClient.getInstance().currentScreen;
         if (currentScreen instanceof GuiMap) {
             return Optional.of((GuiMap) currentScreen);
         } else if (currentScreen instanceof GuiSettings && ((GuiSettings) currentScreen).parent instanceof GuiMap) {
@@ -26,22 +28,24 @@ public class GuiMapHelper {
         return ((MixinGuiMapAccessor)guiMap).getCameraZ();
     }
     public static double getDestScale(final GuiMap guiMap) {
-        return ((MixinGuiMapAccessor)guiMap).getDestScale();
+        return ((MixinGuiMapAccessor) guiMap).getDestScale();
     }
+
     public static int getGuiMapRegionSize(final GuiMap guiMap) {
         // this is intentionally overestimating as we prefer to have a few more chunks than less
         return (int) Math.max((5.0 / getDestScale(guiMap)), 3);
     }
 
-    public static int getGuiMapLoadedDimension() {
+    public static RegistryKey<World> getGuiMapLoadedDimension() {
         return XaeroWorldMapCore.currentSession.getMapProcessor().getMapWorld().getCurrentDimension().getDimId();
     }
-    public static int getCurrentlyViewedDimension() {
+
+    public static RegistryKey<World> getCurrentlyViewedDimension() {
         return Shared.customDimensionId;
     }
 
     public static boolean isGuiMapLoaded() {
-        return Minecraft.getMinecraft().currentScreen instanceof GuiMap;
+        return MinecraftClient.getInstance().currentScreen instanceof GuiMap;
     }
 
     public static int getGuiMapCenterRegionX(final GuiMap guiMap) {

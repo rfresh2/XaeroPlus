@@ -1805,6 +1805,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 Shared.guiMapButtonTempList.addAll(buttonList);
                 xTextEntryField.setVisible(false);
                 zTextEntryField.setVisible(false);
+                clearButtons();
             }
         } else {
             if (!Shared.guiMapButtonTempList.isEmpty()) {
@@ -1867,6 +1868,11 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     public void onInputPress(final int code, final int scanCode, final int modifiers, final CallbackInfoReturnable<Boolean> cir) {
+        if (code == 290) {
+            MinecraftClient.getInstance().options.hudHidden = !MinecraftClient.getInstance().options.hudHidden;
+            cir.cancel();
+            return;
+        }
         if ((xTextEntryField.isVisible() && zTextEntryField.isVisible()) && (xTextEntryField.isFocused() || zTextEntryField.isFocused())) {
             if (code == 257) {
                 onGotoCoordinatesButton(null);

@@ -379,6 +379,73 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
                 }
             }
         }
+        final boolean isDimensionSwitched = Shared.customDimensionId != MinecraftClient.getInstance().world.getRegistryKey();
+
+        if (XaeroPlusSettingRegistry.showRenderDistanceSetting.getValue() && !isDimensionSwitched) {
+            final int setting = (int) XaeroPlusSettingRegistry.assumedServerRenderDistanceSetting.getValue();
+            int width = setting * 2 + 1;
+            // origin of the chunk we are standing in
+            final int middleChunkX = -(xFloored & 15);
+            final int middleChunkZ = -(zFloored & 15);
+            // this is biased to +x/+z for even sizes which im not certain is correct
+            final int x0 = middleChunkX - (width / 2) * 16;
+            final int z0 = middleChunkZ - (width / 2) * 16;
+            final int x1 = x0 + width * 16;
+            final int z1 = z0 + width * 16;
+            VertexConsumer lineBufferBuilder = renderTypeBuffers.getBuffer(CustomRenderTypes.MAP_LINES);
+            MinimapShaders.FRAMEBUFFER_LINES.setFrameSize((float)this.scalingFramebuffer.viewportWidth, (float)this.scalingFramebuffer.viewportHeight);
+            RenderSystem.lineWidth((float)this.modMain.getSettings().chunkGridLineWidth * Shared.minimapScalingFactor);
+            MatrixStack.Entry matrices = matrixStack.peek();
+
+            helper.addColoredLineToExistingBuffer(
+                    matrices,
+                    lineBufferBuilder,
+                    x0,
+                    z0,
+                    x1,
+                    z0,
+                    1.0f,
+                    1.0f,
+                    0.0f,
+                    0.8f
+            );
+            helper.addColoredLineToExistingBuffer(
+                    matrices,
+                    lineBufferBuilder,
+                    x1,
+                    z0,
+                    x1,
+                    z1,
+                    1.0f,
+                    1.0f,
+                    0.0f,
+                    0.8f
+            );
+            helper.addColoredLineToExistingBuffer(
+                    matrices,
+                    lineBufferBuilder,
+                    x1,
+                    z1,
+                    x0,
+                    z1,
+                    1.0f,
+                    1.0f,
+                    0.0f,
+                    0.8f
+            );
+            helper.addColoredLineToExistingBuffer(
+                    matrices,
+                    lineBufferBuilder,
+                    x0,
+                    z0,
+                    x0,
+                    z1,
+                    1.0f,
+                    1.0f,
+                    0.0f,
+                    0.8f
+            );
+        }
 
         renderTypeBuffers.draw();
         this.scalingFramebuffer.endWrite();

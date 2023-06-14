@@ -104,16 +104,16 @@ public final class XaeroPlusSettingRegistry {
     public static final XaeroPlusBooleanSetting showWaypointDistances = XaeroPlusBooleanSetting.create("Show Waypoint Distances",
             "Display the distance to every waypoint in the full waypoint menu.",
             true, SettingLocation.WORLD_MAP_MAIN);
-//    public static final XaeroPlusBooleanSetting showRenderDistanceSetting = XaeroPlusBooleanSetting.create("Show Render Distance",
-//            "Show server side render distance (actually just another setting)",
-//            false, SettingLocation.MINIMAP_OVERLAYS);
+    public static final XaeroPlusBooleanSetting showRenderDistanceSetting = XaeroPlusBooleanSetting.create("Show Render Distance",
+            "Show server side render distance (actually just another setting)",
+            false, SettingLocation.MINIMAP_OVERLAYS);
 //    public static final XaeroPlusBooleanSetting showRenderDistanceWorldMapSetting = XaeroPlusBooleanSetting.create("Show Render Distance WorldMap",
 //            "Show server side render distance on the WorldMap",
 //            false, SettingLocation.MINIMAP_OVERLAYS);
-//    public static final XaeroPlusFloatSetting assumedServerRenderDistanceSetting = XaeroPlusFloatSetting.create("Server Render Distance",
-//            1f, 32f, 1f,
-//            "view-distance of the server",
-//            4f, SettingLocation.MINIMAP_OVERLAYS); // 2b2t
+    public static final XaeroPlusFloatSetting assumedServerRenderDistanceSetting = XaeroPlusFloatSetting.create("Server Render Distance",
+            1f, 32f, 1f,
+            "view-distance of the server",
+            4f, SettingLocation.MINIMAP_OVERLAYS); // 2b2t
     public static final XaeroPlusBooleanSetting nullOverworldDimensionFolder = XaeroPlusBooleanSetting.create("null OW Dim Dir",
             "Sets whether the overworld WorldMap directory is in DIM0 or null (default)"
                     + " \n MC must be restarted for changes to take effect.",

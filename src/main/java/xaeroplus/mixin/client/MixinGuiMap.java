@@ -30,6 +30,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import xaero.common.XaeroMinimapSession;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMap;
 import xaero.map.animation.Animation;
@@ -57,6 +58,7 @@ import xaero.map.region.texture.RegionTexture;
 import xaero.map.settings.ModSettings;
 import xaero.map.world.MapDimension;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.Shared;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -1416,6 +1418,82 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                         }
                     }
 
+                    if (XaeroPlusSettingRegistry.showRenderDistanceWorldMapSetting.getValue() && !mc.options.hudHidden) {
+                        if (MinecraftClient.getInstance().world.getRegistryKey() == Shared.customDimensionId) {
+                            final int setting = (int) XaeroPlusSettingRegistry.assumedServerRenderDistanceSetting.getValue();
+                            int width = setting * 2 + 1;
+                            double playerX = getPlayerX();
+                            double playerZ = getPlayerZ();
+                            int xFloored = OptimizedMath.myFloor(playerX);
+                            int zFloored = OptimizedMath.myFloor(playerZ);
+                            int chunkLeftX = (xFloored >> 4) - (width / 2) << 4;
+                            int chunkRightX = (xFloored >> 4) + 1 + (width / 2) << 4;
+                            int chunkTopZ = (zFloored >> 4) - (width / 2) << 4;
+                            int chunkBottomZ = (zFloored >> 4) + 1 + (width / 2) << 4;
+                            final int x0 = chunkLeftX - flooredCameraX;
+                            final int x1 = chunkRightX - flooredCameraX;
+                            final int z0 = chunkTopZ - flooredCameraZ;
+                            final int z1 = chunkBottomZ - flooredCameraZ;
+                            VertexConsumer lineBufferBuilder = renderTypeBuffers.getBuffer(xaero.common.graphics.CustomRenderTypes.MAP_LINES);
+                            MatrixStack.Entry matrices = matrixStack.peek();
+
+                            float settingWidth = (float) XaeroMinimapSession.getCurrentSession().getModMain().getSettings().chunkGridLineWidth;
+                            float lineScale = (float) Math.min(settingWidth * this.scale, settingWidth);
+                            RenderSystem.lineWidth(lineScale);
+
+                            // todo: horizontal lines seem to have a smaller width here for some reason
+                            //  also there's some jittering to the position noticeable when you zoom in
+                            addColoredLineToExistingBuffer(
+                                    matrices,
+                                    lineBufferBuilder,
+                                    x0,
+                                    z0,
+                                    x1,
+                                    z0,
+                                    1.0f,
+                                    1.0f,
+                                    0.0f,
+                                    0.8f
+                            );
+                            addColoredLineToExistingBuffer(
+                                    matrices,
+                                    lineBufferBuilder,
+                                    x1,
+                                    z0,
+                                    x1,
+                                    z1,
+                                    1.0f,
+                                    1.0f,
+                                    0.0f,
+                                    0.8f
+                            );
+                            addColoredLineToExistingBuffer(
+                                    matrices,
+                                    lineBufferBuilder,
+                                    x1,
+                                    z1,
+                                    x0,
+                                    z1,
+                                    1.0f,
+                                    1.0f,
+                                    0.0f,
+                                    0.8f
+                            );
+                            addColoredLineToExistingBuffer(
+                                    matrices,
+                                    lineBufferBuilder,
+                                    x0,
+                                    z0,
+                                    x0,
+                                    z1,
+                                    1.0f,
+                                    1.0f,
+                                    0.0f,
+                                    0.8f
+                            );
+                        }
+                    }
+
                     this.client.getTextureManager().bindTexture(WorldMap.guiTextures);
                     GL11.glTexParameteri(3553, 10240, 9729);
                     GL11.glTexParameteri(3553, 10241, 9729);
@@ -1713,6 +1791,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 cir.setReturnValue(true);
             }
         }
+    }
+
+    public void addColoredLineToExistingBuffer(
+            MatrixStack.Entry matrices, VertexConsumer vertexBuffer, float x1, float y1, float x2, float y2, float r, float g, float b, float a
+    ) {
+        vertexBuffer.vertex(matrices.getPositionMatrix(), x1, y1, 0.0F).color(r, g, b, a).normal(matrices.getNormalMatrix(), x2 - x1, y2 - y1, 0.0F).next();
+        vertexBuffer.vertex(matrices.getPositionMatrix(), x2, y2, 0.0F).color(r, g, b, a).normal(matrices.getNormalMatrix(), x2 - x1, y2 - y1, 0.0F).next();
     }
 
     public void onFollowButton(final ButtonWidget b) {

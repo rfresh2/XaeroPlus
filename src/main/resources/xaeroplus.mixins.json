@@ -14,6 +14,7 @@
     "MixinGuiMinimapMain",
     "MixinGuiMinimapOverlaysSettings",
     "MixinGuiSettingsWorldMap",
+    "MixinGuiUpdateAll",
     "MixinGuiWaypoints",
     "MixinGuiWaypointsAccessor",
     "MixinGuiWaypointsList",

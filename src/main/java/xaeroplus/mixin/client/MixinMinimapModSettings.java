@@ -1,5 +1,6 @@
 package xaeroplus.mixin.client;
 
+import net.minecraft.client.option.KeyBinding;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -10,12 +11,12 @@ import xaero.common.AXaeroMinimap;
 import xaero.common.settings.ModOptions;
 import xaero.common.settings.ModSettings;
 import xaeroplus.settings.XaeroPlusModSettingsHooks;
+import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
 
 import java.io.File;
 import java.io.IOException;
 
 import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.ALL_MINIMAP_SETTINGS;
-import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.XAERO_PLUS_WORLDMAP_SETTINGS;
 
 @Mixin(value = ModSettings.class, remap = false)
 public class MixinMinimapModSettings {
@@ -71,6 +72,11 @@ public class MixinMinimapModSettings {
     @Inject(method = "getOptionValueName", at = @At("HEAD"), cancellable = true)
     public void getOptionValueName(ModOptions o, CallbackInfoReturnable<String> cir) {
         XaeroPlusModSettingsHooks.getOptionValueName(o.getEnumString(), cir, ALL_MINIMAP_SETTINGS.get());
+    }
+
+    @Inject(method = "isKeyRepeat", at = @At("RETURN"), cancellable = true)
+    public void isKeyRepeat(KeyBinding kb, CallbackInfoReturnable<Boolean> cir) {
+        cir.setReturnValue(cir.getReturnValue() && XaeroPlusSettingsReflectionHax.getKeybinds().stream().noneMatch(keyBinding -> keyBinding == kb));
     }
 }
 

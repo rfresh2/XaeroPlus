@@ -41,7 +41,10 @@ import xaero.common.minimap.waypoints.render.WaypointsGuiRenderer;
 import xaero.common.misc.Misc;
 import xaero.common.misc.OptimizedMath;
 import xaero.common.settings.ModSettings;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.ColorHelper;
 import xaeroplus.util.CustomMinimapFBORenderer;
+import xaeroplus.util.CustomSupportXaeroWorldMap;
 import xaeroplus.util.Shared;
 
 import static net.minecraft.world.World.NETHER;
@@ -109,7 +112,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             // double the framebuffer size
             final int scaledSize = Shared.minimapScalingFactor * 512;
             this.scalingFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, false);
-            this.rotationFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, false);
+            this.rotationFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, true);
             this.rotationFramebuffer.setTexFilter(9729);
             this.loadedFBO = this.scalingFramebuffer.fbo != -1 && this.rotationFramebuffer.fbo != -1;
         }
@@ -211,7 +214,11 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         shaderMatrixStack.translate(scaledSize, scaledSize, -2000.0F);
         shaderMatrixStack.scale((float)this.zoom, (float)this.zoom, 1.0F);
         RenderSystem.applyModelViewMatrix();
-        guiGraphics.fill(-scaledSize, -scaledSize, scaledSize, scaledSize, -16777216);
+        if (!XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) {
+            guiGraphics.fill(-scaledSize, -scaledSize, scaledSize, scaledSize, ColorHelper.getColor(0, 0, 0, 255));
+        } else {
+            guiGraphics.fill(-scaledSize, -scaledSize, scaledSize, scaledSize, ColorHelper.getColor(0, 0, 0, 0));
+        }
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         VertexConsumerProvider.Immediate renderTypeBuffers = cvc.getBetterPVPRenderTypeBuffers();
         VertexConsumer overlayBufferBuilder = renderTypeBuffers.getBuffer(CustomRenderTypes.MAP_CHUNK_OVERLAY);
@@ -223,10 +230,11 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         if (!cave || !this.mc.player.hasStatusEffect(Effects.NO_CAVE_MAPS) && !this.mc.player.hasStatusEffect(Effects.NO_CAVE_MAPS_HARMFUL)) {
             if (useWorldMap) {
                 chunkGridAlphaMultiplier = this.modMain.getSupportMods().worldmapSupport.getMinimapBrightness();
-                this.modMain
+                ((CustomSupportXaeroWorldMap) this.modMain
                         .getSupportMods()
-                        .worldmapSupport
-                        .drawMinimap(
+                        .worldmapSupport)
+                        .drawMinimapWithDrawContext(
+                                guiGraphics,
                                 minimapSession,
                                 matrixStack,
                                 this.getHelper(),

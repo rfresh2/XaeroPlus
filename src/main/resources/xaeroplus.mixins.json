@@ -17,23 +17,22 @@
     "MixinGuiWaypointsAccessor",
     "MixinGuiWaypointsList",
     "MixinGuiWorldMapSettings",
-    "MixinMapWriter",
-    "MixinMinimapModOptionsAccessor",
-    "MixinMinimapModSettings",
-    "MixinWidgetLoadingHandler",
-    "MixinWidgetScreenHandlerAccessor",
-    "MixinWorldMapModOptionsAccessor",
-    "MixinWorldMapModSettings"
-  ],
-  "mixins": [
     "MixinMapProcessor",
+    "MixinMapTileChunk",
+    "MixinMapWriter",
     "MixinMinimapElementOverMapRendererHandler",
     "MixinMinimapFBORenderer",
+    "MixinMinimapModOptionsAccessor",
+    "MixinMinimapModSettings",
     "MixinMinimapRenderer",
     "MixinMisc",
     "MixinRadarRenderProvider",
     "MixinSupportXaeroWorldmap",
     "MixinWaypointsManager",
-    "MixinWorldMapClient"
+    "MixinWidgetLoadingHandler",
+    "MixinWidgetScreenHandlerAccessor",
+    "MixinWorldMapClient",
+    "MixinWorldMapModOptionsAccessor",
+    "MixinWorldMapModSettings"
   ]
 }

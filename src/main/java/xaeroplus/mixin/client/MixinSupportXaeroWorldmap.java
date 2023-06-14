@@ -2,6 +2,7 @@ package xaeroplus.mixin.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
@@ -11,7 +12,6 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import xaero.common.AXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
@@ -31,6 +31,9 @@ import xaero.map.misc.Misc;
 import xaero.map.region.LeveledRegion;
 import xaero.map.region.MapRegion;
 import xaero.map.region.MapTileChunk;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.CustomSupportXaeroWorldMap;
+import xaeroplus.util.GuiHelper;
 import xaeroplus.util.Shared;
 
 import java.util.ArrayList;
@@ -41,7 +44,7 @@ import static xaeroplus.util.ChunkUtils.getPlayerX;
 import static xaeroplus.util.ChunkUtils.getPlayerZ;
 
 @Mixin(value = SupportXaeroWorldmap.class, remap = false)
-public abstract class MixinSupportXaeroWorldmap {
+public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWorldMap {
     @Shadow
     public int compatibilityVersion;
     @Shadow
@@ -76,25 +79,22 @@ public abstract class MixinSupportXaeroWorldmap {
             MinimapRendererHelper helper
     );
 
-
-    /**
-     * @author rfresh2
-     * @reason Render NewChunks on minimap
-     */
-    @Overwrite
-    public void drawMinimap(XaeroMinimapSession minimapSession,
-                            MatrixStack matrixStack,
-                            MinimapRendererHelper helper,
-                            int xFloored,
-                            int zFloored,
-                            int minViewX,
-                            int minViewZ,
-                            int maxViewX,
-                            int maxViewZ,
-                            boolean zooming,
-                            double zoom,
-                            VertexConsumer overlayBufferBuilder,
-                            MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers) {
+    @Override
+    public void drawMinimapWithDrawContext(
+            DrawContext guiGraphics,
+            XaeroMinimapSession minimapSession,
+            MatrixStack matrixStack,
+            MinimapRendererHelper helper,
+            int xFloored,
+            int zFloored,
+            int minViewX,
+            int minViewZ,
+            int maxViewX,
+            int maxViewZ,
+            boolean zooming,
+            double zoom,
+            VertexConsumer overlayBufferBuilder,
+            MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers) {
         WorldMapSession worldmapSession = WorldMapSession.getCurrentSession();
         if (worldmapSession != null) {
             MapProcessor mapProcessor = worldmapSession.getMapProcessor();
@@ -245,10 +245,16 @@ public abstract class MixinSupportXaeroWorldmap {
                                     if (!mapProcessor.isUploadingPaused() && region.isLoaded()) {
                                         mapProcessor.getMapWorld().getCurrentDimension().getLayeredMapRegions().bumpLoadedRegion(region);
                                     }
+                                    int drawX = ((chunk.getX() - chunkX) << 6) - (tileX << 4) - insideX;
+                                    int drawZ = ((chunk.getZ() - chunkZ) << 6) - (tileZ << 4) - insideZ;
+                                    if (XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) {
+                                        // there's probably a better way to do this without needing to pass in guiGraphics
+                                        // but im still unfamiliar with mc's new rendering system (and how xaero uses it)
+                                        GuiHelper.drawMMBackground(guiGraphics, drawX, drawZ, chunk);
+                                    }
 
                                     GL11.glTexParameterf(3553, 33082, 0.0F);
-                                    int drawX = 64 * (chunk.getX() - chunkX) - 16 * tileX - insideX;
-                                    int drawZ = 64 * (chunk.getZ() - chunkZ) - 16 * tileZ - insideZ;
+
                                     this.prepareMapTexturedRect(
                                             matrix, (float)drawX, (float)drawZ, 0, 0, 64.0F, 64.0F, chunk, mapNoLightRenderer, mapWithLightRenderer, helper
                                     );

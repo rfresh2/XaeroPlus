@@ -129,9 +129,9 @@ public final class XaeroPlusSettingRegistry {
         IP, SERVER_NAME, BASE_DOMAIN;
     }
 
-//    public static final XaeroPlusBooleanSetting transparentMinimapBackground = XaeroPlusBooleanSetting.create("Transparent Background",
-//            "Makes the minimap background transparent instead of black.",
-//            false, SettingLocation.MINIMAP);
+    public static final XaeroPlusBooleanSetting transparentMinimapBackground = XaeroPlusBooleanSetting.create("Transparent Background",
+            "Makes the minimap background transparent instead of black.",
+            false, SettingLocation.MINIMAP);
     public static final XaeroPlusFloatSetting minimapScaling = XaeroPlusFloatSetting.create("Minimap Scaling Factor",
             // todo: increase max but we need to start generating mipmaps and change the framebuffer filter for anti aliasing to work better
             1f, 2f, 1f,

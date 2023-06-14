@@ -55,6 +55,7 @@ public class MixinMinimapRenderer {
             ((CustomMinimapFBORenderer) this.minimapInterface.getMinimapFBORenderer()).reloadMapFrameBuffers();
             Shared.minimapScalingFactor = (int) XaeroPlusSettingRegistry.minimapScaling.getValue();
             Shared.shouldResetFBO = false;
+            minimap.setToResetImage(true);
         }
     }
 

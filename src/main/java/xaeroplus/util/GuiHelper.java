@@ -1,19 +1,31 @@
 package xaeroplus.util;
 
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import xaero.map.gui.GuiMap;
+import net.minecraft.client.gui.DrawContext;
 import xaero.map.region.MapTileChunk;
-import xaeroplus.util.ColorHelper;
-import xaeroplus.util.SeenChunksTrackingMapTileChunk;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-
 public class GuiHelper {
-//    public static void drawRect(float left, float top, float right, float bottom, int color)
+
+    public static void drawMMBackground(final DrawContext guiGraphics, final int drawX, final int drawZ, final MapTileChunk chunk) {
+        boolean[][] seenTiles = ((SeenChunksTrackingMapTileChunk) (Object) chunk).getSeenTiles();
+        final List<Rect> rects = new ArrayList<>(32);
+        for(int o = 0; o < 4; ++o) {
+            for (int p = 0; p < 4; ++p) {
+                if (seenTiles[o][p]) {
+                    rects.add(new Rect(drawX + (o << 4), drawZ + (p << 4),
+                                       drawX + ((o + 1) << 4), drawZ + ((p + 1) << 4)));
+                }
+            }
+        }
+        int color = ColorHelper.getColor(0, 0, 0, 255);
+        for (Rect rect : rects) {
+            guiGraphics.fill((int) rect.left, (int) rect.top, (int) rect.right, (int) rect.bottom, color);
+        }
+    }
+
+    //    public static void drawRect(float left, float top, float right, float bottom, int color)
 //    {
 //        if (left < right)
 //        {
@@ -73,32 +85,32 @@ public class GuiHelper {
 //        GlStateManager.disableBlend();
 //    }
 //
-//    public static class Rect {
-//        public float left;
-//        public float top;
-//        public float right;
-//        public float bottom;
-//
-//        public Rect(float left, float top, float right, float bottom) {
-//            if (left < right)
-//            {
-//                float i = left;
-//                left = right;
-//                right = i;
-//            }
-//
-//            if (top < bottom)
-//            {
-//                float j = top;
-//                top = bottom;
-//                bottom = j;
-//            }
-//            this.left = left;
-//            this.top = top;
-//            this.right = right;
-//            this.bottom = bottom;
-//        }
-//    }
+    public static class Rect {
+        public float left;
+        public float top;
+        public float right;
+        public float bottom;
+
+        public Rect(float left, float top, float right, float bottom) {
+            if (left < right)
+            {
+                float i = left;
+                left = right;
+                right = i;
+            }
+
+            if (top < bottom)
+            {
+                float j = top;
+                top = bottom;
+                bottom = j;
+            }
+            this.left = left;
+            this.top = top;
+            this.right = right;
+            this.bottom = bottom;
+        }
+    }
 //
 //    // skips all the unnecessary blending and texture stuff
 //    public static void drawRectSimple(float left, float top, float right, float bottom, int color)

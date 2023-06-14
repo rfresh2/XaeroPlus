@@ -1,7 +1,10 @@
 package xaeroplus.util;
 
-import java.io.File;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.world.World;
+
+import java.nio.file.Path;
 
 public interface CustomWorldDataHandler {
-    File getWorldDir(int dimId);
+    Path getWorldDir(RegistryKey<World> dimId);
 }

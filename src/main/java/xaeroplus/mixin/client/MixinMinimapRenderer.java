@@ -29,6 +29,9 @@ import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.CustomMinimapFBORenderer;
 import xaeroplus.util.Shared;
 
+import static xaeroplus.util.ChunkUtils.getPlayerX;
+import static xaeroplus.util.ChunkUtils.getPlayerZ;
+
 @Mixin(value = MinimapRenderer.class, remap = false)
 public class MixinMinimapRenderer {
     @Shadow
@@ -57,6 +60,16 @@ public class MixinMinimapRenderer {
             Shared.shouldResetFBO = false;
             minimap.setToResetImage(true);
         }
+    }
+
+    @Redirect(method = "renderMinimap", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/radar/MinimapRadar;getEntityX(Lnet/minecraft/entity/Entity;F)D"))
+    public double getEntityX(final MinimapRadar instance, final Entity e, final float partial) {
+        return getPlayerX();
+    }
+
+    @Redirect(method = "renderMinimap", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/radar/MinimapRadar;getEntityZ(Lnet/minecraft/entity/Entity;F)D"))
+    public double getEntityZ(final MinimapRadar instance, final Entity e, final float partial) {
+        return getPlayerZ();
     }
 
     @Redirect(method = "renderMinimap", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/element/render/over/MinimapElementOverMapRendererHandler;render(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/player/PlayerEntity;DDDDDDZFLnet/minecraft/client/gl/Framebuffer;Lxaero/common/AXaeroMinimap;Lxaero/common/minimap/render/MinimapRendererHelper;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/font/TextRenderer;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;IIIIZF)V"))

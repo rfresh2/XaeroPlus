@@ -39,5 +39,13 @@
     "MixinWorldMapClient",
     "MixinWorldMapModOptionsAccessor",
     "MixinWorldMapModSettings"
+  ],
+  "mixins": [
+    "MixinBranchLeveledRegion",
+    "MixinMapLimiter",
+    "MixinRadarRenderer",
+    "MixinWaypointsIngameRenderer",
+    "MixinWorldDataHandler",
+    "MixinWorldDataReader"
   ]
 }

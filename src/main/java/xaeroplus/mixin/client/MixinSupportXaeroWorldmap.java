@@ -32,6 +32,7 @@ import xaero.map.region.LeveledRegion;
 import xaero.map.region.MapRegion;
 import xaero.map.region.MapTileChunk;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.CustomDimensionMapProcessor;
 import xaeroplus.util.CustomSupportXaeroWorldMap;
 import xaeroplus.util.GuiHelper;
 import xaeroplus.util.Shared;
@@ -132,7 +133,7 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                     boolean slimeChunks = this.modMain.getSettings().getSlimeChunks(minimapSession.getWaypointsManager());
                     mapProcessor.updateCaveStart();
                     int renderedCaveLayer = mapProcessor.getCurrentCaveLayer();
-                    int globalCaveStart = mapProcessor.getMapWorld().getCurrentDimension().getLayeredMapRegions().getLayer(renderedCaveLayer).getCaveStart();
+                    int globalCaveStart = mapProcessor.getMapWorld().getDimension(Shared.customDimensionId).getLayeredMapRegions().getLayer(renderedCaveLayer).getCaveStart();
                     int globalCaveDepth = WorldMap.settings.caveModeDepth;
                     float brightness = this.getMinimapBrightness();
                     if (renderedCaveLayer != this.lastRenderedCaveLayer) {
@@ -193,8 +194,12 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
 
                     for(int i = minX; i <= maxX; ++i) {
                         for(int j = minZ; j <= maxZ; ++j) {
-                            MapRegion region = mapProcessor.getMapRegion(
-                                    renderedCaveLayer, i >> 3, j >> 3, mapProcessor.regionExists(renderedCaveLayer, i >> 3, j >> 3)
+                            MapRegion region = ((CustomDimensionMapProcessor) mapProcessor).getMapRegionCustomDimension(
+                                    renderedCaveLayer,
+                                    i >> 3,
+                                    j >> 3,
+                                    ((CustomDimensionMapProcessor) mapProcessor).regionExistsCustomDimension(renderedCaveLayer, i >> 3, j >> 3, Shared.customDimensionId),
+                                    Shared.customDimensionId
                             );
                             if (region != null && region != prevRegion) {
                                 synchronized(region) {
@@ -230,7 +235,7 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                                 MapTileChunk chunk = region == null ? null : region.getChunk(i & 7, j & 7);
                                 boolean chunkIsVisible = chunk != null && chunk.getLeafTexture().getGlColorTexture() != -1;
                                 if (!chunkIsVisible && (!noCaveMaps || this.previousRenderedCaveLayer == Integer.MAX_VALUE)) {
-                                    MapRegion previousLayerRegion = mapProcessor.getMapRegion(this.previousRenderedCaveLayer, i >> 3, j >> 3, false);
+                                    MapRegion previousLayerRegion = ((CustomDimensionMapProcessor) mapProcessor).getMapRegionCustomDimension(this.previousRenderedCaveLayer, i >> 3, j >> 3, false, Shared.customDimensionId);
                                     if (previousLayerRegion != null) {
                                         MapTileChunk previousLayerChunk = previousLayerRegion.getChunk(i & 7, j & 7);
                                         if (previousLayerChunk != null && previousLayerChunk.getLeafTexture().getGlColorTexture() != -1) {
@@ -243,7 +248,7 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
 
                                 if (chunkIsVisible) {
                                     if (!mapProcessor.isUploadingPaused() && region.isLoaded()) {
-                                        mapProcessor.getMapWorld().getCurrentDimension().getLayeredMapRegions().bumpLoadedRegion(region);
+                                        mapProcessor.getMapWorld().getDimension(Shared.customDimensionId).getLayeredMapRegions().bumpLoadedRegion(region);
                                     }
                                     int drawX = ((chunk.getX() - chunkX) << 6) - (tileX << 4) - insideX;
                                     int drawZ = ((chunk.getZ() - chunkZ) << 6) - (tileZ << 4) - insideZ;

@@ -2,6 +2,7 @@ package xaeroplus.settings;
 
 import xaeroplus.util.Shared;
 
+import static net.minecraft.world.World.*;
 import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.SettingLocation;
 
 /**
@@ -26,9 +27,9 @@ public final class XaeroPlusSettingRegistry {
             "Fast Mapping must be enabled. \n " +
                     "Limits how many chunks can be written in a single cycle. Lower values improve FPS at high render distances.",
             50, SettingLocation.WORLD_MAP_MAIN);
-//    public static final XaeroPlusBooleanSetting persistMapDimensionSwitchSetting = XaeroPlusBooleanSetting.create("Persist WM Dim Switch",
-//                    "If enabled, the dimension will not be switched back to current when the WorldMap GUI is closed.",
-//            false, SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting persistMapDimensionSwitchSetting = XaeroPlusBooleanSetting.create("Persist WM Dim Switch",
+                    "If enabled, the dimension will not be switched back to current when the WorldMap GUI is closed.",
+            false, SettingLocation.WORLD_MAP_MAIN);
 //    public static final XaeroPlusBooleanSetting transparentObsidianRoofSetting = XaeroPlusBooleanSetting.create("Transparent Obsidian Roof",
 //                    "Makes obsidian placed at build height transparent. Does not update tiles already mapped - you need to remap them.",
 //            (v) -> markChunksDirtyInWriteDistance(),
@@ -138,18 +139,18 @@ public final class XaeroPlusSettingRegistry {
             "Increases the base minimap scale beyond the default size.",
             (b) -> Shared.shouldResetFBO = true,
             2f, SettingLocation.MINIMAP);
-    //    public static final XaeroPlusBooleanSetting switchToNetherSetting = XaeroPlusBooleanSetting.create("Switch to Nether",
-//            "Switches to the nether map.",
-//            (b) -> Shared.switchToDimension(-1),
-//            false, SettingLocation.KEYBINDS);
-//    public static final XaeroPlusBooleanSetting switchToOverworldSetting = XaeroPlusBooleanSetting.create("Switch to Overworld",
-//            "Switches to the overworld map.",
-//            (b) -> Shared.switchToDimension(0),
-//            false, SettingLocation.KEYBINDS);
-//    public static final XaeroPlusBooleanSetting switchToEndSetting = XaeroPlusBooleanSetting.create("Switch to End",
-//            "Switches to the end map.",
-//            (b) -> Shared.switchToDimension(1),
-//            false, SettingLocation.KEYBINDS);
+    public static final XaeroPlusBooleanSetting switchToNetherSetting = XaeroPlusBooleanSetting.create("Switch to Nether",
+            "Switches to the nether map.",
+            (b) -> Shared.switchToDimension(NETHER),
+            false, SettingLocation.KEYBINDS);
+    public static final XaeroPlusBooleanSetting switchToOverworldSetting = XaeroPlusBooleanSetting.create("Switch to Overworld",
+            "Switches to the overworld map.",
+            (b) -> Shared.switchToDimension(OVERWORLD),
+            false, SettingLocation.KEYBINDS);
+    public static final XaeroPlusBooleanSetting switchToEndSetting = XaeroPlusBooleanSetting.create("Switch to End",
+            "Switches to the end map.",
+            (b) -> Shared.switchToDimension(END),
+            false, SettingLocation.KEYBINDS);
     public static final XaeroPlusBooleanSetting netherCaveFix = XaeroPlusBooleanSetting.create("Nether Cave Fix",
             "Forces full cave maps to be written and rendered when cave mode is \"off\" in the nether."
                     + " \n Without this, you have to manually move region files pre WorldMap 1.30.0 to the correct cave folder",

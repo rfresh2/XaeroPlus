@@ -1,8 +1,10 @@
 package xaeroplus.util;
 
 import com.google.common.collect.Lists;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMap;
@@ -44,7 +46,7 @@ public class Shared {
     public static ExecutorService cacheRefreshExecutorService = Executors.newFixedThreadPool(
             // limited benefits by refreshing on more threads as it will consume the entire CPU and start lagging the game
             Math.max(1, Math.min(Runtime.getRuntime().availableProcessors() / 2, 4)));
-//    public static final ResourceLocation xpGuiTextures = new ResourceLocation("xaeroplus", "gui/xpgui.png");
+    public static final Identifier xpGuiTextures = new Identifier("xaeroplus", "gui/xpgui.png");
 
     public static void onSettingLoad() {
         if (!settingsLoadedInit) { // handle settings where we want them to take effect only on first load
@@ -54,27 +56,27 @@ public class Shared {
         }
     }
 
-//    public static void switchToDimension(final int newDimId) {
-//        MapProcessor mapProcessor = WorldMapSession.getCurrentSession().getMapProcessor();
-//        mapProcessor.getMapSaveLoad().setRegionDetectionComplete(false);
-//        MapDimension dimension = mapProcessor.getMapWorld().getDimension(newDimId);
-//        if (dimension == null) {
-//            dimension = mapProcessor.getMapWorld().createDimensionUnsynced(mapProcessor.mainWorld, newDimId);
-//        }
-//        if (!dimension.hasDoneRegionDetection()) {
-//            ((CustomDimensionMapSaveLoad) mapProcessor.getMapSaveLoad()).detectRegionsInDimension(10, newDimId);
-//        }
-//        mapProcessor.getMapSaveLoad().setRegionDetectionComplete(true);
-//        // kind of shit but its ok. need to reset setting when GuiMap closes
-//        int worldDim = Minecraft.getMinecraft().world.provider.getDimension();
-//        if (worldDim != newDimId) {
-//            WorldMap.settings.minimapRadar = false;
-//        } else {
-//            WorldMap.settings.minimapRadar = true;
-//        }
-//        customDimensionId = newDimId;
-//        SupportMods.xaeroMinimap.requestWaypointsRefresh();
-//    }
+    public static void switchToDimension(final RegistryKey<World> newDimId) {
+        MapProcessor mapProcessor = WorldMapSession.getCurrentSession().getMapProcessor();
+        mapProcessor.getMapSaveLoad().setRegionDetectionComplete(false);
+        MapDimension dimension = mapProcessor.getMapWorld().getDimension(newDimId);
+        if (dimension == null) {
+            dimension = mapProcessor.getMapWorld().createDimensionUnsynced(newDimId);
+        }
+        if (!dimension.hasDoneRegionDetection()) {
+            ((CustomDimensionMapSaveLoad) mapProcessor.getMapSaveLoad()).detectRegionsInDimension(10, newDimId);
+        }
+        mapProcessor.getMapSaveLoad().setRegionDetectionComplete(true);
+        // kind of shit but its ok. need to reset setting when GuiMap closes
+        RegistryKey<World> worldDim = MinecraftClient.getInstance().world.getRegistryKey();
+        if (worldDim != newDimId) {
+            WorldMap.settings.minimapRadar = false;
+        } else {
+            WorldMap.settings.minimapRadar = true;
+        }
+        customDimensionId = newDimId;
+        SupportMods.xaeroMinimap.requestWaypointsRefresh();
+    }
 
     public static byte[] decompressZipToBytes(final Path input) {
         try {

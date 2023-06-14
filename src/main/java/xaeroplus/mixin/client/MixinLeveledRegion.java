@@ -154,8 +154,8 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
      * @author rfresh2
      * @reason efficient zip reads
      */
-    @Overwrite
-    public boolean loadCacheTextures(
+//    @Overwrite
+    public boolean loadCacheTexturesOld(
             MapProcessor mapProcessor,
             Registry<Biome> biomeRegistry,
             boolean justMetaData,
@@ -240,17 +240,18 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
                     }
 
                     metaLoadedDest[0] = false;
-                    return this.loadCacheTextures(
-                            mapProcessor,
-                            biomeRegistry,
-                            justMetaData,
-                            textureLoaded,
-                            targetHighlightsHash,
-                            leafShouldAffectBranchesDest,
-                            metaLoadedDest,
-                            extraAttempts - 1,
-                            oldFormatSupport
-                    );
+                    // todo
+//                    return this.loadCacheTextures(
+//                            mapProcessor,
+//                            biomeRegistry,
+//                            justMetaData,
+//                            textureLoaded,
+//                            targetHighlightsHash,
+//                            leafShouldAffectBranchesDest,
+//                            metaLoadedDest,
+//                            extraAttempts - 1,
+//                            oldFormatSupport
+//                    );
                 }
                 this.onCacheLoadFailed(textureLoaded);
             } catch (Throwable var61) {

@@ -1,8 +1,6 @@
 package xaeroplus.settings;
 
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.text.LiteralTextContent;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import org.apache.commons.lang3.ArrayUtils;
 import xaeroplus.XaeroPlus;
@@ -28,7 +26,7 @@ public class XaeroPlusEnumSetting<T extends Enum<T>> extends XaeroPlusSetting {
     public static <E extends Enum<E>> XaeroPlusEnumSetting<E> create(String settingName, String tooltip,
                                              E[] values, E defaultValue, final SettingLocation settingLocation) {
         final XaeroPlusEnumSetting<E> setting = new XaeroPlusEnumSetting<>(SETTING_PREFIX + settingName,
-                MutableText.of(new LiteralTextContent(tooltip)), null, null, values, defaultValue);
+                Text.of(tooltip), null, null, values, defaultValue);
         settingLocation.getSettingsList().add(setting);
         return setting;
     }
@@ -36,7 +34,7 @@ public class XaeroPlusEnumSetting<T extends Enum<T>> extends XaeroPlusSetting {
     public static <E extends Enum<E>> XaeroPlusEnumSetting<E> create(String settingName, String tooltip, Consumer<E> settingChangeConsumer,
                                                                      E[] values, E defaultValue, final SettingLocation settingLocation) {
         final XaeroPlusEnumSetting<E> setting = new XaeroPlusEnumSetting<>(SETTING_PREFIX + settingName,
-                MutableText.of(new LiteralTextContent(tooltip)), settingChangeConsumer, null, values, defaultValue);
+                Text.of(tooltip), settingChangeConsumer, null, values, defaultValue);
         settingLocation.getSettingsList().add(setting);
         return setting;
     }

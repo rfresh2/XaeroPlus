@@ -1,6 +1,7 @@
 package xaeroplus.settings;
 
 import xaeroplus.module.ModuleManager;
+import xaeroplus.module.impl.NewChunks;
 import xaeroplus.module.impl.PortalSkipDetection;
 import xaeroplus.util.ColorHelper;
 import xaeroplus.util.Shared;
@@ -49,24 +50,24 @@ public final class XaeroPlusSettingRegistry {
     public static final XaeroPlusBooleanSetting skipWorldRenderSetting = XaeroPlusBooleanSetting.create("Skip Background Render",
             "Skip MC world render while in a Xaero GUI. Having this on can cause issues with travel mods while you're in a Xaero GUI like the WorldMap.",
             false, SettingLocation.WORLD_MAP_MAIN);
-    //    public static final XaeroPlusBooleanSetting newChunksEnabledSetting = XaeroPlusBooleanSetting.create("NewChunks Highlighting",
-//            "Highlights NewChunks on the Minimap and WorldMap.",
-//            (b) -> ModuleManager.getModule(NewChunks.class).setEnabled(b),
-//            false, SettingLocation.WORLD_MAP_MAIN);
-//    public static final XaeroPlusBooleanSetting newChunksSaveLoadToDisk = XaeroPlusBooleanSetting.create("Save/Load NewChunks to Disk",
-//            "Saves and loads NewChunk data to disk for each world and dimension. Requires NewChunk Highlighting to be enabled.",
-//            (b) -> ModuleManager.getModule(NewChunks.class).setNewChunksCache(b),
-//            true, SettingLocation.WORLD_MAP_MAIN);
-//    public static final XaeroPlusFloatSetting newChunksAlphaSetting = XaeroPlusFloatSetting.create("New Chunks Opacity",
-//            10f, 255f, 10f,
-//                    "Changes the color opacity of NewChunks.",
-//            (b) -> ModuleManager.getModule(NewChunks.class).setAlpha(b),
-//            100, SettingLocation.WORLD_MAP_MAIN);
-//    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> newChunksColorSetting = XaeroPlusEnumSetting.create("New Chunks Color",
-//            "Changes the color of NewChunks.",
-//            (b) -> ModuleManager.getModule(NewChunks.class).setRgbColor(b.getColor()),
-//            ColorHelper.HighlightColor.values(),
-//            ColorHelper.HighlightColor.RED, SettingLocation.WORLD_MAP_MAIN);
+        public static final XaeroPlusBooleanSetting newChunksEnabledSetting = XaeroPlusBooleanSetting.create("NewChunks Highlighting",
+            "Highlights NewChunks on the Minimap and WorldMap.",
+            (b) -> ModuleManager.getModule(NewChunks.class).setEnabled(b),
+            false, SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting newChunksSaveLoadToDisk = XaeroPlusBooleanSetting.create("Save/Load NewChunks to Disk",
+            "Saves and loads NewChunk data to disk for each world and dimension. Requires NewChunk Highlighting to be enabled.",
+            (b) -> ModuleManager.getModule(NewChunks.class).setNewChunksCache(b),
+            true, SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusFloatSetting newChunksAlphaSetting = XaeroPlusFloatSetting.create("New Chunks Opacity",
+            10f, 255f, 10f,
+                    "Changes the color opacity of NewChunks.",
+            (b) -> ModuleManager.getModule(NewChunks.class).setAlpha(b),
+            100, SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> newChunksColorSetting = XaeroPlusEnumSetting.create("New Chunks Color",
+            "Changes the color of NewChunks.",
+            (b) -> ModuleManager.getModule(NewChunks.class).setRgbColor(b.getColor()),
+            ColorHelper.HighlightColor.values(),
+            ColorHelper.HighlightColor.RED, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting portalSkipDetectionEnabledSetting = XaeroPlusBooleanSetting.create("PortalSkip Detection",
                     "Highlights chunks where portals could have been loaded into. \n "
                             + "This is useful for basehunting to detect where players could switch dimensions along a trail to avoid hunters. \n "

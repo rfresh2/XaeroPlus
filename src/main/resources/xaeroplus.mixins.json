@@ -47,6 +47,7 @@
     "MixinRadarRenderer",
     "MixinWaypointsIngameRenderer",
     "MixinWorldDataHandler",
-    "MixinWorldDataReader"
+    "MixinWorldDataReader",
+    "mc.MixinClientConnection"
   ]
 }

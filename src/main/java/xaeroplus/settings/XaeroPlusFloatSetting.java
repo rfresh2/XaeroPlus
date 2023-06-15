@@ -1,8 +1,6 @@
 package xaeroplus.settings;
 
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.text.LiteralTextContent;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax.SettingLocation;
@@ -38,7 +36,7 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
         final XaeroPlusFloatSetting setting = new XaeroPlusFloatSetting(
                 SETTING_PREFIX + settingName,
                 valueMin, valueMax, valueStep, defaultValue,
-                MutableText.of(new LiteralTextContent(defaultValueStr(settingName, defaultValue) + tooltip)),
+                Text.of(defaultValueStr(settingName, defaultValue) + tooltip),
                 null,
                 null);
         settingLocation.getSettingsList().add(setting);
@@ -51,7 +49,7 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
         final XaeroPlusFloatSetting setting = new XaeroPlusFloatSetting(
                 SETTING_PREFIX + settingName,
                 valueMin, valueMax, valueStep, defaultValue,
-                MutableText.of(new LiteralTextContent(defaultValueStr(settingName, defaultValue) + tooltip)),
+                Text.of(defaultValueStr(settingName, defaultValue) + tooltip),
                 changeConsumer,
                 null);
         settingLocation.getSettingsList().add(setting);

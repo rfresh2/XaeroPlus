@@ -1,10 +1,7 @@
 package xaeroplus.settings;
 
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.text.LiteralTextContent;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import xaero.common.graphics.CursorBox;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax.SettingLocation;
 
@@ -27,9 +24,9 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
     public static XaeroPlusBooleanSetting create(String settingName, String tooltip, boolean defaultValue, final SettingLocation settingLocation) {
         final XaeroPlusBooleanSetting setting = new XaeroPlusBooleanSetting(SETTING_PREFIX + settingName,
                 defaultValue,
-                MutableText.of(new LiteralTextContent(tooltip)),
+                Text.of(tooltip),
                 null,
-                new KeyBinding(settingName, 0, "XaeroPlus"));
+                new KeyBinding(settingName, -1, "XaeroPlus"));
         settingLocation.getSettingsList().add(setting);
         return setting;
     }
@@ -38,9 +35,9 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
                                                  boolean defaultValue, final SettingLocation settingLocation) {
         final XaeroPlusBooleanSetting setting = new XaeroPlusBooleanSetting(SETTING_PREFIX + settingName,
                 defaultValue,
-                MutableText.of(new LiteralTextContent(tooltip)),
+                Text.of(tooltip),
                 settingChangeConsumer,
-                new KeyBinding(settingName, 0, "XaeroPlus"));
+                new KeyBinding(settingName, -1, "XaeroPlus"));
         settingLocation.getSettingsList().add(setting);
         return setting;
     }

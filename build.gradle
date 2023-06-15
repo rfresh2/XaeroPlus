@@ -28,6 +28,12 @@ repositories {
 	mavenLocal()
 }
 
+configurations {
+	jarLibs
+	include.extendsFrom jarLibs
+	implementation.extendsFrom jarLibs
+}
+
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -37,14 +43,10 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	include 'com.github.ben-manes.caffeine:caffeine:3.1.6'
-	include "com.github.collarmc:pounce:0e8492b68e"
-//	include 'org.apache.commons:commons-compress:1.21'
-//	include 'org.xerial:sqlite-jdbc:3.41.2.1'
-	implementation 'com.github.ben-manes.caffeine:caffeine:3.1.6'
-	implementation "com.github.collarmc:pounce:0e8492b68e"
-//	implementation 'org.apache.commons:commons-compress:1.21'
-//	implementation 'org.xerial:sqlite-jdbc:3.41.2.1'
+	jarLibs 'com.github.ben-manes.caffeine:caffeine:3.1.6'
+	jarLibs "com.github.collarmc:pounce:0e8492b68e"
+	jarLibs 'org.apache.commons:commons-compress:1.21'
+	jarLibs 'org.xerial:sqlite-jdbc:3.42.0.0'
 
 	modImplementation "maven.modrinth:xaeros-world-map:1.30.4_Fabric_1.20"
 	modImplementation "maven.modrinth:xaeros-minimap:23.4.4_Fabric_1.20"

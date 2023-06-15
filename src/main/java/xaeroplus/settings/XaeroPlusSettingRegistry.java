@@ -1,5 +1,8 @@
 package xaeroplus.settings;
 
+import xaeroplus.module.ModuleManager;
+import xaeroplus.module.impl.PortalSkipDetection;
+import xaeroplus.util.ColorHelper;
 import xaeroplus.util.Shared;
 
 import static net.minecraft.world.World.*;
@@ -64,28 +67,28 @@ public final class XaeroPlusSettingRegistry {
 //            (b) -> ModuleManager.getModule(NewChunks.class).setRgbColor(b.getColor()),
 //            ColorHelper.HighlightColor.values(),
 //            ColorHelper.HighlightColor.RED, SettingLocation.WORLD_MAP_MAIN);
-//    public static final XaeroPlusBooleanSetting portalSkipDetectionEnabledSetting = XaeroPlusBooleanSetting.create("PortalSkip Detection",
-//                    "Highlights chunks where portals could have been loaded into. \n "
-//                            + "This is useful for basehunting to detect where players could switch dimensions along a trail to avoid hunters. \n "
-//                            + "One thing to note: 2b2t's view distance is not large enough to detect portal skip areas. You need to load surrounding chunks - specifically a 15x15 chunk area",
-//            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setEnabled(b),
-//            false, SettingLocation.WORLD_MAP_MAIN);
-//    public static final XaeroPlusFloatSetting portalSkipDetectionAlphaSetting = XaeroPlusFloatSetting.create("PortalSkip Opacity",
-//            10f, 255f, 10f,
-//            "Changes the color opacity of Portal Skip Detection.",
-//            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setAlpha(b),
-//            100, SettingLocation.WORLD_MAP_MAIN);
-//    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> portalSkipDetectionColorSetting = XaeroPlusEnumSetting.create("PortalSkip Color",
-//            "Changes the color of Portal Skip Detection.",
-//            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setRgbColor(b.getColor()),
-//            ColorHelper.HighlightColor.values(),
-//            ColorHelper.HighlightColor.WHITE, SettingLocation.WORLD_MAP_MAIN);
-//    public static final XaeroPlusFloatSetting portalSkipDetectionSearchDelayTicksSetting = XaeroPlusFloatSetting.create("PortalSkip Search Delay",
-//            0, 100, 1,
-//            "Portal Skip Detection must be enabled. \n " +
-//                    "This is the delay in ticks between Portal Skip Detection search operations.",
-//            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setSearchDelayTicks(b),
-//            10, SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting portalSkipDetectionEnabledSetting = XaeroPlusBooleanSetting.create("PortalSkip Detection",
+                    "Highlights chunks where portals could have been loaded into. \n "
+                            + "This is useful for basehunting to detect where players could switch dimensions along a trail to avoid hunters. \n "
+                            + "One thing to note: 2b2t's view distance is not large enough to detect portal skip areas. You need to load surrounding chunks - specifically a 15x15 chunk area",
+            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setEnabled(b),
+            false, SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusFloatSetting portalSkipDetectionAlphaSetting = XaeroPlusFloatSetting.create("PortalSkip Opacity",
+            10f, 255f, 10f,
+            "Changes the color opacity of Portal Skip Detection.",
+            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setAlpha(b),
+            100, SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> portalSkipDetectionColorSetting = XaeroPlusEnumSetting.create("PortalSkip Color",
+           "Changes the color of Portal Skip Detection.",
+           (b) -> ModuleManager.getModule(PortalSkipDetection.class).setRgbColor(b.getColor()),
+           ColorHelper.HighlightColor.values(),
+           ColorHelper.HighlightColor.WHITE, SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusFloatSetting portalSkipDetectionSearchDelayTicksSetting = XaeroPlusFloatSetting.create("PortalSkip Search Delay",
+            0, 100, 1,
+            "Portal Skip Detection must be enabled. \n " +
+                    "This is the delay in ticks between Portal Skip Detection search operations.",
+            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setSearchDelayTicks(b),
+            10, SettingLocation.WORLD_MAP_MAIN);
 //    public static final XaeroPlusBooleanSetting wdlEnabledSetting = XaeroPlusBooleanSetting.create("WDL Highlight",
 //            "Highlights chunks WDL mod has downloaded on the Minimap and WorldMap.",
 //            false, SettingLocation.WORLD_MAP_MAIN);

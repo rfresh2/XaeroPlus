@@ -41,6 +41,7 @@ import xaero.map.region.MapRegion;
 import xaero.map.world.MapDimension;
 import xaero.map.world.MapWorld;
 import xaeroplus.XaeroPlus;
+import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.util.CustomDimensionMapProcessor;
 import xaeroplus.util.CustomDimensionMapSaveLoad;
 import xaeroplus.util.DataFolderResolveUtil;
@@ -488,6 +489,8 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                 if (WorldMap.settings.debug) {
                     WorldMap.LOGGER.info("World/dimension changed to: " + this.currentWorldId + " " + this.currentDimId + " " + this.currentMWId);
                 }
+
+                XaeroPlus.EVENT_BUS.dispatch(new XaeroWorldChangeEvent(this.currentWorldId, this.currentDimId, this.currentMWId));
 
                 this.worldDataHandler.prepareSingleplayer(this.world, (MapProcessor) (Object) this);
                 if (this.worldDataHandler.getWorldDir() == null && this.currentWorldId != null && !this.mapWorld.isMultiplayer()) {

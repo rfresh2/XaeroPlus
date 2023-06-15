@@ -31,6 +31,8 @@ import xaero.map.misc.Misc;
 import xaero.map.region.LeveledRegion;
 import xaero.map.region.MapRegion;
 import xaero.map.region.MapTileChunk;
+import xaeroplus.module.ModuleManager;
+import xaeroplus.module.impl.PortalSkipDetection;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.CustomDimensionMapProcessor;
 import xaeroplus.util.CustomSupportXaeroWorldMap;
@@ -104,7 +106,7 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                     if (mapProcessor.getCurrentDimension() == null) {
                         return;
                     }
-
+                    final boolean isDimensionSwitched = Shared.customDimensionId != MinecraftClient.getInstance().world.getRegistryKey();
                     int compatibilityVersion = this.compatibilityVersion;
                     String worldString = mapProcessor.getCurrentWorldId();
                     if (worldString == null) {
@@ -263,7 +265,7 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                                     this.prepareMapTexturedRect(
                                             matrix, (float)drawX, (float)drawZ, 0, 0, 64.0F, 64.0F, chunk, mapNoLightRenderer, mapWithLightRenderer, helper
                                     );
-                                    if (slimeChunks) {
+                                    if (slimeChunks && !isDimensionSwitched) {
                                         Long savedSeed = seedsUsed.get(chunk);
                                         boolean newSeed = seed == null && savedSeed != null || seed != null && !seed.equals(savedSeed);
                                         if (newSeed) {
@@ -288,6 +290,18 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                                                 helper.addColoredRectToExistingBuffer(
                                                         matrixStack.peek().getPositionMatrix(), overlayBufferBuilder, (float)slimeDrawX, (float)slimeDrawZ, 16, 16, -2142047936
                                                 );
+                                            }
+                                        }
+                                    }
+                                    if (XaeroPlusSettingRegistry.portalSkipDetectionEnabledSetting.getValue() ) { // && XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
+                                        for (int t = 0; t < 16; ++t) {
+                                            final int chunkPosX = chunk.getX() * 4 + t % 4;
+                                            final int chunkPosZ = chunk.getZ() * 4 + t / 4;
+                                            int color = ModuleManager.getModule(PortalSkipDetection.class).getPortalSkipChunksColor();
+                                            if (ModuleManager.getModule(PortalSkipDetection.class).isPortalSkipChunk(chunkPosX, chunkPosZ)) {
+                                                final float left = drawX + 16 * (t % 4);
+                                                final float top = drawZ + 16 * (t / 4);
+                                                helper.addColoredRectToExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBufferBuilder, left, top, 16, 16, color);
                                             }
                                         }
                                     }

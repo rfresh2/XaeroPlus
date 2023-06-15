@@ -38,9 +38,11 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	include 'com.github.ben-manes.caffeine:caffeine:3.1.6'
+	include "com.github.collarmc:pounce:0e8492b68e"
 //	include 'org.apache.commons:commons-compress:1.21'
 //	include 'org.xerial:sqlite-jdbc:3.41.2.1'
 	implementation 'com.github.ben-manes.caffeine:caffeine:3.1.6'
+	implementation "com.github.collarmc:pounce:0e8492b68e"
 //	implementation 'org.apache.commons:commons-compress:1.21'
 //	implementation 'org.xerial:sqlite-jdbc:3.41.2.1'
 

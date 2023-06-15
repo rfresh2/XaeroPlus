@@ -38,7 +38,8 @@
     "MixinWidgetScreenHandlerAccessor",
     "MixinWorldMapClient",
     "MixinWorldMapModOptionsAccessor",
-    "MixinWorldMapModSettings"
+    "MixinWorldMapModSettings",
+    "mc.MixinMinecraftClient"
   ],
   "mixins": [
     "MixinBranchLeveledRegion",

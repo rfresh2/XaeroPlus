@@ -57,8 +57,12 @@ import xaero.map.region.*;
 import xaero.map.region.texture.RegionTexture;
 import xaero.map.settings.ModSettings;
 import xaero.map.world.MapDimension;
+import xaeroplus.module.ModuleManager;
+import xaeroplus.module.impl.PortalSkipDetection;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.CustomDimensionMapProcessor;
+import xaeroplus.util.GuiHelper;
+import xaeroplus.util.HighlightAtChunkPos;
 import xaeroplus.util.Shared;
 
 import java.util.ArrayList;
@@ -1116,6 +1120,22 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                                 }
                                             }
                                         }
+                                    }
+                                }
+                                if (XaeroPlusSettingRegistry.portalSkipDetectionEnabledSetting.getValue() && !mc.options.hudHidden) {// && XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
+                                    final PortalSkipDetection portalSkipDetection = ModuleManager.getModule(
+                                            PortalSkipDetection.class);
+                                    int color = portalSkipDetection.getPortalSkipChunksColor();
+                                    float a = (float)(color >> 24 & 255) / 255.0F;
+                                    float r = (float)(color >> 16 & 255) / 255.0F;
+                                    float g = (float)(color >> 8 & 255) / 255.0F;
+                                    float b = (float)(color & 255) / 255.0F;
+                                    for (final HighlightAtChunkPos c : portalSkipDetection.getPortalSkipChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions)) {
+                                        final float left = (float) ((c.x << 4) - flooredCameraX);
+                                        final float top = (float) ((c.z << 4) - flooredCameraZ);
+                                        final float right = left + 16;
+                                        final float bottom = top + 16;
+                                        GuiHelper.fillIntoExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBuffer, left, top, right, bottom, r, g, b, a);
                                     }
                                 }
                             }

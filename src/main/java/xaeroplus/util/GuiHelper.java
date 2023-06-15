@@ -1,6 +1,8 @@
 package xaeroplus.util;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.VertexConsumer;
+import org.joml.Matrix4f;
 import xaero.map.region.MapTileChunk;
 
 import java.util.ArrayList;
@@ -23,6 +25,13 @@ public class GuiHelper {
         for (Rect rect : rects) {
             guiGraphics.fill((int) rect.left, (int) rect.top, (int) rect.right, (int) rect.bottom, color);
         }
+    }
+
+    public static void fillIntoExistingBuffer(Matrix4f matrix, VertexConsumer bufferBuilder, float x1, float y1, float x2, float y2, float r, float g, float b, float a) {
+        bufferBuilder.vertex(matrix, x1, y2, 0.0F).color(r, g, b, a).next();
+        bufferBuilder.vertex(matrix, x2, y2, 0.0F).color(r, g, b, a).next();
+        bufferBuilder.vertex(matrix, x2, y1, 0.0F).color(r, g, b, a).next();
+        bufferBuilder.vertex(matrix, x1, y1, 0.0F).color(r, g, b, a).next();
     }
 
     //    public static void drawRect(float left, float top, float right, float bottom, int color)

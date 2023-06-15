@@ -5,8 +5,16 @@ on:
     branches:
       - "mainline"
 env:
-  WORLDMAP_VERSION: "1.30.3"
+  WORLDMAP_VERSION: "1.30.4"
   MINIMAP_VERSION: "23.4.4"
+  MINECRAFT_VERSION: "1.20.1"
+  MINECRAFT_VERSION_SHORT: "1.20"
+  MOD_LOADER: "Fabric"
+  XAERO_PLUS_NAME: XaeroPlus-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}
+  XAERO_PLUS_JAR: ${{ env.XAERO_PLUS_NAME }}.jar
+  WORLDMAP_JAR: XaerosWorldMap_${{ env.WORLDMAP_VERSION }}_${{ env.MOD_LOADER }}_${{ env.MINECRAFT_VERSION_SHORT }}.jar
+  MINIMAP_JAR: Xaeros_Minimap_${{ env.MINIMAP_VERSION }}_${{ env.MOD_LOADER }}_${{ env.MINECRAFT_VERSION_SHORT }}.jar
+  MODPACK_ZIP: XaeroPlus-modpack-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}.zip
 
 jobs:
   build:
@@ -17,10 +25,10 @@ jobs:
     - name: Check out repository
       uses: actions/checkout@v3
 
-    - name: Set up JDK 8
+    - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
-        java-version: '8'
+        java-version: '17'
         distribution: 'temurin'
 
     - name: Elevate wrapper permissions
@@ -30,22 +38,22 @@ jobs:
       run: ./gradlew build
 
     - name: Rename built mod
-      run: mv build/libs/xaeroplus-*.jar xaeroplus-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar
+      run: mv build/libs/xaeroplus-*.jar ${{ env.XAERO_PLUS_JAR }}
 
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
-        name: xaeroplus-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}
-        path: xaeroplus-*.jar
+        name: ${{ env.XAERO_PLUS_NAME }}
+        path: ${{ env.XAERO_PLUS_JAR }}
 
     - name: Download Xaero WorldMap
-      run: wget https://chocolateminecraft.com/mods2/worldmap/XaerosWorldMap_${{ env.WORLDMAP_VERSION }}_Forge_1.12.jar --no-check-certificate
+      run: wget https://chocolateminecraft.com/mods2/worldmap/${{ env.WORLDMAP_JAR }} --no-check-certificate
 
     - name: Download Xaero Minimap
-      run: wget https://chocolateminecraft.com/mods2/minimap/Xaeros_Minimap_${{ env.MINIMAP_VERSION }}_Forge_1.12.jar --no-check-certificate
+      run: wget https://chocolateminecraft.com/mods2/minimap/${{ env.MINIMAP_JAR }} --no-check-certificate
 
     - name: Create modpack zip
-      run: tar -czvf xaeroplus-modpack-${{ github.run_number }}.zip xaeroplus-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar XaerosWorldMap_${{ env.WORLDMAP_VERSION }}_Forge_1.12.jar Xaeros_Minimap_${{ env.MINIMAP_VERSION }}_Forge_1.12.jar
+      run: tar -czvf ${{ env.MODPACK_ZIP }} ${{ env.XAERO_PLUS_JAR }} ${{ env.WORLDMAP_JAR }} ${{ env.MINIMAP_JAR }}
 
     # todo: for future auto-update check feature
 #    - name: Create version identifier file
@@ -62,17 +70,17 @@ jobs:
 
         github-token: ${{ secrets.GITHUB_TOKEN }}
         github-files: |
-          xaeroplus-*.jar
-          xaeroplus-modpack-*.zip
+          ${{ env.XAERO_PLUS_JAR }}
+          ${{ env.MODPACK_ZIP }}
 
         files: |
-          xaeroplus-*.jar
-        name: xaeroplus-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}
-        version: xaeroplus-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}
+          ${{ env.XAERO_PLUS_JAR }}
+        name: ${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}
+        version: ${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}
         loaders: |
-          forge
+          ${{ env.MOD_LOADER }}
         game-versions: |
-          1.12.2
+          ${{ env.MINECRAFT_VERSION }}
         dependencies: |
           xaerominimap@${{ env.MINIMAP_VERSION }}(required){modrinth:1bokaNcj}{curseforge:263420}
           xaeroworldmap@${{ env.WORLDMAP_VERSION }}(required){modrinth:NcUtCpym}{curseforge:317780}

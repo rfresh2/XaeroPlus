@@ -1,6 +1,6 @@
 # XaeroPlus
 
-XaeroPlus is a Forge 1.12.2 mod that depends on and modifies Xaero's WorldMap and Minimap with extra
+XaeroPlus is a Minecraft mod that depends on and modifies Xaero's WorldMap and Minimap with extra
 features and performance improvements - particularly for use on anarchy servers like 2b2t.
 
 <details>
@@ -21,9 +21,9 @@ Available on:
 
 # Xaero Versions
 
-Xaero WorldMap version: [1.30.3](https://chocolateminecraft.com/mods2/worldmap/XaerosWorldMap_1.30.3_Forge_1.12.jar)
+Xaero WorldMap version: [1.30.4](https://chocolateminecraft.com/mods2/worldmap/XaerosWorldMap_1.30.4_Fabric_1.20.jar)
 
-Xaero Minimap version: [23.4.4](https://chocolateminecraft.com/mods2/minimap/Xaeros_Minimap_23.4.4_Forge_1.12.jar)
+Xaero Minimap version: [23.4.4](https://chocolateminecraft.com/mods2/minimap/Xaeros_Minimap_23.4.4_Fabric_1.20.jar)
 
 Download and include these mods in your Forge mods folder **in addition** to `xaeroplus-xx.jar` (3 jars total).
 
@@ -35,7 +35,7 @@ Any other Xaero WorldMap/Minimap version may cause crashes.
   * Recommended: Create keybinds for Minimap dimension switching.
 * [Adjustable minimap scaling that increases how many chunks are visible](https://cdn.discordapp.com/attachments/971140948593635335/1109734742842146937/Temurin-1.8.0_352_2023.03.29_-_16.16.08.32.DVR.mp4)
 * [NewChunks Highlighting in MiniMap and WorldMap.](https://cdn.discordapp.com/attachments/971140948593635335/1109735633045434408/Base_Profile_2023.01.02_-_11.26.22.02.DVR.mp4)
-* [WorldDownloader 4.1.1.0](https://github.com/Pokechu22/WorldDownloader/) integration (does not work with Future's Forge WDL jar)
+* **1.12.2 Only** [WorldDownloader 4.1.1.0](https://github.com/Pokechu22/WorldDownloader/) integration (does not work with Future's Forge WDL jar)
   * [Highlights chunks as they are downloaded in the Minimap and WorldMap.](https://cdn.discordapp.com/attachments/971140948593635335/1109735287006961705/Temurin-1.8.0_352_2023.01.02_-_18.54.28.04.DVR.mp4)
 * [Portal Skip Highlighting in Minimap and WorldMap](https://cdn.discordapp.com/attachments/1029572347818151947/1109656254265163816/Base_Profile_2023.05.20_-_18.34.34.34.DVR.mp4). Detects chunks where a portal could have been loaded.
 * [Transparent minimap background instead of wasted black screen space.](https://cdn.discordapp.com/attachments/963821382569979904/1088651890335686716/2023-03-23_19.26.36.png)

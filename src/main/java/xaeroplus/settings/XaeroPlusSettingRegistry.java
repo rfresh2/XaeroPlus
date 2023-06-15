@@ -8,6 +8,7 @@ import xaeroplus.util.Shared;
 
 import static net.minecraft.world.World.*;
 import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.SettingLocation;
+import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.markChunksDirtyInWriteDistance;
 
 /**
  * Registry for XaeroPlus-specific settings
@@ -34,15 +35,20 @@ public final class XaeroPlusSettingRegistry {
     public static final XaeroPlusBooleanSetting persistMapDimensionSwitchSetting = XaeroPlusBooleanSetting.create("Persist WM Dim Switch",
                     "If enabled, the dimension will not be switched back to current when the WorldMap GUI is closed.",
             false, SettingLocation.WORLD_MAP_MAIN);
-//    public static final XaeroPlusBooleanSetting transparentObsidianRoofSetting = XaeroPlusBooleanSetting.create("Transparent Obsidian Roof",
-//                    "Makes obsidian placed at build height transparent. Does not update tiles already mapped - you need to remap them.",
-//            (v) -> markChunksDirtyInWriteDistance(),
-//            true, SettingLocation.WORLD_MAP_MAIN);
-//    public static final XaeroPlusFloatSetting transparentObsidianRoofDarkeningSetting = XaeroPlusFloatSetting.create("Roof Obsidian Opacity",
-//            0, 255, 5,
-//            "Sets the opacity of the transparent obsidian roof tiles.",
-//            (v) -> markChunksDirtyInWriteDistance(),
-//            150, SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting transparentObsidianRoofSetting = XaeroPlusBooleanSetting.create("Transparent Obsidian Roof",
+                    "Makes obsidian placed at build height transparent. Does not update tiles already mapped - you need to remap them.",
+            (v) -> markChunksDirtyInWriteDistance(),
+            true, SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusFloatSetting transparentObsidianRoofYSetting = XaeroPlusFloatSetting.create("Roof Y Level",
+     0, 320, 1,
+     "Sets the starting Y level of the roof",
+             (v) -> markChunksDirtyInWriteDistance(),
+ 250, SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusFloatSetting transparentObsidianRoofDarkeningSetting = XaeroPlusFloatSetting.create("Roof Obsidian Opacity",
+            0, 255, 5,
+            "Sets the opacity of the transparent obsidian roof tiles.",
+            (v) -> markChunksDirtyInWriteDistance(),
+            150, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting worldMapMinZoomSetting = XaeroPlusFloatSetting.create("Min WorldMap Zoom",
             0, 0.625f, 0.01f,
             "Minimum WorldMap Zoom Setting. This is 10x what you see on the WorldMap.",

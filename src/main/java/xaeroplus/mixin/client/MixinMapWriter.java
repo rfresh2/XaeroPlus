@@ -2,14 +2,19 @@ package xaeroplus.mixin.client;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.state.State;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.WorldChunk;
@@ -20,6 +25,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.map.MapProcessor;
 import xaero.map.MapWriter;
@@ -171,6 +177,29 @@ public abstract class MixinMapWriter {
     protected abstract boolean shouldOverlayCached(State<?, ?> state);
 
     @Shadow
+    protected abstract boolean loadPixelHelp(
+            MapBlock pixel,
+            MapBlock currentPixel,
+            World world,
+            Registry<Block> blockRegistry,
+            BlockState state,
+            byte light,
+            byte skyLight,
+            WorldChunk bchunk,
+            int insideX,
+            int insideZ,
+            int h,
+            boolean canReuseBiomeColours,
+            boolean cave,
+            FluidState fluidFluidState,
+            Registry<Biome> biomeRegistry,
+            int transparentSkipY,
+            boolean shouldExtendTillTheBottom,
+            boolean flowers,
+            boolean underair
+    );
+
+    @Shadow
     public abstract boolean hasVanillaColor(BlockState state, World world, Registry<Block> blockRegistry, BlockPos pos);
 
     @Shadow
@@ -181,6 +210,281 @@ public abstract class MixinMapWriter {
 
     @Shadow
     protected abstract BlockState unpackFramedBlocks(BlockState original, World world, BlockPos globalPos);
+
+    /**
+     * @author Entropy5
+     * @reason obsidian roof
+     */
+    @Inject(method = "loadPixel", at = @At("HEAD"), cancellable = true, remap = true)
+    public void loadPixel(final World world,
+                          final Registry<Block> blockRegistry,
+                          final MapBlock pixel,
+                          final MapBlock currentPixel,
+                          final WorldChunk bchunk,
+                          final int insideX,
+                          final int insideZ,
+                          final int highY,
+                          final int lowY,
+                          final boolean cave,
+                          final boolean fullCave,
+                          final int mappedHeight,
+                          final boolean canReuseBiomeColours,
+                          final boolean ignoreHeightmaps,
+                          final Registry<Biome> biomeRegistry,
+                          final boolean flowers,
+                          final int worldBottomY,
+                          final BlockPos.Mutable mutableBlockPos3,
+                          final CallbackInfo ci) {
+        if (!XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()) {
+            return;
+        } else {
+            ci.cancel();
+        }
+        pixel.prepareForWriting(worldBottomY);
+        this.overlayBuilder.startBuilding();
+        boolean underair = !cave || fullCave;
+        boolean shouldEnterGround = fullCave;
+        BlockState opaqueState = null;
+        byte workingLight = -1;
+        boolean worldHasSkyLight = world.getDimension().hasSkyLight();
+        byte workingSkyLight = (byte)(worldHasSkyLight ? 15 : 0);
+        this.topH = lowY;
+        this.mutableGlobalPos.set((bchunk.getPos().x << 4) + insideX, lowY - 1, (bchunk.getPos().z << 4) + insideZ);
+        boolean shouldExtendTillTheBottom = false;
+        int transparentSkipY = 0;
+        boolean columnRoofObsidian = false;
+
+        int h;
+        for(h = highY; h >= lowY; h = shouldExtendTillTheBottom ? transparentSkipY : h - 1) {
+            this.mutableLocalPos.set(insideX, h, insideZ);
+            BlockState state = bchunk.getBlockState(this.mutableLocalPos);
+            if (state == null) {
+                state = Blocks.AIR.getDefaultState();
+            }
+
+            this.mutableGlobalPos.setY(h);
+            state = this.unpackFramedBlocks(state, world, this.mutableGlobalPos);
+            FluidState fluidFluidState = state.getFluidState();
+            Block b = state.getBlock();
+            boolean roofObsidian = (h >= XaeroPlusSettingRegistry.transparentObsidianRoofYSetting.getValue() && b == Blocks.OBSIDIAN);
+            if (roofObsidian && XaeroPlusSettingRegistry.transparentObsidianRoofDarkeningSetting.getValue() == 0) {
+                transparentSkipY--;
+                continue;  // skip over obsidian roof completely
+            }
+            if (roofObsidian & !columnRoofObsidian) {
+                columnRoofObsidian = true;
+            }
+            shouldExtendTillTheBottom = !shouldExtendTillTheBottom && !this.overlayBuilder.isEmpty() && this.firstTransparentStateY - h >= 5 && !columnRoofObsidian;
+            if (shouldExtendTillTheBottom) {
+                for(transparentSkipY = h - 1; transparentSkipY >= lowY; --transparentSkipY) {
+                    BlockState traceState = bchunk.getBlockState(mutableBlockPos3.set(insideX, transparentSkipY, insideZ));
+                    FluidState traceFluidState = traceState.getFluidState();
+                    if (!traceFluidState.isEmpty()) {
+                        if (!this.shouldOverlayCached(traceFluidState)) {
+                            break;
+                        }
+
+                        if (!(traceState.getBlock() instanceof AirBlock)
+                                && traceState.getBlock() == ((BlockState)this.fluidToBlock.apply(traceFluidState)).getBlock()) {
+                            continue;
+                        }
+                    }
+
+                    if (!this.shouldOverlayCached(traceState)) {
+                        break;
+                    }
+                }
+            }
+
+            this.mutableGlobalPos.setY(h + 1);
+            workingLight = (byte)world.getLightLevel(LightType.BLOCK, this.mutableGlobalPos);
+            if (cave && workingLight < 15 && worldHasSkyLight) {
+                if (!ignoreHeightmaps && !fullCave && highY >= mappedHeight) {
+                    workingSkyLight = 15;
+                } else {
+                    workingSkyLight = (byte)world.getLightLevel(LightType.SKY, this.mutableGlobalPos);
+                }
+            }
+
+            this.mutableGlobalPos.setY(h);
+            if (!fluidFluidState.isEmpty() && (!cave || !shouldEnterGround)) {
+                underair = true;
+                BlockState fluidState = (BlockState)this.fluidToBlock.apply(fluidFluidState);
+                if (this.loadPixelHelp(
+                        pixel,
+                        currentPixel,
+                        world,
+                        blockRegistry,
+                        fluidState,
+                        workingLight,
+                        workingSkyLight,
+                        bchunk,
+                        insideX,
+                        insideZ,
+                        h,
+                        canReuseBiomeColours,
+                        cave,
+                        fluidFluidState,
+                        biomeRegistry,
+                        transparentSkipY,
+                        shouldExtendTillTheBottom,
+                        flowers,
+                        underair
+                )) {
+                    opaqueState = state;
+                    break;
+                }
+            }
+
+            if (b instanceof AirBlock) {
+                underair = true;
+            } else if (underair && state.getBlock() != ((BlockState)this.fluidToBlock.apply(fluidFluidState)).getBlock()) {
+                if (cave && shouldEnterGround) {
+                    if (!state.isBurnable() && !state.isReplaceable() && state.getPistonBehavior() != PistonBehavior.DESTROY && !this.shouldOverlayCached(state)) {
+                        underair = false;
+                        shouldEnterGround = false;
+                    }
+                } else if (this.loadPixelHelp(
+                        pixel,
+                        currentPixel,
+                        world,
+                        blockRegistry,
+                        state,
+                        workingLight,
+                        workingSkyLight,
+                        bchunk,
+                        insideX,
+                        insideZ,
+                        h,
+                        canReuseBiomeColours,
+                        cave,
+                        null,
+                        biomeRegistry,
+                        transparentSkipY,
+                        shouldExtendTillTheBottom,
+                        flowers,
+                        underair
+                )) {
+                    opaqueState = state;
+                    break;
+                }
+            }
+        }
+
+        if (h < lowY) {
+            h = lowY;
+        }
+
+        RegistryKey<Biome> blockBiome = null;
+        BlockState state = opaqueState == null ? Blocks.AIR.getDefaultState() : opaqueState;
+        this.overlayBuilder.finishBuilding(pixel);
+        byte light = 0;
+        if (opaqueState != null) {
+            light = workingLight;
+            if (cave && workingLight < 15 && pixel.getNumberOfOverlays() == 0 && workingSkyLight > workingLight) {
+                light = workingSkyLight;
+            }
+        } else {
+            h = worldBottomY;
+        }
+
+        if (canReuseBiomeColours && currentPixel != null && currentPixel.getState() == state && currentPixel.getTopHeight() == this.topH) {
+            blockBiome = currentPixel.getBiome();
+        } else {
+            this.mutableGlobalPos.setY(this.topH);
+            blockBiome = this.biomeGetter.getBiome(world, this.mutableGlobalPos, biomeRegistry);
+            this.mutableGlobalPos.setY(h);
+        }
+
+        if (this.overlayBuilder.getOverlayBiome() != null) {
+            blockBiome = this.overlayBuilder.getOverlayBiome();
+        }
+
+        boolean glowing = this.isGlowing(state);
+        pixel.write(state, h, this.topH, blockBiome, light, glowing, cave);
+    }
+
+    @Inject(method = "loadPixelHelp", at = @At(value = "HEAD"), cancellable = true, remap = true)
+    public void loadPixelHelpInject(final MapBlock pixel,
+                                    final MapBlock currentPixel,
+                                    final World world,
+                                    final Registry<Block> blockRegistry,
+                                    final BlockState state,
+                                    final byte light,
+                                    final byte skyLight,
+                                    final WorldChunk bchunk,
+                                    final int insideX,
+                                    final int insideZ,
+                                    final int h,
+                                    final boolean canReuseBiomeColours,
+                                    final boolean cave,
+                                    final FluidState fluidFluidState,
+                                    final Registry<Biome> biomeRegistry,
+                                    final int transparentSkipY,
+                                    final boolean shouldExtendTillTheBottom,
+                                    final boolean flowers,
+                                    final boolean underair,
+                                    final CallbackInfoReturnable<Boolean> cir) {
+        if (!XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()) {
+            return;
+        } else {
+            cir.cancel();
+        }
+
+        Block b = state.getBlock();
+        boolean roofObsidian = b == Blocks.OBSIDIAN && h > XaeroPlusSettingRegistry.transparentObsidianRoofYSetting.getValue();
+        if (this.isInvisible(world, state, b, flowers)) {
+            cir.setReturnValue(false);
+        } else if (this.shouldOverlayCached(fluidFluidState == null ? state : fluidFluidState) || roofObsidian) {
+            if (cave && !underair) {
+                cir.setReturnValue(false);
+            } else {
+                if (h > this.topH) {
+                    this.topH = h;
+                }
+
+                byte overlayLight = light;
+                if (this.overlayBuilder.isEmpty()) {
+                    this.firstTransparentStateY = h;
+                    if (cave && skyLight > light) {
+                        overlayLight = skyLight;
+                    }
+                }
+
+                if (shouldExtendTillTheBottom) {
+                    this.overlayBuilder
+                            .getCurrentOverlay()
+                            .increaseOpacity(this.overlayBuilder.getCurrentOverlay().getState().getOpacity(world, this.mutableGlobalPos) * (h - transparentSkipY));
+                } else {
+                    RegistryKey<Biome> overlayBiome = this.overlayBuilder.getOverlayBiome();
+                    if (overlayBiome == null) {
+                        if (canReuseBiomeColours
+                                && currentPixel != null
+                                && currentPixel.getNumberOfOverlays() > 0
+                                && currentPixel.getOverlays().get(0).getState() == state) {
+                            overlayBiome = currentPixel.getBiome();
+                        } else {
+                            overlayBiome = this.biomeGetter.getBiome(world, this.mutableGlobalPos, biomeRegistry);
+                        }
+                    }
+                    int opacity = roofObsidian ? 5 : state.getOpacity(world, this.mutableGlobalPos);
+                    this.overlayBuilder.build(state, opacity, overlayLight, this.mapProcessor, overlayBiome);
+                }
+
+                cir.setReturnValue(false);
+            }
+        } else if (!this.hasVanillaColor(state, world, blockRegistry, this.mutableGlobalPos)) {
+            cir.setReturnValue(false);
+        } else if (cave && !underair) {
+            cir.setReturnValue(true);
+        } else {
+            if (h > this.topH) {
+                this.topH = h;
+            }
+
+            cir.setReturnValue(true);
+        }
+    }
 
     /**
      * @author rfresh2

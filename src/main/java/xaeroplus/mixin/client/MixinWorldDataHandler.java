@@ -36,7 +36,7 @@ public class MixinWorldDataHandler implements CustomWorldDataHandler {
      * @author rfresh2
      * @reason dimension switching singleplayer support
      */
-    @Overwrite
+    @Overwrite(remap = true)
     public ServerWorld getWorldServer() {
         return getWorldServer(Shared.customDimensionId);
     }
@@ -73,7 +73,7 @@ public class MixinWorldDataHandler implements CustomWorldDataHandler {
         }
     }
 
-    @Inject(method = "buildRegion", at = @At("HEAD"))
+    @Inject(method = "buildRegion", at = @At("HEAD"), remap = true)
     public void buildRegionInject(final MapRegion region,
                                   final World world,
                                   final RegistryWrapper<Block> blockLookup,
@@ -86,7 +86,7 @@ public class MixinWorldDataHandler implements CustomWorldDataHandler {
         this.worldServer = getWorldServer(region.getDim().getDimId());
     }
 
-    @Redirect(method = "buildRegion", at = @At(value = "INVOKE", target = "Lxaero/map/file/worldsave/WorldDataReader;buildRegion(Lxaero/map/region/MapRegion;Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/world/World;Lnet/minecraft/registry/RegistryWrapper;Lnet/minecraft/registry/Registry;Lnet/minecraft/registry/Registry;Z[ILxaero/map/executor/Executor;)Z"))
+    @Redirect(method = "buildRegion", at = @At(value = "INVOKE", target = "Lxaero/map/file/worldsave/WorldDataReader;buildRegion(Lxaero/map/region/MapRegion;Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/world/World;Lnet/minecraft/registry/RegistryWrapper;Lnet/minecraft/registry/Registry;Lnet/minecraft/registry/Registry;Z[ILxaero/map/executor/Executor;)Z"), remap = true)
     public boolean buildRegionRedirect(final WorldDataReader worldDataReader,
                                        final MapRegion region,
                                        final ServerWorld serverWorld,

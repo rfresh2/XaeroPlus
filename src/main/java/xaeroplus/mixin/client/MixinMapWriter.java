@@ -386,7 +386,7 @@ public abstract class MixinMapWriter {
     }
 
 
-    @Inject(method = "writeChunk", at = @At(value = "HEAD"), cancellable = true)
+    @Inject(method = "writeChunk", at = @At(value = "HEAD"), cancellable = true, remap = true)
     public void writeChunk(
             World world,
             Registry<Block> blockRegistry,
@@ -427,7 +427,7 @@ public abstract class MixinMapWriter {
         }
     }
 
-    @Redirect(method = "writeChunk", at = @At(value = "INVOKE", target = "Lxaero/map/MapWriter;loadPixel(Lnet/minecraft/world/World;Lnet/minecraft/registry/Registry;Lxaero/map/region/MapBlock;Lxaero/map/region/MapBlock;Lnet/minecraft/world/chunk/WorldChunk;IIIIZZIZZLnet/minecraft/registry/Registry;ZILnet/minecraft/util/math/BlockPos$Mutable;)V"))
+    @Redirect(method = "writeChunk", at = @At(value = "INVOKE", target = "Lxaero/map/MapWriter;loadPixel(Lnet/minecraft/world/World;Lnet/minecraft/registry/Registry;Lxaero/map/region/MapBlock;Lxaero/map/region/MapBlock;Lnet/minecraft/world/chunk/WorldChunk;IIIIZZIZZLnet/minecraft/registry/Registry;ZILnet/minecraft/util/math/BlockPos$Mutable;)V"), remap = true)
     public void redirectLoadPixelForNetherFix(MapWriter instance,
                                               World world,
                                               Registry<Block> blockRegistry,

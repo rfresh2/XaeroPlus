@@ -25,7 +25,7 @@ public class MixinRadarRenderProvider {
     private MinimapRadarList currentList;
 
     @Inject(method = "setupContextAndGetNext(ILxaero/common/minimap/render/radar/element/RadarRenderContext;)Lnet/minecraft/entity/Entity;",
-            at = @At(value = "RETURN"))
+            at = @At(value = "RETURN"), remap = true)
     public void setupContextAndGetNextInject(final int location, final RadarRenderContext context, final CallbackInfoReturnable<Entity> cir) {
         final Entity e = cir.getReturnValue();
         if (e instanceof PlayerEntity) {

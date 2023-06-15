@@ -44,7 +44,12 @@ public abstract class MixinWorldDataReader {
             int worldTopY
     );
 
-    @Redirect(method = "buildTileChunk", at = @At(value = "INVOKE", target = "Lxaero/map/file/worldsave/WorldDataReader;buildTile(Lnet/minecraft/nbt/NbtCompound;Lxaero/map/region/MapTile;Lxaero/map/region/MapTileChunk;IIIIIIZZLnet/minecraft/world/World;Lnet/minecraft/registry/RegistryWrapper;Lnet/minecraft/registry/Registry;Lnet/minecraft/registry/Registry;Lnet/minecraft/registry/Registry;ZII)Z"))
+    @Redirect(method = "buildTileChunk",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lxaero/map/file/worldsave/WorldDataReader;buildTile(Lnet/minecraft/nbt/NbtCompound;Lxaero/map/region/MapTile;Lxaero/map/region/MapTileChunk;IIIIIIZZLnet/minecraft/world/World;Lnet/minecraft/registry/RegistryWrapper;Lnet/minecraft/registry/Registry;Lnet/minecraft/registry/Registry;Lnet/minecraft/registry/Registry;ZII)Z"),
+            remap = true
+    )
     public boolean redirectBuildTile(final WorldDataReader instance,
                                      NbtCompound nbttagcompound,
                                      MapTile tile,

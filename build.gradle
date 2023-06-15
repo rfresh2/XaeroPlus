@@ -38,11 +38,11 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	include 'com.github.ben-manes.caffeine:caffeine:3.1.6'
-	include 'org.apache.commons:commons-compress:1.21'
-	include 'org.xerial:sqlite-jdbc:3.41.2.1'
+//	include 'org.apache.commons:commons-compress:1.21'
+//	include 'org.xerial:sqlite-jdbc:3.41.2.1'
 	implementation 'com.github.ben-manes.caffeine:caffeine:3.1.6'
-	implementation 'org.apache.commons:commons-compress:1.21'
-	implementation 'org.xerial:sqlite-jdbc:3.41.2.1'
+//	implementation 'org.apache.commons:commons-compress:1.21'
+//	implementation 'org.xerial:sqlite-jdbc:3.41.2.1'
 
 	modImplementation "maven.modrinth:xaeros-world-map:1.30.4_Fabric_1.20"
 	modImplementation "maven.modrinth:xaeros-minimap:23.4.4_Fabric_1.20"

@@ -333,7 +333,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     }
 
 
-    @Inject(method = "<init>", at = @At("RETURN"))
+    @Inject(method = "<init>", at = @At("RETURN"), remap = true)
     public void constructorInject(final Screen parent, final Screen escape, final MapProcessor mapProcessor, final Entity player, final CallbackInfo ci) {
         RegistryKey<World> dim = MinecraftClient.getInstance().world.getRegistryKey();
         this.cameraX = player.getX();
@@ -395,13 +395,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Override
     protected void onExit(Screen screen) {
-        if (XaeroPlusSettingRegistry.persistMapDimensionSwitchSetting.getValue()) return;
-        try {
-            Shared.customDimensionId = MinecraftClient.getInstance().world.getRegistryKey();
-        } catch (final Exception e) {
-            Shared.customDimensionId = OVERWORLD;
+        if (!XaeroPlusSettingRegistry.persistMapDimensionSwitchSetting.getValue()) {
+            try {
+                Shared.customDimensionId = MinecraftClient.getInstance().world.getRegistryKey();
+            } catch (final Exception e) {
+                Shared.customDimensionId = OVERWORLD;
+            }
+            WorldMap.settings.minimapRadar = true; // todo: restore previous value before custom dimension was entered (if at all)
         }
-        WorldMap.settings.minimapRadar = true; // todo: restore previous value before custom dimension was entered (if at all)
         super.onExit(screen);
     }
 
@@ -1866,11 +1867,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         zTextEntryField.tick();
     }
 
-    @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
+    // todo: mixin on mouseClicked to close coord entry fields when clicking on something else
+
+    @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true, remap = true)
     public void onInputPress(final int code, final int scanCode, final int modifiers, final CallbackInfoReturnable<Boolean> cir) {
         if (code == 290) {
             MinecraftClient.getInstance().options.hudHidden = !MinecraftClient.getInstance().options.hudHidden;
-            cir.cancel();
+            cir.setReturnValue(true);
             return;
         }
         if ((xTextEntryField.isVisible() && zTextEntryField.isVisible()) && (xTextEntryField.isFocused() || zTextEntryField.isFocused())) {

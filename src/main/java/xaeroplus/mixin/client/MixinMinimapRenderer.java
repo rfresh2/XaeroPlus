@@ -62,17 +62,17 @@ public class MixinMinimapRenderer {
         }
     }
 
-    @Redirect(method = "renderMinimap", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/radar/MinimapRadar;getEntityX(Lnet/minecraft/entity/Entity;F)D"))
+    @Redirect(method = "renderMinimap", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/radar/MinimapRadar;getEntityX(Lnet/minecraft/entity/Entity;F)D"), remap = true)
     public double getEntityX(final MinimapRadar instance, final Entity e, final float partial) {
         return getPlayerX();
     }
 
-    @Redirect(method = "renderMinimap", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/radar/MinimapRadar;getEntityZ(Lnet/minecraft/entity/Entity;F)D"))
+    @Redirect(method = "renderMinimap", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/radar/MinimapRadar;getEntityZ(Lnet/minecraft/entity/Entity;F)D"), remap = true)
     public double getEntityZ(final MinimapRadar instance, final Entity e, final float partial) {
         return getPlayerZ();
     }
 
-    @Redirect(method = "renderMinimap", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/element/render/over/MinimapElementOverMapRendererHandler;render(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/player/PlayerEntity;DDDDDDZFLnet/minecraft/client/gl/Framebuffer;Lxaero/common/AXaeroMinimap;Lxaero/common/minimap/render/MinimapRendererHelper;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/font/TextRenderer;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;IIIIZF)V"))
+    @Redirect(method = "renderMinimap", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/element/render/over/MinimapElementOverMapRendererHandler;render(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/player/PlayerEntity;DDDDDDZFLnet/minecraft/client/gl/Framebuffer;Lxaero/common/AXaeroMinimap;Lxaero/common/minimap/render/MinimapRendererHelper;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/font/TextRenderer;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;IIIIZF)V"), remap = true)
     public void editOvermapRender(final MinimapElementOverMapRendererHandler instance,
                                     final DrawContext guiGraphics,
                                     final Entity renderEntity,
@@ -130,7 +130,7 @@ public class MixinMinimapRenderer {
      * Inspiration for the below mods came from: https://github.com/Abbie5/xaeroarrowfix
      */
 
-    @Redirect(method = "renderMinimap", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/render/MinimapFBORenderer;renderMainEntityDot(Lnet/minecraft/client/gui/DrawContext;Lxaero/common/minimap/MinimapProcessor;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/entity/Entity;DDDDFLxaero/common/minimap/radar/MinimapRadar;ZIZZZDLxaero/common/settings/ModSettings;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;F)V"))
+    @Redirect(method = "renderMinimap", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/render/MinimapFBORenderer;renderMainEntityDot(Lnet/minecraft/client/gui/DrawContext;Lxaero/common/minimap/MinimapProcessor;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/entity/Entity;DDDDFLxaero/common/minimap/radar/MinimapRadar;ZIZZZDLxaero/common/settings/ModSettings;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;F)V"), remap = true)
     public void redirectRenderMainEntityDot(final MinimapFBORenderer instance,
                                             final DrawContext guiGraphics,
                                             final MinimapProcessor minimap,

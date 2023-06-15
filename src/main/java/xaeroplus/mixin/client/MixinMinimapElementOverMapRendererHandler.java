@@ -20,7 +20,7 @@ import xaeroplus.util.Shared;
 @Mixin(value = MinimapElementOverMapRendererHandler.class, remap = false)
 public class MixinMinimapElementOverMapRendererHandler {
 
-    @Redirect(method = "transformAndRenderForRenderer", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/element/render/MinimapElementRenderer;renderElement(IZZLnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/client/gl/Framebuffer;Lxaero/common/minimap/render/MinimapRendererHelper;Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/player/PlayerEntity;DDDIDFLjava/lang/Object;DDZF)Z"))
+    @Redirect(method = "transformAndRenderForRenderer", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/element/render/MinimapElementRenderer;renderElement(IZZLnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/client/gl/Framebuffer;Lxaero/common/minimap/render/MinimapRendererHelper;Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/player/PlayerEntity;DDDIDFLjava/lang/Object;DDZF)Z"), remap = true)
     public boolean redirectRenderElement(final MinimapElementRenderer instance,
                                          final int location,
                                          final boolean highlit,

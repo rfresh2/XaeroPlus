@@ -38,7 +38,7 @@ jobs:
       run: ./gradlew build
 
     - name: Rename built mod
-      run: mv build/libs/xaeroplus-*.jar ${{ env.XAERO_PLUS_JAR }}
+      run: mv build/libs/xaeroplus-${{ env.MINECRAFT_VERSION }}.jar ${{ env.XAERO_PLUS_JAR }}
 
     - name: Upload artifact
       uses: actions/upload-artifact@v3

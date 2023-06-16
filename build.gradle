@@ -1,6 +1,7 @@
 plugins {
 	id 'fabric-loom' version '1.2-SNAPSHOT'
 	id 'maven-publish'
+	id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 version = project.mod_version
@@ -30,7 +31,6 @@ repositories {
 
 configurations {
 	jarLibs
-	include.extendsFrom jarLibs
 	implementation.extendsFrom jarLibs
 }
 
@@ -78,6 +78,32 @@ jar {
 	from("LICENSE") {
 		rename { "${it}_${project.archivesBaseName}" }
 	}
+}
+
+shadowJar {
+	configurations = [project.configurations.jarLibs]
+	archiveClassifier.set('shadow')
+
+	exclude 'com/google/**'
+	exclude 'org/objectweb/**'
+	exclude 'org/checkerframework/**'
+	exclude 'org/sqlite/native/FreeBSD/**'
+	exclude 'org/sqlite/native/Linux-Android/**'
+	exclude 'org/sqlite/native/Linux-Musl/**'
+	exclude 'org/sqlite/native/Linux/arm/**'
+	exclude 'org/sqlite/native/Linux/aarch64/**'
+	exclude 'org/sqlite/native/Linux/armv6/**'
+	exclude 'org/sqlite/native/Linux/x86/**'
+	exclude 'org/sqlite/native/Linux/armv7/**'
+	exclude 'org/sqlite/native/Linux/ppc64/**'
+	exclude 'org/sqlite/native/Windows/armv7/**'
+	exclude 'org/sqlite/native/Windows/aarch64/**'
+	exclude 'org/sqlite/native/Windows/armv7/**'
+}
+
+remapJar {
+	dependsOn shadowJar
+	inputFile.set shadowJar.archiveFile.get()
 }
 
 // configure the maven publication

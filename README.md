@@ -29,6 +29,16 @@ Download and include these mods in your Forge mods folder **in addition** to `xa
 
 Any other Xaero WorldMap/Minimap version may cause crashes.
 
+# Version Upgrade Warning
+
+Info for those testing upgrades from 1.12 to 1.20+. 
+
+Map data files from 1.12 will work on 1.20.x. 
+
+But, 1.20.x map files will not work in 1.12. This is not caused by XaeroPlus, its how Xaero's mods will work without XaeroPlus as well.
+
+If you are considering upgrading, keep a backup of your map data files.
+
 # Modifications
 
 * [Dimension hot-switching on WorldMap and Minimap.](https://cdn.discordapp.com/attachments/971140948593635335/1109733484144107572/Temurin-1.8.0_352_2023.03.31_-_20.11.27.50.mp4)

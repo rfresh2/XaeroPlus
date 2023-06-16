@@ -16,6 +16,7 @@ import xaeroplus.XaeroPlus;
 import xaeroplus.event.ClientTickEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.module.Module;
+import xaeroplus.module.ModuleManager;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.*;
 
@@ -136,9 +137,9 @@ public class PortalSkipDetection extends Module {
                             final int chunkPosX = baseChunkCoordX + chunkX;
                             final int chunkPosZ = baseChunkCoordZ + chunkZ;
                             if (isChunkSeen(chunkPosX, chunkPosZ, currentlyViewedDimension)) {
-//                                if (!isNewChunk(chunkPosX, chunkPosZ, currentlyViewedDimension)) {
+                                if (!isNewChunk(chunkPosX, chunkPosZ, currentlyViewedDimension)) {
                                     portalDetectionSearchChunks.add(new ChunkPos(chunkPosX, chunkPosZ));
-//                                }
+                                }
                             }
                         }
                     }
@@ -178,9 +179,9 @@ public class PortalSkipDetection extends Module {
         }
     }
 
-//    private boolean isNewChunk(final int chunkPosX, final int chunkPosZ, final int currentlyViewedDimension) {
-//        return ModuleManager.getModule(NewChunks.class).isNewChunk(chunkPosX, chunkPosZ, currentlyViewedDimension);
-//    }
+    private boolean isNewChunk(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> currentlyViewedDimension) {
+        return ModuleManager.getModule(NewChunks.class).isNewChunk(chunkPosX, chunkPosZ, currentlyViewedDimension);
+    }
 
     private boolean isChunkSeen(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> currentlyViewedDimension) {
         final WorldMapSession currentSession = XaeroWorldMapCore.currentSession;

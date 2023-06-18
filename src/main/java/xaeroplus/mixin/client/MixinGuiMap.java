@@ -61,10 +61,7 @@ import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
 import xaeroplus.module.impl.PortalSkipDetection;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.CustomDimensionMapProcessor;
-import xaeroplus.util.GuiHelper;
-import xaeroplus.util.HighlightAtChunkPos;
-import xaeroplus.util.Shared;
+import xaeroplus.util.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -1778,11 +1775,11 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                 this.viewed = hovered;
                                 this.viewedInList = true;
                                 if (this.leftMouseButton.clicked) {
-                                    // todo: fix this with reflection :doomcat:
-//                                    this.cameraDestination = new int[]{
-//                                            (int)((PlayerDynamicInfoMapElement)this.viewed.getElement()).getSyncable().getX(),
-//                                            (int)((PlayerDynamicInfoMapElement)this.viewed.getElement()).getSyncable().getZ()
-//                                    };
+                                    this.cameraDestination = new int[]{
+                                            // need to delegate this out to a helper to avoid mixin classloading errors
+                                            PacHelper.getSyncableX(((PlayerDynamicInfoMapElement)this.viewed.getElement())),
+                                            PacHelper.getSyncableZ(((PlayerDynamicInfoMapElement)this.viewed.getElement()))
+                                    };
                                     this.leftMouseButton.isDown = false;
                                 }
                             }

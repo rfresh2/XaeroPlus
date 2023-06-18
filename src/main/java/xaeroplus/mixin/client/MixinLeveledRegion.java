@@ -157,8 +157,8 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
      * @author rfresh2
      * @reason efficient zip reads
      */
-//    @Overwrite
-    public boolean loadCacheTexturesOld(
+    @Overwrite
+    public boolean loadCacheTextures(
             MapProcessor mapProcessor,
             Registry<Biome> biomeRegistry,
             boolean justMetaData,
@@ -169,101 +169,97 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
             int extraAttempts,
             OldFormatSupport oldFormatSupport
     ) {
-        if (this.cacheFile != null && this.cacheFile.exists()) {
+        if (this.cacheFile == null) return false;
+        if (this.cacheFile.exists()) {
             try {
                 try (DataInputStream input = new DataInputStream(new ByteArrayInputStream(decompressZipToBytes(this.cacheFile.toPath())))) {
-                    byte[] integerByteBuffer = new byte[4];
-                    int cacheSaveVersion = input.readInt();
-                    int cacheFullSaveVersion = input.readInt();
-                    int minorSaveVersion = cacheFullSaveVersion & 65535;
-                    int majorSaveVersion = cacheFullSaveVersion >> 16 & 65535;
-                    int currentFullVersion = 65560;
-
-                    if (cacheFullSaveVersion <= currentFullVersion && cacheFullSaveVersion != 7 && minorSaveVersion != 21) {
-                        if (cacheFullSaveVersion < currentFullVersion) {
-                            this.shouldCache = true;
-                        }
-                        this.biomePalette = null;
-                        byte[] usableBuffer = new byte[16384];
-                        if (minorSaveVersion >= 8) {
-                            this.readCacheMetaData(input, minorSaveVersion, majorSaveVersion, usableBuffer, integerByteBuffer, textureLoaded, mapProcessor);
-                            metaLoadedDest[0] = true;
-                            if (justMetaData && (cacheSaveVersion == 8 || cacheSaveVersion >= 12)) {
-                                return true;
-                            }
-                        }
-
-                        this.preCacheLoad();
-                        this.loadBiomePalette(input, minorSaveVersion, majorSaveVersion, mapProcessor, biomeRegistry, oldFormatSupport);
-                        boolean leafShouldAffectBranches = !this.shouldCache && this.shouldLeafAffectCache(targetHighlightsHash);
-                        if (leafShouldAffectBranchesDest != null) {
-                            leafShouldAffectBranchesDest[0] = leafShouldAffectBranches;
-                        }
-
-                        this.readCacheInput(
-                                false,
-                                input,
-                                minorSaveVersion,
-                                majorSaveVersion,
-                                usableBuffer,
-                                integerByteBuffer,
-                                textureLoaded,
-                                leafShouldAffectBranches,
-                                mapProcessor
-                        );
-                        metaLoadedDest[0] = true;
+                    final byte[] integerByteBuffer = new byte[4];
+                    final int cacheFullSaveVersion = input.readInt();
+                    final int minorSaveVersion = cacheFullSaveVersion & 0xFFFF;
+                    final int majorSaveVersion = cacheFullSaveVersion >> 16 & 0xFFFF;
+                    final int currentFullVersion = 65560;
+                    if (cacheFullSaveVersion > currentFullVersion || cacheFullSaveVersion == 7 || minorSaveVersion == 21) {
+                        WorldMap.LOGGER.info("Trying to load newer region cache " + this + " using an older version of Xaero's World Map!");
+                        mapProcessor.getMapSaveLoad().backupFile(this.cacheFile, cacheFullSaveVersion);
+                        this.cacheFile = null;
+                        this.shouldCache = true;
                         return false;
                     }
-
-                    WorldMap.LOGGER.info("(World Map) Trying to load newer region cache " + this + " using an older version of Xaero's World Map!");
-                    mapProcessor.getMapSaveLoad().backupFile(this.cacheFile, cacheSaveVersion);
-                    this.cacheFile = null;
-                    this.shouldCache = true;
-                    return true;
+                    if (cacheFullSaveVersion < currentFullVersion) {
+                        this.shouldCache = true;
+                    }
+                    this.biomePalette = null;
+                    final byte[] usableBuffer = new byte[16384];
+                    if (minorSaveVersion >= 8) {
+                        this.readCacheMetaData(input,
+                                               minorSaveVersion,
+                                               majorSaveVersion,
+                                               usableBuffer,
+                                               integerByteBuffer,
+                                               textureLoaded,
+                                               mapProcessor);
+                        metaLoadedDest[0] = true;
+                        if (justMetaData && (minorSaveVersion == 8 || minorSaveVersion >= 12)) {
+                            return true;
+                        }
+                    }
+                    this.preCacheLoad();
+                    this.loadBiomePalette(input,
+                                          minorSaveVersion,
+                                          majorSaveVersion,
+                                          mapProcessor,
+                                          biomeRegistry,
+                                          oldFormatSupport);
+                    final boolean leafShouldAffectBranches = !this.shouldCache && this.shouldLeafAffectCache(
+                            targetHighlightsHash);
+                    if (leafShouldAffectBranchesDest != null) {
+                        leafShouldAffectBranchesDest[0] = leafShouldAffectBranches;
+                    }
+                    this.readCacheInput(false,
+                                        input,
+                                        minorSaveVersion,
+                                        majorSaveVersion,
+                                        usableBuffer,
+                                        integerByteBuffer,
+                                        textureLoaded,
+                                        leafShouldAffectBranches,
+                                        mapProcessor);
+                    metaLoadedDest[0] = true;
+                    return false;
                 } finally {
-                    if (hasTextures()) {
-                        for(int i = 0; i < 8; ++i) {
-                            for (int j = 0; j < 8; ++j) {
-                                RegionTexture<?> texture = getTexture(i, j);
-                                if (texture != null && texture.getBiomes() != null && texture.getBiomes().getRegionBiomePalette() != this.biomePalette) {
-                                    texture.resetBiomes();
-                                }
+                    for (int i = 0; i < 8; ++i) {
+                        for (int j = 0; j < 8; ++j) {
+                            final RegionTexture<?> texture = this.getTexture(i, j);
+                            if (texture != null && texture.getBiomes() != null && texture.getBiomes().getRegionBiomePalette() != this.biomePalette) {
+                                texture.resetBiomes();
                             }
                         }
                     }
                 }
-            } catch (IOException var60) {
-                WorldMap.LOGGER.error("IO exception while trying to load cache for region " + this + "! " + this.cacheFile, var60);
+            } catch (IOException ioe) {
+                WorldMap.LOGGER.error("IO exception while trying to load cache for region " + this + "! " + this.cacheFile, ioe);
                 if (extraAttempts > 0) {
-                    WorldMap.LOGGER.info("(World Map) Retrying...");
-
+                    WorldMap.LOGGER.info("Retrying...");
                     try {
                         Thread.sleep(20L);
-                    } catch (InterruptedException ignored) {
                     }
-
+                    catch (final InterruptedException ex) {}
                     metaLoadedDest[0] = false;
-                    // todo
-//                    return this.loadCacheTextures(
-//                            mapProcessor,
-//                            biomeRegistry,
-//                            justMetaData,
-//                            textureLoaded,
-//                            targetHighlightsHash,
-//                            leafShouldAffectBranchesDest,
-//                            metaLoadedDest,
-//                            extraAttempts - 1,
-//                            oldFormatSupport
-//                    );
+                    return this.loadCacheTextures(mapProcessor, biomeRegistry, justMetaData, textureLoaded, targetHighlightsHash, leafShouldAffectBranchesDest, metaLoadedDest, extraAttempts - 1, oldFormatSupport);
                 }
+                this.cacheFile = null;
+                this.shouldCache = true;
                 this.onCacheLoadFailed(textureLoaded);
-            } catch (Throwable var61) {
-                WorldMap.LOGGER.error("Failed to load cache for region " + this + "! " + this.cacheFile, var61);
+            } catch (Throwable e) {
+                WorldMap.LOGGER.error("Failed to load cache for region " + this + "! " + this.cacheFile, e);
+                this.cacheFile = null;
+                this.shouldCache = true;
                 this.onCacheLoadFailed(textureLoaded);
             }
+        } else {
+            this.cacheFile = null;
+            this.shouldCache = true;
         }
-        this.cacheFile = null;
-        this.shouldCache = true;
         return false;
     }
 }

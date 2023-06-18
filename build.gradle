@@ -48,8 +48,8 @@ dependencies {
 	jarLibs 'org.apache.commons:commons-compress:1.21'
 	jarLibs 'org.xerial:sqlite-jdbc:3.42.0.0'
 
-	modImplementation "maven.modrinth:xaeros-world-map:1.30.4_Fabric_1.20"
-	modImplementation "maven.modrinth:xaeros-minimap:23.4.4_Fabric_1.20"
+	modImplementation "maven.modrinth:xaeros-world-map:1.30.5_Fabric_1.20"
+	modImplementation "maven.modrinth:xaeros-minimap:23.5.0_Fabric_1.20"
 }
 
 processResources {

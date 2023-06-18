@@ -1,6 +1,6 @@
 # XaeroPlus
 
-XaeroPlus is a Minecraft mod that depends on and modifies Xaero's WorldMap and Minimap with extra
+XaeroPlus is a Minecraft mod that depends on and modifies the Xaero's WorldMap and Minimap mods with extra
 features and performance improvements - particularly for use on anarchy servers like 2b2t.
 
 <details>
@@ -21,13 +21,15 @@ Available on:
 
 # Xaero Versions
 
-Xaero WorldMap version: [1.30.4](https://chocolateminecraft.com/mods2/worldmap/XaerosWorldMap_1.30.4_Fabric_1.20.jar)
+Each XaeroPlus release is only compatible with a specific version of Xaero's WorldMap and Minimap.
 
-Xaero Minimap version: [23.4.4](https://chocolateminecraft.com/mods2/minimap/Xaeros_Minimap_23.4.4_Fabric_1.20.jar)
+Download and include these mods **in addition** to `xaeroplus-xx.jar` (3 jars total).
 
-Download and include these mods in your Forge mods folder **in addition** to `xaeroplus-xx.jar` (3 jars total).
+You can find download links to Xaero's mods here:
+* https://modrinth.com/mod/xaeros-world-map/versions?g=1.20.1
+* https://modrinth.com/mod/xaeros-minimap/versions?g=1.20.1
 
-Any other Xaero WorldMap/Minimap version may cause crashes.
+Or a modpack zip with these jars is included in the Github releases.
 
 # Version Upgrade Warning
 

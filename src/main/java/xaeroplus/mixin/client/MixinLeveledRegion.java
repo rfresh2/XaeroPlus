@@ -85,6 +85,7 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
         if (WorldMap.settings.debug) {
             WorldMap.LOGGER.info("(World Map) Saving cache: " + this);
         }
+        boolean success = false;
         ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
         try(ZipOutputStream zipOutput = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(tempFile.toPath())))) {
             try(DataOutputStream output = new DataOutputStream(byteOut)) {
@@ -114,23 +115,7 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
                 output.write(255);
                 zipOutput.write(byteOut.toByteArray());
                 zipOutput.closeEntry();
-                synchronized (this) {
-                    this.setAllCachePrepared(false);
-                }
-
-                for (int i = 0; i < 8; ++i) {
-                    for (int j = 0; j < 8; ++j) {
-                        T texture = this.getTexture(i, j);
-                        if (texture != null && texture.shouldIncludeInCache()) {
-                            texture.deleteColorBuffer();
-                            synchronized (this) {
-                                texture.setCachePrepared(false);
-                                this.setAllCachePrepared(false);
-                            }
-                        }
-                    }
-                }
-                return true;
+                success = true;
             }
         } catch (IOException var51) {
             WorldMap.LOGGER.info("(World Map) IO exception while trying to save cache textures for " + this);
@@ -148,6 +133,24 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
                 return false;
             }
         }
+
+        synchronized (this) {
+            this.setAllCachePrepared(false);
+        }
+
+        for (int i = 0; i < 8; ++i) {
+            for (int j = 0; j < 8; ++j) {
+                T texture = this.getTexture(i, j);
+                if (texture != null && texture.shouldIncludeInCache()) {
+                    texture.deleteColorBuffer();
+                    synchronized (this) {
+                        texture.setCachePrepared(false);
+                        this.setAllCachePrepared(false);
+                    }
+                }
+            }
+        }
+        return success;
     }
 
     /**

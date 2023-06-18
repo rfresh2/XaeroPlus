@@ -1,12 +1,12 @@
-name: Mainline Build And Release
+name: Fabric 1.20.1 Build And Release
 
 on:
   push:
     branches:
-      - "mainline"
+      - "fabric-1.20.1"
 env:
-  WORLDMAP_VERSION: "1.30.4"
-  MINIMAP_VERSION: "23.4.4"
+  WORLDMAP_VERSION: "1.30.5"
+  MINIMAP_VERSION: "23.5.0"
   MINECRAFT_VERSION: "1.20.1"
   MINECRAFT_VERSION_SHORT: "1.20"
   MOD_LOADER: "Fabric"

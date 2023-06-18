@@ -5,8 +5,8 @@ on:
     branches:
       - "mainline"
 env:
-  WORLDMAP_VERSION: "1.30.3"
-  MINIMAP_VERSION: "23.4.4"
+  WORLDMAP_VERSION: "1.30.5"
+  MINIMAP_VERSION: "23.5.0"
 
 jobs:
   build:

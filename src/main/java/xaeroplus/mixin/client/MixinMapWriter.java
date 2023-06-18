@@ -225,6 +225,9 @@ public abstract class MixinMapWriter {
             if (shouldExtendTillTheBottom) {
                 for (transparentSkipY = h - 1; transparentSkipY >= lowY; --transparentSkipY) {
                     IBlockState traceState = bchunk.getBlockState(mutableBlockPos3.setPos(insideX, transparentSkipY, insideZ));
+                    if (traceState == null) { // should be impossible lol
+                        traceState = Blocks.AIR.getDefaultState();
+                    }
                     if (!this.shouldOverlayCached(traceState)) {
                         break;
                     }

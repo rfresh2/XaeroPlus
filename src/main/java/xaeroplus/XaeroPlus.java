@@ -15,7 +15,7 @@ import xaeroplus.util.Shared;
         modid = XaeroPlus.MODID,
         name = XaeroPlus.NAME,
         version = XaeroPlus.VERSION,
-        dependencies = "required-after:xaerominimap@[23.4.4];required-after:xaeroworldmap@[1.30.3];"
+        dependencies = "required-after:xaerominimap@[23.5.0];required-after:xaeroworldmap@[1.30.5];"
 )
 public class XaeroPlus {
     public static final String MODID = "xaeroplus";

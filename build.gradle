@@ -26,9 +26,9 @@ apply plugin: 'maven-publish'
 apply plugin: 'org.spongepowered.mixin'
 
 compileJava.options.encoding = 'UTF-8'
-version = '1.0'
+version = '1.12.2'
 group = 'xaeroplus'
-archivesBaseName = 'xaeroplus-1.12.2'
+archivesBaseName = 'xaeroplus'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 

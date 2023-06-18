@@ -1,4 +1,4 @@
-name: Forge 1.12.2 Build And Release
+name: Mainline Build And Release
 
 on:
   push:

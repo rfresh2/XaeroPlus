@@ -65,16 +65,25 @@ jobs:
 #    - name: Create version identifier file
 #      run: echo ${{ github.run_number }} > version.txt
 
-    - name: Generate changelog
-      id: changelog
-      uses: metcalfc/changelog-generator@v4.1.0
-      with:
-        myToken: ${{ secrets.GITHUB_TOKEN }}
+      # todo: uncomment after we have a release
+      #    - name: Get Previous Release Number
+      #      env:
+      #        THIS_RUN_NUMBER: ${{ github.run_number }}
+      #      run: |
+      #        echo ::set-env name=PREV_RUN_NUMBER::$(($THIS_RUN_NUMBER - 1))
+      #
+      #    - name: Generate changelog
+      #      id: changelog
+      #      uses: metcalfc/changelog-generator@v4.1.0
+      #      with:
+      #        myToken: ${{ secrets.GITHUB_TOKEN }}
+      #        base-ref: ${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ PREV_RUN_NUMBER }}
 
     - name: Release
       uses: Kir-Antipov/mc-publish@v3.3
       with:
-        changelog: ${{steps.changelog.outputs.changelog}}
+        # todo: uncomment after we have a release
+        #        changelog: ${{steps.changelog.outputs.changelog}}
         curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
         curseforge-id: 866084
 
@@ -85,6 +94,7 @@ jobs:
         github-files: |
           XaeroPlus-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar
           XaeroPlus-modpack-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}.zip
+        github-tag: ${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}
 
         files: |
           XaeroPlus-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar

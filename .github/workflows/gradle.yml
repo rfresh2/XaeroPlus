@@ -59,9 +59,16 @@ jobs:
 #    - name: Create version identifier file
 #      run: echo ${{ github.run_number }} > version.txt
 
+    - name: Generate changelog
+      id: changelog
+      uses: metcalfc/changelog-generator@v4.1.0
+      with:
+        myToken: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Release
       uses: Kir-Antipov/mc-publish@v3.3
       with:
+        changelog: ${{steps.changelog.outputs.changelog}}
         curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
         curseforge-id: 866084
 

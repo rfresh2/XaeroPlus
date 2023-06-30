@@ -51,6 +51,7 @@ dependencies {
 	modImplementation "maven.modrinth:xaeros-world-map:1.30.6_Fabric_1.20"
 	modImplementation "maven.modrinth:xaeros-minimap:23.5.0_Fabric_1.20"
 	modImplementation "maven.modrinth:open-parties-and-claims:fabric-1.20-0.17.5"
+	modImplementation "maven.modrinth:forge-config-api-port:v8.0.0-1.20.1-Fabric"
 }
 
 processResources {

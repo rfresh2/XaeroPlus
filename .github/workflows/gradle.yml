@@ -63,7 +63,7 @@ jobs:
       env:
         THIS_RUN_NUMBER: ${{ github.run_number }}
       run: |
-        echo ::set-env name=PREV_RUN_NUMBER::$(($THIS_RUN_NUMBER - 1))
+        echo "PREV_RUN_NUMBER=$(($THIS_RUN_NUMBER - 1))" >> "$GITHUB_ENV"
 
     - name: Generate changelog
       id: changelog

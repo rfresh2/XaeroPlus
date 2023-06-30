@@ -42,8 +42,8 @@ public class MixinMinimapRenderer {
             final XaeroMinimapSession minimapSession, final MinimapProcessor minimap, final int x, final int y, final int width, final int height, final ScaledResolution scaledRes, final int size, final float partial, final CallbackInfo ci
     ) {
         if (this.minimapInterface.usingFBO() && Shared.shouldResetFBO) {
-            ((CustomMinimapFBORenderer) this.minimapInterface.getMinimapFBORenderer()).reloadMapFrameBuffers();
             Shared.minimapScalingFactor = (int) XaeroPlusSettingRegistry.minimapScaling.getValue();
+            ((CustomMinimapFBORenderer) this.minimapInterface.getMinimapFBORenderer()).reloadMapFrameBuffers();
             Shared.shouldResetFBO = false;
         }
     }

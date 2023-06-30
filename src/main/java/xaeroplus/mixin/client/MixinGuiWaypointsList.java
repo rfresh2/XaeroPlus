@@ -12,7 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.IXaeroMinimap;
 import xaero.common.gui.GuiWaypoints;
 import xaero.common.minimap.waypoints.Waypoint;
-import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.minimap.waypoints.WaypointsManager;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
@@ -40,10 +39,10 @@ public abstract class MixinGuiWaypointsList {
     public ArrayList<Waypoint> getSearchFilteredWaypointList() {
         ArrayList<Waypoint> filteredWaypoints = new ArrayList<>();
         try {
-            final Field displayedWorldField = thisGuiWaypoints.getClass().getDeclaredField("displayedWorld");
-            displayedWorldField.setAccessible(true);
-            final WaypointWorld displayedWorldValue = (WaypointWorld) displayedWorldField.get(thisGuiWaypoints);
-            for(Waypoint w : displayedWorldValue.getCurrentSet().getList()) {
+            final Field waypointsSortedField = thisGuiWaypoints.getClass().getDeclaredField("waypointsSorted");
+            waypointsSortedField.setAccessible(true);
+            final ArrayList<Waypoint> waypointsSorted = (ArrayList<Waypoint>) waypointsSortedField.get(thisGuiWaypoints);
+            for(Waypoint w : waypointsSorted) {
                 if (w.getName().toLowerCase().contains(Shared.waypointsSearchFilter.toLowerCase())) {
                     filteredWaypoints.add(w);
                 }

@@ -70,6 +70,7 @@ minecraft {
     // These can be tweaked, removed, or duplicated as needed.
     runs {
         client {
+            args '--uuid', '572e683c-888a-4a0d-bc10-5d9cfa76d892', '--accessToken', '0'
             workingDirectory project.file('run')
 
             property 'fml.coreMods.load', 'xaeroplus.mixin.MixinLoaderForge,xaeroplus.dev.minimap.core.XaeroMinimapPlugin,xaeroplus.dev.worldmap.core.XaeroWorldMapPlugin'

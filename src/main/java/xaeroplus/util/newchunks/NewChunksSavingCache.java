@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static net.minecraft.world.World.*;
-import static xaeroplus.util.ChunkUtils.getMCDimension;
+import static xaeroplus.util.ChunkUtils.getActualDimension;
 import static xaeroplus.util.GuiMapHelper.*;
 
 public class NewChunksSavingCache implements NewChunksCache {
@@ -68,7 +68,7 @@ public class NewChunksSavingCache implements NewChunksCache {
                         .call(() -> {
                             reset();
                             initializeWorld();
-                            loadChunksInCurrentDimension();
+                            loadChunksInActualDimension();
                             return null;
                         }, Shared.cacheRefreshExecutorService);
     }
@@ -98,8 +98,8 @@ public class NewChunksSavingCache implements NewChunksCache {
             getCacheForDimension(mapDimension).ifPresent(c -> c.setWindow(mapCenterX, mapCenterZ, mapSize));
             getCachesExceptDimension(mapDimension).forEach(cache -> cache.setWindow(0, 0, 0));
         } else {
+            getCacheForDimension(getCurrentlyViewedDimension()).ifPresent(c -> c.setWindow(ChunkUtils.getPlayerRegionX(), ChunkUtils.getPlayerRegionZ(), defaultRegionWindowSize));
             getCachesExceptDimension(getCurrentlyViewedDimension()).forEach(cache -> cache.setWindow(0, 0, 0));
-            getCacheForCurrentDimension().ifPresent(c -> c.setWindow(ChunkUtils.currentPlayerRegionX(), ChunkUtils.currentPlayerRegionZ(), defaultRegionWindowSize));
         }
     }
 
@@ -146,7 +146,7 @@ public class NewChunksSavingCache implements NewChunksCache {
     }
 
     public Optional<NewChunksSavingCacheDimensionHandler> getCacheForCurrentDimension() {
-        RegistryKey<World> mcDimension = getMCDimension();
+        RegistryKey<World> mcDimension = getActualDimension();
         if (mcDimension.equals(NETHER)) {
             return netherCache;
         } else if (mcDimension.equals(OVERWORLD)) {
@@ -154,7 +154,7 @@ public class NewChunksSavingCache implements NewChunksCache {
         } else if (mcDimension.equals(END)) {
             return endCache;
         }
-        throw new RuntimeException("Unknown dimension: " + getMCDimension());
+        throw new RuntimeException("Unknown dimension: " + getActualDimension());
     }
 
     public Optional<NewChunksSavingCacheDimensionHandler> getCacheForDimension(final RegistryKey<World> dimension) {
@@ -191,7 +191,7 @@ public class NewChunksSavingCache implements NewChunksCache {
             final String worldId = XaeroWorldMapCore.currentSession.getMapProcessor().getCurrentWorldId();
             final String mwId = XaeroWorldMapCore.currentSession.getMapProcessor().getCurrentMWId();
             if (worldId == null || mwId == null) return;
-            final RegistryKey<World> dimension = getMCDimension();
+            final RegistryKey<World> dimension = getActualDimension();
             if (dimension != OVERWORLD && dimension != NETHER && dimension != END) {
                 XaeroPlus.LOGGER.error("Unexpected dimension ID: " + dimension + ". Disable Save/Load NewChunks to Disk to restore functionality.");
                 return;
@@ -205,15 +205,15 @@ public class NewChunksSavingCache implements NewChunksCache {
             this.endCache = Optional.of(new NewChunksSavingCacheDimensionHandler(1, db));
             this.worldCacheInitialized = true;
             NewChunksV1Converter.convert(this, worldId, mwId);
-            loadChunksInCurrentDimension();
+            loadChunksInActualDimension();
         } catch (final Exception e) {
             // expected on game launch
         }
     }
 
-    private void loadChunksInCurrentDimension() {
+    private void loadChunksInActualDimension() {
         getCacheForCurrentDimension()
                 .ifPresent(c ->
-                        c.setWindow(ChunkUtils.currentPlayerRegionX(), ChunkUtils.currentPlayerRegionZ(), defaultRegionWindowSize));
+                        c.setWindow(ChunkUtils.actualPlayerRegionX(), ChunkUtils.actualPlayerRegionZ(), defaultRegionWindowSize));
     }
 }

@@ -37,26 +37,112 @@ public class ChunkUtils {
     public static int longToChunkZ(final long l) {
         return (int)(l >> 32 & 4294967295L);
     }
-    public static int currentPlayerChunkX() {
+    public static Callable<List<HighlightAtChunkPos>> loadHighlightChunksAtRegion(
+            final int leafRegionX, final int leafRegionZ, final int level,
+            final Function<Long, Boolean> highlightChunkPosFunction) {
+        return () -> {
+            final List<HighlightAtChunkPos> chunks = new ArrayList<>();
+            final int mx = leafRegionX + level;
+            final int mz = leafRegionZ + level;
+            for (int regX = leafRegionX; regX < mx; ++regX) {
+                for (int regZ = leafRegionZ; regZ < mz; ++regZ) {
+                    for (int cx = 0; cx < 8; cx++) {
+                        for (int cz = 0; cz < 8; cz++) {
+                            final int mapTileChunkX = (regX << 3) + cx;
+                            final int mapTileChunkZ = (regZ << 3) + cz;
+                            for (int t = 0; t < 16; ++t) {
+                                final int chunkPosX = (mapTileChunkX << 2) + t % 4;
+                                final int chunkPosZ = (mapTileChunkZ << 2) + (t >> 2);
+                                if (highlightChunkPosFunction.apply(ChunkUtils.chunkPosToLong(chunkPosX, chunkPosZ))) {
+                                    chunks.add(new HighlightAtChunkPos(chunkPosX, chunkPosZ));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return chunks;
+        };
+    }
+
+    /** Player position util functions **/
+
+    public static double getPlayerX() {
+        try {
+            MinecraftClient mc = MinecraftClient.getInstance();
+            RegistryKey<World> dim = mc.world.getRegistryKey();
+            // when player is in the nether or the custom dimension is the nether, perform coordinate translation
+            if ((dim == NETHER || Shared.customDimensionId == NETHER) && dim != Shared.customDimensionId) {
+                if (Shared.customDimensionId == OVERWORLD) {
+                    return mc.player.getX() * 8.0;
+                } else if (Shared.customDimensionId == NETHER && dim == OVERWORLD) {
+                    return mc.player.getX() / 8.0;
+                }
+            }
+            return mc.player.getX();
+        } catch (final Exception e) {
+            return 0;
+        }
+    }
+    public static double getPlayerZ() {
+        try {
+            MinecraftClient mc = MinecraftClient.getInstance();
+            RegistryKey<World> dim = mc.world.getRegistryKey();
+            // when player is in the nether or the custom dimension is the nether, perform coordinate translation
+            if ((dim == NETHER || Shared.customDimensionId == NETHER) && dim != Shared.customDimensionId) {
+                if (Shared.customDimensionId == OVERWORLD) {
+                    return mc.player.getZ() * 8.0;
+                } else if (Shared.customDimensionId == NETHER && dim == OVERWORLD) {
+                    return mc.player.getZ() / 8.0;
+                }
+            }
+            return mc.player.getZ();
+        } catch (final Exception e) {
+            return 0;
+        }
+    }
+    public static int actualPlayerChunkX() {
         try {
             return MinecraftClient.getInstance().player.getChunkPos().x;
         } catch (final NullPointerException e) {
             return 0;
         }
     }
-    public static int currentPlayerChunkZ() {
+    public static int getPlayerChunkX() {
+        return coordToChunkCoord(getPlayerX());
+    }
+    public static int actualPlayerChunkZ() {
         try {
             return MinecraftClient.getInstance().player.getChunkPos().z;
         } catch (final NullPointerException e) {
             return 0;
         }
     }
-    public static int currentPlayerRegionX() {
-        return currentPlayerChunkX() >> 5;
+    public static int getPlayerChunkZ() {
+        return coordToChunkCoord(getPlayerZ());
     }
-    public static int currentPlayerRegionZ() {
-        return currentPlayerChunkZ() >> 5;
+    public static int actualPlayerRegionX() {
+        return actualPlayerChunkX() >> 5;
     }
+    public static int getPlayerRegionX() {
+        return getPlayerChunkX() >> 5;
+    }
+    public static int actualPlayerRegionZ() {
+        return actualPlayerChunkZ() >> 5;
+    }
+    public static int getPlayerRegionZ() {
+        return getPlayerChunkZ() >> 5;
+    }
+    public static RegistryKey<World> getActualDimension() {
+        try {
+            return MinecraftClient.getInstance().world.getRegistryKey();
+        } catch (final Exception e) {
+            return OVERWORLD;
+        }
+    }
+
+    /** MC Coordinate conversion functions **/
+
     public static int coordToChunkCoord(final double coord) {
         return ((int)coord) >> 4;
     }
@@ -164,69 +250,5 @@ public class ChunkUtils {
     }
     public static int chunkCoordToMapTileCoordLocal(final int chunkCoord) {
         return chunkCoordToMapTileCoord(chunkCoord) & 3;
-    }
-
-    public static RegistryKey<World> getMCDimension() {
-        try {
-            return MinecraftClient.getInstance().world.getRegistryKey();
-        } catch (final Exception e) {
-            return OVERWORLD;
-        }
-    }
-
-    public static Callable<List<HighlightAtChunkPos>> loadHighlightChunksAtRegion(
-            final int leafRegionX, final int leafRegionZ, final int level,
-            final Function<Long, Boolean> highlightChunkPosFunction) {
-        return () -> {
-            final List<HighlightAtChunkPos> chunks = new ArrayList<>();
-            final int mx = leafRegionX + level;
-            final int mz = leafRegionZ + level;
-            for (int regX = leafRegionX; regX < mx; ++regX) {
-                for (int regZ = leafRegionZ; regZ < mz; ++regZ) {
-                    for (int cx = 0; cx < 8; cx++) {
-                        for (int cz = 0; cz < 8; cz++) {
-                            final int mapTileChunkX = (regX << 3) + cx;
-                            final int mapTileChunkZ = (regZ << 3) + cz;
-                            for (int t = 0; t < 16; ++t) {
-                                final int chunkPosX = (mapTileChunkX << 2) + t % 4;
-                                final int chunkPosZ = (mapTileChunkZ << 2) + (t >> 2);
-                                if (highlightChunkPosFunction.apply(ChunkUtils.chunkPosToLong(chunkPosX, chunkPosZ))) {
-                                    chunks.add(new HighlightAtChunkPos(chunkPosX, chunkPosZ));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            return chunks;
-        };
-    }
-
-    public static double getPlayerX() {
-        RegistryKey<World> dim = MinecraftClient.getInstance().world.getRegistryKey();
-        // when player is in the nether or the custom dimension is the nether, perform coordinate translation
-        if ((dim == NETHER || Shared.customDimensionId == NETHER) && dim != Shared.customDimensionId) {
-            if (Shared.customDimensionId == OVERWORLD) {
-                return MinecraftClient.getInstance().player.getX() * 8.0;
-            } else if (Shared.customDimensionId == NETHER && dim == OVERWORLD) {
-                return MinecraftClient.getInstance().player.getX() / 8.0;
-            }
-        }
-
-        return MinecraftClient.getInstance().player.getX();
-    }
-
-    public static double getPlayerZ() {
-        RegistryKey<World> dim = MinecraftClient.getInstance().world.getRegistryKey();
-        // when player is in the nether or the custom dimension is the nether, perform coordinate translation
-        if ((dim == NETHER || Shared.customDimensionId == NETHER) && dim != Shared.customDimensionId) {
-            if (Shared.customDimensionId == OVERWORLD) {
-                return MinecraftClient.getInstance().player.getZ() * 8.0;
-            } else if (Shared.customDimensionId == NETHER && dim == OVERWORLD) {
-                return MinecraftClient.getInstance().player.getZ() / 8.0;
-            }
-        }
-
-        return MinecraftClient.getInstance().player.getZ();
     }
 }

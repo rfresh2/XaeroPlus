@@ -31,7 +31,7 @@ import xaeroplus.util.newchunks.NewChunksSavingCache;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static xaeroplus.util.ChunkUtils.getMCDimension;
+import static xaeroplus.util.ChunkUtils.getActualDimension;
 import static xaeroplus.util.ColorHelper.getColor;
 
 @Module.ModuleInfo()
@@ -103,7 +103,7 @@ public class NewChunks extends Module {
 
             ChunkPos pos = new ChunkPos(packet.getX(), packet.getZ());
 
-            if (!newChunksCache.isNewChunk(pos.x, pos.z, getMCDimension()) && mc.world.getChunkManager().getChunk(packet.getX(), packet.getZ()) == null) {
+            if (!newChunksCache.isNewChunk(pos.x, pos.z, getActualDimension()) && mc.world.getChunkManager().getChunk(packet.getX(), packet.getZ()) == null) {
                 WorldChunk chunk = new WorldChunk(mc.world, pos);
                 try {
                     chunk.loadFromPacket(packet.getChunkData().getSectionsDataBuf(), new NbtCompound(), packet.getChunkData().getBlockEntities(packet.getX(), packet.getZ()));

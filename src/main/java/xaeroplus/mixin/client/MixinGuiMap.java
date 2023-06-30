@@ -354,31 +354,11 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     }
 
     public double getPlayerX() {
-        int dim = mc.world.provider.getDimension();
-        // when player is in the nether or the custom dimension is the nether, perform coordinate translation
-        if ((dim == -1 || Shared.customDimensionId == -1) && dim != Shared.customDimensionId) {
-            if (Shared.customDimensionId == 0) {
-                return mc.player.posX * 8.0;
-            } else if (Shared.customDimensionId == -1 && dim == 0) {
-                return mc.player.posX / 8.0;
-            }
-        }
-
-        return player.posX;
+        return ChunkUtils.getPlayerX();
     }
 
     public double getPlayerZ() {
-        int dim = mc.world.provider.getDimension();
-        // when player is in the nether or the custom dimension is the nether, perform coordinate translation
-        if ((dim == -1 || Shared.customDimensionId == -1) && dim != Shared.customDimensionId) {
-            if (Shared.customDimensionId == 0) {
-                return mc.player.posZ * 8.0;
-            } else if (Shared.customDimensionId == -1 && dim == 0) {
-                return mc.player.posZ / 8.0;
-            }
-        }
-
-        return player.posZ;
+        return ChunkUtils.getPlayerX();
     }
 
     @Inject(method = "drawScreen(IIF)V", at = @At(value = "HEAD"), remap = true, cancellable = true)

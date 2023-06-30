@@ -12,7 +12,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
-import static xaeroplus.util.ChunkUtils.getMCDimension;
+import static xaeroplus.util.ChunkUtils.getActualDimension;
 
 public class NewChunksLocalCache extends NewChunksBaseCacheHandler implements NewChunksCache {
     private final Long2LongOpenHashMap chunks = new Long2LongOpenHashMap();
@@ -50,13 +50,13 @@ public class NewChunksLocalCache extends NewChunksBaseCacheHandler implements Ne
     @Override
     public boolean isNewChunk(final int chunkPosX, final int chunkPosZ, final int dimensionId) {
         // local cache doesn't support cross-dimensional lookups
-        if (dimensionId != getMCDimension()) return false;
+        if (dimensionId != getActualDimension()) return false;
         return super.isNewChunk(chunkPosX, chunkPosZ);
     }
 
     @Override
     public List<HighlightAtChunkPos> getNewChunksInRegion(final int leafRegionX, final int leafRegionZ, final int level, final int dimension) {
-        if (dimension != getMCDimension()) return Collections.emptyList();
+        if (dimension != getActualDimension()) return Collections.emptyList();
         return super.getNewChunksInRegion(leafRegionX, leafRegionZ, level);
     }
 

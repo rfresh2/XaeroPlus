@@ -66,7 +66,7 @@ public class PortalSkipDetection extends Module {
                         final int mapSize = getGuiMapRegionSize(guiMap);
                         setWindow(mapCenterX, mapCenterZ, mapSize);
                     } else {
-                        setWindow(ChunkUtils.currentPlayerRegionX(), ChunkUtils.currentPlayerRegionZ(), defaultRegionWindowSize);
+                        setWindow(ChunkUtils.getPlayerRegionX(), ChunkUtils.getPlayerRegionZ(), defaultRegionWindowSize);
                     }
                 }
             }

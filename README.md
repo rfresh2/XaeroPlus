@@ -1,4 +1,5 @@
 # XaeroPlus
+<a href=https://modrinth.com/mod/xaeroplus ><img alt="Modrinth Downloads" src="https://img.shields.io/modrinth/dt/EnPUzSTg?style=for-the-badge&logo=modrinth&label=Modrinth&color=00AF5C"></a> <a href=https://legacy.curseforge.com/minecraft/mc-mods/xaeroplus ><img alt="CurseForge Downloads" src="https://cf.way2muchnoise.eu/866084.svg?badge_style=for_the_badge"></a>
 
 XaeroPlus is a Minecraft mod that depends on and modifies the Xaero's WorldMap and Minimap mods with extra
 features and performance improvements - particularly for use on anarchy servers like 2b2t.
@@ -94,4 +95,4 @@ Toggleable settings support keybinds through the standard Minecraft Controls GUI
 
 # Support
 
-Message me on Discord: `rfresh#2222`
+Message me on Discord: [`rfresh`](https://discord.com/users/177895753195192321)

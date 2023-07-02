@@ -357,7 +357,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     }
 
     public double getPlayerZ() {
-        return ChunkUtils.getPlayerX();
+        return ChunkUtils.getPlayerZ();
     }
 
     @Inject(method = "drawScreen(IIF)V", at = @At(value = "HEAD"), remap = true, cancellable = true)

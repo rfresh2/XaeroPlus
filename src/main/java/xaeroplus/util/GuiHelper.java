@@ -1,4 +1,4 @@
-package xaeroplus;
+package xaeroplus.util;
 
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -6,8 +6,6 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import xaero.map.gui.GuiMap;
 import xaero.map.region.MapTileChunk;
-import xaeroplus.util.ColorHelper;
-import xaeroplus.util.SeenChunksTrackingMapTileChunk;
 
 import java.util.ArrayList;
 import java.util.List;

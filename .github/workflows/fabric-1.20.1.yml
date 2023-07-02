@@ -71,18 +71,17 @@ jobs:
       run: |
         echo "PREV_RUN_NUMBER=$(($THIS_RUN_NUMBER - 1))" >> "$GITHUB_ENV"
 
-#    - name: Generate changelog
-#      id: changelog
-#      uses: metcalfc/changelog-generator@v4.1.0
-#      with:
-#        myToken: ${{ secrets.GITHUB_TOKEN }}
-#        base-ref: ${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ env.PREV_RUN_NUMBER }}
+    - name: Generate changelog
+      id: changelog
+      uses: metcalfc/changelog-generator@v4.1.0
+      with:
+        myToken: ${{ secrets.GITHUB_TOKEN }}
+        base-ref: ${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ env.PREV_RUN_NUMBER }}
 
     - name: Release
       uses: Kir-Antipov/mc-publish@v3.3
       with:
-        # todo: uncomment after we have a release
-        #        changelog: ${{steps.changelog.outputs.changelog}}
+        changelog: ${{steps.changelog.outputs.changelog}}
         curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
         curseforge-id: 866084
 

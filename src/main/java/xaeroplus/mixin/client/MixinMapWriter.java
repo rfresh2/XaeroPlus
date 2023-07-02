@@ -39,9 +39,8 @@ import xaero.map.misc.CachedFunction;
 import xaero.map.misc.Misc;
 import xaero.map.region.*;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.ChunkUtils;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
@@ -54,15 +53,15 @@ public abstract class MixinMapWriter {
     // insert our own limiter on new tiles being written but this one's keyed on the actual chunk
     // tile "writes" also include a lot of extra operations and lookups before any writing is actually done
     // when we remove existing limiters those extra operations add up to a lot of unnecessary cpu time
-    private final Cache<String, Instant> tileUpdateCache = Caffeine.newBuilder()
+    private final Cache<Long, Long> tileUpdateCache = Caffeine.newBuilder()
             // I would usually expect even second long expiration here to be fine
             // but there are some operations that make repeat invocations actually required
             // perhaps another time ill rewrite those. Or make the cache lock more aware of when we don't have any new updates to write/load
             // there's still alot of performance and efficiency on the table to regain
             // but i think this is a good middle ground for now
-            .maximumSize(1000)
+            .maximumSize(10000)
             .expireAfterWrite(5L, TimeUnit.SECONDS)
-            .<String, Instant>build();
+            .<Long, Long>build();
     public long writeFreeSinceLastWrite = -1L;
     @Shadow
     private int X;
@@ -720,17 +719,17 @@ public abstract class MixinMapWriter {
             final CallbackInfoReturnable<Boolean> cir) {
         if (!XaeroPlusSettingRegistry.fastMapSetting.getValue()) return;
 
-        final String cacheable = chunkX + " " + chunkZ;
-        final Instant cacheValue = tileUpdateCache.getIfPresent(cacheable);
+        final Long cacheable = ChunkUtils.chunkPosToLong(chunkX, chunkZ);
+        final Long cacheValue = tileUpdateCache.getIfPresent(cacheable);
         if (nonNull(cacheValue)) {
-            if (cacheValue.isBefore(Instant.now().minus(Duration.ofMillis((long) XaeroPlusSettingRegistry.mapWriterDelaySetting.getValue())))) {
-                tileUpdateCache.put(cacheable, Instant.now());
+            if (cacheValue < System.currentTimeMillis() - (long) XaeroPlusSettingRegistry.fastMapWriterDelaySetting.getValue()) {
+                tileUpdateCache.put(cacheable, System.currentTimeMillis());
             } else {
                 cir.setReturnValue(false);
                 cir.cancel();
             }
         } else {
-            tileUpdateCache.put(cacheable, Instant.now());
+            tileUpdateCache.put(cacheable, System.currentTimeMillis());
         }
     }
 

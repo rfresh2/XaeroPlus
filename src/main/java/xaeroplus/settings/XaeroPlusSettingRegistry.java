@@ -22,11 +22,11 @@ public final class XaeroPlusSettingRegistry {
     public static final XaeroPlusBooleanSetting fastMapSetting = XaeroPlusBooleanSetting.create("Fast Mapping",
                     "Increases mapping speed, might hurt FPS. Adjust rate limit and delay to regain FPS.",
             true, SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusFloatSetting mapWriterDelaySetting = XaeroPlusFloatSetting.create("Fast Mapping Delay",
-            10, 1000, 10,
-                    "Fast Mapping must be enabled. \n " +
-                            "This is roughly the delay in milliseconds between minimap update operations, both render and actual file writes.",
-            50, SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusFloatSetting fastMapWriterDelaySetting = XaeroPlusFloatSetting.create("Fast Mapping Delay",
+           10, 1000, 10,
+           "Fast Mapping must be enabled. \n " +
+            "This is roughly the delay in milliseconds between minimap update operations, both render and actual file writes.",
+           250, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting fastMapMaxTilesPerCycle = XaeroPlusFloatSetting.create("Fast Mapping Rate Limit",
             10, 120, 10,
             "Fast Mapping must be enabled. \n " +

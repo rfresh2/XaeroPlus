@@ -9,7 +9,7 @@
   "updateUrl": "",
   "authorList": ["rfresh"],
   "credits": "rfresh",
-  "logoFile": "",
+  "logoFile": "XaeroPlus.png",
   "screenshots": [],
   "requiredMods": ["xaerominimap", "xaeroworldmap"]
 }

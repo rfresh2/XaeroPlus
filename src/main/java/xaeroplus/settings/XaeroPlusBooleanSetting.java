@@ -65,5 +65,11 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
         this.settingChangeConsumer = settingChangeConsumer;
     }
 
+    @Override
+    public void init() {
+        if (nonNull(settingChangeConsumer)) {
+            settingChangeConsumer.accept(value);
+        }
+    }
 
 }

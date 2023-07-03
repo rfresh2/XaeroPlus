@@ -47,4 +47,5 @@ public abstract class XaeroPlusSetting {
     public void setKeyBinding(KeyBinding keyBinding) {
         this.keyBinding = keyBinding;
     }
+    public abstract void init();
 }

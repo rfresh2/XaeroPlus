@@ -82,5 +82,10 @@ public class XaeroPlusEnumSetting<T extends Enum<T>> extends XaeroPlusSetting {
     public T[] getEnumValues() {
         return enumValues;
     }
-
+    @Override
+    public void init() {
+        if (nonNull(settingChangeConsumer)) {
+            settingChangeConsumer.accept(value);
+        }
+    }
 }

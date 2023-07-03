@@ -154,7 +154,7 @@ public abstract class MixinMapWriter {
         if (!XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()) {
             return;
         }
-        if (!(state.getBlock() instanceof BlockAir) && !(state.getBlock() instanceof BlockGlass) && state.getBlock().getBlockLayer() != BlockRenderLayer.TRANSLUCENT) {
+        if (!(state.getBlock() instanceof BlockAir) && !(state.getBlock() instanceof BlockGlass) && state.getBlock().getRenderLayer() != BlockRenderLayer.TRANSLUCENT) {
             if (!(state.getBlock() instanceof BlockLiquid)) {
                 cir.setReturnValue(false);
             } else {
@@ -276,7 +276,7 @@ public abstract class MixinMapWriter {
                     }
                 } else if (!state.getMaterial().getCanBurn()
                         && !state.getMaterial().isReplaceable()
-                        && state.getMaterial().getMobilityFlag() != EnumPushReaction.DESTROY
+                        && state.getMaterial().getPushReaction() != EnumPushReaction.DESTROY
                         && !this.shouldOverlayCached(state)) {
                     underair = false;
                     shouldEnterGround = false;

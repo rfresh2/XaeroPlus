@@ -1,5 +1,6 @@
 package xaeroplus.mixin;
 
+import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import org.spongepowered.asm.launch.MixinBootstrap;
 import org.spongepowered.asm.mixin.MixinEnvironment;
@@ -14,6 +15,9 @@ public class MixinLoaderForge implements IFMLLoadingPlugin {
 
     public MixinLoaderForge() {
         MixinBootstrap.init();
+        if (FMLLaunchHandler.isDeobfuscatedEnvironment()) {
+            Mixins.addConfigurations("mixins.baritone.json");
+        }
         Mixins.addConfigurations("mixins.xaeroplus.json");
         MixinEnvironment.getDefaultEnvironment().setObfuscationContext("searge");
     }

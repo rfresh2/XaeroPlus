@@ -1,5 +1,7 @@
 package xaeroplus.mixin.client;
 
+import baritone.api.BaritoneAPI;
+import baritone.api.pathing.goals.GoalXZ;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -22,6 +24,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.misc.OptimizedMath;
 import xaero.map.MapProcessor;
@@ -37,6 +40,7 @@ import xaero.map.graphics.ImprovedFramebuffer;
 import xaero.map.graphics.MapRenderHelper;
 import xaero.map.gui.*;
 import xaero.map.gui.dropdown.rightclick.GuiRightClickMenu;
+import xaero.map.gui.dropdown.rightclick.RightClickOption;
 import xaero.map.misc.Misc;
 import xaero.map.mods.SupportMods;
 import xaero.map.mods.gui.Waypoint;
@@ -222,6 +226,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Shadow
     public static void restoreTextureStates() {}
+
+    @Shadow private int rightClickX;
+
+    @Shadow private int rightClickZ;
 
     /**
      * @author rfresh2
@@ -1550,7 +1558,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     } else if (noWorldMapEffect) {
                         this.renderMessageScreen(I18n.format("gui.xaero_no_world_map_message"));
                     } else if (!allowedBasedOnItem) {
-                        this.renderMessageScreen(I18n.format("gui.xaero_no_world_map_item_message"), ModSettings.mapItem.getUnlocalizedName());
+                        this.renderMessageScreen(I18n.format("gui.xaero_no_world_map_item_message"), ModSettings.mapItem.getTranslationKey());
                     }
                 }
 
@@ -1645,6 +1653,18 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 xTextEntryField.setVisible(false);
                 zTextEntryField.setVisible(false);
             }
+        }
+    }
+
+    @Inject(method = "getRightClickOptions", at = @At(value = "RETURN"), remap = false)
+    public void getRightClickOptionsInject(final CallbackInfoReturnable<ArrayList<RightClickOption>> cir) {
+        if (BaritoneHelper.isBaritonePresent()) {
+            cir.getReturnValue().add(new RightClickOption("Baritone Path Here", cir.getReturnValue().size(), this) {
+                @Override
+                public void onAction(GuiScreen screen) {
+                    BaritoneAPI.getProvider().getPrimaryBaritone().getCustomGoalProcess().setGoalAndPath(new GoalXZ(rightClickX, rightClickZ));
+                }
+            });
         }
     }
 

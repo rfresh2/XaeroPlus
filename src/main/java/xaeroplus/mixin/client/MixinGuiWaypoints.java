@@ -135,7 +135,7 @@ public class MixinGuiWaypoints extends ScreenBase {
         Entity renderViewEntity = Minecraft.getMinecraft().getRenderViewEntity();
         Vec3d cameraPos = isNull(renderViewEntity)
                 ? ActiveRenderInfo.getCameraPosition()
-                : ActiveRenderInfo.getCameraPosition().addVector(renderViewEntity.posX, renderViewEntity.posY, renderViewEntity.posZ);
+                : ActiveRenderInfo.getCameraPosition().add(renderViewEntity.posX, renderViewEntity.posY, renderViewEntity.posZ);
         Vec3d lookVector = isNull(renderViewEntity) ? new Vec3d(1.0, 0.0, 0.0) : renderViewEntity.getLookVec();
         if (Minecraft.getMinecraft().gameSettings.thirdPersonView == 2) {
             lookVector = lookVector.scale(-1.0);

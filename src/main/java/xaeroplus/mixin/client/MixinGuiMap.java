@@ -1659,7 +1659,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Inject(method = "getRightClickOptions", at = @At(value = "RETURN"), remap = false)
     public void getRightClickOptionsInject(final CallbackInfoReturnable<ArrayList<RightClickOption>> cir) {
         if (BaritoneHelper.isBaritonePresent()) {
-            cir.getReturnValue().add(new RightClickOption("Baritone Path Here", cir.getReturnValue().size(), this) {
+            final ArrayList<RightClickOption> options = cir.getReturnValue();
+            options.add(new RightClickOption("Baritone Goal Here", options.size(), this) {
+                @Override
+                public void onAction(GuiScreen screen) {
+                    BaritoneAPI.getProvider().getPrimaryBaritone().getCustomGoalProcess().setGoal(new GoalXZ(rightClickX, rightClickZ));
+                }
+            });
+            options.add(new RightClickOption("Baritone Path Here", options.size(), this) {
                 @Override
                 public void onAction(GuiScreen screen) {
                     BaritoneAPI.getProvider().getPrimaryBaritone().getCustomGoalProcess().setGoalAndPath(new GoalXZ(rightClickX, rightClickZ));

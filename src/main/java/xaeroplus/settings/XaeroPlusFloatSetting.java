@@ -91,4 +91,9 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
     public void setSettingChangeConsumer(final Consumer<Float> settingChangeConsumer) {
         this.settingChangeConsumer = settingChangeConsumer;
     }
+    public void init() {
+        if (nonNull(settingChangeConsumer)) {
+            settingChangeConsumer.accept(value);
+        }
+    }
 }

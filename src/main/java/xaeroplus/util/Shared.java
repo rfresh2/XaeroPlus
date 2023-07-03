@@ -9,7 +9,9 @@ import xaero.map.WorldMap;
 import xaero.map.WorldMapSession;
 import xaero.map.mods.SupportMods;
 import xaero.map.world.MapDimension;
+import xaeroplus.settings.XaeroPlusSetting;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -30,9 +32,9 @@ public class Shared {
     // Map gui follow mode
     public static boolean FOLLOW = false;
     // cache and only update this on new world loads
-    public static boolean nullOverworldDimensionFolder = XaeroPlusSettingRegistry.nullOverworldDimensionFolder.getValue();
-    public static XaeroPlusSettingRegistry.DataFolderResolutionMode dataFolderResolutionMode = XaeroPlusSettingRegistry.dataFolderResolutionMode.getValue();
-    public static int minimapScalingFactor = (int) XaeroPlusSettingRegistry.minimapScaling.getValue();
+    public static boolean nullOverworldDimensionFolder = false;
+    public static XaeroPlusSettingRegistry.DataFolderResolutionMode dataFolderResolutionMode = XaeroPlusSettingRegistry.DataFolderResolutionMode.IP;
+    public static int minimapScalingFactor = 1;
     public static boolean settingsLoadedInit = false;
     public static boolean shouldResetFBO = false;
     public static String LOCK_ID = UUID.randomUUID().toString();
@@ -46,6 +48,7 @@ public class Shared {
 
     public static void onSettingLoad() {
         if (!settingsLoadedInit) { // handle settings where we want them to take effect only on first load
+            XaeroPlusSettingsReflectionHax.ALL_SETTINGS.get().forEach(XaeroPlusSetting::init);
             nullOverworldDimensionFolder = XaeroPlusSettingRegistry.nullOverworldDimensionFolder.getValue();
             dataFolderResolutionMode = XaeroPlusSettingRegistry.dataFolderResolutionMode.getValue();
             minimapScalingFactor = (int) XaeroPlusSettingRegistry.minimapScaling.getValue();
@@ -53,7 +56,9 @@ public class Shared {
     }
 
     public static void switchToDimension(final int newDimId) {
-        MapProcessor mapProcessor = WorldMapSession.getCurrentSession().getMapProcessor();
+        WorldMapSession worldMapSession = WorldMapSession.getCurrentSession();
+        if (worldMapSession == null) return;
+        MapProcessor mapProcessor = worldMapSession.getMapProcessor();
         mapProcessor.getMapSaveLoad().setRegionDetectionComplete(false);
         MapDimension dimension = mapProcessor.getMapWorld().getDimension(newDimId);
         if (dimension == null) {

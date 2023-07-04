@@ -1,6 +1,7 @@
 package xaeroplus.settings;
 
 import xaeroplus.module.ModuleManager;
+import xaeroplus.module.impl.BaritoneGoalSync;
 import xaeroplus.module.impl.NewChunks;
 import xaeroplus.module.impl.PortalSkipDetection;
 import xaeroplus.util.ColorHelper;
@@ -32,6 +33,10 @@ public final class XaeroPlusSettingRegistry {
             "Fast Mapping must be enabled. \n " +
                     "Limits how many chunks can be written in a single cycle. Lower values improve FPS at high render distances.",
             50, SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting baritoneWaypointSyncSetting = XaeroPlusBooleanSetting.create("Baritone Goal Waypoint",
+             "Syncs Baritone goals as temporary waypoints.",
+             (b) -> ModuleManager.getModule(BaritoneGoalSync.class).setEnabled(b),
+             true, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting persistMapDimensionSwitchSetting = XaeroPlusBooleanSetting.create("Persist WM Dim Switch",
                     "If enabled, the dimension will not be switched back to current when the WorldMap GUI is closed.",
             false, SettingLocation.WORLD_MAP_MAIN);

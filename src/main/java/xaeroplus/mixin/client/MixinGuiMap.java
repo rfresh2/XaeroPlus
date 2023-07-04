@@ -1,5 +1,7 @@
 package xaeroplus.mixin.client;
 
+import baritone.api.BaritoneAPI;
+import baritone.api.pathing.goals.GoalXZ;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
@@ -48,6 +50,7 @@ import xaero.map.graphics.renderer.multitexture.MultiTextureRenderTypeRendererPr
 import xaero.map.graphics.shader.MapShaders;
 import xaero.map.gui.*;
 import xaero.map.gui.dropdown.rightclick.GuiRightClickMenu;
+import xaero.map.gui.dropdown.rightclick.RightClickOption;
 import xaero.map.misc.Misc;
 import xaero.map.misc.OptimizedMath;
 import xaero.map.mods.SupportMods;
@@ -1914,6 +1917,25 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 onGotoCoordinatesButton(null);
                 cir.setReturnValue(true);
             }
+        }
+    }
+
+    @Inject(method = "getRightClickOptions", at = @At(value = "RETURN"), remap = false)
+    public void getRightClickOptionsInject(final CallbackInfoReturnable<ArrayList<RightClickOption>> cir) {
+        if (BaritoneHelper.isBaritonePresent()) {
+            final ArrayList<RightClickOption> options = cir.getReturnValue();
+            options.add(new RightClickOption("Baritone Goal Here", options.size(), this) {
+                @Override
+                public void onAction(Screen screen) {
+                    BaritoneAPI.getProvider().getPrimaryBaritone().getCustomGoalProcess().setGoal(new GoalXZ(rightClickX, rightClickZ));
+                }
+            });
+            options.add(new RightClickOption("Baritone Path Here", options.size(), this) {
+                @Override
+                public void onAction(Screen screen) {
+                    BaritoneAPI.getProvider().getPrimaryBaritone().getCustomGoalProcess().setGoalAndPath(new GoalXZ(rightClickX, rightClickZ));
+                }
+            });
         }
     }
 

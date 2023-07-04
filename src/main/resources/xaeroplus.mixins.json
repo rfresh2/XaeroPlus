@@ -48,7 +48,7 @@
     "MixinWorldMapModOptionsAccessor",
     "MixinWorldMapModSettings",
     "mc.MixinClientConnection",
-    "mc.MixinGameRenderer",
-    "mc.MixinMinecraftClient"
+    "mc.MixinMinecraftClient",
+    "mc.MixinWorldRenderer"
   ]
 }

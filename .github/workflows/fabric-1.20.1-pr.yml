@@ -1,0 +1,37 @@
+name: Fabric-1.20.1 PR Build
+
+on:
+  pull_request:
+    branches:
+      - "fabric-1.20.1"
+env:
+  MINECRAFT_VERSION: "1.20.1"
+  MOD_LOADER: "Fabric"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Elevate wrapper permissions
+        run: chmod +x ./gradlew
+
+      - name: Build mod
+        run: ./gradlew build
+
+      - name: Rename built mod
+        run: mv build/libs/xaeroplus-${{ env.MINECRAFT_VERSION }}.jar XaeroPlus-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.event.pull_request.head.sha }}.jar
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.event.pull_request.head.sha }}
+          path: XaeroPlus-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.event.pull_request.head.sha }}.jar

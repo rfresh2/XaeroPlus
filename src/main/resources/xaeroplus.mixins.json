@@ -18,6 +18,7 @@
     "MixinGuiUpdateAll",
     "MixinGuiWaypoints",
     "MixinGuiWaypointsAccessor",
+    "MixinGuiWaypointSettings",
     "MixinGuiWaypointsList",
     "MixinGuiWorldMapSettings",
     "MixinLeveledRegion",
@@ -47,6 +48,7 @@
     "MixinWorldMapModOptionsAccessor",
     "MixinWorldMapModSettings",
     "mc.MixinClientConnection",
+    "mc.MixinGameRenderer",
     "mc.MixinMinecraftClient"
   ]
 }

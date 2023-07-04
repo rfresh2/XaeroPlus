@@ -179,4 +179,7 @@ public final class XaeroPlusSettingRegistry {
     public static final XaeroPlusBooleanSetting fixMainEntityDot = XaeroPlusBooleanSetting.create("Fix Main Entity Dot",
             "Fixes the main entity dot rendering on the radar when arrow is rendered.",
             true, SettingLocation.MINIMAP_ENTITY_RADAR);
+    public static final XaeroPlusBooleanSetting waypointBeacons = XaeroPlusBooleanSetting.create("Waypoint Beacons",
+            "Render waypoint beacons in game.",
+            true, SettingLocation.WAYPOINTS);
 }

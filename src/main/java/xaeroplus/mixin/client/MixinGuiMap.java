@@ -60,6 +60,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
 import static org.lwjgl.opengl.GL11.GL_LINE_LOOP;
 import static xaero.map.gui.GuiMap.*;
@@ -1660,18 +1661,20 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     public void getRightClickOptionsInject(final CallbackInfoReturnable<ArrayList<RightClickOption>> cir) {
         if (BaritoneHelper.isBaritonePresent()) {
             final ArrayList<RightClickOption> options = cir.getReturnValue();
-            options.add(new RightClickOption("Baritone Goal Here", options.size(), this) {
-                @Override
-                public void onAction(GuiScreen screen) {
-                    BaritoneAPI.getProvider().getPrimaryBaritone().getCustomGoalProcess().setGoal(new GoalXZ(rightClickX, rightClickZ));
-                }
-            });
-            options.add(new RightClickOption("Baritone Path Here", options.size(), this) {
-                @Override
-                public void onAction(GuiScreen screen) {
-                    BaritoneAPI.getProvider().getPrimaryBaritone().getCustomGoalProcess().setGoalAndPath(new GoalXZ(rightClickX, rightClickZ));
-                }
-            });
+            options.addAll(3, asList(
+                    new RightClickOption("Baritone Goal Here", options.size(), this) {
+                        @Override
+                        public void onAction(GuiScreen screen) {
+                            BaritoneAPI.getProvider().getPrimaryBaritone().getCustomGoalProcess().setGoal(new GoalXZ(rightClickX, rightClickZ));
+                        }
+                    },
+                    new RightClickOption("Baritone Path Here", options.size(), this) {
+                        @Override
+                        public void onAction(GuiScreen screen) {
+                            BaritoneAPI.getProvider().getPrimaryBaritone().getCustomGoalProcess().setGoalAndPath(new GoalXZ(rightClickX, rightClickZ));
+                        }
+                    }
+            ));
         }
     }
 

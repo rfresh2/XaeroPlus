@@ -117,11 +117,10 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
         }
         EntityRenderDispatcher entityRenderDispatcher = mc.getEntityRenderDispatcher();
         double viewX = entityRenderDispatcher.camera.getPos().getX();
-        double viewY = entityRenderDispatcher.camera.getPos().getY();
         double viewZ = entityRenderDispatcher.camera.getPos().getZ();
         final double x = waypointVec.x - viewX;
         final double z = waypointVec.z - viewZ;
-        final double y = -viewY;
+        final double y = -100;
         final int color = ModSettings.COLORS[waypoint.getColor()];
         VertexConsumerProvider.Immediate entityVertexConsumers = mc.getBufferBuilders().getEntityVertexConsumers();
         final long time = mc.world.getTime();

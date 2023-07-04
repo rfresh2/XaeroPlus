@@ -107,7 +107,8 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
         final Vec3d playerVec = renderManager.renderViewEntity.getPositionVector();
         Vec3d waypointVec = new Vec3d(waypoint.getX(), waypoint.getY(), waypoint.getZ());
         double actualDistance = playerVec.distanceTo(waypointVec);
-        double maxRenderDistance = Math.min(mc.gameSettings.renderDistanceChunks << 4, 512);
+        final int farScale = (int) XaeroPlusSettingRegistry.waypointBeaconScaleMin.getValue();
+        double maxRenderDistance = Math.min(mc.gameSettings.renderDistanceChunks << 4, farScale == 0 ? Integer.MAX_VALUE : farScale << 4);
         if (actualDistance > maxRenderDistance) {
             final Vec3d delta = waypointVec.subtract(playerVec).normalize();
             waypointVec = playerVec.add(new Vec3d(delta.x * maxRenderDistance, delta.y * maxRenderDistance, delta.z * maxRenderDistance));

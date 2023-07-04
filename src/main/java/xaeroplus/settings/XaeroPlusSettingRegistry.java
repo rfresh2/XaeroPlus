@@ -183,4 +183,10 @@ public final class XaeroPlusSettingRegistry {
     public static final XaeroPlusBooleanSetting waypointBeacons = XaeroPlusBooleanSetting.create("Waypoint Beacons",
             "Render waypoint beacons in game.",
             true, SettingLocation.WAYPOINTS);
+    public static final XaeroPlusFloatSetting waypointBeaconScaleMin = XaeroPlusFloatSetting.create("Waypoint Beacon Scale Min",
+            0f, 30f, 1f,
+            "Sets the minimum scale of the waypoint beacon when it is far away."
+            + " \\n This value is the number of chunks away from the player the beacon is rendered at."
+            + " \\n 0 = auto-match the player's render distance",
+            0f, SettingLocation.WAYPOINTS);
 }

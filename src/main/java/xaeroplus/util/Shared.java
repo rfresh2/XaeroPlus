@@ -50,9 +50,8 @@ public class Shared {
             Math.max(1, Math.min(Runtime.getRuntime().availableProcessors() / 2, 4)));
     public static final Identifier xpGuiTextures = new Identifier("xaeroplus", "gui/xpgui.png");
 
-    public static void onSettingLoad() {
+    public static void onAllSettingsDoneLoading() {
         if (!settingsLoadedInit) { // handle settings where we want them to take effect only on first load
-            XaeroPlusSettingRegistry.fastMapSetting.getValue(); // force load all settings if they haven't been already
             XaeroPlusSettingsReflectionHax.ALL_SETTINGS.get().forEach(XaeroPlusSetting::init);
             nullOverworldDimensionFolder = XaeroPlusSettingRegistry.nullOverworldDimensionFolder.getValue();
             dataFolderResolutionMode = XaeroPlusSettingRegistry.dataFolderResolutionMode.getValue();

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class XaeroPlusModSettingsHooks {
+    private static int loadCount = 0;
 
     public static void saveSettings(File configFile, List<XaeroPlusSetting> settings) throws IOException {
         try (PrintWriter writer = new PrintWriter(new FileWriter(configFile, true))) {
@@ -25,6 +26,7 @@ public class XaeroPlusModSettingsHooks {
     }
 
     public static void loadSettings(File file, List<XaeroPlusSetting> settings) throws IOException {
+        loadCount++;
         try(BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String s;
             while ((s = reader.readLine()) != null) {
@@ -44,7 +46,8 @@ public class XaeroPlusModSettingsHooks {
                 }
             }
         }
-        Shared.onSettingLoad();
+        // 1 for minimap, 1 for worldmap
+        if (loadCount == 2) Shared.onAllSettingsDoneLoading();
     }
 
     public static void getClientBooleanValue(String enumString, List<XaeroPlusSetting> settings, CallbackInfoReturnable<Boolean> cir) {

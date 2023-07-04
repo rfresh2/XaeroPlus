@@ -48,6 +48,7 @@ public class Shared {
 
     public static void onSettingLoad() {
         if (!settingsLoadedInit) { // handle settings where we want them to take effect only on first load
+            XaeroPlusSettingRegistry.fastMapSetting.getValue(); // force settings to load if they haven't been already
             XaeroPlusSettingsReflectionHax.ALL_SETTINGS.get().forEach(XaeroPlusSetting::init);
             nullOverworldDimensionFolder = XaeroPlusSettingRegistry.nullOverworldDimensionFolder.getValue();
             dataFolderResolutionMode = XaeroPlusSettingRegistry.dataFolderResolutionMode.getValue();

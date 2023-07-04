@@ -17,6 +17,7 @@
     "MixinGuiSettingsWorldMap",
     "MixinGuiUpdateAll",
     "MixinGuiWaypoints",
+    "MixinGuiWaypointSettings",
     "MixinGuiWaypointsList",
     "MixinGuiWorldMapSettings",
     "MixinLeveledRegion",

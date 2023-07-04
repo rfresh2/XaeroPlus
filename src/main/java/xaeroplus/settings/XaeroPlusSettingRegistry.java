@@ -180,4 +180,7 @@ public final class XaeroPlusSettingRegistry {
             1000000f, 10000000f, 100000f,
             "Experimental. The max number of queued lighting updates. Might prevent crashes on low memory systems when loading many chunks at fast rates",
             1000000f, SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting waypointBeacons = XaeroPlusBooleanSetting.create("Waypoint Beacons",
+            "Render waypoint beacons in game.",
+            true, SettingLocation.WAYPOINTS);
 }

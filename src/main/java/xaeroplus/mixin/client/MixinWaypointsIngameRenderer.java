@@ -103,27 +103,28 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
     }
 
     public void renderWaypointBeacon(final Waypoint waypoint, float tickDelta, MatrixStack matrixStack) {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        final MinecraftClient mc = MinecraftClient.getInstance();
         if (mc.world == null || mc.player == null) return;
-        Vec3d playerVec = mc.player.getPos();
-        Vec3d waypointVec = new Vec3d(waypoint.getX(), waypoint.getY(), waypoint.getZ());
-        double actualDistance = playerVec.distanceTo(waypointVec);
+        final Vec3d playerVec = mc.player.getPos();
+        Vec3d waypointVec = new Vec3d(waypoint.getX(), playerVec.y, waypoint.getZ());
+        final double xzDistance = playerVec.distanceTo(waypointVec);
+        if (xzDistance < (int) XaeroPlusSettingRegistry.waypointBeaconDistanceMin.getValue()) return;
         final int farScale = (int) XaeroPlusSettingRegistry.waypointBeaconScaleMin.getValue();
-        double maxRenderDistance = Math.min(mc.options.getViewDistance().getValue() << 4, farScale == 0 ? Integer.MAX_VALUE : farScale << 4);
-        if (actualDistance > maxRenderDistance) {
+        final double maxRenderDistance = Math.min(mc.options.getViewDistance().getValue() << 4, farScale == 0 ? Integer.MAX_VALUE : farScale << 4);
+        if (xzDistance > maxRenderDistance) {
             final Vec3d delta = waypointVec.subtract(playerVec).normalize();
             waypointVec = playerVec.add(new Vec3d(delta.x * maxRenderDistance, delta.y * maxRenderDistance, delta.z * maxRenderDistance));
         }
-        EntityRenderDispatcher entityRenderDispatcher = mc.getEntityRenderDispatcher();
-        Camera camera = entityRenderDispatcher.camera;
+        final EntityRenderDispatcher entityRenderDispatcher = mc.getEntityRenderDispatcher();
+        final Camera camera = entityRenderDispatcher.camera;
         if (camera == null) return;
-        double viewX = camera.getPos().getX();
-        double viewZ = camera.getPos().getZ();
+        final double viewX = camera.getPos().getX();
+        final double viewZ = camera.getPos().getZ();
         final double x = waypointVec.x - viewX;
         final double z = waypointVec.z - viewZ;
         final double y = -100;
         final int color = ModSettings.COLORS[waypoint.getColor()];
-        VertexConsumerProvider.Immediate entityVertexConsumers = mc.getBufferBuilders().getEntityVertexConsumers();
+        final VertexConsumerProvider.Immediate entityVertexConsumers = mc.getBufferBuilders().getEntityVertexConsumers();
         final long time = mc.world.getTime();
         matrixStack.push();
         matrixStack.translate(x, y, z);

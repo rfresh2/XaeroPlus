@@ -23,6 +23,7 @@ import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.minimap.waypoints.render.WaypointFilterParams;
 import xaero.common.minimap.waypoints.render.WaypointsIngameRenderer;
 import xaero.common.settings.ModSettings;
+import xaeroplus.settings.XaeroPlusFloatSetting;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ColorHelper;
 import xaeroplus.util.CustomWaypointsIngameRenderer;
@@ -111,6 +112,10 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
         double actualDistance = playerVec.distanceTo(waypointVec);
         final int farScale = (int) XaeroPlusSettingRegistry.waypointBeaconScaleMin.getValue();
         double maxRenderDistance = Math.min(mc.gameSettings.renderDistanceChunks << 4, farScale == 0 ? Integer.MAX_VALUE : farScale << 4);
+        final float minDist = XaeroPlusSettingRegistry.wayPointBeaconDistanceMin.getValue();
+        if (actualDistance < minDist) {
+            return;
+        }
         if (actualDistance > maxRenderDistance) {
             final Vec3d delta = waypointVec.subtract(playerVec).normalize();
             waypointVec = playerVec.add(new Vec3d(delta.x * maxRenderDistance, delta.y * maxRenderDistance, delta.z * maxRenderDistance));

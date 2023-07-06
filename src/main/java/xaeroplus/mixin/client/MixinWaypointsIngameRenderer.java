@@ -104,7 +104,9 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
     public void renderWaypointBeacon(final Waypoint waypoint, float partialTicks) {
         final Minecraft mc = Minecraft.getMinecraft();
         final RenderManager renderManager = mc.getRenderManager();
-        final Vec3d playerVec = renderManager.renderViewEntity.getPositionVector();
+        Entity renderViewEntity = renderManager.renderViewEntity;
+        if (renderViewEntity == null) return;
+        final Vec3d playerVec = renderViewEntity.getPositionVector();
         Vec3d waypointVec = new Vec3d(waypoint.getX(), waypoint.getY(), waypoint.getZ());
         double actualDistance = playerVec.distanceTo(waypointVec);
         final int farScale = (int) XaeroPlusSettingRegistry.waypointBeaconScaleMin.getValue();

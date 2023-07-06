@@ -2,10 +2,7 @@ package xaeroplus.mixin.client;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.*;
 import net.minecraft.client.render.block.entity.BeaconBlockEntityRenderer;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
@@ -107,6 +104,7 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
 
     public void renderWaypointBeacon(final Waypoint waypoint, float tickDelta, MatrixStack matrixStack) {
         MinecraftClient mc = MinecraftClient.getInstance();
+        if (mc.world == null || mc.player == null) return;
         Vec3d playerVec = mc.player.getPos();
         Vec3d waypointVec = new Vec3d(waypoint.getX(), waypoint.getY(), waypoint.getZ());
         double actualDistance = playerVec.distanceTo(waypointVec);
@@ -117,8 +115,10 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
             waypointVec = playerVec.add(new Vec3d(delta.x * maxRenderDistance, delta.y * maxRenderDistance, delta.z * maxRenderDistance));
         }
         EntityRenderDispatcher entityRenderDispatcher = mc.getEntityRenderDispatcher();
-        double viewX = entityRenderDispatcher.camera.getPos().getX();
-        double viewZ = entityRenderDispatcher.camera.getPos().getZ();
+        Camera camera = entityRenderDispatcher.camera;
+        if (camera == null) return;
+        double viewX = camera.getPos().getX();
+        double viewZ = camera.getPos().getZ();
         final double x = waypointVec.x - viewX;
         final double z = waypointVec.z - viewZ;
         final double y = -100;

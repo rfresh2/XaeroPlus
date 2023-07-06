@@ -9,6 +9,14 @@ public class ColorHelper {
         return ((a & 255) << 24) | (colorInt & 0x00FFFFFF);
     }
 
+    public static float[] getColorRGBA(final int colorInt) {
+        return new float[] {
+                ((colorInt >> 16) & 255) / 255.0f,
+                ((colorInt >> 8) & 255) / 255.0f,
+                (colorInt & 255) / 255.0f,
+                ((colorInt >> 24) & 255) / 255.0f };
+    }
+
     public static int getColorAlpha(final int colorInt) {
         return (colorInt >> 24) & 255;
     }

@@ -29,20 +29,32 @@ public class XaeroPlusSettingsReflectionHax {
     public static final List<XaeroPlusSetting> XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS = new ArrayList<>();
     public static final List<XaeroPlusSetting> XAERO_PLUS_MINIMAP_ENTITY_RADAR_SETTINGS = new ArrayList<>();
     public static final List<XaeroPlusSetting> XAERO_PLUS_MINIMAP_SETTINGS = new ArrayList<>();
+    public static final List<XaeroPlusSetting> XAERO_PLUS_WAYPOINTS_SETTINGS = new ArrayList<>();
     public static final Supplier<List<XaeroPlusSetting>> ALL_MINIMAP_SETTINGS = () ->
             Stream.of(XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS.stream(),
                             XAERO_PLUS_MINIMAP_SETTINGS.stream(),
-                            XAERO_PLUS_MINIMAP_ENTITY_RADAR_SETTINGS.stream())
+                            XAERO_PLUS_MINIMAP_ENTITY_RADAR_SETTINGS.stream(),
+                            XAERO_PLUS_WAYPOINTS_SETTINGS.stream())
             .flatMap(x -> x)
             .collect(Collectors.toList());
     public static final List<XaeroPlusSetting> XAERO_PLUS_KEYBIND_SETTINGS = new ArrayList<>();
+    public static final Supplier<List<XaeroPlusSetting>> ALL_SETTINGS = () ->
+            Stream.of(XAERO_PLUS_WORLDMAP_SETTINGS.stream(),
+                            XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS.stream(),
+                            XAERO_PLUS_MINIMAP_ENTITY_RADAR_SETTINGS.stream(),
+                            XAERO_PLUS_MINIMAP_SETTINGS.stream(),
+                            XAERO_PLUS_KEYBIND_SETTINGS.stream(),
+                            XAERO_PLUS_WAYPOINTS_SETTINGS.stream())
+            .flatMap(x -> x)
+            .collect(Collectors.toList());
 
     public enum SettingLocation {
         WORLD_MAP_MAIN(XAERO_PLUS_WORLDMAP_SETTINGS),
         MINIMAP_OVERLAYS(XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS),
         MINIMAP(XAERO_PLUS_MINIMAP_SETTINGS),
         KEYBINDS(XAERO_PLUS_KEYBIND_SETTINGS),
-        MINIMAP_ENTITY_RADAR(XAERO_PLUS_MINIMAP_ENTITY_RADAR_SETTINGS);
+        MINIMAP_ENTITY_RADAR(XAERO_PLUS_MINIMAP_ENTITY_RADAR_SETTINGS),
+        WAYPOINTS(XAERO_PLUS_WAYPOINTS_SETTINGS);
 
         private final List<XaeroPlusSetting> settingsList;
 
@@ -60,7 +72,8 @@ public class XaeroPlusSettingsReflectionHax {
                             XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS.stream(),
                             XAERO_PLUS_MINIMAP_ENTITY_RADAR_SETTINGS.stream(),
                             XAERO_PLUS_MINIMAP_SETTINGS.stream(),
-                            XAERO_PLUS_KEYBIND_SETTINGS.stream())
+                            XAERO_PLUS_KEYBIND_SETTINGS.stream(),
+                            XAERO_PLUS_WAYPOINTS_SETTINGS.stream())
                     .flatMap(x -> x)
                     .filter(setting -> setting instanceof XaeroPlusBooleanSetting)
                     .map(XaeroPlusSetting::getKeyBinding)
@@ -71,6 +84,7 @@ public class XaeroPlusSettingsReflectionHax {
     private static List<xaero.common.settings.ModOptions> MINIMAP_OVERLAY_MOD_OPTIONS_LIST = null;
     private static List<xaero.common.settings.ModOptions> MINIMAP_MOD_OPTIONS_LIST = null;
     private static List<xaero.common.settings.ModOptions> MINIMAP_ENTITY_RADAR_MOD_OPTIONS_LIST = null;
+    private static List<xaero.common.settings.ModOptions> WAYPOINTS_MOD_OPTIONS_LIST = null;
 
     private static int enumOrdinal = 69; // needs to not overlap with existing enum indeces
 
@@ -119,6 +133,15 @@ public class XaeroPlusSettingsReflectionHax {
             MINIMAP_MOD_OPTIONS_LIST = constructXaeroPlusSettings(xaero.common.settings.ModOptions.class, ModType.MINIMAP, XAERO_PLUS_MINIMAP_SETTINGS);
         }
         return MINIMAP_MOD_OPTIONS_LIST.stream()
+                .map(xaero.common.gui.ConfigSettingEntry::new)
+                .collect(Collectors.toList());
+    }
+
+    public static List<xaero.common.gui.ConfigSettingEntry> getWaypointSettingEntries() {
+        if (WAYPOINTS_MOD_OPTIONS_LIST == null) {
+            WAYPOINTS_MOD_OPTIONS_LIST = constructXaeroPlusSettings(xaero.common.settings.ModOptions.class, ModType.MINIMAP, XAERO_PLUS_WAYPOINTS_SETTINGS);
+        }
+        return WAYPOINTS_MOD_OPTIONS_LIST.stream()
                 .map(xaero.common.gui.ConfigSettingEntry::new)
                 .collect(Collectors.toList());
     }

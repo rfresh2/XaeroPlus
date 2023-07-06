@@ -8,7 +8,9 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventBus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import xaeroplus.event.ForgeEventHandler;
 import xaeroplus.module.ModuleManager;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.Shared;
 
 @Mod(
@@ -23,7 +25,7 @@ public class XaeroPlus {
     public static final String VERSION = "1.12.2";
     public static EventBus EVENT_BUS = MinecraftForge.EVENT_BUS;
     public static Logger LOGGER = LogManager.getLogger("XaeroPlus");
-    private static boolean a = Shared.settingsLoadedInit; // needed to load static shared classes on init
+    private static final ForgeEventHandler forgeEventHandler = new ForgeEventHandler();
 
     @Mod.Instance
     public static XaeroPlus INSTANCE;
@@ -31,10 +33,14 @@ public class XaeroPlus {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         ModuleManager.init();
+        boolean settingsLoadedInit = Shared.settingsLoadedInit;// force static instances to init
+        XaeroPlusSettingRegistry.fastMapSetting.getValue(); // force static instances to init
     }
 
     @Mod.EventHandler
-    public void init(FMLInitializationEvent event) { }
+    public void init(FMLInitializationEvent event) {
+        EVENT_BUS.register(forgeEventHandler);
+    }
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {

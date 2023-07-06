@@ -48,6 +48,7 @@ repositories {
         name = "jitpack.io"
         url = "https://jitpack.io"
     }
+    maven { url = 'https://impactdevelopment.github.io/maven/' }
     jcenter()
     mavenCentral()
     mavenLocal()
@@ -60,7 +61,7 @@ minecraft {
     // stable_#            Stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'snapshot', version: '20171003-1.12'
+    mappings channel: 'stable', version: '39-1.12'
 
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
@@ -70,7 +71,7 @@ minecraft {
     // These can be tweaked, removed, or duplicated as needed.
     runs {
         client {
-            args '--uuid', '572e683c-888a-4a0d-bc10-5d9cfa76d892', '--accessToken', '0'
+//            args '--uuid', '572e683c-888a-4a0d-bc10-5d9cfa76d892', '--accessToken', '0'
             workingDirectory project.file('run')
 
             property 'fml.coreMods.load', 'xaeroplus.mixin.MixinLoaderForge,xaeroplus.dev.minimap.core.XaeroMinimapPlugin,xaeroplus.dev.worldmap.core.XaeroWorldMapPlugin'
@@ -117,6 +118,7 @@ dependencies {
 
     implementation(fg.deobf("maven.modrinth:xaeros-world-map:1.30.5_Forge_1.12"))
     implementation(fg.deobf("maven.modrinth:xaeros-minimap:23.5.0_Forge_1.12"))
+    implementation(fg.deobf('cabaletta:baritone-deobf-unoptimized-mcp-dev:1.2')).setChanging(true)
 
     annotationProcessor('org.spongepowered:mixin:0.8.5:processor') {
         exclude module: 'gson'

@@ -1,6 +1,7 @@
 package xaeroplus.settings;
 
 import xaeroplus.module.ModuleManager;
+import xaeroplus.module.impl.BaritoneGoalSync;
 import xaeroplus.module.impl.NewChunks;
 import xaeroplus.module.impl.PortalSkipDetection;
 import xaeroplus.util.ColorHelper;
@@ -32,6 +33,10 @@ public final class XaeroPlusSettingRegistry {
                     "Fast Mapping must be enabled. \\n " +
                     "Limits how many chunks can be written in a single cycle. Lower values improve FPS at high render distances.",
             50, SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting baritoneWaypointSyncSetting = XaeroPlusBooleanSetting.create("Baritone Goal Waypoint",
+            "Syncs Baritone goals as temporary waypoints.",
+             (b) -> ModuleManager.getModule(BaritoneGoalSync.class).setEnabled(b),
+        true, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting persistMapDimensionSwitchSetting = XaeroPlusBooleanSetting.create("Persist WM Dim Switch",
                     "If enabled, the dimension will not be switched back to current when the WorldMap GUI is closed.",
             false, SettingLocation.WORLD_MAP_MAIN);
@@ -175,4 +180,13 @@ public final class XaeroPlusSettingRegistry {
             1000000f, 10000000f, 100000f,
             "Experimental. The max number of queued lighting updates. Might prevent crashes on low memory systems when loading many chunks at fast rates",
             1000000f, SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting waypointBeacons = XaeroPlusBooleanSetting.create("Waypoint Beacons",
+            "Render waypoint beacons in game.",
+            true, SettingLocation.WAYPOINTS);
+    public static final XaeroPlusFloatSetting waypointBeaconScaleMin = XaeroPlusFloatSetting.create("Waypoint Beacon Scale Min",
+            0f, 30f, 1f,
+            "Sets the minimum scale of the waypoint beacon when it is far away."
+            + " \\n This value is the number of chunks away from the player the beacon is rendered at."
+            + " \\n 0 = auto-match the player's render distance",
+            0f, SettingLocation.WAYPOINTS);
 }

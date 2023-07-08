@@ -1,6 +1,5 @@
 package xaeroplus.mixin.client;
 
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.option.KeyBinding;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,6 +22,5 @@ public abstract class MixinControlsRegister {
     public void init(CallbackInfo ci) {
         List<KeyBinding> keybinds = XaeroPlusSettingsReflectionHax.getKeybinds();
         this.keybindings.addAll(keybinds);
-        keybinds.forEach(KeyBindingHelper::registerKeyBinding);
     }
 }

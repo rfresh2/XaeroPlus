@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.gui.GuiWaypoints;
 import xaero.common.gui.MySmallButton;
 import xaero.common.gui.ScreenBase;
@@ -49,7 +49,7 @@ public class MixinGuiWaypoints extends ScreenBase {
     private TextFieldWidget searchField;
     private MySmallButton toggleAllButton;
 
-    protected MixinGuiWaypoints(final AXaeroMinimap modMain, final Screen parent, final Screen escape, final Text titleIn) {
+    protected MixinGuiWaypoints(final IXaeroMinimap modMain, final Screen parent, final Screen escape, final Text titleIn) {
         super(modMain, parent, escape, titleIn);
     }
 

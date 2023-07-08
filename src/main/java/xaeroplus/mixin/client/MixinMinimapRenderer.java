@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.graphics.CustomVertexConsumers;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
@@ -37,7 +37,7 @@ public class MixinMinimapRenderer {
     @Shadow
     protected MinimapInterface minimapInterface;
     @Shadow
-    protected AXaeroMinimap modMain;
+    protected IXaeroMinimap modMain;
 
     @Inject(method = "renderMinimap", at = @At("HEAD"))
     public void renderMinimap(
@@ -72,7 +72,7 @@ public class MixinMinimapRenderer {
         return getPlayerZ();
     }
 
-    @Redirect(method = "renderMinimap", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/element/render/over/MinimapElementOverMapRendererHandler;render(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/player/PlayerEntity;DDDDDDZFLnet/minecraft/client/gl/Framebuffer;Lxaero/common/AXaeroMinimap;Lxaero/common/minimap/render/MinimapRendererHelper;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/font/TextRenderer;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;IIIIZF)V"), remap = true)
+    @Redirect(method = "renderMinimap", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/element/render/over/MinimapElementOverMapRendererHandler;render(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/player/PlayerEntity;DDDDDDZFLnet/minecraft/client/gl/Framebuffer;Lxaero/common/IXaeroMinimap;Lxaero/common/minimap/render/MinimapRendererHelper;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/font/TextRenderer;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;IIIIZF)V"), remap = true)
     public void editOvermapRender(final MinimapElementOverMapRendererHandler instance,
                                     final DrawContext guiGraphics,
                                     final Entity renderEntity,
@@ -86,7 +86,7 @@ public class MixinMinimapRenderer {
                                     final boolean cave,
                                     final float partialTicks,
                                     final Framebuffer framebuffer,
-                                    final AXaeroMinimap modMain,
+                                    final IXaeroMinimap modMain,
                                     final MinimapRendererHelper helper,
                                     final VertexConsumerProvider.Immediate renderTypeBuffers,
                                     final TextRenderer font,

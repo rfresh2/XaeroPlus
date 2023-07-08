@@ -13,7 +13,7 @@ import org.lwjgl.opengl.GL14;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.effect.Effects;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRenderer;
@@ -52,7 +52,7 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
     @Shadow
     public int compatibilityVersion;
     @Shadow
-    private AXaeroMinimap modMain;
+    private IXaeroMinimap modMain;
     @Shadow
     private int destinationCaving;
     @Shadow

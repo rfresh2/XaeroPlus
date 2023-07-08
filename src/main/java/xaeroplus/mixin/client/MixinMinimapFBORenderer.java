@@ -16,7 +16,7 @@ import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.effect.Effects;
@@ -69,7 +69,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
     @Shadow
     private boolean loadedFBO;
 
-    public MixinMinimapFBORenderer(final AXaeroMinimap modMain, final MinecraftClient mc, final WaypointsGuiRenderer waypointsGuiRenderer, final MinimapInterface minimapInterface, final CompassRenderer compassRenderer) {
+    public MixinMinimapFBORenderer(final IXaeroMinimap modMain, final MinecraftClient mc, final WaypointsGuiRenderer waypointsGuiRenderer, final MinimapInterface minimapInterface, final CompassRenderer compassRenderer) {
         super(modMain, mc, waypointsGuiRenderer, minimapInterface, compassRenderer);
     }
 

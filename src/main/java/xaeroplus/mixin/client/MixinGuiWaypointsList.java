@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.graphics.CustomRenderTypes;
 import xaero.common.gui.GuiWaypoints;
 import xaero.common.minimap.waypoints.Waypoint;
@@ -30,14 +30,14 @@ import java.util.ArrayList;
 @Mixin(targets = "xaero.common.gui.GuiWaypoints$List", remap = false)
 public abstract class MixinGuiWaypointsList {
     private GuiWaypoints thisGuiWaypoints;
-    private AXaeroMinimap modMain;
+    private IXaeroMinimap modMain;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     public void init(final GuiWaypoints this$0, final CallbackInfo ci) throws NoSuchFieldException, IllegalAccessException {
         thisGuiWaypoints = this$0;
         final Field modMainField = thisGuiWaypoints.getClass().getSuperclass().getDeclaredField("modMain");
         modMainField.setAccessible(true);
-        this.modMain = (AXaeroMinimap) modMainField.get(thisGuiWaypoints);
+        this.modMain = (IXaeroMinimap) modMainField.get(thisGuiWaypoints);
     }
 
     /**

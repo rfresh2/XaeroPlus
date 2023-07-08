@@ -1,28 +1,23 @@
 package xaeroplus.module;
 
-import xaeroplus.XaeroPlus;
-import xaeroplus.util.ClassUtil;
+import xaeroplus.module.impl.BaritoneGoalSync;
+import xaeroplus.module.impl.NewChunks;
+import xaeroplus.module.impl.PortalSkipDetection;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
-import static java.util.Objects.isNull;
+import static java.util.Arrays.asList;
 
 public class ModuleManager {
-    private static final String modulePackage = "xaeroplus.module.impl";
     private static final LinkedHashMap<Class<? extends Module>, Module> modulesClassMap = new LinkedHashMap<>();
 
     public static void init() {
-        for (final Class<?> clazz : ClassUtil.findClassesInPath(modulePackage)) {
-            if (isNull(clazz)) continue;
-            if (Module.class.isAssignableFrom(clazz)) {
-                try {
-                    final Module module = (Module) clazz.newInstance();
-                    addModule(module);
-                } catch (InstantiationException | IllegalAccessException e) {
-                    XaeroPlus.LOGGER.warn("Error initializing module class", e);
-                }
-            }
-        }
+        asList(
+                new BaritoneGoalSync(),
+                new NewChunks(),
+                new PortalSkipDetection())
+                .forEach(ModuleManager::addModule);
     }
 
     private static void addModule(Module module) {

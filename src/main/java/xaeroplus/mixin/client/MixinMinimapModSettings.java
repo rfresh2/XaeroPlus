@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.settings.ModOptions;
 import xaero.common.settings.ModSettings;
 import xaeroplus.settings.XaeroPlusModSettingsHooks;
@@ -25,7 +25,7 @@ public class MixinMinimapModSettings {
     public int caveMaps;
 
     @Shadow
-    protected AXaeroMinimap modMain;
+    protected IXaeroMinimap modMain;
 
     @Inject(method = "<init>", at = @At(value = "RETURN"))
     private void init(CallbackInfo ci) {

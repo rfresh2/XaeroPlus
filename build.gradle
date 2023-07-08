@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.2-SNAPSHOT'
+	id 'dev.architectury.loom' version '1.2-SNAPSHOT'
 	id 'maven-publish'
 	id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
@@ -29,38 +29,33 @@ repositories {
 	mavenLocal()
 }
 
+loom {
+	forge {
+		mixinConfigs = ["xaeroplus.mixins.json"]
+	}
+}
+
 configurations {
 	jarLibs
-	implementation.extendsFrom jarLibs
+	shadow.extendsFrom jarLibs
 }
 
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	forge "net.minecraftforge:forge:${project.forge_version}"
 
-	jarLibs 'com.github.ben-manes.caffeine:caffeine:3.1.6'
+	jarLibs "com.github.ben-manes.caffeine:caffeine:3.1.6"
 	jarLibs "com.github.collarmc:pounce:0e8492b68e"
-	jarLibs 'org.apache.commons:commons-compress:1.21'
-	jarLibs 'org.xerial:sqlite-jdbc:3.42.0.0'
+	jarLibs "org.apache.commons:commons-compress:1.21"
+	jarLibs "org.xerial:sqlite-jdbc:3.42.0.0"
 
-	modImplementation "maven.modrinth:xaeros-world-map:1.30.6_Fabric_1.20"
-	modImplementation "maven.modrinth:xaeros-minimap:23.5.0_Fabric_1.20"
-	modImplementation "maven.modrinth:open-parties-and-claims:fabric-1.20-0.17.5"
-	modImplementation "maven.modrinth:forge-config-api-port:v8.0.0-1.20.1-Fabric"
-	modImplementation files("libs/baritone-api-fabric-1.10.1.jar")
-}
-
-processResources {
-	inputs.property "version", project.version
-
-	filesMatching("fabric.mod.json") {
-		expand "version": project.version
-	}
+	modImplementation "maven.modrinth:xaeros-world-map:1.30.6_Forge_1.20"
+	modImplementation "maven.modrinth:xaeros-minimap:23.5.0_Forge_1.20"
+	modImplementation "maven.modrinth:open-parties-and-claims:forge-1.20-0.17.5"
+	modImplementation files("libs/baritone-api-forge-1.10.1.jar")
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -84,7 +79,7 @@ jar {
 }
 
 shadowJar {
-	configurations = [project.configurations.jarLibs]
+	configurations = [project.configurations.shadow]
 	archiveClassifier.set('shadow')
 
 	exclude 'com/google/**'
@@ -102,6 +97,10 @@ shadowJar {
 	exclude 'org/sqlite/native/Windows/armv7/**'
 	exclude 'org/sqlite/native/Windows/aarch64/**'
 	exclude 'org/sqlite/native/Windows/armv7/**'
+	exclude "fabric.mod.json"
+	relocate "com.collarmc.pounce", "xaeroplus.com.collarmc.pounce.shadow"
+	relocate "com.github.benmanes.caffeine", "xaeroplus.com.github.benmanes.caffeine.shadow"
+	relocate "org.apache.commons.compress", "xaeroplus.org.apache.commons.compress.shadow"
 }
 
 remapJar {

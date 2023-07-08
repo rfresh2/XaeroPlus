@@ -43,7 +43,6 @@
     "MixinWorldDataHandler",
     "MixinWorldDataReader",
     "MixinWorldMapModSettings",
-    "mc.MixinNetworkManager",
-    "mc.MixinRenderGlobal"
+    "mc.MixinNetworkManager"
   ]
 }

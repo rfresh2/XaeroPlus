@@ -176,13 +176,6 @@ public final class XaeroPlusSettingRegistry {
     public static final XaeroPlusBooleanSetting fixMainEntityDot = XaeroPlusBooleanSetting.create("Fix Main Entity Dot",
             "Fixes the main entity dot rendering on the radar when arrow is rendered.",
             true, SettingLocation.MINIMAP_ENTITY_RADAR);
-    public static final XaeroPlusBooleanSetting mcLightingLimiter = XaeroPlusBooleanSetting.create("MC Light Limiter",
-            "Experimental. Limits the amount of queued light updates. Might prevent crashes on low memory systems when loading many chunks at fast rates",
-            false, SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusFloatSetting mcLightingLimiterLimit = XaeroPlusFloatSetting.create("MC Light Crash Limit Num",
-            1000000f, 10000000f, 100000f,
-            "Experimental. The max number of queued lighting updates. Might prevent crashes on low memory systems when loading many chunks at fast rates",
-            1000000f, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting waypointBeacons = XaeroPlusBooleanSetting.create("Waypoint Beacons",
             "Render waypoint beacons in game.",
             true, SettingLocation.WAYPOINTS);

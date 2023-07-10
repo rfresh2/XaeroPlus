@@ -100,7 +100,7 @@ configurations {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2860'
+    minecraft 'net.minecraftforge:forge:1.20.1-47.1.0'
 
     jarLibs('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
         exclude module: 'commons-io'

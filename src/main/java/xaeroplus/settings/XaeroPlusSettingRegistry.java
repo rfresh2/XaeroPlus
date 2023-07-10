@@ -4,10 +4,8 @@ import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.BaritoneGoalSync;
 import xaeroplus.module.impl.NewChunks;
 import xaeroplus.module.impl.PortalSkipDetection;
-import xaeroplus.util.BaritoneHelper;
-import xaeroplus.util.ColorHelper;
-import xaeroplus.util.Shared;
-import xaeroplus.util.WDLHelper;
+import xaeroplus.module.impl.WaystoneSync;
+import xaeroplus.util.*;
 
 import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.SettingLocation;
 import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.markChunksDirtyInWriteDistance;
@@ -48,6 +46,16 @@ public final class XaeroPlusSettingRegistry {
             BaritoneHelper::isBaritonePresent,
             (b) -> {
                 if (BaritoneHelper.isBaritonePresent()) ModuleManager.getModule(BaritoneGoalSync.class).setEnabled(b);
+            },
+            true,
+            SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting waystonesWaypointSyncSetting = XaeroPlusBooleanSetting.create(
+            "Waystones Waypoint Sync",
+            "setting.world_map.waystones_sync",
+            "setting.world_map.waystones_sync.tooltip",
+            WaystonesHelper::isWaystonesPresent,
+            (b) -> {
+                if (WaystonesHelper.isWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setEnabled(b);
             },
             true,
             SettingLocation.WORLD_MAP_MAIN);

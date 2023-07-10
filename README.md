@@ -11,6 +11,10 @@ features and performance improvements - particularly for use on anarchy servers 
 </p>
 </details>
 
+# Discord Server
+
+https://discord.gg/nJZrSaRKtb
+
 # Download
 
 Available on:
@@ -97,7 +101,3 @@ Toggleable settings support keybinds through the standard Minecraft Controls GUI
 * Xaero World
   Merger: [JMToXaero/Region-Scripts](https://github.com/Entropy5/JMtoXaero/blob/Region-Scripts/src/main/java/com/github/entropy5/XaeroRegionMerger.java)
   * Can be used to merge 256k WDL into an existing world. With optional darkening only on tiles from 256K
-
-# Support
-
-Message me on Discord: [`rfresh`](https://discord.com/users/177895753195192321)

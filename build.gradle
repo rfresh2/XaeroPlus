@@ -115,7 +115,7 @@ dependencies {
     jarLibs 'org.xerial:sqlite-jdbc:3.42.0.0'
 
     implementation(fg.deobf("maven.modrinth:xaeros-world-map:1.30.5_Forge_1.12"))
-    implementation(fg.deobf("maven.modrinth:xaeros-minimap:23.5.0_Forge_1.12"))
+    implementation(fg.deobf("maven.modrinth:xaeros-minimap:23.5.0_Forge_1.20"))
     implementation(fg.deobf('cabaletta:baritone-deobf-unoptimized-mcp-dev:1.2')).setChanging(true)
 
     annotationProcessor('org.spongepowered:mixin:0.8.5:processor') {

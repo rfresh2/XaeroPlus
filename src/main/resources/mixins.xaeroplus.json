@@ -6,6 +6,7 @@
   "client": [
     "MixinBlockStateColorTypeCache",
     "MixinBranchLeveledRegion",
+    "MixinCommonGuiSettings",
     "MixinCommonModSettings",
     "MixinControlsHandler",
     "MixinControlsRegister",
@@ -42,6 +43,7 @@
     "MixinWidgetScreenHandlerAccessor",
     "MixinWorldDataHandler",
     "MixinWorldDataReader",
+    "MixinWorldMapGuiSettings",
     "MixinWorldMapModSettings",
     "mc.MixinNetworkManager"
   ]

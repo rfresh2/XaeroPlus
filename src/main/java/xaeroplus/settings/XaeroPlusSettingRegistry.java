@@ -36,6 +36,7 @@ public final class XaeroPlusSettingRegistry {
             50, SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting baritoneWaypointSyncSetting = XaeroPlusBooleanSetting.create("Baritone Goal Waypoint",
             "Syncs Baritone goals as temporary waypoints.",
+             BaritoneHelper::isBaritonePresent,
              (b) -> {
                 if (BaritoneHelper.isBaritonePresent()) ModuleManager.getModule(BaritoneGoalSync.class).setEnabled(b);
              },
@@ -99,16 +100,22 @@ public final class XaeroPlusSettingRegistry {
                     "This is the delay in ticks between Portal Skip Detection search operations.",
             (b) -> ModuleManager.getModule(PortalSkipDetection.class).setSearchDelayTicks(b),
             10, SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusBooleanSetting wdlEnabledSetting = XaeroPlusBooleanSetting.create("WDL Highlight",
+    public static final XaeroPlusBooleanSetting wdlEnabledSetting = XaeroPlusBooleanSetting.create(
+            "WDL Highlight",
             "Highlights chunks WDL mod has downloaded on the Minimap and WorldMap.",
+            WDLHelper::isWdlPresent,
             false, SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusFloatSetting wdlAlphaSetting = XaeroPlusFloatSetting.create("WDL Opacity",
+    public static final XaeroPlusFloatSetting wdlAlphaSetting = XaeroPlusFloatSetting.create(
+            "WDL Opacity",
             10f, 255f, 10f,
             "Changes the color opacity of WDL chunks.",
+            WDLHelper::isWdlPresent,
             WDLHelper::setAlpha,
             100, SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> wdlColorSetting = XaeroPlusEnumSetting.create("WDL Color",
+    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> wdlColorSetting = XaeroPlusEnumSetting.create(
+            "WDL Color",
             "Changes the color of WDL chunks.",
+            WDLHelper::isWdlPresent,
             (b) -> WDLHelper.setRgbColor(b.getColor()),
             ColorHelper.HighlightColor.values(),
             ColorHelper.HighlightColor.GREEN, SettingLocation.WORLD_MAP_MAIN);

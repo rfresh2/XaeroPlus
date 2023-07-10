@@ -7,6 +7,7 @@
   },
   "client": [
     "MixinBranchLeveledRegion",
+    "MixinCommonGuiSettings",
     "MixinControlsHandler",
     "MixinControlsRegister",
     "MixinGuiEntityRadarSettings",
@@ -45,6 +46,7 @@
     "MixinWorldDataHandler",
     "MixinWorldDataReader",
     "MixinWorldMapClient",
+    "MixinWorldMapGuiSettings",
     "MixinWorldMapModOptionsAccessor",
     "MixinWorldMapModSettings",
     "mc.MixinClientConnection",

@@ -30,7 +30,7 @@ public class NewChunksLocalCache extends NewChunksBaseCacheHandler implements Ne
             if (chunks.size() > maxNumber) {
                 if (lock.readLock().tryLock(1, TimeUnit.SECONDS)) {
                     // remove oldest 500 chunks
-                    final List<Long> toRemove = chunks.entrySet().stream()
+                    final List<Long> toRemove = chunks.long2LongEntrySet().stream()
                             .sorted(Map.Entry.comparingByValue())
                             .limit(500)
                             .map(Map.Entry::getKey)

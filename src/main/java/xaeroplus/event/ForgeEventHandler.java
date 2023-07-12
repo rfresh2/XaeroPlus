@@ -12,6 +12,6 @@ public class ForgeEventHandler {
         XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
         if (minimapSession == null) return;
         WaypointsIngameRenderer waypointsIngameRenderer = minimapSession.getModMain().getInterfaces().getMinimapInterface().getWaypointsIngameRenderer();
-        ((CustomWaypointsIngameRenderer) waypointsIngameRenderer).renderWaypointBeacons(event.getContext(), event.getPartialTicks());
+        ((CustomWaypointsIngameRenderer) waypointsIngameRenderer).renderWaypointBeacons(minimapSession, event.getContext(), event.getPartialTicks());
     }
 }

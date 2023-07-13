@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.minimap.waypoints.WaypointsManager;
@@ -97,16 +98,18 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
     }
 
     @Override
-    public void renderWaypointBeacons(final MatrixStack matrixStack, final float tickDelta) {
+    public void renderWaypointBeacons(final XaeroMinimapSession minimapSession, final MatrixStack matrixStack, final float tickDelta) {
         if (!XaeroPlusSettingRegistry.waypointBeacons.getValue()) return;
-        beaconWaypoints.forEach(w -> renderWaypointBeacon(w, tickDelta, matrixStack));
+        final WaypointsManager waypointsManager = minimapSession.getWaypointsManager();
+        double dimDiv = redirectDimensionDivision(waypointsManager, waypointsManager.getCurrentContainerID());
+        beaconWaypoints.forEach(w -> renderWaypointBeacon(w, dimDiv, tickDelta, matrixStack));
     }
 
-    public void renderWaypointBeacon(final Waypoint waypoint, float tickDelta, MatrixStack matrixStack) {
+    public void renderWaypointBeacon(final Waypoint waypoint, final double dimDiv, float tickDelta, MatrixStack matrixStack) {
         final MinecraftClient mc = MinecraftClient.getInstance();
         if (mc.world == null || mc.player == null) return;
         final Vec3d playerVec = mc.player.getPos();
-        Vec3d waypointVec = new Vec3d(waypoint.getX(), playerVec.y, waypoint.getZ());
+        Vec3d waypointVec = new Vec3d(waypoint.getX(dimDiv), playerVec.y, waypoint.getZ(dimDiv));
         final double xzDistance = playerVec.distanceTo(waypointVec);
         if (xzDistance < (int) XaeroPlusSettingRegistry.waypointBeaconDistanceMin.getValue()) return;
         final int farScale = (int) XaeroPlusSettingRegistry.waypointBeaconScaleMin.getValue();

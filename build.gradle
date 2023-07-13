@@ -11,19 +11,19 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:5.+'
         classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
     }
 }
 
 plugins {
-    id "com.github.johnrengelman.shadow" version "7.1.2"
+    id "com.github.johnrengelman.shadow" version "8.1.1"
+    id 'net.minecraftforge.gradle' version '6.+'
 }
 
-apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'org.spongepowered.mixin'
+java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
 compileJava.options.encoding = 'UTF-8'
 version = '1.12.2'
@@ -91,6 +91,7 @@ minecraft {
 
 configurations {
     jarLibs
+    implementation.extendsFrom jarLibs
     // Force choosing the correct nightly build because Mac OS chooses an invalid one
     all {
         resolutionStrategy {
@@ -122,7 +123,6 @@ dependencies {
         exclude module: 'gson'
     }
 
-    implementation configurations.jarLibs
 }
 
 sourceSets {
@@ -177,7 +177,7 @@ shadowJar {
     exclude 'org/sqlite/native/Windows/armv7/**'
     exclude 'org/sqlite/native/Windows/aarch64/**'
     exclude 'org/sqlite/native/Windows/armv7/**'
-
+    exclude 'META-INF/versions/**'
     finalizedBy 'configureReobfTaskForReobfShadowJar', 'reobfShadowJar'
     mustRunAfter 'jar'
 }

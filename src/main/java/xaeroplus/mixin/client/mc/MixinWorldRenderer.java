@@ -22,6 +22,6 @@ public class MixinWorldRenderer {
         final XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
         if (minimapSession == null) return;
         WaypointsIngameRenderer waypointsIngameRenderer = minimapSession.getModMain().getInterfaces().getMinimapInterface().getWaypointsIngameRenderer();
-        ((CustomWaypointsIngameRenderer) waypointsIngameRenderer).renderWaypointBeacons(matrixStack, tickDelta);
+        ((CustomWaypointsIngameRenderer) waypointsIngameRenderer).renderWaypointBeacons(minimapSession, matrixStack, tickDelta);
     }
 }

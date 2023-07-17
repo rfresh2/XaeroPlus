@@ -45,7 +45,6 @@
     "MixinWidgetScreenHandlerAccessor",
     "MixinWorldDataHandler",
     "MixinWorldDataReader",
-    "MixinWorldMapClient",
     "MixinWorldMapGuiSettings",
     "MixinWorldMapModOptionsAccessor",
     "MixinWorldMapModSettings",

@@ -91,7 +91,7 @@ public final class XaeroPlusSettingRegistry {
     public static final XaeroPlusBooleanSetting skipWorldRenderSetting = XaeroPlusBooleanSetting.create(
             "Skip Background Render",
             "Skip MC world render while in a Xaero GUI. Having this on can cause issues with travel mods while you're in a Xaero GUI like the WorldMap.",
-            false,
+            true,
             SettingLocation.WORLD_MAP_MAIN);
         public static final XaeroPlusBooleanSetting newChunksEnabledSetting = XaeroPlusBooleanSetting.create(
                 "NewChunks Highlighting",
@@ -99,12 +99,6 @@ public final class XaeroPlusSettingRegistry {
                 (b) -> ModuleManager.getModule(NewChunks.class).setEnabled(b),
                 false,
                 SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusBooleanSetting newChunksSaveLoadToDisk = XaeroPlusBooleanSetting.create(
-            "Save/Load NewChunks to Disk",
-            "Saves and loads NewChunk data to disk for each world and dimension. Requires NewChunk Highlighting to be enabled.",
-            (b) -> ModuleManager.getModule(NewChunks.class).setNewChunksCache(b),
-            true,
-            SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting newChunksAlphaSetting = XaeroPlusFloatSetting.create(
             "New Chunks Opacity",
             10f,

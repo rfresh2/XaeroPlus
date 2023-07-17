@@ -91,7 +91,7 @@ public final class XaeroPlusSettingRegistry {
     public static final XaeroPlusBooleanSetting skipWorldRenderSetting = XaeroPlusBooleanSetting.create(
             "Skip Background Render",
             "Skip MC world render while in a Xaero GUI. Having this on can cause issues with travel mods while you're in a Xaero GUI like the WorldMap.",
-            false,
+            true,
             SettingLocation.WORLD_MAP_MAIN);
         public static final XaeroPlusBooleanSetting newChunksEnabledSetting = XaeroPlusBooleanSetting.create(
                 "NewChunks Highlighting",

@@ -99,12 +99,6 @@ public final class XaeroPlusSettingRegistry {
                 (b) -> ModuleManager.getModule(NewChunks.class).setEnabled(b),
                 false,
                 SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusBooleanSetting newChunksSaveLoadToDisk = XaeroPlusBooleanSetting.create(
-            "Save/Load NewChunks to Disk",
-            "Saves and loads NewChunk data to disk for each world and dimension. Requires NewChunk Highlighting to be enabled.",
-            (b) -> ModuleManager.getModule(NewChunks.class).setNewChunksCache(b),
-            true,
-            SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting newChunksAlphaSetting = XaeroPlusFloatSetting.create(
             "New Chunks Opacity",
             10f,

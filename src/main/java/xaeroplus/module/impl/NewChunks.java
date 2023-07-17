@@ -3,7 +3,6 @@ package xaeroplus.module.impl;
 import com.collarmc.pounce.Subscribe;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.nbt.NbtCompound;
@@ -15,7 +14,6 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
-import xaeroplus.XaeroPlus;
 import xaeroplus.event.ClientTickEvent;
 import xaeroplus.event.PacketReceivedEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
@@ -26,7 +24,6 @@ import xaeroplus.util.ColorHelper;
 import xaeroplus.util.HighlightAtChunkPos;
 import xaeroplus.util.newchunks.NewChunksCache;
 import xaeroplus.util.newchunks.NewChunksLocalCache;
-import xaeroplus.util.newchunks.NewChunksSavingCache;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -46,24 +43,6 @@ public class NewChunks extends Module {
     private int newChunksColor = getColor(255, 0, 0, 100);
     private final MinecraftClient mc = MinecraftClient.getInstance();
     private static final Direction[] searchDirs = new Direction[] { Direction.EAST, Direction.NORTH, Direction.WEST, Direction.SOUTH, Direction.UP };
-
-    public void setNewChunksCache(boolean disk) {
-        try {
-            Long2LongOpenHashMap map = newChunksCache.getNewChunksState();
-            newChunksCache.onDisable();
-            if (disk) {
-                newChunksCache = new NewChunksSavingCache();
-            } else {
-                newChunksCache = new NewChunksLocalCache();
-            }
-            if (this.isEnabled()) {
-                newChunksCache.onEnable();
-                newChunksCache.loadPreviousState(map);
-            }
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error closing new chunks cache", e);
-        }
-    }
 
     @Subscribe
     public void onPacketReceivedEvent(final PacketReceivedEvent event) {

@@ -45,8 +45,6 @@ dependencies {
 
 	jarLibs 'com.github.ben-manes.caffeine:caffeine:3.1.6'
 	jarLibs "com.github.collarmc:pounce:0e8492b68e"
-	jarLibs 'org.apache.commons:commons-compress:1.21'
-	jarLibs 'org.xerial:sqlite-jdbc:3.42.0.0'
 
 	modImplementation "maven.modrinth:xaeros-world-map:1.30.6_Fabric_1.20"
 	modImplementation "maven.modrinth:xaeros-minimap:23.5.0_Fabric_1.20"
@@ -90,18 +88,8 @@ shadowJar {
 	exclude 'com/google/**'
 	exclude 'org/objectweb/**'
 	exclude 'org/checkerframework/**'
-	exclude 'org/sqlite/native/FreeBSD/**'
-	exclude 'org/sqlite/native/Linux-Android/**'
-	exclude 'org/sqlite/native/Linux-Musl/**'
-	exclude 'org/sqlite/native/Linux/arm/**'
-	exclude 'org/sqlite/native/Linux/aarch64/**'
-	exclude 'org/sqlite/native/Linux/armv6/**'
-	exclude 'org/sqlite/native/Linux/x86/**'
-	exclude 'org/sqlite/native/Linux/armv7/**'
-	exclude 'org/sqlite/native/Linux/ppc64/**'
-	exclude 'org/sqlite/native/Windows/armv7/**'
-	exclude 'org/sqlite/native/Windows/aarch64/**'
-	exclude 'org/sqlite/native/Windows/armv7/**'
+	relocate "com.collarmc.pounce", "xaeroplus.com.collarmc.pounce.shadow"
+	relocate "com.github.benmanes.caffeine", "xaeroplus.com.github.benmanes.caffeine.shadow"
 }
 
 remapJar {

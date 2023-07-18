@@ -13,9 +13,9 @@
   },
   "license": "MIT",
   "icon": "assets/xaeroplus/icon.jpg",
-  "environment": "*",
+  "environment": "client",
   "entrypoints": {
-    "main": [
+    "client": [
       "xaeroplus.XaeroPlus"
     ]
   },

@@ -20,6 +20,7 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
     private Consumer<Float> settingChangeConsumer;
 
     private XaeroPlusFloatSetting(final String settingName,
+                                  final String settingNameTranslationKey,
                                   final ITextComponent tooltip,
                                   final KeyBinding keyBinding,
                                   final Supplier<Boolean> visibilitySupplier,
@@ -28,7 +29,7 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
                                   final float valueMin,
                                   final Consumer<Float> settingChangeConsumer,
                                   final float valueStep) {
-        super(settingName, tooltip, keyBinding, visibilitySupplier);
+        super(settingName, settingNameTranslationKey, tooltip, keyBinding, visibilitySupplier);
         this.valueMin = valueMin;
         this.valueMax = valueMax;
         this.valueStep = valueStep;
@@ -37,6 +38,7 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
     }
 
     public static XaeroPlusFloatSetting create(String settingName,
+                                               String settingNameTranslationKey,
                                                float valueMin,
                                                float valueMax,
                                                float valueStep,
@@ -45,6 +47,7 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
                                                SettingLocation settingLocation) {
         final XaeroPlusFloatSetting setting = new XaeroPlusFloatSetting(
                 SETTING_PREFIX + settingName,
+                settingNameTranslationKey,
                 new TextComponentString(defaultValueStr(settingName, defaultValue) + tooltip),
                 null,
                 null,
@@ -59,6 +62,7 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
     }
 
     public static XaeroPlusFloatSetting create(String settingName,
+                                               String settingNameTranslationKey,
                                                float valueMin,
                                                float valueMax,
                                                float valueStep,
@@ -68,6 +72,7 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
                                                SettingLocation settingLocation) {
         final XaeroPlusFloatSetting setting = new XaeroPlusFloatSetting(
                 SETTING_PREFIX + settingName,
+                settingNameTranslationKey,
                 new TextComponentString(defaultValueStr(settingName, defaultValue) + tooltip),
                 null,
                 null,
@@ -82,6 +87,7 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
     }
 
     public static XaeroPlusFloatSetting create(String settingName,
+                                               String settingNameTranslationKey,
                                                float valueMin,
                                                float valueMax,
                                                float valueStep,
@@ -92,6 +98,7 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
                                                SettingLocation settingLocation) {
         final XaeroPlusFloatSetting setting = new XaeroPlusFloatSetting(
                 SETTING_PREFIX + settingName,
+                settingNameTranslationKey,
                 new TextComponentString(defaultValueStr(settingName, defaultValue) + tooltip),
                 null,
                 visibilitySupplier,

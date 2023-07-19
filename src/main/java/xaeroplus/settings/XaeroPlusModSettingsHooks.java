@@ -1,5 +1,6 @@
 package xaeroplus.settings;
 
+import net.minecraft.client.resources.I18n;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaeroplus.util.Shared;
 
@@ -46,6 +47,7 @@ public class XaeroPlusModSettingsHooks {
                 }
             }
         }
+
         // 1 for minimap, 1 for worldmap
         if (loadCount == 2) Shared.onAllSettingsDoneLoading();
     }
@@ -110,9 +112,18 @@ public class XaeroPlusModSettingsHooks {
                 .filter(xaeroPlusSetting -> xaeroPlusSetting.getSettingName().equals(enumString))
                 .findFirst();
         foundSetting
+                .filter(xaeroPlusSetting -> xaeroPlusSetting instanceof XaeroPlusBooleanSetting)
+                .map(xaeroPlusSetting -> (XaeroPlusBooleanSetting) xaeroPlusSetting)
+                .ifPresent(xaeroPlusBooleanSetting -> cir.setReturnValue(
+                        xaeroPlusBooleanSetting.getTranslatedName() + ": "
+                        + I18n.format("gui.xaero_" + (xaeroPlusBooleanSetting.getValue() ? "on" : "off"))));
+        foundSetting
                 .filter(xaeroPlusSetting -> xaeroPlusSetting instanceof XaeroPlusEnumSetting)
                 .map(xaeroPlusSetting -> (XaeroPlusEnumSetting) xaeroPlusSetting)
-                .ifPresent(xaeroPlusEnumSetting -> cir.setReturnValue(enumString + ": " + xaeroPlusEnumSetting.getValue().toString()));
+                .ifPresent(xaeroPlusEnumSetting -> cir.setReturnValue(xaeroPlusEnumSetting.getTranslatedName() + ": "
+                            + (xaeroPlusEnumSetting.getValue() instanceof TranslatableSettingEnum
+                            ? ((TranslatableSettingEnum) xaeroPlusEnumSetting.getValue()).getTranslatedName()
+                            : xaeroPlusEnumSetting.getValue().toString())));
         foundSetting
                 .filter(xaeroPlusSetting -> xaeroPlusSetting instanceof XaeroPlusFloatSetting)
                 .map(xaeroPlusSetting -> (XaeroPlusFloatSetting) xaeroPlusSetting)
@@ -120,7 +131,7 @@ public class XaeroPlusModSettingsHooks {
                     final int intCastStep = (int) xaeroPlusFloatSetting.getValueStep();
                     if (xaeroPlusFloatSetting.getValueStep() - intCastStep <= 0) {
                         // this float is equivalent to an int
-                        cir.setReturnValue(enumString + ": " + ((int) xaeroPlusFloatSetting.getValue()));
+                        cir.setReturnValue(xaeroPlusFloatSetting.getTranslatedName() + ": " + ((int) xaeroPlusFloatSetting.getValue()));
                     }
                 });
     }

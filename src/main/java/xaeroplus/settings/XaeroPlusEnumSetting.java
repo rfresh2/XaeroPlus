@@ -17,21 +17,23 @@ public class XaeroPlusEnumSetting<T extends Enum<T>> extends XaeroPlusSetting {
     private T value;
     private Consumer<T> settingChangeConsumer;
 
-    private XaeroPlusEnumSetting(final String settingName, final ITextComponent tooltip, final KeyBinding keyBinding,
+    private XaeroPlusEnumSetting(final String settingName, String settingNameTranslationKey, final ITextComponent tooltip, final KeyBinding keyBinding,
                                  final Supplier<Boolean> visibilitySupplier, final Consumer<T> settingChangeConsumer,
                                  final T[] enumValues, final T defaultValue) {
-        super(settingName, tooltip, keyBinding, visibilitySupplier);
+        super(settingName, settingNameTranslationKey, tooltip, keyBinding, visibilitySupplier);
         this.enumValues = enumValues;
         this.value = defaultValue;
         this.settingChangeConsumer = settingChangeConsumer;
     }
 
     public static <E extends Enum<E>> XaeroPlusEnumSetting<E> create(String settingName,
+                                                                     String settingNameTranslationKey,
                                                                      String tooltip,
                                                                      E[] values,
                                                                      E defaultValue,
                                                                      final SettingLocation settingLocation) {
         final XaeroPlusEnumSetting<E> setting = new XaeroPlusEnumSetting<>(SETTING_PREFIX + settingName,
+                                                                           settingNameTranslationKey,
                                                                            new TextComponentString(tooltip),
                                                                            null,
                                                                            null,
@@ -42,12 +44,14 @@ public class XaeroPlusEnumSetting<T extends Enum<T>> extends XaeroPlusSetting {
     }
 
     public static <E extends Enum<E>> XaeroPlusEnumSetting<E> create(String settingName,
+                                                                     String settingNameTranslationKey,
                                                                      String tooltip,
                                                                      Consumer<E> settingChangeConsumer,
                                                                      E[] values,
                                                                      E defaultValue,
                                                                      final SettingLocation settingLocation) {
         final XaeroPlusEnumSetting<E> setting = new XaeroPlusEnumSetting<>(SETTING_PREFIX + settingName,
+                                                                           settingNameTranslationKey,
                                                                            new TextComponentString(tooltip),
                                                                            null,
                                                                            null,
@@ -58,6 +62,7 @@ public class XaeroPlusEnumSetting<T extends Enum<T>> extends XaeroPlusSetting {
     }
 
     public static <E extends Enum<E>> XaeroPlusEnumSetting<E> create(String settingName,
+                                                                     String settingNameTranslationKey,
                                                                      String tooltip,
                                                                      Supplier<Boolean> visibilitySupplier,
                                                                      Consumer<E> settingChangeConsumer,
@@ -65,9 +70,10 @@ public class XaeroPlusEnumSetting<T extends Enum<T>> extends XaeroPlusSetting {
                                                                      E defaultValue,
                                                                      final SettingLocation settingLocation) {
         final XaeroPlusEnumSetting<E> setting = new XaeroPlusEnumSetting<>(SETTING_PREFIX + settingName,
+                                                                           settingNameTranslationKey,
                                                                            new TextComponentString(tooltip),
                                                                            null,
-                                                                           null,
+                                                                           visibilitySupplier,
                                                                            settingChangeConsumer,
                                                                            values, defaultValue);
         settingLocation.getSettingsList().add(setting);

@@ -102,6 +102,7 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
         final WaypointsManager waypointsManager = minimapSession.getWaypointsManager();
         double dimDiv = redirectDimensionDivision(waypointsManager, waypointsManager.getCurrentContainerID());
         beaconWaypoints.forEach(w -> renderWaypointBeacon(w, dimDiv, partialTicks));
+        beaconWaypoints.clear();
     }
 
     public void renderWaypointBeacon(final Waypoint waypoint, final double dimDiv, float partialTicks) {

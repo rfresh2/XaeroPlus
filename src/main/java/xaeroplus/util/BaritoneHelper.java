@@ -1,6 +1,6 @@
 package xaeroplus.util;
 
-import baritone.api.BaritoneAPI;
+import baritone.api.utils.BetterBlockPos;
 import xaeroplus.XaeroPlus;
 
 public class BaritoneHelper {
@@ -10,7 +10,7 @@ public class BaritoneHelper {
     public static boolean isBaritonePresent() {
         if (!checked) {
             try {
-                Class.forName(BaritoneAPI.class.getName());
+                Class.forName(BetterBlockPos.class.getName());
                 XaeroPlus.LOGGER.info("Found Baritone API. Enabling Baritone support.");
                 isBaritonePresent = true;
             } catch (final Throwable e) {

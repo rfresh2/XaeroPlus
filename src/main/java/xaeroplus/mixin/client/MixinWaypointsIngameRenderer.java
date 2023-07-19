@@ -11,7 +11,6 @@ import net.minecraft.client.renderer.tileentity.TileEntityBeaconRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
-import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -102,6 +101,7 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
         final WaypointsManager waypointsManager = minimapSession.getWaypointsManager();
         double dimDiv = redirectDimensionDivision(waypointsManager, waypointsManager.getCurrentContainerID());
         beaconWaypoints.forEach(w -> renderWaypointBeacon(w, dimDiv, partialTicks));
+        GlStateManager.disableLighting(); // baritone goal rendering fix lol, learn 2 set up GL state
         beaconWaypoints.clear();
     }
 
@@ -124,7 +124,7 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
         final double z = waypointVec.z - renderManager.viewerPosZ;
         final double y = -renderManager.viewerPosY;
         final int color = ModSettings.COLORS[waypoint.getColor()];
-        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1f);
+//        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1f);
         mc.renderEngine.bindTexture(BEACON_BEAM_TEXTURE);
         final float time = mc.world.getTotalWorldTime();
         final float[] colorRGBA = ColorHelper.getColorRGBA(color);

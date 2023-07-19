@@ -84,7 +84,7 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
             try {
                 RegistryKey<World> dim = MinecraftClient.getInstance().world.getRegistryKey();
                 if (!Objects.equals(dim, customDimensionId)) {
-                    double currentDimDiv = Objects.equals(dim, -1) ? 8.0 : 1.0;
+                    double currentDimDiv = Objects.equals(dim, NETHER) ? 8.0 : 1.0;
                     String dimPart = worldContainerID.substring(worldContainerID.lastIndexOf(47) + 1);
                     RegistryKey<World> dimKey = waypointsManager.getDimensionKeyForDirectoryName(dimPart);
                     double selectedDimDiv = dimKey == NETHER ? 8.0 : 1.0;
@@ -103,6 +103,7 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
         final WaypointsManager waypointsManager = minimapSession.getWaypointsManager();
         double dimDiv = redirectDimensionDivision(waypointsManager, waypointsManager.getCurrentContainerID());
         beaconWaypoints.forEach(w -> renderWaypointBeacon(w, dimDiv, tickDelta, matrixStack));
+        beaconWaypoints.clear();
     }
 
     public void renderWaypointBeacon(final Waypoint waypoint, final double dimDiv, float tickDelta, MatrixStack matrixStack) {

@@ -22,7 +22,7 @@ public abstract class MixinGuiUpdateAll extends ConfirmScreen {
 
     @Inject(method = "init", at = @At("TAIL"), remap = true)
     public void initGui(CallbackInfo ci) {
-        this.addDrawableChild(ButtonWidget.builder(Text.of("Go to XaeroPlus Github for updates"), (button -> {
+        this.addDrawableChild(ButtonWidget.builder(Text.translatable("gui.xaeroplus.check_github_button"), (button -> {
             try {
                  Util.getOperatingSystem().open(new URI("https://github.com/rfresh2/XaeroPlus"));
             } catch (Exception e) {

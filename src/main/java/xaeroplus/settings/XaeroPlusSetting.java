@@ -1,15 +1,15 @@
 package xaeroplus.settings;
 
-
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.text.Text;
+import net.minecraft.client.resource.language.I18n;
 
 import java.util.function.Supplier;
 
 public abstract class XaeroPlusSetting {
     public static final String SETTING_PREFIX = "[XP] ";
-    private final String settingName; // enumString
-    private Text tooltip;
+    private final String settingName; // enumString. setting name that is used in the config file
+    private final String settingNameTranslationKey;
+    private String tooltipTranslationKey;
     private static boolean ingameOnly = false;
     private static boolean requiresMinimap = false;
     private KeyBinding keyBinding;
@@ -17,12 +17,14 @@ public abstract class XaeroPlusSetting {
 
 
     public XaeroPlusSetting(String settingName,
-                            Text tooltip, // nullable
+                            String settingNameTranslationKey,
+                            String tooltipTranslationKey, // nullable
                             KeyBinding keyBinding, // nullable
                             Supplier<Boolean> visibilitySupplier // nullable
     ) {
         this.settingName = settingName;
-        this.tooltip = tooltip;
+        this.settingNameTranslationKey = settingNameTranslationKey;
+        this.tooltipTranslationKey = tooltipTranslationKey;
         this.keyBinding = keyBinding;
         this.visibilitySupplier = visibilitySupplier;
     }
@@ -35,8 +37,16 @@ public abstract class XaeroPlusSetting {
         return settingName;
     }
 
-    public Text getTooltip() {
-        return tooltip;
+    public String getSettingNameTranslationKey() {
+        return settingNameTranslationKey;
+    }
+
+    public String getTranslatedName() {
+        return SETTING_PREFIX + I18n.translate(getSettingNameTranslationKey());
+    }
+
+    public String getTooltipTranslationKey() {
+        return tooltipTranslationKey;
     }
 
     public boolean isIngameOnly() {

@@ -1,7 +1,6 @@
 package xaeroplus.settings;
 
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.text.Text;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax.SettingLocation;
 
@@ -16,24 +15,27 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
     private Consumer<Boolean> settingChangeConsumer;
 
     private XaeroPlusBooleanSetting(final String settingName,
+                                    final String settingNameTranslationKey,
                                     final boolean value,
-                                    final Text tooltip,
+                                    final String tooltipTranslationKey,
                                     final Supplier<Boolean> visibilitySupplier,
                                     final Consumer<Boolean> settingChangeConsumer,
                                     final KeyBinding keyBinding) {
-        super(settingName, tooltip, keyBinding, visibilitySupplier);
+        super(settingName, settingNameTranslationKey, tooltipTranslationKey, keyBinding, visibilitySupplier);
         this.value = value;
         this.settingChangeConsumer = settingChangeConsumer;
     }
 
     public static XaeroPlusBooleanSetting create(String settingName,
-                                                 String tooltip,
+                                                 String settingNameTranslationKey,
+                                                 String tooltipTranslationKey,
                                                  boolean defaultValue,
                                                  final SettingLocation settingLocation) {
         final XaeroPlusBooleanSetting setting = new XaeroPlusBooleanSetting(
                 SETTING_PREFIX + settingName,
+                settingNameTranslationKey,
                 defaultValue,
-                Text.of(tooltip),
+                tooltipTranslationKey,
                 null,
                 null,
                 new KeyBinding(settingName, -1, "XaeroPlus"));
@@ -42,14 +44,16 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
     }
 
     public static XaeroPlusBooleanSetting create(String settingName,
-                                                 String tooltip,
+                                                 String settingNameTranslationKey,
+                                                 String tooltipTranslationKey,
                                                  Consumer<Boolean> settingChangeConsumer,
                                                  boolean defaultValue,
                                                  final SettingLocation settingLocation) {
         final XaeroPlusBooleanSetting setting = new XaeroPlusBooleanSetting(
                 SETTING_PREFIX + settingName,
+                settingNameTranslationKey,
                 defaultValue,
-                Text.of(tooltip),
+                tooltipTranslationKey,
                 null,
                 settingChangeConsumer,
                 new KeyBinding(settingName, -1, "XaeroPlus"));
@@ -58,14 +62,17 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
     }
 
     public static XaeroPlusBooleanSetting create(String settingName,
-                                                 String tooltip,
+                                                 String settingNameTranslationKey,
+                                                 String tooltipTranslationKey,
                                                  Supplier<Boolean> visibilitySupplier,
                                                  Consumer<Boolean> settingChangeConsumer,
                                                  boolean defaultValue,
                                                  final SettingLocation settingLocation) {
-        final XaeroPlusBooleanSetting setting = new XaeroPlusBooleanSetting(SETTING_PREFIX + settingName,
+        final XaeroPlusBooleanSetting setting = new XaeroPlusBooleanSetting(
+                SETTING_PREFIX + settingName,
+                settingNameTranslationKey,
                 defaultValue,
-                Text.of(tooltip),
+                tooltipTranslationKey,
                 visibilitySupplier,
                 settingChangeConsumer,
                 new KeyBinding(settingName, -1, "XaeroPlus"));

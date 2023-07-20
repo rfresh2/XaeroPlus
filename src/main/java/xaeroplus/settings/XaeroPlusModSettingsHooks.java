@@ -46,6 +46,7 @@ public class XaeroPlusModSettingsHooks {
                 }
             }
         }
+
         // 1 for minimap, 1 for worldmap
         if (loadCount == 2) Shared.onAllSettingsDoneLoading();
     }
@@ -130,27 +131,27 @@ public class XaeroPlusModSettingsHooks {
                 .filter(xaeroPlusSetting -> xaeroPlusSetting instanceof XaeroPlusEnumSetting)
                 .map(xaeroPlusSetting -> (XaeroPlusEnumSetting) xaeroPlusSetting)
                 .ifPresent(xaeroPlusEnumSetting -> {
-                    cir.setReturnValue(xaeroPlusEnumSetting.getValue().name());
+                    cir.setReturnValue(xaeroPlusEnumSetting.getValue() instanceof TranslatableSettingEnum
+                                               ? ((TranslatableSettingEnum) xaeroPlusEnumSetting.getValue()).getTranslatedName()
+                                               : xaeroPlusEnumSetting.getValue().toString());
                 });
     }
 
-    public static void getKeybinding(final String enumString, final CallbackInfoReturnable<String> cir, final List<XaeroPlusSetting> settings) {
-        Optional<XaeroPlusSetting> foundSetting = settings.stream()
+    public static void getSliderOptionText(final String enumString, final CallbackInfoReturnable<String> cir, final List<XaeroPlusSetting> settings) {
+        settings.stream()
                 .filter(xaeroPlusSetting -> xaeroPlusSetting.getSettingName().equals(enumString))
-                .findFirst();
-        foundSetting
-                .filter(xaeroPlusSetting -> xaeroPlusSetting instanceof XaeroPlusEnumSetting)
-                .map(xaeroPlusSetting -> (XaeroPlusEnumSetting) xaeroPlusSetting)
-                .ifPresent(xaeroPlusEnumSetting -> cir.setReturnValue(enumString + ": " + xaeroPlusEnumSetting.getValue().toString()));
-        foundSetting
-                .filter(xaeroPlusSetting -> xaeroPlusSetting instanceof XaeroPlusFloatSetting)
-                .map(xaeroPlusSetting -> (XaeroPlusFloatSetting) xaeroPlusSetting)
-                .ifPresent(xaeroPlusFloatSetting -> {
-                    final int intCastStep = (int) xaeroPlusFloatSetting.getValueStep();
-                    if (xaeroPlusFloatSetting.getValueStep() - intCastStep <= 0) {
-                        // this float is equivalent to an int
-                        cir.setReturnValue(enumString + ": " + ((int) xaeroPlusFloatSetting.getValue()));
+                .findFirst()
+                .ifPresent(xaeroPlusSetting -> {
+                    String s = xaeroPlusSetting.getTranslatedName() + ": ";
+                    if (xaeroPlusSetting instanceof XaeroPlusFloatSetting) {
+                        s += String.format("%.2f", ((XaeroPlusFloatSetting) xaeroPlusSetting).getValue());
+                    } else if (xaeroPlusSetting instanceof XaeroPlusEnumSetting) {
+                        XaeroPlusEnumSetting xaeroPlusEnumSetting = (XaeroPlusEnumSetting) xaeroPlusSetting;
+                        s += xaeroPlusEnumSetting.getValue() instanceof TranslatableSettingEnum
+                                ? ((TranslatableSettingEnum) xaeroPlusEnumSetting.getValue()).getTranslatedName()
+                                : xaeroPlusEnumSetting.getValue().toString();
                     }
+                    cir.setReturnValue(s);
                 });
     }
 }

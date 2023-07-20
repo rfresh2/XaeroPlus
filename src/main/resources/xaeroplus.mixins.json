@@ -32,6 +32,7 @@
     "MixinMapWriter",
     "MixinMinimapElementOverMapRendererHandler",
     "MixinMinimapFBORenderer",
+    "MixinMinimapModOption",
     "MixinMinimapModOptionsAccessor",
     "MixinMinimapModSettings",
     "MixinMinimapRenderer",
@@ -48,6 +49,7 @@
     "MixinWorldMapGuiSettings",
     "MixinWorldMapModOptionsAccessor",
     "MixinWorldMapModSettings",
+    "MixinWorldMapOption",
     "mc.MixinClientConnection",
     "mc.MixinMinecraftClient",
     "mc.MixinWorldRenderer"

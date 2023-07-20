@@ -1,8 +1,6 @@
 package xaeroplus.settings;
 
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax.SettingLocation;
 
@@ -21,7 +19,7 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
 
     private XaeroPlusFloatSetting(final String settingName,
                                   final String settingNameTranslationKey,
-                                  final ITextComponent tooltip,
+                                  final String tooltipTranslationKey,
                                   final KeyBinding keyBinding,
                                   final Supplier<Boolean> visibilitySupplier,
                                   final float valueMax,
@@ -29,7 +27,7 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
                                   final float valueMin,
                                   final Consumer<Float> settingChangeConsumer,
                                   final float valueStep) {
-        super(settingName, settingNameTranslationKey, tooltip, keyBinding, visibilitySupplier);
+        super(settingName, settingNameTranslationKey, tooltipTranslationKey, keyBinding, visibilitySupplier);
         this.valueMin = valueMin;
         this.valueMax = valueMax;
         this.valueStep = valueStep;
@@ -42,13 +40,15 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
                                                float valueMin,
                                                float valueMax,
                                                float valueStep,
-                                               String tooltip,
+                                               String tooltipTranslationKey,
                                                float defaultValue,
                                                SettingLocation settingLocation) {
         final XaeroPlusFloatSetting setting = new XaeroPlusFloatSetting(
                 SETTING_PREFIX + settingName,
                 settingNameTranslationKey,
-                new TextComponentString(defaultValueStr(settingName, defaultValue) + tooltip),
+// todo: inject this somehow?
+//                new TextComponentString(defaultValueStr(settingName, defaultValue) + tooltip),
+                tooltipTranslationKey,
                 null,
                 null,
                 valueMax,
@@ -66,14 +66,16 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
                                                float valueMin,
                                                float valueMax,
                                                float valueStep,
-                                               String tooltip,
+                                               String tooltipTranslationKey,
                                                Consumer<Float> changeConsumer,
                                                float defaultValue,
                                                SettingLocation settingLocation) {
         final XaeroPlusFloatSetting setting = new XaeroPlusFloatSetting(
                 SETTING_PREFIX + settingName,
                 settingNameTranslationKey,
-                new TextComponentString(defaultValueStr(settingName, defaultValue) + tooltip),
+                //todo: inject this somehow?
+                // new TextComponentString(defaultValueStr(settingName, defaultValue) + tooltip),
+                tooltipTranslationKey,
                 null,
                 null,
                 valueMax,
@@ -91,7 +93,7 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
                                                float valueMin,
                                                float valueMax,
                                                float valueStep,
-                                               String tooltip,
+                                               String tooltipTranslationKey,
                                                Supplier<Boolean> visibilitySupplier,
                                                Consumer<Float> changeConsumer,
                                                float defaultValue,
@@ -99,7 +101,9 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
         final XaeroPlusFloatSetting setting = new XaeroPlusFloatSetting(
                 SETTING_PREFIX + settingName,
                 settingNameTranslationKey,
-                new TextComponentString(defaultValueStr(settingName, defaultValue) + tooltip),
+                // todo: inject this somehow?
+                // new TextComponentString(defaultValueStr(settingName, defaultValue) + tooltip),
+                tooltipTranslationKey,
                 null,
                 visibilitySupplier,
                 valueMax,

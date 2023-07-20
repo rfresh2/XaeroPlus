@@ -181,11 +181,11 @@ public class XaeroPlusSettingsReflectionHax {
     private static <T extends Enum<T>> T buildModOptions(final ModType type, final ConstructorAccessor ca, final XaeroPlusSetting xaeroPlusSetting, final int ordinal) {
         try {
             final Object cursorBox;
-            if (xaeroPlusSetting.getTooltip() != null) {
+            if (xaeroPlusSetting.getTooltipTranslationKey() != null) {
                 if (type == ModType.WORLDMAP) {
-                    cursorBox = new xaero.map.gui.CursorBox(xaeroPlusSetting.getTooltip());
+                    cursorBox = new xaero.map.gui.CursorBox(xaeroPlusSetting.getTooltipTranslationKey());
                 } else {
-                    cursorBox = new xaero.common.graphics.CursorBox(xaeroPlusSetting.getTooltip());
+                    cursorBox = new xaero.common.graphics.CursorBox(xaeroPlusSetting.getTooltipTranslationKey());
                 }
             } else {
                 cursorBox = null;

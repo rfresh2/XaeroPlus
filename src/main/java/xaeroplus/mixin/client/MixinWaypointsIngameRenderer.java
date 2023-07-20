@@ -6,11 +6,13 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.culling.ClippingHelper;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntityBeaconRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
+import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -40,6 +42,7 @@ import static xaeroplus.util.Shared.customDimensionId;
 public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRenderer {
     @Shadow private List<Waypoint> sortingList;
     @Shadow private WaypointFilterParams filterParams;
+    @Shadow private ClippingHelper clippingHelper;
     List<Waypoint> beaconWaypoints = new ArrayList<>();
     private static final ResourceLocation BEACON_BEAM_TEXTURE = new ResourceLocation("textures/entity/beacon_beam.png");
     final Predicate<Waypoint> beaconViewFilter = new Predicate<Waypoint>() {
@@ -124,7 +127,8 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
         final double z = waypointVec.z - renderManager.viewerPosZ;
         final double y = -renderManager.viewerPosY;
         final int color = ModSettings.COLORS[waypoint.getColor()];
-//        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1f);
+        if (!this.clippingHelper.isBoxInFrustum(x, y, z, x, y+256, z)) return;
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1f);
         mc.renderEngine.bindTexture(BEACON_BEAM_TEXTURE);
         final float time = mc.world.getTotalWorldTime();
         final float[] colorRGBA = ColorHelper.getColorRGBA(color);

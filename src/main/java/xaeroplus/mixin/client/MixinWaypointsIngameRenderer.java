@@ -57,12 +57,6 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
                     && (w.getWaypointType() != 1 && w.getWaypointType() != 2 || deathpoints)) {
                 double offX = (double)w.getX(filterParams.dimDiv) - filterParams.cameraX + 0.5;
                 double offZ = (double)w.getZ(filterParams.dimDiv) - filterParams.cameraZ + 0.5;
-//                double depth = offX * (double) filterParams.lookVector.x()
-//                        + offZ * (double)filterParams.lookVector.z();
-//                if (depth < 0.1 && Math.abs(filterParams.lookVector.x) > 0.1 && Math.abs(filterParams.lookVector.z) > 0.1) {
-//                    XaeroPlus.LOGGER.warn("Depth: {}, offX: {}, offZ: {}, lookVecX: {}, lookVecZ: {}", depth, offX, offZ, filterParams.lookVector.x(), filterParams.lookVector.z());
-//                    return false;
-//                }
                 double distance2D = Math.sqrt(offX * offX + offZ * offZ);
                 double waypointsDistance = filterParams.waypointsDistance;
                 double waypointsDistanceMin = filterParams.waypointsDistanceMin;

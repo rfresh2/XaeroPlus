@@ -66,4 +66,9 @@ public class MixinWorldMapModSettings {
     public void getOptionValueName(ModOptions o, CallbackInfoReturnable<String> cir) {
         XaeroPlusModSettingsHooks.getOptionValueName(o.getEnumString(), cir, XAERO_PLUS_WORLDMAP_SETTINGS);
     }
+
+    @Inject(method = "getSliderOptionText", at = @At("HEAD"), cancellable = true)
+    public void getSliderOptionText(final ModOptions o, final CallbackInfoReturnable<String> cir) {
+        XaeroPlusModSettingsHooks.getSliderOptionText(o.getEnumString(), cir, XAERO_PLUS_WORLDMAP_SETTINGS);
+    }
 }

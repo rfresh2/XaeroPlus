@@ -78,5 +78,10 @@ public class MixinMinimapModSettings {
     public void isKeyRepeat(KeyBinding kb, CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(cir.getReturnValue() && XaeroPlusSettingsReflectionHax.getKeybinds().stream().noneMatch(keyBinding -> keyBinding == kb));
     }
+
+    @Inject(method = "getSliderOptionText", at = @At("HEAD"), cancellable = true)
+    public void getSliderOptionText(final ModOptions o, final CallbackInfoReturnable<String> cir) {
+        XaeroPlusModSettingsHooks.getSliderOptionText(o.getEnumString(), cir, ALL_MINIMAP_SETTINGS.get());
+    }
 }
 

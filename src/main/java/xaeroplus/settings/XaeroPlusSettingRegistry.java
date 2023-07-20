@@ -23,47 +23,50 @@ public final class XaeroPlusSettingRegistry {
 
     public static final XaeroPlusBooleanSetting fastMapSetting = XaeroPlusBooleanSetting.create(
             "Fast Mapping",
-            "Increases mapping speed, might hurt FPS. Adjust rate limit and delay to regain FPS.",
+            "setting.world_map.fast_mapping",
+            "setting.world_map.fast_mapping.tooltip",
             true,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting fastMapWriterDelaySetting = XaeroPlusFloatSetting.create(
             "Fast Mapping Delay",
-            10,
-            1000,
-            10,
-            "Fast Mapping must be enabled. \n " +
-                    "This is roughly the delay in milliseconds between minimap update operations, both render and actual file writes.",
+            "setting.world_map.fast_mapping_delay",
+            10, 1000, 10,
+            "setting.world_map.fast_mapping_delay.tooltip",
             250,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting fastMapMaxTilesPerCycle = XaeroPlusFloatSetting.create(
             "Fast Mapping Rate Limit",
-            10,
-            120,
-            10,
-            "Fast Mapping must be enabled. \n " +
-                    "Limits how many chunks can be written in a single cycle. Lower values improve FPS at high render distances.",
+            "setting.world_map.fast_mapping_rate_limit",
+            10, 120, 10,
+            "setting.world_map.fast_mapping_rate_limit.tooltip",
             50,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting baritoneWaypointSyncSetting = XaeroPlusBooleanSetting.create(
             "Baritone Goal Waypoint",
-            "Syncs Baritone goals as temporary waypoints.",
+            "setting.world_map.baritone_waypoint",
+            "setting.world_map.baritone_waypoint.tooltip",
             BaritoneHelper::isBaritonePresent,
-            (b) -> ModuleManager.getModule(BaritoneGoalSync.class).setEnabled(b),
+            (b) -> {
+                if (BaritoneHelper.isBaritonePresent()) ModuleManager.getModule(BaritoneGoalSync.class).setEnabled(b);
+            },
             true,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting persistMapDimensionSwitchSetting = XaeroPlusBooleanSetting.create(
             "Persist WM Dim Switch",
-            "If enabled, the dimension will not be switched back to current when the WorldMap GUI is closed.",
+            "setting.world_map.persist_dimension_switch",
+            "setting.world_map.persist_dimension_switch.tooltip",
             false,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting transparentObsidianRoofSetting = XaeroPlusBooleanSetting.create(
             "Transparent Obsidian Roof",
-            "Makes obsidian placed at build height transparent. Does not update tiles already mapped - you need to remap them.",
+            "setting.world_map.transparent_obsidian_roof",
+            "setting.world_map.transparent_obsidian_roof.tooltip",
             (v) -> markChunksDirtyInWriteDistance(),
             true,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting transparentObsidianRoofYSetting = XaeroPlusFloatSetting.create(
             "Roof Y Level",
+            "setting.world_map.transparent_obsidian_roof_y",
             0,
             320,
             1,
@@ -73,202 +76,216 @@ public final class XaeroPlusSettingRegistry {
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting transparentObsidianRoofDarkeningSetting = XaeroPlusFloatSetting.create(
             "Roof Obsidian Opacity",
-            0,
-            255,
-            5,
-            "Sets the opacity of the transparent obsidian roof tiles.",
+            "setting.world_map.transparent_obsidian_roof_darkening",
+            0, 255, 5,
+            "setting.world_map.transparent_obsidian_roof_darkening.tooltip",
             (v) -> markChunksDirtyInWriteDistance(),
             150,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting worldMapMinZoomSetting = XaeroPlusFloatSetting.create(
             "Min WorldMap Zoom",
-            0,
-            0.625f,
-            0.01f,
-            "Minimum WorldMap Zoom Setting. This is 10x what you see on the WorldMap.",
+            "setting.world_map.min_zoom",
+            0, 0.625f, 0.01f,
+            "setting.world_map.min_zoom.tooltip",
             0.1f,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting skipWorldRenderSetting = XaeroPlusBooleanSetting.create(
             "Skip Background Render",
-            "Skip MC world render while in a Xaero GUI. Having this on can cause issues with travel mods while you're in a Xaero GUI like the WorldMap.",
-            true,
+            "setting.world_map.skip_world_render",
+            "setting.world_map.skip_world_render.tooltip",
+            false,
             SettingLocation.WORLD_MAP_MAIN);
-        public static final XaeroPlusBooleanSetting newChunksEnabledSetting = XaeroPlusBooleanSetting.create(
-                "NewChunks Highlighting",
-                "Highlights NewChunks on the Minimap and WorldMap.",
-                (b) -> ModuleManager.getModule(NewChunks.class).setEnabled(b),
-                false,
-                SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting newChunksEnabledSetting = XaeroPlusBooleanSetting.create(
+            "NewChunks Highlighting",
+            "setting.world_map.new_chunks_highlighting",
+            "setting.world_map.new_chunks_highlighting.tooltip",
+            (b) -> ModuleManager.getModule(NewChunks.class).setEnabled(b),
+            false,
+            SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting newChunksAlphaSetting = XaeroPlusFloatSetting.create(
             "New Chunks Opacity",
-            10f,
-            255f,
-            10f,
-            "Changes the color opacity of NewChunks.",
+            "setting.world_map.new_chunks_opacity",
+            10f, 255f, 10f,
+            "setting.world_map.new_chunks_opacity.tooltip",
             (b) -> ModuleManager.getModule(NewChunks.class).setAlpha(b),
             100,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> newChunksColorSetting = XaeroPlusEnumSetting.create(
             "New Chunks Color",
-            "Changes the color of NewChunks.",
+            "setting.world_map.new_chunks_color",
+            "setting.world_map.new_chunks_color.tooltip",
             (b) -> ModuleManager.getModule(NewChunks.class).setRgbColor(b.getColor()),
             ColorHelper.HighlightColor.values(),
             ColorHelper.HighlightColor.RED,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting portalSkipDetectionEnabledSetting = XaeroPlusBooleanSetting.create(
             "PortalSkip Detection",
-            "Highlights chunks where portals could have been loaded into. \n "
-                    + "This is useful for basehunting to detect where players could switch dimensions along a trail to avoid hunters. \n "
-                    + "One thing to note: 2b2t's view distance is not large enough to detect portal skip areas. You need to load surrounding chunks - specifically a 15x15 chunk area",
+            "setting.world_map.portal_skip_detection",
+            "setting.world_map.portal_skip_detection.tooltip",
             (b) -> ModuleManager.getModule(PortalSkipDetection.class).setEnabled(b),
             false,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting portalSkipDetectionAlphaSetting = XaeroPlusFloatSetting.create(
             "PortalSkip Opacity",
-            10f,
-            255f,
-            10f,
-            "Changes the color opacity of Portal Skip Detection.",
+            "setting.world_map.portal_skip_opacity",
+            10f, 255f, 10f,
+            "setting.world_map.portal_skip_opacity.tooltip",
             (b) -> ModuleManager.getModule(PortalSkipDetection.class).setAlpha(b),
             100,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> portalSkipDetectionColorSetting = XaeroPlusEnumSetting.create(
             "PortalSkip Color",
-            "Changes the color of Portal Skip Detection.",
+            "setting.world_map.portal_skip_color",
+            "setting.world_map.portal_skip_color.tooltip",
             (b) -> ModuleManager.getModule(PortalSkipDetection.class).setRgbColor(b.getColor()),
             ColorHelper.HighlightColor.values(),
             ColorHelper.HighlightColor.WHITE,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting portalSkipDetectionSearchDelayTicksSetting = XaeroPlusFloatSetting.create(
             "PortalSkip Search Delay",
-            0,
-            100,
-            1,
-            "Portal Skip Detection must be enabled. \n " +
-                    "This is the delay in ticks between Portal Skip Detection search operations.",
+            "setting.world_map.portal_skip_search_delay",
+            0, 100, 1,
+            "setting.world_map.portal_skip_search_delay.tooltip",
             (b) -> ModuleManager.getModule(PortalSkipDetection.class).setSearchDelayTicks(b),
             10,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting owAutoWaypointDimension = XaeroPlusBooleanSetting.create(
             "Prefer Overworld Waypoints",
-            "Prefer creating and viewing Overworld waypoints when in the nether.",
+            "setting.world_map.ow_auto_waypoint_dimension",
+            "setting.world_map.ow_auto_waypoint_dimension.tooltip",
             true,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting showWaypointDistances = XaeroPlusBooleanSetting.create(
             "Show Waypoint Distances",
-            "Display the distance to every waypoint in the full waypoint menu.",
+            "setting.world_map.show_waypoint_distances",
+            "setting.world_map.show_waypoint_distances.tooltip",
             true,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting showRenderDistanceSetting = XaeroPlusBooleanSetting.create(
             "Show Render Distance",
-            "Show server side render distance (actually just another setting)",
+            "setting.world_map.show_render_distance",
+            "setting.world_map.show_render_distance.tooltip",
             false,
             SettingLocation.MINIMAP_OVERLAYS);
     public static final XaeroPlusBooleanSetting showRenderDistanceWorldMapSetting = XaeroPlusBooleanSetting.create(
             "Show Render Distance WorldMap",
-            "Show server side render distance on the WorldMap",
+            "setting.world_map.show_render_distance_world_map",
+            "setting.world_map.show_render_distance_world_map.tooltip",
             false,
             SettingLocation.MINIMAP_OVERLAYS);
     public static final XaeroPlusFloatSetting assumedServerRenderDistanceSetting = XaeroPlusFloatSetting.create(
             "Server Render Distance",
-            1f,
-            32f,
-            1f,
-            "view-distance of the server",
+            "setting.world_map.assumed_server_render_distance",
+            1f, 32f, 1f,
+            "setting.world_map.assumed_server_render_distance.tooltip",
             4f,
             SettingLocation.MINIMAP_OVERLAYS); // 2b2t
     public static final XaeroPlusBooleanSetting nullOverworldDimensionFolder = XaeroPlusBooleanSetting.create(
             "null OW Dim Dir",
-            "Sets whether the overworld WorldMap directory is in DIM0 or null (default)"
-                    + " \n MC must be restarted for changes to take effect.",
+            "setting.world_map.null_overworld_dimension_folder",
+            "setting.world_map.null_overworld_dimension_folder.tooltip",
             true,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusEnumSetting<DataFolderResolutionMode> dataFolderResolutionMode = XaeroPlusEnumSetting.create(
             "Data Dir Mode",
-            "Sets how the WorldMap and Waypoints data folders are resolved."
-                    + " \n MC must be restarted for changes to take effect."
-                    + " \n IP = Server IP (Xaero Default). Example: .minecraft/XaeroWorldMap/Multiplayer_connect.2b2t.org"
-                    + " \n SERVER_NAME = MC Server Entry Name. Example: .minecraft/XaeroWorldMap/Multiplayer_2b2t"
-                    + " \n BASE_DOMAIN = Base Server Domain Name. Example: .minecraft/XaeroWorldMap/Multiplayer_2b2t.org",
+            "setting.world_map.data_folder_resolution_mode",
+            "setting.world_map.data_folder_resolution_mode.tooltip",
             DataFolderResolutionMode.values(),
             DataFolderResolutionMode.IP,
             SettingLocation.WORLD_MAP_MAIN);
-    public enum DataFolderResolutionMode {
-        IP, SERVER_NAME, BASE_DOMAIN;
-    }
+    public enum DataFolderResolutionMode implements TranslatableSettingEnum {
+        IP("setting.world_map.data_folder_resolution_mode.ip"),
+        SERVER_NAME("setting.world_map.data_folder_resolution_mode.server_name"),
+        BASE_DOMAIN("setting.world_map.data_folder_resolution_mode.base_domain");
 
+        private final String translationKey;
+        DataFolderResolutionMode(final String translationKey) {
+            this.translationKey = translationKey;
+        }
+
+        @Override
+        public String getTranslationKey() {
+            return translationKey;
+        }
+    }
     public static final XaeroPlusBooleanSetting transparentMinimapBackground = XaeroPlusBooleanSetting.create(
             "Transparent Background",
-            "Makes the minimap background transparent instead of black.",
+            "setting.minimap.transparent_background",
+            "setting.minimap.transparent_background.tooltip",
             false,
             SettingLocation.MINIMAP);
     public static final XaeroPlusFloatSetting minimapScaling = XaeroPlusFloatSetting.create(
             "Minimap Scaling Factor",
             // todo: increase max but we need to improve rendering or start using different texture levels
+            "setting.minimap.minimap_scaling",
             1f, 2f, 1f,
-            "Increases the base minimap scale beyond the default size.",
+            "setting.minimap.minimap_scaling.tooltip",
             (b) -> Shared.shouldResetFBO = true,
-            2f, SettingLocation.MINIMAP);
+            2f,
+            SettingLocation.MINIMAP);
     public static final XaeroPlusBooleanSetting switchToNetherSetting = XaeroPlusBooleanSetting.create(
             "Switch to Nether",
-            "Switches to the nether map.",
+            "setting.keybinds.switch_to_nether",
+            "setting.keybinds.switch_to_nether.tooltip",
             (b) -> Shared.switchToDimension(NETHER),
             false,
             SettingLocation.KEYBINDS);
     public static final XaeroPlusBooleanSetting switchToOverworldSetting = XaeroPlusBooleanSetting.create(
             "Switch to Overworld",
-            "Switches to the overworld map.",
+            "setting.keybinds.switch_to_overworld",
+            "setting.keybinds.switch_to_overworld.tooltip",
             (b) -> Shared.switchToDimension(OVERWORLD),
             false,
             SettingLocation.KEYBINDS);
     public static final XaeroPlusBooleanSetting switchToEndSetting = XaeroPlusBooleanSetting.create(
             "Switch to End",
-            "Switches to the end map.",
+            "setting.keybinds.switch_to_end",
+            "setting.keybinds.switch_to_end.tooltip",
             (b) -> Shared.switchToDimension(END),
             false,
             SettingLocation.KEYBINDS);
     public static final XaeroPlusBooleanSetting netherCaveFix = XaeroPlusBooleanSetting.create(
             "Nether Cave Fix",
-            "Forces full cave maps to be written and rendered when cave mode is \"off\" in the nether."
-                    + " \n Without this, you have to manually move region files pre WorldMap 1.30.0 to the correct cave folder",
+            "setting.world_map.nether_cave_fix",
+            "setting.world_map.nether_cave_fix.tooltip",
             true,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting alwaysRenderPlayerWithNameOnRadar = XaeroPlusBooleanSetting.create(
             "Always Render Player Name",
-            "Always render player name on the radar.",
+            "setting.minimap.always_render_player_name",
+            "setting.minimap.always_render_player_name.tooltip",
             true,
             SettingLocation.MINIMAP_ENTITY_RADAR);
     public static final XaeroPlusBooleanSetting alwaysRenderPlayerIconOnRadar = XaeroPlusBooleanSetting.create(
             "Always Render Player Icon",
-            "Always render player icon on the radar.",
+            "setting.minimap.always_render_player_icon",
+            "setting.minimap.always_render_player_icon.tooltip",
             true,
             SettingLocation.MINIMAP_ENTITY_RADAR);
     public static final XaeroPlusBooleanSetting fixMainEntityDot = XaeroPlusBooleanSetting.create(
             "Fix Main Entity Dot",
-            "Fixes the main entity dot rendering on the radar when arrow is rendered.",
+            "setting.minimap.fix_main_entity_dot",
+            "setting.minimap.fix_main_entity_dot.tooltip",
             true,
             SettingLocation.MINIMAP_ENTITY_RADAR);
     public static final XaeroPlusBooleanSetting waypointBeacons = XaeroPlusBooleanSetting.create(
             "Waypoint Beacons",
-            "Render waypoint beacons in game.",
+            "setting.waypoints.waypoint_beacons",
+            "setting.waypoints.waypoint_beacons.tooltip",
             true,
             SettingLocation.WAYPOINTS);
     public static final XaeroPlusFloatSetting waypointBeaconScaleMin = XaeroPlusFloatSetting.create(
             "Waypoint Beacon Scale Min",
-            0f,
-            30f,
-            1f,
-            "Sets the minimum scale of the waypoint beacon when it is far away."
-                    + " \\n This value is the number of chunks away from the player the beacon is rendered at."
-                    + " \\n 0 = auto-match the player's render distance",
+            "setting.waypoints.waypoint_beacon_scale_min",
+            0f, 30f, 1f,
+            "setting.waypoints.waypoint_beacon_scale_min.tooltip",
             0f,
             SettingLocation.WAYPOINTS);
     public static final XaeroPlusFloatSetting waypointBeaconDistanceMin = XaeroPlusFloatSetting.create(
             "Waypoint Beacon Distance Min",
-            0f,
-            512f,
-            8f,
-            "Sets the minimum xz distance from the player the waypoint must be to render a beacon.",
+            "setting.waypoints.waypoint_beacon_distance_min",
+            0f, 512f, 8f,
+            "setting.waypoints.waypoint_beacon_distance_min.tooltip",
             0f,
             SettingLocation.WAYPOINTS);
 }

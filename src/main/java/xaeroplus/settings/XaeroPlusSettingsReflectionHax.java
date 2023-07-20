@@ -137,7 +137,7 @@ public class XaeroPlusSettingsReflectionHax {
             if (xaeroPlusSetting instanceof XaeroPlusBooleanSetting) {
                 return MixinWorldMapModOptionsAccessor.createBooleanSetting(
                         xaeroPlusSetting.getSettingName(),
-                        new CursorBox(xaeroPlusSetting.getTooltip()),
+                        new CursorBox(xaeroPlusSetting.getTooltipTranslationKey()),
                         xaeroPlusSetting.isIngameOnly(),
                         xaeroPlusSetting.isRequiresMinimap(),
                         false);
@@ -147,7 +147,7 @@ public class XaeroPlusSettingsReflectionHax {
                         ((XaeroPlusFloatSetting) xaeroPlusSetting).getValueMin(),
                         ((XaeroPlusFloatSetting) xaeroPlusSetting).getValueMax(),
                         ((XaeroPlusFloatSetting) xaeroPlusSetting).getValueStep(),
-                        new CursorBox(xaeroPlusSetting.getTooltip()),
+                        new CursorBox(xaeroPlusSetting.getTooltipTranslationKey()),
                         xaeroPlusSetting.isIngameOnly(),
                         xaeroPlusSetting.isRequiresMinimap(),
                         false
@@ -156,7 +156,7 @@ public class XaeroPlusSettingsReflectionHax {
                 return MixinWorldMapModOptionsAccessor.createEnumSetting(
                         xaeroPlusSetting.getSettingName(),
                         ((XaeroPlusEnumSetting<?>) xaeroPlusSetting).getIndexMax() + 1,
-                        new CursorBox(xaeroPlusSetting.getTooltip()),
+                        new CursorBox(xaeroPlusSetting.getTooltipTranslationKey()),
                         xaeroPlusSetting.isIngameOnly(),
                         xaeroPlusSetting.isRequiresMinimap(),
                         false
@@ -173,7 +173,7 @@ public class XaeroPlusSettingsReflectionHax {
             if (xaeroPlusSetting instanceof XaeroPlusBooleanSetting) {
                 return MixinMinimapModOptionsAccessor.createBooleanSetting(
                         xaeroPlusSetting.getSettingName(),
-                        new xaero.common.graphics.CursorBox(xaeroPlusSetting.getTooltip()),
+                        new xaero.common.graphics.CursorBox(xaeroPlusSetting.getTooltipTranslationKey()),
                         xaeroPlusSetting.isIngameOnly());
             } else if (xaeroPlusSetting instanceof XaeroPlusFloatSetting) {
                 return MixinMinimapModOptionsAccessor.createDoubleSetting(
@@ -181,7 +181,7 @@ public class XaeroPlusSettingsReflectionHax {
                         ((XaeroPlusFloatSetting) xaeroPlusSetting).getValueMin(),
                         ((XaeroPlusFloatSetting) xaeroPlusSetting).getValueMax(),
                         ((XaeroPlusFloatSetting) xaeroPlusSetting).getValueStep(),
-                        new xaero.common.graphics.CursorBox(xaeroPlusSetting.getTooltip()),
+                        new xaero.common.graphics.CursorBox(xaeroPlusSetting.getTooltipTranslationKey()),
                         xaeroPlusSetting.isIngameOnly()
                 );
             } else if (xaeroPlusSetting instanceof XaeroPlusEnumSetting) {
@@ -189,7 +189,7 @@ public class XaeroPlusSettingsReflectionHax {
                         xaeroPlusSetting.getSettingName(),
                         0,
                         ((XaeroPlusEnumSetting<?>) xaeroPlusSetting).getIndexMax(),
-                        new xaero.common.graphics.CursorBox(xaeroPlusSetting.getTooltip()),
+                        new xaero.common.graphics.CursorBox(xaeroPlusSetting.getTooltipTranslationKey()),
                         xaeroPlusSetting.isIngameOnly()
                 );
             }

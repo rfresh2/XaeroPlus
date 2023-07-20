@@ -1,7 +1,6 @@
 package xaeroplus.settings;
 
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.text.Text;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax.SettingLocation;
 
@@ -19,7 +18,8 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
     private Consumer<Float> settingChangeConsumer;
 
     private XaeroPlusFloatSetting(final String settingName,
-                                  final Text tooltip,
+                                  final String settingNameTranslationKey,
+                                  final String tooltipTranslationKey,
                                   final KeyBinding keyBinding,
                                   final Supplier<Boolean> visibilitySupplier,
                                   final float valueMin,
@@ -27,7 +27,7 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
                                   final float valueMax,
                                   final Consumer<Float> settingChangeConsumer,
                                   final float defaultValue) {
-        super(settingName, tooltip, keyBinding, visibilitySupplier);
+        super(settingName, settingNameTranslationKey, tooltipTranslationKey, keyBinding, visibilitySupplier);
         this.valueMin = valueMin;
         this.valueMax = valueMax;
         this.valueStep = valueStep;
@@ -36,15 +36,17 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
     }
 
     public static XaeroPlusFloatSetting create(String settingName,
+                                               String settingNameTranslationKey,
                                                float valueMin,
                                                float valueMax,
                                                float valueStep,
-                                               String tooltip,
+                                               String tooltipTranslationKey,
                                                float defaultValue,
                                                SettingLocation settingLocation) {
         final XaeroPlusFloatSetting setting = new XaeroPlusFloatSetting(
                 SETTING_PREFIX + settingName,
-                Text.of(defaultValueStr(settingName, defaultValue) + tooltip),
+                settingNameTranslationKey,
+                tooltipTranslationKey,
                 null,
                 null,
                 valueMin,
@@ -58,16 +60,18 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
     }
 
     public static XaeroPlusFloatSetting create(String settingName,
+                                               String settingNameTranslationKey,
                                                float valueMin,
                                                float valueMax,
                                                float valueStep,
-                                               String tooltip,
+                                               String tooltipTranslationKey,
                                                Consumer<Float> changeConsumer,
                                                float defaultValue,
                                                SettingLocation settingLocation) {
         final XaeroPlusFloatSetting setting = new XaeroPlusFloatSetting(
                 SETTING_PREFIX + settingName,
-                Text.of(defaultValueStr(settingName, defaultValue) + tooltip),
+                settingNameTranslationKey,
+                tooltipTranslationKey,
                 null,
                 null,
                 valueMin,
@@ -81,17 +85,19 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
     }
 
     public static XaeroPlusFloatSetting create(String settingName,
+                                               String settingNameTranslationKey,
                                                float valueMin,
                                                float valueMax,
                                                float valueStep,
-                                               String tooltip,
+                                               String tooltipTranslationKey,
                                                Supplier<Boolean> visibilitySupplier,
                                                Consumer<Float> changeConsumer,
                                                float defaultValue,
                                                SettingLocation settingLocation) {
         final XaeroPlusFloatSetting setting = new XaeroPlusFloatSetting(
                 SETTING_PREFIX + settingName,
-                Text.of(defaultValueStr(settingName, defaultValue) + tooltip),
+                settingNameTranslationKey,
+                tooltipTranslationKey,
                 null,
                 visibilitySupplier,
                 valueMin,

@@ -76,7 +76,7 @@ public class MixinGuiWaypoints extends ScreenBase {
                         TOGGLE_ALL_ID,
                         this.width / 2 + 213,
                         this.height - 53,
-                        Text.literal("Toggle Enable All"),
+                        Text.translatable("gui.waypoints.toggle_enable_all"),
                         b -> {
                             waypointsSorted.stream().findFirst().ifPresent(firstWaypoint -> {
                                 boolean firstIsEnabled = firstWaypoint.isDisabled();

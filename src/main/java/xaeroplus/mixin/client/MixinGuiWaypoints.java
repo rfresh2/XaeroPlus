@@ -63,7 +63,7 @@ public class MixinGuiWaypoints extends ScreenBase {
         Keyboard.enableRepeatEvents(true);
         Shared.waypointsSearchFilter = "";
         // todo: this button is a bit larger than i want but cba to figure out exact size rn
-        this.buttonList.add(new MySmallButton(TOGGLE_ALL_ID, this.width / 2 + 213, this.height - 53, "Toggle Enable All"));
+        this.buttonList.add(new MySmallButton(TOGGLE_ALL_ID, this.width / 2 + 213, this.height - 53, I18n.format("gui.waypoints.toggle_enable_all")));
     }
 
     @Inject(method = "actionPerformed", at = @At("TAIL"), remap = true)

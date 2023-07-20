@@ -81,3 +81,12 @@ setting.waypoints.waypoint_beacon_scale_min=Waypoint Beacon Scale Min
 setting.waypoints.waypoint_beacon_scale_min.tooltip=Sets the minimum scale of the waypoint beacon when it is far away. \\n This value is the number of chunks away from the player the beacon is rendered at. \\n 0 = auto-match the player's render distance
 setting.waypoints.waypoint_beacon_distance_min=Waypoint Beacon Distance Min
 setting.waypoints.waypoint_beacon_distance_min.tooltip=Sets the minimum xz distance from the player the waypoint must be to render a beacon.
+gui.world_map.toggle_follow_mode=Toggle Follow Mode
+gui.xaeroplus.on=On
+gui.xaeroplus.off=Off
+gui.world_map.go_to_coordinates=Go to Coordinates
+gui.world_map.baritone_goal_here=Baritone Goal Here
+gui.world_map.baritone_path_here=Baritone Path Here
+gui.world_map.baritone_elytra_here=Baritone Elytra Here
+gui.xaeroplus.check_github_button=Go to XaeroPlus Github for updates
+gui.waypoints.toggle_enable_all=Toggle Enable All

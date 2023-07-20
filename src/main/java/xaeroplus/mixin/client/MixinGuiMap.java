@@ -15,7 +15,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.biome.Biome;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
@@ -311,14 +311,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             public void accept(GuiButton guiButton) {
                 onFollowButton(guiButton);
             }
-        }, () -> new CursorBox(new TextComponentString("Toggle Follow mode (" + (FOLLOW ? "On" : "Off") + ")")));
+        }, () -> new CursorBox(new TextComponentTranslation("gui.world_map.toggle_follow_mode").appendText(" " + I18n.format(FOLLOW ? "gui.xaeroplus.off" : "gui.xaeroplus.on"))));
         addGuiButton(followButton);
         coordinateGotoButton = new GuiTexturedButton(0, followButton.y - 20 , 20, 20, 229, 16, 16, 16, WorldMap.guiTextures, new Consumer<GuiButton>() {
             @Override
             public void accept(GuiButton guiButton) {
                 onGotoCoordinatesButton(guiButton);
             }
-        }, () -> new CursorBox(new TextComponentString("Go to Coordinates")));
+        }, () -> new CursorBox(new TextComponentTranslation("gui.world_map.go_to_coordinates")));
         addGuiButton(coordinateGotoButton);
         xTextEntryField = new GuiTextField(2, mc.fontRenderer, 20, coordinateGotoButton.y - 10, 50, 20);
         xTextEntryField.setVisible(false);
@@ -330,21 +330,21 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             public void accept(final GuiButton button) {
                 onSwitchDimensionButton(1);
             }
-        }, () -> new CursorBox(new TextComponentString("Switch to End")));
+        }, () -> new CursorBox(new TextComponentTranslation("setting.keybinds.switch_to_end")));
         this.switchToOverworldButton = new GuiTexturedButton(
                 this.width - 20, this.switchToEndButton.y - 20, 20, 20, 16, 0, 16, 16, Shared.xpGuiTextures, new Consumer<GuiButton>() {
             @Override
             public void accept(final GuiButton button) {
                 onSwitchDimensionButton(0);
             }
-        }, () -> new CursorBox(new TextComponentString("Switch to Overworld")));
+        }, () -> new CursorBox(new TextComponentTranslation("setting.keybinds.switch_to_overworld")));
         this.switchToNetherButton = new GuiTexturedButton(
                 this.width - 20, this.switchToOverworldButton.y - 20, 20, 20, 0, 0, 16, 16, Shared.xpGuiTextures, new Consumer<GuiButton>() {
             @Override
             public void accept(final GuiButton button) {
                 onSwitchDimensionButton(-1);
             }
-        }, () -> new CursorBox(new TextComponentString("Switch to Nether")));
+        }, () -> new CursorBox(new TextComponentTranslation("setting.keybinds.switch_to_nether")));
         addGuiButton(switchToNetherButton);
         addGuiButton(switchToOverworldButton);
         addGuiButton(switchToEndButton);
@@ -1662,13 +1662,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if (BaritoneHelper.isBaritonePresent()) {
             final ArrayList<RightClickOption> options = cir.getReturnValue();
             options.addAll(3, asList(
-                    new RightClickOption("Baritone Goal Here", options.size(), this) {
+                    new RightClickOption(I18n.format("gui.world_map.baritone_goal_here"), options.size(), this) {
                         @Override
                         public void onAction(GuiScreen screen) {
                             BaritoneAPI.getProvider().getPrimaryBaritone().getCustomGoalProcess().setGoal(new GoalXZ(rightClickX, rightClickZ));
                         }
                     },
-                    new RightClickOption("Baritone Path Here", options.size(), this) {
+                    new RightClickOption(I18n.format("gui.world_map.baritone_path_here"), options.size(), this) {
                         @Override
                         public void onAction(GuiScreen screen) {
                             BaritoneAPI.getProvider().getPrimaryBaritone().getCustomGoalProcess().setGoalAndPath(new GoalXZ(rightClickX, rightClickZ));

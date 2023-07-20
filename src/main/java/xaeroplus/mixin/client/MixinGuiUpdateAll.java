@@ -3,6 +3,7 @@ package xaeroplus.mixin.client;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiYesNo;
 import net.minecraft.client.gui.GuiYesNoCallback;
+import net.minecraft.client.resources.I18n;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,7 +24,8 @@ public abstract class MixinGuiUpdateAll extends GuiYesNo {
 
     @Inject(method = "initGui", at = @At("TAIL"), remap = true)
     public void initGui(CallbackInfo ci) {
-        this.buttonList.add(new GuiButton(999, this.width / 2 - 100, this.height / 6 + 168, "Go to XaeroPlus Github for updates"));
+        this.buttonList.add(new GuiButton(999, this.width / 2 - 100, this.height / 6 + 168,
+                                          I18n.format("gui.xaeroplus.check_github_button")));
     }
 
     @Inject(method = "actionPerformed", at = @At("TAIL"), remap = true)

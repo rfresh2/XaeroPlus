@@ -8,6 +8,7 @@ import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.joml.Matrix4f;
@@ -25,6 +26,7 @@ import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.minimap.waypoints.render.WaypointFilterParams;
 import xaero.common.minimap.waypoints.render.WaypointsIngameRenderer;
 import xaero.common.settings.ModSettings;
+import xaeroplus.mixin.client.mc.AccessorWorldRenderer;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ColorHelper;
 import xaeroplus.util.CustomWaypointsIngameRenderer;
@@ -55,6 +57,12 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
                     && (w.getWaypointType() != 1 && w.getWaypointType() != 2 || deathpoints)) {
                 double offX = (double)w.getX(filterParams.dimDiv) - filterParams.cameraX + 0.5;
                 double offZ = (double)w.getZ(filterParams.dimDiv) - filterParams.cameraZ + 0.5;
+//                double depth = offX * (double) filterParams.lookVector.x()
+//                        + offZ * (double)filterParams.lookVector.z();
+//                if (depth < 0.1 && Math.abs(filterParams.lookVector.x) > 0.1 && Math.abs(filterParams.lookVector.z) > 0.1) {
+//                    XaeroPlus.LOGGER.warn("Depth: {}, offX: {}, offZ: {}, lookVecX: {}, lookVecZ: {}", depth, offX, offZ, filterParams.lookVector.x(), filterParams.lookVector.z());
+//                    return false;
+//                }
                 double distance2D = Math.sqrt(offX * offX + offZ * offZ);
                 double waypointsDistance = filterParams.waypointsDistance;
                 double waypointsDistanceMin = filterParams.waypointsDistanceMin;
@@ -121,12 +129,14 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
         }
         final EntityRenderDispatcher entityRenderDispatcher = mc.getEntityRenderDispatcher();
         final Camera camera = entityRenderDispatcher.camera;
-        if (camera == null) return;
+        final Frustum frustum = ((AccessorWorldRenderer) mc.worldRenderer).getFrustum();
+        if (camera == null || frustum == null) return;
         final double viewX = camera.getPos().getX();
         final double viewZ = camera.getPos().getZ();
         final double x = waypointVec.x - viewX;
         final double z = waypointVec.z - viewZ;
         final double y = -100;
+        if (!frustum.isVisible(new Box(waypointVec.x-1, -100, waypointVec.z-1, waypointVec.x+1, 500, waypointVec.z+1))) return;
         final int color = ModSettings.COLORS[waypoint.getColor()];
         final VertexConsumerProvider.Immediate entityVertexConsumers = mc.getBufferBuilders().getEntityVertexConsumers();
         final long time = mc.world.getTime();

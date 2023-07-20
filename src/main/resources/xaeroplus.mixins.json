@@ -50,6 +50,7 @@
     "MixinWorldMapModOptionsAccessor",
     "MixinWorldMapModSettings",
     "MixinWorldMapOption",
+    "mc.AccessorWorldRenderer",
     "mc.MixinClientConnection",
     "mc.MixinMinecraftClient",
     "mc.MixinWorldRenderer"

@@ -65,6 +65,24 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
                                                  String settingNameTranslationKey,
                                                  String tooltipTranslationKey,
                                                  Supplier<Boolean> visibilitySupplier,
+                                                 boolean defaultValue,
+                                                 final SettingLocation settingLocation) {
+        final XaeroPlusBooleanSetting setting = new XaeroPlusBooleanSetting(
+                SETTING_PREFIX + settingName,
+                settingNameTranslationKey,
+                defaultValue,
+                tooltipTranslationKey,
+                visibilitySupplier,
+                null,
+                new KeyBinding(settingName, -1, "XaeroPlus"));
+        settingLocation.getSettingsList().add(setting);
+        return setting;
+    }
+
+    public static XaeroPlusBooleanSetting create(String settingName,
+                                                 String settingNameTranslationKey,
+                                                 String tooltipTranslationKey,
+                                                 Supplier<Boolean> visibilitySupplier,
                                                  Consumer<Boolean> settingChangeConsumer,
                                                  boolean defaultValue,
                                                  final SettingLocation settingLocation) {

@@ -5,6 +5,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaeroplus.util.Shared;
 
 import java.io.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,7 +80,10 @@ public class XaeroPlusModSettingsHooks {
         foundSetting
                 .filter(xaeroPlusSetting ->  xaeroPlusSetting instanceof XaeroPlusFloatSetting)
                 .map(xaeroPlusSetting -> (XaeroPlusFloatSetting) xaeroPlusSetting)
-                .ifPresent(xaeroPlusSetting -> xaeroPlusSetting.setValue((float) f));
+                .ifPresent(xaeroPlusSetting ->
+                       xaeroPlusSetting.setValue(
+                               // round to 2 places at most
+                               BigDecimal.valueOf(f).setScale(2, RoundingMode.HALF_UP).floatValue()));
         // why does xaero not have proper enum settings??? They are "floats" but treated like int indeces. just...why...
         foundSetting
                 .filter(xaeroPlusSetting ->  xaeroPlusSetting instanceof XaeroPlusEnumSetting)
@@ -116,7 +121,7 @@ public class XaeroPlusModSettingsHooks {
                 .map(xaeroPlusSetting -> (XaeroPlusBooleanSetting) xaeroPlusSetting)
                 .ifPresent(xaeroPlusBooleanSetting -> cir.setReturnValue(
                         xaeroPlusBooleanSetting.getTranslatedName() + ": "
-                        + I18n.format("gui.xaero_" + (xaeroPlusBooleanSetting.getValue() ? "on" : "off"))));
+                        + I18n.format("gui.xaeroplus." + (xaeroPlusBooleanSetting.getValue() ? "on" : "off"))));
         foundSetting
                 .filter(xaeroPlusSetting -> xaeroPlusSetting instanceof XaeroPlusEnumSetting)
                 .map(xaeroPlusSetting -> (XaeroPlusEnumSetting) xaeroPlusSetting)
@@ -129,12 +134,10 @@ public class XaeroPlusModSettingsHooks {
                 .map(xaeroPlusSetting -> (XaeroPlusFloatSetting) xaeroPlusSetting)
                 .ifPresent(xaeroPlusFloatSetting -> {
                     final int intCastStep = (int) xaeroPlusFloatSetting.getValueStep();
-                    if (xaeroPlusFloatSetting.getValueStep() - intCastStep <= 0) {
-                        // this float is equivalent to an int
-                        cir.setReturnValue(xaeroPlusFloatSetting.getTranslatedName() + ": " + ((int) xaeroPlusFloatSetting.getValue()));
-                    } else {
-                        cir.setReturnValue(xaeroPlusFloatSetting.getTranslatedName() + ": " + xaeroPlusFloatSetting.getValue());
-                    }
+                    cir.setReturnValue(xaeroPlusFloatSetting.getTranslatedName() + ": "
+                           + (xaeroPlusFloatSetting.getValueStep() - intCastStep <= 0
+                            ? ((int) xaeroPlusFloatSetting.getValue())
+                            : xaeroPlusFloatSetting.getValue()));
                 });
     }
 }

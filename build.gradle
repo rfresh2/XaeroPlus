@@ -179,6 +179,9 @@ shadowJar {
     exclude 'org/sqlite/native/Windows/aarch64/**'
     exclude 'org/sqlite/native/Windows/armv7/**'
     exclude 'META-INF/versions/**'
+    exclude 'META-INF/maven/**'
+    exclude 'com/google/**'
+    exclude 'org/checkerframework/**'
     finalizedBy 'configureReobfTaskForReobfShadowJar', 'reobfShadowJar'
     mustRunAfter 'jar'
 }

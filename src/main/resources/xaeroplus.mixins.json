@@ -9,7 +9,6 @@
     "MixinBranchLeveledRegion",
     "MixinCommonGuiSettings",
     "MixinControlsHandler",
-    "MixinControlsRegister",
     "MixinGuiEntityRadarSettings",
     "MixinGuiMap",
     "MixinGuiMapAccessor",
@@ -54,5 +53,8 @@
     "mc.MixinClientConnection",
     "mc.MixinMinecraftClient",
     "mc.MixinWorldRenderer"
+  ],
+  "mixins": [
+    "MixinKeyEventHandler"
   ]
 }

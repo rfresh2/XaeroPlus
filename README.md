@@ -47,6 +47,8 @@ Or a modpack zip with these jars is included in the Github releases.
 * [Baritone](https://github.com/cabaletta/baritone) integration
   * Baritone Goals synced as temporary waypoints
   * [Point and Click Travel](https://cdn.discordapp.com/attachments/1005598555186139156/1125306712300204082/Base_Profile_2023.07.02_-_23.04.34.09.DVR.mp4)
+* [Waystones](https://legacy.curseforge.com/minecraft/mc-mods/waystones) integration
+  * Syncs Waystones as temporary waypoints
 * [Portal Skip Highlighting in Minimap and WorldMap](https://cdn.discordapp.com/attachments/1029572347818151947/1109656254265163816/Base_Profile_2023.05.20_-_18.34.34.34.DVR.mp4). Detects chunks where a portal could have been loaded.
 * [Transparent minimap background instead of wasted black screen space.](https://cdn.discordapp.com/attachments/963821382569979904/1088651890335686716/2023-03-23_19.26.36.png)
 * [Fast map region writes](https://cdn.discordapp.com/attachments/963821382569979904/1049947847467995196/Temurin-1.8.0_345_2022.12.06_-_22.44.28.05.DVR.mp4). Prevent missed chunks in map while traveling at very high speeds.

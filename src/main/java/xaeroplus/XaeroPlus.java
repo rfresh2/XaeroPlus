@@ -15,7 +15,7 @@ public class XaeroPlus implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		ModuleManager.init();
-		boolean a = Shared.settingsLoadedInit; // force static instances to init
+		boolean a = Shared.FOLLOW; // force static instances to init
 		XaeroPlusSettingRegistry.fastMapSetting.getValue(); // force static instances to init
 	}
 }

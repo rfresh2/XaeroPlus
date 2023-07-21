@@ -49,7 +49,7 @@ public class XaeroPlusModSettingsHooks {
         }
 
         // 1 for minimap, 1 for worldmap
-        if (loadCount == 2) Shared.onAllSettingsDoneLoading();
+        if (loadCount == 2) Shared.onAllSettingsLoaded();
     }
 
     public static void getClientBooleanValue(String enumString, List<XaeroPlusSetting> settings, CallbackInfoReturnable<Boolean> cir) {

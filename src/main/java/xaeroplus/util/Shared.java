@@ -35,7 +35,6 @@ public class Shared {
     public static boolean nullOverworldDimensionFolder = false;
     public static XaeroPlusSettingRegistry.DataFolderResolutionMode dataFolderResolutionMode = XaeroPlusSettingRegistry.DataFolderResolutionMode.IP;
     public static int minimapScalingFactor = 1;
-    public static boolean settingsLoadedInit = false;
     public static boolean shouldResetFBO = false;
     public static String LOCK_ID = UUID.randomUUID().toString();
     public static int customDimensionId = 0;
@@ -46,13 +45,11 @@ public class Shared {
             Math.max(1, Math.min(Runtime.getRuntime().availableProcessors() / 2, 4)));
     public static final ResourceLocation xpGuiTextures = new ResourceLocation("xaeroplus", "gui/xpgui.png");
 
-    public static void onAllSettingsDoneLoading() {
-        if (!settingsLoadedInit) { // handle settings where we want them to take effect only on first load
-            XaeroPlusSettingsReflectionHax.ALL_SETTINGS.get().forEach(XaeroPlusSetting::init);
-            nullOverworldDimensionFolder = XaeroPlusSettingRegistry.nullOverworldDimensionFolder.getValue();
-            dataFolderResolutionMode = XaeroPlusSettingRegistry.dataFolderResolutionMode.getValue();
-            minimapScalingFactor = (int) XaeroPlusSettingRegistry.minimapScaling.getValue();
-        }
+    public static void onAllSettingsLoaded() {
+        XaeroPlusSettingsReflectionHax.ALL_SETTINGS.get().forEach(XaeroPlusSetting::init);
+        nullOverworldDimensionFolder = XaeroPlusSettingRegistry.nullOverworldDimensionFolder.getValue();
+        dataFolderResolutionMode = XaeroPlusSettingRegistry.dataFolderResolutionMode.getValue();
+        minimapScalingFactor = (int) XaeroPlusSettingRegistry.minimapScaling.getValue();
     }
 
     public static void switchToDimension(final int newDimId) {

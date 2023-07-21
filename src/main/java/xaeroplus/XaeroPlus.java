@@ -33,7 +33,7 @@ public class XaeroPlus {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         ModuleManager.init();
-        boolean settingsLoadedInit = Shared.settingsLoadedInit;// force static instances to init
+        boolean follow = Shared.FOLLOW;// force static instances to init
         XaeroPlusSettingRegistry.fastMapSetting.getValue(); // force static instances to init
     }
 
@@ -43,8 +43,6 @@ public class XaeroPlus {
     }
 
     @Mod.EventHandler
-    public void postInit(FMLPostInitializationEvent event) {
-        Shared.settingsLoadedInit = true;
-    }
+    public void postInit(FMLPostInitializationEvent event) {}
 
 }

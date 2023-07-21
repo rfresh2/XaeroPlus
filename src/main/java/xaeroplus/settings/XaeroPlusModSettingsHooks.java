@@ -132,6 +132,8 @@ public class XaeroPlusModSettingsHooks {
                     if (xaeroPlusFloatSetting.getValueStep() - intCastStep <= 0) {
                         // this float is equivalent to an int
                         cir.setReturnValue(xaeroPlusFloatSetting.getTranslatedName() + ": " + ((int) xaeroPlusFloatSetting.getValue()));
+                    } else {
+                        cir.setReturnValue(xaeroPlusFloatSetting.getTranslatedName() + ": " + xaeroPlusFloatSetting.getValue());
                     }
                 });
     }

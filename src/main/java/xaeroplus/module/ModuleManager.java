@@ -3,9 +3,9 @@ package xaeroplus.module;
 import xaeroplus.module.impl.BaritoneGoalSync;
 import xaeroplus.module.impl.NewChunks;
 import xaeroplus.module.impl.PortalSkipDetection;
+import xaeroplus.module.impl.WaystoneSync;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 
 import static java.util.Arrays.asList;
 
@@ -16,7 +16,8 @@ public class ModuleManager {
         asList(
                 new BaritoneGoalSync(),
                 new NewChunks(),
-                new PortalSkipDetection())
+                new PortalSkipDetection(),
+                new WaystoneSync())
                 .forEach(ModuleManager::addModule);
     }
 

@@ -90,5 +90,7 @@
   "gui.world_map.baritone_path_here": "Baritone Path Here",
   "gui.world_map.baritone_elytra_here": "Baritone Elytra Here",
   "gui.xaeroplus.check_github_button": "Go to XaeroPlus Github for updates",
-  "gui.waypoints.toggle_enable_all": "Toggle Enable All"
+  "gui.waypoints.toggle_enable_all": "Toggle Enable All",
+  "setting.world_map.waystones_sync": "Waystones Sync",
+  "setting.world_map.waystones_sync.tooltip": "Syncs Waystones as waypoints."
 }

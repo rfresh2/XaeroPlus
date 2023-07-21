@@ -92,3 +92,5 @@ gui.xaeroplus.check_github_button=Go to XaeroPlus Github for updates
 gui.waypoints.toggle_enable_all=Toggle Enable All
 setting.world_map.waystones_sync=Waystones Sync
 setting.world_map.waystones_sync.tooltip=Syncs Waystones as waypoints.
+setting.world_map.cross_dimension_teleport=Cross Dimension Teleport
+setting.world_map.cross_dimension_teleport.tooltip=If the XaeroPlus dimension is switched, also modify teleport commands to that dimension

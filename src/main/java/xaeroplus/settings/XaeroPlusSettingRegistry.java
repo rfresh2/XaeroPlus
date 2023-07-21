@@ -318,4 +318,10 @@ public final class XaeroPlusSettingRegistry {
             "setting.waypoints.waypoint_beacon_distance_min.tooltip",
             0f,
             SettingLocation.WAYPOINTS);
+    public static final XaeroPlusBooleanSetting crossDimensionTeleportCommand = XaeroPlusBooleanSetting.create(
+            "Cross Dimension Teleport",
+            "setting.world_map.cross_dimension_teleport",
+            "setting.world_map.cross_dimension_teleport.tooltip",
+            true,
+            SettingLocation.WORLD_MAP_MAIN);
 }

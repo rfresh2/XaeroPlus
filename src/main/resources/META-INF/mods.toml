@@ -18,25 +18,25 @@ modId = "forge"
 mandatory = true
 versionRange = "[47,)"
 ordering = "NONE"
-side = "BOTH"
+side = "CLIENT"
 
 [[dependencies.xaeroplus]]
 modId = "minecraft"
 mandatory = true
 versionRange = "[1.20,)"
 ordering = "NONE"
-side = "BOTH"
+side = "CLIENT"
 
 [[dependencies.xaeroplus]]
 modId = "xaerominimap"
 mandatory = true
-versionRange = "[23.5.0]"
+versionRange = "[23.6.0]"
 ordering = "BEFORE"
-side = "BOTH"
+side = "CLIENT"
 
 [[dependencies.xaeroplus]]
 modId = "xaeroworldmap"
 mandatory = true
-versionRange = "[1.30.6]"
+versionRange = "[1.31.0]"
 ordering = "BEFORE"
-side = "BOTH"
+side = "CLIENT"

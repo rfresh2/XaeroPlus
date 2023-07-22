@@ -21,6 +21,7 @@
     "MixinGuiWaypointSettings",
     "MixinGuiWaypointsList",
     "MixinGuiWorldMapSettings",
+    "MixinKeyEventHandler",
     "MixinLeveledRegion",
     "MixinMapLimiter",
     "MixinMapPixel",
@@ -53,8 +54,5 @@
     "mc.MixinClientConnection",
     "mc.MixinMinecraftClient",
     "mc.MixinWorldRenderer"
-  ],
-  "mixins": [
-    "MixinKeyEventHandler"
   ]
 }

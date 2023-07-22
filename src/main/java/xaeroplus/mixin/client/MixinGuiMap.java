@@ -44,6 +44,7 @@ import xaero.map.gui.dropdown.rightclick.RightClickOption;
 import xaero.map.misc.Misc;
 import xaero.map.mods.SupportMods;
 import xaero.map.mods.gui.Waypoint;
+import xaero.map.radar.tracker.PlayerTrackerMapElement;
 import xaero.map.region.*;
 import xaero.map.region.texture.RegionTexture;
 import xaero.map.settings.ModSettings;
@@ -142,6 +143,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     private Animation zoomAnim;
     @Shadow
     public boolean waypointMenu;
+    @Shadow
+    public boolean playersMenu;
+    @Shadow
+    private boolean overPlayersMenu;
     @Shadow
     private static ImprovedFramebuffer primaryScaleFBO;
     @Shadow
@@ -1275,6 +1280,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                         GlStateManager.enableAlpha();
                         double screenSizeBasedScale = scaleMultiplier;
                         GlStateManager.disableCull();
+                        WorldMap.trackedPlayerRenderer.update(mc);
 
                         try {
                             if (!mc.gameSettings.hideGUI) {
@@ -1508,12 +1514,49 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                             );
                         }
 
+
                         this.overWaypointsMenu = false;
-                        if (this.waypointMenu && SupportMods.xaeroMinimap.getWaypointsSorted() != null) {
+                        this.overPlayersMenu = false;
+                        if (this.waypointMenu || this.playersMenu) {
                             GlStateManager.pushMatrix();
                             GlStateManager.translate(0.0F, 0.0F, 972.0F);
-                            HoveredMapElementHolder<?, ?> hovered = SupportMods.xaeroMinimap
-                                    .renderWaypointsMenu(
+                        }
+
+                        if (this.waypointMenu) {
+                            if (SupportMods.xaeroMinimap.getWaypointsSorted() != null) {
+                                HoveredMapElementHolder<?, ?> hovered = SupportMods.xaeroMinimap
+                                        .renderWaypointsMenu(
+                                                (GuiMap) (Object) this,
+                                                this.scale,
+                                                this.width,
+                                                this.height,
+                                                scaledMouseX,
+                                                scaledMouseY,
+                                                this.leftMouseButton.isDown,
+                                                this.leftMouseButton.clicked,
+                                                this.viewed,
+                                                mc
+                                        );
+                                if (hovered != null) {
+                                    this.overWaypointsMenu = true;
+                                    if (hovered.getElement() instanceof Waypoint) {
+                                        this.viewed = hovered;
+                                        this.viewedInList = true;
+                                        if (this.leftMouseButton.clicked) {
+                                            this.cameraDestination = new int[]{
+                                                    (int)((Waypoint)this.viewed.getElement()).getRenderX(), (int)((Waypoint)this.viewed.getElement()).getRenderZ()
+                                            };
+                                            this.leftMouseButton.isDown = false;
+                                            if (WorldMap.settings.closeWaypointsWhenHopping) {
+                                                this.onWaypointsButton(this.waypointsButton);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } else if (this.playersMenu) {
+                            HoveredMapElementHolder<?, ?> hovered = WorldMap.trackedPlayerMenuRenderer
+                                    .renderMenu(
                                             (GuiMap) (Object) this,
                                             this.scale,
                                             this.width,
@@ -1526,22 +1569,21 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                             mc
                                     );
                             if (hovered != null) {
-                                this.overWaypointsMenu = true;
-                                if (hovered.getElement() instanceof Waypoint) {
+                                this.overPlayersMenu = true;
+                                if (hovered.getElement() instanceof PlayerTrackerMapElement) {
                                     this.viewed = hovered;
                                     this.viewedInList = true;
                                     if (this.leftMouseButton.clicked) {
                                         this.cameraDestination = new int[]{
-                                                (int)((Waypoint)this.viewed.getElement()).getRenderX(), (int)((Waypoint)this.viewed.getElement()).getRenderZ()
+                                                (int)((PlayerTrackerMapElement)this.viewed.getElement()).getX(), (int)((PlayerTrackerMapElement)this.viewed.getElement()).getZ()
                                         };
                                         this.leftMouseButton.isDown = false;
-                                        if (WorldMap.settings.closeWaypointsWhenHopping) {
-                                            this.onWaypointsButton(this.waypointsButton);
-                                        }
                                     }
                                 }
                             }
+                        }
 
+                        if (this.waypointMenu || this.playersMenu) {
                             GlStateManager.popMatrix();
                         }
 

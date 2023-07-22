@@ -11,17 +11,19 @@ import java.util.Map;
 public class XaeroMinimapPlugin implements IFMLLoadingPlugin {
    public String[] getASMTransformerClass() {
       return new String[]{
-         "xaero.common.core.transformer.ChunkTransformer",
-         "xaero.common.core.transformer.NetHandlerPlayClientTransformer",
-         "xaero.common.core.transformer.EntityPlayerTransformer",
-         "xaero.common.core.transformer.AbstractClientPlayerTransformer",
-         "xaero.common.core.transformer.WorldClientTransformer",
-         "xaero.common.core.transformer.EntityPlayerSPTransformer",
-         "xaero.common.core.transformer.PlayerListTransformer",
-         "xaero.common.core.transformer.SaveFormatTransformer",
-         "xaero.common.core.transformer.GuiIngameForgeTransformer",
-         "xaero.common.core.transformer.GuiBossOverlayTransformer",
-         "xaero.common.core.transformer.ModelRendererTransformer"
+              "xaero.common.core.transformer.ChunkTransformer",
+              "xaero.common.core.transformer.NetHandlerPlayClientTransformer",
+              "xaero.common.core.transformer.EntityPlayerTransformer",
+              "xaero.common.core.transformer.AbstractClientPlayerTransformer",
+              "xaero.common.core.transformer.WorldClientTransformer",
+              "xaero.common.core.transformer.EntityPlayerMPTransformer",
+              "xaero.common.core.transformer.EntityPlayerSPTransformer",
+              "xaero.common.core.transformer.PlayerListTransformer",
+              "xaero.common.core.transformer.SaveFormatTransformer",
+              "xaero.common.core.transformer.GuiIngameForgeTransformer",
+              "xaero.common.core.transformer.MinecraftServerTransformer",
+              "xaero.common.core.transformer.GuiBossOverlayTransformer",
+              "xaero.common.core.transformer.ModelRendererTransformer"
       };
    }
 

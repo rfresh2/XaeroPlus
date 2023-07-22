@@ -11,15 +11,17 @@ import java.util.Map;
 public class XaeroWorldMapPlugin implements IFMLLoadingPlugin {
    public String[] getASMTransformerClass() {
       return new String[]{
-         "xaero.map.core.transformer.ChunkTransformer",
-         "xaero.map.core.transformer.NetHandlerPlayClientTransformer",
-         "xaero.map.core.transformer.EntityPlayerTransformer",
-         "xaero.map.core.transformer.AbstractClientPlayerTransformer",
-         "xaero.map.core.transformer.WorldClientTransformer",
-         "xaero.map.core.transformer.PlayerListTransformer",
-         "xaero.map.core.transformer.SaveFormatTransformer",
-         "xaero.map.core.transformer.BiomeColorHelperTransformer",
-         "xaero.map.core.transformer.MinecraftTransformer"
+              "xaero.map.core.transformer.ChunkTransformer",
+              "xaero.map.core.transformer.NetHandlerPlayClientTransformer",
+              "xaero.map.core.transformer.EntityPlayerTransformer",
+              "xaero.map.core.transformer.AbstractClientPlayerTransformer",
+              "xaero.map.core.transformer.WorldClientTransformer",
+              "xaero.map.core.transformer.EntityPlayerMPTransformer",
+              "xaero.map.core.transformer.PlayerListTransformer",
+              "xaero.map.core.transformer.SaveFormatTransformer",
+              "xaero.map.core.transformer.BiomeColorHelperTransformer",
+              "xaero.map.core.transformer.MinecraftServerTransformer",
+              "xaero.map.core.transformer.MinecraftTransformer"
       };
    }
 

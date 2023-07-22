@@ -5,8 +5,8 @@ on:
     branches:
       - "fabric-1.20.1"
 env:
-  WORLDMAP_VERSION: "1.30.6"
-  MINIMAP_VERSION: "23.5.0"
+  WORLDMAP_VERSION: "1.31.0"
+  MINIMAP_VERSION: "23.6.0"
   MINECRAFT_VERSION: "1.20.1"
   MINECRAFT_VERSION_SHORT: "1.20"
   MOD_LOADER: "Fabric"

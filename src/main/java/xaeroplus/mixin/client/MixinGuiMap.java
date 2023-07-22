@@ -55,7 +55,7 @@ import xaero.map.misc.Misc;
 import xaero.map.misc.OptimizedMath;
 import xaero.map.mods.SupportMods;
 import xaero.map.mods.gui.Waypoint;
-import xaero.map.mods.pac.gui.PlayerDynamicInfoMapElement;
+import xaero.map.radar.tracker.PlayerTrackerMapElement;
 import xaero.map.region.*;
 import xaero.map.region.texture.RegionTexture;
 import xaero.map.settings.ModSettings;
@@ -1374,9 +1374,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     matrixStack.pop();
                     matrixStack.scale((float)this.scale, (float)this.scale, 1.0F);
                     double screenSizeBasedScale = scaleMultiplier;
-                    if (SupportMods.pac()) {
-                        SupportMods.xaeroPac.preMapElementRender(mc);
-                    }
+                    WorldMap.trackedPlayerRenderer.update(mc);
 
                     try {
                         if (!mc.options.hudHidden) {
@@ -1758,9 +1756,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                 }
                             }
                         }
-                    } else if (this.playersMenu && SupportMods.xaeroPac.getPlayerDynamicInfoMapElements() != null) {
-                        HoveredMapElementHolder<?, ?> hovered = SupportMods.xaeroPac
-                                .getPlayerMenuRenderer()
+                    } else if (this.playersMenu) {
+                        HoveredMapElementHolder<?, ?> hovered = WorldMap.trackedPlayerMenuRenderer
                                 .renderMenu(
                                         guiGraphics,
                                         (GuiMap) (Object) this,
@@ -1776,14 +1773,12 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                 );
                         if (hovered != null) {
                             this.overPlayersMenu = true;
-                            if (hovered.getElement() instanceof PlayerDynamicInfoMapElement) {
+                            if (hovered.getElement() instanceof PlayerTrackerMapElement) {
                                 this.viewed = hovered;
                                 this.viewedInList = true;
                                 if (this.leftMouseButton.clicked) {
                                     this.cameraDestination = new int[]{
-                                            // need to delegate this out to a helper to avoid mixin classloading errors
-                                            PacHelper.getSyncableX(((PlayerDynamicInfoMapElement)this.viewed.getElement())),
-                                            PacHelper.getSyncableZ(((PlayerDynamicInfoMapElement)this.viewed.getElement()))
+                                            (int)((PlayerTrackerMapElement)this.viewed.getElement()).getX(), (int)((PlayerTrackerMapElement)this.viewed.getElement()).getZ()
                                     };
                                     this.leftMouseButton.isDown = false;
                                 }

@@ -17,6 +17,7 @@ import net.minecraft.world.chunk.WorldChunk;
 import xaeroplus.event.ClientTickEvent;
 import xaeroplus.event.PacketReceivedEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
+import xaeroplus.mixin.client.mc.AccessorWorldRenderer;
 import xaeroplus.module.Module;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ChunkUtils;
@@ -46,7 +47,7 @@ public class NewChunks extends Module {
 
     @Subscribe
     public void onPacketReceivedEvent(final PacketReceivedEvent event) {
-        if (mc.world == null) return;
+        if (mc.world == null || ((AccessorWorldRenderer) mc.worldRenderer).getChunks() == null) return;
         // credits to BleachHack for this fluid flow based detection method
         if (event.packet() instanceof ChunkDeltaUpdateS2CPacket) {
             ChunkDeltaUpdateS2CPacket packet = (ChunkDeltaUpdateS2CPacket) event.packet();
@@ -86,7 +87,7 @@ public class NewChunks extends Module {
                 WorldChunk chunk = new WorldChunk(mc.world, pos);
                 try {
                     chunk.loadFromPacket(packet.getChunkData().getSectionsDataBuf(), new NbtCompound(), packet.getChunkData().getBlockEntities(packet.getX(), packet.getZ()));
-                } catch (ArrayIndexOutOfBoundsException e) {
+                } catch (Throwable e) {
                     return;
                 }
 

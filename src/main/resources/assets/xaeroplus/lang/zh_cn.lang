@@ -92,3 +92,7 @@ gui.xaeroplus.check_github_button=前往 XaeroPlus Github 获取更新
 gui.waypoints.toggle_enable_all=切换全部启用
 setting.world_map.waystones_sync=传送石碑同步
 setting.world_map.waystones_sync.tooltip=将传送石碑同步为路径点。
+setting.world_map.cross_dim_waystones_sync=传送石碑维度同步
+setting.world_map.cross_dim_waystones_sync.tooltip=将传送石碑同步到根据其维度设置的（默认）路径点
+setting.world_map.cross_dimension_teleport=跨维度传送
+setting.world_map.cross_dimension_teleport.tooltip=如果 XaeroPlus 维度被切换，同时修改传送到该维度的命令

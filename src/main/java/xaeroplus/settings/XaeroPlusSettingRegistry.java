@@ -59,6 +59,13 @@ public final class XaeroPlusSettingRegistry {
             },
             true,
             SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting waystonesCrossDimSyncSetting = XaeroPlusBooleanSetting.create(
+            "Waystones Dimension Sync",
+            "setting.world_map.cross_dim_waystones_sync",
+            "setting.world_map.cross_dim_waystones_sync.tooltip",
+            WaystonesHelper::isWaystonesPresent,
+            false,
+            SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting persistMapDimensionSwitchSetting = XaeroPlusBooleanSetting.create(
             "Persist WM Dim Switch",
             "setting.world_map.persist_dimension_switch",

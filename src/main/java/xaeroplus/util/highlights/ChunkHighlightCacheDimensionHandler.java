@@ -1,4 +1,4 @@
-package xaeroplus.util.newchunks;
+package xaeroplus.util.highlights;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
@@ -14,16 +14,16 @@ import java.util.concurrent.TimeUnit;
 import static xaeroplus.util.ChunkUtils.chunkPosToLong;
 import static xaeroplus.util.ChunkUtils.regionCoordToChunkCoord;
 
-public class NewChunksSavingCacheDimensionHandler extends NewChunksBaseCacheHandler {
+public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCacheHandler {
     private final int dimension;
     private int windowRegionX = 0;
     private int windowRegionZ = 0;
     // square centered at windowX, windowZ with size windowSize
     private int windowRegionSize = 0;
-    private final NewChunksDatabase database;
+    private final ChunkHighlightDatabase database;
     private final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(Executors.newSingleThreadExecutor());
 
-    public NewChunksSavingCacheDimensionHandler(final int dimension, final NewChunksDatabase database) {
+    public ChunkHighlightCacheDimensionHandler(final int dimension, final ChunkHighlightDatabase database) {
         this.dimension = dimension;
         this.database = database;
     }
@@ -32,32 +32,33 @@ public class NewChunksSavingCacheDimensionHandler extends NewChunksBaseCacheHand
         this.windowRegionX = regionX;
         this.windowRegionZ = regionZ;
         this.windowRegionSize = regionSize;
-        writeNewChunksOutsideWindowToDatabase();
-        loadNewChunksInWindow();
+        writeHighlightsOutsideWindowToDatabase();
+        loadHighlightsInWindow();
     }
 
-    private void loadNewChunksInWindow() {
+    private void loadHighlightsInWindow() {
         executorService.submit(() -> {
-            final List<NewChunkData> newChunks = database.getNewChunksInWindow(dimension,
+            final List<ChunkHighlightData> chunks = database.getHighlightsInWindow(
+                    dimension,
                     windowRegionX - windowRegionSize, windowRegionX + windowRegionSize,
                     windowRegionZ - windowRegionSize, windowRegionZ + windowRegionSize
             );
             try {
                 if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
-                    for (final NewChunkData chunk : newChunks) {
-                        chunks.put(chunkPosToLong(chunk.x, chunk.z), chunk.foundTime);
+                    for (final ChunkHighlightData chunk : chunks) {
+                        this.chunks.put(chunkPosToLong(chunk.x, chunk.z), chunk.foundTime);
                     }
                     lock.writeLock().unlock();
                 }
             } catch (final Exception e) {
-                XaeroPlus.LOGGER.error("Failed to load new chunks in window", e);
+                XaeroPlus.LOGGER.error("Failed to load portals in window", e);
             }
         });
     }
 
-    private void writeNewChunksOutsideWindowToDatabase() {
+    private void writeHighlightsOutsideWindowToDatabase() {
         executorService.execute(() -> {
-            final List<NewChunkData> chunksToWrite = new ArrayList<>();
+            final List<ChunkHighlightData> chunksToWrite = new ArrayList<>();
             try {
                 if (lock.writeLock().tryLock(1L, TimeUnit.SECONDS)) {
                     chunks.long2LongEntrySet().removeIf(entry -> {
@@ -68,7 +69,7 @@ public class NewChunksSavingCacheDimensionHandler extends NewChunksBaseCacheHand
                                 || chunkX > regionCoordToChunkCoord(windowRegionX + windowRegionSize)
                                 || chunkZ < regionCoordToChunkCoord(windowRegionZ - windowRegionSize)
                                 || chunkZ > regionCoordToChunkCoord(windowRegionZ + windowRegionSize)) {
-                            chunksToWrite.add(new NewChunkData(chunkX, chunkZ, entry.getLongValue()));
+                            chunksToWrite.add(new ChunkHighlightData(chunkX, chunkZ, entry.getLongValue()));
                             return true;
                         }
                         return false;
@@ -76,30 +77,36 @@ public class NewChunksSavingCacheDimensionHandler extends NewChunksBaseCacheHand
                     lock.writeLock().unlock();
                 }
             } catch (final Exception e) {
-                XaeroPlus.LOGGER.error("Error while writing new chunks outside window to database", e);
+                XaeroPlus.LOGGER.error("Error while writing portals outside window to database", e);
             }
-            database.insertNewChunkList(chunksToWrite, dimension);
+            database.insertHighlightList(chunksToWrite, dimension);
         });
     }
 
-    public ListenableFuture<?> writeAllChunksToDatabase() {
+    public ListenableFuture<?> writeAllHighlightsToDatabase() {
         return executorService.submit(() -> {
-            final List<NewChunkData> chunksToWrite = new ArrayList<>();
+            final List<ChunkHighlightData> chunksToWrite = new ArrayList<>();
             try {
                 if (lock.readLock().tryLock(1, TimeUnit.SECONDS)) {
                     chunks.long2LongEntrySet().forEach(entry -> {
                         final long chunkPos = entry.getLongKey();
                         final int chunkX = ChunkUtils.longToChunkX(chunkPos);
                         final int chunkZ = ChunkUtils.longToChunkZ(chunkPos);
-                        chunksToWrite.add(new NewChunkData(chunkX, chunkZ, entry.getLongValue()));
+                        chunksToWrite.add(new ChunkHighlightData(chunkX, chunkZ, entry.getLongValue()));
                     });
                     lock.readLock().unlock();
                 }
             } catch (final Exception e) {
                 XaeroPlus.LOGGER.error("Error while writing all chunks to database", e);
             }
-            database.insertNewChunkList(chunksToWrite, dimension);
+            database.insertHighlightList(chunksToWrite, dimension);
         });
+    }
+
+    @Override
+    public void removeHighlight(final int x, final int z) {
+        super.removeHighlight(x, z);
+        database.removeHighlight(x, z, dimension);
     }
 
     public void close() {

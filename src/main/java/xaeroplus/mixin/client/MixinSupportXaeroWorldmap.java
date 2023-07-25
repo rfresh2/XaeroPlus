@@ -31,6 +31,7 @@ import xaero.map.region.MapTileChunk;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
 import xaeroplus.module.impl.PortalSkipDetection;
+import xaeroplus.module.impl.Portals;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.*;
 
@@ -342,6 +343,21 @@ public abstract class MixinSupportXaeroWorldmap {
                                             }
                                         }
                                         GuiHelper.drawRectList(rects, ModuleManager.getModule(PortalSkipDetection.class).getPortalSkipChunksColor());
+                                    }
+                                    if (XaeroPlusSettingRegistry.portalsEnabledSetting.getValue()) {
+                                        final List<GuiHelper.Rect> rects = new ArrayList<>(32);
+                                        for (int t = 0; t < 16; ++t) {
+                                            final int chunkPosX = chunk.getX() * 4 + t % 4;
+                                            final int chunkPosZ = chunk.getZ() * 4 + t / 4;
+                                            if (ModuleManager.getModule(Portals.class).isPortalChunk(chunkPosX, chunkPosZ, Shared.customDimensionId)) {
+                                                final float left = drawX + 16 * (t % 4);
+                                                final float top = drawZ + 16 * (t / 4);
+                                                final float right = left + 16;
+                                                final float bottom = top + 16;
+                                                rects.add(new GuiHelper.Rect(left, top, right, bottom));
+                                            }
+                                        }
+                                        GuiHelper.drawRectList(rects, ModuleManager.getModule(Portals.class).getPortalsColor());
                                     }
                                     if (XaeroPlusSettingRegistry.wdlEnabledSetting.getValue()
                                             && WDLHelper.isWdlPresent()

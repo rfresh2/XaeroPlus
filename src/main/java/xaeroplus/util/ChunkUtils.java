@@ -2,6 +2,7 @@ package xaeroplus.util;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.ChunkPos;
+import xaeroplus.util.highlights.HighlightAtChunkPos;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,9 @@ public class ChunkUtils {
 
     public static int longToChunkZ(final long l) {
         return (int)(l >> 32 & 4294967295L);
+    }
+    public static int posToChunkPos(final int i) {
+        return i >> 4;
     }
 
     public static Callable<List<HighlightAtChunkPos>> loadHighlightChunksAtRegion(

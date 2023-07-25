@@ -8,6 +8,8 @@ import net.minecraft.world.chunk.Chunk;
 import wdl.WDL;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.highlights.HighlightAtChunkPos;
+import xaeroplus.util.highlights.RegionRenderPos;
 
 import java.util.Collections;
 import java.util.HashSet;

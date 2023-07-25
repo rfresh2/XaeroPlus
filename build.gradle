@@ -118,7 +118,7 @@ dependencies {
     implementation(fg.deobf("maven.modrinth:xaeros-world-map:1.31.0_Forge_1.12"))
     implementation(fg.deobf("maven.modrinth:xaeros-minimap:23.6.0_Forge_1.12"))
     implementation(fg.deobf('cabaletta:baritone-deobf-unoptimized-mcp-dev:1.2')).setChanging(true)
-    implementation(fg.deobf("curse.maven:waystones-245755:2859589"))
+    compileOnly(fg.deobf("curse.maven:waystones-245755:2859589"))
 
     annotationProcessor('org.spongepowered:mixin:0.8.5:processor') {
         exclude module: 'gson'

@@ -1,4 +1,4 @@
-package xaeroplus.util.newchunks;
+package xaeroplus.util.highlights;
 
 import com.google.common.collect.Lists;
 import xaero.map.WorldMap;
@@ -16,21 +16,22 @@ import java.util.stream.Collectors;
 
 import static xaeroplus.util.ChunkUtils.regionCoordToChunkCoord;
 
-public class NewChunksDatabase implements Closeable {
-    public static final int MAX_NEWCHUNKS_LIST_SIZE = 25000;
+public class ChunkHighlightDatabase implements Closeable {
+    public static int MAX_HIGHLIGHTS_LIST = 25000;
     private final Connection connection;
-    public NewChunksDatabase(String worldId) {
+
+    public ChunkHighlightDatabase(String worldId, String databaseName) {
         try {
-            final Path dbPath = WorldMap.saveFolder.toPath().resolve(worldId).resolve("XaeroPlusNewChunks.db");
+            final Path dbPath = WorldMap.saveFolder.toPath().resolve(worldId).resolve(databaseName + ".db");
             connection = DriverManager.getConnection("jdbc:sqlite:" + dbPath);
-            createNewChunksTable();
+            createHighlightsTables();
         } catch (Exception e) {
-            XaeroPlus.LOGGER.error("Error while creating new chunks database", e);
+            XaeroPlus.LOGGER.error("Error while creating chunk highlight database", e);
             throw new RuntimeException(e);
         }
     }
 
-    public void createNewChunksTable() {
+    private void createHighlightsTables() {
         try {
             connection.createStatement().execute("CREATE TABLE IF NOT EXISTS \"0\" (x INTEGER, z INTEGER, foundTime INTEGER)");
             connection.createStatement().execute("CREATE TABLE IF NOT EXISTS \"-1\" (x INTEGER, z INTEGER, foundTime INTEGER)");
@@ -43,50 +44,59 @@ public class NewChunksDatabase implements Closeable {
         }
     }
 
-    public void insertNewChunkList(final List<NewChunkData> newChunks, final int dimension) {
-        if (newChunks.isEmpty()) {
+    public void insertHighlightList(final List<ChunkHighlightData> chunks, final int dimension) {
+        if (chunks.isEmpty()) {
             return;
         }
-        if (newChunks.size() > MAX_NEWCHUNKS_LIST_SIZE) {
-            Lists.partition(newChunks, MAX_NEWCHUNKS_LIST_SIZE).forEach(l -> insertNewChunksListInternal(l, dimension));
+        if (chunks.size() > MAX_HIGHLIGHTS_LIST) {
+            Lists.partition(chunks, MAX_HIGHLIGHTS_LIST).forEach(l -> insertHighlightsListInternal(l, dimension));
         } else {
-            insertNewChunksListInternal(newChunks, dimension);
+            insertHighlightsListInternal(chunks, dimension);
         }
     }
 
-    private void insertNewChunksListInternal(final List<NewChunkData> newChunks, final int dimension) {
+    private void insertHighlightsListInternal(final List<ChunkHighlightData> chunks, final int dimension) {
         try {
             String statement = "INSERT OR IGNORE INTO \"" + dimension + "\" VALUES ";
-            statement += newChunks.stream()
+            statement += chunks.stream()
                     .map(chunk -> "(" + chunk.x + ", " + chunk.z + ", " + chunk.foundTime + ")")
                     .collect(Collectors.joining(", "));
             connection.createStatement().execute(statement);
         } catch (Exception e) {
-            XaeroPlus.LOGGER.error("Error inserting new chunks into database", e);
+            XaeroPlus.LOGGER.error("Error inserting chunks into database", e);
         }
     }
 
-    public List<NewChunkData> getNewChunksInWindow(
+    public List<ChunkHighlightData> getHighlightsInWindow(
             final int dimension,
             final int regionXMin, final int regionXMax,
             final int regionZMin, final int regionZMax) {
         try {
-            ResultSet resultSet = connection.createStatement().executeQuery("SELECT * FROM \"" + dimension + "\" "
-                    + "WHERE x >= " + regionCoordToChunkCoord(regionXMin) + " AND x <= " + regionCoordToChunkCoord(regionXMax)
-                    + " AND z >= " + regionCoordToChunkCoord(regionZMin) + " AND z <= " + regionCoordToChunkCoord(regionZMax));
-            List<NewChunkData> newChunks = new ArrayList<>();
+            ResultSet resultSet = connection.createStatement().executeQuery(
+                    "SELECT * FROM \"" + dimension + "\" "
+                            + "WHERE x >= " + regionCoordToChunkCoord(regionXMin) + " AND x <= " + regionCoordToChunkCoord(regionXMax)
+                            + " AND z >= " + regionCoordToChunkCoord(regionZMin) + " AND z <= " + regionCoordToChunkCoord(regionZMax));
+            List<ChunkHighlightData> chunks = new ArrayList<>();
             while (resultSet.next()) {
-                newChunks.add(new NewChunkData(
+                chunks.add(new ChunkHighlightData(
                         resultSet.getInt("x"),
                         resultSet.getInt("z"),
                         resultSet.getInt("foundTime")));
             }
-            return newChunks;
+            return chunks;
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error while getting new chunks from database", e);
+            XaeroPlus.LOGGER.error("Error getting chunks from database", e);
             // fall through
         }
         return Collections.emptyList();
+    }
+
+    public void removeHighlight(final int x, final int z, final int dimension) {
+        try {
+            connection.createStatement().execute("DELETE FROM \"" + dimension + "\" WHERE x = " + x + " AND z = " + z);
+        } catch (Exception e) {
+            XaeroPlus.LOGGER.error("Error while removing highlight from database", e);
+        }
     }
 
     @Override
@@ -94,7 +104,7 @@ public class NewChunksDatabase implements Closeable {
         try {
             connection.close();
         } catch (Exception e) {
-            XaeroPlus.LOGGER.warn("Failed closing NewChunks database connection", e);
+            XaeroPlus.LOGGER.warn("Failed closing database connection", e);
         }
     }
 }

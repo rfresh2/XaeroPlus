@@ -46,6 +46,7 @@
     "MixinWorldDataReader",
     "MixinWorldMapGuiSettings",
     "MixinWorldMapModSettings",
+    "mc.MixinNetHandlerPlayClient",
     "mc.MixinNetworkManager"
   ]
 }

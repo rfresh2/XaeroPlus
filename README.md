@@ -43,13 +43,13 @@ Or a modpack zip with these jars is included in the Github releases.
 * [Adjustable minimap scaling that increases how many chunks are visible](https://cdn.discordapp.com/attachments/971140948593635335/1109734742842146937/Temurin-1.8.0_352_2023.03.29_-_16.16.08.32.DVR.mp4)
 * [NewChunks Highlighting in MiniMap and WorldMap.](https://cdn.discordapp.com/attachments/971140948593635335/1109735633045434408/Base_Profile_2023.01.02_-_11.26.22.02.DVR.mp4)
 * [WorldDownloader 4.1.1.0](https://github.com/Pokechu22/WorldDownloader/) integration (does not work with Future's Forge WDL jar)
-  * [Highlights chunks as they are downloaded in the Minimap and WorldMap.](https://cdn.discordapp.com/attachments/971140948593635335/1109735287006961705/Temurin-1.8.0_352_2023.01.02_-_18.54.28.04.DVR.mp4)
 * [Baritone](https://github.com/cabaletta/baritone) integration
   * Baritone Goals synced as temporary waypoints
   * [Point and Click Travel](https://cdn.discordapp.com/attachments/1005598555186139156/1125306712300204082/Base_Profile_2023.07.02_-_23.04.34.09.DVR.mp4)
 * [Waystones](https://legacy.curseforge.com/minecraft/mc-mods/waystones) integration
   * Syncs Waystones as temporary waypoints
 * [Portal Skip Highlighting in Minimap and WorldMap](https://cdn.discordapp.com/attachments/1029572347818151947/1109656254265163816/Base_Profile_2023.05.20_-_18.34.34.34.DVR.mp4). Detects chunks where a portal could have been loaded.
+* [Portal Highlighting in Minimap and WorldMap.](https://cdn.discordapp.com/attachments/1127463054804779028/1133251771217752175/Base_Profile_2023.07.24_-_21.02.36.03.mp4)
 * [Transparent minimap background instead of wasted black screen space.](https://cdn.discordapp.com/attachments/963821382569979904/1088651890335686716/2023-03-23_19.26.36.png)
 * [Fast map region writes](https://cdn.discordapp.com/attachments/963821382569979904/1049947847467995196/Temurin-1.8.0_345_2022.12.06_-_22.44.28.05.DVR.mp4). Prevent missed chunks in map while traveling at very high speeds.
 * Allow multiple MC instances to read/write to the same map concurrently

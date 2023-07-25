@@ -1,9 +1,7 @@
 package xaeroplus.module.impl;
 
-import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
-import com.github.benmanes.caffeine.cache.Caffeine;
+import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import xaero.map.WorldMapSession;
@@ -16,16 +14,18 @@ import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.module.Module;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.*;
+import xaeroplus.util.ChunkUtils;
+import xaeroplus.util.ColorHelper;
+import xaeroplus.util.CustomDimensionMapProcessor;
+import xaeroplus.util.SeenChunksTrackingMapTileChunk;
+import xaeroplus.util.highlights.ChunkHighlightLocalCache;
+import xaeroplus.util.highlights.HighlightAtChunkPos;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.*;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.stream.Collectors;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static xaeroplus.util.ChunkUtils.*;
 import static xaeroplus.util.GuiMapHelper.*;
@@ -35,13 +35,7 @@ public class PortalSkipDetection extends Module {
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     private Future<?> portalSkipDetectionSearchFuture = null;
     private int portalSkipChunksColor = ColorHelper.getColor(255, 255, 255, 100);
-    private final LongOpenHashSet portalSkipChunks = new LongOpenHashSet();
-    private final ReadWriteLock lock = new ReentrantReadWriteLock();
-    private final AsyncLoadingCache<RegionRenderPos, List<HighlightAtChunkPos>> regionRenderCache = Caffeine.newBuilder()
-            .expireAfterWrite(3000L, TimeUnit.MILLISECONDS)
-            .refreshAfterWrite(500L, TimeUnit.MILLISECONDS)
-            .executor(Shared.cacheRefreshExecutorService)
-            .buildAsync(key -> loadHighlightChunksAtRegion(key.leafRegionX, key.leafRegionZ, key.level, this::isPortalSkipChunk).call());
+    private final ChunkHighlightLocalCache cache = new ChunkHighlightLocalCache();
     private int windowRegionX = 0;
     private int windowRegionZ = 0;
     private int windowRegionSize = 0;
@@ -52,23 +46,22 @@ public class PortalSkipDetection extends Module {
 
     @SubscribeEvent
     public void onClientTickEvent(final TickEvent.ClientTickEvent event) {
-        if (!worldCacheInitialized) return;
-        if (event.phase == TickEvent.Phase.END) {
-            if (portalSkipDetectionSearchFuture == null || portalSkipDetectionSearchFuture.isDone()) {
-                tickCounter++;
-                if (tickCounter >= searchDelayTicks) {
-                    tickCounter = 0;
-                    Optional<GuiMap> guiMapOptional = getGuiMap();
-                    if (guiMapOptional.isPresent()) {
-                        final GuiMap guiMap = guiMapOptional.get();
-                        final int mapCenterX = getGuiMapCenterRegionX(guiMap);
-                        final int mapCenterZ = getGuiMapCenterRegionZ(guiMap);
-                        final int mapSize = getGuiMapRegionSize(guiMap);
-                        setWindow(mapCenterX, mapCenterZ, mapSize);
-                    } else {
-                        setWindow(ChunkUtils.getPlayerRegionX(), ChunkUtils.getPlayerRegionZ(), defaultRegionWindowSize);
-                    }
-                }
+        if (!worldCacheInitialized
+                || event.phase != TickEvent.Phase.END
+                || portalSkipDetectionSearchFuture != null
+                && !portalSkipDetectionSearchFuture.isDone()) return;
+        tickCounter++;
+        if (tickCounter >= searchDelayTicks) {
+            tickCounter = 0;
+            Optional<GuiMap> guiMapOptional = getGuiMap();
+            if (guiMapOptional.isPresent()) {
+                final GuiMap guiMap = guiMapOptional.get();
+                final int mapCenterX = getGuiMapCenterRegionX(guiMap);
+                final int mapCenterZ = getGuiMapCenterRegionZ(guiMap);
+                final int mapSize = getGuiMapRegionSize(guiMap);
+                setWindow(mapCenterX, mapCenterZ, mapSize);
+            } else {
+                setWindow(ChunkUtils.getPlayerRegionX(), ChunkUtils.getPlayerRegionZ(), defaultRegionWindowSize);
             }
         }
     }
@@ -93,8 +86,7 @@ public class PortalSkipDetection extends Module {
     private void initializeWorld() {
         try {
             final String worldId = XaeroWorldMapCore.currentSession.getMapProcessor().getCurrentWorldId();
-            final String mwId = XaeroWorldMapCore.currentSession.getMapProcessor().getCurrentMWId();
-            if (worldId == null || mwId == null) return;
+            if (worldId == null) return;
             worldCacheInitialized = true;
         } catch (final Exception e) {
             // expected on game launch
@@ -102,12 +94,7 @@ public class PortalSkipDetection extends Module {
     }
 
     private void reset() {
-        try {
-            lock.writeLock().lock();
-            portalSkipChunks.clear();
-        } finally {
-            lock.writeLock().unlock();
-        }
+        cache.reset();
         final Future<?> future = portalSkipDetectionSearchFuture;
         if (future != null && !future.isDone()) {
             future.cancel(true);
@@ -127,7 +114,7 @@ public class PortalSkipDetection extends Module {
             final int windowRegionZ = this.windowRegionZ;
             final int windowRegionSize = this.windowRegionSize;
             final int currentlyViewedDimension = getCurrentlyViewedDimension();
-            final HashSet<ChunkPos> portalDetectionSearchChunks = new HashSet<>();
+            final LongOpenHashSet portalDetectionSearchChunks = new LongOpenHashSet();
             for (int regionX = windowRegionX - windowRegionSize; regionX <= windowRegionX + windowRegionSize; regionX++) {
                 final int baseChunkCoordX = ChunkUtils.regionCoordToChunkCoord(regionX);
                 for (int regionZ = windowRegionZ - windowRegionSize; regionZ <= windowRegionZ + windowRegionSize; regionZ++) {
@@ -136,22 +123,20 @@ public class PortalSkipDetection extends Module {
                         for (int chunkZ = 0; chunkZ < 32; chunkZ++) {
                             final int chunkPosX = baseChunkCoordX + chunkX;
                             final int chunkPosZ = baseChunkCoordZ + chunkZ;
-                            if (isChunkSeen(chunkPosX, chunkPosZ, currentlyViewedDimension)) {
-                                if (!isNewChunk(chunkPosX, chunkPosZ, currentlyViewedDimension)) {
-                                    portalDetectionSearchChunks.add(new ChunkPos(chunkPosX, chunkPosZ));
-                                }
+                            if (isChunkSeen(chunkPosX, chunkPosZ, currentlyViewedDimension) && !isNewChunk(chunkPosX, chunkPosZ, currentlyViewedDimension)) {
+                                portalDetectionSearchChunks.add(ChunkUtils.chunkPosToLong(chunkPosX, chunkPosZ));
                             }
                         }
                     }
                 }
             }
-            final HashSet<ChunkPos> portalAreaChunks = new HashSet<>();
-            for (final ChunkPos chunkPos : portalDetectionSearchChunks) {
+            final Long2LongOpenHashMap portalAreaChunks = new Long2LongOpenHashMap();
+            for (final long chunkPos : portalDetectionSearchChunks) {
                 boolean allSeen = true;
-                final HashSet<ChunkPos> portalChunkTempSet = new HashSet<>();
+                final LongOpenHashSet portalChunkTempSet = new LongOpenHashSet();
                 for (int xOffset = 0; xOffset < 15; xOffset++) {
                     for (int zOffset = 0; zOffset < 15; zOffset++) {
-                        final ChunkPos currentChunkPos = new ChunkPos(chunkPos.x + xOffset, chunkPos.z + zOffset);
+                        final long currentChunkPos = ChunkUtils.chunkPosToLong(ChunkUtils.longToChunkX(chunkPos) + xOffset, ChunkUtils.longToChunkZ(chunkPos) + zOffset);
                         portalChunkTempSet.add(currentChunkPos);
                         if (!portalDetectionSearchChunks.contains(currentChunkPos)) {
                             allSeen = false;
@@ -160,20 +145,12 @@ public class PortalSkipDetection extends Module {
                         }
                     }
                     if (!allSeen) {
-                        portalChunkTempSet.clear();
                         break;
                     }
                 }
-                if (allSeen) portalAreaChunks.addAll(portalChunkTempSet);
+                if (allSeen) portalChunkTempSet.forEach(c -> portalAreaChunks.put(c, 0));
             }
-            final List<Long> chunks = portalAreaChunks.stream().map(chunkPos -> chunkPosToLong(chunkPos.x, chunkPos.z)).collect(Collectors.toList());
-            try {
-                lock.writeLock().lock();
-                this.portalSkipChunks.clear();
-                this.portalSkipChunks.addAll(chunks);
-            } finally {
-                lock.writeLock().unlock();
-            }
+            cache.replaceState(portalAreaChunks);
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error searching for portal skip chunks", e);
         }
@@ -184,8 +161,6 @@ public class PortalSkipDetection extends Module {
     }
 
     private boolean isChunkSeen(final int chunkPosX, final int chunkPosZ, final int currentlyViewedDimension) {
-        //5100,7578
-        //318,473
         final WorldMapSession currentSession = XaeroWorldMapCore.currentSession;
         if (currentSession == null) return false;
         final CustomDimensionMapProcessor mapProcessor = (CustomDimensionMapProcessor) currentSession.getMapProcessor();
@@ -219,17 +194,7 @@ public class PortalSkipDetection extends Module {
     public List<HighlightAtChunkPos> getPortalSkipChunksInRegion(
             final int leafRegionX, final int leafRegionZ,
             final int level) {
-        try {
-            CompletableFuture<List<HighlightAtChunkPos>> future = regionRenderCache.get(new RegionRenderPos(leafRegionX, leafRegionZ, level));
-            if (future.isDone()) {
-                return future.get();
-            } else {
-                return Collections.emptyList();
-            }
-        } catch (Exception e) {
-            XaeroPlus.LOGGER.error("Error loading portal skip chunks", e);
-        }
-        return Collections.emptyList();
+        return cache.getHighlightsInRegion(leafRegionX, leafRegionZ, level);
     }
 
     public boolean isPortalSkipChunk(final int chunkPosX, final int chunkPosZ) {
@@ -237,16 +202,7 @@ public class PortalSkipDetection extends Module {
     }
 
     public boolean isPortalSkipChunk(final long chunkPos) {
-        try {
-            if (lock.readLock().tryLock(1, TimeUnit.SECONDS)) {
-                boolean containsKey = portalSkipChunks.contains(chunkPos);
-                lock.readLock().unlock();
-                return containsKey;
-            }
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error checking if chunk is portal skip chunk", e);
-        }
-        return false;
+        return cache.isHighlighted(chunkPos);
     }
 
     public void setSearchDelayTicks(final float delay) {

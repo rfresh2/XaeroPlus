@@ -1,4 +1,4 @@
-package xaeroplus.util;
+package xaeroplus.util.highlights;
 
 import java.util.Objects;
 

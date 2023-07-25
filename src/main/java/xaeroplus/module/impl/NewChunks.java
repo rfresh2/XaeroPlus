@@ -10,7 +10,7 @@ import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.module.Module;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ColorHelper;
-import xaeroplus.util.HighlightAtChunkPos;
+import xaeroplus.util.highlights.HighlightAtChunkPos;
 import xaeroplus.util.newchunks.NewChunksCache;
 import xaeroplus.util.newchunks.NewChunksLocalCache;
 import xaeroplus.util.newchunks.NewChunksSavingCache;
@@ -23,13 +23,14 @@ import static xaeroplus.util.ColorHelper.getColor;
 public class NewChunks extends Module {
     private NewChunksCache newChunksCache = new NewChunksLocalCache();
     private int newChunksColor = getColor(255, 0, 0, 100);
+    private static final String DATABASE_NAME = "XaeroPlusNewChunks";
 
     public void setNewChunksCache(boolean disk) {
         try {
             Long2LongOpenHashMap map = newChunksCache.getNewChunksState();
             newChunksCache.onDisable();
             if (disk) {
-                newChunksCache = new NewChunksSavingCache();
+                newChunksCache = new NewChunksSavingCache(DATABASE_NAME);
             } else {
                 newChunksCache = new NewChunksLocalCache();
             }

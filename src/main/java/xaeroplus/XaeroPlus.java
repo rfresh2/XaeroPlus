@@ -24,8 +24,6 @@ public class XaeroPlus implements ClientModInitializer {
 		boolean a = Shared.FOLLOW; // force static instances to init
 		XaeroPlusSettingRegistry.fastMapSetting.getValue(); // force static instances to init
 		List<KeyBinding> keybinds = XaeroPlusSettingsReflectionHax.getKeybinds();
-		LOGGER.info("Registering {} keybinds", keybinds.size());
 		keybinds.forEach(KeyBindingHelper::registerKeyBinding);
-		XaeroMinimap.instance.getControlsRegister().keybindings.addAll(keybinds);
 	}
 }

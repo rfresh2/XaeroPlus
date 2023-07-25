@@ -43,7 +43,7 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	jarLibs 'com.github.ben-manes.caffeine:caffeine:3.1.6'
+	jarLibs 'com.github.ben-manes.caffeine:caffeine:3.1.7'
 	jarLibs "com.github.collarmc:pounce:0e8492b68e"
 
 	modImplementation "maven.modrinth:xaeros-world-map:1.31.0_Fabric_1.20"

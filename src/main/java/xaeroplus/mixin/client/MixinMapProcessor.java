@@ -2,6 +2,7 @@ package xaeroplus.mixin.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,11 +15,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.map.*;
 import xaero.map.cache.BlockStateColorTypeCache;
+import xaero.map.effects.Effects;
 import xaero.map.file.MapSaveLoad;
 import xaero.map.file.RegionDetection;
 import xaero.map.file.worldsave.WorldDataHandler;
 import xaero.map.gui.GuiMap;
 import xaero.map.misc.CaveStartCalculator;
+import xaero.map.misc.Misc;
 import xaero.map.mods.SupportMods;
 import xaero.map.region.LayeredRegionManager;
 import xaero.map.region.LeveledRegion;
@@ -163,12 +166,65 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
 
     @Shadow
     protected abstract int getCaveLayer(int caveStart);
-    @Shadow
-    public abstract void updateCaveStart();
 
-    @Redirect(method = "updateCaveStart", at = @At(value = "INVOKE", target = "Lxaero/map/world/MapWorld;getCurrentDimension()Lxaero/map/world/MapDimension;"))
-    public MapDimension getCurrentDimensionRedirect(final MapWorld instance) {
-        return instance.getDimension(Shared.customDimensionId);
+    /**
+     * @author rfresh2
+     * @reason custom dimension support
+     */
+    @Overwrite
+    public void updateCaveStart() {
+        Minecraft mc = Minecraft.getMinecraft();
+        MapDimension dimension = this.mapWorld.getDimension(Shared.customDimensionId);
+        int newCaveStart;
+        // cave mode type = 2 means "Full"
+        if (WorldMap.settings.isCaveMapsAllowed() && dimension.getCaveModeType() != 0) {
+            if (WorldMap.settings.caveModeStart == Integer.MAX_VALUE) {
+                newCaveStart = Integer.MIN_VALUE; // this renders us like the "off" mode for some reason
+            } else {
+                newCaveStart = WorldMap.settings.caveModeStart;
+            }
+
+            boolean isMapScreen = mc.currentScreen instanceof GuiMap || Misc.screenShouldSkipWorldRender(mc.currentScreen, true);
+            if (!isMapScreen
+                    || !Minecraft.getMinecraft().player.isPotionActive(Effects.NO_CAVE_MAPS)
+                    && !Minecraft.getMinecraft().player.isPotionActive(Effects.NO_CAVE_MAPS_HARMFUL)) {
+                if (SupportMods.minimap() && (WorldMap.settings.autoCaveMode < 0 && newCaveStart == Integer.MIN_VALUE || !isMapScreen)) {
+                    newCaveStart = SupportMods.xaeroMinimap.getCaveStart(newCaveStart, isMapScreen);
+                }
+
+                if (newCaveStart == Integer.MIN_VALUE) {
+                    long currentTime = System.currentTimeMillis();
+                    int nextLocalCaveMode = this.caveStartCalculator.getCaving(mc.player.posX, mc.player.posY, mc.player.posZ, mc.world);
+                    boolean toggling = this.localCaveMode == Integer.MAX_VALUE != (nextLocalCaveMode == Integer.MAX_VALUE);
+                    if (!toggling || currentTime - this.lastLocalCaveModeToggle > (long) WorldMap.settings.caveModeToggleTimer) {
+                        if (toggling) {
+                            this.lastLocalCaveModeToggle = currentTime;
+                        }
+
+                        this.localCaveMode = nextLocalCaveMode;
+                    }
+
+                    newCaveStart = this.localCaveMode;
+                }
+
+                if (dimension.getCaveModeType() == 2) { // fixed this when height is set to "auto" so it actually does the full caving
+                    newCaveStart = Integer.MIN_VALUE; // "Full"
+                }
+                if (newCaveStart != Integer.MAX_VALUE) {
+                    if (dimension.getCaveModeType() != 2) {
+                        newCaveStart = MathHelper.clamp(newCaveStart, 0, this.world.getHeight() - 1);
+                    }
+                }
+            } else {
+                newCaveStart = Integer.MAX_VALUE; // "off"
+            }
+        } else {
+            newCaveStart = Integer.MAX_VALUE; // "off"
+        }
+
+        int newCaveLayer = this.getCaveLayer(newCaveStart);
+        dimension.getLayeredMapRegions().getLayer(newCaveLayer).setCaveStart(newCaveStart);
+        this.currentCaveLayer = newCaveLayer;
     }
 
     @Redirect(method = "updateWorld", at = @At(value = "INVOKE", target = "Lxaero/map/file/MapSaveLoad;detectRegions(I)V"))

@@ -53,7 +53,7 @@ public abstract class MixinWaypointsManager {
     private Waypoint selected = null;
     private WaypointWorld displayedWorld = null;
     @Inject(method = "teleportToWaypoint(Lxaero/common/minimap/waypoints/Waypoint;Lxaero/common/minimap/waypoints/WaypointWorld;Lnet/minecraft/client/gui/screen/Screen;Z)V",
-        at = @At(value = "INVOKE", target = "Lxaero/common/minimap/waypoints/WaypointsManager;getDimensionDivision(Ljava/lang/String;)D"))
+        at = @At(value = "INVOKE", target = "Lxaero/common/minimap/waypoints/WaypointsManager;getDimensionDivision(Ljava/lang/String;)D"), remap = true)
     public void teleportToWaypointBefore(final Waypoint selected, final WaypointWorld displayedWorld, final Screen screen, final boolean respectHiddenCoords, final CallbackInfo ci) {
         this.selected = selected;
         this.displayedWorld = displayedWorld;
@@ -62,7 +62,7 @@ public abstract class MixinWaypointsManager {
     boolean crossDimTeleport = false;
 
     @Redirect(method = "teleportToWaypoint(Lxaero/common/minimap/waypoints/Waypoint;Lxaero/common/minimap/waypoints/WaypointWorld;Lnet/minecraft/client/gui/screen/Screen;Z)V",
-        at = @At(value = "INVOKE", target = "Lxaero/common/minimap/waypoints/WaypointWorldRootContainer;getServerTeleportCommandFormat()Ljava/lang/String;"))
+        at = @At(value = "INVOKE", target = "Lxaero/common/minimap/waypoints/WaypointWorldRootContainer;getServerTeleportCommandFormat()Ljava/lang/String;"), remap = true)
     public String getTeleportCommandFormatRedirect(final WaypointWorldRootContainer instance) {
         if (XaeroPlusSettingRegistry.crossDimensionTeleportCommand.getValue()) {
             try {
@@ -83,7 +83,7 @@ public abstract class MixinWaypointsManager {
     }
 
     @Redirect(method = "teleportToWaypoint(Lxaero/common/minimap/waypoints/Waypoint;Lxaero/common/minimap/waypoints/WaypointWorld;Lnet/minecraft/client/gui/screen/Screen;Z)V",
-        at = @At(value = "INVOKE", target = "Lxaero/common/minimap/waypoints/WaypointWorldRootContainer;isUsingDefaultTeleportCommand()Z"))
+        at = @At(value = "INVOKE", target = "Lxaero/common/minimap/waypoints/WaypointWorldRootContainer;isUsingDefaultTeleportCommand()Z"), remap = true)
     public boolean isUsingDefaultTeleportCommand(final WaypointWorldRootContainer instance) {
         if (XaeroPlusSettingRegistry.crossDimensionTeleportCommand.getValue()) {
             return !crossDimTeleport;

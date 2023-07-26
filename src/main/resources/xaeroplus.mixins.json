@@ -6,9 +6,11 @@
     "defaultRequire": 1
   },
   "client": [
+    "AccessorGuiCaveModeOptions",
     "MixinBranchLeveledRegion",
     "MixinCommonGuiSettings",
     "MixinControlsHandler",
+    "MixinGuiCaveModeOptions",
     "MixinGuiEntityRadarSettings",
     "MixinGuiMap",
     "MixinGuiMapAccessor",

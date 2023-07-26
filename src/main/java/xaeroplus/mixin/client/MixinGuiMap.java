@@ -202,6 +202,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Shadow
     private MapTileSelection mapTileSelection;
     @Shadow
+    private GuiCaveModeOptions caveModeOptions;
+    @Shadow
     public abstract void setFocused(GuiTextField field);
     @Shadow
     protected abstract void closeDropdowns();
@@ -1816,5 +1818,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             }
         }
         Shared.switchToDimension(newDimId);
+        MapDimension newDimension = mapProcessor.getMapWorld().getDimension(Shared.customDimensionId);
+        GuiMapHelper.updateCaveModeOptions(this.caveModeOptions, newDimension, this.buttonList);
     }
 }

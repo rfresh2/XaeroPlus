@@ -1,13 +1,18 @@
 package xaeroplus.util;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import xaero.map.core.XaeroWorldMapCore;
-import xaero.map.gui.GuiMap;
-import xaero.map.gui.GuiSettings;
+import xaero.map.gui.*;
+import xaero.map.world.MapDimension;
+import xaeroplus.mixin.client.AccessorGuiCaveModeOptions;
 import xaeroplus.mixin.client.MixinGuiMapAccessor;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class GuiMapHelper {
     public static Optional<GuiMap> getGuiMap() {
@@ -50,6 +55,25 @@ public class GuiMapHelper {
 
     public static int getGuiMapCenterRegionZ(final GuiMap guiMap) {
         return ChunkUtils.coordToRegionCoord(getCameraZ(guiMap));
+    }
+
+    // workaround mixin bug where we can't use accessors inside mixin classes
+    public static void updateCaveModeOptions(final GuiCaveModeOptions guiCaveModeOptions, MapDimension newDimension, final List<GuiButton> buttonList) {
+        AccessorGuiCaveModeOptions options = (AccessorGuiCaveModeOptions) guiCaveModeOptions;
+        options.setDimension(newDimension);
+        for (GuiButton button : buttonList) {
+            if (!(button instanceof TooltipButton)) continue;
+            final TooltipButton tooltipButton = (TooltipButton) button;
+            final Supplier<CursorBox> xaeroWmTooltipSupplier = tooltipButton.getTooltip();
+            if (xaeroWmTooltipSupplier == null) continue;
+            final CursorBox cursorBox = xaeroWmTooltipSupplier.get();
+            if (cursorBox == null) continue;
+            final String code = cursorBox.getFullCode();
+            if (Objects.equals(code, "gui.xaero_wm_box_cave_mode_type")) {
+                button.displayString = options.invokeCaveModeTypeButtonMessage().getFormattedText();
+                break;
+            }
+        }
     }
 
 }

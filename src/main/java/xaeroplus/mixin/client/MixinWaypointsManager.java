@@ -1,6 +1,7 @@
 package xaeroplus.mixin.client;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
@@ -9,8 +10,14 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import xaero.common.minimap.waypoints.Waypoint;
+import xaero.common.minimap.waypoints.WaypointWorld;
+import xaero.common.minimap.waypoints.WaypointWorldRootContainer;
 import xaero.common.minimap.waypoints.WaypointsManager;
+import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.DataFolderResolveUtil;
 import xaeroplus.util.Shared;
@@ -35,6 +42,54 @@ public abstract class MixinWaypointsManager {
     public abstract String getDimensionDirectoryName(RegistryKey<World> dimKey);
     @Shadow
     public abstract RegistryKey<World> getDimensionKeyForDirectoryName(String dirName);
+
+    @Inject(method = "isWorldTeleportable", at = @At("HEAD"), cancellable = true)
+    public void isWorldTeleportable(final WaypointWorld displayedWorld, final CallbackInfoReturnable<Boolean> cir) {
+        if (XaeroPlusSettingRegistry.crossDimensionTeleportCommand.getValue()) {
+            cir.setReturnValue(true);
+        }
+    }
+
+    private Waypoint selected = null;
+    private WaypointWorld displayedWorld = null;
+    @Inject(method = "teleportToWaypoint(Lxaero/common/minimap/waypoints/Waypoint;Lxaero/common/minimap/waypoints/WaypointWorld;Lnet/minecraft/client/gui/screen/Screen;Z)V",
+        at = @At(value = "INVOKE", target = "Lxaero/common/minimap/waypoints/WaypointsManager;getDimensionDivision(Ljava/lang/String;)D"))
+    public void teleportToWaypointBefore(final Waypoint selected, final WaypointWorld displayedWorld, final Screen screen, final boolean respectHiddenCoords, final CallbackInfo ci) {
+        this.selected = selected;
+        this.displayedWorld = displayedWorld;
+    }
+
+    boolean crossDimTeleport = false;
+
+    @Redirect(method = "teleportToWaypoint(Lxaero/common/minimap/waypoints/Waypoint;Lxaero/common/minimap/waypoints/WaypointWorld;Lnet/minecraft/client/gui/screen/Screen;Z)V",
+        at = @At(value = "INVOKE", target = "Lxaero/common/minimap/waypoints/WaypointWorldRootContainer;getServerTeleportCommandFormat()Ljava/lang/String;"))
+    public String getTeleportCommandFormatRedirect(final WaypointWorldRootContainer instance) {
+        if (XaeroPlusSettingRegistry.crossDimensionTeleportCommand.getValue()) {
+            try {
+                final String containerKey = displayedWorld.getContainer().getKey();
+                final RegistryKey<World> dimId = getDimensionKeyForDirectoryName(containerKey);
+                if (containerKey.contains("dim%")) {
+                    if (dimId != MinecraftClient.getInstance().world.getRegistryKey()) {
+                        crossDimTeleport = true;
+                        return "/execute in " + dimId.getValue() + " run teleport @s " + selected.getX() + " {y} " + selected.getZ();
+                    }
+                }
+            } catch (final Throwable e) {
+                XaeroPlus.LOGGER.warn("Failed to get cross-dimension teleport command format for waypoint: {} in world: {}", selected.getName(), displayedWorld.getContainer().getKey());
+            }
+        }
+        crossDimTeleport = false;
+        return instance.getServerTeleportCommandFormat();
+    }
+
+    @Redirect(method = "teleportToWaypoint(Lxaero/common/minimap/waypoints/Waypoint;Lxaero/common/minimap/waypoints/WaypointWorld;Lnet/minecraft/client/gui/screen/Screen;Z)V",
+        at = @At(value = "INVOKE", target = "Lxaero/common/minimap/waypoints/WaypointWorldRootContainer;isUsingDefaultTeleportCommand()Z"))
+    public boolean isUsingDefaultTeleportCommand(final WaypointWorldRootContainer instance) {
+        if (XaeroPlusSettingRegistry.crossDimensionTeleportCommand.getValue()) {
+            return !crossDimTeleport;
+        }
+        return instance.isUsingDefaultTeleportCommand();
+    }
 
     @Inject(method = "getMainContainer", at = @At("HEAD"), cancellable = true)
     private void getMainContainer(ClientPlayNetworkHandler connection, CallbackInfoReturnable<String> cir) {

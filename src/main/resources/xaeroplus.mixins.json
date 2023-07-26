@@ -27,6 +27,7 @@
     "MixinMapPixel",
     "MixinMapProcessor",
     "MixinMapSaveLoad",
+    "MixinMapTeleporter",
     "MixinMapTileChunk",
     "MixinMapWorld",
     "MixinMapWriter",

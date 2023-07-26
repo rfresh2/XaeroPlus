@@ -24,10 +24,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -68,6 +65,8 @@ import xaeroplus.util.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
@@ -1938,6 +1937,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         }
     }
 
+    @Unique
     public void addColoredLineToExistingBuffer(
             MatrixStack.Entry matrices, VertexConsumer vertexBuffer, float x1, float y1, float x2, float y2, float r, float g, float b, float a
     ) {
@@ -1983,8 +1983,25 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             }
         }
         Shared.switchToDimension(newDimId);
+        AccessorGuiCaveModeOptions options = (AccessorGuiCaveModeOptions) caveModeOptions;
+        MapDimension newDimension = mapProcessor.getMapWorld().getDimension(Shared.customDimensionId);
+        options.setDimension(newDimension);
+        for (ButtonWidget button : getButtonList()) {
+            if (!(button instanceof TooltipButton)) continue;
+            final TooltipButton tooltipButton = (TooltipButton) button;
+            final Supplier<CursorBox> xaeroWmTooltipSupplier = tooltipButton.getXaero_wm_tooltip();
+            if (xaeroWmTooltipSupplier == null) continue;
+            final CursorBox cursorBox = xaeroWmTooltipSupplier.get();
+            if (cursorBox == null) continue;
+            final String code = cursorBox.getFullCode();
+            if (Objects.equals(code, "gui.xaero_wm_box_cave_mode_type")) {
+                button.setMessage(options.invokeCaveModeTypeButtonMessage());
+                break;
+            }
+        }
     }
 
+    @Unique
     public List<ButtonWidget> getButtonList() {
         return children().stream()
                 .filter(child -> child instanceof ButtonWidget)
@@ -1992,6 +2009,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 .collect(Collectors.toList());
     }
 
+    @Unique
     public void clearButtons() {
         getButtonList().forEach(this::remove);
     }

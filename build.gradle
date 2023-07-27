@@ -112,7 +112,6 @@ dependencies {
     }
 
     jarLibs 'com.github.ben-manes.caffeine:caffeine:2.9.3'
-    jarLibs 'org.apache.commons:commons-compress:1.23.0'
     jarLibs 'org.xerial:sqlite-jdbc:3.42.0.0'
 
     implementation(fg.deobf("maven.modrinth:xaeros-world-map:1.31.0_Forge_1.12"))

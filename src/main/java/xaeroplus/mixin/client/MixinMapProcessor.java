@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.map.*;
+import xaero.map.biome.BiomeColorCalculator;
 import xaero.map.cache.BlockStateColorTypeCache;
 import xaero.map.effects.Effects;
 import xaero.map.file.MapSaveLoad;
@@ -23,14 +24,12 @@ import xaero.map.gui.GuiMap;
 import xaero.map.misc.CaveStartCalculator;
 import xaero.map.misc.Misc;
 import xaero.map.mods.SupportMods;
-import xaero.map.region.LayeredRegionManager;
-import xaero.map.region.LeveledRegion;
-import xaero.map.region.MapLayer;
-import xaero.map.region.MapRegion;
+import xaero.map.region.*;
 import xaero.map.world.MapDimension;
 import xaero.map.world.MapWorld;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.CustomDimensionMapProcessor;
 import xaeroplus.util.CustomDimensionMapSaveLoad;
 import xaeroplus.util.DataFolderResolveUtil;
@@ -166,6 +165,10 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
 
     @Shadow
     protected abstract int getCaveLayer(int caveStart);
+
+    @Shadow private BiomeColorCalculator biomeColorCalculator;
+
+    @Shadow private OverlayManager overlayManager;
 
     /**
      * @author rfresh2
@@ -538,6 +541,18 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
     @Redirect(method = "onRenderProcess", at = @At(value = "INVOKE", target = "Lxaero/map/world/MapWorld;getCurrentDimension()Lxaero/map/world/MapDimension;"))
     public MapDimension getCustomDimension(final MapWorld mapWorld) {
         return mapWorld.getDimension(Shared.customDimensionId);
+    }
+
+    @Redirect(method = "onRenderProcess", at = @At(value = "INVOKE", target = "Lxaero/map/MapWriter;onRender(Lxaero/map/biome/BiomeColorCalculator;Lxaero/map/region/OverlayManager;)V"))
+    public void redirectOnRenderProcess(final MapWriter instance, final BiomeColorCalculator biomeColorCalculator, final OverlayManager overlayManager) {
+        if (XaeroPlusSettingRegistry.fastMapSetting.getValue()) return;
+        instance.onRender(biomeColorCalculator, overlayManager);
+    }
+
+    @Inject(method = "onClientTickStart", at = @At("RETURN"))
+    public void onClientTickStartReturn(final CallbackInfo ci) {
+        if (!XaeroPlusSettingRegistry.fastMapSetting.getValue()) return;
+        this.mapWriter.onRender(this.biomeColorCalculator, this.overlayManager);
     }
 
     @Override

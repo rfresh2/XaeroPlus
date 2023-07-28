@@ -1,10 +1,10 @@
 {
   "setting.world_map.fast_mapping": "Fast Mapping",
-  "setting.world_map.fast_mapping.tooltip": "Increases mapping speed, might hurt FPS. Adjust rate limit and delay to regain FPS.",
+  "setting.world_map.fast_mapping.tooltip": "Increases mapping speed.",
   "setting.world_map.fast_mapping_delay": "Fast Mapping Delay",
-  "setting.world_map.fast_mapping_delay.tooltip": "Fast Mapping must be enabled. \\n This is roughly the delay in milliseconds between minimap update operations, both render and actual file writes.",
+  "setting.world_map.fast_mapping_delay.tooltip": "Fast Mapping must be enabled. \\n This is roughly the delay in milliseconds between minimap update operations.",
   "setting.world_map.fast_mapping_rate_limit": "Fast Mapping Rate Limit",
-  "setting.world_map.fast_mapping_rate_limit.tooltip": "Fast Mapping must be enabled. \\n Limits how many chunks can be written in a single cycle. Lower values improve FPS at high render distances.",
+  "setting.world_map.fast_mapping_rate_limit.tooltip": "Fast Mapping must be enabled. \\n Limits how many chunks can be written each tick.",
   "setting.world_map.baritone_waypoint": "Baritone Goal Waypoint",
   "setting.world_map.baritone_waypoint.tooltip": "Syncs Baritone goals as temporary waypoints.",
   "setting.world_map.persist_dimension_switch": "Persist WM Dimension Switch",

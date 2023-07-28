@@ -34,12 +34,9 @@ import xaero.map.core.XaeroWorldMapCore;
 import xaero.map.misc.Misc;
 import xaero.map.region.*;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.ChunkUtils;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
-
-import static java.util.Objects.nonNull;
 
 @Mixin(value = MapWriter.class, remap = false)
 public abstract class MixinMapWriter {
@@ -507,37 +504,6 @@ public abstract class MixinMapWriter {
             }
         } catch (Throwable var39) {
             WorldMap.crashHandler.setCrashedBy(var39);
-        }
-    }
-
-    @Inject(method = "writeChunk", at = @At(value = "HEAD"), cancellable = true)
-    public void writeChunk(World world, int distance, boolean onlyLoad,
-                           BiomeColorCalculator biomeColorCalculator,
-                           OverlayManager overlayManager,
-                           boolean loadChunks, boolean updateChunks,
-                           boolean ignoreHeightmaps, boolean flowers,
-                           boolean detailedDebug,
-                           BlockPos.MutableBlockPos mutableBlockPos3,
-                           int caveDepth,
-                           int caveStart,
-                           int layerToWrite,
-                           int tileChunkX, int tileChunkZ,
-                           int tileChunkLocalX, int tileChunkLocalZ,
-                           int chunkX, int chunkZ,
-                           CallbackInfoReturnable<Boolean> cir) {
-        if (!XaeroPlusSettingRegistry.fastMapSetting.getValue()) return;
-
-        final Long cacheable = ChunkUtils.chunkPosToLong(chunkX, chunkZ);
-        final Long cacheValue = tileUpdateCache.getIfPresent(cacheable);
-        if (nonNull(cacheValue)) {
-            if (cacheValue < System.currentTimeMillis() - (long) XaeroPlusSettingRegistry.fastMapWriterDelaySetting.getValue()) {
-                tileUpdateCache.put(cacheable, System.currentTimeMillis());
-            } else {
-                cir.setReturnValue(false);
-                cir.cancel();
-            }
-        } else {
-            tileUpdateCache.put(cacheable, System.currentTimeMillis());
         }
     }
 

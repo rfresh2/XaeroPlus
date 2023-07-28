@@ -27,7 +27,7 @@ public final class XaeroPlusSettingRegistry {
             "setting.world_map.fast_mapping_delay",
             10, 1000, 10,
             "setting.world_map.fast_mapping_delay.tooltip",
-            100,
+            90,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting fastMapMaxTilesPerCycle = XaeroPlusFloatSetting.create(
             "Fast Mapping Chunk Limit",

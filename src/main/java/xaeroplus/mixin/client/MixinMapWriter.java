@@ -1,7 +1,5 @@
 package xaeroplus.mixin.client;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -39,34 +37,14 @@ import xaero.map.misc.CachedFunction;
 import xaero.map.misc.Misc;
 import xaero.map.region.*;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.ChunkUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 
-import static java.util.Objects.nonNull;
 import static net.minecraft.world.World.NETHER;
 
 @Mixin(value = MapWriter.class, remap = false)
 public abstract class MixinMapWriter {
-    // insert our own limiter on new tiles being written but this one's keyed on the actual chunk
-    // tile "writes" also include a lot of extra operations and lookups before any writing is actually done
-    // when we remove existing limiters those extra operations add up to a lot of unnecessary cpu time
-    private final Cache<Long, Long> tileUpdateCache = Caffeine.newBuilder()
-            // I would usually expect even second long expiration here to be fine
-            // but there are some operations that make repeat invocations actually required
-            // perhaps another time ill rewrite those. Or make the cache lock more aware of when we don't have any new updates to write/load
-            // there's still alot of performance and efficiency on the table to regain
-            // but i think this is a good middle ground for now
-            .maximumSize(10000)
-            .expireAfterWrite(5L, TimeUnit.SECONDS)
-            .<Long, Long>build();
-    public long writeFreeSinceLastWrite = -1L;
-    @Shadow
-    private int X;
-    @Shadow
-    private int Z;
     @Shadow
     private int playerChunkX;
     @Shadow
@@ -132,6 +110,8 @@ public abstract class MixinMapWriter {
     private CachedFunction<State<?, ?>, Boolean> transparentCache;
     @Shadow
     private int firstTransparentStateY;
+    @Shadow
+    public long writeFreeSinceLastWrite;
     @Final
     @Shadow
     private BlockPos.Mutable mutableBlockPos3;
@@ -683,48 +663,6 @@ public abstract class MixinMapWriter {
             }
         } catch (Throwable var39) {
             WorldMap.crashHandler.setCrashedBy(var39);
-        }
-    }
-
-
-    @Inject(method = "writeChunk", at = @At(value = "HEAD"), cancellable = true, remap = true)
-    public void writeChunk(
-            World world,
-            Registry<Block> blockRegistry,
-            int distance,
-            boolean onlyLoad,
-            Registry<Biome> biomeRegistry,
-            OverlayManager overlayManager,
-            boolean loadChunks,
-            boolean updateChunks,
-            boolean ignoreHeightmaps,
-            boolean flowers,
-            boolean detailedDebug,
-            BlockPos.Mutable mutableBlockPos3,
-            BlockTintProvider blockTintProvider,
-            int caveDepth,
-            int caveStart,
-            int layerToWrite,
-            int tileChunkX,
-            int tileChunkZ,
-            int tileChunkLocalX,
-            int tileChunkLocalZ,
-            int chunkX,
-            int chunkZ,
-            final CallbackInfoReturnable<Boolean> cir) {
-        if (!XaeroPlusSettingRegistry.fastMapSetting.getValue()) return;
-
-        final Long cacheable = ChunkUtils.chunkPosToLong(chunkX, chunkZ);
-        final Long cacheValue = tileUpdateCache.getIfPresent(cacheable);
-        if (nonNull(cacheValue)) {
-            if (cacheValue < System.currentTimeMillis() - (long) XaeroPlusSettingRegistry.fastMapWriterDelaySetting.getValue()) {
-                tileUpdateCache.put(cacheable, System.currentTimeMillis());
-            } else {
-                cir.setReturnValue(false);
-                cir.cancel();
-            }
-        } else {
-            tileUpdateCache.put(cacheable, System.currentTimeMillis());
         }
     }
 

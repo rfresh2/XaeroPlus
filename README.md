@@ -27,6 +27,7 @@ Available on:
 # Xaero Versions
 
 Each XaeroPlus release is only compatible with a specific version of Xaero's WorldMap and Minimap.
+Xaero's Minimap can be swapped out for [BetterPVP](https://chocolateminecraft.com/betterpvp2.php)
 
 Download and include these mods **in addition** to `xaeroplus-xx.jar` (3 jars total).
 

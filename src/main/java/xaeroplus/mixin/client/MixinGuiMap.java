@@ -62,6 +62,7 @@ import xaeroplus.module.impl.NewChunks;
 import xaeroplus.module.impl.PortalSkipDetection;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.*;
+import xaeroplus.util.highlights.HighlightAtChunkPos;
 
 import java.util.ArrayList;
 import java.util.List;

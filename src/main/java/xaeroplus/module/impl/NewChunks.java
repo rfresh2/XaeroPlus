@@ -22,7 +22,7 @@ import xaeroplus.module.Module;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
-import xaeroplus.util.HighlightAtChunkPos;
+import xaeroplus.util.highlights.HighlightAtChunkPos;
 import xaeroplus.util.newchunks.NewChunksCache;
 import xaeroplus.util.newchunks.NewChunksLocalCache;
 

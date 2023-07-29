@@ -4,6 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
+import xaeroplus.util.highlights.HighlightAtChunkPos;
 
 import java.util.ArrayList;
 import java.util.List;

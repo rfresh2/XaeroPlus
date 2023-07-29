@@ -1,6 +1,6 @@
 package xaeroplus.util.newchunks;
 
-import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import xaeroplus.util.highlights.ChunkHighlightLocalCache;
 import xaeroplus.util.highlights.HighlightAtChunkPos;
 
@@ -56,12 +56,12 @@ public class NewChunksLocalCache implements NewChunksCache {
     }
 
     @Override
-    public Long2LongOpenHashMap getNewChunksState() {
+    public Long2LongMap getNewChunksState() {
         return delegate.getHighlightsState();
     }
 
     @Override
-    public void loadPreviousState(final Long2LongOpenHashMap state) {
+    public void loadPreviousState(final Long2LongMap state) {
         delegate.loadPreviousState(state);
     }
 }

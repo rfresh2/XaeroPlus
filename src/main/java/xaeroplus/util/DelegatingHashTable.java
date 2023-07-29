@@ -1,10 +1,6 @@
 package xaeroplus.util;
 
-import java.util.Collection;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 
 /**
  * Replace HashTable with faster delegate hashmap
@@ -12,10 +8,10 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DelegatingHashTable<K, V> extends Hashtable<K, V> implements Map<K, V> {
 
-    private final Map<K, V> delegate;
+    final Map<K, V> delegate;
 
     public DelegatingHashTable() {
-        this.delegate = new ConcurrentHashMap<>();
+        this.delegate = new HashMap<>();
     }
 
     @Override

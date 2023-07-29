@@ -9,6 +9,7 @@ import xaeroplus.util.ChunkUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -18,10 +19,10 @@ import static xaeroplus.util.GuiMapHelper.*;
 
 public class ChunkHighlightSavingCache {
     // these are initialized async
-    private Optional<ChunkHighlightCacheDimensionHandler> netherCache = Optional.empty();
-    private Optional<ChunkHighlightCacheDimensionHandler> overworldCache = Optional.empty();
-    private Optional<ChunkHighlightCacheDimensionHandler> endCache = Optional.empty();
-    private Optional<ChunkHighlightDatabase> database = Optional.empty();
+    private ChunkHighlightCacheDimensionHandler netherCache = null;
+    private ChunkHighlightCacheDimensionHandler overworldCache = null;
+    private ChunkHighlightCacheDimensionHandler endCache = null;
+    private ChunkHighlightDatabase database = null;
     private static final int defaultRegionWindowSize = 2; // when we are only viewing the minimap
     private String currentWorldId;
     private boolean worldCacheInitialized = false;
@@ -33,9 +34,9 @@ public class ChunkHighlightSavingCache {
 
     public boolean addHighlight(final int x, final int z) {
         try {
-            getCacheForCurrentDimension()
-                    .orElseThrow(() -> new RuntimeException("Didn't find cache for current dimension"))
-                    .addHighlight(x, z);
+            ChunkHighlightCacheDimensionHandler cacheForCurrentDimension = getCacheForCurrentDimension();
+            if (cacheForCurrentDimension == null) throw new RuntimeException("Didn't find cache for current dimension");
+            cacheForCurrentDimension.addHighlight(x, z);
             return true;
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error adding highlight to saving cache: {}", databaseName, e);
@@ -44,27 +45,27 @@ public class ChunkHighlightSavingCache {
     }
 
     public void addHighlight(final int x, final int z, final long foundTime, final int dimension) {
-        getCacheForDimension(dimension)
-                .orElseThrow(() -> new RuntimeException("Dimension not found: " + dimension))
-                .addHighlight(x, z, foundTime);
+        ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimension);
+        if (cacheForDimension == null) throw new RuntimeException("Didn't find cache for dimension: " + dimension);
+        cacheForDimension.addHighlight(x, z, foundTime);
     }
 
     public boolean isHighlighted(final int chunkPosX, final int chunkPosZ, final int dimensionId) {
-        return getCacheForDimension(dimensionId)
-                .map(c -> c.isHighlighted(chunkPosX, chunkPosZ))
-                .orElse(false);
+        ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimensionId);
+        if (cacheForDimension == null) return false;
+        return cacheForDimension.isHighlighted(chunkPosX, chunkPosZ);
     }
 
     public boolean isHighlighted(final int chunkPosX, final int chunkPosZ) {
-        return getCacheForDimension(ChunkUtils.getActualDimension())
-                .map(c -> c.isHighlighted(chunkPosX, chunkPosZ))
-                .orElse(false);
+        ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(getActualDimension());
+        if (cacheForDimension == null) return false;
+        return cacheForDimension.isHighlighted(chunkPosX, chunkPosZ);
     }
 
     public List<HighlightAtChunkPos> getHighlightsInRegion(final int leafRegionX, final int leafRegionZ, final int level, int dimension) {
-        return getCacheForDimension(dimension)
-                .map(c -> c.getHighlightsInRegion(leafRegionX, leafRegionZ, level))
-                .orElse(Collections.emptyList());
+        ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimension);
+        if (cacheForDimension == null) return Collections.emptyList();
+        return cacheForDimension.getHighlightsInRegion(leafRegionX, leafRegionZ, level);
     }
 
     public void handleWorldChange() {
@@ -80,14 +81,14 @@ public class ChunkHighlightSavingCache {
     public void reset() {
         this.worldCacheInitialized = false;
         this.currentWorldId = null;
-        this.netherCache.ifPresent(ChunkHighlightCacheDimensionHandler::close);
-        this.netherCache = Optional.empty();
-        this.overworldCache.ifPresent(ChunkHighlightCacheDimensionHandler::close);
-        this.overworldCache = Optional.empty();
-        this.endCache.ifPresent(ChunkHighlightCacheDimensionHandler::close);
-        this.endCache = Optional.empty();
-        this.database.ifPresent(ChunkHighlightDatabase::close);
-        this.database = Optional.empty();
+        if (this.netherCache != null) this.netherCache.close();
+        this.netherCache = null;
+        if (this.overworldCache != null) this.overworldCache.close();
+        this.overworldCache = null;
+        if (this.endCache != null) this.endCache.close();
+        this.endCache = null;
+        if (this.database != null) this.database.close();
+        this.database = null;
     }
 
     private List<ListenableFuture<?>> saveAllChunks() {
@@ -96,7 +97,7 @@ public class ChunkHighlightSavingCache {
                 .collect(Collectors.toList());
     }
 
-    public Optional<ChunkHighlightCacheDimensionHandler> getCacheForCurrentDimension() {
+    public ChunkHighlightCacheDimensionHandler getCacheForCurrentDimension() {
         switch (getActualDimension()) {
             case -1:
                 return netherCache;
@@ -109,7 +110,7 @@ public class ChunkHighlightSavingCache {
         }
     }
 
-    public Optional<ChunkHighlightCacheDimensionHandler> getCacheForDimension(final int dimension) {
+    public ChunkHighlightCacheDimensionHandler getCacheForDimension(final int dimension) {
         switch (dimension) {
             case -1:
                 return netherCache;
@@ -123,18 +124,18 @@ public class ChunkHighlightSavingCache {
     }
 
     private List<ChunkHighlightCacheDimensionHandler> getAllCaches() {
-        return Stream.of(netherCache, overworldCache, endCache).filter(Optional::isPresent).map(Optional::get).collect(
+        return Stream.of(netherCache, overworldCache, endCache).filter(Objects::nonNull).collect(
                 Collectors.toList());
     }
 
     public List<ChunkHighlightCacheDimensionHandler> getCachesExceptDimension(final int dimension) {
         switch (dimension) {
             case -1:
-                return Stream.of(overworldCache, endCache).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+                return Stream.of(overworldCache, endCache).filter(Objects::nonNull).collect(Collectors.toList());
             case 0:
-                return Stream.of(netherCache, endCache).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+                return Stream.of(netherCache, endCache).filter(Objects::nonNull).collect(Collectors.toList());
             case 1:
-                return Stream.of(netherCache, overworldCache).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+                return Stream.of(netherCache, overworldCache).filter(Objects::nonNull).collect(Collectors.toList());
             default:
                 throw new RuntimeException("Unknown dimension: " + dimension);
         }
@@ -150,11 +151,10 @@ public class ChunkHighlightSavingCache {
                 return;
             }
             this.currentWorldId = worldId;
-            final ChunkHighlightDatabase db = new ChunkHighlightDatabase(worldId, databaseName);
-            this.database = Optional.of(db);
-            this.netherCache = Optional.of(new ChunkHighlightCacheDimensionHandler(-1, db));
-            this.overworldCache = Optional.of(new ChunkHighlightCacheDimensionHandler(0, db));
-            this.endCache = Optional.of(new ChunkHighlightCacheDimensionHandler(1, db));
+            this.database = new ChunkHighlightDatabase(worldId, databaseName);
+            this.netherCache = new ChunkHighlightCacheDimensionHandler(-1, this.database);
+            this.overworldCache = new ChunkHighlightCacheDimensionHandler(0, this.database);
+            this.endCache = new ChunkHighlightCacheDimensionHandler(1, this.database);
             this.worldCacheInitialized = true;
             loadChunksInActualDimension();
         } catch (final Exception e) {
@@ -163,8 +163,10 @@ public class ChunkHighlightSavingCache {
     }
 
     private void loadChunksInActualDimension() {
-        getCacheForCurrentDimension().ifPresent(
-                c -> c.setWindow(ChunkUtils.actualPlayerRegionX(), ChunkUtils.actualPlayerRegionZ(), defaultRegionWindowSize));
+        ChunkHighlightCacheDimensionHandler cacheForCurrentDimension = getCacheForCurrentDimension();
+        if (cacheForCurrentDimension == null) return;
+        cacheForCurrentDimension
+            .setWindow(ChunkUtils.actualPlayerRegionX(), ChunkUtils.actualPlayerRegionZ(), defaultRegionWindowSize);
     }
 
     public void onEnable() {
@@ -201,17 +203,22 @@ public class ChunkHighlightSavingCache {
             final int mapCenterX = getGuiMapCenterRegionX(guiMap);
             final int mapCenterZ = getGuiMapCenterRegionZ(guiMap);
             final int mapSize = getGuiMapRegionSize(guiMap);
-            getCacheForDimension(mapDimension).ifPresent(c -> c.setWindow(mapCenterX, mapCenterZ, mapSize));
-            getCachesExceptDimension(mapDimension).forEach(cache -> cache.setWindow(0, 0, 0));
+            final ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(mapDimension);
+            if (cacheForDimension != null) cacheForDimension.setWindow(mapCenterX, mapCenterZ, mapSize);
+            getCachesExceptDimension(mapDimension)
+                .forEach(cache -> cache.setWindow(0, 0, 0));
         } else {
-            getCacheForDimension(getCurrentlyViewedDimension()).ifPresent(c -> c.setWindow(ChunkUtils.getPlayerRegionX(), ChunkUtils.getPlayerRegionZ(), defaultRegionWindowSize));
-            getCachesExceptDimension(getCurrentlyViewedDimension()).forEach(cache -> cache.setWindow(0, 0, 0));
+            final ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(getCurrentlyViewedDimension());
+            if (cacheForDimension != null) cacheForDimension.setWindow(ChunkUtils.getPlayerRegionX(), ChunkUtils.getPlayerRegionZ(), defaultRegionWindowSize);
+            getCachesExceptDimension(getCurrentlyViewedDimension())
+                .forEach(cache -> cache.setWindow(0, 0, 0));
         }
     }
 
     public void removeHighlight(final int x, final int z) {
         try {
-            getCacheForCurrentDimension().ifPresent(c -> c.removeHighlight(x, z));
+            ChunkHighlightCacheDimensionHandler cacheForCurrentDimension = getCacheForCurrentDimension();
+            if (cacheForCurrentDimension != null) cacheForCurrentDimension.removeHighlight(x, z);
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error removing portal marker from saving cache", e);
         }

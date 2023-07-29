@@ -1,6 +1,7 @@
 package xaeroplus.util.newchunks;
 
-import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2LongMap;
+import it.unimi.dsi.fastutil.longs.Long2LongMaps;
 import xaeroplus.util.highlights.ChunkHighlightCacheDimensionHandler;
 import xaeroplus.util.highlights.ChunkHighlightSavingCache;
 import xaeroplus.util.highlights.HighlightAtChunkPos;
@@ -55,12 +56,15 @@ public class NewChunksSavingCache implements NewChunksCache {
     }
 
     @Override
-    public Long2LongOpenHashMap getNewChunksState() {
-        return delegate.getCacheForCurrentDimension().map(ChunkHighlightCacheDimensionHandler::getHighlightsState).orElse(new Long2LongOpenHashMap());
+    public Long2LongMap getNewChunksState() {
+        ChunkHighlightCacheDimensionHandler cacheForCurrentDimension = delegate.getCacheForCurrentDimension();
+        if (cacheForCurrentDimension != null) return cacheForCurrentDimension.getHighlightsState();
+        return Long2LongMaps.EMPTY_MAP;
     }
 
     @Override
-    public void loadPreviousState(final Long2LongOpenHashMap state) {
-        delegate.getCacheForCurrentDimension().ifPresent(c -> c.loadPreviousState(state));
+    public void loadPreviousState(final Long2LongMap state) {
+        ChunkHighlightCacheDimensionHandler cacheForCurrentDimension = delegate.getCacheForCurrentDimension();
+        if (cacheForCurrentDimension != null) cacheForCurrentDimension.loadPreviousState(state);
     }
 }

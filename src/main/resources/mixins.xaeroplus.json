@@ -11,6 +11,7 @@
     "MixinCommonModSettings",
     "MixinControlsHandler",
     "MixinControlsRegister",
+    "MixinDimensionHighlighterHandler",
     "MixinGuiCaveModeOptions",
     "MixinGuiEntityRadarSettings",
     "MixinGuiMap",

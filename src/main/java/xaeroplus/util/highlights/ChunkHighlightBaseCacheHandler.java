@@ -2,6 +2,7 @@ package xaeroplus.util.highlights;
 
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import xaeroplus.XaeroPlus;
 import xaeroplus.util.Shared;
@@ -11,19 +12,19 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.StampedLock;
 
 import static xaeroplus.util.ChunkUtils.chunkPosToLong;
 import static xaeroplus.util.ChunkUtils.loadHighlightChunksAtRegion;
 
 public abstract class ChunkHighlightBaseCacheHandler {
-    public final ReadWriteLock lock = new ReentrantReadWriteLock();
-    public final Long2LongOpenHashMap chunks = new Long2LongOpenHashMap();
+    public final ReadWriteLock lock = new StampedLock().asReadWriteLock();
+    public final Long2LongMap chunks = new Long2LongOpenHashMap();
     private final AsyncLoadingCache<RegionRenderPos, List<HighlightAtChunkPos>> regionRenderCache = Caffeine.newBuilder()
             .expireAfterWrite(3000, TimeUnit.MILLISECONDS)
             .refreshAfterWrite(500, TimeUnit.MILLISECONDS)
             .executor(Shared.cacheRefreshExecutorService)
-            .buildAsync(key -> loadHighlightChunksAtRegion(key.leafRegionX, key.leafRegionZ, key.level, this::isHighlighted).call());
+            .buildAsync(key -> loadHighlightChunksAtRegion(key.leafRegionX, key.leafRegionZ, key.level, this::isHighlightedWithWait).call());
 
     public void addHighlight(final int x, final int z) {
         addHighlight(x, z, System.currentTimeMillis());
@@ -46,6 +47,19 @@ public abstract class ChunkHighlightBaseCacheHandler {
     }
 
     public boolean isHighlighted(final long chunkPos) {
+        try {
+            if (lock.readLock().tryLock()) {
+                boolean containsKey = chunks.containsKey(chunkPos);
+                lock.readLock().unlock();
+                return containsKey;
+            }
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Error checking if chunk contains portal", e);
+        }
+        return false;
+    }
+
+    public boolean isHighlightedWithWait(final long chunkPos) {
         try {
             if (lock.readLock().tryLock(1, TimeUnit.SECONDS)) {
                 boolean containsKey = chunks.containsKey(chunkPos);
@@ -72,11 +86,11 @@ public abstract class ChunkHighlightBaseCacheHandler {
         return Collections.emptyList();
     }
 
-    public Long2LongOpenHashMap getHighlightsState() {
+    public Long2LongMap getHighlightsState() {
         return chunks;
     }
 
-    public void loadPreviousState(final Long2LongOpenHashMap state) {
+    public void loadPreviousState(final Long2LongMap state) {
         try {
             if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
                 chunks.putAll(state);

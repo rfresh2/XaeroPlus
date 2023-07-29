@@ -1,6 +1,6 @@
 package xaeroplus.module.impl;
 
-import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import net.minecraft.network.play.server.SPacketChunkData;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -27,7 +27,7 @@ public class NewChunks extends Module {
 
     public void setNewChunksCache(boolean disk) {
         try {
-            Long2LongOpenHashMap map = newChunksCache.getNewChunksState();
+            Long2LongMap map = newChunksCache.getNewChunksState();
             newChunksCache.onDisable();
             if (disk) {
                 newChunksCache = new NewChunksSavingCache(DATABASE_NAME);

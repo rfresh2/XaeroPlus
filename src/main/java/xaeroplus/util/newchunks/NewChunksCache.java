@@ -1,6 +1,6 @@
 package xaeroplus.util.newchunks;
 
-import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import xaeroplus.util.highlights.HighlightAtChunkPos;
 
 import java.util.List;
@@ -14,6 +14,6 @@ public interface NewChunksCache {
     void handleTick();
     void onEnable();
     void onDisable();
-    Long2LongOpenHashMap getNewChunksState();
-    void loadPreviousState(Long2LongOpenHashMap state);
+    Long2LongMap getNewChunksState();
+    void loadPreviousState(Long2LongMap state);
 }

@@ -30,15 +30,15 @@ public class XaeroPlusSettingsReflectionHax {
     public static final List<XaeroPlusSetting> XAERO_PLUS_MINIMAP_ENTITY_RADAR_SETTINGS = new ArrayList<>();
     public static final List<XaeroPlusSetting> XAERO_PLUS_MINIMAP_SETTINGS = new ArrayList<>();
     public static final List<XaeroPlusSetting> XAERO_PLUS_WAYPOINTS_SETTINGS = new ArrayList<>();
-    public static final Supplier<List<XaeroPlusSetting>> ALL_MINIMAP_SETTINGS = () ->
+    public static final Supplier<List<XaeroPlusSetting>> ALL_MINIMAP_SETTINGS = Suppliers.memoize(() ->
             Stream.of(XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS.stream(),
                             XAERO_PLUS_MINIMAP_SETTINGS.stream(),
                             XAERO_PLUS_MINIMAP_ENTITY_RADAR_SETTINGS.stream(),
                             XAERO_PLUS_WAYPOINTS_SETTINGS.stream())
             .flatMap(x -> x)
-            .collect(Collectors.toList());
+            .collect(Collectors.toList()));
     public static final List<XaeroPlusSetting> XAERO_PLUS_KEYBIND_SETTINGS = new ArrayList<>();
-    public static final Supplier<List<XaeroPlusSetting>> ALL_SETTINGS = () ->
+    public static final Supplier<List<XaeroPlusSetting>> ALL_SETTINGS = Suppliers.memoize(() ->
             Stream.of(XAERO_PLUS_WORLDMAP_SETTINGS.stream(),
                             XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS.stream(),
                             XAERO_PLUS_MINIMAP_ENTITY_RADAR_SETTINGS.stream(),
@@ -46,7 +46,7 @@ public class XaeroPlusSettingsReflectionHax {
                             XAERO_PLUS_KEYBIND_SETTINGS.stream(),
                             XAERO_PLUS_WAYPOINTS_SETTINGS.stream())
             .flatMap(x -> x)
-            .collect(Collectors.toList());
+            .collect(Collectors.toList()));
 
     public enum SettingLocation {
         WORLD_MAP_MAIN(XAERO_PLUS_WORLDMAP_SETTINGS),

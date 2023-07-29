@@ -56,7 +56,6 @@ import xaeroplus.module.impl.PortalSkipDetection;
 import xaeroplus.module.impl.Portals;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.*;
-import xaeroplus.util.highlights.HighlightAtChunkPos;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -1082,55 +1081,36 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                         GuiHelper.drawRectList(metaLoadedRects, 687865600);
                                     }
                                     if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue() && !mc.gameSettings.hideGUI) {
-                                        final List<GuiHelper.Rect> rects = new ArrayList<>(32);
                                         final NewChunks newChunks = ModuleManager.getModule(NewChunks.class);
-                                        for (final HighlightAtChunkPos c : newChunks.getNewChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions, Shared.customDimensionId)) {
-                                            final float left = (float) ((c.x << 4) - flooredCameraX);
-                                            final float top = (float) ((c.z << 4) - flooredCameraZ);
-                                            final float right = left + 16;
-                                            final float bottom = top + 16;
-                                            rects.add(new GuiHelper.Rect(left, top, right, bottom));
-                                        }
-                                        GuiHelper.drawRectList(rects, newChunks.getNewChunksColor());
+                                        GuiHelper.drawHighlightAtChunkPosList(newChunks.getNewChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions, Shared.customDimensionId),
+                                                                              flooredCameraX,
+                                                                              flooredCameraZ,
+                                                                              newChunks.getNewChunksColor());
                                     }
                                     if (XaeroPlusSettingRegistry.portalSkipDetectionEnabledSetting.getValue() && !mc.gameSettings.hideGUI && XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
-                                        final List<GuiHelper.Rect> rects = new ArrayList<>(32);
                                         final PortalSkipDetection portalSkipDetection = ModuleManager.getModule(PortalSkipDetection.class);
-                                        for (final HighlightAtChunkPos c : portalSkipDetection.getPortalSkipChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions)) {
-                                            final float left = (float) ((c.x << 4) - flooredCameraX);
-                                            final float top = (float) ((c.z << 4) - flooredCameraZ);
-                                            final float right = left + 16;
-                                            final float bottom = top + 16;
-                                            rects.add(new GuiHelper.Rect(left, top, right, bottom));
-                                        }
-                                        GuiHelper.drawRectList(rects, portalSkipDetection.getPortalSkipChunksColor());
+                                        GuiHelper.drawHighlightAtChunkPosList(portalSkipDetection.getPortalSkipChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions),
+                                                                              flooredCameraX,
+                                                                              flooredCameraZ,
+                                                                              portalSkipDetection.getPortalSkipChunksColor());
                                     }
                                     if (XaeroPlusSettingRegistry.portalsEnabledSetting.getValue() && !mc.gameSettings.hideGUI) {
-                                        final List<GuiHelper.Rect> rects = new ArrayList<>(32);
                                         final Portals portals = ModuleManager.getModule(Portals.class);
-                                        for (final HighlightAtChunkPos c : portals.getPortalsInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions, Shared.customDimensionId)) {
-                                            final float left = (float) ((c.x << 4) - flooredCameraX);
-                                            final float top = (float) ((c.z << 4) - flooredCameraZ);
-                                            final float right = left + 16;
-                                            final float bottom = top + 16;
-                                            rects.add(new GuiHelper.Rect(left, top, right, bottom));
-                                        }
-                                        GuiHelper.drawRectList(rects, portals.getPortalsColor());
+                                        GuiHelper.drawHighlightAtChunkPosList(portals.getPortalsInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions, Shared.customDimensionId),
+                                                                              flooredCameraX,
+                                                                              flooredCameraZ,
+                                                                              portals.getPortalsColor());
                                     }
                                     if (XaeroPlusSettingRegistry.wdlEnabledSetting.getValue()
                                             && !mc.gameSettings.hideGUI
                                             && WDLHelper.isWdlPresent()
                                             && WDLHelper.isDownloading()
                                             && !isDimensionSwitched) {
-                                        final List<GuiHelper.Rect> rects = new ArrayList<>(32);
-                                        for (final HighlightAtChunkPos c : WDLHelper.getSavedChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions)) {
-                                            final float left = (float) ((c.x << 4) - flooredCameraX);
-                                            final float top = (float) ((c.z << 4) - flooredCameraZ);
-                                            final float right = left + 16;
-                                            final float bottom = top + 16;
-                                            rects.add(new GuiHelper.Rect(left, top, right, bottom));
-                                        }
-                                        GuiHelper.drawRectList(rects, WDLHelper.getWdlColor());
+
+                                        GuiHelper.drawHighlightAtChunkPosList(WDLHelper.getSavedChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions),
+                                                                              flooredCameraX,
+                                                                              flooredCameraZ,
+                                                                              WDLHelper.getWdlColor());
                                     }
                                     GlStateManager.disableBlend();
                                     setupTextureMatricesAndTextures(brightness);

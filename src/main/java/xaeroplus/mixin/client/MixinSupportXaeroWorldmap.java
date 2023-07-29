@@ -315,67 +315,49 @@ public abstract class MixinSupportXaeroWorldmap {
                                         GuiHelper.drawRectList(rects, -2142047936);
                                     }
                                     if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
-                                        final List<GuiHelper.Rect> rects = new ArrayList<>(32);
-                                        for (int t = 0; t < 16; ++t) {
-                                            final int chunkPosX = chunk.getX() * 4 + t % 4;
-                                            final int chunkPosZ = chunk.getZ() * 4 + t / 4;
-                                            if (ModuleManager.getModule(NewChunks.class).isNewChunk(chunkPosX, chunkPosZ, Shared.customDimensionId)) {
-                                                final float left = drawX + 16 * (t % 4);
-                                                final float top = drawZ + 16 * (t / 4);
-                                                final float right = left + 16;
-                                                final float bottom = top + 16;
-                                                rects.add(new GuiHelper.Rect(left, top, right, bottom));
-                                            }
-                                        }
-                                        GuiHelper.drawRectList(rects, ModuleManager.getModule(NewChunks.class).getNewChunksColor());
+                                        final NewChunks newChunks = ModuleManager.getModule(NewChunks.class);
+                                        GuiHelper.drawMMHighlights(
+                                            (x, z) -> newChunks.isNewChunk(x, z, Shared.customDimensionId),
+                                            drawX,
+                                            drawZ,
+                                            chunk.getX() << 2,
+                                            chunk.getZ() << 2,
+                                            newChunks.getNewChunksColor());
                                     }
                                     if (XaeroPlusSettingRegistry.portalSkipDetectionEnabledSetting.getValue() && XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
-                                        final List<GuiHelper.Rect> rects = new ArrayList<>(32);
-                                        for (int t = 0; t < 16; ++t) {
-                                            final int chunkPosX = chunk.getX() * 4 + t % 4;
-                                            final int chunkPosZ = chunk.getZ() * 4 + t / 4;
-                                            if (ModuleManager.getModule(PortalSkipDetection.class).isPortalSkipChunk(chunkPosX, chunkPosZ)) {
-                                                final float left = drawX + 16 * (t % 4);
-                                                final float top = drawZ + 16 * (t / 4);
-                                                final float right = left + 16;
-                                                final float bottom = top + 16;
-                                                rects.add(new GuiHelper.Rect(left, top, right, bottom));
-                                            }
-                                        }
-                                        GuiHelper.drawRectList(rects, ModuleManager.getModule(PortalSkipDetection.class).getPortalSkipChunksColor());
+                                        final PortalSkipDetection portalSkipDetection = ModuleManager.getModule(
+                                            PortalSkipDetection.class);
+                                        GuiHelper.drawMMHighlights(
+                                            portalSkipDetection::isPortalSkipChunk,
+                                            drawX,
+                                            drawZ,
+                                            chunk.getX() << 2,
+                                            chunk.getZ() << 2,
+                                            portalSkipDetection.getPortalSkipChunksColor());
                                     }
                                     if (XaeroPlusSettingRegistry.portalsEnabledSetting.getValue()) {
-                                        final List<GuiHelper.Rect> rects = new ArrayList<>(32);
-                                        for (int t = 0; t < 16; ++t) {
-                                            final int chunkPosX = chunk.getX() * 4 + t % 4;
-                                            final int chunkPosZ = chunk.getZ() * 4 + t / 4;
-                                            if (ModuleManager.getModule(Portals.class).isPortalChunk(chunkPosX, chunkPosZ, Shared.customDimensionId)) {
-                                                final float left = drawX + 16 * (t % 4);
-                                                final float top = drawZ + 16 * (t / 4);
-                                                final float right = left + 16;
-                                                final float bottom = top + 16;
-                                                rects.add(new GuiHelper.Rect(left, top, right, bottom));
-                                            }
-                                        }
-                                        GuiHelper.drawRectList(rects, ModuleManager.getModule(Portals.class).getPortalsColor());
+                                        final Portals portalModule = ModuleManager.getModule(Portals.class);
+                                        GuiHelper.drawMMHighlights(
+                                            (x, z) -> portalModule.isPortalChunk(x, z, Shared.customDimensionId),
+                                            drawX,
+                                            drawZ,
+                                            chunk.getX() << 2,
+                                            chunk.getZ() << 2,
+                                            portalModule.getPortalsColor());
                                     }
                                     if (XaeroPlusSettingRegistry.wdlEnabledSetting.getValue()
                                             && WDLHelper.isWdlPresent()
                                             && WDLHelper.isDownloading()
                                             && !isDimensionSwitched) {
-                                        final List<GuiHelper.Rect> rects = new ArrayList<>(32);
                                         final Set<Long> wdlSavedChunksWithCache = WDLHelper.getSavedChunksWithCache();
-                                        for (int t = 0; t < 16; ++t) {
-                                            final Long chunkPos = ChunkUtils.chunkPosToLong(chunk.getX() * 4 + t % 4, chunk.getZ() * 4 + t / 4);
-                                            if (wdlSavedChunksWithCache.contains(chunkPos)) {
-                                                final float left = drawX + 16 * (t % 4);
-                                                final float top = drawZ + 16 * (t / 4);
-                                                final float right = left + 16;
-                                                final float bottom = top + 16;
-                                                rects.add(new GuiHelper.Rect(left, top, right, bottom));
-                                            }
-                                        }
-                                        GuiHelper.drawRectList(rects, WDLHelper.getWdlColor());
+                                        GuiHelper.drawMMHighlights(
+                                            (x, z) -> wdlSavedChunksWithCache.contains(ChunkUtils.chunkPosToLong(x, z)),
+                                            drawX,
+                                            drawZ,
+                                            chunk.getX() << 2,
+                                            chunk.getZ() << 2,
+                                            WDLHelper.getWdlColor()
+                                        );
                                     }
                                     if (compatibilityVersion >= 6) {
                                         GuiMap.setupTextures(brightness);

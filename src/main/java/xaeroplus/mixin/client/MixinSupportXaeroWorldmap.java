@@ -3,7 +3,7 @@ package xaeroplus.mixin.client;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.MathHelper;
@@ -193,6 +193,10 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                     WaypointWorld world = minimapSession.getWaypointsManager().getAutoWorld();
                     Long seed = slimeChunks && world != null ? this.modMain.getSettings().getSlimeChunksSeed(world.getFullId()) : null;
                     MapRegion prevRegion = null;
+                    Tessellator bgTesselator = Tessellator.getInstance();
+                    BufferBuilder bgBufferBuilder = bgTesselator.getBuffer();
+                    if (XaeroPlusSettingRegistry.transparentMinimapBackground.getValue())
+                        bgBufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
                     Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 
                     for(int i = minX; i <= maxX; ++i) {
@@ -256,9 +260,11 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                                     int drawX = ((chunk.getX() - chunkX) << 6) - (tileX << 4) - insideX;
                                     int drawZ = ((chunk.getZ() - chunkZ) << 6) - (tileZ << 4) - insideZ;
                                     if (XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) {
-                                        // there's probably a better way to do this without needing to pass in guiGraphics
-                                        // but im still unfamiliar with mc's new rendering system (and how xaero uses it)
-                                        GuiHelper.drawMMBackground(guiGraphics, drawX, drawZ, chunk);
+                                        GuiHelper.addMMBackgroundToBuffer(guiGraphics.getMatrices().peek().getPositionMatrix(),
+                                                                          bgBufferBuilder,
+                                                                          drawX,
+                                                                          drawZ,
+                                                                          chunk);
                                     }
 
                                     GL11.glTexParameterf(3553, 33082, 0.0F);
@@ -324,6 +330,7 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                             }
                         }
                     }
+                    if (XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) bgTesselator.draw();
 
                     MapShaders.WORLD_MAP.setBrightness(brightness);
                     MapShaders.WORLD_MAP.setWithLight(true);

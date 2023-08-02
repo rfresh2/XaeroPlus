@@ -7,10 +7,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import xaero.common.IXaeroMinimap;
+import xaero.common.XaeroMinimapSession;
 import xaero.common.settings.ModOptions;
 import xaero.common.settings.ModSettings;
 import xaeroplus.settings.XaeroPlusModSettingsHooks;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
 
 import java.io.File;
@@ -23,7 +26,10 @@ public class MixinMinimapModSettings {
 
     @Shadow
     public int caveMaps;
-
+    @Shadow
+    private boolean lockNorth;
+    @Shadow
+    public boolean keepUnlockedWhenEnlarged;
     @Shadow
     protected IXaeroMinimap modMain;
 
@@ -33,6 +39,17 @@ public class MixinMinimapModSettings {
         caveMaps = 0;
     }
 
+    @Inject(method = "getLockNorth", at = @At("HEAD"), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
+    public void getLockNorth(int mapSize, int shape, CallbackInfoReturnable<Boolean> cir) {
+        if (!XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) return;
+        // prevent lock north from being forced to true when minimap is square and greater than 180 size
+        XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
+        if (minimapSession == null) {
+            cir.setReturnValue(this.lockNorth);
+        } else {
+            cir.setReturnValue(this.lockNorth || !this.keepUnlockedWhenEnlarged && minimapSession.getMinimapProcessor().isEnlargedMap());
+        }
+    }
 
     @Inject(method = "saveSettings", at = @At("TAIL"))
     public void saveSettings(final CallbackInfo ci) throws IOException {

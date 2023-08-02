@@ -6,10 +6,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import xaero.common.IXaeroMinimap;
+import xaero.common.XaeroMinimapSession;
 import xaero.common.settings.ModOptions;
 import xaero.common.settings.ModSettings;
 import xaeroplus.settings.XaeroPlusModSettingsHooks;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,29 +22,33 @@ import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.ALL_MINIMAP_SETT
 @Mixin(value = ModSettings.class, remap = false)
 public class MixinMinimapModSettings {
 
-    /**
-     * experimenting with minimap zoom adjustments
-     * need to create further mixins in rendering
-     * ideally what we want is as zoom decreases, we get more chunks rendered to fill minimap
-     * unfortunately alot of hardcoded values are used in the rendering that need to be changed
-     */
-    @Shadow
-    public float[] zooms;
-
     @Shadow
     public int caveMaps;
+    @Shadow
+    private boolean lockNorth;
+    @Shadow
+    public boolean keepUnlockedWhenEnlarged;
 
     @Shadow
-    private IXaeroMinimap modMain;
+    protected IXaeroMinimap modMain;
 
     @Inject(method = "<init>", at = @At(value = "RETURN"))
     private void init(CallbackInfo ci) {
-//        zooms = new float[]{0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1.0F, 2.0F, 3.0F, 4.0F, 5.0F};
-
         // don't show cave maps on minimap by default
         caveMaps = 0;
     }
 
+    @Inject(method = "getLockNorth", at = @At("HEAD"), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
+    public void getLockNorth(int mapSize, int shape, CallbackInfoReturnable<Boolean> cir) {
+        if (!XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) return;
+        // prevent lock north from being forced to true when minimap is square and greater than 180 size
+        XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
+        if (minimapSession == null) {
+            cir.setReturnValue(this.lockNorth);
+        } else {
+            cir.setReturnValue(this.lockNorth || !this.keepUnlockedWhenEnlarged && minimapSession.getMinimapProcessor().isEnlargedMap());
+        }
+    }
 
     @Inject(method = "saveSettings", at = @At("TAIL"))
     public void saveSettings(final CallbackInfo ci) throws IOException {

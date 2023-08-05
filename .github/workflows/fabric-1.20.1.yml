@@ -104,6 +104,7 @@ jobs:
         version: ${{ github.run_number }}
         loaders: |
           ${{ env.MOD_LOADER }}
+          quilt
         game-versions: |
           ${{ env.MINECRAFT_VERSION }}
         dependencies: |

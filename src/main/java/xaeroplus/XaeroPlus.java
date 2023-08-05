@@ -2,12 +2,10 @@ package xaeroplus;
 
 import com.collarmc.pounce.EventBus;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.option.KeyBinding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import xaero.minimap.XaeroMinimap;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
@@ -20,6 +18,7 @@ public class XaeroPlus implements ClientModInitializer {
 	public static final EventBus EVENT_BUS = new EventBus(Runnable::run);
 	@Override
 	public void onInitializeClient() {
+		LOGGER.info("Initializing XaeroPlus");
 		ModuleManager.init();
 		boolean a = Shared.FOLLOW; // force static instances to init
 		XaeroPlusSettingRegistry.fastMapSetting.getValue(); // force static instances to init

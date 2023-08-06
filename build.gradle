@@ -53,8 +53,8 @@ dependencies {
 	jarLibs 'com.github.ben-manes.caffeine:caffeine:3.1.7'
 	jarLibs "com.github.collarmc:pounce:0e8492b68e"
 
-	modImplementation "maven.modrinth:xaeros-world-map:1.31.0_Fabric_1.20"
-	modImplementation "maven.modrinth:xaeros-minimap:23.6.0_Fabric_1.20"
+	modImplementation "maven.modrinth:xaeros-world-map:1.32.0_Fabric_1.20"
+	modImplementation "maven.modrinth:xaeros-minimap:23.6.1_Fabric_1.20"
 	modImplementation files("libs/baritone-api-fabric-1.10.1.jar")
 	modCompileOnly "maven.modrinth:waystones:14.0.1+fabric-1.20"
 	modCompileOnly "maven.modrinth:balm:7.0.4+fabric-1.20"

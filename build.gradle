@@ -57,8 +57,8 @@ dependencies {
 	forgeRuntimeLibrary(jarLibs "com.github.ben-manes.caffeine:caffeine:3.1.6")
 	forgeRuntimeLibrary(jarLibs "com.github.collarmc:pounce:0e8492b68e")
 
-	modImplementation "maven.modrinth:xaeros-world-map:1.31.0_Forge_1.20"
-	modImplementation "maven.modrinth:xaeros-minimap:23.6.0_Forge_1.20"
+	modImplementation "maven.modrinth:xaeros-world-map:1.32.0_Forge_1.20"
+	modImplementation "maven.modrinth:xaeros-minimap:23.6.1_Forge_1.20"
 	modImplementation files("libs/baritone-api-forge-1.10.1.jar")
 	modCompileOnly "maven.modrinth:waystones:14.0.1+forge-1.20"
 	modCompileOnly "maven.modrinth:balm:7.0.4+forge-1.20"

@@ -61,7 +61,10 @@ import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
 import xaeroplus.module.impl.PortalSkipDetection;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.*;
+import xaeroplus.util.BaritoneHelper;
+import xaeroplus.util.CustomDimensionMapProcessor;
+import xaeroplus.util.GuiHelper;
+import xaeroplus.util.Shared;
 import xaeroplus.util.highlights.HighlightAtChunkPos;
 
 import java.util.ArrayList;
@@ -1259,16 +1262,21 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                 1.0F,
                                 0.1569F
                         );
-                        if (this.mapTileSelection != null) {
+                        MapTileSelection mapTileSelectionToRender = this.mapTileSelection;
+                        if (mapTileSelectionToRender == null && this.client.currentScreen instanceof ExportScreen) {
+                            mapTileSelectionToRender = ((ExportScreen)this.client.currentScreen).getSelection();
+                        }
+
+                        if (mapTileSelectionToRender != null) {
                             MapRenderHelper.renderDynamicHighlight(
                                     matrixStack,
                                     overlayBuffer,
                                     flooredCameraX,
                                     flooredCameraZ,
-                                    this.mapTileSelection.getLeft() << 4,
-                                    this.mapTileSelection.getRight() + 1 << 4,
-                                    this.mapTileSelection.getTop() << 4,
-                                    this.mapTileSelection.getBottom() + 1 << 4,
+                                    mapTileSelectionToRender.getLeft() << 4,
+                                    mapTileSelectionToRender.getRight() + 1 << 4,
+                                    mapTileSelectionToRender.getTop() << 4,
+                                    mapTileSelectionToRender.getBottom() + 1 << 4,
                                     0.0F,
                                     0.0F,
                                     0.0F,

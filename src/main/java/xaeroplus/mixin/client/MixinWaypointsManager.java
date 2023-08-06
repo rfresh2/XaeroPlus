@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.minimap.waypoints.WaypointWorldRootContainer;
@@ -18,6 +19,7 @@ import xaero.common.minimap.waypoints.WaypointsManager;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.DataFolderResolveUtil;
+import xaeroplus.util.IWaypointDimension;
 import xaeroplus.util.Shared;
 
 @Mixin(value = WaypointsManager.class, remap = false)
@@ -126,4 +128,22 @@ public abstract class MixinWaypointsManager {
         }
     }
 
+    @Inject(
+        method = "createTemporaryWaypoints(Lxaero/common/minimap/waypoints/WaypointWorld;IIIZ)V",
+        at = @At(
+            value = "INVOKE",
+            target = "Lxaero/common/IXaeroMinimap;getSettings()Lxaero/common/settings/ModSettings;",
+            ordinal = 1
+        ),
+        locals = LocalCapture.CAPTURE_FAILHARD)
+    public void createTempWaypointInject(final WaypointWorld wpw,
+                                         final int x,
+                                         final int y,
+                                         final int z,
+                                         final boolean yIncluded,
+                                         final CallbackInfo ci,
+                                         final double dimDiv,
+                                         final Waypoint waypoint) {
+        ((IWaypointDimension) waypoint).setDimension(Integer.parseInt(wpw.getContainer().getKey().substring(wpw.getContainer().getKey().lastIndexOf(47) + 1).substring(4)));
+    }
 }

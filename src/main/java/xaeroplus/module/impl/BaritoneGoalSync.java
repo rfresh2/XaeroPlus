@@ -13,8 +13,10 @@ import xaero.common.minimap.waypoints.WaypointSet;
 import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.misc.OptimizedMath;
 import xaero.map.mods.SupportMods;
+import xaeroplus.XaeroPlus;
 import xaeroplus.module.Module;
 import xaeroplus.util.BaritoneHelper;
+import xaeroplus.util.IWaypointDimension;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,7 +47,8 @@ public class BaritoneGoalSync extends Module {
             baritoneGoalWaypoint.ifPresent(waypoint -> removeBaritoneGoalWaypoint(waypoints, waypoint));
             return;
         };
-        final double dimDiv = waypointsManager.getDimensionDivision(waypointsManager.getCurrentContainerID());
+        String currentContainerId = waypointsManager.getCurrentContainerID();
+        final double dimDiv = waypointsManager.getDimensionDivision(currentContainerId);
         final int x = OptimizedMath.myFloor(baritoneGoalBlockPos.getX() * dimDiv);
         final int z = OptimizedMath.myFloor(baritoneGoalBlockPos.getZ() * dimDiv);
         if (baritoneGoalWaypoint.isPresent()) {
@@ -68,6 +71,13 @@ public class BaritoneGoalSync extends Module {
                     10, // green
                     0,
                     true);
+            try {
+                final int currentWaypointDim = Integer.parseInt(currentContainerId.substring(currentContainerId.lastIndexOf(37) + 1));
+                ((IWaypointDimension) waypoint).setDimension(currentWaypointDim);
+            } catch (final Exception e) {
+                XaeroPlus.LOGGER.error("Failed to set dimension for Baritone Goal waypoint", e);
+            }
+
             waypoints.add(waypoint);
             SupportMods.xaeroMinimap.requestWaypointsRefresh();
         }

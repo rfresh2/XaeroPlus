@@ -14,6 +14,7 @@ import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.module.Module;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.IWaypointDimension;
 import xaeroplus.util.WaystonesHelper;
 
 import java.util.ArrayList;
@@ -79,16 +80,18 @@ public class WaystoneSync extends Module {
                             "gui.xaero_default").getList();
                     // todo: support waystone removal sync for cross-dimension waystones
                     crossDimWaypoints.removeIf(waypoint -> waypoint.isTemporary() && waypoint.getName().equals(waystoneEntry.getName() + " [Waystone]"));
-                    crossDimWaypoints.add(new Waypoint(
-                            waystoneEntry.getPos().getX(),
-                            waystoneEntry.getPos().getY(),
-                            waystoneEntry.getPos().getZ(),
-                            waystoneEntry.getName() + " [Waystone]",
-                            waystoneEntry.getName().substring(0, 1).toUpperCase(Locale.ROOT),
-                            Math.abs(waystoneEntry.getName().hashCode()) % COLORS.length,
-                            0,
-                            true
-                    ));
+                    Waypoint waystoneWp = new Waypoint(
+                        waystoneEntry.getPos().getX(),
+                        waystoneEntry.getPos().getY(),
+                        waystoneEntry.getPos().getZ(),
+                        waystoneEntry.getName() + " [Waystone]",
+                        waystoneEntry.getName().substring(0, 1).toUpperCase(Locale.ROOT),
+                        Math.abs(waystoneEntry.getName().hashCode()) % COLORS.length,
+                        0,
+                        true
+                    );
+                    ((IWaypointDimension) waystoneWp).setDimension(waystoneDim);
+                    crossDimWaypoints.add(waystoneWp);
                 } catch (final Exception e) {
                     XaeroPlus.LOGGER.warn("Failed to add cross-dimension waystone", e);
                 }
@@ -99,16 +102,18 @@ public class WaystoneSync extends Module {
             final double dimDiv = getDimensionDivision(waystoneEntry.getDimensionId(), waypointsManager);
             final int x = OptimizedMath.myFloor(waystoneEntry.getPos().getX() * dimDiv);
             final int z = OptimizedMath.myFloor(waystoneEntry.getPos().getZ() * dimDiv);
-            waypoints.add(new Waypoint(
-                    x,
-                    waystoneEntry.getPos().getY(),
-                    z,
-                    waystoneEntry.getName() + " [Waystone]",
-                    waystoneEntry.getName().substring(0, 1).toUpperCase(Locale.ROOT),
-                    Math.abs(waystoneEntry.getName().hashCode()) % COLORS.length,
-                    0,
-                    true
-            ));
+            Waypoint waystoneWp = new Waypoint(
+                x,
+                waystoneEntry.getPos().getY(),
+                z,
+                waystoneEntry.getName() + " [Waystone]",
+                waystoneEntry.getName().substring(0, 1).toUpperCase(Locale.ROOT),
+                Math.abs(waystoneEntry.getName().hashCode()) % COLORS.length,
+                0,
+                true
+            );
+            ((IWaypointDimension) waystoneWp).setDimension(waystoneEntry.getDimensionId());
+            waypoints.add(waystoneWp);
         }
         SupportMods.xaeroMinimap.requestWaypointsRefresh();
     }

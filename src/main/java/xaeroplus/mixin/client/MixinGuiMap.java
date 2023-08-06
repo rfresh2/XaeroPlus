@@ -1208,14 +1208,19 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                     1.0F,
                                     0.1569F
                             );
-                            if (this.mapTileSelection != null) {
+                            MapTileSelection mapTileSelectionToRender = this.mapTileSelection;
+                            if (mapTileSelectionToRender == null && mc.currentScreen instanceof ExportScreen) {
+                                mapTileSelectionToRender = ((ExportScreen)mc.currentScreen).getSelection();
+                            }
+
+                            if (mapTileSelectionToRender != null) {
                                 MapRenderHelper.renderDynamicHighlight(
                                         flooredCameraX,
                                         flooredCameraZ,
-                                        this.mapTileSelection.getLeft() << 4,
-                                        this.mapTileSelection.getRight() + 1 << 4,
-                                        this.mapTileSelection.getTop() << 4,
-                                        this.mapTileSelection.getBottom() + 1 << 4,
+                                        mapTileSelectionToRender.getLeft() << 4,
+                                        mapTileSelectionToRender.getRight() + 1 << 4,
+                                        mapTileSelectionToRender.getTop() << 4,
+                                        mapTileSelectionToRender.getBottom() + 1 << 4,
                                         0.0F,
                                         0.0F,
                                         0.0F,

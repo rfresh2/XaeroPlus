@@ -5,8 +5,8 @@ on:
     branches:
       - "mainline"
 env:
-  WORLDMAP_VERSION: "1.31.0"
-  MINIMAP_VERSION: "23.6.0"
+  WORLDMAP_VERSION: "1.32.0"
+  MINIMAP_VERSION: "23.6.1"
   MINECRAFT_VERSION: "1.12.2"
   MINECRAFT_VERSION_SHORT: "1.12"
   MOD_LOADER: "Forge"

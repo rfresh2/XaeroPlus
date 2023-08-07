@@ -5,7 +5,9 @@ import baritone.api.pathing.goals.Goal;
 import baritone.api.pathing.goals.GoalXZ;
 import baritone.api.utils.interfaces.IGoalRenderPos;
 import com.collarmc.pounce.Subscribe;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.minimap.waypoints.WaypointSet;
@@ -14,12 +16,13 @@ import xaero.common.misc.OptimizedMath;
 import xaero.map.mods.SupportMods;
 import xaeroplus.event.ClientTickEvent;
 import xaeroplus.module.Module;
-import xaeroplus.util.BaritoneHelper;
-import xaeroplus.util.IWaypointDimension;
-import xaeroplus.util.WaypointsHelper;
+import xaeroplus.util.*;
 
 import java.util.List;
 import java.util.Optional;
+
+import static net.minecraft.world.World.NETHER;
+import static net.minecraft.world.World.OVERWORLD;
 
 @Module.ModuleInfo()
 public class BaritoneGoalSync extends Module {
@@ -51,12 +54,24 @@ public class BaritoneGoalSync extends Module {
         final int z = OptimizedMath.myFloor(baritoneGoalBlockPos.getZ() * dimDiv);
         if (baritoneGoalWaypoint.isPresent()) {
             final Waypoint waypoint = baritoneGoalWaypoint.get();
-            if (waypoint.getX() != x ||
+            RegistryKey<World> customDim = Shared.customDimensionId;
+            RegistryKey<World> actualDim = ChunkUtils.getActualDimension();
+            double customDimDiv = 1.0;
+            if (customDim != actualDim) {
+                if (customDim == NETHER && actualDim == OVERWORLD) {
+                    customDimDiv = 0.125;
+                } else if (customDim == OVERWORLD && actualDim == NETHER) {
+                    customDimDiv = 8.0;
+                }
+            }
+            int expectedX = (int) (x * customDimDiv);
+            int expectedZ = (int) (z * customDimDiv);
+            if (waypoint.getX() != expectedX ||
                     waypoint.getY() != baritoneGoalBlockPos.getY() ||
-                    waypoint.getZ() != z) {
-                waypoint.setX(x);
+                    waypoint.getZ() != expectedZ) {
+                waypoint.setX(expectedX);
                 waypoint.setY(baritoneGoalBlockPos.getY());
-                waypoint.setZ(z);
+                waypoint.setZ(expectedZ);
                 SupportMods.xaeroMinimap.requestWaypointsRefresh();
             }
         } else {

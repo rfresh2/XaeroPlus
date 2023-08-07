@@ -15,6 +15,8 @@ import xaero.map.mods.SupportMods;
 import xaeroplus.event.ClientTickEvent;
 import xaeroplus.module.Module;
 import xaeroplus.util.BaritoneHelper;
+import xaeroplus.util.IWaypointDimension;
+import xaeroplus.util.WaypointsHelper;
 
 import java.util.List;
 import java.util.Optional;
@@ -67,6 +69,7 @@ public class BaritoneGoalSync extends Module {
                     10, // green
                     0,
                     true);
+            ((IWaypointDimension) waypoint).setDimension(WaypointsHelper.getDimensionKeyForWaypointWorldKey(waypointsManager.getCurrentContainerID()));
             waypoints.add(waypoint);
             SupportMods.xaeroMinimap.requestWaypointsRefresh();
         }

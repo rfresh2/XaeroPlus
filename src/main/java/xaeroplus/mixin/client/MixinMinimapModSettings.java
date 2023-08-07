@@ -10,11 +10,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
+import xaero.common.minimap.waypoints.Waypoint;
+import xaero.common.minimap.waypoints.WaypointSet;
+import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.settings.ModOptions;
 import xaero.common.settings.ModSettings;
+import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusModSettingsHooks;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
+import xaeroplus.util.IWaypointDimension;
+import xaeroplus.util.WaypointsHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,6 +54,20 @@ public class MixinMinimapModSettings {
             cir.setReturnValue(this.lockNorth);
         } else {
             cir.setReturnValue(this.lockNorth || !this.keepUnlockedWhenEnlarged && minimapSession.getMinimapProcessor().isEnlargedMap());
+        }
+    }
+
+    @Inject(
+        method = "checkWaypointsLine",
+        at = @At(
+            value = "INVOKE",
+            target = "Ljava/util/ArrayList;add(Ljava/lang/Object;)Z"),
+        locals = LocalCapture.CAPTURE_FAILHARD)
+    public void createWaypointInject(final String[] args, final WaypointWorld wpw, final CallbackInfoReturnable<Boolean> cir, final String setName, final WaypointSet set, boolean yIncluded, int yCoord, Waypoint waypoint) {
+        try {
+            ((IWaypointDimension) waypoint).setDimension(WaypointsHelper.getDimensionKeyForWaypointWorldKey(wpw.getContainer().getKey()));
+        } catch (final Throwable e) {
+            XaeroPlus.LOGGER.error("Failed setting waypoint dimension: {}", waypoint, e);
         }
     }
 

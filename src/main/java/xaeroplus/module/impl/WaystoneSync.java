@@ -18,6 +18,8 @@ import xaeroplus.event.ClientTickEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.module.Module;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.IWaypointDimension;
+import xaeroplus.util.WaypointsHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,16 +82,20 @@ public class WaystoneSync extends Module {
             final double dimDiv = getDimensionDivision(waystoneEntry.getDimension(), waypointsManager);
             final int x = OptimizedMath.myFloor(waystoneEntry.getPos().getX() * dimDiv);
             final int z = OptimizedMath.myFloor(waystoneEntry.getPos().getZ() * dimDiv);
-            waypoints.add(new Waypoint(
-                    x,
-                    waystoneEntry.getPos().getY(),
-                    z,
-                    waystoneEntry.getName() + " [Waystone]",
-                    waystoneEntry.getName().isEmpty() ? "W" : waystoneEntry.getName().substring(0, 1).toUpperCase(Locale.ROOT),
-                    Math.abs(waystoneEntry.getName().hashCode()) % COLORS.length,
-                    0,
-                    true
-            ));
+            Waypoint waypoint = new Waypoint(
+                x,
+                waystoneEntry.getPos().getY(),
+                z,
+                waystoneEntry.getName() + " [Waystone]",
+                waystoneEntry.getName().isEmpty() ? "W" : waystoneEntry.getName()
+                    .substring(0, 1)
+                    .toUpperCase(Locale.ROOT),
+                Math.abs(waystoneEntry.getName().hashCode()) % COLORS.length,
+                0,
+                true
+            );
+            ((IWaypointDimension) waypoint).setDimension(waystoneEntry.getDimension());
+            waypoints.add(waypoint);
         }
         SupportMods.xaeroMinimap.requestWaypointsRefresh();
         return true;

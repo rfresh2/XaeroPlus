@@ -28,6 +28,7 @@ import xaero.common.settings.ModSettings;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ColorHelper;
 import xaeroplus.util.CustomWaypointsIngameRenderer;
+import xaeroplus.util.WaypointsHelper;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -86,8 +87,7 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
                 int dim = Minecraft.getMinecraft().world.provider.getDimension();
                 if (!Objects.equals(dim, customDimensionId)) {
                     double currentDimDiv = Objects.equals(dim, -1) ? 8.0 : 1.0;
-                    String dimPart = worldContainerID.substring(worldContainerID.lastIndexOf(47) + 1);
-                    Integer dimKey = waypointsManager.getDimensionForDirectoryName(dimPart);
+                    int dimKey = WaypointsHelper.getDimensionForWaypointWorldKey(worldContainerID);
                     double selectedDimDiv = dimKey == -1 ? 8.0 : 1.0;
                     return currentDimDiv / selectedDimDiv;
                 }

@@ -21,6 +21,7 @@ import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.DataFolderResolveUtil;
 import xaeroplus.util.IWaypointDimension;
 import xaeroplus.util.Shared;
+import xaeroplus.util.WaypointsHelper;
 
 @Mixin(value = WaypointsManager.class, remap = false)
 public abstract class MixinWaypointsManager {
@@ -110,9 +111,8 @@ public abstract class MixinWaypointsManager {
     @Overwrite
     public double getDimensionDivision(String worldContainerID) {
         if (worldContainerID != null && Minecraft.getMinecraft().world != null) {
-            String dimPart = worldContainerID.substring(worldContainerID.lastIndexOf(47) + 1);
-            Integer dimKey = this.getDimensionForDirectoryName(dimPart);
-            if (dimKey != null && (dimKey == -1 || dimKey == 0 || dimKey == 1)) {
+            int dimKey = WaypointsHelper.getDimensionForWaypointWorldKey(worldContainerID);
+            if (dimKey == -1 || dimKey == 0 || dimKey == 1) {
                 double currentDimDiv = Minecraft.getMinecraft().world.provider.getDimensionType() == DimensionType.NETHER ? 8.0 : 1.0;
                 double selectedDimDiv = dimKey == -1 ? 8.0 : 1.0;
                 if (Minecraft.getMinecraft().world.provider.getDimension() != Shared.customDimensionId) {
@@ -144,6 +144,6 @@ public abstract class MixinWaypointsManager {
                                          final CallbackInfo ci,
                                          final double dimDiv,
                                          final Waypoint waypoint) {
-        ((IWaypointDimension) waypoint).setDimension(Integer.parseInt(wpw.getContainer().getKey().substring(wpw.getContainer().getKey().lastIndexOf(47) + 1).substring(4)));
+        ((IWaypointDimension) waypoint).setDimension(WaypointsHelper.getDimensionForWaypointWorldKey(wpw.getContainer().getKey()));
     }
 }

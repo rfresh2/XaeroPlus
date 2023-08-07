@@ -15,6 +15,7 @@ import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.module.Module;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.IWaypointDimension;
+import xaeroplus.util.WaypointsHelper;
 import xaeroplus.util.WaystonesHelper;
 
 import java.util.ArrayList;
@@ -120,8 +121,7 @@ public class WaystoneSync extends Module {
 
     private double getDimensionDivision(final int waystoneDim, final WaypointsManager waypointsManager) {
         String currentContainerID = waypointsManager.getCurrentContainerID();
-        String dimPart = currentContainerID.substring(currentContainerID.lastIndexOf(47) + 1);
-        Integer waypointContainerDim = waypointsManager.getDimensionForDirectoryName(dimPart);
+        int waypointContainerDim = WaypointsHelper.getDimensionForWaypointWorldKey(currentContainerID);
         if (waystoneDim == waypointContainerDim) return 1.0;
         double waypointsContainerDimDiv = waypointContainerDim == -1 ? 8.0 : 1.0;
         double waystoneDimDiv = waystoneDim == -1 ? 8.0 : 1.0;

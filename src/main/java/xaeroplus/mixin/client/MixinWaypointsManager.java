@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.minimap.waypoints.WaypointWorldRootContainer;
@@ -20,7 +21,9 @@ import xaero.common.minimap.waypoints.WaypointsManager;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.DataFolderResolveUtil;
+import xaeroplus.util.IWaypointDimension;
 import xaeroplus.util.Shared;
+import xaeroplus.util.WaypointsHelper;
 
 import static net.minecraft.world.World.NETHER;
 import static net.minecraft.world.World.OVERWORLD;
@@ -130,5 +133,24 @@ public abstract class MixinWaypointsManager {
         } else {
             return 1.0;
         }
+    }
+
+    @Inject(
+        method = "createTemporaryWaypoints(Lxaero/common/minimap/waypoints/WaypointWorld;IIIZ)V",
+        at = @At(
+            value = "INVOKE",
+            target = "Lxaero/common/AXaeroMinimap;getSettings()Lxaero/common/settings/ModSettings;",
+            ordinal = 1
+        ),
+        locals = LocalCapture.CAPTURE_FAILHARD)
+    public void createTempWaypointInject(final WaypointWorld wpw,
+                                         final int x,
+                                         final int y,
+                                         final int z,
+                                         final boolean yIncluded,
+                                         final CallbackInfo ci,
+                                         final double dimDiv,
+                                         final Waypoint waypoint) {
+        ((IWaypointDimension) waypoint).setDimension(WaypointsHelper.getDimensionKeyForWaypointWorldKey(wpw.getContainer().getKey()));
     }
 }

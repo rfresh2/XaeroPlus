@@ -4,6 +4,10 @@ import baritone.api.BaritoneAPI;
 import baritone.api.pathing.goals.GoalXZ;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -13,10 +17,14 @@ import xaero.map.gui.dropdown.rightclick.RightClickOption;
 import xaero.map.mods.gui.Waypoint;
 import xaero.map.mods.gui.WaypointReader;
 import xaeroplus.util.BaritoneHelper;
+import xaeroplus.util.ChunkUtils;
+import xaeroplus.util.IWaypointDimension;
 
 import java.util.ArrayList;
 
 import static java.util.Arrays.asList;
+import static net.minecraft.world.World.NETHER;
+import static net.minecraft.world.World.OVERWORLD;
 
 @Mixin(value = WaypointReader.class, remap = false)
 public class MixinWaypointReader {
@@ -26,17 +34,32 @@ public class MixinWaypointReader {
     public void getRightClickOptionsReturn(final Waypoint element, final IRightClickableElement target, final CallbackInfoReturnable<ArrayList<RightClickOption>> cir) {
         if (BaritoneHelper.isBaritonePresent()) {
             final ArrayList<RightClickOption> options = cir.getReturnValue();
+            RegistryKey<World> wpDimension = ((IWaypointDimension) element).getDimension();
+            if (wpDimension == null) {
+                wpDimension = OVERWORLD;
+            }
+            RegistryKey<World> playerDimension = ChunkUtils.getActualDimension();
+            double dimDiv = 1.0;
+            if (wpDimension != playerDimension) {
+                if (wpDimension == NETHER && playerDimension == OVERWORLD) {
+                    dimDiv = 8.0;
+                } else if (wpDimension == OVERWORLD && playerDimension == NETHER) {
+                    dimDiv = 0.125;
+                }
+            }
+            int destX = (int) (element.getX() * dimDiv);
+            int destZ = (int) (element.getZ() * dimDiv);
             options.addAll(3, asList(
                 new RightClickOption(I18n.translate("gui.world_map.baritone_goal_here"), options.size(), target) {
                     @Override
                     public void onAction(Screen screen) {
-                        BaritoneAPI.getProvider().getPrimaryBaritone().getCustomGoalProcess().setGoal(new GoalXZ(element.getX(), element.getZ()));
+                        BaritoneAPI.getProvider().getPrimaryBaritone().getCustomGoalProcess().setGoal(new GoalXZ(destX, destZ));
                     }
                 },
                 new RightClickOption(I18n.translate("gui.world_map.baritone_path_here"), options.size(), target) {
                     @Override
                     public void onAction(Screen screen) {
-                        BaritoneAPI.getProvider().getPrimaryBaritone().getCustomGoalProcess().setGoalAndPath(new GoalXZ(element.getX(), element.getZ()));
+                        BaritoneAPI.getProvider().getPrimaryBaritone().getCustomGoalProcess().setGoalAndPath(new GoalXZ(destX, destZ));
                     }
                 }
             ));

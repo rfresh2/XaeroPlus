@@ -64,7 +64,7 @@ public class WaystoneSync extends Module {
         for (WaystoneEntry waystoneEntry : knownWaystones) {
             final int waystoneDim = waystoneEntry.getDimensionId();
             final String currentContainerId = waypointsManager.getCurrentContainerID();
-            final int currentWaypointDim = Integer.parseInt(currentContainerId.substring(currentContainerId.lastIndexOf(37) + 1));
+            final int currentWaypointDim = WaypointsHelper.getDimensionForWaypointWorldKey(currentContainerId);
             if (XaeroPlusSettingRegistry.waystonesCrossDimSyncSetting.getValue() && waystoneDim != currentWaypointDim) { // special case handling
                 // god i hate how there's no easy way to get waypoint sets in other dimensions. also the entire handling of waypoint dimensions...
                 // this will probably (definitely) fail if there are nonstandard waypoint sets in use.

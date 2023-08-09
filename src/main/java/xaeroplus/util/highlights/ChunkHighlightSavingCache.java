@@ -39,14 +39,14 @@ public class ChunkHighlightSavingCache {
             cacheForCurrentDimension.addHighlight(x, z);
             return true;
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error adding highlight to saving cache: {}", databaseName, e);
+            XaeroPlus.LOGGER.debug("Error adding highlight to saving cache: {}", databaseName, e);
             return false;
         }
     }
 
     public void addHighlight(final int x, final int z, final long foundTime, final int dimension) {
         ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimension);
-        if (cacheForDimension == null) throw new RuntimeException("Didn't find cache for dimension: " + dimension);
+        if (cacheForDimension == null) return;
         cacheForDimension.addHighlight(x, z, foundTime);
     }
 
@@ -106,7 +106,7 @@ public class ChunkHighlightSavingCache {
             case 1:
                 return endCache;
             default:
-                throw new RuntimeException("Unknown dimension: " + getActualDimension());
+                return null;
         }
     }
 
@@ -119,7 +119,7 @@ public class ChunkHighlightSavingCache {
             case 1:
                 return endCache;
             default:
-                throw new RuntimeException("Unknown dimension: " + dimension);
+                return null;
         }
     }
 
@@ -137,7 +137,7 @@ public class ChunkHighlightSavingCache {
             case 1:
                 return Stream.of(netherCache, overworldCache).filter(Objects::nonNull).collect(Collectors.toList());
             default:
-                throw new RuntimeException("Unknown dimension: " + dimension);
+                return Collections.emptyList();
         }
     }
 
@@ -220,7 +220,7 @@ public class ChunkHighlightSavingCache {
             ChunkHighlightCacheDimensionHandler cacheForCurrentDimension = getCacheForCurrentDimension();
             if (cacheForCurrentDimension != null) cacheForCurrentDimension.removeHighlight(x, z);
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error removing portal marker from saving cache", e);
+            XaeroPlus.LOGGER.debug("Error removing portal marker from saving cache", e);
         }
     }
 }

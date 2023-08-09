@@ -9,6 +9,7 @@ import xaeroplus.event.PacketReceivedEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.module.Module;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
 import xaeroplus.util.highlights.HighlightAtChunkPos;
 import xaeroplus.util.newchunks.NewChunksCache;
@@ -55,6 +56,12 @@ public class NewChunks extends Module {
 
     @SubscribeEvent
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
+        if (XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.getValue()) {
+            if (inUnknownDimension() && newChunksCache instanceof NewChunksSavingCache) {
+                XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.setValue(false);
+                XaeroPlus.LOGGER.warn("Entered unknown dimension with saving cache on, disabling disk saving");
+            }
+        }
         newChunksCache.handleWorldChange();
     }
 
@@ -63,6 +70,11 @@ public class NewChunks extends Module {
         if (event.phase == TickEvent.Phase.END) {
             newChunksCache.handleTick();
         }
+    }
+
+    public boolean inUnknownDimension() {
+        final int dim = ChunkUtils.getActualDimension();
+        return dim != 0 && dim != -1 && dim != 1;
     }
 
     @Override

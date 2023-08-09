@@ -52,6 +52,11 @@ public class Portals extends Module {
         }
     }
 
+    public boolean inUnknownDimension() {
+        final int dim = ChunkUtils.getActualDimension();
+        return dim != 0 && dim != -1 && dim != 1;
+    }
+
     @SubscribeEvent
     public void onChunkData(final ChunkDataEvent event) {
         if (event.isFullChunk()) {
@@ -84,6 +89,7 @@ public class Portals extends Module {
         }
     }
     private void findPortalInChunkAsync(final Chunk chunk) {
+        if (inUnknownDimension()) return;
         searchExecutor.submit(() -> {
             try {
                 int iterations = 0;
@@ -117,7 +123,7 @@ public class Portals extends Module {
     }
 
     private void searchAllLoadedChunks() {
-        if (mc.world == null) return;
+        if (mc.world == null || inUnknownDimension()) return;
         final int renderDist = mc.gameSettings.renderDistanceChunks;
         final int xMin = ChunkUtils.getPlayerChunkX() - renderDist;
         final int xMax = ChunkUtils.getPlayerChunkX() + renderDist;
@@ -133,6 +139,7 @@ public class Portals extends Module {
     }
 
     private void handleBlockChange(final BlockPos pos, final IBlockState state) {
+        if (inUnknownDimension()) return;
         if (portalsCache.isHighlighted(ChunkUtils.posToChunkPos(pos.getX()), ChunkUtils.posToChunkPos(pos.getZ()))) {
             if (!(state.getBlock() instanceof BlockPortal)) {
                 portalsCache.removeHighlight(ChunkUtils.posToChunkPos(pos.getX()), ChunkUtils.posToChunkPos(pos.getZ()));

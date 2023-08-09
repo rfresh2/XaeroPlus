@@ -484,13 +484,13 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
 
     @Redirect(method = "onRenderProcess", at = @At(value = "INVOKE", target = "Lxaero/map/MapWriter;onRender(Lxaero/map/biome/BiomeColorCalculator;Lxaero/map/region/OverlayManager;)V"))
     public void redirectOnRenderProcess(final MapWriter instance, final BiomeColorCalculator biomeColorCalculator, final OverlayManager overlayManager) {
-        if (XaeroPlusSettingRegistry.fastMapSetting.getValue()) return;
+        if (XaeroPlusSettingRegistry.fastMapSetting.getValue() && this.currentCaveLayer == Integer.MAX_VALUE) return;
         instance.onRender(biomeColorCalculator, overlayManager);
     }
 
     @Inject(method = "onClientTickStart", at = @At("RETURN"))
     public void onClientTickStartReturn(final CallbackInfo ci) {
-        if (!XaeroPlusSettingRegistry.fastMapSetting.getValue()) return;
+        if (!(XaeroPlusSettingRegistry.fastMapSetting.getValue() && this.currentCaveLayer == Integer.MAX_VALUE)) return;
         this.mapWriter.onRender(this.biomeColorCalculator, this.overlayManager);
     }
 

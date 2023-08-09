@@ -531,7 +531,7 @@ public abstract class MixinMapWriter {
                         }
                         sinceLastWrite = Math.max(1L, sinceLastWrite);
 
-                        long tilesToUpdate = XaeroPlusSettingRegistry.fastMapSetting.getValue()
+                        long tilesToUpdate = (XaeroPlusSettingRegistry.fastMapSetting.getValue() && this.mapProcessor.getCurrentCaveLayer() == Integer.MAX_VALUE)
                                 ? (long) Math.min(sizeTiles, XaeroPlusSettingRegistry.fastMapMaxTilesPerCycle.getValue())
                                 : Math.min(sinceLastWrite * (long) sizeTiles / (long) fullUpdateTargetTime, 100L); // default
 
@@ -581,7 +581,7 @@ public abstract class MixinMapWriter {
                                     }
 
                                     /** removing time limit **/
-                                    if (!XaeroPlusSettingRegistry.fastMapSetting.getValue()) {
+                                    if (!(XaeroPlusSettingRegistry.fastMapSetting.getValue() && this.mapProcessor.getCurrentCaveLayer() == Integer.MAX_VALUE)) {
                                         if (System.nanoTime() - writeStartNano >= (long) timeLimit) {
                                             break;
                                         }

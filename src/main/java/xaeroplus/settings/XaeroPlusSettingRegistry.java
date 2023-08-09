@@ -158,7 +158,7 @@ public final class XaeroPlusSettingRegistry {
             "Prefer Overworld Waypoints",
             "setting.world_map.ow_auto_waypoint_dimension",
             "setting.world_map.ow_auto_waypoint_dimension.tooltip",
-            true,
+            false,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting showWaypointDistances = XaeroPlusBooleanSetting.create(
             "Show Waypoint Distances",

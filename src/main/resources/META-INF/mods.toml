@@ -12,6 +12,7 @@ description = '''
 Xaero WorldMap / Minimap Extra Features
 '''
 logoFile = "icon.jpg"
+displayTest="IGNORE_ALL_VERSION"
 
 [[dependencies.xaeroplus]]
 modId = "forge"

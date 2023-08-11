@@ -2,9 +2,13 @@ package xaeroplus;
 
 import com.collarmc.pounce.EventBus;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.slf4j.Logger;
@@ -18,7 +22,7 @@ import java.util.List;
 
 import static net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get;
 
-@Mod("xaeroplus")
+@Mod(value = "xaeroplus")
 public class XaeroPlus {
 	public static final Logger LOGGER = LoggerFactory.getLogger("XaeroPlus");
 	public static final EventBus EVENT_BUS = new EventBus(Runnable::run);
@@ -26,9 +30,13 @@ public class XaeroPlus {
 
 	public XaeroPlus() {
 		IEventBus modEventBus = get().getModEventBus();
-		modEventBus.addListener(this::onInitialize);
-		modEventBus.addListener(this::onRegisterKeyMappingsEvent);
-		FORGE_EVENT_BUS.register(modEventBus);
+		DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> {
+			return () -> {
+				modEventBus.addListener(this::onInitialize);
+				modEventBus.addListener(this::onRegisterKeyMappingsEvent);
+				FORGE_EVENT_BUS.register(modEventBus);
+			};
+		});
 	}
 
 	public void onInitialize(FMLClientSetupEvent event) {

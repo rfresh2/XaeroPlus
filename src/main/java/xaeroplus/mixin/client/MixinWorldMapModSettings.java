@@ -27,7 +27,7 @@ public class MixinWorldMapModSettings {
         this.defaultCaveModeType = 0; // set default cave mode type to 0
     }
 
-    @Inject(method = "saveSettings", at = @At("TAIL"))
+    @Inject(method = "saveSettings", at = @At(value = "RETURN"))
     public void saveSettings(final CallbackInfo ci) throws IOException {
         XaeroPlusModSettingsHooks.saveSettings(WorldMap.optionsFile, XAERO_PLUS_WORLDMAP_SETTINGS);
     }

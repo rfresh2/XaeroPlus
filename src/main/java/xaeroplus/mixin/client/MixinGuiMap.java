@@ -30,6 +30,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.common.XaeroMinimapSession;
+import xaero.common.graphics.shader.MinimapShaders;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMap;
 import xaero.map.animation.Animation;
@@ -1546,6 +1547,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                             final int z1 = chunkBottomZ - flooredCameraZ;
                             VertexConsumer lineBufferBuilder = renderTypeBuffers.getBuffer(xaero.common.graphics.CustomRenderTypes.MAP_LINES);
                             MatrixStack.Entry matrices = matrixStack.peek();
+                            MinimapShaders.FRAMEBUFFER_LINES.setFrameSize(mc.getWindow().getFramebufferWidth(), mc.getWindow().getFramebufferHeight());
 
                             float settingWidth = (float) XaeroMinimapSession.getCurrentSession().getModMain().getSettings().chunkGridLineWidth;
                             float lineScale = (float) Math.min(settingWidth * this.scale, settingWidth);

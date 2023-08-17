@@ -243,6 +243,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     private boolean tabPressed;
     @Shadow
     private GuiCaveModeOptions caveModeOptions;
+    @Shadow
+    private boolean shouldResetCameraPos;
+
     protected MixinGuiMap(final Screen parent, final Screen escape, final Text titleIn) {
         super(parent, escape, titleIn);
     }
@@ -432,6 +435,11 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         MapShaders.ensureShaders();
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         MinecraftClient mc = MinecraftClient.getInstance();
+        if (this.shouldResetCameraPos) {
+            this.cameraX = (float)this.player.getX();
+            this.cameraZ = (float)this.player.getZ();
+            this.shouldResetCameraPos = false;
+        }
         MatrixStack matrixStack = guiGraphics.getMatrices();
         double cameraXBefore = this.cameraX;
         double cameraZBefore = this.cameraZ;
@@ -496,8 +504,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 boolean mapLoaded = this.mapProcessor.getCurrentWorldId() != null
                         && !this.mapProcessor.isWaitingForWorldUpdate()
                         && this.mapProcessor.getMapSaveLoad().isRegionDetectionComplete();
-                boolean noWorldMapEffect = mc.player.hasStatusEffect(Effects.NO_WORLD_MAP) || mc.player.hasStatusEffect(Effects.NO_WORLD_MAP_HARMFUL);
-                boolean allowedBasedOnItem = ModSettings.mapItem == null || Misc.hasItem(mc.player, ModSettings.mapItem);
+                boolean noWorldMapEffect = mc.player == null
+                    || mc.player.hasStatusEffect(Effects.NO_WORLD_MAP)
+                    || mc.player.hasStatusEffect(Effects.NO_WORLD_MAP_HARMFUL);
+                boolean allowedBasedOnItem = ModSettings.mapItem == null || mc.player != null && Misc.hasItem(mc.player, ModSettings.mapItem);
                 boolean isLocked = this.mapProcessor.isCurrentMapLocked();
                 if (mapLoaded && !noWorldMapEffect && allowedBasedOnItem && !isLocked) {
                     if (SupportMods.vivecraft) {
@@ -1446,7 +1456,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                         }
 
                         if (effectiveArrowColorIndex == -1) {
-                            int rgb = Misc.getTeamColour(mc.player);
+                            int rgb = Misc.getTeamColour(mc.player == null ? mc.getCameraEntity() : mc.player);
                             if (rgb == -1) {
                                 effectiveArrowColorIndex = 0;
                             } else {

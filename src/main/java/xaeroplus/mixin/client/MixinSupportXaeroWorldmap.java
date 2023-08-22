@@ -81,6 +81,7 @@ public abstract class MixinSupportXaeroWorldmap {
     public void drawMinimap(XaeroMinimapSession minimapSession, MinimapRendererHelper helper, int xFloored, int zFloored, int minViewX, int minViewZ, int maxViewX, int maxViewZ, boolean zooming, double zoom) {
         WorldMapSession worldmapSession = WorldMapSession.getCurrentSession();
         if (worldmapSession != null) {
+            final boolean isDimensionSwitched = Shared.customDimensionId != Minecraft.getMinecraft().player.dimension;
             MapProcessor mapProcessor = worldmapSession.getMapProcessor();
             synchronized (mapProcessor.renderThreadPauseSync) {
                 if (!mapProcessor.isRenderingPaused()) {
@@ -171,212 +172,42 @@ public abstract class MixinSupportXaeroWorldmap {
                     if (compatibilityVersion >= 6) {
                         GuiMap.setupTextureMatricesAndTextures(brightness);
                     }
-                    final boolean isDimensionSwitched = Shared.customDimensionId != Minecraft.getMinecraft().player.dimension;
 
                     WaypointWorld world = minimapSession.getWaypointsManager().getAutoWorld();
                     Long seed = slimeChunks && world != null ? this.modMain.getSettings().getSlimeChunksSeed(world.getFullId()) : null;
-                    MapRegion prevRegion = null;
-                    for (int i = minX; i <= maxX; ++i) {
-                        for (int j = minZ; j <= maxZ; ++j) {
-                            CustomDimensionMapProcessor customDimensionMapProcessor = (CustomDimensionMapProcessor) mapProcessor;
-                            MapRegion region;
-                            if (wmHasCaveLayers) {
-                                region = customDimensionMapProcessor.getMapRegionCustomDimension(
-                                        renderedCaveLayer, i >> 3, j >> 3,
-                                        !customDimensionMapProcessor.regionExistsCustomDimension(
-                                                renderedCaveLayer, i >> 3, j >> 3,
-                                                Shared.customDimensionId),
-                                        Shared.customDimensionId);
-                            } else {
-                                region = customDimensionMapProcessor.getMapRegionCustomDimension( i >> 3, j >> 3, !customDimensionMapProcessor.regionExistsCustomDimension(i >> 3, j >> 3, Shared.customDimensionId), Shared.customDimensionId);
-                            }
-
-                            if (region != null && region != prevRegion) {
-                                synchronized (region) {
-                                    int regionHashCode = wmUsesHashcodes ? region.getCacheHashCode() : 0;
-                                    int regionReloadVersion = wmUsesHashcodes ? region.getReloadVersion() : 0;
-                                    if (shouldRequestLoading
-                                            && !region.recacheHasBeenRequested()
-                                            && !region.reloadHasBeenRequested()
-                                            && (!(region instanceof MapRegion) || !region.isRefreshing())
-                                            && (region.getLoadState() == 0 || (region.getLoadState() == 4 || region.getLoadState() == 2 && region.isBeingWritten())
-                                            && (reloadEverything && regionReloadVersion != globalReloadVersion
-                                            || regionHashCode != globalRegionCacheHashCode
-                                            || wmHasCaveLayers && !playerIsMoving && region.caveStartOutdated(globalCaveStart, globalCaveDepth)
-                                            || region.getVersion() != mapProcessor.getGlobalVersion()
-                                            || compatibilityVersion >= 11 && (region.isMetaLoaded() || region.getLoadState() != 0 || !region.hasHadTerrain())
-                                            && region.getHighlightsHash() != region.getDim().getHighlightHandler().getRegionHash(region.getRegionX(), region.getRegionZ())
-                                            || region.getLoadState() != 2 && region.shouldCache()))) {
-                                        if (compatibilityVersion >= 11) {
-                                            if (!this.regionBuffer.contains(region)) {
-                                                if (wmHasCaveLayers) {
-                                                    region.calculateSortingChunkDistance();
-                                                } else {
-                                                    region.calculateSortingDistance();
-                                                }
-
-                                                Misc.addToListOfSmallest(10, this.regionBuffer, region);
-                                            }
-                                        } else if (region.getLoadState() == 2) {
-                                            region.requestRefresh(mapProcessor);
-                                        } else if (shouldRequestLoading) {
-                                            mapProcessor.getMapSaveLoad().requestLoad(region, "Minimap", false);
-                                            mapProcessor.getMapSaveLoad().setNextToLoadByViewing(region);
-                                        }
-                                    }
-
-                                }
-                            }
-
-                            prevRegion = region;
-                            if (i >= minViewX && i <= maxViewX && j >= minViewZ && j <= maxViewZ) {
-                                MapTileChunk chunk = region == null ? null : region.getChunk(i & 7, j & 7);
-                                boolean chunkIsVisible = chunk != null && chunk.getGlColorTexture() != -1;
-                                if (wmHasCaveLayers && !chunkIsVisible && (!noCaveMaps || this.previousRenderedCaveLayer == Integer.MAX_VALUE)) {
-                                    MapRegion previousLayerRegion = customDimensionMapProcessor.getMapRegionCustomDimension(this.previousRenderedCaveLayer, i >> 3, j >> 3, false, Shared.customDimensionId);
-                                    if (previousLayerRegion != null) {
-                                        MapTileChunk previousLayerChunk = previousLayerRegion.getChunk(i & 7, j & 7);
-                                        if (previousLayerChunk != null && previousLayerChunk.getGlColorTexture() != -1) {
-                                            region = previousLayerRegion;
-                                            chunk = previousLayerChunk;
-                                            chunkIsVisible = true;
-                                        }
-                                    }
-                                }
-                                if (chunkIsVisible) {
-                                    if (!mapProcessor.isUploadingPaused()) {
-                                        if (compatibilityVersion >= 7) {
-                                            if (region.isLoaded()) {
-                                                if (wmHasCaveLayers) {
-                                                    mapProcessor.getMapWorld().getDimension(Shared.customDimensionId).getLayeredMapRegions().bumpLoadedRegion(region);
-                                                } else {
-                                                    mapProcessor.getMapWorld().getDimension(Shared.customDimensionId).getMapRegions().bumpLoadedRegion(region);
-                                                }
-                                            }
-                                        } else {
-                                            List<MapRegion> regions = mapProcessor.getMapWorld().getDimension(Shared.customDimensionId).getMapRegionsList();
-                                            regions.remove(region);
-                                            regions.add(region);
-                                        }
-                                    }
-                                    int drawX = ((chunk.getX() - chunkX) << 6) - (tileX << 4) - insideX;
-                                    int drawZ = ((chunk.getZ() - chunkZ) << 6) - (tileZ << 4) - insideZ;
-
-                                    if (transparentMinimapBackground.getValue()) {
-                                        GuiHelper.drawMMBackground(drawX, drawZ, brightness, chunk);
-                                        GuiMap.setupTextureMatricesAndTextures(brightness);
-                                    }
-
-                                    this.bindMapTextureWithLighting(compatibilityVersion, brightness, chunk, zooming);
-                                    if (zooming && compatibilityVersion >= 12) {
-                                        GlStateManager.setActiveTexture(33984);
-                                        GL11.glTexParameteri(3553, 10240, 9729);
-                                    }
-
-                                    GL11.glTexParameterf(3553, 33082, 0.0F);
-
-                                    if (compatibilityVersion < 7) {
-                                        GL14.glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-                                        GuiMap.renderTexturedModalRectWithLighting((float) drawX, (float) drawZ, 0, 0, 64.0F, 64.0F);
-                                    } else {
-                                        GuiMap.renderTexturedModalRectWithLighting((float) drawX, (float) drawZ, 64.0F, 64.0F);
-                                    }
-                                    if (XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) {
-                                        GuiHelper.finishMMSetup(compatibilityVersion, brightness, chunk, zooming);
-                                    }
-                                    if (zooming && compatibilityVersion >= 12) {
-                                        GlStateManager.setActiveTexture(33984);
-                                        GL11.glTexParameteri(3553, 10240, 9728);
-                                    }
-                                    GuiMap.restoreTextureStates();
-                                    if (compatibilityVersion >= 7) {
-                                        GL14.glBlendFuncSeparate(770, 771, 1, 771);
-                                    }
-                                    if (slimeChunks && !isDimensionSwitched) {
-                                        Long savedSeed = (Long) seedsUsed.get(chunk);
-                                        boolean newSeed = seed == null && savedSeed != null || seed != null && !seed.equals(savedSeed);
-                                        if (newSeed) {
-                                            seedsUsed.put(chunk, seed);
-                                        }
-                                        final List<GuiHelper.Rect> rects = new ArrayList<>(32);
-                                        for (int t = 0; t < 16; ++t) {
-                                            if (newSeed || (chunk.getTileGridsCache()[t % 4][t / 4] & 1) == 0) {
-                                                chunk.getTileGridsCache()[t % 4][t / 4] = (byte) (1 | (MinimapTile.isSlimeChunk(this.modMain.getSettings(), chunk.getX() * 4 + t % 4, chunk.getZ() * 4 + t / 4, seed) ? 2 : 0));
-                                            }
-
-                                            if ((chunk.getTileGridsCache()[t % 4][t / 4] & 2) != 0) {
-                                                final float left = drawX + 16 * (t % 4);
-                                                final float top = drawZ + 16 * (t / 4);
-                                                final float right = left + 16;
-                                                final float bottom = top + 16;
-                                                rects.add(new GuiHelper.Rect(left, top, right, bottom));
-                                            }
-                                        }
-                                        GuiHelper.drawRectList(rects, -2142047936);
-                                    }
-                                    if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
-                                        final NewChunks newChunks = ModuleManager.getModule(NewChunks.class);
-                                        GuiHelper.drawMMHighlights(
-                                            (x, z) -> newChunks.isNewChunk(x, z, Shared.customDimensionId),
-                                            drawX,
-                                            drawZ,
-                                            chunk.getX() << 2,
-                                            chunk.getZ() << 2,
-                                            newChunks.getNewChunksColor());
-                                    }
-                                    if (XaeroPlusSettingRegistry.portalSkipDetectionEnabledSetting.getValue() && XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
-                                        final PortalSkipDetection portalSkipDetection = ModuleManager.getModule(
-                                            PortalSkipDetection.class);
-                                        GuiHelper.drawMMHighlights(
-                                            portalSkipDetection::isPortalSkipChunk,
-                                            drawX,
-                                            drawZ,
-                                            chunk.getX() << 2,
-                                            chunk.getZ() << 2,
-                                            portalSkipDetection.getPortalSkipChunksColor());
-                                    }
-                                    if (XaeroPlusSettingRegistry.portalsEnabledSetting.getValue()) {
-                                        final Portals portalModule = ModuleManager.getModule(Portals.class);
-                                        GuiHelper.drawMMHighlights(
-                                            (x, z) -> portalModule.isPortalChunk(x, z, Shared.customDimensionId),
-                                            drawX,
-                                            drawZ,
-                                            chunk.getX() << 2,
-                                            chunk.getZ() << 2,
-                                            portalModule.getPortalsColor());
-                                    }
-                                    if (XaeroPlusSettingRegistry.wdlEnabledSetting.getValue()
-                                            && WDLHelper.isWdlPresent()
-                                            && WDLHelper.isDownloading()
-                                            && !isDimensionSwitched) {
-                                        final Set<Long> wdlSavedChunksWithCache = WDLHelper.getSavedChunksWithCache();
-                                        GuiHelper.drawMMHighlights(
-                                            (x, z) -> wdlSavedChunksWithCache.contains(ChunkUtils.chunkPosToLong(x, z)),
-                                            drawX,
-                                            drawZ,
-                                            chunk.getX() << 2,
-                                            chunk.getZ() << 2,
-                                            WDLHelper.getWdlColor()
-                                        );
-                                    }
-                                    if (compatibilityVersion >= 6) {
-                                        GuiMap.setupTextures(brightness);
-                                    }
-
-                                    if (compatibilityVersion >= 7) {
-                                        GL14.glBlendFuncSeparate(1, 0, 0, 1);
-                                        GlStateManager.enableBlend();
-                                    }
-
-                                    if (compatibilityVersion < 7) {
-                                        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-                                        GlStateManager.enableBlend();
-                                    }
-                                }
-                            }
-                        }
-                    }
-
+                    this.renderChunks(
+                        minX,
+                        maxX,
+                        minZ,
+                        maxZ,
+                        minViewX,
+                        maxViewX,
+                        minViewZ,
+                        maxViewZ,
+                        mapProcessor,
+                        renderedCaveLayer,
+                        shouldRequestLoading,
+                        reloadEverything,
+                        globalReloadVersion,
+                        globalRegionCacheHashCode,
+                        globalCaveStart,
+                        globalCaveDepth,
+                        playerIsMoving,
+                        noCaveMaps,
+                        slimeChunks,
+                        chunkX,
+                        chunkZ,
+                        tileX,
+                        tileZ,
+                        insideX,
+                        insideZ,
+                        seed,
+                        wmHasCaveLayers,
+                        wmUsesHashcodes,
+                        brightness,
+                        zooming,
+                        helper
+                    );
 
                     // TODO: moving this code to MinimapFBORenderer would allow it to render on top of grid lines
                     if (XaeroPlusSettingRegistry.showRenderDistanceSetting.getValue() && !isDimensionSwitched) {
@@ -456,6 +287,248 @@ public abstract class MixinSupportXaeroWorldmap {
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @author rfresh2
+     * @reason custom drawing
+     */
+    @Overwrite
+    private void renderChunks(
+        int minX,
+        int maxX,
+        int minZ,
+        int maxZ,
+        int minViewX,
+        int maxViewX,
+        int minViewZ,
+        int maxViewZ,
+        MapProcessor mapProcessor,
+        int renderedCaveLayer,
+        boolean shouldRequestLoading,
+        boolean reloadEverything,
+        int globalReloadVersion,
+        int globalRegionCacheHashCode,
+        int globalCaveStart,
+        int globalCaveDepth,
+        boolean playerIsMoving,
+        boolean noCaveMaps,
+        boolean slimeChunks,
+        int chunkX,
+        int chunkZ,
+        int tileX,
+        int tileZ,
+        int insideX,
+        int insideZ,
+        Long seed,
+        boolean wmHasCaveLayers,
+        boolean wmUsesHashcodes,
+        float brightness,
+        boolean zooming,
+        MinimapRendererHelper helper
+    ) {
+        final boolean isDimensionSwitched = Shared.customDimensionId != Minecraft.getMinecraft().player.dimension;
+        MapRegion prevRegion = null;
+        for (int i = minX; i <= maxX; ++i) {
+            for (int j = minZ; j <= maxZ; ++j) {
+                CustomDimensionMapProcessor customDimensionMapProcessor = (CustomDimensionMapProcessor) mapProcessor;
+                MapRegion region;
+                if (wmHasCaveLayers) {
+                    region = customDimensionMapProcessor.getMapRegionCustomDimension(
+                        renderedCaveLayer, i >> 3, j >> 3,
+                        !customDimensionMapProcessor.regionExistsCustomDimension(
+                            renderedCaveLayer, i >> 3, j >> 3,
+                            Shared.customDimensionId),
+                        Shared.customDimensionId);
+                } else {
+                    region = customDimensionMapProcessor.getMapRegionCustomDimension( i >> 3, j >> 3, !customDimensionMapProcessor.regionExistsCustomDimension(i >> 3, j >> 3, Shared.customDimensionId), Shared.customDimensionId);
+                }
+
+                if (region != null && region != prevRegion) {
+                    synchronized (region) {
+                        int regionHashCode = wmUsesHashcodes ? region.getCacheHashCode() : 0;
+                        int regionReloadVersion = wmUsesHashcodes ? region.getReloadVersion() : 0;
+                        if (shouldRequestLoading
+                            && !region.recacheHasBeenRequested()
+                            && !region.reloadHasBeenRequested()
+                            && (!(region instanceof MapRegion) || !region.isRefreshing())
+                            && (region.getLoadState() == 0 || (region.getLoadState() == 4 || region.getLoadState() == 2 && region.isBeingWritten())
+                            && (reloadEverything && regionReloadVersion != globalReloadVersion
+                            || regionHashCode != globalRegionCacheHashCode
+                            || wmHasCaveLayers && !playerIsMoving && region.caveStartOutdated(globalCaveStart, globalCaveDepth)
+                            || region.getVersion() != mapProcessor.getGlobalVersion()
+                            || compatibilityVersion >= 11 && (region.isMetaLoaded() || region.getLoadState() != 0 || !region.hasHadTerrain())
+                            && region.getHighlightsHash() != region.getDim().getHighlightHandler().getRegionHash(region.getRegionX(), region.getRegionZ())
+                            || region.getLoadState() != 2 && region.shouldCache()))) {
+                            if (compatibilityVersion >= 11) {
+                                if (!this.regionBuffer.contains(region)) {
+                                    if (wmHasCaveLayers) {
+                                        region.calculateSortingChunkDistance();
+                                    } else {
+                                        region.calculateSortingDistance();
+                                    }
+
+                                    Misc.addToListOfSmallest(10, this.regionBuffer, region);
+                                }
+                            } else if (region.getLoadState() == 2) {
+                                region.requestRefresh(mapProcessor);
+                            } else if (shouldRequestLoading) {
+                                mapProcessor.getMapSaveLoad().requestLoad(region, "Minimap", false);
+                                mapProcessor.getMapSaveLoad().setNextToLoadByViewing(region);
+                            }
+                        }
+
+                    }
+                }
+
+                prevRegion = region;
+                if (i >= minViewX && i <= maxViewX && j >= minViewZ && j <= maxViewZ) {
+                    MapTileChunk chunk = region == null ? null : region.getChunk(i & 7, j & 7);
+                    boolean chunkIsVisible = chunk != null && chunk.getGlColorTexture() != -1;
+                    if (wmHasCaveLayers && !chunkIsVisible && (!noCaveMaps || this.previousRenderedCaveLayer == Integer.MAX_VALUE)) {
+                        MapRegion previousLayerRegion = customDimensionMapProcessor.getMapRegionCustomDimension(this.previousRenderedCaveLayer, i >> 3, j >> 3, false, Shared.customDimensionId);
+                        if (previousLayerRegion != null) {
+                            MapTileChunk previousLayerChunk = previousLayerRegion.getChunk(i & 7, j & 7);
+                            if (previousLayerChunk != null && previousLayerChunk.getGlColorTexture() != -1) {
+                                region = previousLayerRegion;
+                                chunk = previousLayerChunk;
+                                chunkIsVisible = true;
+                            }
+                        }
+                    }
+                    if (chunkIsVisible) {
+                        if (!mapProcessor.isUploadingPaused()) {
+                            if (compatibilityVersion >= 7) {
+                                if (region.isLoaded()) {
+                                    if (wmHasCaveLayers) {
+                                        mapProcessor.getMapWorld().getDimension(Shared.customDimensionId).getLayeredMapRegions().bumpLoadedRegion(region);
+                                    } else {
+                                        mapProcessor.getMapWorld().getDimension(Shared.customDimensionId).getMapRegions().bumpLoadedRegion(region);
+                                    }
+                                }
+                            } else {
+                                List<MapRegion> regions = mapProcessor.getMapWorld().getDimension(Shared.customDimensionId).getMapRegionsList();
+                                regions.remove(region);
+                                regions.add(region);
+                            }
+                        }
+                        int drawX = ((chunk.getX() - chunkX) << 6) - (tileX << 4) - insideX;
+                        int drawZ = ((chunk.getZ() - chunkZ) << 6) - (tileZ << 4) - insideZ;
+
+                        if (transparentMinimapBackground.getValue()) {
+                            GuiHelper.drawMMBackground(drawX, drawZ, brightness, chunk);
+                            GuiMap.setupTextureMatricesAndTextures(brightness);
+                        }
+
+                        this.bindMapTextureWithLighting(compatibilityVersion, brightness, chunk, zooming);
+                        if (zooming && compatibilityVersion >= 12) {
+                            GlStateManager.setActiveTexture(33984);
+                            GL11.glTexParameteri(3553, 10240, 9729);
+                        }
+
+                        GL11.glTexParameterf(3553, 33082, 0.0F);
+
+                        if (compatibilityVersion < 7) {
+                            GL14.glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+                            GuiMap.renderTexturedModalRectWithLighting((float) drawX, (float) drawZ, 0, 0, 64.0F, 64.0F);
+                        } else {
+                            GuiMap.renderTexturedModalRectWithLighting((float) drawX, (float) drawZ, 64.0F, 64.0F);
+                        }
+                        if (XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) {
+                            GuiHelper.finishMMSetup(compatibilityVersion, brightness, chunk, zooming);
+                        }
+                        if (zooming && compatibilityVersion >= 12) {
+                            GlStateManager.setActiveTexture(33984);
+                            GL11.glTexParameteri(3553, 10240, 9728);
+                        }
+                        GuiMap.restoreTextureStates();
+                        if (compatibilityVersion >= 7) {
+                            GL14.glBlendFuncSeparate(770, 771, 1, 771);
+                        }
+                        if (slimeChunks && !isDimensionSwitched) {
+                            Long savedSeed = (Long) seedsUsed.get(chunk);
+                            boolean newSeed = seed == null && savedSeed != null || seed != null && !seed.equals(savedSeed);
+                            if (newSeed) {
+                                seedsUsed.put(chunk, seed);
+                            }
+                            final List<GuiHelper.Rect> rects = new ArrayList<>(32);
+                            for (int t = 0; t < 16; ++t) {
+                                if (newSeed || (chunk.getTileGridsCache()[t % 4][t / 4] & 1) == 0) {
+                                    chunk.getTileGridsCache()[t % 4][t / 4] = (byte) (1 | (MinimapTile.isSlimeChunk(this.modMain.getSettings(), chunk.getX() * 4 + t % 4, chunk.getZ() * 4 + t / 4, seed) ? 2 : 0));
+                                }
+
+                                if ((chunk.getTileGridsCache()[t % 4][t / 4] & 2) != 0) {
+                                    final float left = drawX + 16 * (t % 4);
+                                    final float top = drawZ + 16 * (t / 4);
+                                    final float right = left + 16;
+                                    final float bottom = top + 16;
+                                    rects.add(new GuiHelper.Rect(left, top, right, bottom));
+                                }
+                            }
+                            GuiHelper.drawRectList(rects, -2142047936);
+                        }
+                        if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
+                            final NewChunks newChunks = ModuleManager.getModule(NewChunks.class);
+                            GuiHelper.drawMMHighlights(
+                                (x, z) -> newChunks.isNewChunk(x, z, Shared.customDimensionId),
+                                drawX,
+                                drawZ,
+                                chunk.getX() << 2,
+                                chunk.getZ() << 2,
+                                newChunks.getNewChunksColor());
+                        }
+                        if (XaeroPlusSettingRegistry.portalSkipDetectionEnabledSetting.getValue() && XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
+                            final PortalSkipDetection portalSkipDetection = ModuleManager.getModule(
+                                PortalSkipDetection.class);
+                            GuiHelper.drawMMHighlights(
+                                portalSkipDetection::isPortalSkipChunk,
+                                drawX,
+                                drawZ,
+                                chunk.getX() << 2,
+                                chunk.getZ() << 2,
+                                portalSkipDetection.getPortalSkipChunksColor());
+                        }
+                        if (XaeroPlusSettingRegistry.portalsEnabledSetting.getValue()) {
+                            final Portals portalModule = ModuleManager.getModule(Portals.class);
+                            GuiHelper.drawMMHighlights(
+                                (x, z) -> portalModule.isPortalChunk(x, z, Shared.customDimensionId),
+                                drawX,
+                                drawZ,
+                                chunk.getX() << 2,
+                                chunk.getZ() << 2,
+                                portalModule.getPortalsColor());
+                        }
+                        if (XaeroPlusSettingRegistry.wdlEnabledSetting.getValue()
+                            && WDLHelper.isWdlPresent()
+                            && WDLHelper.isDownloading()
+                            && !isDimensionSwitched) {
+                            final Set<Long> wdlSavedChunksWithCache = WDLHelper.getSavedChunksWithCache();
+                            GuiHelper.drawMMHighlights(
+                                (x, z) -> wdlSavedChunksWithCache.contains(ChunkUtils.chunkPosToLong(x, z)),
+                                drawX,
+                                drawZ,
+                                chunk.getX() << 2,
+                                chunk.getZ() << 2,
+                                WDLHelper.getWdlColor()
+                            );
+                        }
+                        if (compatibilityVersion >= 6) {
+                            GuiMap.setupTextures(brightness);
+                        }
+
+                        if (compatibilityVersion >= 7) {
+                            GL14.glBlendFuncSeparate(1, 0, 0, 1);
+                            GlStateManager.enableBlend();
+                        }
+
+                        if (compatibilityVersion < 7) {
+                            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                            GlStateManager.enableBlend();
                         }
                     }
                 }

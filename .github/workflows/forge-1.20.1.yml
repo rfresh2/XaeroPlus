@@ -52,11 +52,17 @@ jobs:
 
     - name: Create modpack zip
       run: >
-        tar -czvf
+        zip -j 
         XaeroPlus-modpack-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}.zip
         XaeroPlus-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar
         XaerosWorldMap_${{ env.WORLDMAP_VERSION }}_${{ env.MOD_LOADER }}_${{ env.MINECRAFT_VERSION_SHORT }}.jar
         Xaeros_Minimap_${{ env.MINIMAP_VERSION }}_${{ env.MOD_LOADER }}_${{ env.MINECRAFT_VERSION_SHORT }}.jar
+
+    - name: Upload modpack artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: XaeroPlus-modpack-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}
+        path: XaeroPlus-modpack-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}.zip
 
 # todo: for future auto-update check feature
 #    - name: Create version identifier file

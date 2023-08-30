@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface NewChunksCache {
     void addNewChunk(final int x, final int z);
+    void addNewChunk(final int x, final int z, long foundTime, RegistryKey<World> dimensionId);
     boolean isNewChunk(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> dimensionId);
     List<HighlightAtChunkPos> getNewChunksInRegion(final int leafRegionX, final int leafRegionZ, final int level, final RegistryKey<World> dimension);
     void handleWorldChange();

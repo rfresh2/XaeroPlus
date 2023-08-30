@@ -60,6 +60,7 @@ import xaero.map.settings.ModSettings;
 import xaero.map.world.MapDimension;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
+import xaeroplus.module.impl.OldChunks;
 import xaeroplus.module.impl.PortalSkipDetection;
 import xaeroplus.module.impl.Portals;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
@@ -1148,6 +1149,21 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                     float g = (float)(color >> 8 & 255) / 255.0F;
                                     float b = (float)(color & 255) / 255.0F;
                                     for (final HighlightAtChunkPos c : newChunks.getNewChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions, Shared.customDimensionId)) {
+                                        final float left = (float) ((c.x << 4) - flooredCameraX);
+                                        final float top = (float) ((c.z << 4) - flooredCameraZ);
+                                        final float right = left + 16;
+                                        final float bottom = top + 16;
+                                        GuiHelper.fillIntoExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBuffer, left, top, right, bottom, r, g, b, a);
+                                    }
+                                }
+                                if (XaeroPlusSettingRegistry.oldChunksEnabledSetting.getValue() && !mc.options.hudHidden) {
+                                    final OldChunks oldChunks = ModuleManager.getModule(OldChunks.class);
+                                    int color = oldChunks.getOldChunksColor();
+                                    float a = (float)(color >> 24 & 255) / 255.0F;
+                                    float r = (float)(color >> 16 & 255) / 255.0F;
+                                    float g = (float)(color >> 8 & 255) / 255.0F;
+                                    float b = (float)(color & 255) / 255.0F;
+                                    for (final HighlightAtChunkPos c : oldChunks.getOldChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions, Shared.customDimensionId)) {
                                         final float left = (float) ((c.x << 4) - flooredCameraX);
                                         final float top = (float) ((c.z << 4) - flooredCameraZ);
                                         final float right = left + 16;

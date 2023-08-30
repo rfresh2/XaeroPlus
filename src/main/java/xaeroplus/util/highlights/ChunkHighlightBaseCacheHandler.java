@@ -4,6 +4,8 @@ import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.world.World;
 import xaeroplus.XaeroPlus;
 import xaeroplus.util.RegionRenderPos;
 import xaeroplus.util.Shared;
@@ -18,7 +20,7 @@ import java.util.concurrent.locks.StampedLock;
 import static xaeroplus.util.ChunkUtils.chunkPosToLong;
 import static xaeroplus.util.ChunkUtils.loadHighlightChunksAtRegion;
 
-public abstract class ChunkHighlightBaseCacheHandler {
+public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCache {
     public final ReadWriteLock lock = new StampedLock().asReadWriteLock();
     public final Long2LongMap chunks = new Long2LongOpenHashMap();
     private final AsyncLoadingCache<RegionRenderPos, List<HighlightAtChunkPos>> regionRenderCache = Caffeine.newBuilder()
@@ -27,11 +29,11 @@ public abstract class ChunkHighlightBaseCacheHandler {
             .executor(Shared.cacheRefreshExecutorService)
             .buildAsync(key -> loadHighlightChunksAtRegion(key.leafRegionX, key.leafRegionZ, key.level, this::isHighlightedWithWait).call());
 
-    public void addHighlight(final int x, final int z) {
-        addHighlight(x, z, System.currentTimeMillis());
+    public boolean addHighlight(final int x, final int z) {
+        return addHighlight(x, z, System.currentTimeMillis());
     }
 
-    public void addHighlight(final int x, final int z, final long foundTime) {
+    public boolean addHighlight(final int x, final int z, final long foundTime) {
         final long chunkPos = chunkPosToLong(x, z);
         try {
             if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
@@ -41,9 +43,10 @@ public abstract class ChunkHighlightBaseCacheHandler {
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Failed to add new chunk", e);
         }
+        return true;
     }
 
-    public boolean isHighlighted(final int x, final int z) {
+    public boolean isHighlighted(final int x, final int z, RegistryKey<World> dimensionId) {
         return isHighlighted(chunkPosToLong(x, z));
     }
 
@@ -73,7 +76,7 @@ public abstract class ChunkHighlightBaseCacheHandler {
         return false;
     }
 
-    public List<HighlightAtChunkPos> getHighlightsInRegion(final int leafRegionX, final int leafRegionZ, final int level) {
+    public List<HighlightAtChunkPos> getHighlightsInRegion(final int leafRegionX, final int leafRegionZ, final int level, RegistryKey<World> dimension) {
         try {
             final CompletableFuture<List<HighlightAtChunkPos>> future = regionRenderCache.get(new RegionRenderPos(leafRegionX, leafRegionZ, level));
             if (future.isDone()) {

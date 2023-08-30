@@ -36,6 +36,7 @@ import static xaeroplus.util.ColorHelper.getColor;
 @Module.ModuleInfo()
 public class Portals extends Module {
 
+    // todo: local cache setting
     private ChunkHighlightSavingCache portalsCache;
     private final ExecutorService searchExecutor = Executors.newSingleThreadExecutor();
     private final MinecraftClient mc = MinecraftClient.getInstance();
@@ -115,7 +116,7 @@ public class Portals extends Module {
         final MutableBlockPos pos = new MutableBlockPos(0, 0, 0);
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
-                for (int y = 0; y < 256; y++) {
+                for (int y = mc.world.getBottomY(); y < mc.world.getTopY(); y++) {
                     pos.setPos(x, y, z);
                     BlockState blockState = chunk.getBlockState(pos);
                     if (blockState.getBlock() instanceof NetherPortalBlock || blockState.getBlock() instanceof EndPortalBlock) {

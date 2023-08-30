@@ -113,4 +113,15 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
         executorService.shutdown();
     }
 
+    @Override
+    public void handleWorldChange() {}
+
+    @Override
+    public void handleTick() {}
+
+    @Override
+    public void onEnable() {}
+
+    @Override
+    public void onDisable() {}
 }

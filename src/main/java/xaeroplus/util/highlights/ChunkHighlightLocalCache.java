@@ -11,15 +11,17 @@ public class ChunkHighlightLocalCache extends ChunkHighlightBaseCacheHandler {
     private static final int maxNumber = 5000;
 
     @Override
-    public void addHighlight(final int x, final int z) {
+    public boolean addHighlight(final int x, final int z) {
         limitChunksSize();
         super.addHighlight(x, z);
+        return true;
     }
 
     @Override
-    public void addHighlight(final int x, final int z, final long foundTime) {
+    public boolean addHighlight(final int x, final int z, final long foundTime) {
         limitChunksSize();
         super.addHighlight(x, z, foundTime);
+        return true;
     }
 
     private void limitChunksSize() {

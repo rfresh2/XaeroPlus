@@ -24,10 +24,10 @@ import xaeroplus.module.Module;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
+import xaeroplus.util.highlights.ChunkHighlightCache;
+import xaeroplus.util.highlights.ChunkHighlightLocalCache;
+import xaeroplus.util.highlights.ChunkHighlightSavingCache;
 import xaeroplus.util.highlights.HighlightAtChunkPos;
-import xaeroplus.util.newchunks.NewChunksCache;
-import xaeroplus.util.newchunks.NewChunksLocalCache;
-import xaeroplus.util.newchunks.NewChunksSavingCache;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +40,7 @@ import static xaeroplus.util.ColorHelper.getColor;
 public class NewChunks extends Module {
     // todo: add newchunk detection mode setting: fluid flows (current), timing, etc.
 
-    private NewChunksCache newChunksCache = new NewChunksLocalCache();
+    private ChunkHighlightCache newChunksCache = new ChunkHighlightLocalCache();
     private final Cache<Long, Byte> oldChunksCache = Caffeine.newBuilder()
             .maximumSize(50)
             .expireAfterWrite(10L, TimeUnit.SECONDS)
@@ -52,12 +52,12 @@ public class NewChunks extends Module {
 
     public void setNewChunksCache(boolean disk) {
         try {
-            Long2LongMap map = newChunksCache.getNewChunksState();
+            Long2LongMap map = newChunksCache.getHighlightsState();
             newChunksCache.onDisable();
             if (disk) {
-                newChunksCache = new NewChunksSavingCache(DATABASE_NAME);
+                newChunksCache = new ChunkHighlightSavingCache(DATABASE_NAME);
             } else {
-                newChunksCache = new NewChunksLocalCache();
+                newChunksCache = new ChunkHighlightLocalCache();
             }
             if (this.isEnabled()) {
                 newChunksCache.onEnable();
@@ -81,7 +81,7 @@ public class NewChunks extends Module {
                     for (Direction dir: searchDirs) {
                         if (mc.world.getBlockState(pos.offset(dir)).getFluidState().isStill()
                                 && oldChunksCache.getIfPresent(ChunkUtils.chunkPosToLong(chunkPos)) == null) {
-                            newChunksCache.addNewChunk(chunkPos.x, chunkPos.z);
+                            newChunksCache.addHighlight(chunkPos.x, chunkPos.z);
                             return;
                         }
                     }
@@ -96,7 +96,7 @@ public class NewChunks extends Module {
                 for (Direction dir: searchDirs) {
                     if (mc.world.getBlockState(packet.getPos().offset(dir)).getFluidState().isStill()
                             && oldChunksCache.getIfPresent(ChunkUtils.chunkPosToLong(chunkPos)) == null) {
-                        newChunksCache.addNewChunk(chunkPos.x, chunkPos.z);
+                        newChunksCache.addHighlight(chunkPos.x, chunkPos.z);
                         return;
                     }
                 }
@@ -106,7 +106,7 @@ public class NewChunks extends Module {
 
             ChunkPos pos = new ChunkPos(packet.getX(), packet.getZ());
 
-            if (!newChunksCache.isNewChunk(pos.x, pos.z, getActualDimension()) && mc.world.getChunkManager().getChunk(packet.getX(), packet.getZ()) == null) {
+            if (!newChunksCache.isHighlighted(pos.x, pos.z, getActualDimension()) && mc.world.getChunkManager().getChunk(packet.getX(), packet.getZ()) == null) {
                 WorldChunk chunk = new WorldChunk(mc.world, pos);
                 try {
                     chunk.loadFromPacket(packet.getChunkData().getSectionsDataBuf(), new NbtCompound(), packet.getChunkData().getBlockEntities(packet.getX(), packet.getZ()));
@@ -133,7 +133,7 @@ public class NewChunks extends Module {
     @Subscribe
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
         if (XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.getValue()) {
-            if (inUnknownDimension() && newChunksCache instanceof NewChunksSavingCache) {
+            if (inUnknownDimension() && newChunksCache instanceof ChunkHighlightSavingCache) {
                 XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.setValue(false);
                 XaeroPlus.LOGGER.warn("Entered unknown dimension with saving cache on, disabling disk saving");
             }
@@ -177,10 +177,10 @@ public class NewChunks extends Module {
             final int leafRegionX, final int leafRegionZ,
             final int level,
             final RegistryKey<World> dimension) {
-        return newChunksCache.getNewChunksInRegion(leafRegionX, leafRegionZ, level, dimension);
+        return newChunksCache.getHighlightsInRegion(leafRegionX, leafRegionZ, level, dimension);
     }
 
     public boolean isNewChunk(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> dimensionId) {
-        return newChunksCache.isNewChunk(chunkPosX, chunkPosZ, dimensionId);
+        return newChunksCache.isHighlighted(chunkPosX, chunkPosZ, dimensionId);
     }
 }

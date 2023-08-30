@@ -195,7 +195,7 @@ public class PortalSkipDetection extends Module {
     public List<HighlightAtChunkPos> getPortalSkipChunksInRegion(
             final int leafRegionX, final int leafRegionZ,
             final int level) {
-        return cache.getHighlightsInRegion(leafRegionX, leafRegionZ, level);
+        return cache.getHighlightsInRegion(leafRegionX, leafRegionZ, level, ChunkUtils.getActualDimension());
     }
 
     public boolean isPortalSkipChunk(final int chunkPosX, final int chunkPosZ) {

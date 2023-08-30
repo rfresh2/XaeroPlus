@@ -24,14 +24,21 @@ public final class XaeroPlusSettingRegistry {
             "Fast Mapping",
             "setting.world_map.fast_mapping",
             "setting.world_map.fast_mapping.tooltip",
-            true,
+            false,
+            SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusFloatSetting fastMapWriterDelaySetting = XaeroPlusFloatSetting.create(
+            "Fast Mapping Delay",
+            "setting.world_map.fast_mapping_delay",
+            10, 1000, 10,
+            "setting.world_map.fast_mapping_delay.tooltip",
+            250,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting fastMapMaxTilesPerCycle = XaeroPlusFloatSetting.create(
             "Fast Mapping Rate Limit",
             "setting.world_map.fast_mapping_rate_limit",
             10, 120, 10,
             "setting.world_map.fast_mapping_rate_limit.tooltip",
-            20,
+            50,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting baritoneWaypointSyncSetting = XaeroPlusBooleanSetting.create(
             "Baritone Goal Waypoint",

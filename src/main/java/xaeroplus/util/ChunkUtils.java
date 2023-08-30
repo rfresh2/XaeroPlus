@@ -31,6 +31,10 @@ public class ChunkUtils {
         return new ChunkPos((int) (l & 4294967295L), (int) (l >> 32 & 4294967295L));
     }
 
+    public static int posToChunkPos(final int i) {
+        return i >> 4;
+    }
+
     public static int longToChunkX(final long l) {
         return (int)(l & 4294967295L);
     }

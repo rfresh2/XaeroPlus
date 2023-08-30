@@ -1,18 +1,21 @@
 package xaeroplus.util.newchunks;
 
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
+import it.unimi.dsi.fastutil.longs.Long2LongMaps;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
-import xaeroplus.util.highlights.ChunkHighlightLocalCache;
+import xaeroplus.util.highlights.ChunkHighlightCacheDimensionHandler;
+import xaeroplus.util.highlights.ChunkHighlightSavingCache;
 import xaeroplus.util.highlights.HighlightAtChunkPos;
 
-import java.util.Collections;
 import java.util.List;
 
-import static xaeroplus.util.ChunkUtils.getActualDimension;
+public class NewChunksSavingCache implements NewChunksCache {
+    private final ChunkHighlightSavingCache delegate;
 
-public class NewChunksLocalCache implements NewChunksCache {
-    private final ChunkHighlightLocalCache delegate = new ChunkHighlightLocalCache();
+    public NewChunksSavingCache(final String databaseName) {
+        this.delegate = new ChunkHighlightSavingCache(databaseName);
+    }
 
     @Override
     public void addNewChunk(final int x, final int z) {
@@ -21,19 +24,17 @@ public class NewChunksLocalCache implements NewChunksCache {
 
     @Override
     public void addNewChunk(final int x, final int z, final long foundTime, final RegistryKey<World> dimensionId) {
-        delegate.addHighlight(x, z, foundTime);
+        delegate.addHighlight(x, z, foundTime, dimensionId);
     }
 
     @Override
     public boolean isNewChunk(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> dimensionId) {
-        if (dimensionId != getActualDimension()) return false;
-        return delegate.isHighlighted(chunkPosX, chunkPosZ);
+        return delegate.isHighlighted(chunkPosX, chunkPosZ, dimensionId);
     }
 
     @Override
     public List<HighlightAtChunkPos> getNewChunksInRegion(final int leafRegionX, final int leafRegionZ, final int level, final RegistryKey<World> dimension) {
-        if (dimension != getActualDimension()) return Collections.emptyList();
-        return delegate.getHighlightsInRegion(leafRegionX, leafRegionZ, level);
+        return delegate.getHighlightsInRegion(leafRegionX, leafRegionZ, level, dimension);
     }
 
     @Override
@@ -58,11 +59,14 @@ public class NewChunksLocalCache implements NewChunksCache {
 
     @Override
     public Long2LongMap getNewChunksState() {
-        return delegate.getHighlightsState();
+        ChunkHighlightCacheDimensionHandler cacheForCurrentDimension = delegate.getCacheForCurrentDimension();
+        if (cacheForCurrentDimension != null) return cacheForCurrentDimension.getHighlightsState();
+        return Long2LongMaps.EMPTY_MAP;
     }
 
     @Override
     public void loadPreviousState(final Long2LongMap state) {
-        delegate.loadPreviousState(state);
+        ChunkHighlightCacheDimensionHandler cacheForCurrentDimension = delegate.getCacheForCurrentDimension();
+        if (cacheForCurrentDimension != null) cacheForCurrentDimension.loadPreviousState(state);
     }
 }

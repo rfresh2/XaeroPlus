@@ -65,6 +65,7 @@
     "MixinXaeroMinimap",
     "mc.AccessorWorldRenderer",
     "mc.MixinClientConnection",
+    "mc.MixinClientPlayNetworkHandler",
     "mc.MixinMinecraftClient",
     "mc.MixinWorldRenderer"
   ]

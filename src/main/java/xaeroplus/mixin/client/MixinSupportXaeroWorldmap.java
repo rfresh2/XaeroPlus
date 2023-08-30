@@ -12,14 +12,12 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import xaero.common.AXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.effect.Effects;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRenderer;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
-import xaero.common.minimap.region.MinimapTile;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.mods.SupportXaeroWorldmap;
@@ -35,6 +33,7 @@ import xaero.map.region.MapTileChunk;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
 import xaeroplus.module.impl.PortalSkipDetection;
+import xaeroplus.module.impl.Portals;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.CustomDimensionMapProcessor;
 import xaeroplus.util.CustomSupportXaeroWorldMap;
@@ -398,6 +397,19 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                                 final int chunkPosZ = chunk.getZ() * 4 + t / 4;
                                 int color = newChunks.getNewChunksColor();
                                 if (newChunks.isNewChunk(chunkPosX, chunkPosZ, Shared.customDimensionId)) {
+                                    final float left = drawX + 16 * (t % 4);
+                                    final float top = drawZ + 16 * (t / 4);
+                                    helper.addColoredRectToExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBufferBuilder, left, top, 16, 16, color);
+                                }
+                            }
+                        }
+                        if (XaeroPlusSettingRegistry.portalsEnabledSetting.getValue()) {
+                            Portals portals = ModuleManager.getModule(Portals.class);
+                            for (int t = 0; t < 16; ++t) {
+                                final int chunkPosX = chunk.getX() * 4 + t % 4;
+                                final int chunkPosZ = chunk.getZ() * 4 + t / 4;
+                                int color = portals.getPortalsColor();
+                                if (portals.isPortalChunk(chunkPosX, chunkPosZ, Shared.customDimensionId)) {
                                     final float left = drawX + 16 * (t % 4);
                                     final float top = drawZ + 16 * (t / 4);
                                     helper.addColoredRectToExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBufferBuilder, left, top, 16, 16, color);

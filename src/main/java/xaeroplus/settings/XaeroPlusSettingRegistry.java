@@ -127,6 +127,36 @@ public final class XaeroPlusSettingRegistry {
             ColorHelper.HighlightColor.values(),
             ColorHelper.HighlightColor.RED,
             SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting oldChunksEnabledSetting = XaeroPlusBooleanSetting.create(
+            "OldChunks Highlighting",
+            "setting.world_map.old_chunks_highlighting",
+            "setting.world_map.old_chunks_highlighting.tooltip",
+            (b) -> ModuleManager.getModule(OldChunks.class).setEnabled(b),
+            false,
+            SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting oldChunksSaveLoadToDisk = XaeroPlusBooleanSetting.create(
+            "Save/Load OldChunks to Disk",
+            "setting.world_map.old_chunks_save_load_to_disk",
+            "setting.world_map.old_chunks_save_load_to_disk.tooltip",
+            (b) -> ModuleManager.getModule(OldChunks.class).setOldChunksCache(b),
+            true,
+            SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusFloatSetting oldChunksAlphaSetting = XaeroPlusFloatSetting.create(
+            "Old Chunks Opacity",
+            "setting.world_map.old_chunks_opacity",
+            10f, 255f, 10f,
+            "setting.world_map.old_chunks_opacity.tooltip",
+            (b) -> ModuleManager.getModule(OldChunks.class).setAlpha(b),
+            100,
+            SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> oldChunksColorSetting = XaeroPlusEnumSetting.create(
+            "Old Chunks Color",
+            "setting.world_map.old_chunks_color",
+            "setting.world_map.old_chunks_color.tooltip",
+            (b) -> ModuleManager.getModule(OldChunks.class).setRgbColor(b.getColor()),
+            ColorHelper.HighlightColor.values(),
+            ColorHelper.HighlightColor.YELLOW,
+            SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting portalsEnabledSetting = XaeroPlusBooleanSetting.create(
             "Portal Highlights",
             "setting.world_map.portals",

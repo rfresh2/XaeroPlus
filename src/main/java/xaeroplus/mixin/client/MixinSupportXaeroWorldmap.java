@@ -32,6 +32,7 @@ import xaero.map.region.MapRegion;
 import xaero.map.region.MapTileChunk;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
+import xaeroplus.module.impl.OldChunks;
 import xaeroplus.module.impl.PortalSkipDetection;
 import xaeroplus.module.impl.Portals;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
@@ -397,6 +398,19 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                                 final int chunkPosZ = chunk.getZ() * 4 + t / 4;
                                 int color = newChunks.getNewChunksColor();
                                 if (newChunks.isNewChunk(chunkPosX, chunkPosZ, Shared.customDimensionId)) {
+                                    final float left = drawX + 16 * (t % 4);
+                                    final float top = drawZ + 16 * (t / 4);
+                                    helper.addColoredRectToExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBufferBuilder, left, top, 16, 16, color);
+                                }
+                            }
+                        }
+                        if (XaeroPlusSettingRegistry.oldChunksEnabledSetting.getValue()) {
+                            OldChunks oldChunks = ModuleManager.getModule(OldChunks.class);
+                            for (int t = 0; t < 16; ++t) {
+                                final int chunkPosX = chunk.getX() * 4 + t % 4;
+                                final int chunkPosZ = chunk.getZ() * 4 + t / 4;
+                                int color = oldChunks.getOldChunksColor();
+                                if (oldChunks.isOldChunk(chunkPosX, chunkPosZ, Shared.customDimensionId)) {
                                     final float left = drawX + 16 * (t % 4);
                                     final float top = drawZ + 16 * (t / 4);
                                     helper.addColoredRectToExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBufferBuilder, left, top, 16, 16, color);

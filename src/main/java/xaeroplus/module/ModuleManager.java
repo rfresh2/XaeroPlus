@@ -13,6 +13,7 @@ public class ModuleManager {
         asList(
                 new BaritoneGoalSync(),
                 new NewChunks(),
+                new OldChunks(),
                 new Portals(),
                 new PortalSkipDetection(),
                 new WaystoneSync())

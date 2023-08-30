@@ -2,6 +2,7 @@ package xaeroplus.util.highlights;
 
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
 import xaero.map.core.XaeroWorldMapCore;
@@ -21,7 +22,7 @@ import static net.minecraft.world.World.*;
 import static xaeroplus.util.ChunkUtils.getActualDimension;
 import static xaeroplus.util.GuiMapHelper.*;
 
-public class ChunkHighlightSavingCache {
+public class ChunkHighlightSavingCache implements ChunkHighlightCache {
     // these are initialized async
     private ChunkHighlightCacheDimensionHandler netherCache = null;
     private ChunkHighlightCacheDimensionHandler overworldCache = null;
@@ -57,19 +58,19 @@ public class ChunkHighlightSavingCache {
     public boolean isHighlighted(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> dimensionId) {
         ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimensionId);
         if (cacheForDimension == null) return false;
-        return cacheForDimension.isHighlighted(chunkPosX, chunkPosZ);
+        return cacheForDimension.isHighlighted(chunkPosX, chunkPosZ, dimensionId);
     }
 
     public boolean isHighlighted(final int chunkPosX, final int chunkPosZ) {
         ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(getActualDimension());
         if (cacheForDimension == null) return false;
-        return cacheForDimension.isHighlighted(chunkPosX, chunkPosZ);
+        return cacheForDimension.isHighlighted(chunkPosX, chunkPosZ, getActualDimension());
     }
 
     public List<HighlightAtChunkPos> getHighlightsInRegion(final int leafRegionX, final int leafRegionZ, final int level, RegistryKey<World> dimension) {
         ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimension);
         if (cacheForDimension == null) return Collections.emptyList();
-        return cacheForDimension.getHighlightsInRegion(leafRegionX, leafRegionZ, level);
+        return cacheForDimension.getHighlightsInRegion(leafRegionX, leafRegionZ, level, dimension);
     }
 
     public void handleWorldChange() {
@@ -179,6 +180,16 @@ public class ChunkHighlightSavingCache {
             reset();
             return null;
         }, Shared.cacheRefreshExecutorService);
+    }
+
+    @Override
+    public Long2LongMap getHighlightsState() {
+        return null;
+    }
+
+    @Override
+    public void loadPreviousState(final Long2LongMap state) {
+
     }
 
     int tickCounter = 0;

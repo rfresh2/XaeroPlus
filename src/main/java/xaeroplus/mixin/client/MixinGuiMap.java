@@ -1988,6 +1988,16 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                         }
                     }
             ));
+            if (BaritoneHelper.isBaritoneElytraPresent()) {
+                options.addAll(5, asList(
+                    new RightClickOption(I18n.translate("gui.world_map.baritone_elytra_here"), options.size(), this) {
+                        @Override
+                        public void onAction(Screen screen) {
+                            BaritoneAPI.getProvider().getPrimaryBaritone().getElytraProcess().pathTo(new GoalXZ(rightClickX, rightClickZ));
+                        }
+                    }
+                ));
+            }
         }
     }
 

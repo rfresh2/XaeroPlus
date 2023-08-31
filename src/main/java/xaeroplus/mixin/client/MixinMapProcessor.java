@@ -189,8 +189,8 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
 
             boolean isMapScreen = mc.currentScreen instanceof GuiMap || Misc.screenShouldSkipWorldRender(mc.currentScreen, true);
             if (!isMapScreen
-                    || !Minecraft.getMinecraft().player.isPotionActive(Effects.NO_CAVE_MAPS)
-                    && !Minecraft.getMinecraft().player.isPotionActive(Effects.NO_CAVE_MAPS_HARMFUL)) {
+                || !Minecraft.getMinecraft().player.isPotionActive(Effects.NO_CAVE_MAPS)
+                && !Minecraft.getMinecraft().player.isPotionActive(Effects.NO_CAVE_MAPS_HARMFUL)) {
                 if (SupportMods.minimap() && (WorldMap.settings.autoCaveMode < 0 && newCaveStart == Integer.MIN_VALUE || !isMapScreen)) {
                     newCaveStart = SupportMods.xaeroMinimap.getCaveStart(newCaveStart, isMapScreen);
                 }

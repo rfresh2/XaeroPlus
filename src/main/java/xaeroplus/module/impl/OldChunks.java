@@ -94,8 +94,16 @@ public class OldChunks extends Module {
                             || blockState.getBlock() == Blocks.TUFF
                             || blockState.getBlock() == Blocks.KELP
                             || blockState.getBlock() == Blocks.KELP_PLANT
+                            || blockState.getBlock() == Blocks.POINTED_DRIPSTONE
                             || blockState.getBlock() == Blocks.DRIPSTONE_BLOCK
                             || blockState.getBlock() == Blocks.DEEPSLATE
+                            || blockState.getBlock() == Blocks.AZALEA
+                            || blockState.getBlock() == Blocks.BIG_DRIPLEAF
+                            || blockState.getBlock() == Blocks.BIG_DRIPLEAF_STEM
+                            || blockState.getBlock() == Blocks.SMALL_DRIPLEAF
+                            || blockState.getBlock() == Blocks.MOSS_BLOCK
+                            || blockState.getBlock() == Blocks.CAVE_VINES
+                            || blockState.getBlock() == Blocks.CAVE_VINES_PLANT
                         ) {
                             return true;
                         }

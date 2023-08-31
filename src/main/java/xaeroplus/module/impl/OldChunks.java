@@ -8,6 +8,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.EmptyChunk;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.ChunkDataEvent;
 import xaeroplus.event.ClientTickEvent;
@@ -140,6 +141,23 @@ public class OldChunks extends Module {
     @Override
     public void onEnable() {
         oldChunksCache.onEnable();
+        searchAllLoadedChunks();
+    }
+
+    private void searchAllLoadedChunks() {
+        if (mc.world == null || inUnknownDimension()) return;
+        final int renderDist = mc.options.getViewDistance().getValue();
+        final int xMin = ChunkUtils.getPlayerChunkX() - renderDist;
+        final int xMax = ChunkUtils.getPlayerChunkX() + renderDist;
+        final int zMin = ChunkUtils.getPlayerChunkZ() - renderDist;
+        final int zMax = ChunkUtils.getPlayerChunkZ() + renderDist;
+        for (int x = xMin; x <= xMax; x++) {
+            for (int z = zMin; z <= zMax; z++) {
+                Chunk chunk = mc.world.getChunkManager().getWorldChunk(x, z, false);
+                if (chunk instanceof EmptyChunk) continue;
+                searchChunkAsync(chunk);
+            }
+        }
     }
 
     @Override

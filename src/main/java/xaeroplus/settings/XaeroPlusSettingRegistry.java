@@ -242,13 +242,6 @@ public final class XaeroPlusSettingRegistry {
             "setting.world_map.show_render_distance_world_map.tooltip",
             false,
             SettingLocation.MINIMAP_OVERLAYS);
-    public static final XaeroPlusFloatSetting assumedServerRenderDistanceSetting = XaeroPlusFloatSetting.create(
-            "Server Render Distance",
-            "setting.world_map.assumed_server_render_distance",
-            1f, 32f, 1f,
-            "setting.world_map.assumed_server_render_distance.tooltip",
-            4f,
-            SettingLocation.MINIMAP_OVERLAYS); // 2b2t
     public static final XaeroPlusBooleanSetting nullOverworldDimensionFolder = XaeroPlusBooleanSetting.create(
             "null OW Dim Dir",
             "setting.world_map.null_overworld_dimension_folder",

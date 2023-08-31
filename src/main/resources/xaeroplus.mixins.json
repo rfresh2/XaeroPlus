@@ -63,6 +63,7 @@
     "MixinWorldMapModSettings",
     "MixinWorldMapOption",
     "MixinXaeroMinimap",
+    "mc.AccessorGameOptions",
     "mc.AccessorWorldRenderer",
     "mc.MixinClientConnection",
     "mc.MixinClientPlayNetworkHandler",

@@ -51,7 +51,7 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	jarLibs 'com.github.ben-manes.caffeine:caffeine:3.1.7'
-	jarLibs "com.github.collarmc:pounce:0e8492b68e"
+	jarLibs "com.github.collarmc:pounce:pounce-0.5"
 	jarLibs 'org.xerial:sqlite-jdbc:3.43.0.0'
 
 	modImplementation "maven.modrinth:xaeros-world-map:1.34.0_Fabric_1.20"

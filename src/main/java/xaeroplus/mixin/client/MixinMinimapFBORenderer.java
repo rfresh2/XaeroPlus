@@ -41,8 +41,12 @@ import xaero.common.minimap.waypoints.render.WaypointsGuiRenderer;
 import xaero.common.misc.Misc;
 import xaero.common.misc.OptimizedMath;
 import xaero.common.settings.ModSettings;
+import xaeroplus.mixin.client.mc.AccessorGameOptions;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.*;
+import xaeroplus.util.ColorHelper;
+import xaeroplus.util.CustomMinimapFBORenderer;
+import xaeroplus.util.CustomSupportXaeroWorldMap;
+import xaeroplus.util.Shared;
 
 import static net.minecraft.world.World.NETHER;
 import static net.minecraft.world.World.OVERWORLD;
@@ -383,8 +387,8 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             double actualPlayerZ = minimap.getEntityRadar().getEntityZ(mc.player, partial);
             int actualXFloored = OptimizedMath.myFloor(actualPlayerX);
             int actualZFloored = OptimizedMath.myFloor(actualPlayerZ);
-            final int setting = (int) XaeroPlusSettingRegistry.assumedServerRenderDistanceSetting.getValue();
-            int width = setting * 2 + 1;
+            final int viewDistance = ((AccessorGameOptions) mc.options).getServerViewDistance();
+            int width = viewDistance * 2 + 1;
             // origin of the chunk we are standing in
             final int middleChunkX = -(actualXFloored & 15);
             final int middleChunkZ = -(actualZFloored & 15);

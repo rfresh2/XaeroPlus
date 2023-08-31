@@ -58,6 +58,7 @@ import xaero.map.region.*;
 import xaero.map.region.texture.RegionTexture;
 import xaero.map.settings.ModSettings;
 import xaero.map.world.MapDimension;
+import xaeroplus.mixin.client.mc.AccessorGameOptions;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
 import xaeroplus.module.impl.OldChunks;
@@ -1573,8 +1574,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
                     if (XaeroPlusSettingRegistry.showRenderDistanceWorldMapSetting.getValue() && !mc.options.hudHidden) {
                         if (MinecraftClient.getInstance().world.getRegistryKey() == Shared.customDimensionId) {
-                            final int setting = (int) XaeroPlusSettingRegistry.assumedServerRenderDistanceSetting.getValue();
-                            int width = setting * 2 + 1;
+                            final int viewDistance = ((AccessorGameOptions) mc.options).getServerViewDistance();
+                            int width = viewDistance * 2 + 1;
                             double playerX = getPlayerX();
                             double playerZ = getPlayerZ();
                             int xFloored = OptimizedMath.myFloor(playerX);

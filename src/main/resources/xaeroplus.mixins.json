@@ -60,6 +60,7 @@
     "MixinWorldMapModOptionsAccessor",
     "MixinWorldMapModSettings",
     "MixinWorldMapOption",
+    "mc.AccessorGameOptions",
     "mc.AccessorWorldRenderer",
     "mc.MixinClientConnection",
     "mc.MixinClientPlayNetworkHandler",

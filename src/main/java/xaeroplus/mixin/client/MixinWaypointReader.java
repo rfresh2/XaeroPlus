@@ -5,8 +5,6 @@ import baritone.api.pathing.goals.GoalXZ;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -63,6 +61,16 @@ public class MixinWaypointReader {
                     }
                 }
             ));
+            if (BaritoneHelper.isBaritoneElytraPresent()) {
+                options.addAll(5, asList(
+                    new RightClickOption(I18n.translate("gui.world_map.baritone_elytra_here"), options.size(), target) {
+                        @Override
+                        public void onAction(Screen screen) {
+                            BaritoneAPI.getProvider().getPrimaryBaritone().getElytraProcess().pathTo(new GoalXZ(destX, destZ));
+                        }
+                    }
+                ));
+            }
         }
     }
 }

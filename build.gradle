@@ -60,7 +60,7 @@ dependencies {
 
 	modImplementation "maven.modrinth:xaeros-world-map:1.33.1_Forge_1.20"
 	modImplementation "maven.modrinth:xaeros-minimap:23.6.3_Forge_1.20"
-	modImplementation files("libs/baritone-api-forge-1.10.1.jar")
+	modImplementation files("libs/baritone-api-forge-1.20.1-elytra-beta-v1.jar")
 	modCompileOnly "maven.modrinth:waystones:14.0.1+forge-1.20"
 	modCompileOnly "maven.modrinth:balm:7.0.4+forge-1.20"
 }

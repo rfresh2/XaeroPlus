@@ -33,17 +33,20 @@ import static xaeroplus.util.ColorHelper.getColor;
 @Module.ModuleInfo()
 public class OldChunks extends Module {
     private ChunkHighlightCache oldChunksCache = new ChunkHighlightLocalCache();
-    private static final String DATABASE_NAME = "XaeroPlusOldChunks";
+    private ChunkHighlightCache modernChunksCache = new ChunkHighlightLocalCache();
+    private static final String OLD_CHUNKS_DATABASE_NAME = "XaeroPlusOldChunks";
+    private static final String MODERN_CHUNKS_DATABASE_NAME = "XaeroPlusModernChunks";
     private int oldChunksColor = getColor(0, 0, 255, 100);
     private final MinecraftClient mc = MinecraftClient.getInstance();
     private final ExecutorService searchExecutor = Executors.newSingleThreadExecutor();
+    private boolean inverse = false;
 
     public void setOldChunksCache(boolean disk) {
         try {
             Long2LongMap map = oldChunksCache.getHighlightsState();
             oldChunksCache.onDisable();
             if (disk) {
-                oldChunksCache = new ChunkHighlightSavingCache(DATABASE_NAME);
+                oldChunksCache = new ChunkHighlightSavingCache(OLD_CHUNKS_DATABASE_NAME);
             } else {
                 oldChunksCache = new ChunkHighlightLocalCache();
             }
@@ -52,7 +55,22 @@ public class OldChunks extends Module {
                 oldChunksCache.loadPreviousState(map);
             }
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error closing new chunks cache", e);
+            XaeroPlus.LOGGER.error("Error closing old chunks cache", e);
+        }
+        try {
+            Long2LongMap map = modernChunksCache.getHighlightsState();
+            modernChunksCache.onDisable();
+            if (disk) {
+                modernChunksCache = new ChunkHighlightSavingCache(MODERN_CHUNKS_DATABASE_NAME);
+            } else {
+                modernChunksCache = new ChunkHighlightLocalCache();
+            }
+            if (this.isEnabled()) {
+                modernChunksCache.onEnable();
+                modernChunksCache.loadPreviousState(map);
+            }
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Error closing modern chunks cache", e);
         }
     }
 
@@ -105,7 +123,7 @@ public class OldChunks extends Module {
                             || blockState.getBlock() == Blocks.CAVE_VINES
                             || blockState.getBlock() == Blocks.CAVE_VINES_PLANT
                         ) {
-                            return true;
+                            return modernChunksCache.addHighlight(chunk.getPos().x, chunk.getPos().z);
                         }
                     } else if (actualDimension == NETHER) {
                         if (blockState.getBlock() == Blocks.ANCIENT_DEBRIS
@@ -116,7 +134,7 @@ public class OldChunks extends Module {
                             || blockState.getBlock() == Blocks.NETHER_GOLD_ORE
                             || blockState.getBlock() == Blocks.CHAIN
                         ) {
-                            return true;
+                            return modernChunksCache.addHighlight(chunk.getPos().x, chunk.getPos().z);
                         }
                     }
                 }
@@ -134,6 +152,7 @@ public class OldChunks extends Module {
             }
         }
         oldChunksCache.handleWorldChange();
+        modernChunksCache.handleWorldChange();
     }
 
     public boolean inUnknownDimension() {
@@ -144,11 +163,13 @@ public class OldChunks extends Module {
     @Subscribe
     public void onClientTickEvent(final ClientTickEvent.Post event) {
         oldChunksCache.handleTick();
+        modernChunksCache.handleTick();
     }
 
     @Override
     public void onEnable() {
         oldChunksCache.onEnable();
+        modernChunksCache.onEnable();
         searchAllLoadedChunks();
     }
 
@@ -171,6 +192,7 @@ public class OldChunks extends Module {
     @Override
     public void onDisable() {
         oldChunksCache.onDisable();
+        modernChunksCache.onDisable();
     }
 
     public int getOldChunksColor() {
@@ -189,10 +211,20 @@ public class OldChunks extends Module {
         final int leafRegionX, final int leafRegionZ,
         final int level,
         final RegistryKey<World> dimension) {
-        return oldChunksCache.getHighlightsInRegion(leafRegionX, leafRegionZ, level, dimension);
+        if (inverse)
+            return modernChunksCache.getHighlightsInRegion(leafRegionX, leafRegionZ, level, dimension);
+        else
+            return oldChunksCache.getHighlightsInRegion(leafRegionX, leafRegionZ, level, dimension);
     }
 
     public boolean isOldChunk(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> dimensionId) {
-        return oldChunksCache.isHighlighted(chunkPosX, chunkPosZ, dimensionId);
+        if (inverse)
+            return modernChunksCache.isHighlighted(chunkPosX, chunkPosZ, dimensionId);
+        else
+            return oldChunksCache.isHighlighted(chunkPosX, chunkPosZ, dimensionId);
+    }
+
+    public void setInverse(final Boolean b) {
+        this.inverse = b;
     }
 }

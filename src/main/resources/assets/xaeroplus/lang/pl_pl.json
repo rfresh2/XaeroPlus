@@ -29,6 +29,8 @@
   "setting.world_map.new_chunks_color.tooltip": "Zmienia kolor Nowych Chunków.",
   "setting.world_map.old_chunks_highlighting": "Podświetlanie OldChunks",
   "setting.world_map.old_chunks_highlighting.tooltip": "Podświetla OldChunks na minimapie i mapie świata. OldChunk to fragment wygenerowany w wersji 1.12.2 lub starszej na podstawie bloków znajdujących się w fragmencie. Przeznaczony do użytku na 2b2t",
+  "setting.world_map.old_chunks_inverse": "Odwrotność OldChunks",
+  "setting.world_map.old_chunks_inverse.tooltip": "Podświetla fragmenty, które zostały wygenerowane w wersji 1.13 lub nowszej. Przeciwieństwo OldChunks.",
   "setting.world_map.old_chunks_save_load_to_disk": "Zapisz/załaduj OldChunks na dysk",
   "setting.world_map.old_chunks_save_load_to_disk.tooltip": "Zapisuje i ładuje dane OldChunk na dysk dla każdego świata i wymiaru. Wymaga włączenia podświetlania OldChunk.",
   "setting.world_map.old_chunks_opacity": "Nieprzezroczystość starych kawałków",

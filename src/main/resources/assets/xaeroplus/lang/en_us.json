@@ -21,6 +21,8 @@
   "setting.world_map.skip_world_render.tooltip": "Skip MC world render while in a Xaero GUI. Having this on can cause issues with travel mods while you're in a Xaero GUI like the WorldMap.",
   "setting.world_map.new_chunks_highlighting": "NewChunks Highlighting",
   "setting.world_map.new_chunks_highlighting.tooltip": "Highlights NewChunks on the Minimap and WorldMap.",
+  "setting.world_map.old_chunks_inverse": "OldChunks Inverse",
+  "setting.world_map.old_chunks_inverse.tooltip": "Highlights chunks that were generated in 1.13 or higher. The opposite of OldChunks.",
   "setting.world_map.new_chunks_save_load_to_disk": "Save/Load NewChunks to Disk",
   "setting.world_map.new_chunks_save_load_to_disk.tooltip": "Saves and loads NewChunk data to disk for each world and dimension. Requires NewChunk Highlighting to be enabled.",
   "setting.world_map.new_chunks_opacity": "New Chunks Opacity",

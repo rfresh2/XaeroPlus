@@ -29,6 +29,8 @@
   "setting.world_map.new_chunks_color.tooltip": "Изменяет цвет новых фрагментов.",
   "setting.world_map.old_chunks_highlighting": "Выделение старых фрагментов",
   "setting.world_map.old_chunks_highlighting.tooltip": "Выделяет OldChunks на мини-карте и карте мира. OldChunk — это чанк, созданный в версии 1.12.2 или ниже на основе блоков, присутствующих в чанк. Предназначен для использования на 2b2t.",
+  "setting.world_map.old_chunks_inverse": "OldChunks Инверсия",
+  "setting.world_map.old_chunks_inverse.tooltip": "Выделяет фрагменты, созданные в версии 1.13 или выше. Противоположность OldChunks.",
   "setting.world_map.old_chunks_save_load_to_disk": "Сохранить/загрузить OldChunks на диск",
   "setting.world_map.old_chunks_save_load_to_disk.tooltip": "Сохраняет и загружает данные OldChunk на диск для каждого мира и измерения. Требуется, чтобы подсветка OldChunk была включена.",
   "setting.world_map.old_chunks_opacity": "Непрозрачность старых кусков",

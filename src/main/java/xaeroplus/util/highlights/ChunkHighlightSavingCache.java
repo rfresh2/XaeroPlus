@@ -147,7 +147,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
             if (worldId == null) return;
             final RegistryKey<World> dimension = getActualDimension();
             if (dimension != OVERWORLD && dimension != NETHER && dimension != END) {
-                XaeroPlus.LOGGER.error("Unexpected dimension ID: " + dimension + ". Disable Save/Load NewChunks to Disk to restore functionality.");
+                XaeroPlus.LOGGER.error("Unexpected dimension ID: " + dimension + ". Disable Save/Load to Disk to restore functionality.");
                 return;
             }
             this.currentWorldId = worldId;
@@ -230,7 +230,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
             ChunkHighlightCacheDimensionHandler cacheForCurrentDimension = getCacheForCurrentDimension();
             if (cacheForCurrentDimension != null) cacheForCurrentDimension.removeHighlight(x, z);
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.debug("Error removing portal marker from saving cache", e);
+            XaeroPlus.LOGGER.debug("Error removing highlight from saving cache: {}, {}", x, z, e);
         }
     }
 }

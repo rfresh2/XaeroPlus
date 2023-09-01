@@ -29,6 +29,8 @@
   "setting.world_map.new_chunks_color.tooltip": "Modifie la couleur des nouveaux chunks.",
   "setting.world_map.old_chunks_highlighting": "Mise en évidence d'OldChunks",
   "setting.world_map.old_chunks_highlighting.tooltip": "Met en évidence OldChunks sur la mini-carte et la carte du monde. Un OldChunk est un morceau généré dans la version 1.12.2 ou inférieure en fonction des blocs présents dans le morceau. Destiné à être utilisé sur 2b2t",
+  "setting.world_map.old_chunks_inverse": "OldChunks inversé",
+  "setting.world_map.old_chunks_inverse.tooltip": "Met en évidence les morceaux générés dans la version 1.13 ou supérieure. Le contraire d’OldChunks.",
   "setting.world_map.old_chunks_save_load_to_disk": "Enregistrer/charger OldChunks sur le disque",
   "setting.world_map.old_chunks_save_load_to_disk.tooltip": "Enregistre et charge les données OldChunk sur le disque pour chaque monde et dimension. Nécessite que la mise en évidence OldChunk soit activée.",
   "setting.world_map.old_chunks_opacity": "Opacité des vieux morceaux",

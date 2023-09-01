@@ -141,6 +141,13 @@ public final class XaeroPlusSettingRegistry {
             (b) -> ModuleManager.getModule(OldChunks.class).setEnabled(b),
             false,
             SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting oldChunksInverse = XaeroPlusBooleanSetting.create(
+            "OldChunks Inverse",
+            "setting.world_map.old_chunks_inverse",
+            "setting.world_map.old_chunks_inverse.tooltip",
+            (b) -> ModuleManager.getModule(OldChunks.class).setInverse(b),
+            false,
+            SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting oldChunksSaveLoadToDisk = XaeroPlusBooleanSetting.create(
             "Save/Load OldChunks to Disk",
             "setting.world_map.old_chunks_save_load_to_disk",

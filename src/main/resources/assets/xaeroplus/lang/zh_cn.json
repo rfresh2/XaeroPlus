@@ -29,6 +29,8 @@
   "setting.world_map.new_chunks_color.tooltip": "更改新区块的颜色。",
   "setting.world_map.old_chunks_highlighting": "OldChunks 突出显示",
   "setting.world_map.old_chunks_highlighting.tooltip": "在小地图和世界地图上突出显示 OldChunks。 OldChunk 是在 1.12.2 或更低版本中根据块中存在的块生成的块。 旨在用于 2b2t",
+  "setting.world_map.old_chunks_inverse": "OldChunks 逆",
+  "setting.world_map.old_chunks_inverse.tooltip": "突出显示在 1.13 或更高版本中生成的块。 与 OldChunks 相反。",
   "setting.world_map.old_chunks_save_load_to_disk": "将 OldChunk 保存/加载到磁盘",
   "setting.world_map.old_chunks_save_load_to_disk.tooltip": "将每个世界和维度的 OldChunk 数据保存并加载到磁盘。 需要启用 OldChunk 突出显示。",
   "setting.world_map.old_chunks_opacity": "旧块不透明度",

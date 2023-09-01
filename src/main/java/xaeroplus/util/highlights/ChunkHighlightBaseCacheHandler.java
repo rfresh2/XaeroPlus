@@ -41,7 +41,7 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
                 lock.writeLock().unlock();
             }
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Failed to add new chunk", e);
+            XaeroPlus.LOGGER.error("Failed to add new highlight", e);
         }
         return true;
     }
@@ -58,7 +58,7 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
                 return containsKey;
             }
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error checking if chunk contains portal", e);
+            XaeroPlus.LOGGER.error("Error checking if chunk is highlighted", e);
         }
         return false;
     }
@@ -71,7 +71,7 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
                 return containsKey;
             }
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error checking if chunk contains portal", e);
+            XaeroPlus.LOGGER.error("Error checking if chunk is highlighted", e);
         }
         return false;
     }
@@ -85,7 +85,7 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
                 return Collections.emptyList();
             }
         } catch (Exception e) {
-            XaeroPlus.LOGGER.error("Error handling Portals region lookup", e);
+            XaeroPlus.LOGGER.error("Error handling chunk highlight region lookup", e);
         }
         return Collections.emptyList();
     }

@@ -51,7 +51,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
                     lock.writeLock().unlock();
                 }
             } catch (final Exception e) {
-                XaeroPlus.LOGGER.error("Failed to load portals in window", e);
+                XaeroPlus.LOGGER.error("Failed to load highlights in window", e);
             }
         });
     }
@@ -77,7 +77,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
                     lock.writeLock().unlock();
                 }
             } catch (final Exception e) {
-                XaeroPlus.LOGGER.error("Error while writing portals outside window to database", e);
+                XaeroPlus.LOGGER.error("Error while writing highlights outside window to database", e);
             }
             database.insertHighlightList(chunksToWrite, dimension);
         });

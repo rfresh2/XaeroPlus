@@ -65,10 +65,7 @@ import xaeroplus.module.impl.OldChunks;
 import xaeroplus.module.impl.PortalSkipDetection;
 import xaeroplus.module.impl.Portals;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.BaritoneHelper;
-import xaeroplus.util.CustomDimensionMapProcessor;
-import xaeroplus.util.GuiHelper;
-import xaeroplus.util.Shared;
+import xaeroplus.util.*;
 import xaeroplus.util.highlights.HighlightAtChunkPos;
 
 import java.util.ArrayList;
@@ -1973,18 +1970,30 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Inject(method = "getRightClickOptions", at = @At(value = "RETURN"), remap = false)
     public void getRightClickOptionsInject(final CallbackInfoReturnable<ArrayList<RightClickOption>> cir) {
         if (BaritoneHelper.isBaritonePresent()) {
+            RegistryKey<World> customDim = Shared.customDimensionId;
+            RegistryKey<World> actualDim = ChunkUtils.getActualDimension();
+            double customDimDiv = 1.0;
+            if (customDim != actualDim) {
+                if (customDim == NETHER && actualDim == OVERWORLD) {
+                    customDimDiv = 8;
+                } else if (customDim == OVERWORLD && actualDim == NETHER) {
+                    customDimDiv = 0.125;
+                }
+            }
+            int goalX = (int) (rightClickX * customDimDiv);
+            int goalZ = (int) (rightClickZ * customDimDiv);
             final ArrayList<RightClickOption> options = cir.getReturnValue();
             options.addAll(3, asList(
                     new RightClickOption(I18n.translate("gui.world_map.baritone_goal_here"), options.size(), this) {
                         @Override
                         public void onAction(Screen screen) {
-                            BaritoneAPI.getProvider().getPrimaryBaritone().getCustomGoalProcess().setGoal(new GoalXZ(rightClickX, rightClickZ));
+                            BaritoneAPI.getProvider().getPrimaryBaritone().getCustomGoalProcess().setGoal(new GoalXZ(goalX, goalZ));
                         }
                     },
                     new RightClickOption(I18n.translate("gui.world_map.baritone_path_here"), options.size(), this) {
                         @Override
                         public void onAction(Screen screen) {
-                            BaritoneAPI.getProvider().getPrimaryBaritone().getCustomGoalProcess().setGoalAndPath(new GoalXZ(rightClickX, rightClickZ));
+                            BaritoneAPI.getProvider().getPrimaryBaritone().getCustomGoalProcess().setGoalAndPath(new GoalXZ(goalX, goalZ));
                         }
                     }
             ));
@@ -1993,7 +2002,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     new RightClickOption(I18n.translate("gui.world_map.baritone_elytra_here"), options.size(), this) {
                         @Override
                         public void onAction(Screen screen) {
-                            BaritoneAPI.getProvider().getPrimaryBaritone().getElytraProcess().pathTo(new GoalXZ(rightClickX, rightClickZ));
+                            BaritoneAPI.getProvider().getPrimaryBaritone().getElytraProcess().pathTo(new GoalXZ(goalX, goalZ));
                         }
                     }
                 ));

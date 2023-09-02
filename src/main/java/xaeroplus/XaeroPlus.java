@@ -1,13 +1,12 @@
 package xaeroplus;
 
 import com.collarmc.pounce.EventBus;
+import com.github.benmanes.caffeine.cache.RemovalCause;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -35,6 +34,7 @@ public class XaeroPlus {
 				modEventBus.addListener(this::onInitialize);
 				modEventBus.addListener(this::onRegisterKeyMappingsEvent);
 				FORGE_EVENT_BUS.register(modEventBus);
+				RemovalCause explicit = RemovalCause.EXPLICIT; // force class load to stop forge shitting itself at runtime??
 			};
 		});
 	}

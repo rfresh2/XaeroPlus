@@ -1,6 +1,5 @@
 package xaeroplus.module.impl;
 
-import baritone.api.BaritoneAPI;
 import baritone.api.pathing.goals.Goal;
 import baritone.api.pathing.goals.GoalXZ;
 import baritone.api.utils.interfaces.IGoalRenderPos;
@@ -39,7 +38,7 @@ public class BaritoneGoalSync extends Module {
         Optional<Waypoint> baritoneGoalWaypoint = waypoints.stream()
                 .filter(waypoint -> waypoint.getName().equals("Baritone Goal"))
                 .findFirst();
-        final Goal goal = BaritoneAPI.getProvider().getPrimaryBaritone().getCustomGoalProcess().getGoal();
+        final Goal goal = BaritoneGoalHelper.getBaritoneGoal();
         if (goal == null) {
             baritoneGoalWaypoint.ifPresent(waypoint -> removeBaritoneGoalWaypoint(waypoints, waypoint));
             return;

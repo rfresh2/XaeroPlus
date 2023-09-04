@@ -54,9 +54,9 @@ public final class XaeroPlusSettingRegistry {
             "Waystones Sync",
             "setting.world_map.waystones_sync",
             "setting.world_map.waystones_sync.tooltip",
-            WaystonesHelper::isWaystonesPresent,
+            WaystonesHelper::isAnyWaystonesPresent,
             (b) -> {
-                if (WaystonesHelper.isWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setEnabled(b);
+                if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setEnabled(b);
             },
             true,
             SettingLocation.WORLD_MAP_MAIN);

@@ -29,23 +29,13 @@ Available on:
 Each XaeroPlus release is only compatible with a specific version of Xaero's WorldMap and Minimap.
 Xaero's Minimap can be swapped out for [BetterPVP](https://chocolateminecraft.com/betterpvp2.php)
 
-Download and include these mods **in addition** to `xaeroplus-xx.jar` (3 jars total).
+Download and include these mods **in addition** to `XaeroPlus-*.jar` (3 jars total).
 
 You can find download links to Xaero's mods here:
 * https://modrinth.com/mod/xaeros-world-map/versions?g=1.20.1
 * https://modrinth.com/mod/xaeros-minimap/versions?g=1.20.1
 
 Or a modpack zip with these jars is included in the Github releases.
-
-# Version Upgrade Warning
-
-Info for those testing upgrades from 1.12 to 1.20+. 
-
-Map data files from 1.12 will work on 1.20.x. 
-
-But, 1.20.x map files will not work in 1.12. This is not caused by XaeroPlus, its how Xaero's mods will work without XaeroPlus as well.
-
-If you are considering upgrading, keep a backup of your map data files.
 
 # Modifications
 
@@ -56,7 +46,7 @@ If you are considering upgrading, keep a backup of your map data files.
 * [Baritone](https://github.com/cabaletta/baritone) integration
   * Baritone Goals synced as temporary waypoints
   * [Point and Click Travel](https://cdn.discordapp.com/attachments/1005598555186139156/1125306712300204082/Base_Profile_2023.07.02_-_23.04.34.09.DVR.mp4)
-* [Waystones](https://legacy.curseforge.com/minecraft/mc-mods/waystones) integration
+* [Waystones](https://legacy.curseforge.com/minecraft/mc-mods/waystones) and [Fabric Waystones](https://legacy.curseforge.com/minecraft/mc-mods/fabric-waystones) integration
   * Syncs Waystones as temporary waypoints
 * [Portals Highlighting in Minimap and WorldMap](https://cdn.discordapp.com/attachments/1127463054804779028/1133251771217752175/Base_Profile_2023.07.24_-_21.02.36.03.mp4)
 * [Portal Skip Highlighting in Minimap and WorldMap](https://cdn.discordapp.com/attachments/1029572347818151947/1109656254265163816/Base_Profile_2023.05.20_-_18.34.34.34.DVR.mp4). Detects chunks where a portal could have been loaded.

@@ -11,9 +11,7 @@ import net.minecraft.world.World;
 import wraith.fwaystones.FabricWaystones;
 import wraith.fwaystones.access.WaystoneValue;
 import xaero.common.XaeroMinimapSession;
-import xaero.common.minimap.waypoints.Waypoint;
-import xaero.common.minimap.waypoints.WaypointSet;
-import xaero.common.minimap.waypoints.WaypointsManager;
+import xaero.common.minimap.waypoints.*;
 import xaero.common.misc.OptimizedMath;
 import xaero.map.mods.SupportMods;
 import xaeroplus.XaeroPlus;
@@ -21,6 +19,7 @@ import xaeroplus.event.ClientTickEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.module.Module;
 import xaeroplus.util.IWaypointDimension;
+import xaeroplus.util.WaypointsHelper;
 import xaeroplus.util.WaystonesHelper;
 
 import java.util.ArrayList;
@@ -73,7 +72,7 @@ public class WaystoneSync extends Module {
     public void onClientTickEvent(final ClientTickEvent.Post event) {
         if (WaystonesHelper.isWaystonesPresent()) {
             if (shouldSync) {
-                if (syncWaypoints()) {
+                if (syncMainWaystones()) {
                     shouldSync = false;
                     toSyncWaystones = new ArrayList<>();
                 }
@@ -84,42 +83,28 @@ public class WaystoneSync extends Module {
     }
 
     public void syncFabricWaystones() {
-        if (!WaystonesHelper.isFabricWaystonesPresent()) return;
         if (fwaystonesTickC++ % 20 != 0) return;
         if (fwaystonesTickC > 100) fwaystonesTickC = 0;
-        XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
-        if (minimapSession == null) return;
-        final WaypointsManager waypointsManager = minimapSession.getWaypointsManager();
-        WaypointSet waypointSet = waypointsManager.getWaypoints();
-        if (waypointSet == null) return;
-        final List<Waypoint> waypoints = waypointSet.getList();
-        waypoints.removeIf(waypoint -> waypoint.isTemporary() && waypoint.getName().endsWith(" [Waystone]"));
         ConcurrentHashMap<String, WaystoneValue> waystones = FabricWaystones.WAYSTONE_STORAGE.WAYSTONES;
         if (waystones == null) return;
-        for (WaystoneValue waystoneEntry : waystones.values()) {
-            XaeroPlus.LOGGER.info("Syncing waystone entry: {} pos: {}", waystoneEntry.getWaystoneName(), waystoneEntry.way_getPos().toString());
-            final RegistryKey<World> waystoneDimension = RegistryKey.of(RegistryKeys.WORLD, new Identifier(waystoneEntry.getWorldName()));
-            final double dimDiv = getDimensionDivision(waystoneDimension, waypointsManager);
-            final int x = OptimizedMath.myFloor(waystoneEntry.way_getPos().getX() * dimDiv);
-            final int z = OptimizedMath.myFloor(waystoneEntry.way_getPos().getZ() * dimDiv);
-            Waypoint waypoint = new Waypoint(
-                x,
-                waystoneEntry.way_getPos().getY(),
-                z,
-                waystoneEntry.getWaystoneName() + " [Waystone]",
-                waystoneEntry.getWaystoneName().isEmpty() ? "W" : waystoneEntry.getWaystoneName()
-                    .substring(0, 1)
-                    .toUpperCase(Locale.ROOT),
-                Math.abs(waystoneEntry.getWaystoneName().hashCode()) % COLORS.length,
-                0,
-                true
-            );
-            ((IWaypointDimension) waypoint).setDimension(waystoneDimension);
-            waypoints.add(waypoint);
-        }
+        commonWaystoneSync(waystones.values().stream()
+                               .map(waystone -> new Waystone(waystone.getWaystoneName(),
+                                                             RegistryKey.of(RegistryKeys.WORLD, new Identifier(waystone.getWorldName())),
+                                                             waystone.way_getPos().getX(),
+                                                             waystone.way_getPos().getY() + 1, // avoid teleporting directly into the waystone
+                                                             waystone.way_getPos().getZ())).toList());
     }
 
-    public boolean syncWaypoints() {
+    public boolean syncMainWaystones() {
+        return commonWaystoneSync(toSyncWaystones.stream()
+                                      .map(waystone -> new Waystone(waystone.getName(),
+                                                                    waystone.getDimension(),
+                                                                    waystone.getPos().getX(),
+                                                                    waystone.getPos().getY() + 1, // avoid teleporting directly into the waystone
+                                                                    waystone.getPos().getZ())).toList());
+    }
+
+    public boolean commonWaystoneSync(final List<Waystone> waystones) {
         XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
         if (minimapSession == null) return false;
         final WaypointsManager waypointsManager = minimapSession.getWaypointsManager();
@@ -127,27 +112,84 @@ public class WaystoneSync extends Module {
         if (waypointSet == null) return false;
         final List<Waypoint> waypoints = waypointSet.getList();
         waypoints.removeIf(waypoint -> waypoint.isTemporary() && waypoint.getName().endsWith(" [Waystone]"));
-        for (IWaystone waystoneEntry : toSyncWaystones) {
-            final double dimDiv = getDimensionDivision(waystoneEntry.getDimension(), waypointsManager);
-            final int x = OptimizedMath.myFloor(waystoneEntry.getPos().getX() * dimDiv);
-            final int z = OptimizedMath.myFloor(waystoneEntry.getPos().getZ() * dimDiv);
-            Waypoint waypoint = new Waypoint(
-                x,
-                waystoneEntry.getPos().getY(),
-                z,
-                waystoneEntry.getName() + " [Waystone]",
-                waystoneEntry.getName().isEmpty() ? "W" : waystoneEntry.getName()
-                    .substring(0, 1)
-                    .toUpperCase(Locale.ROOT),
-                Math.abs(waystoneEntry.getName().hashCode()) % COLORS.length,
-                0,
-                true
-            );
-            ((IWaypointDimension) waypoint).setDimension(waystoneEntry.getDimension());
-            waypoints.add(waypoint);
+        final String currentContainerId = waypointsManager.getCurrentContainerID();
+        final RegistryKey<World> currentWaypointDimension = WaypointsHelper.getDimensionKeyForWaypointWorldKey(currentContainerId);
+        for (Waystone waystoneEntry : waystones) {
+//            XaeroPlus.LOGGER.info("Syncing waystone entry: {} pos: {}, {}, {}", waystoneEntry.name(), waystoneEntry.x(), waystoneEntry.y(), waystoneEntry.z());
+            RegistryKey<World> waystoneDimension = waystoneEntry.dimension();
+            if (waystoneDimension.getValue() != currentWaypointDimension.getValue()
+                && isVanillaDimension(waystoneDimension // this will most likely fail, just skip it and sync to current set
+            )) {
+                crossDimWaystoneSync(waystoneEntry, waypointsManager, currentContainerId);
+            } else {
+                currentDimWaystoneSync(waystoneEntry, waypointsManager, waypoints);
+            }
         }
         SupportMods.xaeroMinimap.requestWaypointsRefresh();
         return true;
+    }
+
+    private boolean isVanillaDimension(RegistryKey<World> dimension) {
+        return dimension == World.OVERWORLD || dimension == World.NETHER || dimension == World.END;
+    }
+
+    private void crossDimWaystoneSync(Waystone waystone, WaypointsManager waypointsManager, String currentContainerId) {
+        try {
+            final RegistryKey<World> waystoneDimension = waystone.dimension();
+            final String waystoneDimensionDirectoryName = waypointsManager.getDimensionDirectoryName(waystoneDimension);
+            final int waystoneDim = WaypointsHelper.getDimensionForWaypointWorldKey(waystoneDimensionDirectoryName);
+            WaypointWorldContainer waypointWorldContainer = waypointsManager.getWorldContainer(currentContainerId.substring(
+                0,
+                currentContainerId.lastIndexOf(37) + 1) + waystoneDim);
+            WaypointWorld crossDimWaypointWorld = waypointWorldContainer.worlds.get("waypoints");
+            if (crossDimWaypointWorld == null) {
+                waypointWorldContainer.worlds.put("waypoints", new WaypointWorld(waypointWorldContainer, "waypoints"));
+                crossDimWaypointWorld = waypointWorldContainer.worlds.get("waypoints");
+            }
+            ArrayList<Waypoint> crossDimWaypoints = crossDimWaypointWorld.getSets().get(
+                "gui.xaero_default").getList();
+            crossDimWaypoints.removeIf(waypoint -> waypoint.isTemporary() && waypoint.getName().equals(waystone.name() + " [Waystone]"));
+            Waypoint waystoneWp = new Waypoint(
+                waystone.x(),
+                waystone.y(),
+                waystone.z(),
+                waystone.name() + " [Waystone]",
+                waystone.name().substring(0, 1).toUpperCase(Locale.ROOT),
+                Math.abs(waystone.name().hashCode()) % COLORS.length,
+                0,
+                true
+            );
+            ((IWaypointDimension) waystoneWp).setDimension(waystoneDimension);
+            crossDimWaypoints.add(waystoneWp);
+        } catch (final Exception e) {
+            // this most likely will be due to custom dimensions. Setting this down to debug so we don't spam logs in that case
+            XaeroPlus.LOGGER.error("Failed to sync cross-dim waystone: {}", waystone.name(), e);
+        }
+    }
+
+    private void currentDimWaystoneSync(Waystone waystone, WaypointsManager waypointsManager, List<Waypoint> currentWaypointSet) {
+        try {
+            final RegistryKey<World> waystoneDimension = waystone.dimension();
+            final double dimDiv = getDimensionDivision(waystoneDimension, waypointsManager);
+            final int x = OptimizedMath.myFloor(waystone.x() * dimDiv);
+            final int z = OptimizedMath.myFloor(waystone.z() * dimDiv);
+            Waypoint waypoint = new Waypoint(
+                x,
+                waystone.y(),
+                z,
+                waystone.name() + " [Waystone]",
+                waystone.name().isEmpty() ? "W" : waystone.name()
+                    .substring(0, 1)
+                    .toUpperCase(Locale.ROOT),
+                Math.abs(waystone.name().hashCode()) % COLORS.length,
+                0,
+                true
+            );
+            ((IWaypointDimension) waypoint).setDimension(waystoneDimension);
+            currentWaypointSet.add(waypoint);
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Failed to sync waystone: {}", waystone.name(), e);
+        }
     }
 
     private double getDimensionDivision(final RegistryKey<World> waystoneDim, final WaypointsManager waypointsManager) {
@@ -159,4 +201,6 @@ public class WaystoneSync extends Module {
         double waystoneDimDiv = waystoneDim == NETHER ? 8.0 : 1.0;
         return waystoneDimDiv / waypointsContainerDimDiv;
     }
+
+    private record Waystone(String name, RegistryKey<World> dimension, int x, int y, int z) { }
 }

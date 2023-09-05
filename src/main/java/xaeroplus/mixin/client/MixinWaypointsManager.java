@@ -69,20 +69,33 @@ public abstract class MixinWaypointsManager {
     public String getTeleportCommandFormatRedirect(final WaypointWorldRootContainer instance) {
         if (XaeroPlusSettingRegistry.crossDimensionTeleportCommand.getValue()) {
             try {
-                final String containerKey = displayedWorld.getContainer().getKey();
-                final RegistryKey<World> dimId = getDimensionKeyForDirectoryName(containerKey);
-                if (containerKey.contains("dim%")) {
-                    if (dimId != MinecraftClient.getInstance().world.getRegistryKey()) {
-                        crossDimTeleport = true;
-                        return "/execute in " + dimId.getValue() + " run teleport @s " + selected.getX() + " {y} " + selected.getZ();
-                    }
+                // todo: if the dest is a waystone:
+                //  ideally we'd be teleported offset by 0.5 x or z in the direction the waystone is facing
+                //  however, we don't have access to the facing state from the client directly
+                //  and we can't send a specific waystone teleport request packet as our teleport source is non-standard
+                //  perhaps if we had a deeper integration into the waystones codebase we could do this better
+                //  we could increase the dest Y val by 0.5 or something as a slight improvement
+
+                RegistryKey<World> waypointDimension = ((IWaypointDimension) selected).getDimension();
+                RegistryKey<World> currentPlayerDim = MinecraftClient.getInstance().world.getRegistryKey();
+                if (waypointDimension.getValue() != currentPlayerDim.getValue()) {
+                    crossDimTeleport = true;
+                    return "/execute in " + waypointDimension.getValue() + " run teleport @s " + selected.getX() + " {y} " + selected.getZ();
                 }
             } catch (final Throwable e) {
-                XaeroPlus.LOGGER.warn("Failed to get cross-dimension teleport command format for waypoint: {} in world: {}", selected.getName(), displayedWorld.getContainer().getKey());
+                XaeroPlus.LOGGER.warn("Failed to get cross-dimension teleport command format for waypoint: {} in world: {}", selected.getName(), displayedWorld.getContainer().getKey(), e);
             }
         }
         crossDimTeleport = false;
         return instance.getServerTeleportCommandFormat();
+    }
+
+    @Inject(method = "isTeleportationSafe", at = @At("HEAD"), cancellable = true)
+    public void isTeleportationSafeInject(final WaypointWorld displayedWorld, final CallbackInfoReturnable<Boolean> cir) {
+        if (XaeroPlusSettingRegistry.crossDimensionTeleportCommand.getValue()) {
+            // xD
+            cir.setReturnValue(true);
+        }
     }
 
     @Redirect(method = "teleportToWaypoint(Lxaero/common/minimap/waypoints/Waypoint;Lxaero/common/minimap/waypoints/WaypointWorld;Lnet/minecraft/client/gui/screen/Screen;Z)V",

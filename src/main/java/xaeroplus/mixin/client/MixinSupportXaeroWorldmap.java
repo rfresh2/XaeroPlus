@@ -410,7 +410,7 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                                 final int chunkPosX = chunk.getX() * 4 + t % 4;
                                 final int chunkPosZ = chunk.getZ() * 4 + t / 4;
                                 int color = oldChunks.getOldChunksColor();
-                                if (oldChunks.isOldChunk(chunkPosX, chunkPosZ, Shared.customDimensionId)) {
+                                if (oldChunks.isHighlighted(chunkPosX, chunkPosZ, Shared.customDimensionId)) {
                                     final float left = drawX + 16 * (t % 4);
                                     final float top = drawZ + 16 * (t / 4);
                                     helper.addColoredRectToExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBufferBuilder, left, top, 16, 16, color);

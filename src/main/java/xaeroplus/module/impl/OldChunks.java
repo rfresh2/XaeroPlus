@@ -217,11 +217,19 @@ public class OldChunks extends Module {
             return oldChunksCache.getHighlightsInRegion(leafRegionX, leafRegionZ, level, dimension);
     }
 
-    public boolean isOldChunk(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> dimensionId) {
+    public boolean isHighlighted(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> dimensionId) {
         if (inverse)
-            return modernChunksCache.isHighlighted(chunkPosX, chunkPosZ, dimensionId);
+            return isOldChunkInverse(chunkPosX, chunkPosZ, dimensionId);
         else
-            return oldChunksCache.isHighlighted(chunkPosX, chunkPosZ, dimensionId);
+            return isOldChunk(chunkPosX, chunkPosZ, dimensionId);
+    }
+
+    public boolean isOldChunk(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> dimensionId) {
+        return oldChunksCache.isHighlighted(chunkPosX, chunkPosZ, dimensionId);
+    }
+
+    public boolean isOldChunkInverse(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> dimensionId) {
+        return modernChunksCache.isHighlighted(chunkPosX, chunkPosZ, dimensionId);
     }
 
     public void setInverse(final Boolean b) {

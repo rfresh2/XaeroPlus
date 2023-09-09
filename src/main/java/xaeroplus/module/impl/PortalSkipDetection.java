@@ -45,6 +45,9 @@ public class PortalSkipDetection extends Module {
     private boolean worldCacheInitialized = false;
     private int searchDelayTicks = 0;
     private int tickCounter = 10000;
+    private int portalRadius = 15;
+    private boolean oldChunksInverse = false;
+    private boolean newChunks = false;
 
     @Subscribe
     public void onClientTickEvent(final ClientTickEvent.Post event) {
@@ -124,7 +127,7 @@ public class PortalSkipDetection extends Module {
                         for (int chunkZ = 0; chunkZ < 32; chunkZ++) {
                             final int chunkPosX = baseChunkCoordX + chunkX;
                             final int chunkPosZ = baseChunkCoordZ + chunkZ;
-                            if (isChunkSeen(chunkPosX, chunkPosZ, currentlyViewedDimension) && !isNewChunk(chunkPosX, chunkPosZ, currentlyViewedDimension)) {
+                            if (isChunkSeen(chunkPosX, chunkPosZ, currentlyViewedDimension) && !isNewishChunk(chunkPosX, chunkPosZ, currentlyViewedDimension)) {
                                 portalDetectionSearchChunks.add(ChunkUtils.chunkPosToLong(chunkPosX, chunkPosZ));
                             }
                         }
@@ -135,8 +138,8 @@ public class PortalSkipDetection extends Module {
             for (final long chunkPos : portalDetectionSearchChunks) {
                 boolean allSeen = true;
                 final LongOpenHashSet portalChunkTempSet = new LongOpenHashSet();
-                for (int xOffset = 0; xOffset < 15; xOffset++) {
-                    for (int zOffset = 0; zOffset < 15; zOffset++) {
+                for (int xOffset = 0; xOffset < portalRadius; xOffset++) {
+                    for (int zOffset = 0; zOffset < portalRadius; zOffset++) {
                         final long currentChunkPos = ChunkUtils.chunkPosToLong(ChunkUtils.longToChunkX(chunkPos) + xOffset, ChunkUtils.longToChunkZ(chunkPos) + zOffset);
                         portalChunkTempSet.add(currentChunkPos);
                         if (!portalDetectionSearchChunks.contains(currentChunkPos)) {
@@ -157,8 +160,24 @@ public class PortalSkipDetection extends Module {
         }
     }
 
+    private boolean isNewishChunk(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> currentlyViewedDimension) {
+        if (newChunks && oldChunksInverse) {
+            return isNewChunk(chunkPosX, chunkPosZ, currentlyViewedDimension) || isOldChunksInverse(chunkPosX, chunkPosZ, currentlyViewedDimension);
+        } else if (newChunks) {
+            return isNewChunk(chunkPosX, chunkPosZ, currentlyViewedDimension);
+        } else if (oldChunksInverse) {
+            return isOldChunksInverse(chunkPosX, chunkPosZ, currentlyViewedDimension);
+        } else {
+            return false;
+        }
+    }
+
     private boolean isNewChunk(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> currentlyViewedDimension) {
         return ModuleManager.getModule(NewChunks.class).isNewChunk(chunkPosX, chunkPosZ, currentlyViewedDimension);
+    }
+
+    private boolean isOldChunksInverse(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> currentlyViewedDimension) {
+        return ModuleManager.getModule(OldChunks.class).isOldChunkInverse(chunkPosX, chunkPosZ, currentlyViewedDimension);
     }
 
     private boolean isChunkSeen(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> currentlyViewedDimension) {
@@ -208,5 +227,17 @@ public class PortalSkipDetection extends Module {
 
     public void setSearchDelayTicks(final float delay) {
         searchDelayTicks = (int) delay;
+    }
+
+    public void setOldChunksInverse(final Boolean b) {
+        this.oldChunksInverse = b;
+    }
+
+    public void setNewChunks(final Boolean b) {
+        this.newChunks = b;
+    }
+
+    public void setPortalRadius(final Float b) {
+        this.portalRadius = b.intValue();
     }
 }

@@ -217,6 +217,14 @@ public final class XaeroPlusSettingRegistry {
             ColorHelper.HighlightColor.values(),
             ColorHelper.HighlightColor.WHITE,
             SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusFloatSetting portalSkipPortalRadius = XaeroPlusFloatSetting.create(
+            "PortalSkip Portal Radius",
+            "setting.world_map.portal_skip_portal_radius",
+            0, 32, 1,
+            "setting.world_map.portal_skip_portal_radius.tooltip",
+            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setPortalRadius(b),
+            15,
+            SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting portalSkipDetectionSearchDelayTicksSetting = XaeroPlusFloatSetting.create(
             "PortalSkip Search Delay",
             "setting.world_map.portal_skip_search_delay",
@@ -224,6 +232,20 @@ public final class XaeroPlusSettingRegistry {
             "setting.world_map.portal_skip_search_delay.tooltip",
             (b) -> ModuleManager.getModule(PortalSkipDetection.class).setSearchDelayTicks(b),
             10,
+            SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting portalSkipNewChunksSetting = XaeroPlusBooleanSetting.create(
+            "PortalSkip NewChunks",
+            "setting.world_map.portal_skip_new_chunks",
+            "setting.world_map.portal_skip_new_chunks.tooltip",
+            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setNewChunks(b),
+            false,
+            SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting portalSkipOldChunkInverseSetting = XaeroPlusBooleanSetting.create(
+            "PortalSkip OldChunks Inverse",
+            "setting.world_map.portal_skip_old_chunks_inverse",
+            "setting.world_map.portal_skip_old_chunks_inverse.tooltip",
+            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setOldChunksInverse(b),
+            false,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting owAutoWaypointDimension = XaeroPlusBooleanSetting.create(
             "Prefer Overworld Waypoints",

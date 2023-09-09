@@ -101,6 +101,7 @@
   "gui.world_map.toggle_follow_mode": "Переключить Режим Следования",
   "gui.xaeroplus.on": "Вкл",
   "gui.xaeroplus.off": "Выкл",
+  "gui.xaeroplus.world_map_settings": "Настройки карты мира XaeroPlus",
   "gui.world_map.go_to_coordinates": "Идти на координаты",
   "gui.world_map.baritone_goal_here": "Baritone Цель тут",
   "gui.world_map.baritone_path_here": "Baritone Путь тут",

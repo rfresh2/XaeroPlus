@@ -107,6 +107,7 @@
   "gui.world_map.toggle_follow_mode": "Basculer le mode suivi",
   "gui.xaeroplus.on": "On",
   "gui.xaeroplus.off": "Off",
+  "gui.xaeroplus.world_map_settings": "Paramètres de WorldMap XaeroPlus",
   "gui.world_map.go_to_coordinates": "Aller aux coordonnées",
   "gui.world_map.baritone_goal_here": "Baryton Ciblez ici",
   "gui.world_map.baritone_path_here": "Chemin du baryton ici",

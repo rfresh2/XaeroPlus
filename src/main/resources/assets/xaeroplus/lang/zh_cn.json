@@ -107,6 +107,7 @@
   "gui.world_map.toggle_follow_mode": "切换跟随模式",
   "gui.xaeroplus.on": "开启",
   "gui.xaeroplus.off": "关闭",
+  "gui.xaeroplus.world_map_settings": "XaeroPlus 世界地图设置",
   "gui.world_map.go_to_coordinates": "转到坐标",
   "gui.world_map.baritone_goal_here": "设置 Baritone 目标点",
   "gui.world_map.baritone_path_here": "通过 Baritone 寻路至此处",

@@ -1184,7 +1184,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                         GuiHelper.fillIntoExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBuffer, left, top, right, bottom, r, g, b, a);
                                     }
                                 }
-                                if (XaeroPlusSettingRegistry.portalSkipDetectionEnabledSetting.getValue() && !mc.options.hudHidden && XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
+                                if (XaeroPlusSettingRegistry.portalSkipDetectionEnabledSetting.getValue() && !mc.options.hudHidden) {
                                     final PortalSkipDetection portalSkipDetection = ModuleManager.getModule(
                                             PortalSkipDetection.class);
                                     int color = portalSkipDetection.getPortalSkipChunksColor();

@@ -430,7 +430,7 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                                 }
                             }
                         }
-                        if (XaeroPlusSettingRegistry.portalSkipDetectionEnabledSetting.getValue() && XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
+                        if (XaeroPlusSettingRegistry.portalSkipDetectionEnabledSetting.getValue()) {
                             PortalSkipDetection portalSkipDetection = ModuleManager.getModule(PortalSkipDetection.class);
                             for (int t = 0; t < 16; ++t) {
                                 final int chunkPosX = chunk.getX() * 4 + t % 4;

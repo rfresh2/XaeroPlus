@@ -48,6 +48,8 @@ public class PortalSkipDetection extends Module {
     private int portalRadius = 15;
     private boolean oldChunksInverse = false;
     private boolean newChunks = false;
+    private OldChunks oldChunksModule;
+    private NewChunks newChunksModule;
 
     @Subscribe
     public void onClientTickEvent(final ClientTickEvent.Post event) {
@@ -80,6 +82,8 @@ public class PortalSkipDetection extends Module {
     public void onEnable() {
         reset();
         initializeWorld();
+        this.newChunksModule = ModuleManager.getModule(NewChunks.class);
+        this.oldChunksModule = ModuleManager.getModule(OldChunks.class);
     }
 
     @Override
@@ -173,11 +177,17 @@ public class PortalSkipDetection extends Module {
     }
 
     private boolean isNewChunk(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> currentlyViewedDimension) {
-        return ModuleManager.getModule(NewChunks.class).isNewChunk(chunkPosX, chunkPosZ, currentlyViewedDimension);
+        if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue() && newChunksModule != null)
+            return newChunksModule.isNewChunk(chunkPosX, chunkPosZ, currentlyViewedDimension);
+        else
+            return false;
     }
 
     private boolean isOldChunksInverse(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> currentlyViewedDimension) {
-        return ModuleManager.getModule(OldChunks.class).isOldChunkInverse(chunkPosX, chunkPosZ, currentlyViewedDimension);
+        if (XaeroPlusSettingRegistry.oldChunksEnabledSetting.getValue() && oldChunksModule != null)
+            return oldChunksModule.isOldChunkInverse(chunkPosX, chunkPosZ, currentlyViewedDimension);
+        else
+            return false;
     }
 
     private boolean isChunkSeen(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> currentlyViewedDimension) {

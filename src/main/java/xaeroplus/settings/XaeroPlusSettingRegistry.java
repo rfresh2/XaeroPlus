@@ -238,14 +238,14 @@ public final class XaeroPlusSettingRegistry {
             "setting.world_map.portal_skip_new_chunks",
             "setting.world_map.portal_skip_new_chunks.tooltip",
             (b) -> ModuleManager.getModule(PortalSkipDetection.class).setNewChunks(b),
-            false,
+            true,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting portalSkipOldChunkInverseSetting = XaeroPlusBooleanSetting.create(
             "PortalSkip OldChunks Inverse",
             "setting.world_map.portal_skip_old_chunks_inverse",
             "setting.world_map.portal_skip_old_chunks_inverse.tooltip",
             (b) -> ModuleManager.getModule(PortalSkipDetection.class).setOldChunksInverse(b),
-            false,
+            true,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting owAutoWaypointDimension = XaeroPlusBooleanSetting.create(
             "Prefer Overworld Waypoints",

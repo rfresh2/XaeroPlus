@@ -59,9 +59,9 @@ dependencies {
 	modCompileOnly "maven.modrinth:balm:7.0.7+fabric-1.20"
 	modImplementation "maven.modrinth:fwaystones:3.1.3+mc1.20"
 	modRuntimeOnly "maven.modrinth:owo-lib:0.11.2+1.20"
-	runtimeOnly "blue.endless:jankson:1.2.2"
+	runtimeOnly "blue.endless:jankson:1.2.3"
 	modRuntimeOnly "maven.modrinth:auth-me:7.0.2+1.20"
-	modRuntimeOnly "maven.modrinth:cloth-config:11.1.106+fabric"
+	modRuntimeOnly "maven.modrinth:cloth-config:12.0.107+"
 }
 
 processResources {

@@ -21,7 +21,7 @@ import java.util.Arrays;
 @Mixin(value = GuiAddWaypoint.class, remap = true)
 public class MixinGuiAddWaypoint {
 
-    @Shadow private ArrayList<Waypoint> waypointsEdited;
+    @Shadow(remap = false) private ArrayList<Waypoint> waypointsEdited;
 
 
     @Inject(

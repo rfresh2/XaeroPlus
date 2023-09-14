@@ -31,20 +31,20 @@ side = "CLIENT"
 [[dependencies.xaeroplus]]
 modId = "xaerominimap"
 mandatory = false
-versionRange = "[23.7.0]"
+versionRange = "[23.8.0]"
 ordering = "BEFORE"
 side = "CLIENT"
 
 [[dependencies.xaeroplus]]
 modId = "xaerobetterpvp"
 mandatory = false
-versionRange = "[23.7.0]"
+versionRange = "[23.8.0]"
 ordering = "BEFORE"
 side = "CLIENT"
 
 [[dependencies.xaeroplus]]
 modId = "xaeroworldmap"
 mandatory = true
-versionRange = "[1.34.0]"
+versionRange = "[1.34.1]"
 ordering = "BEFORE"
 side = "CLIENT"

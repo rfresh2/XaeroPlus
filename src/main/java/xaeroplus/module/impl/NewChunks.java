@@ -104,12 +104,12 @@ public class NewChunks extends Module {
         } else if (event.packet() instanceof ChunkDataS2CPacket) {
             ChunkDataS2CPacket packet = (ChunkDataS2CPacket) event.packet();
 
-            ChunkPos pos = new ChunkPos(packet.getX(), packet.getZ());
+            ChunkPos pos = new ChunkPos(packet.getChunkX(), packet.getChunkZ());
 
-            if (!newChunksCache.isHighlighted(pos.x, pos.z, getActualDimension()) && mc.world.getChunkManager().getChunk(packet.getX(), packet.getZ()) == null) {
+            if (!newChunksCache.isHighlighted(pos.x, pos.z, getActualDimension()) && mc.world.getChunkManager().getChunk(packet.getChunkX(), packet.getChunkZ()) == null) {
                 WorldChunk chunk = new WorldChunk(mc.world, pos);
                 try {
-                    chunk.loadFromPacket(packet.getChunkData().getSectionsDataBuf(), new NbtCompound(), packet.getChunkData().getBlockEntities(packet.getX(), packet.getZ()));
+                    chunk.loadFromPacket(packet.getChunkData().getSectionsDataBuf(), new NbtCompound(), packet.getChunkData().getBlockEntities(packet.getChunkX(), packet.getChunkZ()));
                 } catch (Throwable e) {
                     return;
                 }

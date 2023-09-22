@@ -1,17 +1,17 @@
-name: Fabric 1.20.1 Build And Release
+name: Fabric 1.20.2 Build And Release
 
 on:
   push:
     branches:
-      - "fabric-1.20.1"
+      - "fabric-1.20.2"
 env:
   WORLDMAP_VERSION: "1.34.1"
   MINIMAP_VERSION: "23.8.2"
-  MINECRAFT_VERSION: "1.20.1"
-  MINECRAFT_VERSION_SHORT: "1.20"
+  MINECRAFT_VERSION: "1.20.2"
+  MINECRAFT_VERSION_SHORT: "1.20.2"
   MOD_LOADER: "Fabric"
-  FABRIC_API_VERSION: "0.89.0+1.20.1"
-  FABRIC_API_MODRINTH_VERSION_ID: "1sf8i9fy"
+  FABRIC_API_VERSION: "0.89.1+1.20.2"
+  FABRIC_API_MODRINTH_VERSION_ID: "lRcC0FRh"
 
 jobs:
   build:

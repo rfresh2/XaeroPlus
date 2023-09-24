@@ -1,9 +1,11 @@
 package xaeroplus.module.impl;
 
 import com.collarmc.pounce.Subscribe;
+import com.google.common.collect.ImmutableSet;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
@@ -23,10 +25,13 @@ import xaeroplus.util.highlights.ChunkHighlightLocalCache;
 import xaeroplus.util.highlights.ChunkHighlightSavingCache;
 import xaeroplus.util.highlights.HighlightAtChunkPos;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static java.util.Arrays.asList;
 import static net.minecraft.world.World.*;
 import static xaeroplus.util.ColorHelper.getColor;
 
@@ -40,6 +45,34 @@ public class OldChunks extends Module {
     private final MinecraftClient mc = MinecraftClient.getInstance();
     private final ExecutorService searchExecutor = Executors.newSingleThreadExecutor();
     private boolean inverse = false;
+    private static final HashSet<Block> OVERWORLD_BLOCKS = new HashSet<>();
+    private static final Set<Block> NETHER_BLOCKS = new HashSet<>();
+    static {
+        OVERWORLD_BLOCKS.addAll(asList(Blocks.COPPER_ORE,
+                                       Blocks.DEEPSLATE_COPPER_ORE,
+                                       Blocks.AMETHYST_BLOCK,
+                                       Blocks.SMOOTH_BASALT,
+                                       Blocks.TUFF,
+                                       Blocks.KELP,
+                                       Blocks.KELP_PLANT,
+                                       Blocks.POINTED_DRIPSTONE,
+                                       Blocks.DRIPSTONE_BLOCK,
+                                       Blocks.DEEPSLATE,
+                                       Blocks.AZALEA,
+                                       Blocks.BIG_DRIPLEAF,
+                                       Blocks.BIG_DRIPLEAF_STEM,
+                                       Blocks.SMALL_DRIPLEAF,
+                                       Blocks.MOSS_BLOCK,
+                                       Blocks.CAVE_VINES,
+                                       Blocks.CAVE_VINES_PLANT));
+        NETHER_BLOCKS.addAll(asList(Blocks.ANCIENT_DEBRIS,
+                                    Blocks.BLACKSTONE,
+                                    Blocks.BASALT,
+                                    Blocks.CRIMSON_NYLIUM,
+                                    Blocks.WARPED_NYLIUM,
+                                    Blocks.NETHER_GOLD_ORE,
+                                    Blocks.CHAIN));
+    }
 
     public void setOldChunksCache(boolean disk) {
         try {
@@ -105,35 +138,11 @@ public class OldChunks extends Module {
                     pos.setPos(x, y, z);
                     BlockState blockState = chunk.getBlockState(pos);
                     if (actualDimension == OVERWORLD) {
-                        if (blockState.getBlock() == Blocks.COPPER_ORE
-                            || blockState.getBlock() == Blocks.DEEPSLATE_COPPER_ORE
-                            || blockState.getBlock() == Blocks.AMETHYST_BLOCK
-                            || blockState.getBlock() == Blocks.SMOOTH_BASALT
-                            || blockState.getBlock() == Blocks.TUFF
-                            || blockState.getBlock() == Blocks.KELP
-                            || blockState.getBlock() == Blocks.KELP_PLANT
-                            || blockState.getBlock() == Blocks.POINTED_DRIPSTONE
-                            || blockState.getBlock() == Blocks.DRIPSTONE_BLOCK
-                            || blockState.getBlock() == Blocks.DEEPSLATE
-                            || blockState.getBlock() == Blocks.AZALEA
-                            || blockState.getBlock() == Blocks.BIG_DRIPLEAF
-                            || blockState.getBlock() == Blocks.BIG_DRIPLEAF_STEM
-                            || blockState.getBlock() == Blocks.SMALL_DRIPLEAF
-                            || blockState.getBlock() == Blocks.MOSS_BLOCK
-                            || blockState.getBlock() == Blocks.CAVE_VINES
-                            || blockState.getBlock() == Blocks.CAVE_VINES_PLANT
-                        ) {
+                        if (OVERWORLD_BLOCKS.contains(blockState.getBlock())) {
                             return modernChunksCache.addHighlight(chunk.getPos().x, chunk.getPos().z);
                         }
                     } else if (actualDimension == NETHER) {
-                        if (blockState.getBlock() == Blocks.ANCIENT_DEBRIS
-                            || blockState.getBlock() == Blocks.BLACKSTONE
-                            || blockState.getBlock() == Blocks.BASALT
-                            || blockState.getBlock() == Blocks.CRIMSON_NYLIUM
-                            || blockState.getBlock() == Blocks.WARPED_NYLIUM
-                            || blockState.getBlock() == Blocks.NETHER_GOLD_ORE
-                            || blockState.getBlock() == Blocks.CHAIN
-                        ) {
+                        if (NETHER_BLOCKS.contains(blockState.getBlock())) {
                             return modernChunksCache.addHighlight(chunk.getPos().x, chunk.getPos().z);
                         }
                     }

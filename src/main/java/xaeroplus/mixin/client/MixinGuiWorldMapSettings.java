@@ -23,7 +23,7 @@ public abstract class MixinGuiWorldMapSettings extends GuiSettings {
         final int newLen = 1;
         final int totalNewLen = oldLen + 1;
         final ISettingEntry[] newEntries = new ISettingEntry[totalNewLen];
-        newEntries[0] = GuiXaeroPlusWorldMapSettings.getScreenSwitchSettingEntry(this);
+        newEntries[0] = GuiXaeroPlusWorldMapSettings.getScreenSwitchSettingEntry(parent);
         System.arraycopy(this.entries, 0, newEntries, newLen, oldLen);
         this.entries = newEntries;
     }

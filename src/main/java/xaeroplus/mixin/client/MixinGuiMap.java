@@ -1146,12 +1146,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                     float r = (float)(color >> 16 & 255) / 255.0F;
                                     float g = (float)(color >> 8 & 255) / 255.0F;
                                     float b = (float)(color & 255) / 255.0F;
-                                    for (final HighlightAtChunkPos c : newChunks.getNewChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions, Shared.customDimensionId)) {
-                                        final float left = (float) ((c.x << 4) - flooredCameraX);
-                                        final float top = (float) ((c.z << 4) - flooredCameraZ);
-                                        final float right = left + 16;
-                                        final float bottom = top + 16;
-                                        GuiHelper.fillIntoExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBuffer, left, top, right, bottom, r, g, b, a);
+                                    if (a != 0.0f) {
+                                        for (final HighlightAtChunkPos c : newChunks.getNewChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions, Shared.customDimensionId)) {
+                                            final float left = (float) ((c.x << 4) - flooredCameraX);
+                                            final float top = (float) ((c.z << 4) - flooredCameraZ);
+                                            final float right = left + 16;
+                                            final float bottom = top + 16;
+                                            GuiHelper.fillIntoExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBuffer, left, top, right, bottom, r, g, b, a);
+                                        }
                                     }
                                 }
                                 if (XaeroPlusSettingRegistry.oldChunksEnabledSetting.getValue() && !mc.options.hudHidden) {
@@ -1161,12 +1163,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                     float r = (float)(color >> 16 & 255) / 255.0F;
                                     float g = (float)(color >> 8 & 255) / 255.0F;
                                     float b = (float)(color & 255) / 255.0F;
-                                    for (final HighlightAtChunkPos c : oldChunks.getOldChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions, Shared.customDimensionId)) {
-                                        final float left = (float) ((c.x << 4) - flooredCameraX);
-                                        final float top = (float) ((c.z << 4) - flooredCameraZ);
-                                        final float right = left + 16;
-                                        final float bottom = top + 16;
-                                        GuiHelper.fillIntoExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBuffer, left, top, right, bottom, r, g, b, a);
+                                    if (a != 0.0f) {
+                                        for (final HighlightAtChunkPos c : oldChunks.getOldChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions, Shared.customDimensionId)) {
+                                            final float left = (float) ((c.x << 4) - flooredCameraX);
+                                            final float top = (float) ((c.z << 4) - flooredCameraZ);
+                                            final float right = left + 16;
+                                            final float bottom = top + 16;
+                                            GuiHelper.fillIntoExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBuffer, left, top, right, bottom, r, g, b, a);
+                                        }
                                     }
                                 }
                                 if (XaeroPlusSettingRegistry.portalsEnabledSetting.getValue() && !mc.options.hudHidden) {
@@ -1176,12 +1180,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                     float r = (float)(color >> 16 & 255) / 255.0F;
                                     float g = (float)(color >> 8 & 255) / 255.0F;
                                     float b = (float)(color & 255) / 255.0F;
-                                    for (final HighlightAtChunkPos c : portals.getPortalsInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions, Shared.customDimensionId)) {
-                                        final float left = (float) ((c.x << 4) - flooredCameraX);
-                                        final float top = (float) ((c.z << 4) - flooredCameraZ);
-                                        final float right = left + 16;
-                                        final float bottom = top + 16;
-                                        GuiHelper.fillIntoExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBuffer, left, top, right, bottom, r, g, b, a);
+                                    if (a != 0.0f) {
+                                        for (final HighlightAtChunkPos c : portals.getPortalsInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions, Shared.customDimensionId)) {
+                                            final float left = (float) ((c.x << 4) - flooredCameraX);
+                                            final float top = (float) ((c.z << 4) - flooredCameraZ);
+                                            final float right = left + 16;
+                                            final float bottom = top + 16;
+                                            GuiHelper.fillIntoExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBuffer, left, top, right, bottom, r, g, b, a);
+                                        }
                                     }
                                 }
                                 if (XaeroPlusSettingRegistry.portalSkipDetectionEnabledSetting.getValue() && !mc.options.hudHidden) {
@@ -1192,12 +1198,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                     float r = (float)(color >> 16 & 255) / 255.0F;
                                     float g = (float)(color >> 8 & 255) / 255.0F;
                                     float b = (float)(color & 255) / 255.0F;
-                                    for (final HighlightAtChunkPos c : portalSkipDetection.getPortalSkipChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions)) {
-                                        final float left = (float) ((c.x << 4) - flooredCameraX);
-                                        final float top = (float) ((c.z << 4) - flooredCameraZ);
-                                        final float right = left + 16;
-                                        final float bottom = top + 16;
-                                        GuiHelper.fillIntoExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBuffer, left, top, right, bottom, r, g, b, a);
+                                    if (a != 0.0f) {
+                                        for (final HighlightAtChunkPos c : portalSkipDetection.getPortalSkipChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions)) {
+                                            final float left = (float) ((c.x << 4) - flooredCameraX);
+                                            final float top = (float) ((c.z << 4) - flooredCameraZ);
+                                            final float right = left + 16;
+                                            final float bottom = top + 16;
+                                            GuiHelper.fillIntoExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBuffer, left, top, right, bottom, r, g, b, a);
+                                        }
                                     }
                                 }
                             }

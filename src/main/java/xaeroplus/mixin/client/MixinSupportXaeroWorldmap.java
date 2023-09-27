@@ -397,10 +397,13 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                                 final int chunkPosX = chunk.getX() * 4 + t % 4;
                                 final int chunkPosZ = chunk.getZ() * 4 + t / 4;
                                 int color = newChunks.getNewChunksColor();
-                                if (newChunks.isNewChunk(chunkPosX, chunkPosZ, Shared.customDimensionId)) {
-                                    final float left = drawX + 16 * (t % 4);
-                                    final float top = drawZ + 16 * (t / 4);
-                                    helper.addColoredRectToExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBufferBuilder, left, top, 16, 16, color);
+                                float a = ((color >> 24) & 255) / 255.0f;
+                                if (a != 0.0f) {
+                                    if (newChunks.isNewChunk(chunkPosX, chunkPosZ, Shared.customDimensionId)) {
+                                        final float left = drawX + 16 * (t % 4);
+                                        final float top = drawZ + 16 * (t / 4);
+                                        helper.addColoredRectToExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBufferBuilder, left, top, 16, 16, color);
+                                    }
                                 }
                             }
                         }
@@ -410,10 +413,13 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                                 final int chunkPosX = chunk.getX() * 4 + t % 4;
                                 final int chunkPosZ = chunk.getZ() * 4 + t / 4;
                                 int color = oldChunks.getOldChunksColor();
-                                if (oldChunks.isHighlighted(chunkPosX, chunkPosZ, Shared.customDimensionId)) {
-                                    final float left = drawX + 16 * (t % 4);
-                                    final float top = drawZ + 16 * (t / 4);
-                                    helper.addColoredRectToExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBufferBuilder, left, top, 16, 16, color);
+                                float a = ((color >> 24) & 255) / 255.0f;
+                                if (a != 0.0f) {
+                                    if (oldChunks.isHighlighted(chunkPosX, chunkPosZ, Shared.customDimensionId)) {
+                                        final float left = drawX + 16 * (t % 4);
+                                        final float top = drawZ + 16 * (t / 4);
+                                        helper.addColoredRectToExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBufferBuilder, left, top, 16, 16, color);
+                                    }
                                 }
                             }
                         }
@@ -423,10 +429,13 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                                 final int chunkPosX = chunk.getX() * 4 + t % 4;
                                 final int chunkPosZ = chunk.getZ() * 4 + t / 4;
                                 int color = portals.getPortalsColor();
-                                if (portals.isPortalChunk(chunkPosX, chunkPosZ, Shared.customDimensionId)) {
-                                    final float left = drawX + 16 * (t % 4);
-                                    final float top = drawZ + 16 * (t / 4);
-                                    helper.addColoredRectToExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBufferBuilder, left, top, 16, 16, color);
+                                float a = ((color >> 24) & 255) / 255.0f;
+                                if (a != 0.0f) {
+                                    if (portals.isPortalChunk(chunkPosX, chunkPosZ, Shared.customDimensionId)) {
+                                        final float left = drawX + 16 * (t % 4);
+                                        final float top = drawZ + 16 * (t / 4);
+                                        helper.addColoredRectToExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBufferBuilder, left, top, 16, 16, color);
+                                    }
                                 }
                             }
                         }
@@ -436,10 +445,13 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                                 final int chunkPosX = chunk.getX() * 4 + t % 4;
                                 final int chunkPosZ = chunk.getZ() * 4 + t / 4;
                                 int color = portalSkipDetection.getPortalSkipChunksColor();
-                                if (portalSkipDetection.isPortalSkipChunk(chunkPosX, chunkPosZ)) {
-                                    final float left = drawX + 16 * (t % 4);
-                                    final float top = drawZ + 16 * (t / 4);
-                                    helper.addColoredRectToExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBufferBuilder, left, top, 16, 16, color);
+                                float a = ((color >> 24) & 255) / 255.0f;
+                                if (a != 0.0f) {
+                                    if (portalSkipDetection.isPortalSkipChunk(chunkPosX, chunkPosZ)) {
+                                        final float left = drawX + 16 * (t % 4);
+                                        final float top = drawZ + 16 * (t / 4);
+                                        helper.addColoredRectToExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBufferBuilder, left, top, 16, 16, color);
+                                    }
                                 }
                             }
                         }

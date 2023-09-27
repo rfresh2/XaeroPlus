@@ -121,7 +121,7 @@ public final class XaeroPlusSettingRegistry {
     public static final XaeroPlusFloatSetting newChunksAlphaSetting = XaeroPlusFloatSetting.create(
             "New Chunks Opacity",
             "setting.world_map.new_chunks_opacity",
-            10f, 255f, 10f,
+            0f, 255f, 10f,
             "setting.world_map.new_chunks_opacity.tooltip",
             (b) -> ModuleManager.getModule(NewChunks.class).setAlpha(b),
             100,
@@ -158,7 +158,7 @@ public final class XaeroPlusSettingRegistry {
     public static final XaeroPlusFloatSetting oldChunksAlphaSetting = XaeroPlusFloatSetting.create(
             "Old Chunks Opacity",
             "setting.world_map.old_chunks_opacity",
-            10f, 255f, 10f,
+            0f, 255f, 10f,
             "setting.world_map.old_chunks_opacity.tooltip",
             (b) -> ModuleManager.getModule(OldChunks.class).setAlpha(b),
             100,
@@ -181,7 +181,7 @@ public final class XaeroPlusSettingRegistry {
     public static final XaeroPlusFloatSetting portalsAlphaSetting = XaeroPlusFloatSetting.create(
             "Portal Highlights Opacity",
             "setting.world_map.portals_opacity",
-            10f, 255f, 10f,
+            0f, 255f, 10f,
             "setting.world_map.portals_opacity.tooltip",
             (b) -> ModuleManager.getModule(Portals.class).setAlpha(b),
             100,
@@ -204,7 +204,7 @@ public final class XaeroPlusSettingRegistry {
     public static final XaeroPlusFloatSetting portalSkipDetectionAlphaSetting = XaeroPlusFloatSetting.create(
             "PortalSkip Opacity",
             "setting.world_map.portal_skip_opacity",
-            10f, 255f, 10f,
+            0f, 255f, 10f,
             "setting.world_map.portal_skip_opacity.tooltip",
             (b) -> ModuleManager.getModule(PortalSkipDetection.class).setAlpha(b),
             100,

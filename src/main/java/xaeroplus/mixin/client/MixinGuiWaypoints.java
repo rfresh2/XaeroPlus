@@ -53,18 +53,12 @@ public class MixinGuiWaypoints extends ScreenBase {
         super(modMain, parent, escape, titleIn);
     }
 
-    @Override
-    public void tick() {
-        super.tick();
-        this.searchField.tick();
-    }
-
     @Inject(method = "init", at = @At("TAIL"), remap = true)
     public void initGui(CallbackInfo ci) {
         this.searchField = new TextFieldWidget(this.textRenderer, this.width / 2 - 297, 32, 80, 20, Text.literal("Search"));
         this.searchField.setText("");
         this.searchField.setFocused(true);
-        this.searchField.setCursor(0);
+        this.searchField.setCursor(0, false);
         this.searchField.setSelectionStart(0);
         this.addSelectableChild(searchField);
         this.setFocused(this.searchField);
@@ -91,7 +85,7 @@ public class MixinGuiWaypoints extends ScreenBase {
         if (dropDownClosed) {
             if (this.searchField.mouseClicked(x, y, button)) {
                 this.searchField.setFocused(true);
-                this.searchField.setCursorToEnd();
+                this.searchField.setCursorToEnd(false);
                 this.searchField.setEditable(true);
 //                this.searchField.setSelectionEnd(0);
             } else {
@@ -119,7 +113,7 @@ public class MixinGuiWaypoints extends ScreenBase {
     public void drawScreenInject(final DrawContext guiGraphics, final int mouseX, final int mouseY, final float partial, final CallbackInfo ci) {
         if (!this.searchField.isFocused() && this.searchField.getText().isEmpty()) {
             xaero.map.misc.Misc.setFieldText(this.searchField, I18n.translate("gui.xaero_settings_search_placeholder", new Object[0]), -11184811);
-            this.searchField.setCursorToStart();
+            this.searchField.setCursorToStart(false);
         }
         this.searchField.render(guiGraphics, mouseX, mouseY, partial);
         if (!this.searchField.isFocused()) {

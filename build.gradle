@@ -40,13 +40,6 @@ configurations {
 	shadow.extendsFrom jarLibs
 }
 
-afterEvaluate {
-	loom.runs.configureEach {
-		// https://fabricmc.net/wiki/tutorial:mixin_hotswaps
-		vmArg "-javaagent:${ configurations.compileClasspath.find { it.name.contains("sponge-mixin") } }"
-	}
-}
-
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
@@ -56,9 +49,9 @@ dependencies {
 	forgeRuntimeLibrary(jarLibs "com.github.collarmc:pounce:0e8492b68e")
     forgeRuntimeLibrary(jarLibs 'org.xerial:sqlite-jdbc:3.43.0.0')
 
-	modImplementation "maven.modrinth:xaeros-world-map:1.34.1_Forge_1.20"
-	modImplementation "maven.modrinth:xaeros-minimap:23.8.2_Forge_1.20"
-	modImplementation files("libs/baritone-unoptimized-forge-1.10.1.jar")
+	modImplementation "maven.modrinth:xaeros-world-map:1.34.1_Forge_1.20.2"
+	modImplementation "maven.modrinth:xaeros-minimap:23.8.2_Forge_1.20.2"
+	modImplementation files("libs/baritone-unoptimized-forge-1.10.2.jar")
 	modCompileOnly "maven.modrinth:waystones:14.0.2+forge-1.20"
 	modCompileOnly "maven.modrinth:balm:7.1.4+forge-1.20.1"
 }

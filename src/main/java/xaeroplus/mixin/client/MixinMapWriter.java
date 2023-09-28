@@ -492,24 +492,24 @@ public abstract class MixinMapWriter {
      * @author rfresh2
      * @reason remove limiters on map write frequency
      */
-    @Overwrite
-    public void onRender(BiomeColorCalculator biomeColorCalculator, OverlayManager overlayManager) {
-        long before = System.nanoTime();
-
+    @Inject(method = "onRender", at = @At("HEAD"), cancellable = true)
+    public void onRender(BiomeColorCalculator biomeColorCalculator, OverlayManager overlayManager, CallbackInfo ci) {
+        if (!(XaeroPlusSettingRegistry.fastMapSetting.getValue() && this.mapProcessor.getCurrentCaveLayer() == Integer.MAX_VALUE)) return; // do default logic when fast mapping is off or we're mapping caves
+        else ci.cancel(); // overwrite
         try {
             if (WorldMap.crashHandler.getCrashedBy() == null) {
                 synchronized (this.mapProcessor.renderThreadPauseSync) {
                     if (!this.mapProcessor.isWritingPaused()
-                            && !this.mapProcessor.isWaitingForWorldUpdate()
-                            && this.mapProcessor.getMapSaveLoad().isRegionDetectionComplete()
-                            && this.mapProcessor.isCurrentMultiworldWritable()) {
+                        && !this.mapProcessor.isWaitingForWorldUpdate()
+                        && this.mapProcessor.getMapSaveLoad().isRegionDetectionComplete()
+                        && this.mapProcessor.isCurrentMultiworldWritable()) {
                         if (this.mapProcessor.getWorld() == null || this.mapProcessor.isCurrentMapLocked()) {
                             return;
                         }
 
                         if (this.mapProcessor.getCurrentWorldId() != null
-                                && !this.mapProcessor.ignoreWorld(this.mapProcessor.getWorld())
-                                && (WorldMap.settings.updateChunks || WorldMap.settings.loadChunks || !this.mapProcessor.getMapWorld().isMultiplayer())) {
+                            && !this.mapProcessor.ignoreWorld(this.mapProcessor.getWorld())
+                            && (WorldMap.settings.updateChunks || WorldMap.settings.loadChunks || !this.mapProcessor.getMapWorld().isMultiplayer())) {
                             double playerX;
                             double playerY;
                             double playerZ;
@@ -538,9 +538,9 @@ public abstract class MixinMapWriter {
                             long time = System.currentTimeMillis();
                             long passed = this.lastWrite == -1L ? 0L : time - this.lastWrite;
                             if (this.lastWriteTry == -1L
-                                    || this.writeFreeSizeTiles != sizeTiles
-                                    || this.writeFreeFullUpdateTargetTime != fullUpdateTargetTime
-                                    || this.workingFrameCount > 30) {
+                                || this.writeFreeSizeTiles != sizeTiles
+                                || this.writeFreeFullUpdateTargetTime != fullUpdateTargetTime
+                                || this.workingFrameCount > 30) {
                                 this.framesFreedTime = time;
                                 this.writeFreeSizeTiles = sizeTiles;
                                 this.writeFreeFullUpdateTargetTime = fullUpdateTargetTime;
@@ -554,9 +554,7 @@ public abstract class MixinMapWriter {
                             }
                             sinceLastWrite = Math.max(1L, sinceLastWrite);
 
-                            long tilesToUpdate = (XaeroPlusSettingRegistry.fastMapSetting.getValue() && this.mapProcessor.getCurrentCaveLayer() == Integer.MAX_VALUE)
-                                    ? (long) Math.min(sizeTiles, XaeroPlusSettingRegistry.fastMapMaxTilesPerCycle.getValue())
-                                    : Math.min(sinceLastWrite * (long) sizeTiles / (long) fullUpdateTargetTime, 100L); // default
+                            long tilesToUpdate = (long) Math.min(sizeTiles, XaeroPlusSettingRegistry.fastMapMaxTilesPerCycle.getValue());
 
                             if (this.lastWrite == -1L || tilesToUpdate != 0L) {
                                 this.lastWrite = time;
@@ -583,36 +581,30 @@ public abstract class MixinMapWriter {
 
                                     for (int i = 0; (long) i < tilesToUpdate; ++i) {
                                         if (this.writeMap(
-                                                world,
-                                                blockRegistry,
-                                                playerX,
-                                                playerY,
-                                                playerZ,
-                                                biomeRegistry,
-                                                biomeColorCalculator,
-                                                overlayManager,
-                                                loadChunks,
-                                                updateChunks,
-                                                ignoreHeightmaps,
-                                                flowers,
-                                                detailedDebug,
-                                                mutableBlockPos3,
-                                                blockTintProvider,
-                                                caveDepth
+                                            world,
+                                            blockRegistry,
+                                            playerX,
+                                            playerY,
+                                            playerZ,
+                                            biomeRegistry,
+                                            biomeColorCalculator,
+                                            overlayManager,
+                                            loadChunks,
+                                            updateChunks,
+                                            ignoreHeightmaps,
+                                            flowers,
+                                            detailedDebug,
+                                            mutableBlockPos3,
+                                            blockTintProvider,
+                                            caveDepth
                                         )) {
                                             --i;
                                         }
-
-                                        /** removing time limit **/
-                                        if (!XaeroPlusSettingRegistry.fastMapSetting.getValue() && this.mapProcessor.getCurrentCaveLayer() == Integer.MAX_VALUE) {
-                                            if (System.nanoTime() - writeStartNano >= (long) timeLimit) {
-                                                break;
-                                            }
-                                        }
+                                        /** removed time limit per frame **/
                                     }
                                     ++this.workingFrameCount;
                                 }
-                             }
+                            }
 
                             this.lastWriteTry = time;
                             int startRegionX = this.startTileChunkX >> 3;
@@ -624,7 +616,7 @@ public abstract class MixinMapWriter {
                             if (nextToLoad != null) {
                                 synchronized (nextToLoad) {
                                     if (!nextToLoad.reloadHasBeenRequested()
-                                            && !nextToLoad.hasRemovableSourceData()
+                                        && !nextToLoad.hasRemovableSourceData()
                                             && (!(nextToLoad instanceof MapRegion) || !((MapRegion) nextToLoad).isRefreshing())) {
                                         shouldRequestLoading = true;
                                     }
@@ -646,10 +638,10 @@ public abstract class MixinMapWriter {
                                     }
                                     synchronized (visitRegion) {
                                         if (visitRegion.isResting()
-                                                && shouldRequestLoading
-                                                && !visitRegion.reloadHasBeenRequested()
-                                                && !visitRegion.recacheHasBeenRequested()
-                                                && (visitRegion.getLoadState() == 0 || visitRegion.getLoadState() == 4)) {
+                                            && shouldRequestLoading
+                                            && !visitRegion.reloadHasBeenRequested()
+                                            && !visitRegion.recacheHasBeenRequested()
+                                            && (visitRegion.getLoadState() == 0 || visitRegion.getLoadState() == 4)) {
                                             visitRegion.calculateSortingChunkDistance();
                                             Misc.addToListOfSmallest(10, this.regionBuffer, visitRegion);
                                         }
@@ -665,12 +657,12 @@ public abstract class MixinMapWriter {
                                 if (region != nextToLoad || this.regionBuffer.size() <= 1) {
                                     synchronized (region) {
                                         if (!region.reloadHasBeenRequested()
-                                                && !region.recacheHasBeenRequested()
-                                                && (region.getLoadState() == 0 || region.getLoadState() == 4)) {
+                                            && !region.recacheHasBeenRequested()
+                                            && (region.getLoadState() == 0 || region.getLoadState() == 4)) {
                                             region.setBeingWritten(true);
                                             this.mapProcessor.getMapSaveLoad().requestLoad(region, "writing");
                                             if (counter == 0) {
-                                                this.mapProcessor.getMapSaveLoad().setNextToLoadByViewing((LeveledRegion<?>) region);
+                                                this.mapProcessor.getMapSaveLoad().setNextToLoadByViewing(region);
                                             }
 
                                             ++counter;
@@ -686,8 +678,8 @@ public abstract class MixinMapWriter {
                     return;
                 }
             }
-        } catch (Throwable var39) {
-            WorldMap.crashHandler.setCrashedBy(var39);
+        } catch (Throwable var50) {
+            WorldMap.crashHandler.setCrashedBy(var50);
         }
     }
 

@@ -7,6 +7,8 @@
   "setting.world_map.fast_mapping_rate_limit.tooltip": "必须启用快速绘制。\n 限制每刻内可写入的区块数量。",
   "setting.world_map.baritone_waypoint": "Baritone 目标路径点",
   "setting.world_map.baritone_waypoint.tooltip": "将 Baritone 的目标点同步为临时路径点。",
+  "setting.world_map.disable_waypoint_sharing": "禁用航点共享",
+  "setting.world_map.disable_waypoint_sharing.tooltip": "禁用与其他玩家共享航点。",
   "setting.world_map.persist_dimension_switch": "持久世界地图维度切换",
   "setting.world_map.persist_dimension_switch.tooltip": "如果启用，当世界地图 GUI 关闭时，维度将不会切换回当前维度。",
   "setting.world_map.transparent_obsidian_roof": "透明黑曜石平台",

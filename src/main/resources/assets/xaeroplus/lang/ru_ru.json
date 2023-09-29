@@ -7,6 +7,8 @@
   "setting.world_map.fast_mapping_rate_limit.tooltip": "Быстрое картографирование должно быть включено. \n Ограничивает количество фрагментов, которые могут быть записаны за один цикл. Более низкие значения улучшают FPS на больших расстояниях рендеринга.",
   "setting.world_map.baritone_waypoint": "Точка Цели Baritone",
   "setting.world_map.baritone_waypoint.tooltip": "Синхронизирует цели Baritone в качестве временных путевых точек.",
+  "setting.world_map.disable_waypoint_sharing": "Отключить обмен маршрутными точками",
+  "setting.world_map.disable_waypoint_sharing.tooltip": "Отключает обмен маршрутными точками с другими игроками.",
   "setting.world_map.persist_dimension_switch": "Принудительное переключение измерений Большой карты",
   "setting.world_map.persist_dimension_switch.tooltip": "Если включено, измерение не будет переключено обратно на текущее при закрытии графического интерфейса карты мира.",
   "setting.world_map.transparent_obsidian_roof": "Прозрачная обсидиановая крыша",

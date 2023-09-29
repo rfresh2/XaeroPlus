@@ -7,6 +7,8 @@
   "setting.world_map.fast_mapping_rate_limit.tooltip": "Fast Mapping must be enabled. \n Limits how many chunks can be written in a single cycle. Lower values improve FPS at high render distances.",
   "setting.world_map.baritone_waypoint": "Baritone Goal Waypoint",
   "setting.world_map.baritone_waypoint.tooltip": "Syncs Baritone goals as temporary waypoints.",
+  "setting.world_map.disable_waypoint_sharing": "Disable Waypoint Sharing",
+  "setting.world_map.disable_waypoint_sharing.tooltip": "Disables waypoint sharing with other players.",
   "setting.world_map.persist_dimension_switch": "Persist WM Dimension Switch",
   "setting.world_map.persist_dimension_switch.tooltip": "If enabled, the dimension will not be switched back to current when the WorldMap GUI is closed.",
   "setting.world_map.transparent_obsidian_roof": "Transparent Obsidian Roof",

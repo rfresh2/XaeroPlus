@@ -14,6 +14,7 @@ import xaero.map.gui.IRightClickableElement;
 import xaero.map.gui.dropdown.rightclick.RightClickOption;
 import xaero.map.mods.gui.Waypoint;
 import xaero.map.mods.gui.WaypointReader;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.BaritoneHelper;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.IWaypointDimension;
@@ -71,6 +72,10 @@ public class MixinWaypointReader {
                     }
                 ));
             }
+        }
+
+        if (XaeroPlusSettingRegistry.disableWaypointSharing.getValue()) {
+            cir.getReturnValue().removeIf(option -> ((AccessorRightClickOption) option).getName().equals("gui.xaero_right_click_waypoint_share"));
         }
     }
 }

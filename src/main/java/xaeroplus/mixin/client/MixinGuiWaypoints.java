@@ -1,20 +1,19 @@
 package xaeroplus.mixin.client;
 
 import com.google.common.base.Objects;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.entity.Entity;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.common.AXaeroMinimap;
@@ -26,6 +25,7 @@ import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.minimap.waypoints.WaypointsSort;
 import xaero.common.misc.KeySortableByOther;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.Shared;
 
 import java.util.ArrayList;
@@ -33,10 +33,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.util.Objects.isNull;
-
 @Mixin(value = GuiWaypoints.class, remap = false)
-public class MixinGuiWaypoints extends ScreenBase {
+public abstract class MixinGuiWaypoints extends ScreenBase {
 
     private final int TOGGLE_ALL_ID = 69;
     private final int SEARCH_ID = 70;
@@ -46,6 +44,8 @@ public class MixinGuiWaypoints extends ScreenBase {
     private ArrayList<Waypoint> waypointsSorted;
     @Shadow
     private WaypointsManager waypointsManager;
+    @Shadow
+    private ButtonWidget shareButton;
     private TextFieldWidget searchField;
     private MySmallButton toggleAllButton;
 
@@ -87,7 +87,6 @@ public class MixinGuiWaypoints extends ScreenBase {
                 this.searchField.setFocused(true);
                 this.searchField.setCursorToEnd(false);
                 this.searchField.setEditable(true);
-//                this.searchField.setSelectionEnd(0);
             } else {
                 this.searchField.setFocused(false);
             }
@@ -119,6 +118,17 @@ public class MixinGuiWaypoints extends ScreenBase {
         if (!this.searchField.isFocused()) {
             xaero.map.misc.Misc.setFieldText(this.searchField, Shared.waypointsSearchFilter);
         }
+    }
+
+    @Shadow
+    abstract boolean isOneSelected();
+
+    @Redirect(method = "updateButtons", at = @At(value = "INVOKE", target = "Lxaero/common/gui/GuiWaypoints;isOneSelected()Z"))
+    public boolean shareButtonRedirect(final GuiWaypoints instance) {
+        if (XaeroPlusSettingRegistry.disableWaypointSharing.getValue()) {
+            return false;
+        }
+        return isOneSelected();
     }
 
     private void updateSearch() {

@@ -50,6 +50,12 @@ public final class XaeroPlusSettingRegistry {
             },
             true,
             SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting disableWaypointSharing = XaeroPlusBooleanSetting.create(
+        "Disable Waypoint Sharing",
+        "setting.world_map.disable_waypoint_sharing",
+        "setting.world_map.disable_waypoint_sharing.tooltip",
+        false,
+        SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting waystonesWaypointSyncSetting = XaeroPlusBooleanSetting.create(
             "Waystones Sync",
             "setting.world_map.waystones_sync",

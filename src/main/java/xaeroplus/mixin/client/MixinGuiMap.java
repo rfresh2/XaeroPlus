@@ -2010,6 +2010,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 ));
             }
         }
+
+        if (XaeroPlusSettingRegistry.disableWaypointSharing.getValue()) {
+            cir.getReturnValue().removeIf(option -> ((AccessorRightClickOption) option).getName().equals("gui.xaero_right_click_map_share_location"));
+        }
     }
 
     @Unique

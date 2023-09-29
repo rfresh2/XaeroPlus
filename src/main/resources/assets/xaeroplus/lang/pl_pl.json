@@ -7,6 +7,8 @@
   "setting.world_map.fast_mapping_rate_limit.tooltip": "Szybkie Mapowanie musi być włączone. \n Ogranicza liczbę chunktów, które mogą być zapisane co jeden Tick.",
   "setting.world_map.baritone_waypoint": "Punkt nawigacyjny Celu Baritone",
   "setting.world_map.baritone_waypoint.tooltip": "Synchronizuje cele Baritone jako tymczasowe punkty orientacyjne.",
+  "setting.world_map.disable_waypoint_sharing": "Wyłącz udostępnianie punktów trasy",
+  "setting.world_map.disable_waypoint_sharing.tooltip": "Wyłącza udostępnianie punktów trasy innym graczom.",
   "setting.world_map.persist_dimension_switch": "Trwała Zmiana Wymiarów Mapy Świata",
   "setting.world_map.persist_dimension_switch.tooltip": "Jeśli aktywne, wymiar nie zostanie przywrócony do aktualnego jeśli GUI Mapy Świata jest zamknięte.",
   "setting.world_map.transparent_obsidian_roof": "Przezroczysty Obsydianowy Dach",

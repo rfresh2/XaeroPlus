@@ -56,6 +56,18 @@ public final class XaeroPlusSettingRegistry {
         "setting.world_map.disable_waypoint_sharing.tooltip",
         false,
         SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting disableReceivingWaypoints = XaeroPlusBooleanSetting.create(
+        "Disable Receiving Waypoints",
+        "setting.world_map.disable_receiving_waypoints",
+        "setting.world_map.disable_receiving_waypoints.tooltip",
+        false,
+        SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting waypointReceiveNoChatReportsFix = XaeroPlusBooleanSetting.create(
+        "Waypoint Receive No Chat Reports Fix",
+        "setting.world_map.waypoint_receive_no_chat_reports_fix",
+        "setting.world_map.waypoint_receive_no_chat_reports_fix.tooltip",
+        true,
+        SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting waystonesWaypointSyncSetting = XaeroPlusBooleanSetting.create(
             "Waystones Sync",
             "setting.world_map.waystones_sync",

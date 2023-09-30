@@ -11,6 +11,7 @@
     "MixinBranchLeveledRegion",
     "MixinCommonGuiSettings",
     "MixinControlsHandler",
+    "MixinForgeEventHandler",
     "MixinGuiAddWaypoint",
     "MixinGuiCaveModeOptions",
     "MixinGuiEntityRadarSettings",

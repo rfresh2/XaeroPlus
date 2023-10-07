@@ -13,14 +13,12 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.state.State;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
 import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.WorldChunk;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -33,7 +31,6 @@ import xaero.map.WorldMap;
 import xaero.map.biome.BiomeColorCalculator;
 import xaero.map.biome.BiomeGetter;
 import xaero.map.biome.BlockTintProvider;
-import xaero.map.cache.BlockStateShortShapeCache;
 import xaero.map.core.XaeroWorldMapCore;
 import xaero.map.misc.CachedFunction;
 import xaero.map.misc.Misc;
@@ -42,7 +39,6 @@ import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ChunkUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.Objects.nonNull;
@@ -62,17 +58,12 @@ public abstract class MixinMapWriter {
             .maximumSize(10000)
             .expireAfterWrite(5L, TimeUnit.SECONDS)
             .<Long, Long>build();
+    @Shadow
     public long writeFreeSinceLastWrite = -1L;
-    @Shadow
-    private int X;
-    @Shadow
-    private int Z;
     @Shadow
     private int playerChunkX;
     @Shadow
     private int playerChunkZ;
-    @Shadow
-    private int loadDistance;
     @Shadow
     private int startTileChunkX;
     @Shadow
@@ -82,21 +73,7 @@ public abstract class MixinMapWriter {
     @Shadow
     private int endTileChunkZ;
     @Shadow
-    private int insideX;
-    @Shadow
-    private int insideZ;
-    @Shadow
-    private long updateCounter;
-    @Shadow
-    private int caveStart;
-    @Shadow
     private int writingLayer = Integer.MAX_VALUE;
-    @Shadow
-    private int writtenCaveStart = Integer.MAX_VALUE;
-    @Shadow
-    private boolean clearCachedColours;
-    @Shadow
-    private MapBlock loadingObject;
     @Shadow
     private OverlayBuilder overlayBuilder;
     @Final
@@ -105,8 +82,6 @@ public abstract class MixinMapWriter {
     @Final
     @Shadow
     private BlockPos.Mutable mutableGlobalPos;
-    @Shadow
-    private Random usedRandom = Random.create(0L);
     @Shadow
     private long lastWrite = -1L;
     @Shadow
@@ -122,14 +97,7 @@ public abstract class MixinMapWriter {
     @Shadow
     private MapProcessor mapProcessor;
     @Shadow
-    private ArrayList<BlockState> buggedStates;
-    @Shadow
-    private BlockStateShortShapeCache blockStateShortShapeCache;
-    @Shadow
     private int topH;
-    @Final
-    @Shadow
-    private CachedFunction<State<?, ?>, Boolean> transparentCache;
     @Shadow
     private int firstTransparentStateY;
     @Final
@@ -141,16 +109,6 @@ public abstract class MixinMapWriter {
     private BiomeGetter biomeGetter;
     @Shadow
     private ArrayList<MapRegion> regionBuffer = new ArrayList<>();
-    @Shadow
-    private HashMap<String, Integer> textureColours;
-    @Shadow
-    private HashMap<BlockState, Integer> blockColours;
-    @Shadow
-    private long lastLayerSwitch;
-    @Shadow
-    private BlockState lastBlockStateForTextureColor = null;
-    @Shadow
-    private int lastBlockStateForTextureColorResult = -1;
 
     @Shadow
     public abstract boolean writeMap(

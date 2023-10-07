@@ -20,6 +20,7 @@ import xaeroplus.util.ColorHelper;
 import xaeroplus.util.highlights.ChunkHighlightSavingCache;
 import xaeroplus.util.highlights.HighlightAtChunkPos;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -165,10 +166,14 @@ public class Portals extends Module {
             final int leafRegionX, final int leafRegionZ,
             final int level,
             final int dimension) {
-        return portalsCache.getHighlightsInRegion(leafRegionX, leafRegionZ, level, dimension);
+        final ChunkHighlightSavingCache cache = this.portalsCache;
+        if (cache == null) return Collections.emptyList();
+        else return cache.getHighlightsInRegion(leafRegionX, leafRegionZ, level, dimension);
     }
 
     public boolean isPortalChunk(final int chunkPosX, final int chunkPosZ, final int dimensionId) {
-        return portalsCache.isHighlighted(chunkPosX, chunkPosZ, dimensionId);
+        final ChunkHighlightSavingCache cache = this.portalsCache;
+        if (cache == null) return false;
+        else return cache.isHighlighted(chunkPosX, chunkPosZ, dimensionId);
     }
 }

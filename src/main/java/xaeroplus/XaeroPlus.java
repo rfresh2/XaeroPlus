@@ -40,6 +40,7 @@ public class XaeroPlus {
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         EVENT_BUS.register(forgeEventHandler);
+        LOGGER.info("XaeroPlus initialized");
     }
 
     @Mod.EventHandler

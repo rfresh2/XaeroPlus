@@ -125,7 +125,7 @@ public final class XaeroPlusSettingRegistry {
             "setting.world_map.portals",
             "setting.world_map.portals.tooltip",
             (b) -> ModuleManager.getModule(Portals.class).setEnabled(b),
-            true,
+            false,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting portalsAlphaSetting = XaeroPlusFloatSetting.create(
             "Portal Highlights Opacity",

@@ -44,12 +44,12 @@ public abstract class Module {
     public void enable() {
         if (this.isEnabled()) return;
         this.enabled = true;
-        XaeroPlus.EVENT_BUS.register(this);
         try {
             onEnable();
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error enabling module: " + this.getClass().getSimpleName(), e);
         }
+        XaeroPlus.EVENT_BUS.register(this);
     }
 
     public void disable() {

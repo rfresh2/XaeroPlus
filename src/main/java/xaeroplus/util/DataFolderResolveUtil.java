@@ -19,7 +19,7 @@ public class DataFolderResolveUtil {
                 if (serverName.length() > 0) {
                     // use common directories based on server list name instead of IP
                     // good for proxies
-                    cir.setReturnValue("Multiplayer_" + serverName);
+                    cir.setReturnValue("Multiplayer_" + serverName.replace(":", "_" ));
                     cir.cancel();
                     return;
                 }

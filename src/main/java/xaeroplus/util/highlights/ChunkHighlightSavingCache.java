@@ -110,8 +110,9 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
             return overworldCache;
         } else if (mcDimension.equals(END)) {
             return endCache;
+        } else {
+            return null;
         }
-        throw new RuntimeException("Unknown dimension: " + getActualDimension());
     }
 
     public ChunkHighlightCacheDimensionHandler getCacheForDimension(final RegistryKey<World> dimension) {
@@ -121,8 +122,9 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
             return overworldCache;
         } else if (dimension.equals(END)) {
             return endCache;
+        } else {
+            return null;
         }
-        throw new RuntimeException("Unknown dimension: " + dimension);
     }
 
     private List<ChunkHighlightCacheDimensionHandler> getAllCaches() {
@@ -137,8 +139,9 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
             return Stream.of(netherCache, endCache).filter(Objects::nonNull).collect(Collectors.toList());
         } else if (dimension.equals(END)) {
             return Stream.of(netherCache, overworldCache).filter(Objects::nonNull).collect(Collectors.toList());
+        } else {
+            return Collections.emptyList();
         }
-        throw new RuntimeException("Unknown dimension: " + dimension);
     }
 
     private void initializeWorld() {

@@ -1,6 +1,7 @@
 package xaeroplus.module.impl;
 
 import com.collarmc.pounce.Subscribe;
+import com.google.common.hash.Hashing;
 import net.blay09.mods.balm.api.Balm;
 import net.blay09.mods.waystones.api.IWaystone;
 import net.blay09.mods.waystones.api.KnownWaystonesEvent;
@@ -155,7 +156,7 @@ public class WaystoneSync extends Module {
                 waystone.z(),
                 waystone.name() + " [Waystone]",
                 waystone.name().substring(0, 1).toUpperCase(Locale.ROOT),
-                Math.abs(waystone.name().hashCode()) % COLORS.length,
+                getWaystoneColor(waystone),
                 0,
                 true
             );
@@ -181,7 +182,7 @@ public class WaystoneSync extends Module {
                 waystone.name().isEmpty() ? "W" : waystone.name()
                     .substring(0, 1)
                     .toUpperCase(Locale.ROOT),
-                Math.abs(waystone.name().hashCode()) % COLORS.length,
+                getWaystoneColor(waystone),
                 0,
                 true
             );
@@ -200,6 +201,10 @@ public class WaystoneSync extends Module {
         double waypointsContainerDimDiv = waypointContainerDim == NETHER ? 8.0 : 1.0;
         double waystoneDimDiv = waystoneDim == NETHER ? 8.0 : 1.0;
         return waystoneDimDiv / waypointsContainerDimDiv;
+    }
+
+    private int getWaystoneColor(Waystone waystone) {
+        return Math.abs(Hashing. murmur3_128().hashUnencodedChars(waystone.name()).asInt()) % COLORS.length;
     }
 
     private record Waystone(String name, RegistryKey<World> dimension, int x, int y, int z) { }

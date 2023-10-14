@@ -15,6 +15,7 @@ import xaeroplus.XaeroPlus;
 import xaeroplus.event.ClientTickEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.module.Module;
+import xaeroplus.util.ColorHelper.WaystoneColor;
 import xaeroplus.util.IWaypointDimension;
 import xaeroplus.util.WaypointsHelper;
 import xaeroplus.util.WaystonesHelper;
@@ -31,6 +32,7 @@ public class WaystoneSync extends Module {
     private boolean subscribed = false;
     private boolean shouldSync = false;
     private List<IWaystone> toSyncWaystones = new ArrayList<>();
+    private WaystoneColor color = WaystoneColor.RANDOM;
 
     @Override
     public void onEnable() {
@@ -134,7 +136,9 @@ public class WaystoneSync extends Module {
                 waystone.y(),
                 waystone.z(),
                 waystone.name() + " [Waystone]",
-                waystone.name().substring(0, 1).toUpperCase(Locale.ROOT),
+                waystone.name().isEmpty()
+                    ? "W"
+                    : waystone.name().substring(0, 1).toUpperCase(Locale.ROOT),
                 getWaystoneColor(waystone),
                 0,
                 true
@@ -158,9 +162,9 @@ public class WaystoneSync extends Module {
                 waystone.y(),
                 z,
                 waystone.name() + " [Waystone]",
-                waystone.name().isEmpty() ? "W" : waystone.name()
-                    .substring(0, 1)
-                    .toUpperCase(Locale.ROOT),
+                waystone.name().isEmpty()
+                    ? "W"
+                    : waystone.name().substring(0, 1).toUpperCase(Locale.ROOT),
                 getWaystoneColor(waystone),
                 0,
                 true
@@ -183,7 +187,16 @@ public class WaystoneSync extends Module {
     }
 
     private int getWaystoneColor(Waystone waystone) {
-        return Math.abs(Hashing. murmur3_128().hashUnencodedChars(waystone.name()).asInt()) % COLORS.length;
+        if (color == WaystoneColor.RANDOM) {
+            return Math.abs(Hashing. murmur3_128().hashUnencodedChars(waystone.name()).asInt()) % COLORS.length;
+        } else {
+            return color.getColorIndex();
+        }
+    }
+
+    public void setColor(final WaystoneColor color) {
+        this.color = color;
+        // todo: reload all waypoints with new color
     }
 
     private record Waystone(String name, RegistryKey<World> dimension, int x, int y, int z) { }

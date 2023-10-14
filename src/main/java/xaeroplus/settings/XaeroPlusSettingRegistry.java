@@ -4,6 +4,7 @@ import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.*;
 import xaeroplus.util.BaritoneHelper;
 import xaeroplus.util.ColorHelper;
+import xaeroplus.util.ColorHelper.WaystoneColor;
 import xaeroplus.util.Shared;
 import xaeroplus.util.WaystonesHelper;
 
@@ -77,6 +78,14 @@ public final class XaeroPlusSettingRegistry {
                 if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setEnabled(b);
             },
             true,
+            SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusEnumSetting<WaystoneColor> waystoneColorSetting = XaeroPlusEnumSetting.create(
+            "Waystone Color",
+            "setting.world_map.waystone_color",
+            "setting.world_map.waystone_color.tooltip",
+            (b) -> ModuleManager.getModule(WaystoneSync.class).setColor(b),
+            ColorHelper.WaystoneColor.values(),
+            WaystoneColor.RANDOM,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting persistMapDimensionSwitchSetting = XaeroPlusBooleanSetting.create(
             "Persist WM Dim Switch",

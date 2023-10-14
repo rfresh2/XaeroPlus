@@ -49,4 +49,42 @@ public class ColorHelper {
             return translationKey;
         }
     }
+
+    public enum WaystoneColor implements TranslatableSettingEnum {
+
+        BLACK(0, "gui.xaero_black"),
+        DARK_BLUE(1, "gui.xaero_dark_blue"),
+        DARK_GREEN(2, "gui.xaero_dark_green"),
+        DARK_AQUA(3, "gui.xaero_dark_aqua"),
+        DARK_RED(4, "gui.xaero_dark_red"),
+        DARK_PURPLE(5, "gui.xaero_dark_purple"),
+        GOLD(6, "gui.xaero_gold"),
+        GRAY(7, "gui.xaero_gray"),
+        DARK_GRAY(8, "gui.xaero_dark_gray"),
+        BLUE(9, "gui.xaero_blue"),
+        GREEN(10, "gui.xaero_green"),
+        AQUA(11, "gui.xaero_aqua"),
+        RED(12, "gui.xaero_red"),
+        LIGHT_PURPLE(13, "gui.xaero_purple"),
+        YELLOW(14, "gui.xaero_yellow"),
+        WHITE(15, "gui.xaero_white"),
+        RANDOM(16, "gui.xaeroplus.random");
+
+        private final int colorIndex;
+        private final String translationKey;
+
+        WaystoneColor(final int colorIndex, final String translationKey) {
+            this.colorIndex = colorIndex;
+            this.translationKey = translationKey;
+        }
+
+        public int getColorIndex() {
+            return colorIndex;
+        }
+
+        @Override
+        public String getTranslationKey() {
+            return translationKey;
+        }
+    }
 }

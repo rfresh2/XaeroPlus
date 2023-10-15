@@ -124,7 +124,7 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
             BiomeGetter biomeGetter,
             int extraAttempts
     ) {
-        boolean multiplayer = region.isMultiplayer();
+        boolean multiplayer = region.isNormalMapData();
         int emptySize = multiplayer ? 0 : 8192;
         int minorSaveVersion = -1;
         int majorSaveVersion = 0;
@@ -410,9 +410,9 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                 }
 
                 return region.countChunks() > 0;
-            } else if (!region.isMultiplayer()) {
+            } else if (!region.isNormalMapData()) {
                 if (WorldMap.settings.debug) {
-                    WorldMap.LOGGER.info("Save not required for singleplayer: " + region + " " + region.getWorldId() + " " + region.getDimId());
+                    WorldMap.LOGGER.info("Save not required for world save map: " + region + " " + region.getWorldId() + " " + region.getDimId());
                 }
 
                 return region.countChunks() > 0;
@@ -584,12 +584,12 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
         if (worldId != null && !this.mapProcessor.isCurrentMapLocked()) {
             final String dimIdStr = this.mapProcessor.getDimensionName(dimId);
             String mwId = this.mapProcessor.getCurrentMWId();
-            boolean multiplayer = this.mapProcessor.isWorldMultiplayer(this.mapProcessor.isWorldRealms(worldId), worldId);
+            boolean usingNormalMapData = !mapDimension.isUsingWorldSave();
             Path mapFolder = this.getMWSubFolder(worldId, dimIdStr, mwId);
             boolean mapFolderExists = mapFolder.toFile().exists();
             String multiplayerMapRegex = "^(-?\\d+)_(-?\\d+)\\.(zip|xaero)$";
             MapLayer mainLayer = mapDimension.getLayeredMapRegions().getLayer(Integer.MAX_VALUE);
-            if (multiplayer) {
+            if (usingNormalMapData) {
                 if (mapFolderExists) {
                     this.detectRegionsFromFiles(mapDimension, worldId, dimIdStr, mwId, mapFolder, multiplayerMapRegex, 1, 2, 0, 20, mainLayer::addRegionDetection);
                 }
@@ -636,7 +636,7 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                                         try {
                                             int layerInt = Integer.parseInt(folderName);
                                             MapLayer layer = mapDimension.getLayeredMapRegions().getLayer(layerInt);
-                                            if (multiplayer) {
+                                            if (usingNormalMapData) {
                                                 this.detectRegionsFromFiles(
                                                         mapDimension,
                                                         worldId,

@@ -243,11 +243,10 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                     changedDimension
                             || !this.mapWorld.getFutureDimension().getFutureMultiworldUnsynced().equals(this.mapWorld.getFutureDimension().getCurrentMultiworld())
             )) {
-                String newMultiworldId = !this.mapWorldUsableRequest ? null : this.mapWorld.getFutureMultiworldUnsynced();
+                String newMwId = !this.mapWorldUsableRequest ? null : this.mapWorld.getFutureMultiworldUnsynced();
                 this.pushRenderPause(true, true);
                 this.pushWriterPause();
                 String newWorldId = !this.mapWorldUsableRequest ? null : this.mapWorld.getMainId();
-                String newMWId = !this.mapWorld.isMultiplayer() ? null : newMultiworldId;
                 boolean shouldClearAllDimensions = this.state == 1;
                 boolean shouldClearNewDimension = this.mapWorldUsableRequest
                         && !this.mapWorld.getFutureMultiworldUnsynced().equals(this.mapWorld.getFutureDimension().getCurrentMultiworld());
@@ -274,7 +273,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                             if (shouldFinishCurrentDim) {
                                 if (region.getLevel() == 0) {
                                     MapRegion leafRegion = (MapRegion)region;
-                                    if (!leafRegion.isMultiplayer() && !leafRegion.hasLookedForCache() && leafRegion.isOutdatedWithOtherLayers()) {
+                                    if (!leafRegion.isNormalMapData() && !leafRegion.hasLookedForCache() && leafRegion.isOutdatedWithOtherLayers()) {
                                         File potentialCacheFile = this.mapSaveLoad.getCacheFile(leafRegion, leafRegion.getCaveLayer(), false, false);
                                         if (potentialCacheFile.exists()) {
                                             leafRegion.setCacheFile(potentialCacheFile);
@@ -360,7 +359,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
 
                 this.currentWorldId = newWorldId;
                 this.currentDimId = !this.mapWorldUsableRequest ? null : ((MapProcessor) (Object) this).getDimensionName(this.mapWorld.getFutureDimensionId());
-                this.currentMWId = newMWId;
+                this.currentMWId = newMwId;
                 Path mapPath = this.mapSaveLoad.getMWSubFolder(this.currentWorldId, this.currentDimId, this.currentMWId);
                 if (this.mapWorldUsable) {
                     Files.createDirectories(mapPath);
@@ -433,7 +432,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                 XaeroPlus.EVENT_BUS.dispatch(new XaeroWorldChangeEvent(this.currentWorldId, this.currentDimId, this.currentMWId));
 
                 this.worldDataHandler.prepareSingleplayer(this.world, (MapProcessor) (Object) this);
-                if (this.worldDataHandler.getWorldDir() == null && this.currentWorldId != null && !this.mapWorld.isMultiplayer()) {
+                if (this.worldDataHandler.getWorldDir() == null && this.currentWorldId != null && this.mapWorld.getCurrentDimension().isUsingWorldSave()) {
                     this.currentWorldId = this.currentDimId = null;
                 }
 
@@ -531,7 +530,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                         regZ,
                         caveLayer,
                         this.getGlobalVersion(),
-                        this.mapWorld.isMultiplayer(),
+                        !mapDimension.isUsingWorldSave(),
                         this.worldBiomeRegistry
                 );
                 MapLayer mapLayer = regions.getLayer(caveLayer);
@@ -540,7 +539,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                 if (regionDetection != null) {
                     regionDetection.transferInfoTo(region);
                     mapLayer.removeRegionDetection(regX, regZ);
-                } else if (!region.isMultiplayer() && mapDimension.getWorldSaveRegionDetection(regX, regZ) == null) {
+                } else if (!region.isNormalMapData() && mapDimension.getWorldSaveRegionDetection(regX, regZ) == null) {
                     RegionDetection worldSaveRegionDetection = new RegionDetection(
                             region.getWorldId(),
                             region.getDimId(),

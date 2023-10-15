@@ -1,7 +1,5 @@
 package xaeroplus.mixin.client;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockGlass;
@@ -36,7 +34,6 @@ import xaero.map.region.*;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 @Mixin(value = MapWriter.class, remap = false)
 public abstract class MixinMapWriter {
@@ -110,19 +107,6 @@ public abstract class MixinMapWriter {
             BlockPos.MutableBlockPos mutableBlockPos3,
             int caveDepth
     );
-
-    // insert our own limiter on new tiles being written but this one's keyed on the actual chunk
-    // tile "writes" also include a lot of extra operations and lookups before any writing is actually done
-    // when we remove existing limiters those extra operations add up to a lot of unnecessary cpu time
-    private final Cache<Long, Long> tileUpdateCache = Caffeine.newBuilder()
-            // I would usually expect even second long expiration here to be fine
-            // but there are some operations that make repeat invocations actually required
-            // perhaps another time ill rewrite those. Or make the cache lock more aware of when we don't have any new updates to write/load
-            // there's still alot of performance and efficiency on the table to regain
-            // but i think this is a good middle ground for now
-            .maximumSize(10000)
-            .expireAfterWrite(5L, TimeUnit.SECONDS)
-            .<Long, Long>build();
 
     protected MixinMapWriter() {
     }

@@ -171,7 +171,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Shadow
     private long lastStartTime;
     @Shadow
-    private GuiMapSwitching dimensionSettings;
+    private GuiMapSwitching mapSwitchingGui;
     @Shadow
     private MapMouseButtonPress leftMouseButton;
     @Shadow
@@ -401,10 +401,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             long startTime = System.currentTimeMillis();
             MapDimension currentDim = !this.mapProcessor.isMapWorldUsable() ? null : this.mapProcessor.getMapWorld().getCurrentDimension();
             if (currentDim != this.dimension) {
-                this.dimensionSettings.active = false;
+                this.mapSwitchingGui.active = false;
                 this.setWorldAndResolution(mc, this.width, this.height);
             }
-            this.dimensionSettings.preMapRender((GuiMap)(Object) this, mc, this.width, this.height);
+            this.mapSwitchingGui.preMapRender((GuiMap)(Object) this, mc, this.width, this.height);
             long passed = this.lastStartTime == 0L ? 16L : startTime - this.lastStartTime;
             double passedScrolls = (double)((float)passed / 64.0F);
             int direction = this.buttonPressed != this.zoomInButton && !ControlsHandler.isDown(ControlsRegister.keyZoomIn)
@@ -634,10 +634,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                 }
                             }
 
-                            if (this.mapProcessor.getMapWorld().isMultiplayer()) {
-                                this.drawString(mc.fontRenderer, "MultiWorld ID: " + this.mapProcessor.getMapWorld().getCurrentMultiworld(), 5, 255, -1);
-                            }
-
+                            this.drawString(mc.fontRenderer, "MultiWorld ID: " + this.mapProcessor.getMapWorld().getCurrentMultiworld(), 5, 255, -1);
                             LayeredRegionManager regions = this.mapProcessor.getMapWorld().getDimension(Shared.customDimensionId).getLayeredMapRegions();
                             this.drawString(
                                     mc.fontRenderer,
@@ -1614,7 +1611,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     }
                 }
 
-                this.dimensionSettings.renderText(mc, scaledMouseX, scaledMouseY, this.width, this.height);
+                this.mapSwitchingGui.renderText(mc, scaledMouseX, scaledMouseY, this.width, this.height);
                 mc.getTextureManager().bindTexture(WorldMap.guiTextures);
                 if (!mc.gameSettings.hideGUI) {
                     this.drawTexturedModalRect(this.width - 34, 2, 0, 37, 32, 32);

@@ -83,12 +83,22 @@ public final class XaeroPlusSettingRegistry {
             "Waystone Color",
             "setting.world_map.waystone_color",
             "setting.world_map.waystone_color.tooltip",
-            WaystonesHelper::isAnyWaystonesPresent,
+            WaystonesHelper::isWaystonesPresent,
             (b) -> {
-                if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setColor(b);
+                if (WaystonesHelper.isWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setColor(b);
             },
             ColorHelper.WaystoneColor.values(),
             WaystoneColor.RANDOM,
+            SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting waystoneWaypointSetSetting = XaeroPlusBooleanSetting.create(
+            "Waystone Waypoint Set",
+            "setting.world_map.waystone_waypoint_set",
+            "setting.world_map.waystone_waypoint_set.tooltip",
+            WaystonesHelper::isWaystonesPresent,
+            (b) -> {
+                if (WaystonesHelper.isWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setWaypointSet(b);
+            },
+            false,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting persistMapDimensionSwitchSetting = XaeroPlusBooleanSetting.create(
             "Persist WM Dim Switch",

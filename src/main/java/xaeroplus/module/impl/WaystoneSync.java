@@ -187,6 +187,7 @@ public class WaystoneSync extends Module {
 
     public void reloadStandardWaystones() {
         this.toSyncWaystones = this.currentWaystones;
+        this.shouldSync = true;
     }
 
     private record Waystone(String name, RegistryKey<World> dimension, int x, int y, int z) { }

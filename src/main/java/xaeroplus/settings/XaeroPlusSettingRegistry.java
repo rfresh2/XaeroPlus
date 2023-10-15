@@ -83,7 +83,10 @@ public final class XaeroPlusSettingRegistry {
             "Waystone Color",
             "setting.world_map.waystone_color",
             "setting.world_map.waystone_color.tooltip",
-            (b) -> ModuleManager.getModule(WaystoneSync.class).setColor(b),
+            WaystonesHelper::isAnyWaystonesPresent,
+            (b) -> {
+                if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setColor(b);
+            },
             ColorHelper.WaystoneColor.values(),
             WaystoneColor.RANDOM,
             SettingLocation.WORLD_MAP_MAIN);

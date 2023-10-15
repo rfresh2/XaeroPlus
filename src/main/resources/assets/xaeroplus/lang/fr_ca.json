@@ -125,6 +125,8 @@
   "setting.world_map.waystones_sync.tooltip": "Synchronise les Waystones en tant que Waypoints.",
   "setting.world_map.waystone_color": "Couleur du point de cheminement de la pierre de cheminement",
   "setting.world_map.waystone_color.tooltip": "Utilise une couleur prédéfinie facultative pour tous les waypoints waystone ou une couleur aléatoire.",
+  "setting.world_map.waystone_waypoint_set": "Ensemble de points de cheminement Waystone",
+  "setting.world_map.waystone_waypoint_set.tooltip": "Crée un ensemble de waypoints distinct pour les waypoints waystone au lieu de les ajouter à l'ensemble par défaut.",
   "setting.world_map.cross_dim_waystones_sync": "Synchronisation des dimensions des Waystones",
   "setting.world_map.cross_dim_waystones_sync.tooltip": "Synchronise les Waystones avec les Waypoints (par défaut) défini en fonction de sa dimension.",
   "setting.world_map.cross_dimension_teleport": "Téléportation à travers la dimension",

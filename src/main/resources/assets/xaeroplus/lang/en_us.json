@@ -125,6 +125,8 @@
   "setting.world_map.waystones_sync.tooltip": "Syncs Waystones as waypoints.",
   "setting.world_map.waystone_color": "Waystone Waypoint Color",
   "setting.world_map.waystone_color.tooltip": "Uses an optional preset color for all waystone waypoints or a random color.",
+  "setting.world_map.waystone_waypoint_set": "Waystone Waypoint Set",
+  "setting.world_map.waystone_waypoint_set.tooltip": "Creates a separate waypoint set for waystone waypoints instead of adding them to the default set.",
   "setting.world_map.cross_dim_waystones_sync": "Waystones Dimension Sync",
   "setting.world_map.cross_dim_waystones_sync.tooltip": "Syncs Waystones to the (default) waypoint set according to its dimension",
   "setting.world_map.cross_dimension_teleport": "Cross Dimension Teleport",

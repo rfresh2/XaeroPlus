@@ -119,6 +119,8 @@
   "setting.world_map.waystones_sync.tooltip": "Синхр. Waystones как точки.",
   "setting.world_map.waystone_color": "Цвет путевой точки",
   "setting.world_map.waystone_color.tooltip": "Использует дополнительный предустановленный цвет для всех путевых точек путевого камня или случайный цвет.",
+  "setting.world_map.waystone_waypoint_set": "Набор путевых точек Waystone",
+  "setting.world_map.waystone_waypoint_set.tooltip": "Создает отдельный набор путевых точек для путевых точек вместо добавления их в набор по умолчанию.",
   "setting.world_map.cross_dim_waystones_sync": "Синхронизация измерений Waystones",
   "setting.world_map.cross_dim_waystones_sync.tooltip": "Синхронизирует Waystones с путевой точкой (по умолчанию), установленной в соответствии с ее измерением",
   "setting.world_map.cross_dimension_teleport": "Телепортация между измерениями",

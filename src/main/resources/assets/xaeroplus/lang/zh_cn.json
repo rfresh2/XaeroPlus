@@ -125,6 +125,8 @@
   "setting.world_map.waystones_sync.tooltip": "将指路石同步为路径点。",
   "setting.world_map.waystone_color": "Waystone 路点颜色",
   "setting.world_map.waystone_color.tooltip": "对所有路石航路点使用可选的预设颜色或随机颜色。",
+  "setting.world_map.waystone_waypoint_set": "Waystone 航点集",
+  "setting.world_map.waystone_waypoint_set.tooltip": "为路石航点创建单独的航点集，而不是将它们添加到默认集。",
   "setting.world_map.cross_dim_waystones_sync": "指路石维度同步",
   "setting.world_map.cross_dim_waystones_sync.tooltip": "将指路石同步到根据其维度设置的（默认）路径点",
   "setting.world_map.cross_dimension_teleport": "跨维度传送",

@@ -52,7 +52,7 @@ public class NewChunks extends Module {
 
     public void setNewChunksCache(boolean disk) {
         try {
-            Long2LongMap map = newChunksCache.getHighlightsState();
+            final Long2LongMap map = newChunksCache.getHighlightsState();
             newChunksCache.onDisable();
             if (disk) {
                 newChunksCache = new ChunkHighlightSavingCache(DATABASE_NAME);
@@ -61,7 +61,7 @@ public class NewChunks extends Module {
             }
             if (this.isEnabled()) {
                 newChunksCache.onEnable();
-                newChunksCache.loadPreviousState(map);
+                if (map != null) newChunksCache.loadPreviousState(map);
             }
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error closing new chunks cache", e);

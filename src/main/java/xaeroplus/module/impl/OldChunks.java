@@ -85,7 +85,7 @@ public class OldChunks extends Module {
             }
             if (this.isEnabled()) {
                 oldChunksCache.onEnable();
-                oldChunksCache.loadPreviousState(map);
+                if (map != null) oldChunksCache.loadPreviousState(map);
             }
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error closing old chunks cache", e);
@@ -100,7 +100,7 @@ public class OldChunks extends Module {
             }
             if (this.isEnabled()) {
                 modernChunksCache.onEnable();
-                modernChunksCache.loadPreviousState(map);
+                if (map != null) modernChunksCache.loadPreviousState(map);
             }
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error closing modern chunks cache", e);

@@ -134,6 +134,7 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                     int maxX = (mapX >> 2) + scaledSize;
                     int minZ = (mapZ >> 2) - scaledSize;
                     int maxZ = (mapZ >> 2) + scaledSize;
+                    boolean wmHasFullReload = compatibilityVersion >= 23;
                     int globalRegionCacheHashCode = WorldMap.settings.getRegionCacheHashCode();
                     boolean reloadEverything = WorldMap.settings.reloadEverything;
                     int globalReloadVersion = WorldMap.settings.reloadVersion;
@@ -155,7 +156,11 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                     shouldRequestLoading = false;
                     LeveledRegion<?> nextToLoad = mapProcessor.getMapSaveLoad().getNextToLoadByViewing();
                     Object var76 = nextToLoad;
-                    if (nextToLoad != null) {
+                    if (nextToLoad == null) {
+                        shouldRequestLoading = true;
+                    } else if (wmHasFullReload) {
+                        shouldRequestLoading = nextToLoad.shouldAllowAnotherRegionToLoad();
+                    } else {
                         synchronized(nextToLoad) {
                             if (!nextToLoad.reloadHasBeenRequested()
                                     && !nextToLoad.hasRemovableSourceData()
@@ -163,8 +168,6 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                                 shouldRequestLoading = true;
                             }
                         }
-                    } else {
-                        shouldRequestLoading = true;
                     }
 
                     this.regionBuffer.clear();
@@ -246,23 +249,26 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                         MapRegion region = (MapRegion)this.regionBuffer.get(i);
                         if (region != var76 || this.regionBuffer.size() <= 1) {
                             synchronized(region) {
-                                if (!region.reloadHasBeenRequested()
-                                    && !region.recacheHasBeenRequested()
-                                    && (!(region instanceof MapRegion) || !region.isRefreshing())
-                                    && (region.getLoadState() == 0 || region.getLoadState() == 4 || region.getLoadState() == 2 && region.isBeingWritten())) {
-                                    if (region.getLoadState() == 2) {
-                                        region.requestRefresh(mapProcessor);
-                                    } else {
-                                        mapProcessor.getMapSaveLoad().requestLoad(region, "Minimap sorted", false);
-                                    }
+                                if (!wmHasFullReload || region.canRequestReload_unsynced()) {
+                                    if (wmHasFullReload
+                                        || !region.reloadHasBeenRequested()
+                                            && !region.recacheHasBeenRequested()
+                                            && (!(region instanceof MapRegion) || !region.isRefreshing())
+                                            && (region.getLoadState() == 0 || region.getLoadState() == 4 || region.getLoadState() == 2 && region.isBeingWritten())) {
+                                        if (region.getLoadState() == 2) {
+                                            region.requestRefresh(mapProcessor);
+                                        } else {
+                                            mapProcessor.getMapSaveLoad().requestLoad(region, "Minimap sorted", false);
+                                        }
 
-                                    if (counter == 0) {
-                                        mapProcessor.getMapSaveLoad().setNextToLoadByViewing(region);
-                                    }
+                                        if (counter == 0) {
+                                            mapProcessor.getMapSaveLoad().setNextToLoadByViewing(region);
+                                        }
 
-                                    ++counter;
-                                    if (region.getLoadState() == 4) {
-                                        break;
+                                        ++counter;
+                                        if (region.getLoadState() == 4) {
+                                            break;
+                                        }
                                     }
                                 }
                             }
@@ -315,6 +321,7 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
         if (XaeroPlusSettingRegistry.transparentMinimapBackground.getValue())
             bgBufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
         Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+        boolean wmHasFullReload = this.compatibilityVersion >= 23;
 
         for(int i = minX; i <= maxX; ++i) {
             for(int j = minZ; j <= maxZ; ++j) {
@@ -330,9 +337,13 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                         int regionHashCode = region.getCacheHashCode();
                         int regionReloadVersion = region.getReloadVersion();
                         if (shouldRequestLoading
-                            && !region.recacheHasBeenRequested()
-                            && !region.reloadHasBeenRequested()
-                            && (!(region instanceof MapRegion) || !region.isRefreshing())
+                            && (
+                                wmHasFullReload && region.canRequestReload_unsynced()
+                                    || !wmHasFullReload
+                                    && !region.recacheHasBeenRequested()
+                                    && !region.reloadHasBeenRequested()
+                                    && (!(region instanceof MapRegion) || !region.isRefreshing())
+                            )
                             && (
                             region.getLoadState() == 0
                                 || (region.getLoadState() == 4 || region.getLoadState() == 2 && region.isBeingWritten())

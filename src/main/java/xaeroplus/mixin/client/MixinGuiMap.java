@@ -92,7 +92,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     ButtonWidget switchToNetherButton;
     ButtonWidget switchToOverworldButton;
     ButtonWidget switchToEndButton;
-
+    @Final
+    @Shadow
+    private static Text FULL_RELOAD_IN_PROGRESS = Text.translatable("gui.xaero_full_reload_in_progress");
     @Final
     @Shadow
     private static final double ZOOM_STEP = 1.2;
@@ -894,15 +896,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                                             region.getParent().setShouldCheckForUpdatesRecursive(true);
                                                         }
 
-                                                        if (!region.recacheHasBeenRequested()
-                                                                && !region.reloadHasBeenRequested()
-                                                                && !region.isRefreshing()
-                                                                && (
-                                                                region.getLoadState() == 4
-                                                                        || region.getLoadState() == 2 && region.isBeingWritten()
-                                                                        || region.getLoadState() == 0
-                                                        )
-                                                                && (
+                                                        if (region.canRequestReload_unsynced()
+                                                            && (
                                                                 reloadEverything && region.getReloadVersion() != globalReloadVersion
                                                                         || region.getCacheHashCode() != globalRegionCacheHashCode
                                                                         || region.caveStartOutdated(globalCaveStart, globalCaveDepth)
@@ -1218,13 +1213,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     LeveledRegion<?> nextToLoad = this.mapProcessor.getMapSaveLoad().getNextToLoadByViewing();
                     boolean shouldRequest = false;
                     if (nextToLoad != null) {
-                        synchronized(nextToLoad) {
-                            if (!nextToLoad.reloadHasBeenRequested()
-                                    && !nextToLoad.hasRemovableSourceData()
-                                    && (!(nextToLoad instanceof MapRegion) || !((MapRegion)nextToLoad).isRefreshing())) {
-                                shouldRequest = true;
-                            }
-                        }
+                        shouldRequest = nextToLoad.shouldAllowAnotherRegionToLoad();
                     } else {
                         shouldRequest = true;
                     }
@@ -1256,10 +1245,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                 MapRegion region = this.regionBuffer.get(i);
                                 if (region != nextToLoad || this.regionBuffer.size() <= 1) {
                                     synchronized(region) {
-                                        if (!region.reloadHasBeenRequested()
-                                                && !region.recacheHasBeenRequested()
-                                                && (!(region instanceof MapRegion) || !region.isRefreshing())
-                                                && (region.getLoadState() == 0 || region.getLoadState() == 4 || region.getLoadState() == 2 && region.isBeingWritten())) {
+                                        if (region.canRequestReload_unsynced()) {
                                             if (region.getLoadState() == 2) {
                                                 region.requestRefresh(this.mapProcessor);
                                             } else {
@@ -1704,6 +1690,23 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                 0.0F,
                                 0.4F,
                                 backgroundVertexBuffer
+                        );
+                    }
+
+                    if (this.dimension.getFullReloader() != null && !mc.options.hudHidden) {
+                        subtleTooltipOffset += 12;
+                        MapRenderHelper.drawCenteredStringWithBackground(
+                            guiGraphics,
+                            mc.textRenderer,
+                            FULL_RELOAD_IN_PROGRESS,
+                            this.width / 2,
+                            this.height - subtleTooltipOffset,
+                            -1,
+                            0.0F,
+                            0.0F,
+                            0.0F,
+                            0.4F,
+                            backgroundVertexBuffer
                         );
                     }
 

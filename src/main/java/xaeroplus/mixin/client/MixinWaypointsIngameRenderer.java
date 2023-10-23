@@ -57,7 +57,9 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
                     && (w.getWaypointType() != 1 && w.getWaypointType() != 2 || deathpoints)) {
                 double offX = (double)w.getX(filterParams.dimDiv) - filterParams.cameraX + 0.5;
                 double offZ = (double)w.getZ(filterParams.dimDiv) - filterParams.cameraZ + 0.5;
-                double distance2D = Math.sqrt(offX * offX + offZ * offZ);
+                double distanceScale = filterParams.dimensionScaleDistance ? MinecraftClient.getInstance().world.getDimension().coordinateScale() : 1.0;
+                double unscaledDistance2D = Math.sqrt(offX * offX + offZ * offZ);
+                double distance2D = unscaledDistance2D * distanceScale;
                 double waypointsDistance = filterParams.waypointsDistance;
                 double waypointsDistanceMin = filterParams.waypointsDistanceMin;
                 return w.isOneoffDestination()
@@ -68,7 +70,7 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
                                 || waypointsDistance == 0.0
                                 || !(distance2D > waypointsDistance)
                 )
-                        && (waypointsDistanceMin == 0.0 || !(distance2D < waypointsDistanceMin));
+                    && (waypointsDistanceMin == 0.0 || !(unscaledDistance2D < waypointsDistanceMin));
             } else {
                 return false;
             }

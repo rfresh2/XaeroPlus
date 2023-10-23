@@ -57,7 +57,8 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
     private HashMap<RegistryKey<Biome>, Integer> regionSaveBiomePalette;
     @Shadow
     public abstract File getFile(MapRegion region);
-
+    @Shadow
+    public abstract File getNormalFile(MapRegion region);
     @Shadow
     public abstract void backupFile(File file, int saveVersion);
     @Shadow
@@ -410,131 +411,135 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                 }
 
                 return region.countChunks() > 0;
-            } else if (!region.isNormalMapData()) {
+            } else if (!region.isResaving() && !region.isNormalMapData()) {
                 if (WorldMap.settings.debug) {
                     WorldMap.LOGGER.info("Save not required for world save map: " + region + " " + region.getWorldId() + " " + region.getDimId());
                 }
 
                 return region.countChunks() > 0;
             } else {
-                File permFile = this.getFile(region);
-                File file = this.getTempFile(permFile);
-                if (file == null) {
-                    return true;
+                File permFile = this.getNormalFile(region);
+                if (!permFile.toPath().startsWith(WorldMap.saveFolder.toPath())) {
+                    throw new IllegalArgumentException();
                 } else {
-                    if (!file.exists()) {
-                        file.createNewFile();
-                    }
+                    File file = this.getTempFile(permFile);
+                    if (file == null) {
+                        return true;
+                    } else {
+                        if (!file.exists()) {
+                            file.createNewFile();
+                        }
 
-                    boolean hasAnything = false;
-                    boolean regionWasSavedEmpty = true;
-                    ByteArrayOutputStream byteOut = new ByteArrayOutputStream(); // does not need to be closed
+                        boolean hasAnything = false;
+                        boolean regionWasSavedEmpty = true;
+                        ByteArrayOutputStream byteOut = new ByteArrayOutputStream(); // does not need to be closed
 
-                    try(DataOutputStream out = new DataOutputStream(byteOut);
-                        ZipOutputStream zipOut = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(file.toPath())))) {
-                        //zip fast
-                        ZipEntry e = new ZipEntry("region.xaero");
-                        zipOut.putNextEntry(e);
-                        int fullVersion = 393224;
-                        out.write(255);
-                        out.writeInt(fullVersion);
-                        this.regionSavePalette.clear();
-                        this.regionSaveBiomePalette.clear();
-                        Registry<Biome> biomeRegistry = region.getBiomeRegistry();
+                        try(DataOutputStream out = new DataOutputStream(byteOut);
+                            ZipOutputStream zipOut = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(file.toPath())))) {
+                            //zip fast
+                            ZipEntry e = new ZipEntry("region.xaero");
+                            zipOut.putNextEntry(e);
+                            int fullVersion = 393224;
+                            out.write(255);
+                            out.writeInt(fullVersion);
+                            this.regionSavePalette.clear();
+                            this.regionSaveBiomePalette.clear();
+                            Registry<Biome> biomeRegistry = region.getBiomeRegistry();
 
-                        for(int o = 0; o < 8; ++o) {
-                            for(int p = 0; p < 8; ++p) {
-                                MapTileChunk chunk = region.getChunk(o, p);
-                                if (chunk != null) {
-                                    hasAnything = true;
-                                    if (!chunk.includeInSave()) {
-                                        if (!chunk.hasHighlightsIfUndiscovered()) {
-                                            region.uncountTextureBiomes(chunk.getLeafTexture());
-                                            region.setChunk(o, p, null);
-                                            synchronized(chunk) {
-                                                chunk.getLeafTexture().deleteTexturesAndBuffers();
-                                            }
-                                        }
-
-                                        BranchLeveledRegion parentRegion = region.getParent();
-                                        if (parentRegion != null) {
-                                            parentRegion.setShouldCheckForUpdatesRecursive(true);
-                                        }
-                                    } else {
-                                        out.write(o << 4 | p);
-                                        boolean chunkIsEmpty = true;
-
-                                        for(int i = 0; i < 4; ++i) {
-                                            for(int j = 0; j < 4; ++j) {
-                                                MapTile tile = chunk.getTile(i, j);
-                                                if (tile != null && tile.isLoaded()) {
-                                                    chunkIsEmpty = false;
-
-                                                    for(int x = 0; x < 16; ++x) {
-                                                        MapBlock[] c = tile.getBlockColumn(x);
-
-                                                        for(int z = 0; z < 16; ++z) {
-                                                            this.savePixel(c[z], out, biomeRegistry);
-                                                        }
-                                                    }
-
-                                                    out.write(tile.getWorldInterpretationVersion());
-                                                    out.writeInt(tile.getWrittenCaveStart());
-                                                    out.write(tile.getWrittenCaveDepth());
-                                                } else {
-                                                    out.writeInt(-1);
+                            for(int o = 0; o < 8; ++o) {
+                                for(int p = 0; p < 8; ++p) {
+                                    MapTileChunk chunk = region.getChunk(o, p);
+                                    if (chunk != null) {
+                                        hasAnything = true;
+                                        if (!chunk.includeInSave()) {
+                                            if (!chunk.hasHighlightsIfUndiscovered()) {
+                                                region.uncountTextureBiomes(chunk.getLeafTexture());
+                                                region.setChunk(o, p, null);
+                                                synchronized(chunk) {
+                                                    chunk.getLeafTexture().deleteTexturesAndBuffers();
                                                 }
                                             }
-                                        }
 
-                                        if (!chunkIsEmpty) {
-                                            regionWasSavedEmpty = false;
+                                            BranchLeveledRegion parentRegion = region.getParent();
+                                            if (parentRegion != null) {
+                                                parentRegion.setShouldCheckForUpdatesRecursive(true);
+                                            }
+                                        } else {
+                                            out.write(o << 4 | p);
+                                            boolean chunkIsEmpty = true;
+
+                                            for(int i = 0; i < 4; ++i) {
+                                                for(int j = 0; j < 4; ++j) {
+                                                    MapTile tile = chunk.getTile(i, j);
+                                                    if (tile != null && tile.isLoaded()) {
+                                                        chunkIsEmpty = false;
+
+                                                        for(int x = 0; x < 16; ++x) {
+                                                            MapBlock[] c = tile.getBlockColumn(x);
+
+                                                            for(int z = 0; z < 16; ++z) {
+                                                                this.savePixel(c[z], out, biomeRegistry);
+                                                            }
+                                                        }
+
+                                                        out.write(tile.getWorldInterpretationVersion());
+                                                        out.writeInt(tile.getWrittenCaveStart());
+                                                        out.write(tile.getWrittenCaveDepth());
+                                                    } else {
+                                                        out.writeInt(-1);
+                                                    }
+                                                }
+                                            }
+
+                                            if (!chunkIsEmpty) {
+                                                regionWasSavedEmpty = false;
+                                            }
                                         }
                                     }
                                 }
                             }
+                            zipOut.write(byteOut.toByteArray());
+                            zipOut.closeEntry();
                         }
-                        zipOut.write(byteOut.toByteArray());
-                        zipOut.closeEntry();
-                    }
 
-                    if (regionWasSavedEmpty) {
-                        this.safeDelete(permFile.toPath(), ".zip");
-                        this.safeDelete(file.toPath(), ".temp");
-                        if (WorldMap.settings.debug) {
-                            WorldMap.LOGGER
+                        if (regionWasSavedEmpty) {
+                            this.safeDelete(permFile.toPath(), ".zip");
+                            this.safeDelete(file.toPath(), ".temp");
+                            if (WorldMap.settings.debug) {
+                                WorldMap.LOGGER
                                     .info(
-                                            "Save cancelled because the region would be saved empty: "
-                                                    + region
-                                                    + " "
-                                                    + region.getWorldId()
-                                                    + " "
-                                                    + region.getDimId()
-                                                    + " "
-                                                    + region.getMwId()
+                                        "Save cancelled because the region would be saved empty: "
+                                            + region
+                                            + " "
+                                            + region.getWorldId()
+                                            + " "
+                                            + region.getDimId()
+                                            + " "
+                                            + region.getMwId()
                                     );
-                        }
+                            }
 
-                        return hasAnything;
-                    } else {
-                        this.safeMoveAndReplace(file.toPath(), permFile.toPath(), ".temp", ".zip");
-                        if (WorldMap.settings.debug) {
-                            WorldMap.LOGGER
+                            return hasAnything;
+                        } else {
+                            this.safeMoveAndReplace(file.toPath(), permFile.toPath(), ".temp", ".zip");
+                            if (WorldMap.settings.debug) {
+                                WorldMap.LOGGER
                                     .info(
-                                            "Region saved: "
-                                                    + region
-                                                    + " "
-                                                    + region.getWorldId()
-                                                    + " "
-                                                    + region.getDimId()
-                                                    + " "
-                                                    + region.getMwId()
-                                                    + ", "
-                                                    + this.mapProcessor.getMapWriter().getUpdateCounter()
+                                        "Region saved: "
+                                            + region
+                                            + " "
+                                            + region.getWorldId()
+                                            + " "
+                                            + region.getDimId()
+                                            + " "
+                                            + region.getMwId()
+                                            + ", "
+                                            + this.mapProcessor.getMapWriter().getUpdateCounter()
                                     );
-                        }
+                            }
 
-                        return true;
+                            return true;
+                        }
                     }
                 }
             }

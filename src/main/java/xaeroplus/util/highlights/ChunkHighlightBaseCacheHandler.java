@@ -91,6 +91,7 @@ public abstract class ChunkHighlightBaseCacheHandler {
     }
 
     public void loadPreviousState(final Long2LongMap state) {
+        if (state == null) return;
         try {
             if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
                 chunks.putAll(state);

@@ -64,6 +64,7 @@ public class NewChunksSavingCache implements NewChunksCache {
 
     @Override
     public void loadPreviousState(final Long2LongMap state) {
+        if (state == null) return;
         ChunkHighlightCacheDimensionHandler cacheForCurrentDimension = delegate.getCacheForCurrentDimension();
         if (cacheForCurrentDimension != null) cacheForCurrentDimension.loadPreviousState(state);
     }

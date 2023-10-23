@@ -37,7 +37,7 @@ public class NewChunks extends Module {
             }
             if (this.isEnabled()) {
                 newChunksCache.onEnable();
-                newChunksCache.loadPreviousState(map);
+                if (map != null) newChunksCache.loadPreviousState(map);
             }
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error closing new chunks cache", e);

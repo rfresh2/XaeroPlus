@@ -447,10 +447,9 @@ public abstract class MixinMapWriter {
                                 }
                                 synchronized(visitRegion) {
                                     if (visitRegion.isResting()
-                                            && shouldRequestLoading
-                                            && !visitRegion.reloadHasBeenRequested()
-                                            && !visitRegion.recacheHasBeenRequested()
-                                            && (visitRegion.getLoadState() == 0 || visitRegion.getLoadState() == 4)) {
+                                        && shouldRequestLoading
+                                        && visitRegion.canRequestReload_unsynced()
+                                        && visitRegion.getLoadState() != 2) {
                                         visitRegion.calculateSortingChunkDistance();
                                         Misc.addToListOfSmallest(10, this.regionBuffer, visitRegion);
                                     }
@@ -465,9 +464,7 @@ public abstract class MixinMapWriter {
                             MapRegion region = this.regionBuffer.get(i);
                             if (region != nextToLoad || this.regionBuffer.size() <= 1) {
                                 synchronized(region) {
-                                    if (!region.reloadHasBeenRequested()
-                                            && !region.recacheHasBeenRequested()
-                                            && (region.getLoadState() == 0 || region.getLoadState() == 4)) {
+                                    if (region.canRequestReload_unsynced() && region.getLoadState() != 2) {
                                         region.setBeingWritten(true);
                                         this.mapProcessor.getMapSaveLoad().requestLoad(region, "writing");
                                         if (counter == 0) {

@@ -112,6 +112,7 @@ public abstract class MixinSupportXaeroWorldmap {
                     int maxZ = (mapZ >> 2) + scaledSize;
                     boolean wmHasCaveLayers = this.hasCaveLayers();
                     boolean wmUsesHashcodes = compatibilityVersion >= 5;
+                    boolean wmHasFullReload = compatibilityVersion >= 23;
                     int globalRegionCacheHashCode = wmUsesHashcodes ? WorldMap.settings.getRegionCacheHashCode() : 0;
                     boolean reloadEverything = wmUsesHashcodes ? WorldMap.settings.reloadEverything : false;
                     int globalReloadVersion = wmUsesHashcodes ? WorldMap.settings.reloadVersion : 0;
@@ -141,11 +142,15 @@ public abstract class MixinSupportXaeroWorldmap {
                         LeveledRegion<?> nextToLoad = mapProcessor.getMapSaveLoad().getNextToLoadByViewing();
                         nextToLoadObj = nextToLoad;
                         if (nextToLoad != null) {
-                            synchronized (nextToLoad) {
-                                if (!nextToLoad.reloadHasBeenRequested()
+                            if (wmHasFullReload) {
+                                shouldRequestLoading = nextToLoad.shouldAllowAnotherRegionToLoad();
+                            } else {
+                                synchronized (nextToLoad) {
+                                    if (!nextToLoad.reloadHasBeenRequested()
                                         && !nextToLoad.hasRemovableSourceData()
                                         && (!(nextToLoad instanceof MapRegion) || !((MapRegion) nextToLoad).isRefreshing())) {
-                                    shouldRequestLoading = true;
+                                        shouldRequestLoading = true;
+                                    }
                                 }
                             }
                         } else {
@@ -266,23 +271,27 @@ public abstract class MixinSupportXaeroWorldmap {
                             MapRegion region = (MapRegion) this.regionBuffer.get(i);
                             if (region != nextToLoadObj || this.regionBuffer.size() <= 1) {
                                 synchronized (region) {
-                                    if (!region.reloadHasBeenRequested()
+                                    if (!wmHasFullReload || region.canRequestReload_unsynced()) {
+                                        if (wmHasFullReload
+                                            || !region.reloadHasBeenRequested()
                                             && !region.recacheHasBeenRequested()
                                             && (!(region instanceof MapRegion) || !region.isRefreshing())
                                             && (region.getLoadState() == 0 || region.getLoadState() == 4 || region.getLoadState() == 2 && region.isBeingWritten())) {
-                                        if (region.getLoadState() == 2) {
-                                            region.requestRefresh(mapProcessor);
-                                        } else {
-                                            mapProcessor.getMapSaveLoad().requestLoad(region, "Minimap sorted", false);
-                                        }
+                                            if (region.getLoadState() == 2) {
+                                                region.requestRefresh(mapProcessor);
+                                            } else {
+                                                mapProcessor.getMapSaveLoad()
+                                                    .requestLoad(region, "Minimap sorted", false);
+                                            }
 
-                                        if (counter == 0) {
-                                            mapProcessor.getMapSaveLoad().setNextToLoadByViewing(region);
-                                        }
+                                            if (counter == 0) {
+                                                mapProcessor.getMapSaveLoad().setNextToLoadByViewing(region);
+                                            }
 
-                                        ++counter;
-                                        if (region.getLoadState() == 4) {
-                                            break;
+                                            ++counter;
+                                            if (region.getLoadState() == 4) {
+                                                break;
+                                            }
                                         }
                                     }
                                 }
@@ -334,6 +343,7 @@ public abstract class MixinSupportXaeroWorldmap {
     ) {
         final boolean isDimensionSwitched = Shared.customDimensionId != Minecraft.getMinecraft().player.dimension;
         MapRegion prevRegion = null;
+        boolean wmHasFullReload = this.compatibilityVersion >= 23;
         for (int i = minX; i <= maxX; ++i) {
             for (int j = minZ; j <= maxZ; ++j) {
                 CustomDimensionMapProcessor customDimensionMapProcessor = (CustomDimensionMapProcessor) mapProcessor;
@@ -354,9 +364,13 @@ public abstract class MixinSupportXaeroWorldmap {
                         int regionHashCode = wmUsesHashcodes ? region.getCacheHashCode() : 0;
                         int regionReloadVersion = wmUsesHashcodes ? region.getReloadVersion() : 0;
                         if (shouldRequestLoading
-                            && !region.recacheHasBeenRequested()
-                            && !region.reloadHasBeenRequested()
-                            && (!(region instanceof MapRegion) || !region.isRefreshing())
+                            && (
+                                wmHasFullReload && region.canRequestReload_unsynced()
+                                    || !wmHasFullReload
+                                    && !region.recacheHasBeenRequested()
+                                    && !region.reloadHasBeenRequested()
+                                    && (!(region instanceof MapRegion) || !region.isRefreshing())
+                            )
                             && (region.getLoadState() == 0 || (region.getLoadState() == 4 || region.getLoadState() == 2 && region.isBeingWritten())
                             && (reloadEverything && regionReloadVersion != globalReloadVersion
                             || regionHashCode != globalRegionCacheHashCode

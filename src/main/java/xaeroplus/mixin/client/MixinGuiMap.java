@@ -18,6 +18,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.biome.Biome;
 import org.lwjgl.opengl.GL11;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -84,6 +85,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         super(parent, escape);
     }
 
+    @Final
+    @Shadow
+    private static final ITextComponent FULL_RELOAD_IN_PROGRESS = new TextComponentTranslation("gui.xaero_full_reload_in_progress", new Object[0]);
     @Shadow
     private MapDimension dimension;
     @Shadow
@@ -841,15 +845,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                                                 region.getParent().setShouldCheckForUpdatesRecursive(true);
                                                             }
 
-                                                            if (!region.recacheHasBeenRequested()
-                                                                    && !region.reloadHasBeenRequested()
-                                                                    && !region.isRefreshing()
-                                                                    && (
-                                                                    region.getLoadState() == 4
-                                                                            || region.getLoadState() == 2 && region.isBeingWritten()
-                                                                            || region.getLoadState() == 0
-                                                            )
-                                                                    && (
+                                                            if (region.canRequestReload_unsynced()
+                                                                && (
                                                                     reloadEverything && region.getReloadVersion() != globalReloadVersion
                                                                             || region.getCacheHashCode() != globalRegionCacheHashCode
                                                                             || region.caveStartOutdated(globalCaveStart, globalCaveDepth)
@@ -1128,13 +1125,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                         LeveledRegion<?> nextToLoad = this.mapProcessor.getMapSaveLoad().getNextToLoadByViewing();
                         boolean shouldRequest = false;
                         if (nextToLoad != null) {
-                            synchronized(nextToLoad) {
-                                if (!nextToLoad.reloadHasBeenRequested()
-                                        && !nextToLoad.hasRemovableSourceData()
-                                        && (!(nextToLoad instanceof MapRegion) || !((MapRegion)nextToLoad).isRefreshing())) {
-                                    shouldRequest = true;
-                                }
-                            }
+                            shouldRequest = nextToLoad.shouldAllowAnotherRegionToLoad();
                         } else {
                             shouldRequest = true;
                         }
@@ -1165,10 +1156,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                     MapRegion region = (MapRegion)this.regionBuffer.get(i);
                                     if (region != nextToLoad || this.regionBuffer.size() <= 1) { // allow check on region buffer
                                         synchronized(region) {
-                                            if (!region.reloadHasBeenRequested()
-                                                    && !region.recacheHasBeenRequested()
-                                                    && (!(region instanceof MapRegion) || !region.isRefreshing())
-                                                    && (region.getLoadState() == 0 || region.getLoadState() == 4 || region.getLoadState() == 2 && region.isBeingWritten())) {
+                                            if (region.canRequestReload_unsynced()) {
                                                 if (region.getLoadState() == 2) {
                                                     region.requestRefresh(this.mapProcessor);
                                                 } else {
@@ -1484,6 +1472,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                             String zoomString = (double)Math.round(destScale * 1000.0) / 1000.0 + "x";
                             MapRenderHelper.drawCenteredStringWithBackground(
                                     mc.fontRenderer, zoomString, this.width / 2, this.height - subtleTooltipOffset, -1, 0.0F, 0.0F, 0.0F, 0.4F
+                            );
+                        }
+
+                        if (this.dimension.getFullReloader() != null && !mc.gameSettings.hideGUI) {
+                            subtleTooltipOffset += 12;
+                            MapRenderHelper.drawCenteredStringWithBackground(
+                                mc.fontRenderer, FULL_RELOAD_IN_PROGRESS, this.width / 2, this.height - subtleTooltipOffset, -1, 0.0F, 0.0F, 0.0F, 0.4F
                             );
                         }
 

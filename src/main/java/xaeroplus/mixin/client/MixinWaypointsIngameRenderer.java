@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.tileentity.TileEntityBeaconRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.DimensionType;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -58,7 +59,12 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
                 double wpRenderZ = (double)w.getZ(filterParams.dimDiv) + 0.5 - filterParams.actualEntityZ;
                 double offX = wpRenderX - filterParams.cameraX;
                 double offZ = wpRenderZ - filterParams.cameraZ;
-                double distance2D = Math.sqrt(offX * offX + offZ * offZ);
+                double distanceScale = filterParams.dimensionScaleDistance
+                    && Minecraft.getMinecraft().world.provider.getDimensionType() == DimensionType.NETHER
+                    ? 8.0
+                    : 1.0;
+                double unscaledDistance2D = Math.sqrt(offX * offX + offZ * offZ);
+                double distance2D = unscaledDistance2D * distanceScale;
                 double waypointsDistance = filterParams.waypointsDistance;
                 double waypointsDistanceMin = filterParams.waypointsDistanceMin;
                 return w.isOneoffDestination()
@@ -68,7 +74,7 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
                                 || w.isTemporary() && filterParams.temporaryWaypointsGlobal
                                 || waypointsDistance == 0.0
                                 || !(distance2D > waypointsDistance))
-                        && (waypointsDistanceMin == 0.0 || !(distance2D < waypointsDistanceMin));
+                    && (waypointsDistanceMin == 0.0 || !(unscaledDistance2D < waypointsDistanceMin));
             } else {
                 return false;
             }

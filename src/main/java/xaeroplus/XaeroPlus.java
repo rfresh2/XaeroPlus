@@ -21,7 +21,7 @@ public class XaeroPlus implements ClientModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger("XaeroPlus");
 	public static final EventBus EVENT_BUS = new EventBus(Runnable::run);
 	public static AtomicBoolean initialized = new AtomicBoolean(false);
-	private static final String compatibleMinimapVersion = "23.8.3";
+	private static final String compatibleMinimapVersion = "23.8.4";
 
 	public static void initialize() {
 		if (initialized.compareAndSet(false, true)) {

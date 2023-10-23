@@ -539,8 +539,8 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                 if (regionDetection != null) {
                     regionDetection.transferInfoTo(region);
                     mapLayer.removeRegionDetection(regX, regZ);
-                } else if (!region.isNormalMapData() && mapDimension.getWorldSaveRegionDetection(regX, regZ) == null) {
-                    RegionDetection worldSaveRegionDetection = new RegionDetection(
+                } else if (mapLayer.getCompleteRegionDetection(regX, regZ) == null) {
+                    RegionDetection perpetualRegionDetection = new RegionDetection(
                             region.getWorldId(),
                             region.getDimId(),
                             region.getMwId(),
@@ -550,8 +550,10 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                             this.getGlobalVersion(),
                             true
                     );
-                    mapDimension.addWorldSaveRegionDetection(worldSaveRegionDetection);
-                    mapLayer.removeRegionDetection(regX, regZ);
+                    mapLayer.tryAddingToCompleteRegionDetection(perpetualRegionDetection);
+                    if (!region.isNormalMapData()) {
+                        mapLayer.removeRegionDetection(regX, regZ);
+                    }
                 }
 
                 if (!region.hasHadTerrain()) {

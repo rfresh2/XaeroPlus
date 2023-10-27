@@ -498,7 +498,7 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                                     }
                                 }
                             }
-                            zipOut.write(byteOut.toByteArray());
+                            byteOut.writeTo(zipOut);
                             zipOut.closeEntry();
                         }
 

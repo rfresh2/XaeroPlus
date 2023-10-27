@@ -113,7 +113,7 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
                 }
 
                 output.write(255);
-                zipOutput.write(byteOut.toByteArray());
+                byteOut.writeTo(zipOutput);
                 zipOutput.closeEntry();
                 success = true;
             }

@@ -1,7 +1,10 @@
 package xaeroplus.mixin.client;
 
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.option.KeyBinding;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -19,5 +22,14 @@ public class MixinMisc {
         if (!XaeroPlusSettingRegistry.skipWorldRenderSetting.getValue()) {
             cir.setReturnValue(false);
         }
+    }
+
+    /**
+     * @author rfresh2
+     * @reason hide unset keybind text
+     */
+    @Overwrite
+    public static String getKeyName(KeyBinding kb) {
+        return kb != null && KeyBindingHelper.getBoundKeyOf(kb).getCode() != -1 ? kb.getBoundKeyLocalizedText().getString().toUpperCase() : "";
     }
 }

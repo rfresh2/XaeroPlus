@@ -14,6 +14,7 @@ import xaeroplus.XaeroPlus;
 import xaeroplus.event.ClientTickEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.module.Module;
+import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper.WaystoneColor;
 import xaeroplus.util.IWaypointDimension;
 import xaeroplus.util.WaypointsHelper;
@@ -22,6 +23,7 @@ import xaeroplus.util.WaystonesHelper;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static net.minecraft.world.World.*;
 import static xaero.common.settings.ModSettings.COLORS;
 
 @Module.ModuleInfo()
@@ -96,6 +98,7 @@ public class WaystoneSync extends Module {
             WaypointSet waypointSet = waypointsManager.getWaypoints();
             if (waypointSet == null) return false;
             final String currentContainerId = waypointsManager.getCurrentContainerID();
+            if (waypointsManager.getCurrentWorld() == null) return false;
 
             // iterate over ALL waypoint sets and lists and remove waystones
             // todo: this doesn't iterate over dims/set permutations where we have no waystones at all
@@ -142,13 +145,41 @@ public class WaystoneSync extends Module {
     private List<Waypoint> getWaypointsList(final Waystone waystone,
                                             final WaypointsManager waypointsManager,
                                             final String currentContainerId) {
+        final String waypointSetName = this.separateWaypointSet ? "Waystones" : "gui.xaero_default";
+        final WaypointWorld waypointWorld = getWaypointWorldForWaystone(waystone, waypointsManager, currentContainerId);
+        WaypointSet waypointSet = waypointWorld.getSets().get(waypointSetName);
+        if (waypointSet == null) {
+            waypointWorld.getSets().put(waypointSetName, new WaypointSet(waypointSetName));
+            waypointSet = waypointWorld.getSets().get(waypointSetName);
+        }
+        return waypointSet.getList();
+    }
+
+    private WaypointWorld getWaypointWorldForWaystone(final Waystone waystone,
+                                                      final WaypointsManager waypointsManager,
+                                                      final String currentContainerId) {
         final RegistryKey<World> waystoneDimension = waystone.dimension();
         final String waystoneDimensionDirectoryName = waypointsManager.getDimensionDirectoryName(waystoneDimension);
         final int waystoneDim = WaypointsHelper.getDimensionForWaypointWorldKey(waystoneDimensionDirectoryName);
+        // waypoint worlds can sometimes have irregular names
+        // if we have a world already open, trying syncing to that world
+        if (waystoneDim == getCurrentDimensionInt()) {
+            WaypointWorld currentWpWorld = waypointsManager.getCurrentWorld();
+            if (currentWpWorld == null) {
+                WaypointWorld newWaypointWorld = new WaypointWorld(waypointsManager.getWorldContainer(currentContainerId), "waypoints");
+                waypointsManager.getWorldContainer(currentContainerId).worlds.put(
+                    "waypoints",
+                    newWaypointWorld);
+                currentWpWorld = newWaypointWorld;
+            }
+            return currentWpWorld;
+        }
         final String worldContainerSuffix;
         if (waystoneDim == Integer.MIN_VALUE) // non-vanilla dimensions
             worldContainerSuffix = waystoneDimension.getValue().getNamespace() + "$" + waystoneDimension.getValue().getPath().replace("/", "%");
         else
+            // this is a crapshoot
+            // waypoint containers have no single naming scheme. this can change depending on the server, the world, and the dimension
             worldContainerSuffix = String.valueOf(waystoneDim);
         final WaypointWorldContainer waypointWorldContainer = waypointsManager.getWorldContainer(currentContainerId.substring(
             0,
@@ -158,13 +189,7 @@ public class WaystoneSync extends Module {
             waypointWorldContainer.worlds.put("waypoints", new WaypointWorld(waypointWorldContainer, "waypoints"));
             crossDimWaypointWorld = waypointWorldContainer.worlds.get("waypoints");
         }
-        final String waypointSetName = this.separateWaypointSet ? "Waystones" : "gui.xaero_default";
-        WaypointSet waypointSet = crossDimWaypointWorld.getSets().get(waypointSetName);
-        if (waypointSet == null) {
-            crossDimWaypointWorld.getSets().put(waypointSetName, new WaypointSet(waypointSetName));
-            waypointSet = crossDimWaypointWorld.getSets().get(waypointSetName);
-        }
-        return waypointSet.getList();
+        return crossDimWaypointWorld;
     }
 
     private int getWaystoneColor(Waystone waystone) {
@@ -188,6 +213,14 @@ public class WaystoneSync extends Module {
     public void reloadStandardWaystones() {
         this.toSyncWaystones = this.currentWaystones;
         this.shouldSync = true;
+    }
+
+    private int getCurrentDimensionInt() {
+        RegistryKey<World> actualDimension = ChunkUtils.getActualDimension();
+        if (actualDimension == OVERWORLD) return 0;
+        else if (actualDimension == NETHER) return -1;
+        else if (actualDimension == END) return 1;
+        else return Integer.MIN_VALUE;
     }
 
     private record Waystone(String name, RegistryKey<World> dimension, int x, int y, int z) { }

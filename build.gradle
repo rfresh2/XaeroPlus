@@ -106,6 +106,7 @@ shadowJar {
 	exclude 'org/sqlite/native/Windows/armv7/**'
 	exclude 'org/sqlite/native/Windows/aarch64/**'
 	exclude 'org/sqlite/native/Windows/armv7/**'
+	exclude 'org/slf4j/**'
 	relocate "com.collarmc.pounce", "xaeroplus.com.collarmc.pounce.shadow"
 	relocate "com.github.benmanes.caffeine", "xaeroplus.com.github.benmanes.caffeine.shadow"
 }

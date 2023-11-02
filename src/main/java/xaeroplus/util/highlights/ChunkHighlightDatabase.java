@@ -59,7 +59,7 @@ public class ChunkHighlightDatabase implements Closeable {
         try {
             String statement = "INSERT OR IGNORE INTO \"" + dimension + "\" VALUES ";
             statement += chunks.stream()
-                    .map(chunk -> "(" + chunk.x + ", " + chunk.z + ", " + chunk.foundTime + ")")
+                    .map(chunk -> "(" + chunk.x() + ", " + chunk.z() + ", " + chunk.foundTime() + ")")
                     .collect(Collectors.joining(", "));
             connection.createStatement().execute(statement);
         } catch (Exception e) {

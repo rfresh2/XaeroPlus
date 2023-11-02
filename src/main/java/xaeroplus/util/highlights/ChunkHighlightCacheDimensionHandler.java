@@ -46,7 +46,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
             try {
                 if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
                     for (final ChunkHighlightData chunk : chunks) {
-                        this.chunks.put(chunkPosToLong(chunk.x, chunk.z), chunk.foundTime);
+                        this.chunks.put(chunkPosToLong(chunk.x(), chunk.z()), chunk.foundTime());
                     }
                     lock.writeLock().unlock();
                 }

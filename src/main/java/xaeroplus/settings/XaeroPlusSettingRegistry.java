@@ -212,6 +212,13 @@ public final class XaeroPlusSettingRegistry {
             (b) -> ModuleManager.getModule(Portals.class).setEnabled(b),
             false,
             SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting portalsSaveLoadToDisk = XaeroPlusBooleanSetting.create(
+            "Save/Load Portals to Disk",
+            "setting.world_map.portals_save_load_to_disk",
+            "setting.world_map.portals_save_load_to_disk.tooltip",
+            (b) -> ModuleManager.getModule(Portals.class).setPortalsCache(b),
+            true,
+            SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting portalsAlphaSetting = XaeroPlusFloatSetting.create(
             "Portal Highlights Opacity",
             "setting.world_map.portals_opacity",

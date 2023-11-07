@@ -55,6 +55,18 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
         cacheForDimension.addHighlight(x, z, foundTime);
     }
 
+    public boolean removeHighlight(final int x, final int z) {
+        try {
+            ChunkHighlightCacheDimensionHandler cacheForCurrentDimension = getCacheForCurrentDimension();
+            if (cacheForCurrentDimension == null) throw new RuntimeException("Didn't find cache for current dimension");
+            cacheForCurrentDimension.removeHighlight(x, z);
+            return true;
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.debug("Error removing highlight from saving cache: {}, {}", x, z, e);
+            return false;
+        }
+    }
+
     public boolean isHighlighted(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> dimensionId) {
         ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimensionId);
         if (cacheForDimension == null) return false;
@@ -225,15 +237,6 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
             if (cacheForDimension != null) cacheForDimension.setWindow(ChunkUtils.getPlayerRegionX(), ChunkUtils.getPlayerRegionZ(), defaultRegionWindowSize);
             getCachesExceptDimension(getCurrentlyViewedDimension())
                 .forEach(cache -> cache.setWindow(0, 0, 0));
-        }
-    }
-
-    public void removeHighlight(final int x, final int z) {
-        try {
-            ChunkHighlightCacheDimensionHandler cacheForCurrentDimension = getCacheForCurrentDimension();
-            if (cacheForCurrentDimension != null) cacheForCurrentDimension.removeHighlight(x, z);
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.debug("Error removing highlight from saving cache: {}, {}", x, z, e);
         }
     }
 }

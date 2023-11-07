@@ -45,6 +45,8 @@
   "setting.world_map.old_chunks_color.tooltip": "更改 OldChunks 的颜色。",
   "setting.world_map.portals": "高亮传送门",
   "setting.world_map.portals.tooltip": "高亮在小地图和世界地图上找到传送门的区块。",
+  "setting.world_map.portals_save_load_to_disk": "保存/加载传送门到磁盘",
+  "setting.world_map.portals_save_load_to_disk.tooltip": "为每个世界和维度保存和加载传送门数据到磁盘。需要启用传送门高亮功能",
   "setting.world_map.portals_opacity": "传送门不透明度",
   "setting.world_map.portals_opacity.tooltip": "更改高亮传送门颜色的不透明度。",
   "setting.world_map.portals_color": "传送门颜色",

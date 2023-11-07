@@ -1,6 +1,7 @@
 package xaeroplus.module.impl;
 
 import com.collarmc.pounce.Subscribe;
+import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.EndPortalBlock;
 import net.minecraft.block.NetherPortalBlock;
@@ -23,6 +24,8 @@ import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
 import xaeroplus.util.MutableBlockPos;
+import xaeroplus.util.highlights.ChunkHighlightCache;
+import xaeroplus.util.highlights.ChunkHighlightLocalCache;
 import xaeroplus.util.highlights.ChunkHighlightSavingCache;
 import xaeroplus.util.highlights.HighlightAtChunkPos;
 
@@ -37,27 +40,39 @@ import static xaeroplus.util.ColorHelper.getColor;
 public class Portals extends Module {
 
     // todo: local cache setting
-    private ChunkHighlightSavingCache portalsCache;
+    private ChunkHighlightCache portalsCache = new ChunkHighlightLocalCache();
     private final ExecutorService searchExecutor = Executors.newSingleThreadExecutor();
     private final MinecraftClient mc = MinecraftClient.getInstance();
     private int portalsColor = getColor(0, 255, 0, 100);
     private static final String DATABASE_NAME = "XaeroPlusPortals";
 
-    @Override
-    public void onEnable() {
-        if (portalsCache == null) {
-            portalsCache = new ChunkHighlightSavingCache(DATABASE_NAME);
-            portalsCache.onEnable();
-            searchAllLoadedChunks();
+    public void setPortalsCache(final Boolean disk) {
+        try {
+            final Long2LongMap map = portalsCache.getHighlightsState();
+            portalsCache.onDisable();
+            if (disk) {
+                portalsCache = new ChunkHighlightSavingCache(DATABASE_NAME);
+            } else {
+                portalsCache = new ChunkHighlightLocalCache();
+            }
+            if (this.isEnabled()) {
+                portalsCache.onEnable();
+                if (map != null) portalsCache.loadPreviousState(map);
+            }
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Error setting portals cache", e);
         }
     }
 
     @Override
+    public void onEnable() {
+        portalsCache.onEnable();
+        searchAllLoadedChunks();
+    }
+
+    @Override
     public void onDisable() {
-        if (portalsCache != null) {
-            portalsCache.onDisable();
-            portalsCache = null;
-        }
+        portalsCache.onDisable();
     }
 
     public boolean inUnknownDimension() {
@@ -83,13 +98,20 @@ public class Portals extends Module {
 
     @Subscribe
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
+        if (XaeroPlusSettingRegistry.portalsSaveLoadToDisk.getValue()) {
+            if (inUnknownDimension() && portalsCache instanceof ChunkHighlightSavingCache) {
+                XaeroPlusSettingRegistry.portalsSaveLoadToDisk.setValue(false);
+                XaeroPlus.LOGGER.warn("Entered unknown dimension with saving cache on, disabling disk saving");
+            }
+        }
         portalsCache.handleWorldChange();
     }
 
     @Subscribe
-    public void onClientTickEvent(final ClientTickEvent event) {
+    public void onClientTickEvent(final ClientTickEvent.Post event) {
         portalsCache.handleTick();
     }
+
     private void findPortalInChunkAsync(final Chunk chunk) {
         findPortalInChunkAsync(chunk, 0);
     }
@@ -112,7 +134,7 @@ public class Portals extends Module {
     }
 
     private boolean findPortalInChunk(final Chunk chunk) {
-        final boolean chunkHadPortal = portalsCache.isHighlighted(chunk.getPos().x, chunk.getPos().z);
+        final boolean chunkHadPortal = portalsCache.isHighlighted(chunk.getPos().x, chunk.getPos().z, ChunkUtils.getActualDimension());
         final MutableBlockPos pos = new MutableBlockPos(0, 0, 0);
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
@@ -161,7 +183,7 @@ public class Portals extends Module {
         if (inUnknownDimension()) return;
         int chunkX = ChunkUtils.posToChunkPos(pos.getX());
         int chunkZ = ChunkUtils.posToChunkPos(pos.getZ());
-        if (portalsCache.isHighlighted(chunkX, chunkZ)) {
+        if (portalsCache.isHighlighted(chunkX, chunkZ, ChunkUtils.getActualDimension())) {
             if (findPortalAtBlockPos(pos)) {
                 if (mc.world == null || mc.world.getChunkManager() == null) return;
                 WorldChunk worldChunk = mc.world.getChunkManager().getWorldChunk(chunkX, chunkZ, false);

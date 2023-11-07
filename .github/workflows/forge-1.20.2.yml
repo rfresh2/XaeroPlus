@@ -104,7 +104,6 @@ jobs:
         version: ${{ github.run_number }}
         loaders: |
           ${{ env.MOD_LOADER }}
-          neoforge
         game-versions: |
           ${{ env.MINECRAFT_VERSION }}
         dependencies: |

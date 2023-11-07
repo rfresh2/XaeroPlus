@@ -45,6 +45,8 @@
   "setting.world_map.old_chunks_color.tooltip": "Change la couleur des OldChunks.",
   "setting.world_map.portals": "Mise en évidence des portails",
   "setting.world_map.portals.tooltip": "Met en évidence les chunks où des portails ont été trouvés sur la Minimap et la WorldMap.",
+  "setting.world_map.portals_save_load_to_disk": "Enregistrer/Charger les Portails sur le Disque",
+  "setting.world_map.portals_save_load_to_disk.tooltip": "Enregistre et charge les données des Portails sur le disque pour chaque monde et dimension. Nécessite que les Points de Repère des Portails soient activés",
   "setting.world_map.portals_opacity": "Opacité des portails",
   "setting.world_map.portals_opacity.tooltip": "Change l'opacité de la couleur des portails mis en évidence.",
   "setting.world_map.portals_color": "Couleur des portails",

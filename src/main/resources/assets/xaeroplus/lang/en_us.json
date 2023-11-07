@@ -45,6 +45,8 @@
   "setting.world_map.old_chunks_color.tooltip": "Changes the color of OldChunks.",
   "setting.world_map.portals": "Portal Highlights",
   "setting.world_map.portals.tooltip": "Highlights chunks where Nether Portals and End Portals are found",
+  "setting.world_map.portals_save_load_to_disk": "Save/Load Portals to Disk",
+  "setting.world_map.portals_save_load_to_disk.tooltip": "Saves and loads Portals data to disk for each world and dimension. Requires Portal Highlights to be enabled",
   "setting.world_map.portals_opacity": "Portals Opacity",
   "setting.world_map.portals_opacity.tooltip": "Changes the color opacity of Portal Highlights.",
   "setting.world_map.portals_color": "Portals Color",

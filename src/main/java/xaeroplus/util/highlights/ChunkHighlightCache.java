@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface ChunkHighlightCache {
     boolean addHighlight(final int x, final int z);
+    boolean removeHighlight(final int x, final int z);
     boolean isHighlighted(final int x, final int z, RegistryKey<World> dimensionId);
     List<HighlightAtChunkPos> getHighlightsInRegion(final int leafRegionX, final int leafRegionZ, final int level, RegistryKey<World> dimension);
     void handleWorldChange();

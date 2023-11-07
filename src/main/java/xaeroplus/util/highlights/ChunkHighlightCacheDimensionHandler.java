@@ -104,9 +104,10 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
     }
 
     @Override
-    public void removeHighlight(final int x, final int z) {
+    public boolean removeHighlight(final int x, final int z) {
         super.removeHighlight(x, z);
         database.removeHighlight(x, z, dimension);
+        return true;
     }
 
     public void close() {

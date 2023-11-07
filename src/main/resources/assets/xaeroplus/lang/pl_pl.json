@@ -45,6 +45,8 @@
   "setting.world_map.old_chunks_color.tooltip": "Zmienia kolor OldChunks.",
   "setting.world_map.portals": "Podświetlanie Portali",
   "setting.world_map.portals.tooltip": "Podświetla chunki, na których znaleziono portale na Minimapie i Mapie Świata.",
+  "setting.world_map.portals_save_load_to_disk": "Zapisz/Wczytaj Portale na Dysk",
+  "setting.world_map.portals_save_load_to_disk.tooltip": "Zapisuje i wczytuje dane Portali na dysk dla każdego świata i wymiaru. Wymaga włączenia Wyróżniania Portali",
   "setting.world_map.portals_opacity": "Nieprzezroczystość Portali",
   "setting.world_map.portals_opacity.tooltip": "Zmienia nieprzezroczystość koloru Podświetlenia Portali.",
   "setting.world_map.portals_color": "Kolor Portali",

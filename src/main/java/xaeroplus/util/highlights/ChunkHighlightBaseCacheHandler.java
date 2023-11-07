@@ -46,6 +46,19 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
         return true;
     }
 
+    public boolean removeHighlight(final int x, final int z) {
+        final long chunkPos = chunkPosToLong(x, z);
+        try {
+            if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
+                chunks.remove(chunkPos);
+                lock.writeLock().unlock();
+            }
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Failed to add new highlight", e);
+        }
+        return true;
+    }
+
     public boolean isHighlighted(final int x, final int z, RegistryKey<World> dimensionId) {
         return isHighlighted(chunkPosToLong(x, z));
     }
@@ -103,17 +116,6 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
             }
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error loading previous state", e);
-        }
-    }
-
-    public void removeHighlight(final int x, final int z) {
-        try {
-            if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
-                chunks.remove(chunkPosToLong(x, z));
-                lock.writeLock().unlock();
-            }
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error removing highlight", e);
         }
     }
 

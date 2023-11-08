@@ -1,6 +1,7 @@
 package xaeroplus.module.impl;
 
 import com.collarmc.pounce.Subscribe;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.registry.RegistryKey;
@@ -34,7 +35,10 @@ import static xaeroplus.util.GuiMapHelper.*;
 
 @Module.ModuleInfo()
 public class PortalSkipDetection extends Module {
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder()
+                                                                                          .setNameFormat("XaeroPlus-PortalSkipDetection-Search")
+                                                                                          .setDaemon(true)
+                                                                                          .build());
     private Future<?> portalSkipDetectionSearchFuture = null;
     private int portalSkipChunksColor = ColorHelper.getColor(255, 255, 255, 100);
     private final ChunkHighlightLocalCache cache = new ChunkHighlightLocalCache();

@@ -3,6 +3,7 @@ package xaeroplus.util.highlights;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import xaeroplus.XaeroPlus;
 import xaeroplus.util.ChunkUtils;
 
@@ -21,11 +22,16 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
     // square centered at windowX, windowZ with size windowSize
     private int windowRegionSize = 0;
     private final ChunkHighlightDatabase database;
-    private final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(Executors.newSingleThreadExecutor());
+    private final ListeningExecutorService executorService;
 
     public ChunkHighlightCacheDimensionHandler(final int dimension, final ChunkHighlightDatabase database) {
         this.dimension = dimension;
         this.database = database;
+        this.executorService = MoreExecutors.listeningDecorator(
+            Executors.newSingleThreadExecutor(
+                new ThreadFactoryBuilder()
+                    .setNameFormat("XaeroPlus-ChunkHighlightCacheDimensionHandler-" + database.databaseName + "-Dim" + dimension)
+                    .build()));
     }
 
     public void setWindow(int regionX, int regionZ, int regionSize) {
@@ -37,7 +43,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
     }
 
     private void loadHighlightsInWindow() {
-        executorService.submit(() -> {
+        executorService.execute(() -> {
             final List<ChunkHighlightData> chunks = database.getHighlightsInWindow(
                     dimension,
                     windowRegionX - windowRegionSize, windowRegionX + windowRegionSize,

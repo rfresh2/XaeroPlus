@@ -1,11 +1,11 @@
 package xaeroplus.module.impl;
 
 import com.collarmc.pounce.Subscribe;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
@@ -43,7 +43,12 @@ public class OldChunks extends Module {
     private static final String MODERN_CHUNKS_DATABASE_NAME = "XaeroPlusModernChunks";
     private int oldChunksColor = getColor(0, 0, 255, 100);
     private final MinecraftClient mc = MinecraftClient.getInstance();
-    private final ExecutorService searchExecutor = Executors.newSingleThreadExecutor();
+    private final ExecutorService searchExecutor = Executors.newFixedThreadPool(
+        1,
+        new ThreadFactoryBuilder()
+            .setNameFormat("XaeroPlus-OldChunks-Search-%d")
+            .build());
+
     private boolean inverse = false;
     private static final HashSet<Block> OVERWORLD_BLOCKS = new HashSet<>();
     private static final Set<Block> NETHER_BLOCKS = new HashSet<>();

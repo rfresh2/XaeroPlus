@@ -1,6 +1,7 @@
 package xaeroplus.module.impl;
 
 import com.collarmc.pounce.Subscribe;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.EndPortalBlock;
@@ -38,13 +39,15 @@ import static xaeroplus.util.ColorHelper.getColor;
 
 @Module.ModuleInfo()
 public class Portals extends Module {
-
-    // todo: local cache setting
     private ChunkHighlightCache portalsCache = new ChunkHighlightLocalCache();
-    private final ExecutorService searchExecutor = Executors.newSingleThreadExecutor();
     private final MinecraftClient mc = MinecraftClient.getInstance();
     private int portalsColor = getColor(0, 255, 0, 100);
     private static final String DATABASE_NAME = "XaeroPlusPortals";
+    private final ExecutorService searchExecutor = Executors.newFixedThreadPool(
+        1,
+        new ThreadFactoryBuilder()
+            .setNameFormat("XaeroPlus-Portals-Search-%d")
+            .build());
 
     public void setPortalsCache(final Boolean disk) {
         try {
@@ -118,7 +121,7 @@ public class Portals extends Module {
 
     private void findPortalInChunkAsync(final Chunk chunk, final int waitMs) {
         if (inUnknownDimension()) return;
-        searchExecutor.submit(() -> {
+        searchExecutor.execute(() -> {
             try {
                 Thread.sleep(waitMs);
                 int iterations = 0;

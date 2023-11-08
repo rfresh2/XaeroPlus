@@ -1,6 +1,8 @@
 package xaeroplus.util;
 
+import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.registry.RegistryKey;
@@ -24,6 +26,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Supplier;
 import java.util.zip.ZipInputStream;
 
 import static net.minecraft.world.World.OVERWORLD;
@@ -44,9 +47,14 @@ public class Shared {
     public static RegistryKey<World> customDimensionId = OVERWORLD;
     public static String waypointsSearchFilter = "";
     public static List<ButtonWidget> guiMapButtonTempList = Lists.<ButtonWidget>newArrayList();
-    public static ExecutorService cacheRefreshExecutorService = Executors.newFixedThreadPool(
+    public static Supplier<ExecutorService> cacheRefreshExecutorService = Suppliers.memoize(() -> Executors.newFixedThreadPool(
             // limited benefits by refreshing on more threads as it will consume the entire CPU and start lagging the game
-            Math.max(1, Math.min(Runtime.getRuntime().availableProcessors() / 2, 4)));
+            Math.max(1, Math.min(Runtime.getRuntime().availableProcessors() / 2, 4)),
+            new ThreadFactoryBuilder()
+                .setNameFormat("XaeroPlus-Cache-Refresh-%d")
+                .setDaemon(true)
+                .build()));
+
     public static final Identifier xpGuiTextures = new Identifier("xaeroplus", "gui/xpgui.png");
 
     public static void onAllSettingsLoaded() {

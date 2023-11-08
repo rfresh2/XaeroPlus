@@ -92,7 +92,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
                     initializeWorld();
                     loadChunksInActualDimension();
                     return null;
-                }, Shared.cacheRefreshExecutorService);
+                }, Shared.cacheRefreshExecutorService.get());
     }
 
     public void reset() {
@@ -194,7 +194,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
         Futures.whenAllComplete(saveAllChunks()).call(() -> {
             reset();
             return null;
-        }, Shared.cacheRefreshExecutorService);
+        }, Shared.cacheRefreshExecutorService.get());
     }
 
     @Override

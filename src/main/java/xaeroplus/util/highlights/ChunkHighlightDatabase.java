@@ -19,8 +19,10 @@ import static xaeroplus.util.ChunkUtils.regionCoordToChunkCoord;
 public class ChunkHighlightDatabase implements Closeable {
     public static int MAX_HIGHLIGHTS_LIST = 25000;
     private final Connection connection;
+    protected final String databaseName;
 
     public ChunkHighlightDatabase(String worldId, String databaseName) {
+        this.databaseName = databaseName;
         try {
             final Path dbPath = WorldMap.saveFolder.toPath().resolve(worldId).resolve(databaseName + ".db");
             connection = DriverManager.getConnection("jdbc:sqlite:" + dbPath);

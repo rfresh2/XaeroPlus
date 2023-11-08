@@ -26,7 +26,7 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
     private final AsyncLoadingCache<RegionRenderPos, List<HighlightAtChunkPos>> regionRenderCache = Caffeine.newBuilder()
             .expireAfterWrite(3000, TimeUnit.MILLISECONDS)
             .refreshAfterWrite(500, TimeUnit.MILLISECONDS)
-            .executor(Shared.cacheRefreshExecutorService)
+            .executor(Shared.cacheRefreshExecutorService.get())
             .buildAsync(key -> loadHighlightChunksAtRegion(key.leafRegionX, key.leafRegionZ, key.level, this::isHighlightedWithWait).call());
 
     public boolean addHighlight(final int x, final int z) {

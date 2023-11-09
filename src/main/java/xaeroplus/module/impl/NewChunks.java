@@ -24,6 +24,8 @@ import xaeroplus.module.Module;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
+import xaeroplus.util.DrawManager;
+import xaeroplus.util.Shared;
 import xaeroplus.util.highlights.ChunkHighlightCache;
 import xaeroplus.util.highlights.ChunkHighlightLocalCache;
 import xaeroplus.util.highlights.ChunkHighlightSavingCache;
@@ -153,6 +155,14 @@ public class NewChunks extends Module {
 
     @Override
     public void onEnable() {
+        Shared.drawManager.registerChunkHighlightDrawFeature(
+            this.getClass(),
+            new DrawManager.ChunkHighlightDrawFeature(
+                this::isEnabled,
+                this::isNewChunk,
+                this::getNewChunksInRegion,
+                this::getNewChunksColor
+            ));
         newChunksCache.onEnable();
     }
 

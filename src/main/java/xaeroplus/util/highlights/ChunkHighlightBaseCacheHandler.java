@@ -12,7 +12,6 @@ import xaeroplus.util.Shared;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.StampedLock;
@@ -91,12 +90,7 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
 
     public List<HighlightAtChunkPos> getHighlightsInRegion(final int leafRegionX, final int leafRegionZ, final int level, RegistryKey<World> dimension) {
         try {
-            final CompletableFuture<List<HighlightAtChunkPos>> future = regionRenderCache.get(new RegionRenderPos(leafRegionX, leafRegionZ, level));
-            if (future.isDone()) {
-                return future.get();
-            } else {
-                return Collections.emptyList();
-            }
+            return regionRenderCache.get(new RegionRenderPos(leafRegionX, leafRegionZ, level)).getNow(Collections.emptyList());
         } catch (Exception e) {
             XaeroPlus.LOGGER.error("Error handling chunk highlight region lookup", e);
         }

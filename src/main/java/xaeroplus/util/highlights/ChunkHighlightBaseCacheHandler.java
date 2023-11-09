@@ -1,33 +1,20 @@
 package xaeroplus.util.highlights;
 
-import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
 import xaeroplus.XaeroPlus;
-import xaeroplus.util.RegionRenderPos;
-import xaeroplus.util.Shared;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.StampedLock;
 
 import static xaeroplus.util.ChunkUtils.chunkPosToLong;
-import static xaeroplus.util.ChunkUtils.loadHighlightChunksAtRegion;
 
 public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCache {
     public final ReadWriteLock lock = new StampedLock().asReadWriteLock();
     public final Long2LongMap chunks = new Long2LongOpenHashMap();
-    private final AsyncLoadingCache<RegionRenderPos, List<HighlightAtChunkPos>> regionRenderCache = Caffeine.newBuilder()
-            .expireAfterWrite(3000, TimeUnit.MILLISECONDS)
-            .refreshAfterWrite(500, TimeUnit.MILLISECONDS)
-            .executor(Shared.cacheRefreshExecutorService.get())
-            .buildAsync(key -> loadHighlightChunksAtRegion(key.leafRegionX, key.leafRegionZ, key.level, this::isHighlightedWithWait).call());
-
     public boolean addHighlight(final int x, final int z) {
         return addHighlight(x, z, System.currentTimeMillis());
     }
@@ -86,15 +73,6 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
             XaeroPlus.LOGGER.error("Error checking if chunk is highlighted", e);
         }
         return false;
-    }
-
-    public List<HighlightAtChunkPos> getHighlightsInRegion(final int leafRegionX, final int leafRegionZ, final int level, RegistryKey<World> dimension) {
-        try {
-            return regionRenderCache.get(new RegionRenderPos(leafRegionX, leafRegionZ, level)).getNow(Collections.emptyList());
-        } catch (Exception e) {
-            XaeroPlus.LOGGER.error("Error handling chunk highlight region lookup", e);
-        }
-        return Collections.emptyList();
     }
 
     public Long2LongMap getHighlightsState() {

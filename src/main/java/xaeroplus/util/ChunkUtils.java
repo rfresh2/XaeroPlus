@@ -4,6 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
+import xaeroplus.Globals;
 
 import static net.minecraft.world.World.NETHER;
 import static net.minecraft.world.World.OVERWORLD;
@@ -43,10 +44,10 @@ public class ChunkUtils {
             MinecraftClient mc = MinecraftClient.getInstance();
             RegistryKey<World> dim = mc.world.getRegistryKey();
             // when player is in the nether or the custom dimension is the nether, perform coordinate translation
-            if ((dim == NETHER || Shared.customDimensionId == NETHER) && dim != Shared.customDimensionId) {
-                if (Shared.customDimensionId == OVERWORLD) {
+            if ((dim == NETHER || Globals.customDimensionId == NETHER) && dim != Globals.customDimensionId) {
+                if (Globals.customDimensionId == OVERWORLD) {
                     return mc.player.getX() * 8.0;
-                } else if (Shared.customDimensionId == NETHER && dim == OVERWORLD) {
+                } else if (Globals.customDimensionId == NETHER && dim == OVERWORLD) {
                     return mc.player.getX() / 8.0;
                 }
             }
@@ -60,10 +61,10 @@ public class ChunkUtils {
             MinecraftClient mc = MinecraftClient.getInstance();
             RegistryKey<World> dim = mc.world.getRegistryKey();
             // when player is in the nether or the custom dimension is the nether, perform coordinate translation
-            if ((dim == NETHER || Shared.customDimensionId == NETHER) && dim != Shared.customDimensionId) {
-                if (Shared.customDimensionId == OVERWORLD) {
+            if ((dim == NETHER || Globals.customDimensionId == NETHER) && dim != Globals.customDimensionId) {
+                if (Globals.customDimensionId == OVERWORLD) {
                     return mc.player.getZ() * 8.0;
-                } else if (Shared.customDimensionId == NETHER && dim == OVERWORLD) {
+                } else if (Globals.customDimensionId == NETHER && dim == OVERWORLD) {
                     return mc.player.getZ() / 8.0;
                 }
             }

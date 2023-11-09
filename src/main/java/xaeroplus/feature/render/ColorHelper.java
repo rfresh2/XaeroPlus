@@ -1,4 +1,4 @@
-package xaeroplus.util;
+package xaeroplus.feature.render;
 
 import xaeroplus.settings.TranslatableSettingEnum;
 

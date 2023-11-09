@@ -13,9 +13,9 @@ import xaero.common.minimap.radar.MinimapRadarList;
 import xaero.common.minimap.radar.category.setting.EntityRadarCategorySettings;
 import xaero.common.minimap.render.radar.element.RadarRenderContext;
 import xaero.common.minimap.render.radar.element.RadarRenderProvider;
+import xaeroplus.Globals;
+import xaeroplus.feature.extensions.IScreenRadarRenderContext;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.IScreenRadarRenderContext;
-import xaeroplus.util.Shared;
 
 import java.util.Objects;
 
@@ -41,8 +41,8 @@ public class MixinRadarRenderProvider {
         }
 
         if (!((IScreenRadarRenderContext) (Object) context).isWorldMap()) {
-            context.nameScale = XaeroMinimapSession.getCurrentSession().getModMain().getSettings().getDotNameScale() * Shared.minimapScalingFactor;
-            context.iconScale = this.currentList.getCategory().getSettingValue(EntityRadarCategorySettings.ICON_SCALE) * Shared.minimapScalingFactor;
+            context.nameScale = XaeroMinimapSession.getCurrentSession().getModMain().getSettings().getDotNameScale() * Globals.minimapScalingFactor;
+            context.iconScale = this.currentList.getCategory().getSettingValue(EntityRadarCategorySettings.ICON_SCALE) * Globals.minimapScalingFactor;
         }
     }
 }

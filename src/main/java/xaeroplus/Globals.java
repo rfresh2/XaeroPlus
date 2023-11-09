@@ -1,4 +1,4 @@
-package xaeroplus.util;
+package xaeroplus;
 
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
@@ -13,6 +13,8 @@ import xaero.map.WorldMap;
 import xaero.map.WorldMapSession;
 import xaero.map.mods.SupportMods;
 import xaero.map.world.MapDimension;
+import xaeroplus.feature.extensions.CustomDimensionMapSaveLoad;
+import xaeroplus.feature.render.DrawManager;
 import xaeroplus.settings.XaeroPlusSetting;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
@@ -34,7 +36,7 @@ import static net.minecraft.world.World.OVERWORLD;
 /**
  * static variables and functions to share or persist across mixins
  */
-public class Shared {
+public class Globals {
 
     // Map gui follow mode
     public static boolean FOLLOW = false;

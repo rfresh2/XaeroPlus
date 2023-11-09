@@ -1,4 +1,4 @@
-package xaeroplus.util;
+package xaeroplus.feature.extensions;
 
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;

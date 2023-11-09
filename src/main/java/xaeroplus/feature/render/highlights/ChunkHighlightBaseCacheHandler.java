@@ -1,4 +1,4 @@
-package xaeroplus.util.highlights;
+package xaeroplus.feature.render.highlights;
 
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;

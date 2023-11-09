@@ -4,7 +4,7 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import xaero.common.minimap.waypoints.Waypoint;
-import xaeroplus.util.IWaypointDimension;
+import xaeroplus.feature.extensions.IWaypointDimension;
 
 @Mixin(value = Waypoint.class, remap = false)
 public class MixinWaypoint implements IWaypointDimension {

@@ -26,10 +26,10 @@ import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.minimap.waypoints.render.WaypointFilterParams;
 import xaero.common.minimap.waypoints.render.WaypointsIngameRenderer;
 import xaero.common.settings.ModSettings;
+import xaeroplus.feature.extensions.CustomWaypointsIngameRenderer;
+import xaeroplus.feature.render.ColorHelper;
 import xaeroplus.mixin.client.mc.AccessorWorldRenderer;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.ColorHelper;
-import xaeroplus.util.CustomWaypointsIngameRenderer;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 
 import static net.minecraft.client.render.block.entity.BeaconBlockEntityRenderer.BEAM_TEXTURE;
 import static net.minecraft.world.World.NETHER;
-import static xaeroplus.util.Shared.customDimensionId;
+import static xaeroplus.Globals.customDimensionId;
 
 @Mixin(value = WaypointsIngameRenderer.class, remap = false)
 public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRenderer {

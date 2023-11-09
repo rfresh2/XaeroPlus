@@ -41,16 +41,16 @@ import xaero.common.minimap.waypoints.render.WaypointsGuiRenderer;
 import xaero.common.misc.Misc;
 import xaero.common.misc.OptimizedMath;
 import xaero.common.settings.ModSettings;
+import xaeroplus.Globals;
+import xaeroplus.feature.extensions.CustomMinimapFBORenderer;
+import xaeroplus.feature.extensions.CustomSupportXaeroWorldMap;
+import xaeroplus.feature.render.ColorHelper;
 import xaeroplus.mixin.client.mc.AccessorGameOptions;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.ColorHelper;
-import xaeroplus.util.CustomMinimapFBORenderer;
-import xaeroplus.util.CustomSupportXaeroWorldMap;
-import xaeroplus.util.Shared;
 
 import static net.minecraft.world.World.NETHER;
 import static net.minecraft.world.World.OVERWORLD;
-import static xaeroplus.util.Shared.customDimensionId;
+import static xaeroplus.Globals.customDimensionId;
 
 @Mixin(value = MinimapFBORenderer.class, remap = false)
 public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements CustomMinimapFBORenderer {
@@ -111,7 +111,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             if (this.rotationFramebuffer != null)
                 this.rotationFramebuffer.delete();
             // double the framebuffer size
-            final int scaledSize = Shared.minimapScalingFactor * 512;
+            final int scaledSize = Globals.minimapScalingFactor * 512;
             this.scalingFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, false);
             this.rotationFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, true);
             this.rotationFramebuffer.setTexFilter(9729);
@@ -173,8 +173,8 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             boolean circle,
             CustomVertexConsumers cvc
     ) {
-        viewW *= Shared.minimapScalingFactor;
-        final int scaledSize = 256 * Shared.minimapScalingFactor;
+        viewW *= Globals.minimapScalingFactor;
+        final int scaledSize = 256 * Globals.minimapScalingFactor;
         MatrixStack matrixStack = guiGraphics.getMatrices();
         MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers = minimapSession.getMultiTextureRenderTypeRenderers();
         double maxVisibleLength = !lockedNorth && shape != 1 ? (double)viewW * Math.sqrt(2.0) : (double)viewW;
@@ -334,7 +334,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             red *= chunkGridAlphaMultiplier;
             green *= chunkGridAlphaMultiplier;
             blue *= chunkGridAlphaMultiplier;
-            RenderSystem.lineWidth((float)this.modMain.getSettings().chunkGridLineWidth * Shared.minimapScalingFactor);
+            RenderSystem.lineWidth((float)this.modMain.getSettings().chunkGridLineWidth * Globals.minimapScalingFactor);
             int bias = 1;
             MatrixStack.Entry matrices = matrixStack.peek();
 
@@ -380,7 +380,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
                 }
             }
         }
-        final boolean isDimensionSwitched = Shared.customDimensionId != MinecraftClient.getInstance().world.getRegistryKey();
+        final boolean isDimensionSwitched = Globals.customDimensionId != MinecraftClient.getInstance().world.getRegistryKey();
 
         if (XaeroPlusSettingRegistry.showRenderDistanceSetting.getValue() && !isDimensionSwitched) {
             double actualPlayerX = minimap.getEntityRadar().getEntityX(mc.player, partial);
@@ -401,7 +401,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             final int z1 = z0 + width * 16;
             VertexConsumer lineBufferBuilder = renderTypeBuffers.getBuffer(CustomRenderTypes.MAP_LINES);
             MinimapShaders.FRAMEBUFFER_LINES.setFrameSize((float) scalingFramebuffer.viewportWidth, (float) scalingFramebuffer.viewportHeight);
-            RenderSystem.lineWidth((float) modMain.getSettings().chunkGridLineWidth * Shared.minimapScalingFactor);
+            RenderSystem.lineWidth((float) modMain.getSettings().chunkGridLineWidth * Globals.minimapScalingFactor);
             MatrixStack.Entry matrices = matrixStack.peek();
 
             helper.addColoredLineToExistingBuffer(
@@ -478,7 +478,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         RenderSystem.applyModelViewMatrix();
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, (float)(this.modMain.getSettings().minimapOpacity / 100.0));
-        final float scaledSizeM = Shared.minimapScalingFactor * 512f;
+        final float scaledSizeM = Globals.minimapScalingFactor * 512f;
         this.helper.drawMyTexturedModalRect(matrixStack, -scaledSize, -scaledSize, 0, 0, scaledSizeM, scaledSizeM, scaledSizeM, scaledSizeM);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         shaderMatrixStack.pop();

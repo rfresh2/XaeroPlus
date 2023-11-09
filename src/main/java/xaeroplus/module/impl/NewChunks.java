@@ -29,9 +29,7 @@ import xaeroplus.util.Shared;
 import xaeroplus.util.highlights.ChunkHighlightCache;
 import xaeroplus.util.highlights.ChunkHighlightLocalCache;
 import xaeroplus.util.highlights.ChunkHighlightSavingCache;
-import xaeroplus.util.highlights.HighlightAtChunkPos;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static net.minecraft.world.World.*;
@@ -160,7 +158,6 @@ public class NewChunks extends Module {
             new DrawManager.ChunkHighlightDrawFeature(
                 this::isEnabled,
                 this::isNewChunk,
-                this::getNewChunksInRegion,
                 this::getNewChunksColor
             ));
         newChunksCache.onEnable();
@@ -181,13 +178,6 @@ public class NewChunks extends Module {
 
     public void setAlpha(final float a) {
         newChunksColor = ColorHelper.getColorWithAlpha(newChunksColor, (int) (a));
-    }
-
-    public List<HighlightAtChunkPos> getNewChunksInRegion(
-            final int leafRegionX, final int leafRegionZ,
-            final int level,
-            final RegistryKey<World> dimension) {
-        return newChunksCache.getHighlightsInRegion(leafRegionX, leafRegionZ, level, dimension);
     }
 
     public boolean isNewChunk(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> dimensionId) {

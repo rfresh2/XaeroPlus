@@ -21,10 +21,8 @@ import xaeroplus.util.*;
 import xaeroplus.util.highlights.ChunkHighlightCache;
 import xaeroplus.util.highlights.ChunkHighlightLocalCache;
 import xaeroplus.util.highlights.ChunkHighlightSavingCache;
-import xaeroplus.util.highlights.HighlightAtChunkPos;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -185,7 +183,6 @@ public class OldChunks extends Module {
             new DrawManager.ChunkHighlightDrawFeature(
                 this::isEnabled,
                 this::isHighlighted,
-                this::getOldChunksInRegion,
                 this::getOldChunksColor
             ));
         oldChunksCache.onEnable();
@@ -225,16 +222,6 @@ public class OldChunks extends Module {
 
     public void setAlpha(final float a) {
         oldChunksColor = ColorHelper.getColorWithAlpha(oldChunksColor, (int) (a));
-    }
-
-    public List<HighlightAtChunkPos> getOldChunksInRegion(
-        final int leafRegionX, final int leafRegionZ,
-        final int level,
-        final RegistryKey<World> dimension) {
-        if (inverse)
-            return modernChunksCache.getHighlightsInRegion(leafRegionX, leafRegionZ, level, dimension);
-        else
-            return oldChunksCache.getHighlightsInRegion(leafRegionX, leafRegionZ, level, dimension);
     }
 
     public boolean isHighlighted(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> dimensionId) {

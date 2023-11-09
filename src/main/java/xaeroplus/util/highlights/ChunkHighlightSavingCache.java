@@ -79,12 +79,6 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
         return cacheForDimension.isHighlighted(chunkPosX, chunkPosZ, getActualDimension());
     }
 
-    public List<HighlightAtChunkPos> getHighlightsInRegion(final int leafRegionX, final int leafRegionZ, final int level, RegistryKey<World> dimension) {
-        ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimension);
-        if (cacheForDimension == null) return Collections.emptyList();
-        return cacheForDimension.getHighlightsInRegion(leafRegionX, leafRegionZ, level, dimension);
-    }
-
     public void handleWorldChange() {
         Futures.whenAllComplete(saveAllChunks())
                 .call(() -> {

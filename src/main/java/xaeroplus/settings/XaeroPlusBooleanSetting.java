@@ -38,7 +38,7 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
                 tooltipTranslationKey,
                 null,
                 null,
-                new KeyBinding(settingName, -1, "XaeroPlus"));
+                new KeyBinding(settingNameTranslationKey, -1, "XaeroPlus"));
         settingLocation.getSettingsList().add(setting);
         return setting;
     }
@@ -56,7 +56,7 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
                 tooltipTranslationKey,
                 null,
                 settingChangeConsumer,
-                new KeyBinding(settingName, -1, "XaeroPlus"));
+                new KeyBinding(settingNameTranslationKey, -1, "XaeroPlus"));
         settingLocation.getSettingsList().add(setting);
         return setting;
     }
@@ -74,7 +74,7 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
                 tooltipTranslationKey,
                 visibilitySupplier,
                 null,
-                new KeyBinding(settingName, -1, "XaeroPlus"));
+                new KeyBinding(settingNameTranslationKey, -1, "XaeroPlus"));
         settingLocation.getSettingsList().add(setting);
         return setting;
     }
@@ -93,7 +93,7 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
                 tooltipTranslationKey,
                 visibilitySupplier,
                 settingChangeConsumer,
-                new KeyBinding(settingName, -1, "XaeroPlus"));
+                new KeyBinding(settingNameTranslationKey, -1, "XaeroPlus"));
         settingLocation.getSettingsList().add(setting);
         return setting;
     }

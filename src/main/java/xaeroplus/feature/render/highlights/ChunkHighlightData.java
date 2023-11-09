@@ -1,4 +1,4 @@
-package xaeroplus.util.highlights;
+package xaeroplus.feature.render.highlights;
 
 import static xaeroplus.util.ChunkUtils.longToChunkX;
 import static xaeroplus.util.ChunkUtils.longToChunkZ;

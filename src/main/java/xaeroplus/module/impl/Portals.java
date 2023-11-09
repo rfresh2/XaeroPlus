@@ -15,23 +15,27 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.EmptyChunk;
 import net.minecraft.world.chunk.WorldChunk;
+import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.ChunkDataEvent;
 import xaeroplus.event.ClientTickEvent;
 import xaeroplus.event.PacketReceivedEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
+import xaeroplus.feature.render.ChunkHighlightProvider;
+import xaeroplus.feature.render.ColorHelper;
+import xaeroplus.feature.render.highlights.ChunkHighlightCache;
+import xaeroplus.feature.render.highlights.ChunkHighlightLocalCache;
+import xaeroplus.feature.render.highlights.ChunkHighlightSavingCache;
 import xaeroplus.module.Module;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.*;
-import xaeroplus.util.highlights.ChunkHighlightCache;
-import xaeroplus.util.highlights.ChunkHighlightLocalCache;
-import xaeroplus.util.highlights.ChunkHighlightSavingCache;
+import xaeroplus.util.ChunkUtils;
+import xaeroplus.util.MutableBlockPos;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static net.minecraft.world.World.*;
-import static xaeroplus.util.ColorHelper.getColor;
+import static xaeroplus.feature.render.ColorHelper.getColor;
 
 @Module.ModuleInfo()
 public class Portals extends Module {
@@ -65,10 +69,9 @@ public class Portals extends Module {
 
     @Override
     public void onEnable() {
-        Shared.drawManager.registerChunkHighlightDrawFeature(
+        Globals.drawManager.registerChunkHighlightProvider(
             this.getClass(),
-            new DrawManager.ChunkHighlightDrawFeature(
-                this::isEnabled,
+            new ChunkHighlightProvider(
                 this::isPortalChunk,
                 this::getPortalsColor
             ));
@@ -79,6 +82,7 @@ public class Portals extends Module {
     @Override
     public void onDisable() {
         portalsCache.onDisable();
+        Globals.drawManager.unregister(this.getClass());
     }
 
     public boolean inUnknownDimension() {

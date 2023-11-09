@@ -11,16 +11,20 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.EmptyChunk;
+import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.ChunkDataEvent;
 import xaeroplus.event.ClientTickEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
+import xaeroplus.feature.render.ChunkHighlightProvider;
+import xaeroplus.feature.render.ColorHelper;
+import xaeroplus.feature.render.highlights.ChunkHighlightCache;
+import xaeroplus.feature.render.highlights.ChunkHighlightLocalCache;
+import xaeroplus.feature.render.highlights.ChunkHighlightSavingCache;
 import xaeroplus.module.Module;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.*;
-import xaeroplus.util.highlights.ChunkHighlightCache;
-import xaeroplus.util.highlights.ChunkHighlightLocalCache;
-import xaeroplus.util.highlights.ChunkHighlightSavingCache;
+import xaeroplus.util.ChunkUtils;
+import xaeroplus.util.MutableBlockPos;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -29,7 +33,7 @@ import java.util.concurrent.Executors;
 
 import static java.util.Arrays.asList;
 import static net.minecraft.world.World.*;
-import static xaeroplus.util.ColorHelper.getColor;
+import static xaeroplus.feature.render.ColorHelper.getColor;
 
 @Module.ModuleInfo()
 public class OldChunks extends Module {
@@ -178,10 +182,9 @@ public class OldChunks extends Module {
 
     @Override
     public void onEnable() {
-        Shared.drawManager.registerChunkHighlightDrawFeature(
+        Globals.drawManager.registerChunkHighlightProvider(
             this.getClass(),
-            new DrawManager.ChunkHighlightDrawFeature(
-                this::isEnabled,
+            new ChunkHighlightProvider(
                 this::isHighlighted,
                 this::getOldChunksColor
             ));
@@ -210,6 +213,7 @@ public class OldChunks extends Module {
     public void onDisable() {
         oldChunksCache.onDisable();
         modernChunksCache.onDisable();
+        Globals.drawManager.unregister(this.getClass());
     }
 
     public int getOldChunksColor() {

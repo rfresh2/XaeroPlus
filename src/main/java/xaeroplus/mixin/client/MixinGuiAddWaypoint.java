@@ -12,7 +12,7 @@ import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.minimap.waypoints.WaypointSet;
 import xaero.common.minimap.waypoints.WaypointWorld;
 import xaeroplus.XaeroPlus;
-import xaeroplus.util.IWaypointDimension;
+import xaeroplus.feature.extensions.IWaypointDimension;
 import xaeroplus.util.WaypointsHelper;
 
 import java.util.ArrayList;

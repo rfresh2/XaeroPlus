@@ -1,4 +1,4 @@
-package xaeroplus.util;
+package xaeroplus.feature.extensions;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;

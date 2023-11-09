@@ -4,6 +4,7 @@ import com.google.common.net.InternetDomainName;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 
@@ -12,7 +13,7 @@ import static java.util.Objects.nonNull;
 public class DataFolderResolveUtil {
 
     public static void resolveDataFolder(final ClientPlayNetworkHandler connection, final CallbackInfoReturnable<String> cir) {
-        final XaeroPlusSettingRegistry.DataFolderResolutionMode dataFolderResolutionMode = Shared.dataFolderResolutionMode;
+        final XaeroPlusSettingRegistry.DataFolderResolutionMode dataFolderResolutionMode = Globals.dataFolderResolutionMode;
         if (dataFolderResolutionMode == XaeroPlusSettingRegistry.DataFolderResolutionMode.SERVER_NAME) {
             if (nonNull(connection.getServerInfo())) {
                 String serverName = connection.getServerInfo().name;

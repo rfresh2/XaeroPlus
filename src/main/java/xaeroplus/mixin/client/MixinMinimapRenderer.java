@@ -28,14 +28,12 @@ import xaero.common.minimap.render.MinimapFBORenderer;
 import xaero.common.minimap.render.MinimapRenderer;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.settings.ModSettings;
+import xaeroplus.Globals;
+import xaeroplus.feature.extensions.CustomMinimapFBORenderer;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.CustomMinimapFBORenderer;
-import xaeroplus.util.Shared;
 
 import static net.minecraft.world.World.NETHER;
 import static net.minecraft.world.World.OVERWORLD;
-import static xaeroplus.util.ChunkUtils.getPlayerX;
-import static xaeroplus.util.ChunkUtils.getPlayerZ;
 
 @Mixin(value = MinimapRenderer.class, remap = false)
 public class MixinMinimapRenderer {
@@ -59,10 +57,10 @@ public class MixinMinimapRenderer {
             final CustomVertexConsumers cvc,
             final CallbackInfo ci
     ) {
-        if (this.minimapInterface.usingFBO() && Shared.shouldResetFBO) {
-            Shared.minimapScalingFactor = (int) XaeroPlusSettingRegistry.minimapScaling.getValue();
+        if (this.minimapInterface.usingFBO() && Globals.shouldResetFBO) {
+            Globals.minimapScalingFactor = (int) XaeroPlusSettingRegistry.minimapScaling.getValue();
             ((CustomMinimapFBORenderer) this.minimapInterface.getMinimapFBORenderer()).reloadMapFrameBuffers();
-            Shared.shouldResetFBO = false;
+            Globals.shouldResetFBO = false;
             minimap.setToResetImage(true);
         }
     }
@@ -72,10 +70,10 @@ public class MixinMinimapRenderer {
             MinecraftClient mc = MinecraftClient.getInstance();
             RegistryKey<World> dim = mc.world.getRegistryKey();
             // when player is in the nether or the custom dimension is the nether, perform coordinate translation
-            if ((dim == NETHER || Shared.customDimensionId == NETHER) && dim != Shared.customDimensionId) {
-                if (Shared.customDimensionId == OVERWORLD) {
+            if ((dim == NETHER || Globals.customDimensionId == NETHER) && dim != Globals.customDimensionId) {
+                if (Globals.customDimensionId == OVERWORLD) {
                     return renderEntityXZ * 8.0;
-                } else if (Shared.customDimensionId == NETHER && dim == OVERWORLD) {
+                } else if (Globals.customDimensionId == NETHER && dim == OVERWORLD) {
                     return renderEntityXZ / 8.0;
                 }
             }
@@ -120,7 +118,7 @@ public class MixinMinimapRenderer {
                                     final int halfViewH,
                                     final boolean circle,
                                     final float minimapScale) {
-        double customZoom = zoom / Shared.minimapScalingFactor;
+        double customZoom = zoom / Globals.minimapScalingFactor;
         instance.render(
                 guiGraphics,
                 renderEntity,

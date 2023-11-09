@@ -13,9 +13,14 @@ import xaero.common.minimap.waypoints.WaypointSet;
 import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.misc.OptimizedMath;
 import xaero.map.mods.SupportMods;
+import xaeroplus.Globals;
 import xaeroplus.event.ClientTickEvent;
+import xaeroplus.feature.extensions.IWaypointDimension;
 import xaeroplus.module.Module;
-import xaeroplus.util.*;
+import xaeroplus.util.BaritoneGoalHelper;
+import xaeroplus.util.BaritoneHelper;
+import xaeroplus.util.ChunkUtils;
+import xaeroplus.util.WaypointsHelper;
 
 import java.util.List;
 import java.util.Optional;
@@ -53,7 +58,7 @@ public class BaritoneGoalSync extends Module {
         final int z = OptimizedMath.myFloor(baritoneGoalBlockPos.getZ() * dimDiv);
         if (baritoneGoalWaypoint.isPresent()) {
             final Waypoint waypoint = baritoneGoalWaypoint.get();
-            RegistryKey<World> customDim = Shared.customDimensionId;
+            RegistryKey<World> customDim = Globals.customDimensionId;
             RegistryKey<World> actualDim = ChunkUtils.getActualDimension();
             double customDimDiv = 1.0;
             if (customDim != actualDim) {

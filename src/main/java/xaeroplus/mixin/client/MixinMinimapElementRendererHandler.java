@@ -19,7 +19,7 @@ import xaero.common.minimap.element.render.MinimapElementRenderer;
 import xaero.common.minimap.element.render.MinimapElementRendererHandler;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.minimap.render.radar.element.RadarRenderContext;
-import xaeroplus.util.IScreenRadarRenderContext;
+import xaeroplus.feature.extensions.IScreenRadarRenderContext;
 
 @Mixin(value = MinimapElementRendererHandler.class, remap = false)
 public class MixinMinimapElementRendererHandler {

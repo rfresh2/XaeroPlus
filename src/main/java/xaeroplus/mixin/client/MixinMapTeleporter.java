@@ -11,9 +11,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.map.teleport.MapTeleporter;
 import xaero.map.world.MapWorld;
+import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.Shared;
 
 import static net.minecraft.world.World.OVERWORLD;
 
@@ -23,7 +23,7 @@ public class MixinMapTeleporter {
 
     @Inject(method = "teleport", at = @At("HEAD"))
     public void teleportHeadInject(final Screen screen, final MapWorld mapWorld, final int x, final int y, final int z, final CallbackInfo ci) {
-        dimensionId = Shared.customDimensionId;
+        dimensionId = Globals.customDimensionId;
         // line below this will close GuiMap. which will reset Shared.customDimensionId if persist setting is off (default)
     }
 

@@ -10,7 +10,7 @@ import xaero.map.region.MapRegion;
 import xaero.map.region.texture.BranchRegionTexture;
 import xaero.map.world.MapDimension;
 import xaero.map.world.MapWorld;
-import xaeroplus.util.CustomDimensionMapProcessor;
+import xaeroplus.feature.extensions.CustomDimensionMapProcessor;
 
 @Mixin(value = BranchLeveledRegion.class, remap = false)
 public abstract class MixinBranchLeveledRegion extends LeveledRegion<BranchRegionTexture> {

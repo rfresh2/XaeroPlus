@@ -18,11 +18,11 @@ import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.minimap.waypoints.WaypointWorldRootContainer;
 import xaero.common.minimap.waypoints.WaypointsManager;
+import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
+import xaeroplus.feature.extensions.IWaypointDimension;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.DataFolderResolveUtil;
-import xaeroplus.util.IWaypointDimension;
-import xaeroplus.util.Shared;
 import xaeroplus.util.WaypointsHelper;
 
 import static net.minecraft.world.World.NETHER;
@@ -137,8 +137,8 @@ public abstract class MixinWaypointsManager {
             } else {
                 double currentDimDiv = MinecraftClient.getInstance().world.getDimension().coordinateScale();
                 double selectedDimDiv = dimKey == World.NETHER ? 8.0 : 1.0;
-                if (MinecraftClient.getInstance().world.getRegistryKey() != Shared.customDimensionId) {
-                    double customDimDiv = Shared.customDimensionId == NETHER ? 8.0 : 1.0;
+                if (MinecraftClient.getInstance().world.getRegistryKey() != Globals.customDimensionId) {
+                    double customDimDiv = Globals.customDimensionId == NETHER ? 8.0 : 1.0;
                     return customDimDiv / selectedDimDiv;
                 }
                 return currentDimDiv / selectedDimDiv;

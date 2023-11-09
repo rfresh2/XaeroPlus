@@ -5,7 +5,7 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import xaero.map.mods.gui.Waypoint;
-import xaeroplus.util.IWaypointDimension;
+import xaeroplus.feature.extensions.IWaypointDimension;
 
 @Mixin(value = Waypoint.class, remap = false)
 public class MixinGuiWaypoint implements IWaypointDimension {

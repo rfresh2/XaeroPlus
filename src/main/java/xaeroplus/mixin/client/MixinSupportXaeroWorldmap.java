@@ -397,17 +397,24 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                         if (slimeChunks && !isDimensionSwitched) {
                             this.renderSlimeChunks(chunk, seed, drawX, drawZ, matrixStack, helper, overlayBufferBuilder);
                         }
-                        Shared.drawManager.drawMinimapFeatures(
-                            chunk,
-                            drawX,
-                            drawZ,
-                            matrixStack,
-                            overlayBufferBuilder,
-                            helper);
                     }
                 }
             }
         }
+        Shared.drawManager.drawMinimapFeatures(
+            minViewX,
+            maxViewX,
+            minViewZ,
+            maxViewZ,
+            chunkX,
+            chunkZ,
+            tileX,
+            tileZ,
+            insideX,
+            insideZ,
+            matrixStack,
+            overlayBufferBuilder,
+            helper);
         if (XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) bgTesselator.draw();
     }
 }

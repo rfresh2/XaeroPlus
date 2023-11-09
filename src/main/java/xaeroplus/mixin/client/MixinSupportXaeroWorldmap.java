@@ -30,11 +30,6 @@ import xaero.map.misc.Misc;
 import xaero.map.region.LeveledRegion;
 import xaero.map.region.MapRegion;
 import xaero.map.region.MapTileChunk;
-import xaeroplus.module.ModuleManager;
-import xaeroplus.module.impl.NewChunks;
-import xaeroplus.module.impl.OldChunks;
-import xaeroplus.module.impl.PortalSkipDetection;
-import xaeroplus.module.impl.Portals;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.CustomDimensionMapProcessor;
 import xaeroplus.util.CustomSupportXaeroWorldMap;
@@ -402,70 +397,13 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                         if (slimeChunks && !isDimensionSwitched) {
                             this.renderSlimeChunks(chunk, seed, drawX, drawZ, matrixStack, helper, overlayBufferBuilder);
                         }
-                        if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
-                            NewChunks newChunks = ModuleManager.getModule(NewChunks.class);
-                            for (int t = 0; t < 16; ++t) {
-                                final int chunkPosX = chunk.getX() * 4 + t % 4;
-                                final int chunkPosZ = chunk.getZ() * 4 + t / 4;
-                                int color = newChunks.getNewChunksColor();
-                                float a = ((color >> 24) & 255) / 255.0f;
-                                if (a != 0.0f) {
-                                    if (newChunks.isNewChunk(chunkPosX, chunkPosZ, Shared.customDimensionId)) {
-                                        final float left = drawX + 16 * (t % 4);
-                                        final float top = drawZ + 16 * (t / 4);
-                                        helper.addColoredRectToExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBufferBuilder, left, top, 16, 16, color);
-                                    }
-                                }
-                            }
-                        }
-                        if (XaeroPlusSettingRegistry.oldChunksEnabledSetting.getValue()) {
-                            OldChunks oldChunks = ModuleManager.getModule(OldChunks.class);
-                            for (int t = 0; t < 16; ++t) {
-                                final int chunkPosX = chunk.getX() * 4 + t % 4;
-                                final int chunkPosZ = chunk.getZ() * 4 + t / 4;
-                                int color = oldChunks.getOldChunksColor();
-                                float a = ((color >> 24) & 255) / 255.0f;
-                                if (a != 0.0f) {
-                                    if (oldChunks.isHighlighted(chunkPosX, chunkPosZ, Shared.customDimensionId)) {
-                                        final float left = drawX + 16 * (t % 4);
-                                        final float top = drawZ + 16 * (t / 4);
-                                        helper.addColoredRectToExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBufferBuilder, left, top, 16, 16, color);
-                                    }
-                                }
-                            }
-                        }
-                        if (XaeroPlusSettingRegistry.portalsEnabledSetting.getValue()) {
-                            Portals portals = ModuleManager.getModule(Portals.class);
-                            for (int t = 0; t < 16; ++t) {
-                                final int chunkPosX = chunk.getX() * 4 + t % 4;
-                                final int chunkPosZ = chunk.getZ() * 4 + t / 4;
-                                int color = portals.getPortalsColor();
-                                float a = ((color >> 24) & 255) / 255.0f;
-                                if (a != 0.0f) {
-                                    if (portals.isPortalChunk(chunkPosX, chunkPosZ, Shared.customDimensionId)) {
-                                        final float left = drawX + 16 * (t % 4);
-                                        final float top = drawZ + 16 * (t / 4);
-                                        helper.addColoredRectToExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBufferBuilder, left, top, 16, 16, color);
-                                    }
-                                }
-                            }
-                        }
-                        if (XaeroPlusSettingRegistry.portalSkipDetectionEnabledSetting.getValue()) {
-                            PortalSkipDetection portalSkipDetection = ModuleManager.getModule(PortalSkipDetection.class);
-                            for (int t = 0; t < 16; ++t) {
-                                final int chunkPosX = chunk.getX() * 4 + t % 4;
-                                final int chunkPosZ = chunk.getZ() * 4 + t / 4;
-                                int color = portalSkipDetection.getPortalSkipChunksColor();
-                                float a = ((color >> 24) & 255) / 255.0f;
-                                if (a != 0.0f) {
-                                    if (portalSkipDetection.isPortalSkipChunk(chunkPosX, chunkPosZ)) {
-                                        final float left = drawX + 16 * (t % 4);
-                                        final float top = drawZ + 16 * (t / 4);
-                                        helper.addColoredRectToExistingBuffer(matrixStack.peek().getPositionMatrix(), overlayBufferBuilder, left, top, 16, 16, color);
-                                    }
-                                }
-                            }
-                        }
+                        Shared.drawManager.drawMinimapFeatures(
+                            chunk,
+                            drawX,
+                            drawZ,
+                            matrixStack,
+                            overlayBufferBuilder,
+                            helper);
                     }
                 }
             }

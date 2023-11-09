@@ -17,10 +17,7 @@ import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.module.Module;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.ChunkUtils;
-import xaeroplus.util.ColorHelper;
-import xaeroplus.util.CustomDimensionMapProcessor;
-import xaeroplus.util.SeenChunksTrackingMapTileChunk;
+import xaeroplus.util.*;
 import xaeroplus.util.highlights.ChunkHighlightLocalCache;
 import xaeroplus.util.highlights.HighlightAtChunkPos;
 
@@ -84,6 +81,14 @@ public class PortalSkipDetection extends Module {
 
     @Override
     public void onEnable() {
+        Shared.drawManager.registerChunkHighlightDrawFeature(
+            this.getClass(),
+            new DrawManager.ChunkHighlightDrawFeature(
+                this::isEnabled,
+                this::isPortalSkipChunk,
+                this::getPortalSkipChunksInRegion,
+                this::getPortalSkipChunksColor
+            ));
         reset();
         initializeWorld();
         this.newChunksModule = ModuleManager.getModule(NewChunks.class);
@@ -227,11 +232,11 @@ public class PortalSkipDetection extends Module {
 
     public List<HighlightAtChunkPos> getPortalSkipChunksInRegion(
             final int leafRegionX, final int leafRegionZ,
-            final int level) {
+            final int level, final RegistryKey<World> dimension) {
         return cache.getHighlightsInRegion(leafRegionX, leafRegionZ, level, ChunkUtils.getActualDimension());
     }
 
-    public boolean isPortalSkipChunk(final int chunkPosX, final int chunkPosZ) {
+    public boolean isPortalSkipChunk(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> dimension) {
         return isPortalSkipChunk(chunkPosToLong(chunkPosX, chunkPosZ));
     }
 

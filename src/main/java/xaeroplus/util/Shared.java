@@ -57,6 +57,8 @@ public class Shared {
 
     public static final Identifier xpGuiTextures = new Identifier("xaeroplus", "gui/xpgui.png");
 
+    public static DrawManager drawManager = new DrawManager();
+
     public static void onAllSettingsLoaded() {
         XaeroPlusSettingsReflectionHax.ALL_SETTINGS.get().forEach(XaeroPlusSetting::init);
         nullOverworldDimensionFolder = XaeroPlusSettingRegistry.nullOverworldDimensionFolder.getValue();

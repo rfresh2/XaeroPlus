@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.map.gui.GuiSettings;
 import xaero.map.gui.GuiWorldMapSettings;
 import xaero.map.gui.ISettingEntry;
-import xaeroplus.util.GuiXaeroPlusWorldMapSettings;
+import xaeroplus.feature.extensions.GuiXaeroPlusWorldMapSettings;
 
 @Mixin(value = GuiWorldMapSettings.class, remap = false)
 public abstract class MixinGuiWorldMapSettings extends GuiSettings {

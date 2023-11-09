@@ -4,10 +4,11 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 public class WaypointsHelper {
     // nullable
-    public static RegistryKey<World> getDimensionKeyForWaypointWorldKey(String waypointWorldKey) {
+    public static @Nullable RegistryKey<World> getDimensionKeyForWaypointWorldKey(String waypointWorldKey) {
         String dimIdPart = waypointWorldKey.substring(waypointWorldKey.lastIndexOf(47) + 1).substring(4);
         if (dimIdPart.equals("0")) {
             return World.OVERWORLD;

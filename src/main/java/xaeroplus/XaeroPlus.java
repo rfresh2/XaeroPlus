@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
-import xaeroplus.util.Shared;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -29,7 +28,7 @@ public class XaeroPlus implements ClientModInitializer {
 			// needed as we can either accept Xaero's Minimap or BetterPVP but can't describe this in the fabric.mod.json
 			minimapCompatibleVersionCheck();
 			ModuleManager.init();
-			boolean a = Shared.FOLLOW; // force static instances to init
+			boolean a = Globals.FOLLOW; // force static instances to init
 			XaeroPlusSettingRegistry.fastMapSetting.getValue(); // force static instances to init
 			List<KeyBinding> keybinds = XaeroPlusSettingsReflectionHax.getKeybinds();
 			keybinds.forEach(KeyBindingHelper::registerKeyBinding);

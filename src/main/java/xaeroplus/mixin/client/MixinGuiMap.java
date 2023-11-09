@@ -58,12 +58,12 @@ import xaero.map.region.*;
 import xaero.map.region.texture.RegionTexture;
 import xaero.map.settings.ModSettings;
 import xaero.map.world.MapDimension;
+import xaeroplus.Globals;
+import xaeroplus.feature.extensions.CustomDimensionMapProcessor;
 import xaeroplus.mixin.client.mc.AccessorGameOptions;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.BaritoneHelper;
 import xaeroplus.util.ChunkUtils;
-import xaeroplus.util.CustomDimensionMapProcessor;
-import xaeroplus.util.Shared;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,9 +75,9 @@ import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
 import static net.minecraft.world.World.*;
 import static xaero.map.gui.GuiMap.*;
+import static xaeroplus.Globals.FOLLOW;
 import static xaeroplus.util.ChunkUtils.getPlayerX;
 import static xaeroplus.util.ChunkUtils.getPlayerZ;
-import static xaeroplus.util.Shared.FOLLOW;
 
 @Mixin(value = GuiMap.class, remap = false)
 public abstract class MixinGuiMap extends ScreenBase implements IRightClickableElement {
@@ -350,17 +350,17 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         RegistryKey<World> dim = MinecraftClient.getInstance().world.getRegistryKey();
         this.cameraX = player.getX();
         this.cameraZ = player.getZ();
-        if ((dim == NETHER || Shared.customDimensionId == NETHER) && dim != Shared.customDimensionId) {
-            if (Shared.customDimensionId == OVERWORLD) {
+        if ((dim == NETHER || Globals.customDimensionId == NETHER) && dim != Globals.customDimensionId) {
+            if (Globals.customDimensionId == OVERWORLD) {
                 this.cameraX = player.getX() * 8.0;
-            } else if (Shared.customDimensionId == NETHER && dim == OVERWORLD) {
+            } else if (Globals.customDimensionId == NETHER && dim == OVERWORLD) {
                 this.cameraX = player.getX() / 8.0;
             }
         }
-        if ((dim == NETHER || Shared.customDimensionId == NETHER) && dim != Shared.customDimensionId) {
-            if (Shared.customDimensionId == OVERWORLD) {
+        if ((dim == NETHER || Globals.customDimensionId == NETHER) && dim != Globals.customDimensionId) {
+            if (Globals.customDimensionId == OVERWORLD) {
                 this.cameraZ = player.getZ() * 8.0;
-            } else if (Shared.customDimensionId == NETHER && dim == OVERWORLD) {
+            } else if (Globals.customDimensionId == NETHER && dim == OVERWORLD) {
                 this.cameraZ = player.getZ() / 8.0;
             }
         }
@@ -390,15 +390,15 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         this.addSelectableChild(xTextEntryField);
         this.addSelectableChild(zTextEntryField);
         switchToEndButton = new GuiTexturedButton(this.width - 20, zoomInButton.getY() - 20, 20, 20, 31, 0, 16, 16,
-                                                  Shared.xpGuiTextures,
+                                                  Globals.xpGuiTextures,
                                                   (button -> onSwitchDimensionButton(END)),
                                                   () -> new CursorBox(Text.translatable("setting.keybinds.switch_to_end")));
         switchToOverworldButton = new GuiTexturedButton(this.width - 20, this.switchToEndButton.getY() - 20, 20, 20, 16, 0, 16, 16,
-                                                        Shared.xpGuiTextures,
+                                                        Globals.xpGuiTextures,
                                                         (button -> onSwitchDimensionButton(OVERWORLD)),
                                                         () -> new CursorBox(Text.translatable("setting.keybinds.switch_to_overworld")));
-        switchToNetherButton = new GuiTexturedButton( this.width - 20, this.switchToOverworldButton.getY() - 20, 20, 20, 0, 0, 16, 16,
-                                                     Shared.xpGuiTextures,
+        switchToNetherButton = new GuiTexturedButton(this.width - 20, this.switchToOverworldButton.getY() - 20, 20, 20, 0, 0, 16, 16,
+                                                     Globals.xpGuiTextures,
                                                      (button -> onSwitchDimensionButton(NETHER)),
                                                      () -> new CursorBox(Text.translatable("setting.keybinds.switch_to_nether")));
         addButton(switchToEndButton);
@@ -410,9 +410,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     protected void onExit(Screen screen) {
         if (!XaeroPlusSettingRegistry.persistMapDimensionSwitchSetting.getValue()) {
             try {
-                Shared.customDimensionId = MinecraftClient.getInstance().world.getRegistryKey();
+                Globals.customDimensionId = MinecraftClient.getInstance().world.getRegistryKey();
             } catch (final Exception e) {
-                Shared.customDimensionId = OVERWORLD;
+                Globals.customDimensionId = OVERWORLD;
             }
             WorldMap.settings.minimapRadar = true; // todo: restore previous value before custom dimension was entered (if at all)
         }
@@ -427,7 +427,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     public void render(DrawContext guiGraphics, int scaledMouseX, int scaledMouseY, float partialTicks) {
         while(GL11.glGetError() != 0) {
         }
-        final boolean isDimensionSwitched = Shared.customDimensionId != MinecraftClient.getInstance().world.getRegistryKey();
+        final boolean isDimensionSwitched = Globals.customDimensionId != MinecraftClient.getInstance().world.getRegistryKey();
 
         GlStateManager._clearColor(0.0F, 0.0F, 0.0F, 0.0F);
         GL11.glClearColor(0.0F, 0.0F, 0.0F, 0.0F);
@@ -636,7 +636,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     int mouseRegZ = this.mouseBlockPosZ >> leveledRegionShift;
                     int renderedCaveLayer = this.mapProcessor.getCurrentCaveLayer();
                     final CustomDimensionMapProcessor customDimensionMapProcessor = (CustomDimensionMapProcessor) this.mapProcessor;
-                    LeveledRegion<?> reg = customDimensionMapProcessor.getLeveledRegionCustomDimension(renderedCaveLayer, mouseRegX, mouseRegZ, textureLevel, Shared.customDimensionId);
+                    LeveledRegion<?> reg = customDimensionMapProcessor.getLeveledRegionCustomDimension(renderedCaveLayer, mouseRegX, mouseRegZ, textureLevel, Globals.customDimensionId);
                     int maxRegBlockCoord = (1 << leveledRegionShift) - 1;
                     int mouseRegPixelX = (this.mouseBlockPosX & maxRegBlockCoord) >> textureLevel;
                     int mouseRegPixelZ = (this.mouseBlockPosZ & maxRegBlockCoord) >> textureLevel;
@@ -646,7 +646,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                         this.mapTileSelection.setEnd(this.mouseBlockPosX >> 4, this.mouseBlockPosZ >> 4);
                     }
 
-                    MapRegion leafRegion = customDimensionMapProcessor.getMapRegionCustomDimension(renderedCaveLayer, this.mouseBlockPosX >> 9, this.mouseBlockPosZ >> 9, false, Shared.customDimensionId);
+                    MapRegion leafRegion = customDimensionMapProcessor.getMapRegionCustomDimension(renderedCaveLayer, this.mouseBlockPosX >> 9, this.mouseBlockPosZ >> 9, false, Globals.customDimensionId);
                     MapTileChunk chunk = leafRegion == null ? null : leafRegion.getChunk(this.mouseBlockPosX >> 6 & 7, this.mouseBlockPosZ >> 6 & 7);
                     int debugTextureX = this.mouseBlockPosX >> leveledRegionShift - 3 & 7;
                     int debugTextureY = this.mouseBlockPosZ >> leveledRegionShift - 3 & 7;
@@ -684,7 +684,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                         }
 
                         guiGraphics.drawTextWithShadow(mc.textRenderer, "MultiWorld ID: " + this.mapProcessor.getMapWorld().getCurrentMultiworld(), 5, 255, -1);
-                        LayeredRegionManager regions = this.mapProcessor.getMapWorld().getDimension(Shared.customDimensionId).getLayeredMapRegions();
+                        LayeredRegionManager regions = this.mapProcessor.getMapWorld().getDimension(Globals.customDimensionId).getLayeredMapRegions();
                         guiGraphics.drawTextWithShadow(
                                 mc.textRenderer,
                                 String.format(
@@ -830,7 +830,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     this.branchRegionBuffer.clear();
                     float brightness = this.mapProcessor.getBrightness();
                     int globalRegionCacheHashCode = WorldMap.settings.getRegionCacheHashCode();
-                    int globalCaveStart = this.mapProcessor.getMapWorld().getDimension(Shared.customDimensionId).getLayeredMapRegions().getLayer(renderedCaveLayer).getCaveStart();
+                    int globalCaveStart = this.mapProcessor.getMapWorld().getDimension(Globals.customDimensionId).getLayeredMapRegions().getLayer(renderedCaveLayer).getCaveStart();
                     int globalCaveDepth = WorldMap.settings.caveModeDepth;
                     boolean reloadEverything = WorldMap.settings.reloadEverything;
                     int globalReloadVersion = WorldMap.settings.reloadVersion;
@@ -872,15 +872,15 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                     if (regX >= minLeafRegX && regX <= maxLeafRegX) {
                                         int regZ = leafRegionMinZ + leafZ;
                                         if (regZ >= minLeafRegZ && regZ <= maxLeafRegZ) {
-                                            MapRegion region = customDimensionMapProcessor.getMapRegionCustomDimension(renderedCaveLayer, regX, regZ, false, Shared.customDimensionId);
+                                            MapRegion region = customDimensionMapProcessor.getMapRegionCustomDimension(renderedCaveLayer, regX, regZ, false, Globals.customDimensionId);
                                             if (region == null) {
                                                 region = customDimensionMapProcessor
-                                                        .getMapRegionCustomDimension(renderedCaveLayer, regX, regZ, customDimensionMapProcessor.regionExistsCustomDimension(renderedCaveLayer, regX, regZ, Shared.customDimensionId), Shared.customDimensionId);
+                                                        .getMapRegionCustomDimension(renderedCaveLayer, regX, regZ, customDimensionMapProcessor.regionExistsCustomDimension(renderedCaveLayer, regX, regZ, Globals.customDimensionId), Globals.customDimensionId);
                                             }
 
                                             if (region != null) {
                                                 if (leveledRegion == null) {
-                                                    leveledRegion = customDimensionMapProcessor.getLeveledRegionCustomDimension(renderedCaveLayer, leveledRegX, leveledRegZ, textureLevel, Shared.customDimensionId);
+                                                    leveledRegion = customDimensionMapProcessor.getLeveledRegionCustomDimension(renderedCaveLayer, leveledRegX, leveledRegZ, textureLevel, Globals.customDimensionId);
                                                 }
 
                                                 if (!prevWaitingForBranchCache) {
@@ -969,9 +969,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                         lastUpdatedRootLeveledRegion = rootLeveledRegion;
                                     }
 
-                                    this.mapProcessor.getMapWorld().getDimension(Shared.customDimensionId).getLayeredMapRegions().bumpLoadedRegion(leveledRegion);
+                                    this.mapProcessor.getMapWorld().getDimension(Globals.customDimensionId).getLayeredMapRegions().bumpLoadedRegion(leveledRegion);
                                     if (rootLeveledRegion != null) {
-                                        this.mapProcessor.getMapWorld().getDimension(Shared.customDimensionId).getLayeredMapRegions().bumpLoadedRegion(rootLeveledRegion);
+                                        this.mapProcessor.getMapWorld().getDimension(Globals.customDimensionId).getLayeredMapRegions().bumpLoadedRegion(rootLeveledRegion);
                                     }
                                 } else {
                                     this.waitingForBranchCache[0] = prevWaitingForBranchCache;
@@ -1129,7 +1129,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                     }
                                 }
                                 if (!mc.options.hudHidden)
-                                    Shared.drawManager.drawWorldMapFeatures(leafRegionMinX, leafRegionMinZ, leveledSideInRegions, flooredCameraX, flooredCameraZ, matrixStack, overlayBuffer);
+                                    Globals.drawManager.drawWorldMapFeatures(leafRegionMinX, leafRegionMinZ, leveledSideInRegions, flooredCameraX, flooredCameraZ, matrixStack, overlayBuffer);
                             }
                         }
                     }
@@ -1491,7 +1491,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     }
 
                     if (XaeroPlusSettingRegistry.showRenderDistanceWorldMapSetting.getValue() && !mc.options.hudHidden) {
-                        if (MinecraftClient.getInstance().world.getRegistryKey() == Shared.customDimensionId) {
+                        if (MinecraftClient.getInstance().world.getRegistryKey() == Globals.customDimensionId) {
                             final int viewDistance = ((AccessorGameOptions) mc.options).getServerViewDistance();
                             int width = viewDistance * 2 + 1;
                             double playerX = getPlayerX();
@@ -1683,7 +1683,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     discoveredForHighlights = mouseBlockBottomY != 32767;
                     Text subtleHighlightTooltip = this.mapProcessor
                             .getMapWorld()
-                            .getDimension(Shared.customDimensionId)
+                            .getDimension(Globals.customDimensionId)
                             .getHighlightHandler()
                             .getBlockHighlightSubtleTooltip(this.mouseBlockPosX, this.mouseBlockPosZ, discoveredForHighlights);
                     if (subtleHighlightTooltip != null && !mc.options.hudHidden) {
@@ -1823,17 +1823,17 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if (mc.options.hudHidden) {
             List<ButtonWidget> buttonList = getButtonList();
             if (!buttonList.isEmpty()) {
-                Shared.guiMapButtonTempList.clear();
-                Shared.guiMapButtonTempList.addAll(buttonList);
+                Globals.guiMapButtonTempList.clear();
+                Globals.guiMapButtonTempList.addAll(buttonList);
                 xTextEntryField.setVisible(false);
                 zTextEntryField.setVisible(false);
                 clearButtons();
             }
         } else {
-            if (!Shared.guiMapButtonTempList.isEmpty()) {
+            if (!Globals.guiMapButtonTempList.isEmpty()) {
                 clearButtons();
-                Shared.guiMapButtonTempList.forEach(this::addButton);
-                Shared.guiMapButtonTempList.clear();
+                Globals.guiMapButtonTempList.forEach(this::addButton);
+                Globals.guiMapButtonTempList.clear();
             }
         }
         super.render(guiGraphics, scaledMouseX, scaledMouseY, partialTicks);
@@ -1856,7 +1856,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                 && this.mapProcessor.getMapSaveLoad().isRegionDetectionComplete()) {
                             Text bluntHighlightTooltip = this.mapProcessor
                                     .getMapWorld()
-                                    .getDimension(Shared.customDimensionId)
+                                    .getDimension(Globals.customDimensionId)
                                     .getHighlightHandler()
                                     .getBlockHighlightBluntTooltip(this.mouseBlockPosX, this.mouseBlockPosZ, discoveredForHighlights);
                             if (bluntHighlightTooltip != null) {
@@ -1908,7 +1908,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Inject(method = "getRightClickOptions", at = @At(value = "RETURN"), remap = false)
     public void getRightClickOptionsInject(final CallbackInfoReturnable<ArrayList<RightClickOption>> cir) {
         if (BaritoneHelper.isBaritonePresent()) {
-            RegistryKey<World> customDim = Shared.customDimensionId;
+            RegistryKey<World> customDim = Globals.customDimensionId;
             RegistryKey<World> actualDim = ChunkUtils.getActualDimension();
             double customDimDiv = 1.0;
             if (customDim != actualDim) {
@@ -1990,16 +1990,16 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     }
 
     private void onSwitchDimensionButton(final RegistryKey<World> newDimId) {
-        if (Shared.customDimensionId != newDimId) {
-            if (Shared.customDimensionId == NETHER) {
+        if (Globals.customDimensionId != newDimId) {
+            if (Globals.customDimensionId == NETHER) {
                 this.cameraDestination = new int[] {(int) (cameraX * 8), (int) (cameraZ * 8)};
             } else if (newDimId == NETHER) {
                 this.cameraDestination = new int[] {(int) (cameraX / 8), (int) (cameraZ / 8)};
             }
         }
-        Shared.switchToDimension(newDimId);
+        Globals.switchToDimension(newDimId);
         AccessorGuiCaveModeOptions options = (AccessorGuiCaveModeOptions) caveModeOptions;
-        MapDimension newDimension = mapProcessor.getMapWorld().getDimension(Shared.customDimensionId);
+        MapDimension newDimension = mapProcessor.getMapWorld().getDimension(Globals.customDimensionId);
         options.setDimension(newDimension);
         for (ButtonWidget button : getButtonList()) {
             if (!(button instanceof TooltipButton)) continue;

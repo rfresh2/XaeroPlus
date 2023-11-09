@@ -25,8 +25,8 @@ import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.minimap.waypoints.WaypointsSort;
 import xaero.common.misc.KeySortableByOther;
+import xaeroplus.Globals;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.Shared;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -69,7 +69,7 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         this.addSelectableChild(searchField);
         this.setFocused(this.searchField);
 
-        Shared.waypointsSearchFilter = "";
+        Globals.waypointsSearchFilter = "";
         // todo: this button is a bit larger than i want but cba to figure out exact size rn
         this.addDrawableChild(
                 this.toggleAllButton = new MySmallButton(
@@ -122,7 +122,7 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         }
         this.searchField.render(guiGraphics, mouseX, mouseY, partial);
         if (!this.searchField.isFocused()) {
-            xaero.map.misc.Misc.setFieldText(this.searchField, Shared.waypointsSearchFilter);
+            xaero.map.misc.Misc.setFieldText(this.searchField, Globals.waypointsSearchFilter);
         }
     }
 
@@ -140,8 +140,8 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
     private void updateSearch() {
         if (this.searchField.isFocused()) {
             String newValue = this.searchField.getText();
-            if (!Objects.equal(Shared.waypointsSearchFilter, newValue)) {
-                Shared.waypointsSearchFilter = this.searchField.getText();
+            if (!Objects.equal(Globals.waypointsSearchFilter, newValue)) {
+                Globals.waypointsSearchFilter = this.searchField.getText();
                 updateSortedList();
             }
         }
@@ -164,9 +164,9 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         final List<Waypoint> enabledWaypoints = waypointsList.stream()
                 .filter(waypoint -> !waypoint.isDisabled())
                 .collect(Collectors.toList());
-        if (!java.util.Objects.equals(Shared.waypointsSearchFilter, "")) {
-            enabledWaypoints.removeIf(waypoint -> !waypoint.getName().toLowerCase().contains(Shared.waypointsSearchFilter.toLowerCase()));
-            disabledWaypoints.removeIf(waypoint -> !waypoint.getName().toLowerCase().contains(Shared.waypointsSearchFilter.toLowerCase()));
+        if (!java.util.Objects.equals(Globals.waypointsSearchFilter, "")) {
+            enabledWaypoints.removeIf(waypoint -> !waypoint.getName().toLowerCase().contains(Globals.waypointsSearchFilter.toLowerCase()));
+            disabledWaypoints.removeIf(waypoint -> !waypoint.getName().toLowerCase().contains(Globals.waypointsSearchFilter.toLowerCase()));
         }
         this.waypointsSorted = new ArrayList<>();
 

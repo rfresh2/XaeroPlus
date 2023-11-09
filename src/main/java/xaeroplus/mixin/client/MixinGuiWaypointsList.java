@@ -17,15 +17,10 @@ import xaero.common.AXaeroMinimap;
 import xaero.common.graphics.CustomRenderTypes;
 import xaero.common.gui.GuiWaypoints;
 import xaero.common.minimap.waypoints.Waypoint;
-import xaero.common.minimap.waypoints.WaypointWorld;
-import xaero.common.minimap.waypoints.WaypointsManager;
-import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.Shared;
 
 import java.lang.reflect.Field;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 
 @Mixin(targets = "xaero.common.gui.GuiWaypoints$List", remap = false)
 public abstract class MixinGuiWaypointsList {

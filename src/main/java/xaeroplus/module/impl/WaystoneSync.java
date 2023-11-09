@@ -17,10 +17,10 @@ import xaero.map.mods.SupportMods;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.ClientTickEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
+import xaeroplus.feature.extensions.IWaypointDimension;
+import xaeroplus.feature.render.ColorHelper.WaystoneColor;
 import xaeroplus.module.Module;
 import xaeroplus.util.ChunkUtils;
-import xaeroplus.util.ColorHelper.WaystoneColor;
-import xaeroplus.util.IWaypointDimension;
 import xaeroplus.util.WaypointsHelper;
 import xaeroplus.util.WaystonesHelper;
 

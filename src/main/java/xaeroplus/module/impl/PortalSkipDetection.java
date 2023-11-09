@@ -11,14 +11,19 @@ import xaero.map.core.XaeroWorldMapCore;
 import xaero.map.gui.GuiMap;
 import xaero.map.region.MapRegion;
 import xaero.map.region.MapTileChunk;
+import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.ClientTickEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
+import xaeroplus.feature.extensions.CustomDimensionMapProcessor;
+import xaeroplus.feature.extensions.SeenChunksTrackingMapTileChunk;
+import xaeroplus.feature.render.ChunkHighlightProvider;
+import xaeroplus.feature.render.ColorHelper;
+import xaeroplus.feature.render.highlights.ChunkHighlightLocalCache;
 import xaeroplus.module.Module;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.*;
-import xaeroplus.util.highlights.ChunkHighlightLocalCache;
+import xaeroplus.util.ChunkUtils;
 
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
@@ -79,10 +84,9 @@ public class PortalSkipDetection extends Module {
 
     @Override
     public void onEnable() {
-        Shared.drawManager.registerChunkHighlightDrawFeature(
+        Globals.drawManager.registerChunkHighlightProvider(
             this.getClass(),
-            new DrawManager.ChunkHighlightDrawFeature(
-                this::isEnabled,
+            new ChunkHighlightProvider(
                 this::isPortalSkipChunk,
                 this::getPortalSkipChunksColor
             ));
@@ -95,6 +99,7 @@ public class PortalSkipDetection extends Module {
     @Override
     public void onDisable() {
         reset();
+        Globals.drawManager.unregister(this.getClass());
     }
 
     private void initializeWorld() {

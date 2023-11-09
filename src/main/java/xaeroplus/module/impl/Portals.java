@@ -22,9 +22,7 @@ import xaeroplus.event.PacketReceivedEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.module.Module;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.ChunkUtils;
-import xaeroplus.util.ColorHelper;
-import xaeroplus.util.MutableBlockPos;
+import xaeroplus.util.*;
 import xaeroplus.util.highlights.ChunkHighlightCache;
 import xaeroplus.util.highlights.ChunkHighlightLocalCache;
 import xaeroplus.util.highlights.ChunkHighlightSavingCache;
@@ -69,6 +67,14 @@ public class Portals extends Module {
 
     @Override
     public void onEnable() {
+        Shared.drawManager.registerChunkHighlightDrawFeature(
+            this.getClass(),
+            new DrawManager.ChunkHighlightDrawFeature(
+                this::isEnabled,
+                this::isPortalChunk,
+                this::getPortalsInRegion,
+                this::getPortalsColor
+            ));
         portalsCache.onEnable();
         searchAllLoadedChunks();
     }

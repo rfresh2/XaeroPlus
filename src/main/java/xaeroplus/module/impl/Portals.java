@@ -26,9 +26,7 @@ import xaeroplus.util.*;
 import xaeroplus.util.highlights.ChunkHighlightCache;
 import xaeroplus.util.highlights.ChunkHighlightLocalCache;
 import xaeroplus.util.highlights.ChunkHighlightSavingCache;
-import xaeroplus.util.highlights.HighlightAtChunkPos;
 
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -72,7 +70,6 @@ public class Portals extends Module {
             new DrawManager.ChunkHighlightDrawFeature(
                 this::isEnabled,
                 this::isPortalChunk,
-                this::getPortalsInRegion,
                 this::getPortalsColor
             ));
         portalsCache.onEnable();
@@ -216,13 +213,6 @@ public class Portals extends Module {
 
     public void setAlpha(final float a) {
         portalsColor = ColorHelper.getColorWithAlpha(portalsColor, (int) (a));
-    }
-
-    public List<HighlightAtChunkPos> getPortalsInRegion(
-            final int leafRegionX, final int leafRegionZ,
-            final int level,
-            final RegistryKey<World> dimension) {
-        return portalsCache.getHighlightsInRegion(leafRegionX, leafRegionZ, level, dimension);
     }
 
     public boolean isPortalChunk(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> dimensionId) {

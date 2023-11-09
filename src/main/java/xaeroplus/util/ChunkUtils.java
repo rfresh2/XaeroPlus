@@ -4,12 +4,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import xaeroplus.util.highlights.HighlightAtChunkPos;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.function.Function;
 
 import static net.minecraft.world.World.NETHER;
 import static net.minecraft.world.World.OVERWORLD;
@@ -42,34 +36,6 @@ public class ChunkUtils {
     public static int longToChunkZ(final long l) {
         return (int)(l >> 32 & 4294967295L);
     }
-    public static Callable<List<HighlightAtChunkPos>> loadHighlightChunksAtRegion(
-            final int leafRegionX, final int leafRegionZ, final int level,
-            final Function<Long, Boolean> highlightChunkPosFunction) {
-        return () -> {
-            final List<HighlightAtChunkPos> chunks = new ArrayList<>();
-            final int mx = leafRegionX + level;
-            final int mz = leafRegionZ + level;
-            for (int regX = leafRegionX; regX < mx; ++regX) {
-                for (int regZ = leafRegionZ; regZ < mz; ++regZ) {
-                    for (int cx = 0; cx < 8; cx++) {
-                        for (int cz = 0; cz < 8; cz++) {
-                            final int mapTileChunkX = (regX << 3) + cx;
-                            final int mapTileChunkZ = (regZ << 3) + cz;
-                            for (int t = 0; t < 16; ++t) {
-                                final int chunkPosX = (mapTileChunkX << 2) + t % 4;
-                                final int chunkPosZ = (mapTileChunkZ << 2) + (t >> 2);
-                                if (highlightChunkPosFunction.apply(ChunkUtils.chunkPosToLong(chunkPosX, chunkPosZ))) {
-                                    chunks.add(new HighlightAtChunkPos(chunkPosX, chunkPosZ));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            return chunks;
-        };
-    }
-
     /** Player position util functions **/
 
     public static double getPlayerX() {

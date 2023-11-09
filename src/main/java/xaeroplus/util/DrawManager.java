@@ -10,10 +10,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
 import xaero.common.minimap.render.MinimapRendererHelper;
-import xaeroplus.util.highlights.HighlightAtChunkPos;
 
 import java.util.IdentityHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -21,35 +19,9 @@ public class DrawManager {
 
     private final Map<Class<?>, DrawFeature> chunkHighlightDrawFeatures = new IdentityHashMap<>();
 
-    // todo: refactor and unify minimap and worldmap draw interfaces
-    //  we want to utilize caching and caffeine async cache loading as much as possible
-    //  worldmap drawing does this to some extent, but minimap drawing does not
-    //  ideally we draw all highlights in one op per frame
-    //  with inputs being the coords of the map view rect (or some extended rect that changes infrequently while panning small distances)
-    //  fewer change to inputs is good -> fewer cache misses
-    //  fewer cache lookup ops is good -> fewer ops per frame
-    //  this is also the only way we can scale the minimap further without impacting fps horribly
-
-    // todo: consider how to centralize the caching of highlight data here
-    //  we currently have region render caches in each module for their highlights
-    //  it'd be better for this manager to own the render caching so we can modify it in one place
-    //  and so we can have a single cache for all highlights, reducing cache misses and reducing cache loading costs
-
-
-    @FunctionalInterface
-    public interface MinimapChunkHighlightDrawPredicate {
-        boolean isHighlighted(int chunkX, int chunkZ, RegistryKey<World> dimension);
-    }
-
-    @FunctionalInterface
-    public interface WorldMapChunkHighlightDrawPredicate {
-        List<HighlightAtChunkPos> highlightsInRegion(int leafRegionMinx, int leafRegionMinZ, int leveledSideInRegions, RegistryKey<World> dimension);
-    }
-
     public record ChunkHighlightDrawFeature(
         Supplier<Boolean> enabled,
-        MinimapChunkHighlightDrawPredicate minimapDrawPredicate,
-        WorldMapChunkHighlightDrawPredicate worldMapDrawPredicate,
+        ChunkHighlightPredicate chunkHighlightPredicate,
         Supplier<Integer> colorSupplier
     ) {
     }
@@ -68,25 +40,32 @@ public class DrawManager {
             .expireAfterWrite(3000, java.util.concurrent.TimeUnit.MILLISECONDS)
             .refreshAfterWrite(500, java.util.concurrent.TimeUnit.MILLISECONDS)
             .executor(Shared.cacheRefreshExecutorService.get())
-            .buildAsync(regionLong -> {
-                final LongList list = new LongArrayList(8);
-                final int regionX = ChunkUtils.longToChunkX(regionLong);
-                final int regionZ = ChunkUtils.longToChunkZ(regionLong);
-                for (int cx = 0; cx < 8; cx++) {
-                    for (int cz = 0; cz < 8; cz++) {
-                        final int mapTileChunkX = (regionX << 3) + cx;
-                        final int mapTileChunkZ = (regionZ << 3) + cz;
-                        for (int t = 0; t < 16; ++t) {
-                            final int chunkPosX = (mapTileChunkX << 2) + t % 4;
-                            final int chunkPosZ = (mapTileChunkZ << 2) + (t >> 2);
-                            if (feature.minimapDrawPredicate.isHighlighted(chunkPosX, chunkPosZ, Shared.customDimensionId)) {
-                                list.add(ChunkUtils.chunkPosToLong(chunkPosX, chunkPosZ));
-                            }
-                        }
+            .buildAsync(regionLong -> loadHighlightChunksInRegion(regionLong, feature.chunkHighlightPredicate))));
+    }
+
+    private LongList loadHighlightChunksInRegion(final long regionLong, final ChunkHighlightPredicate highlightPredicate) {
+        final LongList list = new LongArrayList(8);
+        final int regionX = ChunkUtils.longToChunkX(regionLong);
+        final int regionZ = ChunkUtils.longToChunkZ(regionLong);
+        for (int cx = 0; cx < 8; cx++) {
+            for (int cz = 0; cz < 8; cz++) {
+                final int mapTileChunkX = (regionX << 3) + cx;
+                final int mapTileChunkZ = (regionZ << 3) + cz;
+                for (int t = 0; t < 16; ++t) {
+                    final int chunkPosX = (mapTileChunkX << 2) + t % 4;
+                    final int chunkPosZ = (mapTileChunkZ << 2) + (t >> 2);
+                    if (highlightPredicate.isHighlighted(chunkPosX, chunkPosZ, Shared.customDimensionId)) {
+                        list.add(ChunkUtils.chunkPosToLong(chunkPosX, chunkPosZ));
                     }
                 }
-                return list;
-            })));
+            }
+        }
+        return list;
+    }
+
+    @FunctionalInterface
+    public interface ChunkHighlightPredicate {
+        boolean isHighlighted(int chunkX, int chunkZ, RegistryKey<World> dimension);
     }
 
     public void drawMinimapFeatures(
@@ -113,9 +92,9 @@ public class DrawManager {
             }
         }
         var regionsArray = regions.toLongArray();
-        for (DrawFeature value : chunkHighlightDrawFeatures.values()) {
-            if (!value.chunkHighlightDrawFeature.enabled.get()) continue;
-            int color = value.chunkHighlightDrawFeature.colorSupplier.get();
+        for (DrawFeature feature : chunkHighlightDrawFeatures.values()) {
+            if (!feature.chunkHighlightDrawFeature.enabled.get()) continue;
+            int color = feature.chunkHighlightDrawFeature.colorSupplier.get();
             float a = ((color >> 24) & 255) / 255.0f;
             if (a == 0.0f) continue;
             for (int r = 0; r < regionsArray.length; r++) {
@@ -126,7 +105,7 @@ public class DrawManager {
                 var cz = regionZ & 7;
                 var drawX = ((cx - chunkX) << 6) - (tileX << 4) - insideX;
                 var drawZ = ((cz - chunkZ) << 6) - (tileZ << 4) - insideZ;
-                final LongList highlights = value.getChunkHighlights(regionLong);
+                final LongList highlights = feature.getChunkHighlights(regionLong);
                 for (int i = 0; i < highlights.size(); i++) {
                     var chunkPosLong = highlights.getLong(i);
                     var chunkPosX = ChunkUtils.longToChunkX(chunkPosLong);
@@ -147,41 +126,53 @@ public class DrawManager {
     }
 
     public void drawWorldMapFeatures(
-        final int leafRegionMinx,
-        final int leafRegionMinZ,
-        final int leveledSideInRegions,
+        final int leafRegionX,
+        final int leafRegionZ,
+        final int level,
         final int flooredCameraX,
         final int flooredCameraZ,
         final MatrixStack matrixStack,
         final VertexConsumer overlayBuffer
     ) {
-        for (DrawFeature value : chunkHighlightDrawFeatures.values()) {
-            if (!value.chunkHighlightDrawFeature.enabled.get()) continue;
-            int color = value.chunkHighlightDrawFeature.colorSupplier.get();
+        final int mx = leafRegionX + level;
+        final int mz = leafRegionZ + level;
+        final LongArraySet regions = new LongArraySet(1);
+        for (int regX = leafRegionX; regX < mx; ++regX) {
+            for (int regZ = leafRegionZ; regZ < mz; ++regZ) {
+                regions.add(ChunkUtils.chunkPosToLong(regX, regZ));
+            }
+        }
+        final long[] regionsArray = regions.toLongArray();
+
+        for (DrawFeature feature : chunkHighlightDrawFeatures.values()) {
+            if (!feature.chunkHighlightDrawFeature.enabled.get()) continue;
+            int color = feature.chunkHighlightDrawFeature.colorSupplier.get();
             float a = ((color >> 24) & 255) / 255.0f;
             if (a == 0.0f) continue;
-            var highlights = value.chunkHighlightDrawFeature.worldMapDrawPredicate.highlightsInRegion(leafRegionMinx, leafRegionMinZ, leveledSideInRegions, Shared.customDimensionId);
-            if (highlights.isEmpty()) continue;
             float r = (float)(color >> 16 & 255) / 255.0F;
             float g = (float)(color >> 8 & 255) / 255.0F;
             float b = (float)(color & 255) / 255.0F;
-            for (int i = 0; i < highlights.size(); i++) {
-                HighlightAtChunkPos c = highlights.get(i);
-                final float left = (float) ((c.x() << 4) - flooredCameraX);
-                final float top = (float) ((c.z() << 4) - flooredCameraZ);
-                final float right = left + 16;
-                final float bottom = top + 16;
-                GuiHelper.fillIntoExistingBuffer(
-                    matrixStack.peek().getPositionMatrix(),
-                    overlayBuffer,
-                    left,
-                    top,
-                    right,
-                    bottom,
-                    r,
-                    g,
-                    b,
-                    a);
+            for (int reg = 0; reg < regionsArray.length; reg++) {
+                var highlights = feature.getChunkHighlights(regionsArray[reg]);
+                for (int i = 0; i < highlights.size(); i++) {
+                    var chunkX = ChunkUtils.longToChunkX(highlights.getLong(i));
+                    var chunkZ = ChunkUtils.longToChunkZ(highlights.getLong(i));
+                    final float left = (float) (ChunkUtils.chunkCoordToCoord(chunkX) - flooredCameraX);
+                    final float top = (float) (ChunkUtils.chunkCoordToCoord(chunkZ) - flooredCameraZ);
+                    final float right = left + 16;
+                    final float bottom = top + 16;
+                    GuiHelper.fillIntoExistingBuffer(
+                        matrixStack.peek().getPositionMatrix(),
+                        overlayBuffer,
+                        left,
+                        top,
+                        right,
+                        bottom,
+                        r,
+                        g,
+                        b,
+                        a);
+                }
             }
         }
     }

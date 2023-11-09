@@ -19,9 +19,7 @@ import xaeroplus.module.ModuleManager;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.*;
 import xaeroplus.util.highlights.ChunkHighlightLocalCache;
-import xaeroplus.util.highlights.HighlightAtChunkPos;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -86,7 +84,6 @@ public class PortalSkipDetection extends Module {
             new DrawManager.ChunkHighlightDrawFeature(
                 this::isEnabled,
                 this::isPortalSkipChunk,
-                this::getPortalSkipChunksInRegion,
                 this::getPortalSkipChunksColor
             ));
         reset();
@@ -228,12 +225,6 @@ public class PortalSkipDetection extends Module {
 
     public void setAlpha(final float a) {
         portalSkipChunksColor = ColorHelper.getColorWithAlpha(portalSkipChunksColor, (int) a);
-    }
-
-    public List<HighlightAtChunkPos> getPortalSkipChunksInRegion(
-            final int leafRegionX, final int leafRegionZ,
-            final int level, final RegistryKey<World> dimension) {
-        return cache.getHighlightsInRegion(leafRegionX, leafRegionZ, level, ChunkUtils.getActualDimension());
     }
 
     public boolean isPortalSkipChunk(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> dimension) {

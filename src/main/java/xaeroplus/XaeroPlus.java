@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
-import xaeroplus.util.Shared;
 
 import java.util.List;
 
@@ -45,7 +44,7 @@ public class XaeroPlus {
 
 	public void onRegisterKeyMappingsEvent(final RegisterKeyMappingsEvent event) {
 		ModuleManager.init();
-		boolean a = Shared.FOLLOW; // force static instances to init
+		boolean a = Globals.FOLLOW; // force static instances to init
 		XaeroPlusSettingRegistry.fastMapSetting.getValue(); // force static instances to init
 		List<KeyBinding> keybinds = XaeroPlusSettingsReflectionHax.getKeybinds();
 		keybinds.forEach(event::register);

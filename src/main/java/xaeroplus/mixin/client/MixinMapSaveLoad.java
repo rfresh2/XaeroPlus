@@ -25,10 +25,10 @@ import xaero.map.file.worldsave.WorldDataHandler;
 import xaero.map.region.*;
 import xaero.map.world.MapDimension;
 import xaero.map.world.MapWorld;
+import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
-import xaeroplus.util.CustomDimensionMapSaveLoad;
-import xaeroplus.util.CustomWorldDataHandler;
-import xaeroplus.util.Shared;
+import xaeroplus.feature.extensions.CustomDimensionMapSaveLoad;
+import xaeroplus.feature.extensions.CustomWorldDataHandler;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -41,7 +41,7 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import static xaeroplus.util.Shared.decompressZipToBytes;
+import static xaeroplus.Globals.decompressZipToBytes;
 
 @Mixin(value = MapSaveLoad.class, remap = false)
 public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
@@ -102,7 +102,7 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
 
     @Inject(method = "getOldFolder", at = @At(value = "HEAD"), cancellable = true)
     public void getOldFolder(final String oldUnfixedMainId, final String dim, final CallbackInfoReturnable<Path> cir) {
-        if (!Shared.nullOverworldDimensionFolder) {
+        if (!Globals.nullOverworldDimensionFolder) {
             if (oldUnfixedMainId == null) {
                 cir.setReturnValue(null);
             }
@@ -208,7 +208,7 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                                     if (nextTile != -1) {
                                         MapTile tile = this.mapProcessor
                                                 .getTilePool()
-                                                .get(this.mapProcessor.getDimensionName(Shared.customDimensionId), chunk.getX() * 4 + i, chunk.getZ() * 4 + j);
+                                                .get(this.mapProcessor.getDimensionName(Globals.customDimensionId), chunk.getX() * 4 + i, chunk.getZ() * 4 + j);
 
                                         for(int x = 0; x < 16; ++x) {
                                             MapBlock[] c = tile.getBlockColumn(x);
@@ -567,7 +567,7 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
 
     @Redirect(method = "run", at = @At(value = "INVOKE", target = "Lxaero/map/world/MapWorld;getCurrentDimension()Lxaero/map/world/MapDimension;"))
     public MapDimension redirectGetCurrentDimension(MapWorld instance) {
-        return instance.getDimension(Shared.customDimensionId);
+        return instance.getDimension(Globals.customDimensionId);
     }
 
     @Redirect(method = "run", at = @At(value = "INVOKE", target = "Lxaero/map/region/LeveledRegion;isAllCachePrepared()Z", ordinal = 0))

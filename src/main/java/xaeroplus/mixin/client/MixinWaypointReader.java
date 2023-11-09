@@ -14,10 +14,10 @@ import xaero.map.gui.IRightClickableElement;
 import xaero.map.gui.dropdown.rightclick.RightClickOption;
 import xaero.map.mods.gui.Waypoint;
 import xaero.map.mods.gui.WaypointReader;
+import xaeroplus.feature.extensions.IWaypointDimension;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.BaritoneHelper;
 import xaeroplus.util.ChunkUtils;
-import xaeroplus.util.IWaypointDimension;
 
 import java.util.ArrayList;
 

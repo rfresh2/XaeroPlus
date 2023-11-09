@@ -18,7 +18,7 @@ import java.nio.file.Files;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import static xaeroplus.util.Shared.decompressZipToBytes;
+import static xaeroplus.Globals.decompressZipToBytes;
 
 @Mixin(value = LeveledRegion.class, remap = false)
 public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {

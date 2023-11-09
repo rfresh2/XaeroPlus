@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.waypoints.render.WaypointsIngameRenderer;
 import xaeroplus.XaeroPlus;
-import xaeroplus.util.CustomWaypointsIngameRenderer;
+import xaeroplus.feature.extensions.CustomWaypointsIngameRenderer;
 
 @Mixin(value = WorldRenderer.class)
 public class MixinWorldRenderer {

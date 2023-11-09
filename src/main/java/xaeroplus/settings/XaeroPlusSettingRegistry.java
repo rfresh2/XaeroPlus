@@ -1,11 +1,11 @@
 package xaeroplus.settings;
 
+import xaeroplus.Globals;
+import xaeroplus.feature.render.ColorHelper;
+import xaeroplus.feature.render.ColorHelper.WaystoneColor;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.*;
 import xaeroplus.util.BaritoneHelper;
-import xaeroplus.util.ColorHelper;
-import xaeroplus.util.ColorHelper.WaystoneColor;
-import xaeroplus.util.Shared;
 import xaeroplus.util.WaystonesHelper;
 
 import static net.minecraft.world.World.*;
@@ -352,28 +352,28 @@ public final class XaeroPlusSettingRegistry {
             "setting.minimap.minimap_scaling",
             1f, 2f, 1f,
             "setting.minimap.minimap_scaling.tooltip",
-            (b) -> Shared.shouldResetFBO = true,
+            (b) -> Globals.shouldResetFBO = true,
             2f,
             SettingLocation.MINIMAP);
     public static final XaeroPlusBooleanSetting switchToNetherSetting = XaeroPlusBooleanSetting.create(
             "Switch to Nether",
             "setting.keybinds.switch_to_nether",
             "setting.keybinds.switch_to_nether.tooltip",
-            (b) -> Shared.switchToDimension(NETHER),
+            (b) -> Globals.switchToDimension(NETHER),
             false,
             SettingLocation.KEYBINDS);
     public static final XaeroPlusBooleanSetting switchToOverworldSetting = XaeroPlusBooleanSetting.create(
             "Switch to Overworld",
             "setting.keybinds.switch_to_overworld",
             "setting.keybinds.switch_to_overworld.tooltip",
-            (b) -> Shared.switchToDimension(OVERWORLD),
+            (b) -> Globals.switchToDimension(OVERWORLD),
             false,
             SettingLocation.KEYBINDS);
     public static final XaeroPlusBooleanSetting switchToEndSetting = XaeroPlusBooleanSetting.create(
             "Switch to End",
             "setting.keybinds.switch_to_end",
             "setting.keybinds.switch_to_end.tooltip",
-            (b) -> Shared.switchToDimension(END),
+            (b) -> Globals.switchToDimension(END),
             false,
             SettingLocation.KEYBINDS);
     public static final XaeroPlusBooleanSetting netherCaveFix = XaeroPlusBooleanSetting.create(

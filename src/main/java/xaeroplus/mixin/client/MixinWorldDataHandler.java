@@ -21,8 +21,8 @@ import xaero.map.executor.Executor;
 import xaero.map.file.worldsave.WorldDataHandler;
 import xaero.map.file.worldsave.WorldDataReader;
 import xaero.map.region.MapRegion;
-import xaeroplus.util.CustomWorldDataHandler;
-import xaeroplus.util.Shared;
+import xaeroplus.Globals;
+import xaeroplus.feature.extensions.CustomWorldDataHandler;
 
 import java.nio.file.Path;
 
@@ -38,7 +38,7 @@ public class MixinWorldDataHandler implements CustomWorldDataHandler {
      */
     @Overwrite(remap = true)
     public ServerWorld getWorldServer() {
-        return getWorldServer(Shared.customDimensionId);
+        return getWorldServer(Globals.customDimensionId);
     }
 
     public ServerWorld getWorldServer(RegistryKey<World> dimId) {
@@ -57,7 +57,7 @@ public class MixinWorldDataHandler implements CustomWorldDataHandler {
     public Path getWorldDir() {
         ServerWorld server = getWorldServer();
         if (server != null) {
-            return DimensionType.getSaveDirectory(Shared.customDimensionId, server.getServer().getSavePath(WorldSavePath.ROOT));
+            return DimensionType.getSaveDirectory(Globals.customDimensionId, server.getServer().getSavePath(WorldSavePath.ROOT));
         } else {
             return null;
         }

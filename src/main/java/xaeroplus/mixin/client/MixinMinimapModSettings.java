@@ -16,10 +16,10 @@ import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.settings.ModOptions;
 import xaero.common.settings.ModSettings;
 import xaeroplus.XaeroPlus;
+import xaeroplus.feature.extensions.IWaypointDimension;
 import xaeroplus.settings.XaeroPlusModSettingsHooks;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
-import xaeroplus.util.IWaypointDimension;
 import xaeroplus.util.WaypointsHelper;
 
 import java.io.File;

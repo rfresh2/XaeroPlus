@@ -1,4 +1,4 @@
-package xaeroplus.util.highlights;
+package xaeroplus.feature.render.highlights;
 
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -7,9 +7,9 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
 import xaero.map.core.XaeroWorldMapCore;
 import xaero.map.gui.GuiMap;
+import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.util.ChunkUtils;
-import xaeroplus.util.Shared;
 
 import java.util.Collections;
 import java.util.List;
@@ -86,7 +86,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
                     initializeWorld();
                     loadChunksInActualDimension();
                     return null;
-                }, Shared.cacheRefreshExecutorService.get());
+                }, Globals.cacheRefreshExecutorService.get());
     }
 
     public void reset() {
@@ -188,7 +188,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
         Futures.whenAllComplete(saveAllChunks()).call(() -> {
             reset();
             return null;
-        }, Shared.cacheRefreshExecutorService.get());
+        }, Globals.cacheRefreshExecutorService.get());
     }
 
     @Override

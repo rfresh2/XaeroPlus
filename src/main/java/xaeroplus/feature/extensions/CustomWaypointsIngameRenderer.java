@@ -1,4 +1,4 @@
-package xaeroplus.util;
+package xaeroplus.feature.extensions;
 
 import net.minecraft.client.util.math.MatrixStack;
 import xaero.common.XaeroMinimapSession;

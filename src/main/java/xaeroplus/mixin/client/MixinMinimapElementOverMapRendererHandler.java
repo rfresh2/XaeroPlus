@@ -15,7 +15,7 @@ import xaero.common.minimap.element.render.over.MinimapElementOverMapRendererHan
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.minimap.render.radar.element.RadarRenderContext;
 import xaero.common.minimap.render.radar.element.RadarRenderer;
-import xaeroplus.util.Shared;
+import xaeroplus.Globals;
 
 @Mixin(value = MinimapElementOverMapRendererHandler.class, remap = false)
 public class MixinMinimapElementOverMapRendererHandler {
@@ -48,7 +48,7 @@ public class MixinMinimapElementOverMapRendererHandler {
             return instance.renderElement(location, highlit, outOfBounds, drawContext, immediate, fontRenderer,
                     framebuffer, minimapRendererHelper, renderEntity, entityPlayer, renderX, renderY, renderZ,
                     elementIndex, optionalDepth,
-                    optionalScale / Shared.minimapScalingFactor,
+                    optionalScale / Globals.minimapScalingFactor,
                     e, partialX, partialY, cave, partialTicks);
         } else {
             return instance.renderElement(location, highlit, outOfBounds, drawContext, immediate, fontRenderer,

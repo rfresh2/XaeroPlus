@@ -30,11 +30,11 @@ import xaero.map.misc.Misc;
 import xaero.map.region.LeveledRegion;
 import xaero.map.region.MapRegion;
 import xaero.map.region.MapTileChunk;
+import xaeroplus.Globals;
+import xaeroplus.feature.extensions.CustomDimensionMapProcessor;
+import xaeroplus.feature.extensions.CustomSupportXaeroWorldMap;
+import xaeroplus.feature.render.MinimapBackgroundDrawHelper;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.CustomDimensionMapProcessor;
-import xaeroplus.util.CustomSupportXaeroWorldMap;
-import xaeroplus.util.GuiHelper;
-import xaeroplus.util.Shared;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -124,7 +124,7 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                     int insideZ = zFloored & 15;
                     RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
                     RenderSystem.enableBlend();
-                    final int scaledSize = Shared.minimapScalingFactor * 4;
+                    final int scaledSize = Globals.minimapScalingFactor * 4;
                     int minX = (mapX >> 2) - scaledSize;
                     int maxX = (mapX >> 2) + scaledSize;
                     int minZ = (mapZ >> 2) - scaledSize;
@@ -136,7 +136,7 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                     boolean slimeChunks = this.modMain.getSettings().getSlimeChunks(minimapSession.getWaypointsManager());
                     mapProcessor.updateCaveStart();
                     int renderedCaveLayer = mapProcessor.getCurrentCaveLayer();
-                    int globalCaveStart = mapProcessor.getMapWorld().getDimension(Shared.customDimensionId).getLayeredMapRegions().getLayer(renderedCaveLayer).getCaveStart();
+                    int globalCaveStart = mapProcessor.getMapWorld().getDimension(Globals.customDimensionId).getLayeredMapRegions().getLayer(renderedCaveLayer).getCaveStart();
                     int globalCaveDepth = WorldMap.settings.caveModeDepth;
                     float brightness = this.getMinimapBrightness();
                     if (renderedCaveLayer != this.lastRenderedCaveLayer) {
@@ -309,7 +309,7 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
         MinimapRendererHelper helper,
         VertexConsumer overlayBufferBuilder
     ) {
-        final boolean isDimensionSwitched = Shared.customDimensionId != MinecraftClient.getInstance().world.getRegistryKey();
+        final boolean isDimensionSwitched = Globals.customDimensionId != MinecraftClient.getInstance().world.getRegistryKey();
         MapRegion prevRegion = null;
         Tessellator bgTesselator = Tessellator.getInstance();
         BufferBuilder bgBufferBuilder = bgTesselator.getBuffer();
@@ -324,8 +324,8 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                     renderedCaveLayer,
                     i >> 3,
                     j >> 3,
-                    ((CustomDimensionMapProcessor) mapProcessor).regionExistsCustomDimension(renderedCaveLayer, i >> 3, j >> 3, Shared.customDimensionId),
-                    Shared.customDimensionId
+                    ((CustomDimensionMapProcessor) mapProcessor).regionExistsCustomDimension(renderedCaveLayer, i >> 3, j >> 3, Globals.customDimensionId),
+                    Globals.customDimensionId
                 );
                 if (region != null && region != prevRegion) {
                     synchronized(region) {
@@ -365,7 +365,7 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                     MapTileChunk chunk = region == null ? null : region.getChunk(i & 7, j & 7);
                     boolean chunkIsVisible = chunk != null && chunk.getLeafTexture().getGlColorTexture() != -1;
                     if (!chunkIsVisible && (!noCaveMaps || this.previousRenderedCaveLayer == Integer.MAX_VALUE)) {
-                        MapRegion previousLayerRegion = ((CustomDimensionMapProcessor) mapProcessor).getMapRegionCustomDimension(this.previousRenderedCaveLayer, i >> 3, j >> 3, false, Shared.customDimensionId);
+                        MapRegion previousLayerRegion = ((CustomDimensionMapProcessor) mapProcessor).getMapRegionCustomDimension(this.previousRenderedCaveLayer, i >> 3, j >> 3, false, Globals.customDimensionId);
                         if (previousLayerRegion != null) {
                             MapTileChunk previousLayerChunk = previousLayerRegion.getChunk(i & 7, j & 7);
                             if (previousLayerChunk != null && previousLayerChunk.getLeafTexture().getGlColorTexture() != -1) {
@@ -378,16 +378,16 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
 
                     if (chunkIsVisible) {
                         if (!mapProcessor.isUploadingPaused() && region.isLoaded()) {
-                            mapProcessor.getMapWorld().getDimension(Shared.customDimensionId).getLayeredMapRegions().bumpLoadedRegion(region);
+                            mapProcessor.getMapWorld().getDimension(Globals.customDimensionId).getLayeredMapRegions().bumpLoadedRegion(region);
                         }
                         int drawX = ((chunk.getX() - chunkX) << 6) - (tileX << 4) - insideX;
                         int drawZ = ((chunk.getZ() - chunkZ) << 6) - (tileZ << 4) - insideZ;
                         if (XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) {
-                            GuiHelper.addMMBackgroundToBuffer(guiGraphics.getMatrices().peek().getPositionMatrix(),
-                                                              bgBufferBuilder,
-                                                              drawX,
-                                                              drawZ,
-                                                              chunk);
+                            MinimapBackgroundDrawHelper.addMMBackgroundToBuffer(guiGraphics.getMatrices().peek().getPositionMatrix(),
+                                                                                bgBufferBuilder,
+                                                                                drawX,
+                                                                                drawZ,
+                                                                                chunk);
                         }
                         GL11.glTexParameterf(3553, 33082, 0.0F);
 
@@ -401,7 +401,7 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                 }
             }
         }
-        Shared.drawManager.drawMinimapFeatures(
+        Globals.drawManager.drawMinimapFeatures(
             minViewX,
             maxViewX,
             minViewZ,

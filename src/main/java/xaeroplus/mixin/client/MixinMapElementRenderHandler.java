@@ -14,7 +14,7 @@ import xaero.common.minimap.render.radar.element.RadarRenderContext;
 import xaero.map.element.*;
 import xaero.map.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
 import xaero.map.gui.GuiMap;
-import xaeroplus.util.IScreenRadarRenderContext;
+import xaeroplus.feature.extensions.IScreenRadarRenderContext;
 
 @Mixin(value = MapElementRenderHandler.class, remap = false)
 public class MixinMapElementRenderHandler {

@@ -19,8 +19,6 @@ import xaeroplus.settings.XaeroPlusSetting;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -83,35 +81,20 @@ public class Globals {
         mapProcessor.getMapSaveLoad().setRegionDetectionComplete(true);
         // kind of shit but its ok. need to reset setting when GuiMap closes
         RegistryKey<World> worldDim = MinecraftClient.getInstance().world.getRegistryKey();
-        if (worldDim != newDimId) {
-            WorldMap.settings.minimapRadar = false;
-        } else {
-            WorldMap.settings.minimapRadar = true;
-        }
+        WorldMap.settings.minimapRadar = worldDim == newDimId;
         customDimensionId = newDimId;
         SupportMods.xaeroMinimap.requestWaypointsRefresh();
     }
 
     public static byte[] decompressZipToBytes(final Path input) {
-        try {
-            return toUnzippedByteArray(Files.readAllBytes(input));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static byte[] toUnzippedByteArray(byte[] zippedBytes) throws IOException {
-        try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(zippedBytes))) {
-            final byte[] buff = new byte[1024];
-            if (zipInputStream.getNextEntry() != null) {
-                final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                int l;
-                while ((l = zipInputStream.read(buff)) > 0) {
-                    outputStream.write(buff, 0, l);
-                }
-                return outputStream.toByteArray();
+        // overall performance improvement here is not that large
+        // writing has bigger impact doing it all bytes at once
+        try (final var in = new ZipInputStream(Files.newInputStream(input))) {
+            if (in.getNextEntry() != null) { // all xaero zip files (currently) only have 1 entry
+                return in.readAllBytes();
             }
-        } catch (final Throwable ignored) {
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
         }
         return new byte[0];
     }

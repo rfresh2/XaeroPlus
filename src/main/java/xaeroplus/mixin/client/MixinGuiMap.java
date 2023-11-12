@@ -110,8 +110,11 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     private static double destScale = 3.0;
     @Shadow
     private static ImprovedFramebuffer primaryScaleFBO = null;
+    @Shadow
     public boolean waypointMenu = false;
+    @Shadow
     public boolean playersMenu = false;
+    @Shadow
     public boolean noUploadingLimits;
     @Shadow
     private long loadingAnimationStart;

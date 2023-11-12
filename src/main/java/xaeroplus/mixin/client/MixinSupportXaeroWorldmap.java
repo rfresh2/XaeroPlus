@@ -57,6 +57,7 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
     private int previousRenderedCaveLayer;
     @Shadow
     private int lastRenderedCaveLayer;
+    @Shadow
     private ArrayList<MapRegion> regionBuffer;
     @Final
     @Shadow

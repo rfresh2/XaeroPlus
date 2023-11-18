@@ -5,17 +5,16 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
 import it.unimi.dsi.fastutil.longs.LongList;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.math.MatrixStack;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaeroplus.Globals;
 import xaeroplus.util.ChunkUtils;
 
-import java.util.IdentityHashMap;
-import java.util.Map;
-
 public class DrawManager {
-    private final Map<Class<?>, DrawFeature> chunkHighlightDrawFeatures = new IdentityHashMap<>();
+    private final Reference2ObjectMap<Class<?>, DrawFeature> chunkHighlightDrawFeatures = new Reference2ObjectOpenHashMap<>();
 
     public synchronized void registerChunkHighlightProvider(Class<?> clazz, ChunkHighlightProvider feature) {
         chunkHighlightDrawFeatures.put(clazz, new DrawFeature(

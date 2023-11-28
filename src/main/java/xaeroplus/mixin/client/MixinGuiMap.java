@@ -370,6 +370,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "init", at = @At(value = "RETURN"), remap = true)
     public void customInitGui(CallbackInfo ci) {
+        // left side
         followButton = new GuiTexturedButton(0, this.dimensionToggleButton.getY() - 20, 20, 20, FOLLOW ? 133 : 149, 16, 16, 16,
                                              WorldMap.guiTextures,
                                              this::onFollowButton,
@@ -391,6 +392,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         zTextEntryField.setPlaceholder(Text.literal("Z:").formatted(Formatting.DARK_GRAY));
         this.addSelectableChild(xTextEntryField);
         this.addSelectableChild(zTextEntryField);
+        // right side
+        if (!SupportMods.pac()) {  // remove useless button when pac is not installed
+            this.remove(this.claimsButton);
+            this.exportButton.setY(this.claimsButton.getY());
+            this.keybindingsButton.setY(this.claimsButton.getY() - 20);
+            this.zoomOutButton.setY(this.keybindingsButton.getY() - 20);
+            this.zoomInButton.setY(this.zoomOutButton.getY() - 20);
+        }
         switchToEndButton = new GuiTexturedButton(this.width - 20, zoomInButton.getY() - 20, 20, 20, 31, 0, 16, 16,
                                                   Globals.xpGuiTextures,
                                                   (button -> onSwitchDimensionButton(END)),

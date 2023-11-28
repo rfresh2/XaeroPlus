@@ -53,11 +53,11 @@ dependencies {
 
 	jarLibs 'com.github.ben-manes.caffeine:caffeine:3.1.8'
 	jarLibs "com.github.collarmc:pounce:0e8492b68e"
-	jarLibs 'org.xerial:sqlite-jdbc:3.44.0.0'
+	jarLibs 'org.xerial:sqlite-jdbc:3.44.1.0'
 
-	modImplementation "maven.modrinth:xaeros-world-map:1.36.0_Fabric_1.20"
-	modImplementation "maven.modrinth:xaeros-minimap:23.8.4_Fabric_1.20"
-	modCompileOnly files("libs/BetterPvP_23.8.4_Fabric_1.20.jar")
+	modImplementation "maven.modrinth:xaeros-world-map:1.37.0_Fabric_1.20"
+	modImplementation "maven.modrinth:xaeros-minimap:23.9.0_Fabric_1.20"
+	modCompileOnly files("libs/BetterPvP_23.9.0_Fabric_1.20.jar")
 	modImplementation files("libs/baritone-api-fabric-1.20.1-elytra-beta-v1.jar")
 	modImplementation "maven.modrinth:waystones:14.0.2+fabric-1.20"
 	modImplementation "maven.modrinth:balm:7.1.4+fabric-1.20.1"

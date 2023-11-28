@@ -10,8 +10,6 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -47,10 +45,6 @@ import xaeroplus.feature.extensions.CustomSupportXaeroWorldMap;
 import xaeroplus.feature.render.ColorHelper;
 import xaeroplus.mixin.client.mc.AccessorGameOptions;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-
-import static net.minecraft.world.World.NETHER;
-import static net.minecraft.world.World.OVERWORLD;
-import static xaeroplus.Globals.customDimensionId;
 
 @Mixin(value = MinimapFBORenderer.class, remap = false)
 public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements CustomMinimapFBORenderer {
@@ -119,34 +113,6 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         }
     }
 
-    public double getRenderEntityX(MinimapProcessor minimap, Entity renderEntity, float partial) {
-        RegistryKey<World> dim = mc.world.getRegistryKey();
-        // when player is in the nether or the custom dimension is the nether, perform coordinate translation
-        if ((dim == NETHER || customDimensionId == NETHER) && dim != customDimensionId) {
-            if (customDimensionId == OVERWORLD) {
-                return minimap.getEntityRadar().getEntityX(renderEntity, partial) * 8.0;
-            } else if (customDimensionId == NETHER && dim == OVERWORLD) {
-                return minimap.getEntityRadar().getEntityX(renderEntity, partial) / 8.0;
-            }
-        }
-
-        return minimap.getEntityRadar().getEntityX(renderEntity, partial);
-    }
-
-    public double getRenderEntityZ(MinimapProcessor minimap, Entity renderEntity, float partial) {
-        RegistryKey<World> dim = mc.world.getRegistryKey();
-        // when player is in the nether or the custom dimension is the nether, perform coordinate translation
-        if ((dim == NETHER || customDimensionId == NETHER) && dim != customDimensionId) {
-            if (customDimensionId == OVERWORLD) {
-                return minimap.getEntityRadar().getEntityZ(renderEntity, partial) * 8.0;
-            } else if (customDimensionId == NETHER && dim == OVERWORLD) {
-                return minimap.getEntityRadar().getEntityZ(renderEntity, partial) / 8.0;
-            }
-        }
-
-        return minimap.getEntityRadar().getEntityZ(renderEntity, partial);
-    }
-
     /**
      * @author rfresh2
      * @reason big minimap
@@ -158,6 +124,10 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             MinimapProcessor minimap,
             PlayerEntity player,
             Entity renderEntity,
+            double playerX,
+            double playerZ,
+            double playerDimDiv,
+            double mapDimensionScale,
             int bufferSize,
             int viewW,
             float sizeFix,
@@ -180,8 +150,6 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         double maxVisibleLength = !lockedNorth && shape != 1 ? (double)viewW * Math.sqrt(2.0) : (double)viewW;
         double halfMaxVisibleLength = maxVisibleLength / 2.0;
         double radiusBlocks = maxVisibleLength / 2.0 / this.zoom;
-        double playerX = getRenderEntityX(minimap, renderEntity, partial);
-        double playerZ = getRenderEntityZ(minimap, renderEntity, partial);
         int xFloored = OptimizedMath.myFloor(playerX);
         int zFloored = OptimizedMath.myFloor(playerZ);
         int playerChunkX = xFloored >> 6;
@@ -199,12 +167,12 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         shaderMatrixStack.push();
         shaderMatrixStack.loadIdentity();
         before = System.currentTimeMillis();
-        double xInsidePixel = getRenderEntityX(minimap, renderEntity, partial) - (double)xFloored;
+        double xInsidePixel = playerX - (double)xFloored;
         if (xInsidePixel < 0.0) {
             ++xInsidePixel;
         }
 
-        double zInsidePixel = getRenderEntityZ(minimap, renderEntity, partial) - (double)zFloored;
+        double zInsidePixel = playerZ - (double)zFloored;
         if (zInsidePixel < 0.0) {
             ++zInsidePixel;
         }
@@ -247,6 +215,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
                                 maxZ,
                                 zooming,
                                 this.zoom,
+                                mapDimensionScale,
                                 overlayBufferBuilder,
                                 multiTextureRenderTypeRenderers
                         );
@@ -380,8 +349,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
                 }
             }
         }
-        final boolean isDimensionSwitched = Globals.customDimensionId != MinecraftClient.getInstance().world.getRegistryKey();
-
+        final boolean isDimensionSwitched = Globals.getCurrentDimensionId() != MinecraftClient.getInstance().world.getRegistryKey();
         if (XaeroPlusSettingRegistry.showRenderDistanceSetting.getValue() && !isDimensionSwitched) {
             double actualPlayerX = minimap.getEntityRadar().getEntityX(mc.player, partial);
             double actualPlayerZ = minimap.getEntityRadar().getEntityZ(mc.player, partial);
@@ -502,6 +470,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
                         playerX,
                         renderEntity.getY(),
                         playerZ,
+                        playerDimDiv,
                         ps,
                         pc,
                         this.zoom,

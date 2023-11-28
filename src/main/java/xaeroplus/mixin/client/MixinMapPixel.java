@@ -7,6 +7,7 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.dimension.DimensionType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,6 +18,7 @@ import xaero.map.MapWriter;
 import xaero.map.biome.BlockTintProvider;
 import xaero.map.cache.BlockStateShortShapeCache;
 import xaero.map.region.*;
+import xaero.map.world.MapDimension;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 import java.util.ArrayList;
@@ -31,6 +33,7 @@ public abstract class MixinMapPixel {
             final int[] result_dest,
             final MapWriter mapWriter,
             final World world,
+            MapDimension dim,
             final Registry<Block> blockRegistry,
             final MapTileChunk tileChunk,
             final MapTileChunk prevChunk,
@@ -47,6 +50,7 @@ public abstract class MixinMapPixel {
             final ArrayList<Overlay> overlays,
             final BlockPos.Mutable mutableGlobalPos,
             final Registry<Biome> biomeRegistry,
+            Registry<DimensionType> dimensionTypes,
             final float shadowR,
             final float shadowG,
             final float shadowB,

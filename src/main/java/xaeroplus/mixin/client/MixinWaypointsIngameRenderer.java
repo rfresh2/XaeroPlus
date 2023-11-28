@@ -7,17 +7,14 @@ import net.minecraft.client.render.block.entity.BeaconBlockEntityRenderer;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.render.MinimapRendererHelper;
@@ -34,13 +31,10 @@ import xaeroplus.settings.XaeroPlusSettingRegistry;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static net.minecraft.client.render.block.entity.BeaconBlockEntityRenderer.BEAM_TEXTURE;
-import static net.minecraft.world.World.NETHER;
-import static xaeroplus.Globals.customDimensionId;
 
 @Mixin(value = WaypointsIngameRenderer.class, remap = false)
 public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRenderer {
@@ -82,30 +76,11 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
         beaconWaypoints = sortingList.stream().filter(beaconViewFilter).sorted().collect(Collectors.toList());
     }
 
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/waypoints/WaypointsManager;getDimensionDivision(Ljava/lang/String;)D"))
-    public double redirectDimensionDivision(final WaypointsManager waypointsManager, final String worldContainerID) {
-        if (worldContainerID != null && MinecraftClient.getInstance().world != null) {
-            try {
-                RegistryKey<World> dim = MinecraftClient.getInstance().world.getRegistryKey();
-                if (!Objects.equals(dim, customDimensionId)) {
-                    double currentDimDiv = Objects.equals(dim, NETHER) ? 8.0 : 1.0;
-                    String dimPart = worldContainerID.substring(worldContainerID.lastIndexOf(47) + 1);
-                    RegistryKey<World> dimKey = waypointsManager.getDimensionKeyForDirectoryName(dimPart);
-                    double selectedDimDiv = dimKey == NETHER ? 8.0 : 1.0;
-                    return currentDimDiv / selectedDimDiv;
-                }
-            } catch (final Exception e) {
-                // fall through
-            }
-        }
-        return waypointsManager.getDimensionDivision(worldContainerID);
-    }
-
     @Override
     public void renderWaypointBeacons(final XaeroMinimapSession minimapSession, final MatrixStack matrixStack, final float tickDelta) {
         if (!XaeroPlusSettingRegistry.waypointBeacons.getValue()) return;
         final WaypointsManager waypointsManager = minimapSession.getWaypointsManager();
-        double dimDiv = redirectDimensionDivision(waypointsManager, waypointsManager.getCurrentContainerID());
+        double dimDiv = waypointsManager.getDimensionDivision(waypointsManager.getCurrentContainerID());
         beaconWaypoints.forEach(w -> renderWaypointBeacon(w, dimDiv, tickDelta, matrixStack));
         beaconWaypoints.clear();
     }

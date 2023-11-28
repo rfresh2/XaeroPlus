@@ -40,6 +40,7 @@ public class MixinMapElementRenderHandler {
                                          double screenSizeBasedScale,
                                          double baseScale,
                                          double scale,
+                                         double playerDimDiv,
                                          double mouseX,
                                          double mouseZ,
                                          float brightness,
@@ -54,7 +55,8 @@ public class MixinMapElementRenderHandler {
                                          int location,
                                          MapElementReader reader,
                                          MapElementRenderProvider provider,
-                                         Object context) {
+                                         Object context,
+                                         double rendererDimDiv) {
         if (context instanceof RadarRenderContext) {
             ((IScreenRadarRenderContext) context).setIsWorldMap(true);
         }

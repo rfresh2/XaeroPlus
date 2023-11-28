@@ -95,11 +95,18 @@ public final class XaeroPlusSettingRegistry {
             false,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting persistMapDimensionSwitchSetting = XaeroPlusBooleanSetting.create(
-            "Persist WM Dim Switch",
+            "Persist Dim Switch",
             "setting.world_map.persist_dimension_switch",
             "setting.world_map.persist_dimension_switch.tooltip",
-            false,
+            true,
             SettingLocation.WORLD_MAP_MAIN);
+    // todo: implement
+//    public static final XaeroPlusBooleanSetting radarWhileDimensionSwitchedSetting = XaeroPlusBooleanSetting.create(
+//            "Radar While Dim Switched",
+//            "setting.world_map.radar_while_dimension_switched",
+//            "setting.world_map.radar_while_dimension_switched.tooltip",
+//            true,
+//            SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting transparentObsidianRoofSetting = XaeroPlusBooleanSetting.create(
             "Transparent Obsidian Roof",
             "setting.world_map.transparent_obsidian_roof",
@@ -420,10 +427,4 @@ public final class XaeroPlusSettingRegistry {
             "setting.waypoints.waypoint_beacon_distance_min.tooltip",
             0f,
             SettingLocation.WAYPOINTS);
-    public static final XaeroPlusBooleanSetting crossDimensionTeleportCommand = XaeroPlusBooleanSetting.create(
-        "Cross Dimension Teleport",
-        "setting.world_map.cross_dimension_teleport",
-        "setting.world_map.cross_dimension_teleport.tooltip",
-        true,
-        SettingLocation.WORLD_MAP_MAIN);
 }

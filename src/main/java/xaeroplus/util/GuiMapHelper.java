@@ -2,12 +2,8 @@ package xaeroplus.util;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.world.World;
-import xaero.map.core.XaeroWorldMapCore;
 import xaero.map.gui.GuiMap;
 import xaero.map.gui.GuiSettings;
-import xaeroplus.Globals;
 import xaeroplus.mixin.client.MixinGuiMapAccessor;
 
 import java.util.Optional;
@@ -17,8 +13,12 @@ public class GuiMapHelper {
         Screen currentScreen = MinecraftClient.getInstance().currentScreen;
         if (currentScreen instanceof GuiMap) {
             return Optional.of((GuiMap) currentScreen);
-        } else if (currentScreen instanceof GuiSettings && ((GuiSettings) currentScreen).parent instanceof GuiMap) {
-            return Optional.of((GuiMap) ((GuiSettings) currentScreen).parent);
+        } else if (currentScreen instanceof GuiSettings screen) {
+            if (screen.parent instanceof GuiMap map)
+                return Optional.of(map);
+            else if (screen.escape instanceof GuiMap map) {
+                return Optional.of(map);
+            }
         }
         return Optional.empty();
     }
@@ -35,14 +35,6 @@ public class GuiMapHelper {
     public static int getGuiMapRegionSize(final GuiMap guiMap) {
         // this is intentionally overestimating as we prefer to have a few more chunks than less
         return (int) Math.max((5.0 / getDestScale(guiMap)), 3);
-    }
-
-    public static RegistryKey<World> getGuiMapLoadedDimension() {
-        return XaeroWorldMapCore.currentSession.getMapProcessor().getMapWorld().getCurrentDimension().getDimId();
-    }
-
-    public static RegistryKey<World> getCurrentlyViewedDimension() {
-        return Globals.customDimensionId;
     }
 
     public static boolean isGuiMapLoaded() {

@@ -5,13 +5,13 @@ on:
     branches:
       - "fabric-1.20.1"
 env:
-  WORLDMAP_VERSION: "1.36.0"
-  MINIMAP_VERSION: "23.8.4"
+  WORLDMAP_VERSION: "1.37.0"
+  MINIMAP_VERSION: "23.9.0"
   MINECRAFT_VERSION: "1.20.1"
   MINECRAFT_VERSION_SHORT: "1.20"
   MOD_LOADER: "Fabric"
-  FABRIC_API_VERSION: "0.90.0+1.20.1"
-  FABRIC_API_MODRINTH_VERSION_ID: "tFw0iWAk"
+  FABRIC_API_VERSION: "0.91.0+1.20.1"
+  FABRIC_API_MODRINTH_VERSION_ID: "YblXfKtI"
 
 jobs:
   build:
@@ -82,7 +82,7 @@ jobs:
 
     - name: Generate changelog
       id: changelog
-      uses: metcalfc/changelog-generator@v4.1.0
+      uses: metcalfc/changelog-generator@v4.2.0
       with:
         myToken: ${{ secrets.GITHUB_TOKEN }}
         base-ref: ${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ env.PREV_RUN_NUMBER }}

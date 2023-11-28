@@ -100,13 +100,12 @@ public final class XaeroPlusSettingRegistry {
             "setting.world_map.persist_dimension_switch.tooltip",
             true,
             SettingLocation.WORLD_MAP_MAIN);
-    // todo: implement
-//    public static final XaeroPlusBooleanSetting radarWhileDimensionSwitchedSetting = XaeroPlusBooleanSetting.create(
-//            "Radar While Dim Switched",
-//            "setting.world_map.radar_while_dimension_switched",
-//            "setting.world_map.radar_while_dimension_switched.tooltip",
-//            true,
-//            SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting radarWhileDimensionSwitchedSetting = XaeroPlusBooleanSetting.create(
+            "Radar While Dim Switched",
+            "setting.world_map.radar_while_dimension_switched",
+            "setting.world_map.radar_while_dimension_switched.tooltip",
+            true,
+            SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting transparentObsidianRoofSetting = XaeroPlusBooleanSetting.create(
             "Transparent Obsidian Roof",
             "setting.world_map.transparent_obsidian_roof",

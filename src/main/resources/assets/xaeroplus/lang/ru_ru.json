@@ -15,6 +15,8 @@
   "setting.world_map.waypoint_receive_no_chat_reports_fix.tooltip": "Исправлен анализ отправки игроком путевых точек в чат на серверах с установленным плагином NoChatReports.",
   "setting.world_map.persist_dimension_switch": "Принудительное переключение измерений Большой карты",
   "setting.world_map.persist_dimension_switch.tooltip": "Если включено, измерение не будет переключено обратно на текущее при закрытии графического интерфейса карты мира.",
+  "setting.world_map.radar_while_dimension_switched": "Радар при переключении измерения",
+  "setting.world_map.radar_while_dimension_switched.tooltip": "Отключает отображение радара WorldMap при переключении измерения",
   "setting.world_map.transparent_obsidian_roof": "Прозрачная обсидиановая крыша",
   "setting.world_map.transparent_obsidian_roof.tooltip": "Делает обсидиан, размещенный на высоте сборки, прозрачным. Не обновляет уже поставленные плитки - вам нужно переназначить их.",
   "setting.world_map.transparent_obsidian_roof_y": "Обсидиановая крыша Y",

@@ -6,7 +6,6 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -24,11 +23,8 @@ import xaero.map.file.RegionDetection;
 import xaero.map.file.worldsave.WorldDataHandler;
 import xaero.map.region.*;
 import xaero.map.world.MapDimension;
-import xaero.map.world.MapWorld;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
-import xaeroplus.feature.extensions.CustomDimensionMapSaveLoad;
-import xaeroplus.feature.extensions.CustomWorldDataHandler;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -37,14 +33,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import static xaeroplus.Globals.decompressZipToBytes;
 
 @Mixin(value = MapSaveLoad.class, remap = false)
-public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
+public abstract class MixinMapSaveLoad {
     @Shadow
     private MapProcessor mapProcessor;
     @Shadow
@@ -116,15 +111,12 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
      * @reason faster zip writes
      */
     @Overwrite
-    public boolean loadRegion(
-            World world,
-            MapRegion region,
-            RegistryWrapper<Block> blockLookup,
-            Registry<Block> blockRegistry,
-            Registry<Fluid> fluidRegistry,
-            BiomeGetter biomeGetter,
-            int extraAttempts
-    ) {
+    public boolean loadRegion(MapRegion region,
+                              RegistryWrapper<Block> blockLookup,
+                              Registry<Block> blockRegistry,
+                              Registry<Fluid> fluidRegistry,
+                              BiomeGetter biomeGetter,
+                              int extraAttempts) {
         boolean multiplayer = region.isNormalMapData();
         int emptySize = multiplayer ? 0 : 8192;
         int minorSaveVersion = -1;
@@ -208,7 +200,7 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                                     if (nextTile != -1) {
                                         MapTile tile = this.mapProcessor
                                                 .getTilePool()
-                                                .get(this.mapProcessor.getDimensionName(Globals.customDimensionId), chunk.getX() * 4 + i, chunk.getZ() * 4 + j);
+                                                .get(this.mapProcessor.getDimensionName(this.mapProcessor.getMapWorld().getCurrentDimensionId()), chunk.getX() * 4 + i, chunk.getZ() * 4 + j);
 
                                         for(int x = 0; x < 16; ++x) {
                                             MapBlock[] c = tile.getBlockColumn(x);
@@ -304,7 +296,7 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                     int[] chunkCount = new int[1];
                     WorldDataHandler.Result buildResult = this.mapProcessor
                             .getWorldDataHandler()
-                            .buildRegion(region, world, blockLookup, blockRegistry, fluidRegistry, true, chunkCount);
+                        .buildRegion(region, blockLookup, blockRegistry, fluidRegistry, true, chunkCount);
                     if (buildResult == WorldDataHandler.Result.CANCEL) {
                         if (region.hasHadTerrain()) {
                             RegionDetection restoredDetection = new RegionDetection(
@@ -386,7 +378,7 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
                 } catch (InterruptedException var42) {
                 }
 
-                return this.loadRegion(world, region, blockLookup, blockRegistry, fluidRegistry, biomeGetter, extraAttempts - 1);
+                return this.loadRegion(region, blockLookup, blockRegistry, fluidRegistry, biomeGetter, extraAttempts - 1);
             } else {
                 region.setSaveExists(null);
                 return false;
@@ -403,7 +395,7 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
      * @reason zip fast
      */
     @Overwrite
-    public boolean saveRegion(MapRegion region, int extraAttempts) {
+    private boolean saveRegion(MapRegion region, int extraAttempts) {
         try {
             if (!region.hasHadTerrain()) {
                 if (WorldMap.settings.debug) {
@@ -560,16 +552,6 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
         }
     }
 
-    @Redirect(method = "run", at = @At(value = "INVOKE", target = "Lxaero/map/region/LayeredRegionManager;addLoadedRegion(Lxaero/map/region/LeveledRegion;)V"))
-    public void redirectAddLoadedRegionDimension(LayeredRegionManager instance, LeveledRegion<?> reg) {
-        reg.getDim().getLayeredMapRegions().addLoadedRegion(reg);
-    }
-
-    @Redirect(method = "run", at = @At(value = "INVOKE", target = "Lxaero/map/world/MapWorld;getCurrentDimension()Lxaero/map/world/MapDimension;"))
-    public MapDimension redirectGetCurrentDimension(MapWorld instance) {
-        return instance.getDimension(Globals.customDimensionId);
-    }
-
     @Redirect(method = "run", at = @At(value = "INVOKE", target = "Lxaero/map/region/LeveledRegion;isAllCachePrepared()Z", ordinal = 0))
     public boolean redirectCacheSaveFailCrash(final LeveledRegion instance) {
         final boolean value = instance.isAllCachePrepared();
@@ -579,106 +561,5 @@ public abstract class MixinMapSaveLoad implements CustomDimensionMapSaveLoad {
             // See MixinMapProcessor for where we catch the exception (which is still thrown)
         }
         return value;
-    }
-
-    @Override
-    public void detectRegionsInDimension(int attempts, final RegistryKey<World> dimId) {
-        final MapDimension mapDimension = this.mapProcessor.getMapWorld().getDimension(dimId);
-        mapDimension.preDetection();
-        String worldId = this.mapProcessor.getCurrentWorldId();
-        if (worldId != null && !this.mapProcessor.isCurrentMapLocked()) {
-            final String dimIdStr = this.mapProcessor.getDimensionName(dimId);
-            String mwId = this.mapProcessor.getCurrentMWId();
-            boolean usingNormalMapData = !mapDimension.isUsingWorldSave();
-            Path mapFolder = this.getMWSubFolder(worldId, dimIdStr, mwId);
-            boolean mapFolderExists = mapFolder.toFile().exists();
-            String multiplayerMapRegex = "^(-?\\d+)_(-?\\d+)\\.(zip|xaero)$";
-            MapLayer mainLayer = mapDimension.getLayeredMapRegions().getLayer(Integer.MAX_VALUE);
-            if (usingNormalMapData) {
-                if (mapFolderExists) {
-                    this.detectRegionsFromFiles(mapDimension, worldId, dimIdStr, mwId, mapFolder, multiplayerMapRegex, 1, 2, 0, 20, mainLayer::addRegionDetection);
-                }
-            } else {
-                Path worldDir = ((CustomWorldDataHandler) this.mapProcessor.getWorldDataHandler()).getWorldDir(dimId);
-                if (worldDir == null) {
-                    return;
-                }
-
-                Path worldFolder = worldDir.resolve("region");
-                if (!worldFolder.toFile().exists()) {
-                    return;
-                }
-
-                this.detectRegionsFromFiles(
-                        mapDimension,
-                        worldId,
-                        dimIdStr,
-                        mwId,
-                        worldFolder,
-                        "^r\\.(-{0,1}[0-9]+)\\.(-{0,1}[0-9]+)\\.mc[ar]$",
-                        1,
-                        2,
-                        8192,
-                        20,
-                        mapDimension::addWorldSaveRegionDetection
-                );
-            }
-
-            if (mapFolderExists) {
-                Path cavesFolder = mapFolder.resolve("caves");
-
-                try {
-                    if (!Files.exists(cavesFolder)) {
-                        Files.createDirectories(cavesFolder);
-                    }
-
-                    try (Stream<Path> cavesFolderStream = Files.list(cavesFolder)) {
-                        cavesFolderStream.forEach(
-                                layerFolder -> {
-                                    if (Files.isDirectory(layerFolder)) {
-                                        String folderName = layerFolder.getFileName().toString();
-
-                                        try {
-                                            int layerInt = Integer.parseInt(folderName);
-                                            MapLayer layer = mapDimension.getLayeredMapRegions().getLayer(layerInt);
-                                            if (usingNormalMapData) {
-                                                this.detectRegionsFromFiles(
-                                                        mapDimension,
-                                                        worldId,
-                                                        dimIdStr,
-                                                        mwId,
-                                                        layerFolder,
-                                                        multiplayerMapRegex,
-                                                        1,
-                                                        2,
-                                                        0,
-                                                        20,
-                                                        layer::addRegionDetection
-                                                );
-                                            }
-                                        } catch (NumberFormatException var11x) {
-                                        }
-                                    }
-                                }
-                        );
-                    }
-                } catch (IOException var18) {
-                    WorldMap.LOGGER.error("IOException trying to detect map layers!");
-                    if (attempts > 1) {
-                        WorldMap.LOGGER.error("Retrying... " + --attempts);
-
-                        try {
-                            Thread.sleep(30L);
-                        } catch (InterruptedException var15) {
-                        }
-
-                        this.detectRegionsInDimension(attempts, dimId);
-                        return;
-                    }
-
-                    throw new RuntimeException("Couldn't detect map layers after multiple attempts.", var18);
-                }
-            }
-        }
     }
 }

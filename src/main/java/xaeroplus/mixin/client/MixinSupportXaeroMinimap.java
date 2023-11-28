@@ -2,9 +2,12 @@ package xaeroplus.mixin.client;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.map.mods.SupportXaeroMinimap;
 import xaero.map.mods.gui.Waypoint;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 import java.util.ArrayList;
 
@@ -26,6 +29,14 @@ public class MixinSupportXaeroMinimap {
             return false;
         } catch (final Exception e) {
             return waypoints.contains(w);
+        }
+    }
+
+    @Inject(method = "getSubWorldNameToRender", at = @At("HEAD"), cancellable = true)
+    public void getSubworldNameToRenderInject(final CallbackInfoReturnable<String> cir) {
+        if (XaeroPlusSettingRegistry.owAutoWaypointDimension.getValue()) {
+            // remove annoying string rendered in the middle of the worldmap
+            cir.setReturnValue(null);
         }
     }
 }

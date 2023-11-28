@@ -10,6 +10,7 @@ import net.minecraft.world.World;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.minimap.waypoints.WaypointSet;
+import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.misc.OptimizedMath;
 import xaero.map.mods.SupportMods;
@@ -20,7 +21,6 @@ import xaeroplus.module.Module;
 import xaeroplus.util.BaritoneGoalHelper;
 import xaeroplus.util.BaritoneHelper;
 import xaeroplus.util.ChunkUtils;
-import xaeroplus.util.WaypointsHelper;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,6 +39,8 @@ public class BaritoneGoalSync extends Module {
         final WaypointsManager waypointsManager = minimapSession.getWaypointsManager();
         WaypointSet waypointSet = waypointsManager.getWaypoints();
         if (waypointSet == null) return;
+        WaypointWorld waypointWorld = waypointsManager.getCurrentWorld();
+        if (waypointWorld == null) return;
         final List<Waypoint> waypoints = waypointSet.getList();
         Optional<Waypoint> baritoneGoalWaypoint = waypoints.stream()
                 .filter(waypoint -> waypoint.getName().equals("Baritone Goal"))
@@ -53,12 +55,12 @@ public class BaritoneGoalSync extends Module {
             baritoneGoalWaypoint.ifPresent(waypoint -> removeBaritoneGoalWaypoint(waypoints, waypoint));
             return;
         };
-        final double dimDiv = waypointsManager.getDimensionDivision(waypointsManager.getCurrentContainerID());
+        final double dimDiv = waypointsManager.getDimensionDivision(waypointWorld);
         final int x = OptimizedMath.myFloor(baritoneGoalBlockPos.getX() * dimDiv);
         final int z = OptimizedMath.myFloor(baritoneGoalBlockPos.getZ() * dimDiv);
         if (baritoneGoalWaypoint.isPresent()) {
             final Waypoint waypoint = baritoneGoalWaypoint.get();
-            RegistryKey<World> customDim = Globals.customDimensionId;
+            RegistryKey<World> customDim = Globals.getCurrentDimensionId();
             RegistryKey<World> actualDim = ChunkUtils.getActualDimension();
             double customDimDiv = 1.0;
             if (customDim != actualDim) {
@@ -88,7 +90,7 @@ public class BaritoneGoalSync extends Module {
                     10, // green
                     0,
                     true);
-            ((IWaypointDimension) waypoint).setDimension(WaypointsHelper.getDimensionKeyForWaypointWorldKey(waypointsManager.getCurrentContainerID()));
+            ((IWaypointDimension) waypoint).setDimension(waypointWorld.getDimId());
             waypoints.add(waypoint);
             SupportMods.xaeroMinimap.requestWaypointsRefresh();
         }

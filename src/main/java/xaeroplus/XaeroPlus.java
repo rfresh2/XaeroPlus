@@ -46,7 +46,7 @@ public class XaeroPlus {
 		ModuleManager.init();
 		boolean a = Globals.FOLLOW; // force static instances to init
 		XaeroPlusSettingRegistry.fastMapSetting.getValue(); // force static instances to init
-		List<KeyBinding> keybinds = XaeroPlusSettingsReflectionHax.getKeybinds();
+		List<KeyBinding> keybinds = XaeroPlusSettingsReflectionHax.keybindsSupplier.get();
 		keybinds.forEach(event::register);
 	}
 }

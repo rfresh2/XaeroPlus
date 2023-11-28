@@ -160,7 +160,7 @@ public abstract class MixinMapWriter {
     public abstract boolean hasVanillaColor(BlockState state, World world, Registry<Block> blockRegistry, BlockPos pos);
 
     @Shadow
-    public abstract boolean isInvisible(World world, BlockState state, Block b, boolean flowers);
+    public abstract boolean isInvisible(BlockState state, Block b, boolean flowers);
 
     @Shadow
     public abstract boolean isGlowing(BlockState state);
@@ -393,7 +393,7 @@ public abstract class MixinMapWriter {
 
         Block b = state.getBlock();
         boolean roofObsidian = b == Blocks.OBSIDIAN && h > XaeroPlusSettingRegistry.transparentObsidianRoofYSetting.getValue();
-        if (this.isInvisible(world, state, b, flowers)) {
+        if (this.isInvisible(state, b, flowers)) {
             cir.setReturnValue(false);
         } else if (this.shouldOverlayCached(fluidFluidState == null ? state : fluidFluidState) || roofObsidian) {
             if (cave && !underair) {
@@ -461,18 +461,26 @@ public abstract class MixinMapWriter {
                         && !this.mapProcessor.isWaitingForWorldUpdate()
                         && this.mapProcessor.getMapSaveLoad().isRegionDetectionComplete()
                         && this.mapProcessor.isCurrentMultiworldWritable()) {
-                        if (this.mapProcessor.getWorld() == null || this.mapProcessor.isCurrentMapLocked()) {
+                        if (this.mapProcessor.getWorld() == null || this.mapProcessor.isCurrentMapLocked() || this.mapProcessor.getMapWorld().isCacheOnlyMode()) {
                             return;
                         }
 
                         if (this.mapProcessor.getCurrentWorldId() != null
                             && !this.mapProcessor.ignoreWorld(this.mapProcessor.getWorld())
-                            && (WorldMap.settings.updateChunks || WorldMap.settings.loadChunks || !this.mapProcessor.getMapWorld().isMultiplayer())) {
+                            && (
+                            WorldMap.settings.updateChunks
+                                || WorldMap.settings.loadChunks
+                                || this.mapProcessor.getMapWorld().getCurrentDimension().isUsingWorldSave()
+                        )) {
                             double playerX;
                             double playerY;
                             double playerZ;
                             synchronized (this.mapProcessor.mainStuffSync) {
                                 if (this.mapProcessor.mainWorld != this.mapProcessor.getWorld()) {
+                                    return;
+                                }
+
+                                if (this.mapProcessor.getWorld().getRegistryKey() != this.mapProcessor.getMapWorld().getCurrentDimensionId()) {
                                     return;
                                 }
 
@@ -526,8 +534,8 @@ public abstract class MixinMapWriter {
                                     int timeLimit = (int) (Math.min(sinceLastWrite, 50L) * 86960L);
                                     long writeStartNano = System.nanoTime();
                                     Registry<Biome> biomeRegistry = this.mapProcessor.worldBiomeRegistry;
-                                    boolean loadChunks = WorldMap.settings.loadChunks || !this.mapProcessor.getMapWorld().isMultiplayer();
-                                    boolean updateChunks = WorldMap.settings.updateChunks || !this.mapProcessor.getMapWorld().isMultiplayer();
+                                    boolean loadChunks = WorldMap.settings.loadChunks || this.mapProcessor.getMapWorld().getCurrentDimension().isUsingWorldSave();
+                                    boolean updateChunks = WorldMap.settings.updateChunks || this.mapProcessor.getMapWorld().getCurrentDimension().isUsingWorldSave();
                                     boolean ignoreHeightmaps = this.mapProcessor.getMapWorld().isIgnoreHeightmaps();
                                     boolean flowers = WorldMap.settings.flowers;
                                     boolean detailedDebug = WorldMap.settings.detailed_debug;
@@ -584,10 +592,11 @@ public abstract class MixinMapWriter {
 
                             for (int visitRegionX = startRegionX; visitRegionX <= endRegionX; ++visitRegionX) {
                                 for (int visitRegionZ = startRegionZ; visitRegionZ <= endRegionZ; ++visitRegionZ) {
-                                    MapRegion visitRegion = this.mapProcessor.getMapRegion(this.writingLayer, visitRegionX, visitRegionZ, true);
+                                    MapRegion visitRegion = this.mapProcessor.getLeafMapRegion(this.writingLayer, visitRegionX, visitRegionZ, true);
                                     if (visitRegion != null && visitRegion.getLoadState() == 2) {
                                         visitRegion.registerVisit();
                                     }
+                                    if (visitRegion == null) continue;
                                     synchronized (visitRegion) {
                                         if (visitRegion.isResting()
                                             && shouldRequestLoading

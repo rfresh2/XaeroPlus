@@ -424,6 +424,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 var actualDimension = ChunkUtils.getActualDimension();
                 if (Globals.getCurrentDimensionId() != actualDimension) {
                     Globals.switchToDimension(actualDimension);
+                    if (!XaeroPlusSettingRegistry.radarWhileDimensionSwitchedSetting.getValue()) {
+                        WorldMap.settings.minimapRadar = true;
+                    }
                 }
             } catch (final Exception e) {
                 XaeroPlus.LOGGER.error("Failed to switch back to original dimension", e);
@@ -451,6 +454,11 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         MapDimension currentFutureDim = !this.mapProcessor.isMapWorldUsable() ? null : this.mapProcessor.getMapWorld().getFutureDimension();
         if (currentFutureDim != this.futureDimension) {
             this.init(this.client, this.width, this.height);
+            if (!XaeroPlusSettingRegistry.radarWhileDimensionSwitchedSetting.getValue()) {
+                if (currentFutureDim.getDimId() != ChunkUtils.getActualDimension())
+                    WorldMap.settings.minimapRadar = false;
+                else WorldMap.settings.minimapRadar = true;
+            }
         }
 
         MatrixStack matrixStack = guiGraphics.getMatrices();
@@ -1984,6 +1992,15 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             zTextEntryField.render(guiGraphics, scaledMouseX, scaledMouseY, partialTicks);
         }
         MapRenderHelper.restoreDefaultShaderBlendState();
+    }
+
+    @Inject(method = "onDimensionToggleButton", at = @At(value = "RETURN"))
+    public void onDimensionToggleAfter(final ButtonWidget b, final CallbackInfo ci) {
+        if (!XaeroPlusSettingRegistry.radarWhileDimensionSwitchedSetting.getValue()) {
+            if (mapProcessor.getMapWorld().getFutureDimensionId() != ChunkUtils.getActualDimension())
+                WorldMap.settings.minimapRadar = false;
+            else WorldMap.settings.minimapRadar = true;
+        }
     }
 
     @Inject(method = "tick", at = @At("RETURN"), remap = true)

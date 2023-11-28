@@ -73,8 +73,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
-import static net.minecraft.world.World.NETHER;
-import static net.minecraft.world.World.OVERWORLD;
+import static net.minecraft.world.World.*;
 import static xaero.map.gui.GuiMap.*;
 import static xaeroplus.Globals.FOLLOW;
 import static xaeroplus.util.ChunkUtils.getPlayerX;
@@ -87,6 +86,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     TextFieldWidget xTextEntryField;
     TextFieldWidget zTextEntryField;
     ButtonWidget followButton;
+    ButtonWidget switchToNetherButton;
+    ButtonWidget switchToOverworldButton;
+    ButtonWidget switchToEndButton;
     @Final
     @Shadow
     private static Text FULL_RELOAD_IN_PROGRESS = Text.translatable("gui.xaero_full_reload_in_progress");
@@ -389,6 +391,21 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         zTextEntryField.setPlaceholder(Text.literal("Z:").formatted(Formatting.DARK_GRAY));
         this.addSelectableChild(xTextEntryField);
         this.addSelectableChild(zTextEntryField);
+        switchToEndButton = new GuiTexturedButton(this.width - 20, zoomInButton.getY() - 20, 20, 20, 31, 0, 16, 16,
+                                                  Globals.xpGuiTextures,
+                                                  (button -> onSwitchDimensionButton(END)),
+                                                  () -> new CursorBox(Text.translatable("setting.keybinds.switch_to_end")));
+        switchToOverworldButton = new GuiTexturedButton(this.width - 20, this.switchToEndButton.getY() - 20, 20, 20, 16, 0, 16, 16,
+                                                        Globals.xpGuiTextures,
+                                                        (button -> onSwitchDimensionButton(OVERWORLD)),
+                                                        () -> new CursorBox(Text.translatable("setting.keybinds.switch_to_overworld")));
+        switchToNetherButton = new GuiTexturedButton(this.width - 20, this.switchToOverworldButton.getY() - 20, 20, 20, 0, 0, 16, 16,
+                                                     Globals.xpGuiTextures,
+                                                     (button -> onSwitchDimensionButton(NETHER)),
+                                                     () -> new CursorBox(Text.translatable("setting.keybinds.switch_to_nether")));
+        addButton(switchToEndButton);
+        addButton(switchToOverworldButton);
+        addButton(switchToNetherButton);
     }
 
     @Override
@@ -445,10 +462,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             this.cameraZ = (float)scaledPlayerZ;
             this.shouldResetCameraPos = false;
         } else if (this.prevPlayerDimDiv != 0.0 && playerDimDiv != this.prevPlayerDimDiv) {
-            double oldScaledPlayerX = this.player.getX() / this.prevPlayerDimDiv;
-            double oldScaledPlayerZ = this.player.getZ() / this.prevPlayerDimDiv;
-            this.cameraX = this.cameraX - oldScaledPlayerX + scaledPlayerX;
-            this.cameraZ = this.cameraZ - oldScaledPlayerZ + scaledPlayerZ;
+            this.cameraX *= prevPlayerDimDiv / playerDimDiv;
+            this.cameraZ *= prevPlayerDimDiv / playerDimDiv;
             this.cameraDestinationAnimX = null;
             this.cameraDestinationAnimZ = null;
             this.cameraDestination = null;
@@ -459,7 +474,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         double scaleBefore = this.scale;
         this.mapSwitchingGui.preMapRender((GuiMap) (Object)this, this.client, this.width, this.height);
         long passed = this.lastStartTime == 0L ? 16L : startTime - this.lastStartTime;
-        double passedScrolls = (double)((float)passed / 64.0F);
+        double passedScrolls = (float)passed / 64.0F;
         int direction = this.buttonPressed != this.zoomInButton && !ControlsHandler.isDown(ControlsRegister.keyZoomIn)
                 ? (this.buttonPressed != this.zoomOutButton && !ControlsHandler.isDown(ControlsRegister.keyZoomOut) ? 0 : -1)
                 : 1;
@@ -2061,6 +2076,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             xTextEntryField.setEditable(true);
             xTextEntryField.setFocused(true);
         }
+    }
+
+    private void onSwitchDimensionButton(final RegistryKey<World> newDimId) {
+        Globals.switchToDimension(newDimId);
     }
 
     @Unique

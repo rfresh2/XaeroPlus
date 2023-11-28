@@ -23,6 +23,6 @@ public class MixinCommonModSettings {
 
     @Inject(method = "isKeyRepeat", at = @At("RETURN"), cancellable = true)
     public void isKeyRepeat(KeyBinding kb, CallbackInfoReturnable<Boolean> cir) {
-        cir.setReturnValue(cir.getReturnValue() && XaeroPlusSettingsReflectionHax.getKeybinds().stream().noneMatch(keyBinding -> keyBinding == kb));
+        cir.setReturnValue(cir.getReturnValue() && XaeroPlusSettingsReflectionHax.keybindingMapSupplier.get().get(kb) == null);
     }
 }

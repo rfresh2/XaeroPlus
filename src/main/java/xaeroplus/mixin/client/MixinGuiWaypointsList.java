@@ -15,7 +15,7 @@ import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.minimap.waypoints.WaypointsManager;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.Shared;
+import xaeroplus.util.Globals;
 
 import java.lang.reflect.Field;
 import java.text.NumberFormat;
@@ -43,7 +43,7 @@ public abstract class MixinGuiWaypointsList {
             waypointsSortedField.setAccessible(true);
             final ArrayList<Waypoint> waypointsSorted = (ArrayList<Waypoint>) waypointsSortedField.get(thisGuiWaypoints);
             for(Waypoint w : waypointsSorted) {
-                if (w.getName().toLowerCase().contains(Shared.waypointsSearchFilter.toLowerCase())) {
+                if (w.getName().toLowerCase().contains(Globals.waypointsSearchFilter.toLowerCase())) {
                     filteredWaypoints.add(w);
                 }
             }
@@ -52,7 +52,7 @@ public abstract class MixinGuiWaypointsList {
             final WaypointsManager waypointsManagerValue = (WaypointsManager) waypointsManagerField.get(thisGuiWaypoints);
             if (waypointsManagerValue.getServerWaypoints() != null) {
                 for(Waypoint w : waypointsManagerValue.getServerWaypoints()) {
-                    if (w.getName().toLowerCase().contains(Shared.waypointsSearchFilter.toLowerCase())) {
+                    if (w.getName().toLowerCase().contains(Globals.waypointsSearchFilter.toLowerCase())) {
                         filteredWaypoints.add(w);
                     }
                 }

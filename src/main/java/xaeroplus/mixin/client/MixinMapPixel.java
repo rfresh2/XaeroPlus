@@ -15,6 +15,7 @@ import xaero.map.biome.BiomeColorCalculator;
 import xaero.map.cache.BlockStateShortShapeCache;
 import xaero.map.misc.Misc;
 import xaero.map.region.*;
+import xaero.map.world.MapDimension;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public abstract class MixinMapPixel {
             int[] result_dest,
             MapWriter mapWriter,
             World world,
+            MapDimension dim,
             MapTileChunk tileChunk,
             MapTileChunk prevChunk,
             MapTileChunk prevChunkDiagonal,

@@ -83,7 +83,7 @@ public class WDLHelper {
     private static final AsyncLoadingCache<RegionRenderPos, List<HighlightAtChunkPos>> regionRenderCache = Caffeine.newBuilder()
             .expireAfterWrite(3000, TimeUnit.MILLISECONDS)
             .refreshAfterWrite(500, TimeUnit.MILLISECONDS)
-            .executor(Shared.cacheRefreshExecutorService)
+            .executor(Globals.cacheRefreshExecutorService)
             .buildAsync(key -> loadHighlightChunksAtRegion(key.leafRegionX, key.leafRegionZ, key.level,
                     (chunkPos) -> getSavedChunksWithCache().contains(chunkPos)).call());
     public static List<HighlightAtChunkPos> getSavedChunksInRegion(final int leafRegionX, final int leafRegionZ, final int level) {

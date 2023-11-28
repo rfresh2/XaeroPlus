@@ -11,13 +11,13 @@ import org.apache.logging.log4j.Logger;
 import xaeroplus.event.ForgeEventHandler;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.Shared;
+import xaeroplus.util.Globals;
 
 @Mod(
         modid = XaeroPlus.MODID,
         name = XaeroPlus.NAME,
         version = XaeroPlus.VERSION,
-        dependencies = "after:xaerominimap;after:xaerobetterpvp;required-after:xaeroworldmap@[1.36.0];"
+        dependencies = "after:xaerominimap;after:xaerobetterpvp;required-after:xaeroworldmap@[1.37.0];"
 )
 public class XaeroPlus {
     public static final String MODID = "xaeroplus";
@@ -33,7 +33,7 @@ public class XaeroPlus {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         ModuleManager.init();
-        boolean follow = Shared.FOLLOW;// force static instances to init
+        boolean follow = Globals.FOLLOW;// force static instances to init
         XaeroPlusSettingRegistry.fastMapSetting.getValue(); // force static instances to init
     }
 

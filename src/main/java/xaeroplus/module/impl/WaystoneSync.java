@@ -15,7 +15,6 @@ import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.module.Module;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.IWaypointDimension;
-import xaeroplus.util.WaypointsHelper;
 import xaeroplus.util.WaystonesHelper;
 
 import java.util.ArrayList;
@@ -57,14 +56,17 @@ public class WaystoneSync extends Module {
         XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
         if (minimapSession == null) return;
         final WaypointsManager waypointsManager = minimapSession.getWaypointsManager();
+        WaypointWorld currentWaypointWorld = waypointsManager.getCurrentWorld();
+        if (currentWaypointWorld == null) return;
         final WaypointSet waypointSet = waypointsManager.getWaypoints();
         if (waypointSet == null) return;
         final List<Waypoint> waypoints = waypointSet.getList();
         waypoints.removeIf(waypoint -> waypoint.isTemporary() && waypoint.getName().endsWith(" [Waystone]"));
         for (WaystoneEntry waystoneEntry : knownWaystones) {
             final int waystoneDim = waystoneEntry.getDimensionId();
+
             final String currentContainerId = waypointsManager.getCurrentContainerID();
-            final int currentWaypointDim = WaypointsHelper.getDimensionForWaypointWorldKey(currentContainerId);
+            final int currentWaypointDim = currentWaypointWorld.getDimId();
             if (XaeroPlusSettingRegistry.waystonesCrossDimSyncSetting.getValue() && waystoneDim != currentWaypointDim) { // special case handling
                 // god i hate how there's no easy way to get waypoint sets in other dimensions. also the entire handling of waypoint dimensions...
                 // this will probably (definitely) fail if there are nonstandard waypoint sets in use.
@@ -74,7 +76,7 @@ public class WaystoneSync extends Module {
                             currentContainerId.lastIndexOf(37) + 1) + waystoneDim);
                     WaypointWorld crossDimWaypointWorld = waypointWorldContainer.worlds.get("waypoints");
                     if (crossDimWaypointWorld == null) {
-                        waypointWorldContainer.worlds.put("waypoints", new WaypointWorld(waypointWorldContainer, "waypoints"));
+                        waypointWorldContainer.worlds.put("waypoints", new WaypointWorld(waypointWorldContainer, "waypoints", waystoneDim));
                         crossDimWaypointWorld = waypointWorldContainer.worlds.get("waypoints");
                     }
                     ArrayList<Waypoint> crossDimWaypoints = crossDimWaypointWorld.getSets().get(
@@ -100,7 +102,7 @@ public class WaystoneSync extends Module {
             }
 
             // places all waystones in the current waypoint set regardless of dimension
-            final double dimDiv = getDimensionDivision(waystoneEntry.getDimensionId(), waypointsManager);
+            final double dimDiv = getDimensionDivision(waystoneEntry.getDimensionId(), currentWaypointWorld);
             final int x = OptimizedMath.myFloor(waystoneEntry.getPos().getX() * dimDiv);
             final int z = OptimizedMath.myFloor(waystoneEntry.getPos().getZ() * dimDiv);
             Waypoint waystoneWp = new Waypoint(
@@ -119,9 +121,8 @@ public class WaystoneSync extends Module {
         SupportMods.xaeroMinimap.requestWaypointsRefresh();
     }
 
-    private double getDimensionDivision(final int waystoneDim, final WaypointsManager waypointsManager) {
-        String currentContainerID = waypointsManager.getCurrentContainerID();
-        int waypointContainerDim = WaypointsHelper.getDimensionForWaypointWorldKey(currentContainerID);
+    private double getDimensionDivision(final int waystoneDim, final WaypointWorld currentWaypointWorld) {
+        int waypointContainerDim = currentWaypointWorld.getDimId();
         if (waystoneDim == waypointContainerDim) return 1.0;
         double waypointsContainerDimDiv = waypointContainerDim == -1 ? 8.0 : 1.0;
         double waystoneDimDiv = waystoneDim == -1 ? 8.0 : 1.0;

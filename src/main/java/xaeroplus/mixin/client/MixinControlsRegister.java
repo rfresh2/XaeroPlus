@@ -21,7 +21,7 @@ public abstract class MixinControlsRegister {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     public void init(CallbackInfo ci) {
-        List<KeyBinding> keybinds = XaeroPlusSettingsReflectionHax.getKeybinds();
+        List<KeyBinding> keybinds = XaeroPlusSettingsReflectionHax.keybindsSupplier.get();
         this.keybindings.addAll(keybinds);
         keybinds.forEach(ClientRegistry::registerKeyBinding);
     }

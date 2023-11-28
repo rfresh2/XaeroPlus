@@ -34,6 +34,7 @@ public class MixinMinimapElementRendererHandler {
                                         double renderX,
                                         double renderY,
                                         double renderZ,
+                                        double playerDimDiv,
                                         double ps,
                                         double pc,
                                         double zoom,

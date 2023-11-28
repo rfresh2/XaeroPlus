@@ -18,7 +18,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.waypoints.Waypoint;
@@ -29,16 +28,12 @@ import xaero.common.settings.ModSettings;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ColorHelper;
 import xaeroplus.util.CustomWaypointsIngameRenderer;
-import xaeroplus.util.WaypointsHelper;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import static xaeroplus.util.Shared.customDimensionId;
 
 @Mixin(value = WaypointsIngameRenderer.class, remap = false)
 public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRenderer {
@@ -86,29 +81,11 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
         beaconWaypoints = sortingList.stream().filter(beaconViewFilter).sorted().collect(Collectors.toList());
     }
 
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/waypoints/WaypointsManager;getDimensionDivision(Ljava/lang/String;)D"))
-    public double redirectDimensionDivision(final WaypointsManager waypointsManager, final String worldContainerID) {
-        if (worldContainerID != null && Minecraft.getMinecraft().world != null) {
-            try {
-                int dim = Minecraft.getMinecraft().world.provider.getDimension();
-                if (!Objects.equals(dim, customDimensionId)) {
-                    double currentDimDiv = Objects.equals(dim, -1) ? 8.0 : 1.0;
-                    int dimKey = WaypointsHelper.getDimensionForWaypointWorldKey(worldContainerID);
-                    double selectedDimDiv = dimKey == -1 ? 8.0 : 1.0;
-                    return currentDimDiv / selectedDimDiv;
-                }
-            } catch (final Exception e) {
-                // fall through
-            }
-        }
-        return waypointsManager.getDimensionDivision(worldContainerID);
-    }
-
     @Override
     public void renderWaypointBeacons(final XaeroMinimapSession minimapSession, final RenderGlobal renderGlobal, final float partialTicks) {
         if (!XaeroPlusSettingRegistry.waypointBeacons.getValue()) return;
         final WaypointsManager waypointsManager = minimapSession.getWaypointsManager();
-        double dimDiv = redirectDimensionDivision(waypointsManager, waypointsManager.getCurrentContainerID());
+        double dimDiv = waypointsManager.getDimensionDivision(waypointsManager.getCurrentWorld());
         beaconWaypoints.forEach(w -> renderWaypointBeacon(w, dimDiv, partialTicks));
         GlStateManager.disableLighting(); // baritone goal rendering fix lol, learn 2 set up GL state
         beaconWaypoints.clear();

@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import xaero.map.file.worldsave.WorldDataReader;
 import xaero.map.region.MapTile;
 import xaero.map.region.MapTileChunk;
+import xaero.map.world.MapDimensionTypeInfo;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 @Mixin(value = WorldDataReader.class, remap = false)
@@ -28,11 +29,29 @@ public abstract class MixinWorldDataReader {
             boolean worldHasSkylight,
             boolean ignoreHeightmaps,
             World world,
+            MapDimensionTypeInfo dimType,
             boolean flowers
     );
 
-    @Redirect(method = "buildTileChunk", at = @At(value = "INVOKE", target = "Lxaero/map/file/worldsave/WorldDataReader;buildTile(Lnet/minecraft/nbt/NBTTagCompound;Lxaero/map/region/MapTile;Lxaero/map/region/MapTileChunk;IIIIIIZZLnet/minecraft/world/World;Z)Z"))
-    public boolean redirectBuildTile(final WorldDataReader instance, final NBTTagCompound nbtTagCompound, final MapTile tile, final MapTileChunk tileChunk, final int chunkX, final int chunkZ, final int insideRegionX, final int insideRegionZ, final int caveStart, final int caveDepth, final boolean worldHasSkylight, final boolean ignoreHeightmaps, final World world, final boolean flowers) {
+    @Redirect(method = "buildTileChunk",
+        at = @At(
+            value = "INVOKE",
+            target = "Lxaero/map/file/worldsave/WorldDataReader;buildTile(Lnet/minecraft/nbt/NBTTagCompound;Lxaero/map/region/MapTile;Lxaero/map/region/MapTileChunk;IIIIIIZZLnet/minecraft/world/World;Lxaero/map/world/MapDimensionTypeInfo;Z)Z"))
+    public boolean redirectBuildTile(final WorldDataReader instance,
+                                     final NBTTagCompound nbtTagCompound,
+                                     final MapTile tile,
+                                     final MapTileChunk tileChunk,
+                                     final int chunkX,
+                                     final int chunkZ,
+                                     final int insideRegionX,
+                                     final int insideRegionZ,
+                                     final int caveStart,
+                                     final int caveDepth,
+                                     final boolean worldHasSkylight,
+                                     final boolean ignoreHeightmaps,
+                                     final World world,
+                                     MapDimensionTypeInfo dimType,
+                                     final boolean flowers) {
         if (XaeroPlusSettingRegistry.netherCaveFix.getValue()) {
             boolean cave = caveStart != Integer.MAX_VALUE;
             boolean nether = tileChunk.getInRegion().getDim().getDimId() == -1;
@@ -53,6 +72,7 @@ public abstract class MixinWorldDataReader {
                     worldHasSkylight,
                     ignoreHeightmaps,
                     world,
+                    dimType,
                     flowers);
         }
         return buildTile(
@@ -68,6 +88,7 @@ public abstract class MixinWorldDataReader {
                 worldHasSkylight,
                 ignoreHeightmaps,
                 world,
+                dimType,
                 flowers);
     }
 }

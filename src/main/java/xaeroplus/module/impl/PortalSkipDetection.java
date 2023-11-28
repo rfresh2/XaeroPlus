@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import xaero.map.MapProcessor;
 import xaero.map.WorldMapSession;
 import xaero.map.core.XaeroWorldMapCore;
 import xaero.map.gui.GuiMap;
@@ -16,7 +17,6 @@ import xaeroplus.module.ModuleManager;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
-import xaeroplus.util.CustomDimensionMapProcessor;
 import xaeroplus.util.SeenChunksTrackingMapTileChunk;
 import xaeroplus.util.highlights.ChunkHighlightLocalCache;
 import xaeroplus.util.highlights.HighlightAtChunkPos;
@@ -163,13 +163,13 @@ public class PortalSkipDetection extends Module {
     private boolean isChunkSeen(final int chunkPosX, final int chunkPosZ, final int currentlyViewedDimension) {
         final WorldMapSession currentSession = XaeroWorldMapCore.currentSession;
         if (currentSession == null) return false;
-        final CustomDimensionMapProcessor mapProcessor = (CustomDimensionMapProcessor) currentSession.getMapProcessor();
+        final MapProcessor mapProcessor = currentSession.getMapProcessor();
         if (mapProcessor == null) return false;
-        final MapRegion mapRegion = mapProcessor.getMapRegionCustomDimension(
+        final MapRegion mapRegion = mapProcessor.getMapRegion(
                 ChunkUtils.chunkCoordToMapRegionCoord(chunkPosX),
                 ChunkUtils.chunkCoordToMapRegionCoord(chunkPosZ),
-                false,
-                currentlyViewedDimension);
+                false
+        );
         if (mapRegion == null) return false;
         final MapTileChunk mapChunk = mapRegion.getChunk(chunkCoordToMapTileChunkCoordLocal(chunkPosX), chunkCoordToMapTileChunkCoordLocal(chunkPosZ));
         if (mapChunk == null) return false;

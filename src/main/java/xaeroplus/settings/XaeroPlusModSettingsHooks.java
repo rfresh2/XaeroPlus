@@ -2,7 +2,7 @@ package xaeroplus.settings;
 
 import net.minecraft.client.resources.I18n;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import xaeroplus.util.Shared;
+import xaeroplus.util.Globals;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -51,7 +51,7 @@ public class XaeroPlusModSettingsHooks {
         }
 
         // 1 for minimap, 1 for worldmap
-        if (loadCount == 2) Shared.onAllSettingsLoaded();
+        if (loadCount == 2) Globals.onAllSettingsLoaded();
     }
 
     public static void getClientBooleanValue(String enumString, List<XaeroPlusSetting> settings, CallbackInfoReturnable<Boolean> cir) {

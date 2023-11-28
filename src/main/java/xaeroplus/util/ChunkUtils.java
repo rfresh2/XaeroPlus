@@ -101,10 +101,10 @@ public class ChunkUtils {
             final Minecraft mc = Minecraft.getMinecraft();
             int dim = mc.world.provider.getDimension();
             // when player is in the nether or the custom dimension is the nether, perform coordinate translation
-            if ((dim == -1 || Shared.customDimensionId == -1) && dim != Shared.customDimensionId) {
-                if (Shared.customDimensionId == 0) {
+            if ((dim == -1 || Globals.getCurrentDimensionId() == -1) && dim != Globals.getCurrentDimensionId()) {
+                if (Globals.getCurrentDimensionId() == 0) {
                     return mc.player.posX * 8.0;
-                } else if (Shared.customDimensionId == -1 && dim == 0) {
+                } else if (Globals.getCurrentDimensionId() == -1 && dim == 0) {
                     return mc.player.posX / 8.0;
                 }
             }
@@ -125,10 +125,10 @@ public class ChunkUtils {
             Minecraft mc = Minecraft.getMinecraft();
             int dim = mc.world.provider.getDimension();
             // when player is in the nether or the custom dimension is the nether, perform coordinate translation
-            if ((dim == -1 || Shared.customDimensionId == -1) && dim != Shared.customDimensionId) {
-                if (Shared.customDimensionId == 0) {
+            if ((dim == -1 || Globals.getCurrentDimensionId() == -1) && dim != Globals.getCurrentDimensionId()) {
+                if (Globals.getCurrentDimensionId() == 0) {
                     return mc.player.posZ * 8.0;
-                } else if (Shared.customDimensionId == -1 && dim == 0) {
+                } else if (Globals.getCurrentDimensionId() == -1 && dim == 0) {
                     return mc.player.posZ / 8.0;
                 }
             }

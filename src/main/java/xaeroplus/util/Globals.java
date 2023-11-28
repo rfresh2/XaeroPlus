@@ -1,14 +1,13 @@
 package xaeroplus.util;
 
 import com.google.common.collect.Lists;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.util.ResourceLocation;
 import xaero.map.MapProcessor;
-import xaero.map.WorldMap;
 import xaero.map.WorldMapSession;
-import xaero.map.mods.SupportMods;
-import xaero.map.world.MapDimension;
+import xaero.map.core.XaeroWorldMapCore;
+import xaero.map.world.MapWorld;
+import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSetting;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
@@ -27,7 +26,7 @@ import java.util.zip.ZipInputStream;
 /**
  * static variables and functions to share or persist across mixins
  */
-public class Shared {
+public class Globals {
 
     // Map gui follow mode
     public static boolean FOLLOW = false;
@@ -37,7 +36,16 @@ public class Shared {
     public static int minimapScalingFactor = 1;
     public static boolean shouldResetFBO = false;
     public static String LOCK_ID = UUID.randomUUID().toString();
-    public static int customDimensionId = 0;
+    public static int getCurrentDimensionId() {
+        try {
+            final Integer dim = XaeroWorldMapCore.currentSession.getMapProcessor().getMapWorld().getCurrentDimensionId();
+            if (dim == null) return 0;
+            else return dim;
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.info("Failed to get current dimension id", e);
+            return 0;
+        }
+    }
     public static String waypointsSearchFilter = "";
     public static List<GuiButton> guiMapButtonTempList = Lists.<GuiButton>newArrayList();
     public static ExecutorService cacheRefreshExecutorService = Executors.newFixedThreadPool(
@@ -53,27 +61,18 @@ public class Shared {
     }
 
     public static void switchToDimension(final int newDimId) {
-        WorldMapSession worldMapSession = WorldMapSession.getCurrentSession();
-        if (worldMapSession == null) return;
-        MapProcessor mapProcessor = worldMapSession.getMapProcessor();
-        mapProcessor.getMapSaveLoad().setRegionDetectionComplete(false);
-        MapDimension dimension = mapProcessor.getMapWorld().getDimension(newDimId);
-        if (dimension == null) {
-            dimension = mapProcessor.getMapWorld().createDimensionUnsynced(mapProcessor.mainWorld, newDimId);
+        try {
+            final WorldMapSession session = XaeroWorldMapCore.currentSession;
+            if (session == null) return;
+            final MapProcessor mapProcessor = session.getMapProcessor();
+            if (mapProcessor == null) return;
+            final MapWorld mapWorld = mapProcessor.getMapWorld();
+            if (mapWorld == null) return;
+            mapWorld.setCustomDimensionId(newDimId);
+            mapProcessor.checkForWorldUpdate();
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Failed switching to dimension: {}", newDimId, e);
         }
-        if (!dimension.hasDoneRegionDetection()) {
-            ((CustomDimensionMapSaveLoad) mapProcessor.getMapSaveLoad()).detectRegionsInDimension(10, newDimId);
-        }
-        mapProcessor.getMapSaveLoad().setRegionDetectionComplete(true);
-        // kind of shit but its ok. need to reset setting when GuiMap closes
-        int worldDim = Minecraft.getMinecraft().world.provider.getDimension();
-        if (worldDim != newDimId) {
-            WorldMap.settings.minimapRadar = false;
-        } else {
-            WorldMap.settings.minimapRadar = true;
-        }
-        customDimensionId = newDimId;
-        SupportMods.xaeroMinimap.requestWaypointsRefresh();
     }
 
     public static byte[] decompressZipToBytes(final Path input) {

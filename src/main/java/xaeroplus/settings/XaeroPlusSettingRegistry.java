@@ -57,7 +57,7 @@ public final class XaeroPlusSettingRegistry {
             false,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting persistMapDimensionSwitchSetting = XaeroPlusBooleanSetting.create(
-            "Persist WM Dim Switch",
+            "Persist Dim Switch",
             "setting.world_map.persist_dimension_switch",
             "setting.world_map.persist_dimension_switch.tooltip",
             false,
@@ -270,28 +270,28 @@ public final class XaeroPlusSettingRegistry {
             // todo: increase max. need design improvements
             1f, 2f, 1f,
             "setting.minimap.minimap_scaling.tooltip",
-            (b) -> Shared.shouldResetFBO = true,
+            (b) -> Globals.shouldResetFBO = true,
             2f,
             SettingLocation.MINIMAP);
     public static final XaeroPlusBooleanSetting switchToNetherSetting = XaeroPlusBooleanSetting.create(
             "Switch to Nether",
             "setting.keybinds.switch_to_nether",
             "setting.keybinds.switch_to_nether.tooltip",
-            (b) -> Shared.switchToDimension(-1),
+            (b) -> Globals.switchToDimension(-1),
             false,
             SettingLocation.KEYBINDS);
     public static final XaeroPlusBooleanSetting switchToOverworldSetting = XaeroPlusBooleanSetting.create(
             "Switch to Overworld",
             "setting.keybinds.switch_to_overworld",
             "setting.keybinds.switch_to_overworld.tooltip",
-            (b) -> Shared.switchToDimension(0),
+            (b) -> Globals.switchToDimension(0),
             false,
             SettingLocation.KEYBINDS);
     public static final XaeroPlusBooleanSetting switchToEndSetting = XaeroPlusBooleanSetting.create(
             "Switch to End",
             "setting.keybinds.switch_to_end",
             "setting.keybinds.switch_to_end.tooltip",
-            (b) -> Shared.switchToDimension(1),
+            (b) -> Globals.switchToDimension(1),
             false,
             SettingLocation.KEYBINDS);
     public static final XaeroPlusBooleanSetting netherCaveFix = XaeroPlusBooleanSetting.create(
@@ -338,10 +338,4 @@ public final class XaeroPlusSettingRegistry {
             "setting.waypoints.waypoint_beacon_distance_min.tooltip",
             0f,
             SettingLocation.WAYPOINTS);
-    public static final XaeroPlusBooleanSetting crossDimensionTeleportCommand = XaeroPlusBooleanSetting.create(
-            "Cross Dimension Teleport",
-            "setting.world_map.cross_dimension_teleport",
-            "setting.world_map.cross_dimension_teleport.tooltip",
-            true,
-            SettingLocation.WORLD_MAP_MAIN);
 }

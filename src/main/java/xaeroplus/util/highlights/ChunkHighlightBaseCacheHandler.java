@@ -5,7 +5,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import xaeroplus.XaeroPlus;
-import xaeroplus.util.Shared;
+import xaeroplus.util.Globals;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,7 +23,7 @@ public abstract class ChunkHighlightBaseCacheHandler {
     private final AsyncLoadingCache<RegionRenderPos, List<HighlightAtChunkPos>> regionRenderCache = Caffeine.newBuilder()
             .expireAfterWrite(3000, TimeUnit.MILLISECONDS)
             .refreshAfterWrite(500, TimeUnit.MILLISECONDS)
-            .executor(Shared.cacheRefreshExecutorService)
+            .executor(Globals.cacheRefreshExecutorService)
             .buildAsync(key -> loadHighlightChunksAtRegion(key.leafRegionX, key.leafRegionZ, key.level, this::isHighlightedWithWait).call());
 
     public void addHighlight(final int x, final int z) {

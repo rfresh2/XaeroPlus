@@ -24,10 +24,7 @@ import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.settings.ModSettings;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.CustomMinimapFBORenderer;
-import xaeroplus.util.Shared;
-
-import static xaeroplus.util.ChunkUtils.getPlayerX;
-import static xaeroplus.util.ChunkUtils.getPlayerZ;
+import xaeroplus.util.Globals;
 
 @Mixin(value = MinimapRenderer.class, remap = false)
 public class MixinMinimapRenderer {
@@ -36,37 +33,32 @@ public class MixinMinimapRenderer {
     protected MinimapInterface minimapInterface;
     @Shadow
     protected IXaeroMinimap modMain;
+    @Shadow
+    private double lastMapDimensionScale = 1.0;
+    @Shadow
+    private double lastPlayerDimDiv = 1.0;
 
     @Inject(method = "renderMinimap", at = @At("HEAD"))
     public void renderMinimap(
             final XaeroMinimapSession minimapSession, final MinimapProcessor minimap, final int x, final int y, final int width, final int height, final ScaledResolution scaledRes, final int size, final float partial, final CallbackInfo ci
     ) {
-        if (this.minimapInterface.usingFBO() && Shared.shouldResetFBO) {
-            Shared.minimapScalingFactor = (int) XaeroPlusSettingRegistry.minimapScaling.getValue();
+        if (this.minimapInterface.usingFBO() && Globals.shouldResetFBO) {
+            Globals.minimapScalingFactor = (int) XaeroPlusSettingRegistry.minimapScaling.getValue();
             ((CustomMinimapFBORenderer) this.minimapInterface.getMinimapFBORenderer()).reloadMapFrameBuffers();
-            Shared.shouldResetFBO = false;
+            Globals.shouldResetFBO = false;
         }
     }
 
-    @Redirect(method = "renderMinimap", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/radar/MinimapRadar;getEntityX(Lnet/minecraft/entity/Entity;F)D"))
-    public double getEntityX(final MinimapRadar instance, final Entity e, final float partial) {
-        return getPlayerX();
-    }
-
-    @Redirect(method = "renderMinimap", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/radar/MinimapRadar;getEntityZ(Lnet/minecraft/entity/Entity;F)D"))
-    public double getEntityZ(final MinimapRadar instance, final Entity e, final float partial) {
-        return getPlayerZ();
-    }
-
-    @Redirect(method = "renderMinimap", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/element/render/over/MinimapElementOverMapRendererHandler;render(Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/player/EntityPlayer;DDDDDDZFLnet/minecraft/client/shader/Framebuffer;Lxaero/common/IXaeroMinimap;Lxaero/common/minimap/render/MinimapRendererHelper;Lnet/minecraft/client/gui/FontRenderer;Lnet/minecraft/client/gui/ScaledResolution;IIIIZF)D"))
-    public double editOvermapRender(final MinimapElementOverMapRendererHandler instance, final Entity renderEntity, final EntityPlayer player, final double renderX, final double renderY, final double renderZ, final double ps, final double pc, final double zoom, final boolean cave, final float partialTicks, final Framebuffer framebuffer, final IXaeroMinimap modMain, final MinimapRendererHelper helper, final FontRenderer font, final ScaledResolution scaledRes, final int specW, final int specH, final int halfViewW, final int halfViewH, final boolean circle, final float minimapScale) {
-        double customZoom = zoom / Shared.minimapScalingFactor;
+    @Redirect(method = "renderMinimap", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/element/render/over/MinimapElementOverMapRendererHandler;render(Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/player/EntityPlayer;DDDDDDDZFLnet/minecraft/client/shader/Framebuffer;Lxaero/common/IXaeroMinimap;Lxaero/common/minimap/render/MinimapRendererHelper;Lnet/minecraft/client/gui/FontRenderer;Lnet/minecraft/client/gui/ScaledResolution;IIIIZF)D"))
+    public double editOvermapRender(final MinimapElementOverMapRendererHandler instance, final Entity renderEntity, final EntityPlayer player, final double renderX, final double renderY, final double renderZ, final double playerDimDiv, final double ps, final double pc, final double zoom, final boolean cave, final float partialTicks, final Framebuffer framebuffer, final IXaeroMinimap modMain, final MinimapRendererHelper helper, final FontRenderer font, final ScaledResolution scaledRes, final int specW, final int specH, final int halfViewW, final int halfViewH, final boolean circle, final float minimapScale) {
+        double customZoom = zoom / Globals.minimapScalingFactor;
         return instance.render(
                 renderEntity,
                 player,
                 renderX,
                 renderY,
                 renderZ,
+                playerDimDiv,
                 ps,
                 pc,
                 customZoom,

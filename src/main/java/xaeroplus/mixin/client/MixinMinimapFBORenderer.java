@@ -37,9 +37,7 @@ import xaero.common.settings.ModSettings;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ColorHelper;
 import xaeroplus.util.CustomMinimapFBORenderer;
-import xaeroplus.util.Shared;
-
-import static xaeroplus.util.Shared.customDimensionId;
+import xaeroplus.util.Globals;
 
 @Mixin(value = MinimapFBORenderer.class, remap = false)
 public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements CustomMinimapFBORenderer {
@@ -100,40 +98,12 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             if (this.rotationFramebuffer != null)
                 this.rotationFramebuffer.deleteFramebuffer();
             // double the framebuffer size
-            final int scaledSize = Shared.minimapScalingFactor * 512;
+            final int scaledSize = Globals.minimapScalingFactor * 512;
             this.scalingFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, false);
             this.rotationFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, false);
             this.rotationFramebuffer.setFramebufferFilter(9729);
             this.loadedFBO = this.scalingFramebuffer.framebufferObject != -1 && this.rotationFramebuffer.framebufferObject != -1;
         }
-    }
-
-    public double getRenderEntityX(MinimapProcessor minimap, Entity renderEntity, float partial) {
-        int dim = mc.world.provider.getDimension();
-        // when player is in the nether or the custom dimension is the nether, perform coordinate translation
-        if ((dim == -1 || customDimensionId == -1) && dim != customDimensionId) {
-            if (customDimensionId == 0) {
-                return minimap.getEntityRadar().getEntityX(renderEntity, partial) * 8.0;
-            } else if (customDimensionId == -1 && dim == 0) {
-                return minimap.getEntityRadar().getEntityX(renderEntity, partial) / 8.0;
-            }
-        }
-
-        return minimap.getEntityRadar().getEntityX(renderEntity, partial);
-    }
-
-    public double getRenderEntityZ(MinimapProcessor minimap, Entity renderEntity, float partial) {
-        int dim = mc.world.provider.getDimension();
-        // when player is in the nether or the custom dimension is the nether, perform coordinate translation
-        if ((dim == -1 || customDimensionId == -1) && dim != customDimensionId) {
-            if (customDimensionId == 0) {
-                return minimap.getEntityRadar().getEntityZ(renderEntity, partial) * 8.0;
-            } else if (customDimensionId == -1 && dim == 0) {
-                return minimap.getEntityRadar().getEntityZ(renderEntity, partial) / 8.0;
-            }
-        }
-
-        return minimap.getEntityRadar().getEntityZ(renderEntity, partial);
     }
 
     /**
@@ -146,6 +116,10 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             MinimapProcessor minimap,
             EntityPlayer player,
             Entity renderEntity,
+            double playerX,
+            double playerZ,
+            double playerDimDiv,
+            double mapDimensionScale,
             int bufferSize,
             int viewW,
             float sizeFix,
@@ -161,13 +135,11 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             boolean circle,
             ScaledResolution scaledRes
     ) {
-        viewW *= Shared.minimapScalingFactor;
-        final int scaledSize = 256 * Shared.minimapScalingFactor;
+        viewW *= Globals.minimapScalingFactor;
+        final int scaledSize = 256 * Globals.minimapScalingFactor;
         double maxVisibleLength = !lockedNorth && shape != 1 ? (double)viewW * Math.sqrt(2.0) : (double)viewW;
         double halfMaxVisibleLength = maxVisibleLength / 2.0;
         double radiusBlocks = maxVisibleLength / 2.0 /  this.zoom;
-        double playerX = getRenderEntityX(minimap, renderEntity, partial);
-        double playerZ = getRenderEntityZ(minimap, renderEntity, partial);
         int xFloored = OptimizedMath.myFloor(playerX);
         int zFloored = OptimizedMath.myFloor(playerZ);
         int playerChunkX = xFloored >> 6;
@@ -185,12 +157,12 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         GlStateManager.matrixMode(5888);
         GL11.glPushMatrix();
         GlStateManager.loadIdentity();
-        double xInsidePixel = getRenderEntityX(minimap, renderEntity, partial) - (double)xFloored;
+        double xInsidePixel = playerX - (double)xFloored;
         if (xInsidePixel < 0.0) {
             ++xInsidePixel;
         }
 
-        double zInsidePixel = getRenderEntityZ(minimap, renderEntity, partial) - (double)zFloored;
+        double zInsidePixel = playerZ - (double)zFloored;
         if (zInsidePixel < 0.0) {
             ++zInsidePixel;
         }
@@ -219,7 +191,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
                 this.modMain
                         .getSupportMods()
                         .worldmapSupport
-                        .drawMinimap(minimapSession, this.helper, xFloored, zFloored, minX, minZ, maxX, maxZ, zooming, this.zoom);
+                        .drawMinimap(minimapSession, this.helper, xFloored, zFloored, minX, minZ, maxX, maxZ, zooming, this.zoom, mapDimensionScale);
             } else if (minimap.getMinimapWriter().getLoadedBlocks() != null && level >= 0) {
                 int loadedLevels = minimap.getMinimapWriter().getLoadedLevels();
                 chunkGridAlphaMultiplier = loadedLevels <= 1 ? 1.0F : 0.375F + 0.625F * (1.0F - (float)level / (float)(loadedLevels - 1));
@@ -289,7 +261,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             red *= chunkGridAlphaMultiplier;
             green *= chunkGridAlphaMultiplier;
             blue *= chunkGridAlphaMultiplier;
-            GlStateManager.glLineWidth((float)this.modMain.getSettings().chunkGridLineWidth * Shared.minimapScalingFactor);
+            GlStateManager.glLineWidth((float)this.modMain.getSettings().chunkGridLineWidth * Globals.minimapScalingFactor);
             int bias = (int)Math.ceil(this.zoom);
 
             for(int X = minX; X <= maxX; ++X) {
@@ -345,7 +317,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         GlStateManager.translate(-xInsidePixel * this.zoom, -zInsidePixel * this.zoom, 0.0);
         GlStateManager.disableBlend();
         GlStateManager.color(1.0F, 1.0F, 1.0F, (float)(this.modMain.getSettings().minimapOpacity / 100.0));
-        final float scaledSizeM = Shared.minimapScalingFactor * 512f;
+        final float scaledSizeM = Globals.minimapScalingFactor * 512f;
         this.helper.drawMyTexturedModalRect(-scaledSize, -scaledSize, 0, 0, scaledSizeM, scaledSizeM, scaledSizeM);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GL11.glPopMatrix();
@@ -371,6 +343,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
                         playerX,
                         renderEntity.posY,
                         playerZ,
+                        playerDimDiv,
                         ps,
                         pc,
                         this.zoom,

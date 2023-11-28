@@ -11,7 +11,7 @@ import static java.util.Objects.nonNull;
 public class DataFolderResolveUtil {
 
     public static void resolveDataFolder(final CallbackInfoReturnable<String> cir) {
-        final XaeroPlusSettingRegistry.DataFolderResolutionMode dataFolderResolutionMode = Shared.dataFolderResolutionMode;
+        final XaeroPlusSettingRegistry.DataFolderResolutionMode dataFolderResolutionMode = Globals.dataFolderResolutionMode;
         if (dataFolderResolutionMode == XaeroPlusSettingRegistry.DataFolderResolutionMode.SERVER_NAME) {
             Minecraft mc = Minecraft.getMinecraft();
             if (nonNull(mc.getCurrentServerData())) {

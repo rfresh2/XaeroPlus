@@ -52,7 +52,7 @@ public class BaritoneGoalSync extends Module {
         final int z = OptimizedMath.myFloor(baritoneGoalBlockPos.getZ() * dimDiv);
         if (baritoneGoalWaypoint.isPresent()) {
             final Waypoint waypoint = baritoneGoalWaypoint.get();
-            int customDim = Shared.customDimensionId;
+            int customDim = Globals.getCurrentDimensionId();
             int actualDim = ChunkUtils.getActualDimension();
             double customDimDiv = 1.0;
             if (customDim != actualDim) {

@@ -42,7 +42,7 @@ public class GuiMapHelper {
         return XaeroWorldMapCore.currentSession.getMapProcessor().getMapWorld().getCurrentDimension().getDimId();
     }
     public static int getCurrentlyViewedDimension() {
-        return Shared.customDimensionId;
+        return Globals.getCurrentDimensionId();
     }
 
     public static boolean isGuiMapLoaded() {

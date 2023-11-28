@@ -36,13 +36,13 @@ public class MixinGuiAddWaypoint {
                                   final CallbackInfo ci,
                                   int var2,
                                   boolean creatingAWaypoint,
-                                  double dimDiv,
+                                  String[] destinationWorldKeys,
+                                  WaypointWorld destinationWorld,
+                                  double waypointDimScale,
                                   int initialEditedWaypointsSize,
                                   WaypointWorld sourceWorld,
                                   WaypointSet sourceSet,
-                                  String[] destinationWorldKeys,
                                   String destinationSetKey,
-                                  WaypointWorld destinationWorld,
                                   WaypointSet destinationSet) {
         try {
             waypointsEdited.forEach(waypoint -> {

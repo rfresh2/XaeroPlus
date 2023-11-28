@@ -15,6 +15,8 @@
   "setting.world_map.waypoint_receive_no_chat_reports_fix.tooltip": "Naprawiono analizę odtwarzacza wysyłającego punkty trasy na czacie na serwerach z zainstalowaną wtyczką NoChatReports",
   "setting.world_map.persist_dimension_switch": "Trwała Zmiana Wymiarów Mapy Świata",
   "setting.world_map.persist_dimension_switch.tooltip": "Jeśli aktywne, wymiar nie zostanie przywrócony do aktualnego jeśli GUI Mapy Świata jest zamknięte.",
+  "setting.world_map.radar_while_dimension_switched": "Radar podczas przełączania wymiaru",
+  "setting.world_map.radar_while_dimension_switched.tooltip": "Wyłącza renderowanie radaru WorldMap podczas przełączania wymiaru",
   "setting.world_map.transparent_obsidian_roof": "Przezroczysty Obsydianowy Dach",
   "setting.world_map.transparent_obsidian_roof.tooltip": "Powoduje, że obsydian postawiony na wysokości budowy staje się przezroczysty. Nie aktualizuje kafelków, które są już zmapowane - musisz je zmapować na nowo.",
   "setting.world_map.transparent_obsidian_roof_y": "Oś Y Obsydianowego Dachu",
@@ -128,9 +130,5 @@
   "setting.world_map.waystone_color": "Kolor punktu orientacyjnego Waystone",
   "setting.world_map.waystone_color.tooltip": "Używa opcjonalnego, wstępnie ustawionego koloru dla wszystkich punktów orientacyjnych lub koloru losowego.",
   "setting.world_map.waystone_waypoint_set": "Zestaw punktów orientacyjnych Waystone",
-  "setting.world_map.waystone_waypoint_set.tooltip": "Tworzy oddzielny zestaw punktów orientacyjnych dla punktów orientacyjnych zamiast dodawać je do zestawu domyślnego.",
-  "setting.world_map.cross_dim_waystones_sync": "Synchronizuj Wymiar Kamieni Nawigacyjnych",
-  "setting.world_map.cross_dim_waystones_sync.tooltip": "Synchronizuj Kamienie Nawigacyjne do (domyślnego) zestawu Punktów Nawigacyjnych zgodnie z ich wymiarem",
-  "setting.world_map.cross_dimension_teleport": "Teleportuj Pomiędzy Wymiarami",
-  "setting.world_map.cross_dimension_teleport.tooltip": "Jeśli wymiar XaeroPlus zostaje przełączony, zmodyfikuj też komendy teleportacyjne do tego wymiaru"
+  "setting.world_map.waystone_waypoint_set.tooltip": "Tworzy oddzielny zestaw punktów orientacyjnych dla punktów orientacyjnych zamiast dodawać je do zestawu domyślnego."
 }

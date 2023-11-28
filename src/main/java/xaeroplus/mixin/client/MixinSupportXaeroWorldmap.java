@@ -6,7 +6,8 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.world.World;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
@@ -31,7 +32,6 @@ import xaero.map.region.LeveledRegion;
 import xaero.map.region.MapRegion;
 import xaero.map.region.MapTileChunk;
 import xaeroplus.Globals;
-import xaeroplus.feature.extensions.CustomDimensionMapProcessor;
 import xaeroplus.feature.extensions.CustomSupportXaeroWorldMap;
 import xaeroplus.feature.render.MinimapBackgroundDrawHelper;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
@@ -39,9 +39,6 @@ import xaeroplus.settings.XaeroPlusSettingRegistry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.IntConsumer;
-
-import static xaeroplus.util.ChunkUtils.getPlayerX;
-import static xaeroplus.util.ChunkUtils.getPlayerZ;
 
 @Mixin(value = SupportXaeroWorldmap.class, remap = false)
 public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWorldMap {
@@ -83,6 +80,14 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
     public abstract void renderSlimeChunks(
         MapTileChunk chunk, Long seed, int drawX, int drawZ, MatrixStack matrixStack, MinimapRendererHelper helper, VertexConsumer overlayBufferBuilder
     );
+    @Shadow
+    public abstract boolean hasDimensionSwitching();
+    @Shadow
+    public abstract double getMapDimensionScale();
+    @Shadow
+    public abstract RegistryKey<World> getMapDimension();
+    @Shadow
+    public abstract void bumpLoadedRegion(MapProcessor mapProcessor, MapRegion region);
 
     @Override
     public void drawMinimapWithDrawContext(
@@ -98,6 +103,7 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
             int maxViewZ,
             boolean zooming,
             double zoom,
+            double mapDimensionScale,
             VertexConsumer overlayBufferBuilder,
             MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers) {
         WorldMapSession worldmapSession = WorldMapSession.getCurrentSession();
@@ -135,10 +141,20 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                     boolean reloadEverything = WorldMap.settings.reloadEverything;
                     int globalReloadVersion = WorldMap.settings.reloadVersion;
                     boolean slimeChunks = this.modMain.getSettings().getSlimeChunks(minimapSession.getWaypointsManager());
-                    mapProcessor.updateCaveStart();
+                    boolean wmHasDimensionSwitch = this.hasDimensionSwitching();
+                    if (wmHasDimensionSwitch) {
+                        mapProcessor.initMinimapRender(xFloored, zFloored);
+                    }
+
+                    if (!wmHasDimensionSwitch) {
+                        mapProcessor.updateCaveStart();
+                    }
+
                     int renderedCaveLayer = mapProcessor.getCurrentCaveLayer();
-                    int globalCaveStart = mapProcessor.getMapWorld().getDimension(Globals.customDimensionId).getLayeredMapRegions().getLayer(renderedCaveLayer).getCaveStart();
-                    int globalCaveDepth = WorldMap.settings.caveModeDepth;
+                    int globalCaveStart = !wmHasDimensionSwitch
+                        ? mapProcessor.getMapWorld().getCurrentDimension().getLayeredMapRegions().getLayer(renderedCaveLayer).getCaveStart()
+                        : 0;
+                    int globalCaveDepth = !wmHasDimensionSwitch ? WorldMap.settings.caveModeDepth : 0;
                     float brightness = this.getMinimapBrightness();
                     if (renderedCaveLayer != this.lastRenderedCaveLayer) {
                         this.previousRenderedCaveLayer = this.lastRenderedCaveLayer;
@@ -146,30 +162,35 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
 
                     PlayerEntity player = MinecraftClient.getInstance().player;
                     boolean noCaveMaps = player.hasStatusEffect(Effects.NO_CAVE_MAPS) || player.hasStatusEffect(Effects.NO_CAVE_MAPS_HARMFUL);
-                    boolean playerIsMoving = player.prevX != player.getX() || player.prevY != player.getY() || player.prevZ != player.getZ();
+                    boolean playerIsMoving = !wmHasDimensionSwitch
+                        && (player.prevX != player.getX() || player.prevY != player.getY() || player.prevZ != player.getZ());
                     boolean shouldRequestLoading = true;
                     Object nextToLoadObj = null;
                     shouldRequestLoading = false;
-                    LeveledRegion<?> nextToLoad = mapProcessor.getMapSaveLoad().getNextToLoadByViewing();
-                    Object var76 = nextToLoad;
-                    if (nextToLoad == null) {
-                        shouldRequestLoading = true;
-                    } else if (wmHasFullReload) {
-                        shouldRequestLoading = nextToLoad.shouldAllowAnotherRegionToLoad();
-                    } else {
-                        synchronized(nextToLoad) {
-                            if (!nextToLoad.reloadHasBeenRequested()
-                                    && !nextToLoad.hasRemovableSourceData()
-                                    && (!(nextToLoad instanceof MapRegion) || !((MapRegion)nextToLoad).isRefreshing())) {
-                                shouldRequestLoading = true;
+                    if (!wmHasDimensionSwitch) {
+                        LeveledRegion<?> nextToLoad = mapProcessor.getMapSaveLoad().getNextToLoadByViewing();
+                        nextToLoadObj = nextToLoad;
+                        if (nextToLoad != null) {
+                            if (wmHasFullReload) {
+                                shouldRequestLoading = nextToLoad.shouldAllowAnotherRegionToLoad();
+                            } else {
+                                synchronized(nextToLoad) {
+                                    if (!nextToLoad.reloadHasBeenRequested()
+                                        && !nextToLoad.hasRemovableSourceData()
+                                        && (!(nextToLoad instanceof MapRegion) || !((MapRegion)nextToLoad).isRefreshing())) {
+                                        shouldRequestLoading = true;
+                                    }
+                                }
                             }
+                        } else {
+                            shouldRequestLoading = true;
                         }
-                    }
 
-                    this.regionBuffer.clear();
-                    int comparisonChunkX = (MathHelper.floor(getPlayerX()) >> 4) - 16;
-                    int comparisonChunkZ = (MathHelper.floor(getPlayerZ()) >> 4) - 16;
-                    LeveledRegion.setComparison(comparisonChunkX, comparisonChunkZ, 0, comparisonChunkX, comparisonChunkZ);
+                        this.regionBuffer.clear();
+                        int comparisonChunkX = (player.getBlockPos().getX() >> 4) - 16;
+                        int comparisonChunkZ = (player.getBlockPos().getZ() >> 4) - 16;
+                        LeveledRegion.setComparison(comparisonChunkX, comparisonChunkZ, 0, comparisonChunkX, comparisonChunkZ);
+                    }
                     MultiTextureRenderTypeRenderer mapWithLightRenderer = null;
                     MultiTextureRenderTypeRenderer mapNoLightRenderer = null;
                     Runnable finalizer = null;
@@ -238,32 +259,36 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                     GL14.glBlendFuncSeparate(770, 771, 1, 0);
                     RenderSystem.disableBlend();
                     this.lastRenderedCaveLayer = renderedCaveLayer;
-                    int toRequest = 1;
-                    int counter = 0;
+                    if (wmHasDimensionSwitch) {
+                        mapProcessor.finalizeMinimapRender();
+                    } else {
+                        int toRequest = 1;
+                        int counter = 0;
 
-                    for(int i = 0; i < this.regionBuffer.size() && counter < toRequest; ++i) {
-                        MapRegion region = (MapRegion)this.regionBuffer.get(i);
-                        if (region != var76 || this.regionBuffer.size() <= 1) {
-                            synchronized(region) {
-                                if (!wmHasFullReload || region.canRequestReload_unsynced()) {
-                                    if (wmHasFullReload
-                                        || !region.reloadHasBeenRequested()
+                        for(int i = 0; i < this.regionBuffer.size() && counter < toRequest; ++i) {
+                            MapRegion region = this.regionBuffer.get(i);
+                            if (region != nextToLoadObj || this.regionBuffer.size() <= 1) {
+                                synchronized(region) {
+                                    if (!wmHasFullReload || region.canRequestReload_unsynced()) {
+                                        if (wmHasFullReload
+                                            || !region.reloadHasBeenRequested()
                                             && !region.recacheHasBeenRequested()
                                             && (!(region instanceof MapRegion) || !region.isRefreshing())
                                             && (region.getLoadState() == 0 || region.getLoadState() == 4 || region.getLoadState() == 2 && region.isBeingWritten())) {
-                                        if (region.getLoadState() == 2) {
-                                            region.requestRefresh(mapProcessor);
-                                        } else {
-                                            mapProcessor.getMapSaveLoad().requestLoad(region, "Minimap sorted", false);
-                                        }
+                                            if (region.getLoadState() == 2) {
+                                                region.requestRefresh(mapProcessor);
+                                            } else {
+                                                mapProcessor.getMapSaveLoad().requestLoad(region, "Minimap sorted", false);
+                                            }
 
-                                        if (counter == 0) {
-                                            mapProcessor.getMapSaveLoad().setNextToLoadByViewing(region);
-                                        }
+                                            if (counter == 0) {
+                                                mapProcessor.getMapSaveLoad().setNextToLoadByViewing(region);
+                                            }
 
-                                        ++counter;
-                                        if (region.getLoadState() == 4) {
-                                            break;
+                                            ++counter;
+                                            if (region.getLoadState() == 4) {
+                                                break;
+                                            }
                                         }
                                     }
                                 }
@@ -310,7 +335,7 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
         MinimapRendererHelper helper,
         VertexConsumer overlayBufferBuilder
     ) {
-        final boolean isDimensionSwitched = Globals.customDimensionId != MinecraftClient.getInstance().world.getRegistryKey();
+        final boolean isDimensionSwitched = Globals.getCurrentDimensionId() != MinecraftClient.getInstance().world.getRegistryKey();
         MapRegion prevRegion = null;
         Tessellator bgTesselator = Tessellator.getInstance();
         BufferBuilder bgBufferBuilder = bgTesselator.getBuffer();
@@ -318,17 +343,19 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
             bgBufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
         Matrix4f matrix = matrixStack.peek().getPositionMatrix();
         boolean wmHasFullReload = this.compatibilityVersion >= 23;
+        boolean wmHasDimensionSwitch = this.hasDimensionSwitching();
 
         for(int i = minX; i <= maxX; ++i) {
             for(int j = minZ; j <= maxZ; ++j) {
-                MapRegion region = ((CustomDimensionMapProcessor) mapProcessor).getMapRegionCustomDimension(
-                    renderedCaveLayer,
-                    i >> 3,
-                    j >> 3,
-                    ((CustomDimensionMapProcessor) mapProcessor).regionExistsCustomDimension(renderedCaveLayer, i >> 3, j >> 3, Globals.customDimensionId),
-                    Globals.customDimensionId
-                );
-                if (region != null && region != prevRegion) {
+                MapRegion region;
+                if (wmHasDimensionSwitch) {
+                    region = mapProcessor.getMinimapMapRegion(i >> 3, j >> 3);
+                    mapProcessor.beforeMinimapRegionRender(region);
+                } else {
+                    region = mapProcessor.getMapRegion(renderedCaveLayer, i >> 3, j >> 3, mapProcessor.regionExists(renderedCaveLayer, i >> 3, j >> 3));
+                }
+
+                if (!wmHasDimensionSwitch && region != null && region != prevRegion) {
                     synchronized(region) {
                         int regionHashCode = region.getCacheHashCode();
                         int regionReloadVersion = region.getReloadVersion();
@@ -366,7 +393,12 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                     MapTileChunk chunk = region == null ? null : region.getChunk(i & 7, j & 7);
                     boolean chunkIsVisible = chunk != null && chunk.getLeafTexture().getGlColorTexture() != -1;
                     if (!chunkIsVisible && (!noCaveMaps || this.previousRenderedCaveLayer == Integer.MAX_VALUE)) {
-                        MapRegion previousLayerRegion = ((CustomDimensionMapProcessor) mapProcessor).getMapRegionCustomDimension(this.previousRenderedCaveLayer, i >> 3, j >> 3, false, Globals.customDimensionId);
+                        MapRegion previousLayerRegion;
+                        if (wmHasDimensionSwitch) {
+                            previousLayerRegion = mapProcessor.getLeafMapRegion(this.previousRenderedCaveLayer, i >> 3, j >> 3, false);
+                        } else {
+                            previousLayerRegion = mapProcessor.getMapRegion(this.previousRenderedCaveLayer, i >> 3, j >> 3, false);
+                        }
                         if (previousLayerRegion != null) {
                             MapTileChunk previousLayerChunk = previousLayerRegion.getChunk(i & 7, j & 7);
                             if (previousLayerChunk != null && previousLayerChunk.getLeafTexture().getGlColorTexture() != -1) {
@@ -378,9 +410,7 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
                     }
 
                     if (chunkIsVisible) {
-                        if (!mapProcessor.isUploadingPaused() && region.isLoaded()) {
-                            mapProcessor.getMapWorld().getDimension(Globals.customDimensionId).getLayeredMapRegions().bumpLoadedRegion(region);
-                        }
+                        this.bumpLoadedRegion(mapProcessor, region);
                         int drawX = ((chunk.getX() - chunkX) << 6) - (tileX << 4) - insideX;
                         int drawZ = ((chunk.getZ() - chunkZ) << 6) - (tileZ << 4) - insideZ;
                         if (XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) {

@@ -11,7 +11,7 @@ import xaeroplus.mixin.client.MixinWorldMapModOptionsAccessor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -59,19 +59,18 @@ public class XaeroPlusSettingsReflectionHax {
         }
     }
 
-    private static final Supplier<List<KeyBinding>> memoizingKeybindsList = Suppliers.memoize(() ->
+    private static final Supplier<List<XaeroPlusBooleanSetting>> memoizingKeybindsList = Suppliers.memoize(() ->
             Stream.of(XAERO_PLUS_WORLDMAP_SETTINGS.stream(),
                             XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS.stream(),
                             XAERO_PLUS_MINIMAP_ENTITY_RADAR_SETTINGS.stream(),
                             XAERO_PLUS_MINIMAP_SETTINGS.stream(),
                             XAERO_PLUS_KEYBIND_SETTINGS.stream(),
                             XAERO_PLUS_WAYPOINT_SETTINGS.stream())
-                    .flatMap(x -> x)
-                    .filter(setting -> setting instanceof XaeroPlusBooleanSetting)
-                    .map(XaeroPlusSetting::getKeyBinding)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList())
-    );
+                .flatMap(x -> x)
+                .filter(setting -> setting instanceof XaeroPlusBooleanSetting)
+                .map(setting -> (XaeroPlusBooleanSetting) setting)
+                .filter(setting -> setting.getKeyBinding() != null)
+                .collect(Collectors.toList()));
     private static List<ModOptions> WORLDMAP_MOD_OPTIONS_LIST = null;
     private static List<xaero.common.settings.ModOptions> MINIMAP_OVERLAY_MOD_OPTIONS_LIST = null;
     private static List<xaero.common.settings.ModOptions> MINIMAP_MOD_OPTIONS_LIST = null;
@@ -209,7 +208,9 @@ public class XaeroPlusSettingsReflectionHax {
         }
     }
 
-    public static List<KeyBinding> getKeybinds() {
-        return memoizingKeybindsList.get();
-    }
+    public static Supplier<Map<KeyBinding, XaeroPlusBooleanSetting>> keybindingMapSupplier = Suppliers.memoize(() ->
+            memoizingKeybindsList.get().stream().collect(Collectors.toMap(XaeroPlusSetting::getKeyBinding, s -> s)));
+
+    public static Supplier<List<KeyBinding>> keybindsSupplier = Suppliers.memoize(() -> new ArrayList<>(
+        keybindingMapSupplier.get().keySet()));
 }

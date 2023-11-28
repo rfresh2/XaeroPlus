@@ -45,7 +45,7 @@ public class DrawManager {
                 for (int t = 0; t < 16; ++t) {
                     final int chunkPosX = (mapTileChunkX << 2) + t % 4;
                     final int chunkPosZ = (mapTileChunkZ << 2) + (t >> 2);
-                    if (highlightPredicate.isHighlighted(chunkPosX, chunkPosZ, Globals.customDimensionId)) {
+                    if (highlightPredicate.isHighlighted(chunkPosX, chunkPosZ, Globals.getCurrentDimensionId())) {
                         list.add(ChunkUtils.chunkPosToLong(chunkPosX, chunkPosZ));
                     }
                 }

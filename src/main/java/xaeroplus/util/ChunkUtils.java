@@ -44,10 +44,10 @@ public class ChunkUtils {
             MinecraftClient mc = MinecraftClient.getInstance();
             RegistryKey<World> dim = mc.world.getRegistryKey();
             // when player is in the nether or the custom dimension is the nether, perform coordinate translation
-            if ((dim == NETHER || Globals.customDimensionId == NETHER) && dim != Globals.customDimensionId) {
-                if (Globals.customDimensionId == OVERWORLD) {
+            if ((dim == NETHER || Globals.getCurrentDimensionId() == NETHER) && dim != Globals.getCurrentDimensionId()) {
+                if (Globals.getCurrentDimensionId() == OVERWORLD) {
                     return mc.player.getX() * 8.0;
-                } else if (Globals.customDimensionId == NETHER && dim == OVERWORLD) {
+                } else if (Globals.getCurrentDimensionId() == NETHER && dim == OVERWORLD) {
                     return mc.player.getX() / 8.0;
                 }
             }
@@ -61,10 +61,10 @@ public class ChunkUtils {
             MinecraftClient mc = MinecraftClient.getInstance();
             RegistryKey<World> dim = mc.world.getRegistryKey();
             // when player is in the nether or the custom dimension is the nether, perform coordinate translation
-            if ((dim == NETHER || Globals.customDimensionId == NETHER) && dim != Globals.customDimensionId) {
-                if (Globals.customDimensionId == OVERWORLD) {
+            if ((dim == NETHER || Globals.getCurrentDimensionId() == NETHER) && dim != Globals.getCurrentDimensionId()) {
+                if (Globals.getCurrentDimensionId() == OVERWORLD) {
                     return mc.player.getZ() * 8.0;
-                } else if (Globals.customDimensionId == NETHER && dim == OVERWORLD) {
+                } else if (Globals.getCurrentDimensionId() == NETHER && dim == OVERWORLD) {
                     return mc.player.getZ() / 8.0;
                 }
             }

@@ -23,6 +23,7 @@ public interface CustomSupportXaeroWorldMap {
             int maxViewZ,
             boolean zooming,
             double zoom,
+            double mapDimensionScale,
             VertexConsumer overlayBufferBuilder,
             MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers);
 

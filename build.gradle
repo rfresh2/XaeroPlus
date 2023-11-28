@@ -47,12 +47,12 @@ dependencies {
 
 	forgeRuntimeLibrary(jarLibs "com.github.ben-manes.caffeine:caffeine:3.1.8")
 	forgeRuntimeLibrary(jarLibs "com.github.collarmc:pounce:0e8492b68e")
-    forgeRuntimeLibrary(jarLibs 'org.xerial:sqlite-jdbc:3.43.2.2')
+    forgeRuntimeLibrary(jarLibs 'org.xerial:sqlite-jdbc:3.44.1.0')
 
-	modImplementation "maven.modrinth:xaeros-world-map:1.36.0_Forge_1.20.2"
-	modImplementation "maven.modrinth:xaeros-minimap:23.8.4_Forge_1.20.2"
+	modImplementation "maven.modrinth:xaeros-world-map:1.37.0_Forge_1.20.2"
+	modImplementation "maven.modrinth:xaeros-minimap:23.9.0_Forge_1.20.2"
 	modImplementation files("libs/baritone-unoptimized-forge-1.10.2.jar")
-	modCompileOnly "maven.modrinth:waystones:15.0.0+forge-1.20.2"
+	modCompileOnly "maven.modrinth:waystones:15.0.1+forge-1.20.2"
 	modCompileOnly "maven.modrinth:balm:8.0.1+forge-1.20.2"
 }
 

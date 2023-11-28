@@ -15,6 +15,8 @@
   "setting.world_map.waypoint_receive_no_chat_reports_fix.tooltip": "修复了在安装了 NoChatReports 插件的服务器上解析玩家在聊天中发送路径点的问题",
   "setting.world_map.persist_dimension_switch": "持久世界地图维度切换",
   "setting.world_map.persist_dimension_switch.tooltip": "如果启用，当世界地图 GUI 关闭时，维度将不会切换回当前维度。",
+  "setting.world_map.radar_while_dimension_switched": "切換維度時的雷達",
+  "setting.world_map.radar_while_dimension_switched.tooltip": "在切換維度時禁用WorldMap雷達渲染",
   "setting.world_map.transparent_obsidian_roof": "透明黑曜石平台",
   "setting.world_map.transparent_obsidian_roof.tooltip": "使特定高度的黑曜石透明化。不更新已绘制的地图 - 你需要重新绘制它们。",
   "setting.world_map.transparent_obsidian_roof_y": "黑曜石平台 Y 值",
@@ -128,9 +130,5 @@
   "setting.world_map.waystone_color": "Waystone 路点颜色",
   "setting.world_map.waystone_color.tooltip": "对所有路石航路点使用可选的预设颜色或随机颜色。",
   "setting.world_map.waystone_waypoint_set": "Waystone 航点集",
-  "setting.world_map.waystone_waypoint_set.tooltip": "为路石航点创建单独的航点集，而不是将它们添加到默认集。",
-  "setting.world_map.cross_dim_waystones_sync": "指路石维度同步",
-  "setting.world_map.cross_dim_waystones_sync.tooltip": "将指路石同步到根据其维度设置的（默认）路径点",
-  "setting.world_map.cross_dimension_teleport": "跨维度传送",
-  "setting.world_map.cross_dimension_teleport.tooltip": "如果 XaeroPlus 维度被切换，同时修改传送到该维度的命令"
+  "setting.world_map.waystone_waypoint_set.tooltip": "为路石航点创建单独的航点集，而不是将它们添加到默认集。"
 }

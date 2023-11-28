@@ -11,13 +11,13 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.dimension.DimensionType;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.map.*;
@@ -26,19 +26,19 @@ import xaero.map.biome.BiomeGetter;
 import xaero.map.biome.BlockTintProvider;
 import xaero.map.cache.BrokenBlockTintCache;
 import xaero.map.file.MapSaveLoad;
-import xaero.map.file.RegionDetection;
 import xaero.map.file.worldsave.WorldDataHandler;
 import xaero.map.gui.GuiMap;
+import xaero.map.minimap.MinimapRenderListener;
 import xaero.map.misc.CaveStartCalculator;
 import xaero.map.mods.SupportMods;
-import xaero.map.region.*;
+import xaero.map.region.LeveledRegion;
+import xaero.map.region.MapRegion;
+import xaero.map.region.OverlayManager;
 import xaero.map.world.MapDimension;
 import xaero.map.world.MapWorld;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
-import xaeroplus.feature.extensions.CustomDimensionMapProcessor;
-import xaeroplus.feature.extensions.CustomDimensionMapSaveLoad;
 import xaeroplus.util.DataFolderResolveUtil;
 
 import java.io.File;
@@ -54,7 +54,7 @@ import java.util.ArrayList;
 import static xaeroplus.Globals.LOCK_ID;
 
 @Mixin(value = MapProcessor.class, remap = false)
-public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
+public abstract class MixinMapProcessor {
     @Shadow private int state;
     @Final
     @Shadow public Object processorThreadPauseSync;
@@ -89,6 +89,10 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
     @Shadow public Registry<Block> newWorldBlockRegistry;
     @Shadow private Registry<Fluid> newWorldFluidRegistry;
     @Shadow public Registry<Biome> newWorldBiomeRegistry;
+    @Shadow public Registry<DimensionType> newWorldDimensionTypeRegistry;
+    @Shadow private Registry<DimensionType> worldDimensionTypeRegistry;
+    @Shadow public Registry<DimensionType> mainWorldDimensionTypeRegistry;
+    @Shadow private MinimapRenderListener minimapRenderListener;
     @Shadow private BlockTintProvider worldBlockTintProvider;
     @Shadow private BiomeColorCalculator biomeColorCalculator;
     @Shadow private OverlayManager overlayManager;
@@ -124,26 +128,18 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
     @Shadow
     protected abstract void releaseLocksIfNeeded();
     @Shadow
-    protected abstract void handleRefresh(World world) throws RuntimeException;
+    protected abstract void handleRefresh() throws RuntimeException;
     @Shadow
-    public abstract void updateFootprints(World world, int step);
+    public abstract void updateFootprints(int step);
     @Shadow
     public abstract boolean isProcessingPaused();
     @Shadow
     protected abstract void updateWorld() throws IOException, CommandSyntaxException;
-
-    @Redirect(method = "updateCaveStart", at = @At(value = "INVOKE", target = "Lxaero/map/world/MapWorld;getCurrentDimension()Lxaero/map/world/MapDimension;"))
-    public MapDimension getCurrentDimensionRedirect(final MapWorld instance) {
-        return instance.getDimension(Globals.customDimensionId);
-    }
-
-    @Redirect(method = "updateWorld", at = @At(value = "INVOKE", target = "Lxaero/map/file/MapSaveLoad;detectRegions(I)V"))
-    public void updateWorldDetectRegionsRedirect(MapSaveLoad mapSaveLoad, int step) {
-        ((CustomDimensionMapSaveLoad) mapSaveLoad).detectRegionsInDimension(step, Globals.customDimensionId);
-    }
+    @Shadow
+    protected abstract void checkFootstepsReset(World oldWorld, World newWorld);
 
     @Inject(method = "getMainId", at = @At("HEAD"), cancellable = true)
-    private void getMainId(final boolean rootFolderFormat, final ClientPlayNetworkHandler connection, final CallbackInfoReturnable<String> cir) {
+    private void getMainId(final boolean rootFolderFormat, boolean preIP6Fix, final ClientPlayNetworkHandler connection, final CallbackInfoReturnable<String> cir) {
         DataFolderResolveUtil.resolveDataFolder(connection, cir);
     }
 
@@ -169,7 +165,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                         if (!this.isProcessingPaused()) {
                             this.updateWorld();
                             if (this.world != null) {
-                                this.updateFootprints(this.world, MinecraftClient.getInstance().currentScreen instanceof GuiMap ? 1 : 10);
+                                this.updateFootprints(MinecraftClient.getInstance().currentScreen instanceof GuiMap ? 1 : 10);
                             }
 
                             if (this.mapWorldUsable) {
@@ -194,9 +190,8 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                                 }
                             }
 
-                            this.mapSaveLoad
-                                    .run(this.world, this.worldBlockLookup, this.worldBlockRegistry, this.worldFluidRegistry, this.biomeGetter, this.worldBiomeRegistry);
-                            this.handleRefresh(this.world);
+                            this.mapSaveLoad.run(this.worldBlockLookup, this.worldBlockRegistry, this.worldFluidRegistry, this.biomeGetter, this.worldBiomeRegistry);
+                            this.handleRefresh();
                             runner.doTasks((MapProcessor) (Object) this);
                             this.releaseLocksIfNeeded();
                         }
@@ -269,7 +264,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                     }
 
                     if (shouldFinishCurrentDim || shouldClearNewDimension && reqDim == currentDim) {
-                        for(LeveledRegion<?> region : currentDim.getLayeredMapRegions().getUnsyncedList()) {
+                        for(LeveledRegion<?> region : currentDim.getLayeredMapRegions().getUnsyncedSet()) {
                             if (shouldFinishCurrentDim) {
                                 if (region.getLevel() == 0) {
                                     MapRegion leafRegion = (MapRegion)region;
@@ -302,7 +297,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                     }
 
                     if (reqDim != currentDim && shouldClearNewDimension) {
-                        for(LeveledRegion<?> region : reqDim.getLayeredMapRegions().getUnsyncedList()) {
+                        for(LeveledRegion<?> region : reqDim.getLayeredMapRegions().getUnsyncedSet()) {
                             region.onDimensionClear((MapProcessor) (Object) this);
                         }
                     }
@@ -310,7 +305,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                     if (shouldClearAllDimensions) {
                         for(MapDimension dim : this.mapWorld.getDimensionsList()) {
                             if (!currentDimChecked || dim != currentDim) {
-                                for(LeveledRegion<?> region : dim.getLayeredMapRegions().getUnsyncedList()) {
+                                for(LeveledRegion<?> region : dim.getLayeredMapRegions().getUnsyncedSet()) {
                                     region.onDimensionClear((MapProcessor) (Object) this);
                                 }
                             }
@@ -390,7 +385,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                     }
                 }
 
-                this.footprints.clear();
+                this.checkFootstepsReset(this.world, this.newWorld);
                 this.mapSaveLoad.clearToLoad();
                 this.mapSaveLoad.setNextToLoadByViewing((LeveledRegion<?>) null);
                 this.clearToRefresh();
@@ -400,7 +395,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                 }
 
                 if (this.mapWorldUsable && !this.isCurrentMapLocked()) {
-                    for(LeveledRegion<?> region : this.mapWorld.getCurrentDimension().getLayeredMapRegions().getUnsyncedList()) {
+                    for(LeveledRegion<?> region : this.mapWorld.getCurrentDimension().getLayeredMapRegions().getUnsyncedSet()) {
                         if (region.shouldBeProcessed()) {
                             this.addToProcess(region);
                         }
@@ -413,6 +408,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                 this.worldBlockRegistry = this.newWorldBlockRegistry;
                 this.worldFluidRegistry = this.newWorldFluidRegistry;
                 this.worldBiomeRegistry = this.newWorldBiomeRegistry;
+                this.worldDimensionTypeRegistry = this.newWorldDimensionTypeRegistry;
                 this.worldBlockTintProvider = this.world == null
                         ? null
                         : new BlockTintProvider(this.worldBiomeRegistry, this.biomeColorCalculator, (MapProcessor) (Object) this, this.brokenBlockTintCache);
@@ -425,6 +421,7 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                     SupportMods.xaeroPac.resetDetection();
                 }
 
+                this.mapWorld.onWorldChangeUnsynced(this.world);
                 if (WorldMap.settings.debug) {
                     WorldMap.LOGGER.info("World/dimension changed to: " + this.currentWorldId + " " + this.currentDimId + " " + this.currentMWId);
                 }
@@ -441,12 +438,15 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                 this.popRenderPause(true, true);
                 this.popWriterPause();
             } else if (this.newWorld != this.world) {
+                this.pushRenderPause(false, true);
                 this.pushWriterPause();
+                this.checkFootstepsReset(this.world, this.newWorld);
                 this.world = this.newWorld;
                 this.worldBlockLookup = this.newWorldBlockLookup;
                 this.worldBlockRegistry = this.newWorldBlockRegistry;
                 this.worldFluidRegistry = this.newWorldFluidRegistry;
                 this.worldBiomeRegistry = this.newWorldBiomeRegistry;
+                this.worldDimensionTypeRegistry = this.newWorldDimensionTypeRegistry;
                 this.worldBlockTintProvider = this.world == null
                         ? null
                         : new BlockTintProvider(this.worldBiomeRegistry, this.biomeColorCalculator, (MapProcessor) (Object) this, this.brokenBlockTintCache);
@@ -458,6 +458,8 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
                     SupportMods.xaeroPac.resetDetection();
                 }
 
+                this.mapWorld.onWorldChangeUnsynced(this.world);
+                this.popRenderPause(false, true);
                 this.popWriterPause();
             }
 
@@ -468,114 +470,5 @@ public abstract class MixinMapProcessor implements CustomDimensionMapProcessor {
 
             this.waitingForWorldUpdate = false;
         }
-    }
-
-    @Inject(method = "changeWorld", at = @At(value = "INVOKE", target = "Lxaero/map/world/MapDimension;resetCustomMultiworldUnsynced()V", shift = At.Shift.AFTER))
-    public synchronized void changeWorld(final ClientWorld world, final RegistryWrapper<Block> blockLookup, final Registry<Block> blockRegistry, final Registry<Fluid> fluidRegistry, final Registry<Biome> biomeRegistry, final CallbackInfo ci) {
-        Globals.customDimensionId = world.getRegistryKey();
-    }
-
-    @Redirect(method = "onRenderProcess", at = @At(value = "INVOKE", target = "Lxaero/map/world/MapWorld;getCurrentDimension()Lxaero/map/world/MapDimension;"))
-    public MapDimension getCustomDimension(final MapWorld mapWorld) {
-        return mapWorld.getDimension(Globals.customDimensionId);
-    }
-
-    @Override
-    public boolean regionExistsCustomDimension(int caveLayer, int x, int z, RegistryKey<World> dimId) {
-        return this.regionDetectionExistsCustomDimension(caveLayer, x, z, dimId)
-                || this.mapWorld.getDimension(dimId).getHighlightHandler().shouldApplyRegionHighlights(x, z, false);
-    }
-
-    @Override
-    public boolean regionExistsCustomDimension(int x, int z, RegistryKey<World> dimId) {
-        return regionExistsCustomDimension(Integer.MAX_VALUE, x, z, dimId);
-    }
-
-    @Override
-    public boolean regionDetectionExistsCustomDimension(int caveLayer, int x, int z, RegistryKey<World> dimId) {
-        return this.mapSaveLoad.isRegionDetectionComplete()
-                && this.mapWorld.getDimension(dimId).getLayeredMapRegions().getLayer(caveLayer).regionDetectionExists(x, z);
-    }
-
-    @Override
-    public LeveledRegion<?> getLeveledRegionCustomDimension(int caveLayer, int leveledRegX, int leveledRegZ, int level, RegistryKey<World> dimId) {
-        MapDimension mapDimension = this.mapWorld.getDimension(dimId);
-        LayeredRegionManager regions = mapDimension.getLayeredMapRegions();
-        return regions.get(caveLayer, leveledRegX, leveledRegZ, level);
-    }
-
-    @Override
-    public MapRegion getMapRegionCustomDimension(int caveLayer, int regX, int regZ, boolean create, RegistryKey<World> dimId) {
-        if (!this.mapSaveLoad.isRegionDetectionComplete()) {
-            return null;
-        } else {
-            MapDimension mapDimension = this.mapWorld.getDimension(dimId);
-            LayeredRegionManager regions = mapDimension.getLayeredMapRegions();
-            MapRegion region = regions.getLeaf(caveLayer, regX, regZ);
-            if (region == null) {
-                if (!create) {
-                    return null;
-                }
-
-                if (!MinecraftClient.getInstance().isOnThread()) {
-                    throw new IllegalAccessError();
-                }
-
-                region = new MapRegion(
-                        this.currentWorldId,
-                        getDimensionName(dimId),
-                        this.currentMWId,
-                        mapDimension,
-                        regX,
-                        regZ,
-                        caveLayer,
-                        this.getGlobalVersion(),
-                        !mapDimension.isUsingWorldSave(),
-                        this.worldBiomeRegistry
-                );
-                MapLayer mapLayer = regions.getLayer(caveLayer);
-                region.updateCaveMode();
-                RegionDetection regionDetection = mapLayer.getRegionDetection(regX, regZ);
-                if (regionDetection != null) {
-                    regionDetection.transferInfoTo(region);
-                    mapLayer.removeRegionDetection(regX, regZ);
-                } else if (mapLayer.getCompleteRegionDetection(regX, regZ) == null) {
-                    RegionDetection perpetualRegionDetection = new RegionDetection(
-                            region.getWorldId(),
-                            region.getDimId(),
-                            region.getMwId(),
-                            region.getRegionX(),
-                            region.getRegionZ(),
-                            region.getRegionFile(),
-                            this.getGlobalVersion(),
-                            true
-                    );
-                    mapLayer.tryAddingToCompleteRegionDetection(perpetualRegionDetection);
-                    if (!region.isNormalMapData()) {
-                        mapLayer.removeRegionDetection(regX, regZ);
-                    }
-                }
-
-                if (!region.hasHadTerrain()) {
-                    regions.getLayer(caveLayer).getRegionHighlightExistenceTracker().stopTracking(regX, regZ);
-                    region.setVersion(this.getGlobalVersion());
-                    region.setCacheHashCode(WorldMap.settings.getRegionCacheHashCode());
-                    region.setReloadVersion(WorldMap.settings.reloadVersion);
-                }
-
-                regions.putLeaf(regX, regZ, region);
-                regions.addListRegion(region);
-                if (regionDetection != null) {
-                    regionDetection.transferInfoPostAddTo(region, (MapProcessor) (Object) this);
-                }
-            }
-
-            return region;
-        }
-    }
-
-    @Override
-    public MapRegion getMapRegionCustomDimension(int regX, int regZ, boolean create, RegistryKey<World> dimId) {
-        return getMapRegionCustomDimension(Integer.MAX_VALUE, regX, regZ, create, dimId);
     }
 }

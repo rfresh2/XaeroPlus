@@ -218,7 +218,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
         Optional<GuiMap> guiMapOptional = getGuiMap();
         if (guiMapOptional.isPresent()) {
             final GuiMap guiMap = guiMapOptional.get();
-            final RegistryKey<World> mapDimension = getCurrentlyViewedDimension();
+            final RegistryKey<World> mapDimension = Globals.getCurrentDimensionId();
             final int mapCenterX = getGuiMapCenterRegionX(guiMap);
             final int mapCenterZ = getGuiMapCenterRegionZ(guiMap);
             final int mapSize = getGuiMapRegionSize(guiMap);
@@ -227,9 +227,9 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
             getCachesExceptDimension(mapDimension)
                 .forEach(cache -> cache.setWindow(0, 0, 0));
         } else {
-            final ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(getCurrentlyViewedDimension());
+            final ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(Globals.getCurrentDimensionId());
             if (cacheForDimension != null) cacheForDimension.setWindow(ChunkUtils.getPlayerRegionX(), ChunkUtils.getPlayerRegionZ(), defaultRegionWindowSize);
-            getCachesExceptDimension(getCurrentlyViewedDimension())
+            getCachesExceptDimension(Globals.getCurrentDimensionId())
                 .forEach(cache -> cache.setWindow(0, 0, 0));
         }
     }

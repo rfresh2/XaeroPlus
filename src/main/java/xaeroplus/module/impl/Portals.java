@@ -128,6 +128,7 @@ public class Portals extends Module {
 
     private void findPortalInChunkAsync(final Chunk chunk, final int waitMs) {
         if (inUnknownDimension()) return;
+        if (chunk == null) return;
         searchExecutor.execute(() -> {
             try {
                 Thread.sleep(waitMs);

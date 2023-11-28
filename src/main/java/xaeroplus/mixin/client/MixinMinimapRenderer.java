@@ -1,14 +1,11 @@
 package xaeroplus.mixin.client;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -32,15 +29,16 @@ import xaeroplus.Globals;
 import xaeroplus.feature.extensions.CustomMinimapFBORenderer;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 
-import static net.minecraft.world.World.NETHER;
-import static net.minecraft.world.World.OVERWORLD;
-
 @Mixin(value = MinimapRenderer.class, remap = false)
 public class MixinMinimapRenderer {
     @Shadow
     protected MinimapInterface minimapInterface;
     @Shadow
     protected AXaeroMinimap modMain;
+    @Shadow
+    private double lastMapDimensionScale = 1.0;
+    @Shadow
+    private double lastPlayerDimDiv = 1.0;
 
     @Inject(method = "renderMinimap", at = @At("HEAD"))
     public void renderMinimap(
@@ -65,59 +63,36 @@ public class MixinMinimapRenderer {
         }
     }
 
-    private double getRenderEntityXZWithDim(final double renderEntityXZ) {
-        try {
-            MinecraftClient mc = MinecraftClient.getInstance();
-            RegistryKey<World> dim = mc.world.getRegistryKey();
-            // when player is in the nether or the custom dimension is the nether, perform coordinate translation
-            if ((dim == NETHER || Globals.customDimensionId == NETHER) && dim != Globals.customDimensionId) {
-                if (Globals.customDimensionId == OVERWORLD) {
-                    return renderEntityXZ * 8.0;
-                } else if (Globals.customDimensionId == NETHER && dim == OVERWORLD) {
-                    return renderEntityXZ / 8.0;
-                }
-            }
-            return renderEntityXZ;
-        } catch (final Exception e) {
-            return 0;
-        }
-    }
-
-    @Redirect(method = "renderMinimap", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/radar/MinimapRadar;getEntityX(Lnet/minecraft/entity/Entity;F)D"), remap = true)
-    public double getEntityX(final MinimapRadar instance, final Entity e, final float partial) {
-        return getRenderEntityXZWithDim(instance.getEntityX(e, partial));
-    }
-
-    @Redirect(method = "renderMinimap", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/radar/MinimapRadar;getEntityZ(Lnet/minecraft/entity/Entity;F)D"), remap = true)
-    public double getEntityZ(final MinimapRadar instance, final Entity e, final float partial) {
-        return getRenderEntityXZWithDim(instance.getEntityZ(e, partial));
-    }
-
-    @Redirect(method = "renderMinimap", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/element/render/over/MinimapElementOverMapRendererHandler;render(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/player/PlayerEntity;DDDDDDZFLnet/minecraft/client/gl/Framebuffer;Lxaero/common/AXaeroMinimap;Lxaero/common/minimap/render/MinimapRendererHelper;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/font/TextRenderer;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;IIIIZF)V"), remap = true)
+    @Redirect(method = "renderMinimap", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/common/minimap/element/render/over/MinimapElementOverMapRendererHandler;render(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/player/PlayerEntity;DDDDDDDZFLnet/minecraft/client/gl/Framebuffer;Lxaero/common/AXaeroMinimap;Lxaero/common/minimap/render/MinimapRendererHelper;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/font/TextRenderer;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;IIIIZF)V"),
+        remap = true)
     public void editOvermapRender(final MinimapElementOverMapRendererHandler instance,
-                                    final DrawContext guiGraphics,
-                                    final Entity renderEntity,
-                                    final PlayerEntity player,
-                                    final double renderX,
-                                    final double renderY,
-                                    final double renderZ,
-                                    final double ps,
-                                    final double pc,
-                                    final double zoom,
-                                    final boolean cave,
-                                    final float partialTicks,
-                                    final Framebuffer framebuffer,
-                                    final AXaeroMinimap modMain,
-                                    final MinimapRendererHelper helper,
-                                    final VertexConsumerProvider.Immediate renderTypeBuffers,
-                                    final TextRenderer font,
-                                    final MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers,
-                                    final int specW,
-                                    final int specH,
-                                    final int halfViewW,
-                                    final int halfViewH,
-                                    final boolean circle,
-                                    final float minimapScale) {
+                                  final DrawContext guiGraphics,
+                                  final Entity renderEntity,
+                                  final PlayerEntity player,
+                                  final double renderX,
+                                  final double renderY,
+                                  final double renderZ,
+                                  final double playerDimDiv,
+                                  final double ps,
+                                  final double pc,
+                                  final double zoom,
+                                  final boolean cave,
+                                  final float partialTicks,
+                                  final Framebuffer framebuffer,
+                                  final AXaeroMinimap modMain,
+                                  final MinimapRendererHelper helper,
+                                  final VertexConsumerProvider.Immediate renderTypeBuffers,
+                                  final TextRenderer font,
+                                  final MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers,
+                                  final int specW,
+                                  final int specH,
+                                  final int halfViewW,
+                                  final int halfViewH,
+                                  final boolean circle,
+                                  final float minimapScale
+    ) {
         double customZoom = zoom / Globals.minimapScalingFactor;
         instance.render(
                 guiGraphics,
@@ -126,6 +101,7 @@ public class MixinMinimapRenderer {
                 renderX,
                 renderY,
                 renderZ,
+                playerDimDiv,
                 ps,
                 pc,
                 customZoom,

@@ -5,6 +5,7 @@ import com.google.common.hash.Hashing;
 import net.blay09.mods.balm.api.Balm;
 import net.blay09.mods.waystones.api.IWaystone;
 import net.blay09.mods.waystones.api.KnownWaystonesEvent;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
@@ -187,7 +188,8 @@ public class WaystoneSync extends Module {
         if (waystoneDim == getCurrentDimensionInt()) {
             WaypointWorld currentWpWorld = waypointsManager.getCurrentWorld();
             if (currentWpWorld == null) {
-                WaypointWorld newWaypointWorld = new WaypointWorld(waypointsManager.getWorldContainer(currentContainerId), "waypoints");
+                WaypointWorld newWaypointWorld = new WaypointWorld(waypointsManager.getWorldContainer(currentContainerId), "waypoints",
+                                                                   MinecraftClient.getInstance().world.getRegistryKey());
                 waypointsManager.getWorldContainer(currentContainerId).worlds.put(
                     "waypoints",
                     newWaypointWorld);
@@ -207,7 +209,7 @@ public class WaystoneSync extends Module {
             currentContainerId.lastIndexOf(37) + 1) + worldContainerSuffix);;
         WaypointWorld crossDimWaypointWorld = waypointWorldContainer.worlds.get("waypoints");
         if (crossDimWaypointWorld == null) {
-            waypointWorldContainer.worlds.put("waypoints", new WaypointWorld(waypointWorldContainer, "waypoints"));
+            waypointWorldContainer.worlds.put("waypoints", new WaypointWorld(waypointWorldContainer, "waypoints", waystoneDimension));
             crossDimWaypointWorld = waypointWorldContainer.worlds.get("waypoints");
         }
         return crossDimWaypointWorld;

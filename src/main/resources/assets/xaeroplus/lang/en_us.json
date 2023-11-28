@@ -15,6 +15,8 @@
   "setting.world_map.waypoint_receive_no_chat_reports_fix.tooltip": "Fixes parsing the player sending waypoints in chat on servers with the NoChatReports plugin installed",
   "setting.world_map.persist_dimension_switch": "Persist WM Dimension Switch",
   "setting.world_map.persist_dimension_switch.tooltip": "If enabled, the dimension will not be switched back to current when the WorldMap GUI is closed.",
+  "setting.world_map.radar_while_dimension_switched": "Radar While Dim Switched",
+  "setting.world_map.radar_while_dimension_switched.tooltip": "Disables WorldMap radar rendering while dimension switched",
   "setting.world_map.transparent_obsidian_roof": "Transparent Obsidian Roof",
   "setting.world_map.transparent_obsidian_roof.tooltip": "Makes obsidian placed at build height transparent. Does not update tiles already mapped - you need to remap them.",
   "setting.world_map.transparent_obsidian_roof_y": "Obsidian Roof Y",
@@ -128,9 +130,5 @@
   "setting.world_map.waystone_color": "Waystone Waypoint Color",
   "setting.world_map.waystone_color.tooltip": "Uses an optional preset color for all waystone waypoints or a random color.",
   "setting.world_map.waystone_waypoint_set": "Waystone Waypoint Set",
-  "setting.world_map.waystone_waypoint_set.tooltip": "Creates a separate waypoint set for waystone waypoints instead of adding them to the default set.",
-  "setting.world_map.cross_dim_waystones_sync": "Waystones Dimension Sync",
-  "setting.world_map.cross_dim_waystones_sync.tooltip": "Syncs Waystones to the (default) waypoint set according to its dimension",
-  "setting.world_map.cross_dimension_teleport": "Cross Dimension Teleport",
-  "setting.world_map.cross_dimension_teleport.tooltip": "If the XaeroPlus dimension is switched, also modify teleport commands to that dimension"
+  "setting.world_map.waystone_waypoint_set.tooltip": "Creates a separate waypoint set for waystone waypoints instead of adding them to the default set."
 }

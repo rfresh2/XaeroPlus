@@ -210,8 +210,7 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
                                           mapProcessor,
                                           biomeRegistry,
                                           oldFormatSupport);
-                    final boolean leafShouldAffectBranches = !this.shouldCache && this.shouldLeafAffectCache(
-                            targetHighlightsHash);
+                    final boolean leafShouldAffectBranches = this.shouldLeafAffectCache(targetHighlightsHash);
                     if (leafShouldAffectBranchesDest != null) {
                         leafShouldAffectBranchesDest[0] = leafShouldAffectBranches;
                     }

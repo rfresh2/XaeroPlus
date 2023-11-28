@@ -20,7 +20,7 @@ public class XaeroPlus implements ClientModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger("XaeroPlus");
 	public static final EventBus EVENT_BUS = new EventBus(Runnable::run);
 	public static AtomicBoolean initialized = new AtomicBoolean(false);
-	private static final String compatibleMinimapVersion = "23.8.4";
+	private static final String compatibleMinimapVersion = "23.9.0";
 
 	public static void initialize() {
 		if (initialized.compareAndSet(false, true)) {
@@ -30,7 +30,7 @@ public class XaeroPlus implements ClientModInitializer {
 			ModuleManager.init();
 			boolean a = Globals.FOLLOW; // force static instances to init
 			XaeroPlusSettingRegistry.fastMapSetting.getValue(); // force static instances to init
-			List<KeyBinding> keybinds = XaeroPlusSettingsReflectionHax.getKeybinds();
+			List<KeyBinding> keybinds = XaeroPlusSettingsReflectionHax.keybindsSupplier.get();
 			keybinds.forEach(KeyBindingHelper::registerKeyBinding);
 		}
 	}

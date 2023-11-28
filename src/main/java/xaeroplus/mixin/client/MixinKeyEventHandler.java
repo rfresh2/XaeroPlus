@@ -15,8 +15,8 @@ public class MixinKeyEventHandler {
     private static boolean init = false;
     @Inject(method = "onKeyInput", at = @At("HEAD"))
     public void onKeyInputInject(final MinecraftClient mc, final AXaeroMinimap modMain, final XaeroMinimapSession minimapSession, final CallbackInfo ci) {
-        if (init || XaeroPlusSettingsReflectionHax.getKeybinds().isEmpty()) return;
+        if (init || XaeroPlusSettingsReflectionHax.keybindsSupplier.get().isEmpty()) return;
         init = true;
-        modMain.getControlsRegister().keybindings.addAll(XaeroPlusSettingsReflectionHax.getKeybinds());
+        modMain.getControlsRegister().keybindings.addAll(XaeroPlusSettingsReflectionHax.keybindsSupplier.get());
     }
 }

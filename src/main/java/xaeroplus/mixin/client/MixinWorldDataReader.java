@@ -5,7 +5,7 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.world.World;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.biome.Biome;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -34,7 +34,7 @@ public abstract class MixinWorldDataReader {
             int caveDepth,
             boolean worldHasSkylight,
             boolean ignoreHeightmaps,
-            World world,
+            ServerWorld serverWorld,
             RegistryWrapper<Block> blockLookup,
             Registry<Block> blockRegistry,
             Registry<Fluid> fluidRegistry,
@@ -47,7 +47,7 @@ public abstract class MixinWorldDataReader {
     @Redirect(method = "buildTileChunk",
             at = @At(
                     value = "INVOKE",
-                    target = "Lxaero/map/file/worldsave/WorldDataReader;buildTile(Lnet/minecraft/nbt/NbtCompound;Lxaero/map/region/MapTile;Lxaero/map/region/MapTileChunk;IIIIIIZZLnet/minecraft/world/World;Lnet/minecraft/registry/RegistryWrapper;Lnet/minecraft/registry/Registry;Lnet/minecraft/registry/Registry;Lnet/minecraft/registry/Registry;ZII)Z"),
+                    target = "Lxaero/map/file/worldsave/WorldDataReader;buildTile(Lnet/minecraft/nbt/NbtCompound;Lxaero/map/region/MapTile;Lxaero/map/region/MapTileChunk;IIIIIIZZLnet/minecraft/server/world/ServerWorld;Lnet/minecraft/registry/RegistryWrapper;Lnet/minecraft/registry/Registry;Lnet/minecraft/registry/Registry;Lnet/minecraft/registry/Registry;ZII)Z"),
             remap = true
     )
     public boolean redirectBuildTile(final WorldDataReader instance,
@@ -62,7 +62,7 @@ public abstract class MixinWorldDataReader {
                                      int caveDepth,
                                      boolean worldHasSkylight,
                                      boolean ignoreHeightmaps,
-                                     World world,
+                                     ServerWorld serverWorld,
                                      RegistryWrapper<Block> blockLookup,
                                      Registry<Block> blockRegistry,
                                      Registry<Fluid> fluidRegistry,
@@ -89,7 +89,7 @@ public abstract class MixinWorldDataReader {
                     caveDepth,
                     worldHasSkylight,
                     ignoreHeightmaps,
-                    world,
+                    serverWorld,
                     blockLookup,
                     blockRegistry,
                     fluidRegistry,
@@ -111,7 +111,7 @@ public abstract class MixinWorldDataReader {
                 caveDepth,
                 worldHasSkylight,
                 ignoreHeightmaps,
-                world,
+                serverWorld,
                 blockLookup,
                 blockRegistry,
                 fluidRegistry,

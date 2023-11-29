@@ -40,6 +40,11 @@ configurations {
 	shadow.extendsFrom jarLibs
 }
 
+ext {
+    worldmap_version = "1.37.1"
+    minimap_version = "23.9.1"
+}
+
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
@@ -49,11 +54,28 @@ dependencies {
 	forgeRuntimeLibrary(jarLibs "com.github.collarmc:pounce:0e8492b68e")
     forgeRuntimeLibrary(jarLibs 'org.xerial:sqlite-jdbc:3.44.1.0')
 
-	modImplementation "maven.modrinth:xaeros-world-map:1.37.0_Forge_1.20.2"
-	modImplementation "maven.modrinth:xaeros-minimap:23.9.0_Forge_1.20.2"
+	modImplementation "maven.modrinth:xaeros-world-map:${worldmap_version}_Forge_1.20.2"
+	modImplementation "maven.modrinth:xaeros-minimap:${minimap_version}_Forge_1.20.2"
 	modImplementation files("libs/baritone-unoptimized-forge-1.10.2.jar")
 	modCompileOnly "maven.modrinth:waystones:15.0.1+forge-1.20.2"
 	modCompileOnly "maven.modrinth:balm:8.0.1+forge-1.20.2"
+}
+
+processResources {
+    filesMatching("META-INF/mods.toml") {
+        expand([
+                "version": project.version,
+                "worldmap_version": project.ext.worldmap_version,
+                "minimap_version": project.ext.minimap_version
+        ])
+    }
+}
+
+tasks.register('printWorldMapVersion') {
+    println project.ext.worldmap_version
+}
+tasks.register('printMinimapVersion') {
+    println project.ext.minimap_version
 }
 
 tasks.withType(JavaCompile).configureEach {

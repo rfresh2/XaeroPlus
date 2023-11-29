@@ -5,7 +5,7 @@ license = "MIT"
 
 [[mods]]
 modId = "xaeroplus"
-version = "1.20.2"
+version = "${version}"
 displayName = "XaeroPlus"
 authors = "rfresh2"
 description = '''
@@ -31,20 +31,20 @@ side = "CLIENT"
 [[dependencies.xaeroplus]]
 modId = "xaerominimap"
 mandatory = false
-versionRange = "[23.9.0]"
+versionRange = "[${minimap_version}]"
 ordering = "BEFORE"
 side = "CLIENT"
 
 [[dependencies.xaeroplus]]
 modId = "xaerobetterpvp"
 mandatory = false
-versionRange = "[23.9.0]"
+versionRange = "[${minimap_version}]"
 ordering = "BEFORE"
 side = "CLIENT"
 
 [[dependencies.xaeroplus]]
 modId = "xaeroworldmap"
 mandatory = true
-versionRange = "[1.37.0]"
+versionRange = "[${worldmap_version}]"
 ordering = "BEFORE"
 side = "CLIENT"

@@ -20,8 +20,6 @@ public class XaeroPlus implements ClientModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger("XaeroPlus");
 	public static final EventBus EVENT_BUS = new EventBus(Runnable::run);
 	public static AtomicBoolean initialized = new AtomicBoolean(false);
-	private static final String compatibleMinimapVersion = "23.9.0";
-
 	public static void initialize() {
 		if (initialized.compareAndSet(false, true)) {
 			LOGGER.info("Initializing XaeroPlus");
@@ -42,7 +40,7 @@ public class XaeroPlus implements ClientModInitializer {
 
 	private static void minimapCompatibleVersionCheck() {
 		try {
-			SemanticVersion compatibleMinimapVersion = SemanticVersion.parse(XaeroPlus.compatibleMinimapVersion);
+			SemanticVersion compatibleMinimapVersion = SemanticVersion.parse(getCompatibleMinimapVersion());
 			if (!checkVersion("xaerominimap", compatibleMinimapVersion) && !checkVersion("xaerobetterpvp", compatibleMinimapVersion)) {
 				throw new RuntimeException("XaeroPlus requires version: '" + compatibleMinimapVersion + "' of Xaero's Minimap or BetterPVP installed");
 			}
@@ -61,5 +59,9 @@ public class XaeroPlus implements ClientModInitializer {
 			LOGGER.error("Failed to check version for {}", modId, e);
 			return false;
 		}
+	}
+
+	private static String getCompatibleMinimapVersion() {
+		return FabricLoader.getInstance().getModContainer("xaeroplus").get().getMetadata().getCustomValue("minimap_version").getAsString();
 	}
 }

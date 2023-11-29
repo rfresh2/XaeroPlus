@@ -403,7 +403,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             double playerDimDiv = this.prevPlayerDimDiv;
             synchronized(this.mapProcessor.renderThreadPauseSync) {
                 if (!this.mapProcessor.isRenderingPaused()) {
-                    playerDimDiv = this.mapProcessor.getMapWorld().getCurrentDimension().calculateDimDiv(this.player.world.provider);
+                    MapDimension mapDim = this.mapProcessor.getMapWorld().getCurrentDimension();
+                    if (mapDim != null) {
+                        playerDimDiv = mapDim.calculateDimDiv(this.player.world.provider);
+                    }
                 }
             }
 

@@ -12,9 +12,6 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.effect.Effects;
@@ -30,7 +27,6 @@ import xaero.map.misc.Misc;
 import xaero.map.region.LeveledRegion;
 import xaero.map.region.MapRegion;
 import xaero.map.region.MapTileChunk;
-import xaeroplus.XaeroPlus;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
 import xaeroplus.module.impl.PortalSkipDetection;
@@ -78,16 +74,6 @@ public abstract class MixinSupportXaeroWorldmap {
     public abstract boolean hasCaveLayers();
     @Shadow
     public abstract boolean hasDimensionSwitching();
-
-    // not caused by xaeroplus but i'll fix it anyway lol
-    @Inject(method = "getMapDimensionScale", at = @At(value = "INVOKE", target = "Lxaero/map/WorldMapSession;getMapProcessor()Lxaero/map/MapProcessor;", shift = At.Shift.BEFORE), cancellable = true)
-    public void getCurrentDimensionCrashPrevention(final CallbackInfoReturnable<Double> cir) {
-        if (WorldMapSession.getCurrentSession().getMapProcessor().getMapWorld().getCurrentDimension() == null) {
-            XaeroPlus.LOGGER.info("Prevented xaero crash xD");
-            cir.setReturnValue(0.0);
-        }
-    }
-
     @Shadow
     protected abstract void bumpLoadedRegion(MapProcessor mapProcessor, MapRegion region, boolean wmHasCaveLayers);
 

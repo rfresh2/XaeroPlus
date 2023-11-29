@@ -45,6 +45,11 @@ afterEvaluate {
 	}
 }
 
+ext {
+	worldmap_version = "1.37.1"
+	minimap_version = "23.9.1"
+}
+
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
@@ -55,9 +60,9 @@ dependencies {
 	jarLibs "com.github.collarmc:pounce:0e8492b68e"
 	jarLibs 'org.xerial:sqlite-jdbc:3.44.1.0'
 
-	modImplementation "maven.modrinth:xaeros-world-map:1.37.0_Fabric_1.20"
-	modImplementation "maven.modrinth:xaeros-minimap:23.9.0_Fabric_1.20"
-	modCompileOnly files("libs/BetterPvP_23.9.0_Fabric_1.20.jar")
+	modImplementation "maven.modrinth:xaeros-world-map:${worldmap_version}_Fabric_1.20"
+	modImplementation "maven.modrinth:xaeros-minimap:${minimap_version}_Fabric_1.20"
+	modCompileOnly files("libs/BetterPvP_${minimap_version}_Fabric_1.20.jar")
 	modImplementation files("libs/baritone-api-fabric-1.20.1-elytra-beta-v1.jar")
 	modImplementation "maven.modrinth:waystones:14.0.2+fabric-1.20"
 	modImplementation "maven.modrinth:balm:7.1.4+fabric-1.20.1"
@@ -69,11 +74,20 @@ dependencies {
 }
 
 processResources {
-	inputs.property "version", project.version
-
 	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+		expand([
+				"version": project.version,
+				"worldmap_version": project.ext.worldmap_version,
+				"minimap_version": project.ext.minimap_version
+		])
 	}
+}
+
+tasks.register('printWorldMapVersion') {
+	println project.ext.worldmap_version
+}
+tasks.register('printMinimapVersion') {
+	println project.ext.minimap_version
 }
 
 tasks.withType(JavaCompile).configureEach {

@@ -27,6 +27,9 @@
     "minecraft": "~1.20",
     "java": ">=17",
     "fabric-api": "*",
-    "xaeroworldmap": "1.37.0"
+    "xaeroworldmap": "${worldmap_version}"
+  },
+  "custom": {
+    "minimap_version": "${minimap_version}"
   }
 }

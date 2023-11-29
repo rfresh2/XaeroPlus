@@ -12,7 +12,6 @@
     "MixinControlsHandler",
     "MixinForgeEventHandler",
     "MixinGuiAddWaypoint",
-    "MixinGuiCaveModeOptions",
     "MixinGuiEntityRadarSettings",
     "MixinGuiMap",
     "MixinGuiMapAccessor",

@@ -5,8 +5,6 @@ on:
     branches:
       - "forge-1.20.1"
 env:
-  WORLDMAP_VERSION: "1.37.0"
-  MINIMAP_VERSION: "23.9.0"
   MINECRAFT_VERSION: "1.20.1"
   MINECRAFT_VERSION_SHORT: "1.20"
   MOD_LOADER: "Forge"
@@ -32,6 +30,14 @@ jobs:
     - name: Elevate wrapper permissions
       run: chmod +x ./gradlew
 
+    - name: Get WorldMap Version
+      run: |
+        echo "WORLDMAP_VERSION=$(./gradlew -q printWorldMapVersion)" >> $GITHUB_ENV
+
+    - name: Get Minimap Version
+      run: |
+        echo "MINIMAP_VERSION=$(./gradlew -q printMinimapVersion)" >> $GITHUB_ENV
+
     - name: Build mod
       run: ./gradlew build
 
@@ -52,7 +58,7 @@ jobs:
 
     - name: Create modpack zip
       run: >
-        zip -j 
+        zip -j
         XaeroPlus-modpack-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}.zip
         XaeroPlus-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar
         XaerosWorldMap_${{ env.WORLDMAP_VERSION }}_${{ env.MOD_LOADER }}_${{ env.MINECRAFT_VERSION_SHORT }}.jar

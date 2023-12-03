@@ -15,6 +15,7 @@
 <img src="https://img.shields.io/badge/MC-1.12.2-brightgreen.svg" alt="Minecraft"/>
   <img src="https://img.shields.io/badge/MC-1.20.1-brightgreen.svg" alt="Minecraft"/>
   <img src="https://img.shields.io/badge/MC-1.20.2-brightgreen.svg" alt="Minecraft"/>
+  <img src="https://img.shields.io/badge/MC-1.20.3-brightgreen.svg" alt="Minecraft"/>
   <img src="https://img.shields.io/github/languages/code-size/rfresh2/XaeroPlus.svg" alt="Code size"/>
   <img src="https://img.shields.io/github/repo-size/rfresh2/XaeroPlus.svg" alt="GitHub repo size"/>
   <img src="https://tokei.rs/b1/github/rfresh2/XaeroPlus?category=code&style=flat" alt="Lines of Code"/>
@@ -51,8 +52,8 @@ Xaero's Minimap can be swapped out for [BetterPVP](https://chocolateminecraft.co
 Download and include these mods **in addition** to `XaeroPlus-*.jar` (3 jars total).
 
 You can find download links to Xaero's mods here:
-* https://modrinth.com/mod/xaeros-world-map/versions?g=1.20.1
-* https://modrinth.com/mod/xaeros-minimap/versions?g=1.20.1
+* https://modrinth.com/mod/xaeros-world-map/versions
+* https://modrinth.com/mod/xaeros-minimap/versions
 
 Or a modpack zip with these jars is included in the Github releases.
 

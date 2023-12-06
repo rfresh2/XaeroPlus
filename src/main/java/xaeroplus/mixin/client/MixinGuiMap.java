@@ -732,12 +732,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                             .getMapWorld()
                             .getCurrentDimension()
                             .getDimensionType(this.mapProcessor.getWorldDimensionTypeRegistry());
+                        Identifier dimTypeId = this.mapProcessor.getMapWorld().getCurrentDimension().getDimensionTypeId();
                         guiGraphics.drawTextWithShadow(
                             mc.textRenderer,
-                            "MultiWorld ID: "
-                                + this.mapProcessor.getMapWorld().getCurrentMultiworld()
-                                + " Dim Type: "
-                                + (dimType == null ? "null" : dimType.effects()),
+                            "MultiWorld ID: " + this.mapProcessor.getMapWorld().getCurrentMultiworld() + " Dim Type: " + (dimType == null ? "unknown" : dimTypeId),
                             5,
                             265,
                             -1

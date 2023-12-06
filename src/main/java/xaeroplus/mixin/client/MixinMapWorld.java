@@ -36,6 +36,7 @@ public class MixinMapWorld {
      */
     @Overwrite
     public MapDimension getDimension(RegistryKey<World> dimId) {
-        return this.dimensions.get(dimId);
+        if (dimId == null) return null;
+        else return this.dimensions.get(dimId);
     }
 }

@@ -5,7 +5,6 @@ import com.google.common.hash.Hashing;
 import net.blay09.mods.balm.api.Balm;
 import net.blay09.mods.waystones.api.IWaystone;
 import net.blay09.mods.waystones.api.KnownWaystonesEvent;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
 import xaero.common.XaeroMinimapSession;
@@ -162,18 +161,11 @@ public class WaystoneSync extends Module {
         final RegistryKey<World> waystoneDimension = waystone.dimension();
         final String waystoneDimensionDirectoryName = waypointsManager.getDimensionDirectoryName(waystoneDimension);
         final int waystoneDim = WaypointsHelper.getDimensionForWaypointWorldKey(waystoneDimensionDirectoryName);
-        // waypoint worlds can sometimes have irregular names
-        // if we have a world already open, trying syncing to that world
-        if (waystoneDim == getCurrentDimensionInt()) {
-            WaypointWorld currentWpWorld = waypointsManager.getCurrentWorld();
-            if (currentWpWorld == null) {
-                WaypointWorld newWaypointWorld = new WaypointWorld(waypointsManager.getWorldContainer(currentContainerId), "waypoints",
-                                                                   MinecraftClient.getInstance().world.getRegistryKey());
-                waypointsManager.getWorldContainer(currentContainerId).worlds.put(
-                    "waypoints",
-                    newWaypointWorld);
-                currentWpWorld = newWaypointWorld;
-            }
+        final WaypointWorld currentWpWorld = waypointsManager.getCurrentWorld();
+        if (currentWpWorld == null) {
+            throw new RuntimeException("WaystoneSync: current waypoint world is null");
+        }
+        if (currentWpWorld.getDimId() == waystoneDimension) {
             return currentWpWorld;
         }
         final String worldContainerSuffix;

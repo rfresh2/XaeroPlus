@@ -13,7 +13,6 @@ import xaero.common.minimap.waypoints.WaypointSet;
 import xaero.common.minimap.waypoints.WaypointWorld;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.extensions.IWaypointDimension;
-import xaeroplus.util.WaypointsHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,7 +45,7 @@ public class MixinGuiAddWaypoint {
         WaypointSet destinationSet) {
         try {
             waypointsEdited.forEach(waypoint -> {
-                ((IWaypointDimension) waypoint).setDimension(WaypointsHelper.getDimensionKeyForWaypointWorldKey(destinationWorld.getContainer().getKey()));
+                ((IWaypointDimension) waypoint).setDimension(destinationWorld.getDimId());
             });
         } catch (Throwable e) {
             XaeroPlus.LOGGER.error("Failed setting waypoint dimension: {}", Arrays.toString(waypointsEdited.toArray()), e);

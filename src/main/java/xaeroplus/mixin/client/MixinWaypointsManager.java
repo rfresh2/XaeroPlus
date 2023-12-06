@@ -20,7 +20,6 @@ import xaeroplus.Globals;
 import xaeroplus.feature.extensions.IWaypointDimension;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.DataFolderResolveUtil;
-import xaeroplus.util.WaypointsHelper;
 
 import static net.minecraft.world.World.NETHER;
 import static net.minecraft.world.World.OVERWORLD;
@@ -40,8 +39,6 @@ public abstract class MixinWaypointsManager {
 
     @Shadow
     public abstract String getDimensionDirectoryName(RegistryKey<World> dimKey);
-    @Shadow
-    public abstract RegistryKey<World> getDimensionKeyForDirectoryName(String dirName);
 
     @Inject(method = "getMainContainer", at = @At("HEAD"), cancellable = true)
     private void getMainContainer(boolean preIp6Fix, ClientPlayNetworkHandler connection, CallbackInfoReturnable<String> cir) {
@@ -108,6 +105,6 @@ public abstract class MixinWaypointsManager {
                                          double waypointDestDimScale,
                                          final double dimDiv,
                                          final Waypoint waypoint) {
-        ((IWaypointDimension) waypoint).setDimension(WaypointsHelper.getDimensionKeyForWaypointWorldKey(wpw.getContainer().getKey()));
+        ((IWaypointDimension) waypoint).setDimension(wpw.getDimId());
     }
 }

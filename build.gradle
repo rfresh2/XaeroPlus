@@ -46,8 +46,8 @@ afterEvaluate {
 }
 
 ext {
-	worldmap_version = "1.37.1"
-	minimap_version = "23.9.1"
+	worldmap_version = "1.37.2"
+	minimap_version = "23.9.2"
 }
 
 dependencies {

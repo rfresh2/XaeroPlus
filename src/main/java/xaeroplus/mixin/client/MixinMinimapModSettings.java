@@ -20,7 +20,6 @@ import xaeroplus.feature.extensions.IWaypointDimension;
 import xaeroplus.settings.XaeroPlusModSettingsHooks;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
-import xaeroplus.util.WaypointsHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,7 +64,7 @@ public class MixinMinimapModSettings {
         locals = LocalCapture.CAPTURE_FAILHARD)
     public void createWaypointInject(final String[] args, final WaypointWorld wpw, final CallbackInfoReturnable<Boolean> cir, final String setName, final WaypointSet set, boolean yIncluded, int yCoord, Waypoint waypoint) {
         try {
-            ((IWaypointDimension) waypoint).setDimension(WaypointsHelper.getDimensionKeyForWaypointWorldKey(wpw.getContainer().getKey()));
+            ((IWaypointDimension) waypoint).setDimension(wpw.getDimId());
         } catch (final Throwable e) {
             XaeroPlus.LOGGER.error("Failed setting waypoint dimension: {}", waypoint, e);
         }

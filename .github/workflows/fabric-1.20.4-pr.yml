@@ -1,11 +1,11 @@
-name: Fabric-1.20.3 PR Build
+name: Fabric-1.20.4 PR Build
 
 on:
   pull_request:
     branches:
-      - "fabric-1.20.3"
+      - "fabric-1.20.4"
 env:
-  MINECRAFT_VERSION: "1.20.3"
+  MINECRAFT_VERSION: "1.20.4"
   MOD_LOADER: "Fabric"
 
 jobs:

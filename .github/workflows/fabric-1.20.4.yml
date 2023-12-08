@@ -1,15 +1,15 @@
-name: Fabric 1.20.3 Build And Release
+name: Fabric 1.20.4 Build And Release
 
 on:
   push:
     branches:
-      - "fabric-1.20.3"
+      - "fabric-1.20.4"
 env:
-  MINECRAFT_VERSION: "1.20.3"
-  MINECRAFT_VERSION_SHORT: "1.20.3"
+  MINECRAFT_VERSION: "1.20.4"
+  MINECRAFT_VERSION_SHORT: "1.20.4"
   MOD_LOADER: "Fabric"
-  FABRIC_API_VERSION: "0.91.1+1.20.3"
-  FABRIC_API_MODRINTH_VERSION_ID: "Yolngp3s"
+  FABRIC_API_VERSION: "0.91.2+1.20.4"
+  FABRIC_API_MODRINTH_VERSION_ID: "yGY1P8Yr"
 
 jobs:
   build:
@@ -108,7 +108,7 @@ jobs:
           XaeroPlus-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar
           XaeroPlus-modpack-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}.zip
         github-tag: ${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}
-        github-commitish: fabric-1.20.3
+        github-commitish: fabric-1.20.4
 
         files: |
           XaeroPlus-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar
@@ -118,6 +118,7 @@ jobs:
           ${{ env.MOD_LOADER }}
           quilt
         game-versions: |
+          1.20.3
           ${{ env.MINECRAFT_VERSION }}
         dependencies: |
           xaerominimap@${{ env.MINIMAP_VERSION }}(required){modrinth:1bokaNcj}{curseforge:263420}

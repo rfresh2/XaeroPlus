@@ -46,8 +46,8 @@ afterEvaluate {
 }
 
 ext {
-	worldmap_version = "1.37.2"
-	minimap_version = "23.9.3"
+	worldmap_version = "1.37.4"
+	minimap_version = "23.9.4"
 }
 
 dependencies {
@@ -60,17 +60,17 @@ dependencies {
 	jarLibs "com.github.collarmc:pounce:0e8492b68e"
     jarLibs 'org.xerial:sqlite-jdbc:3.44.1.0'
 
-	modImplementation "maven.modrinth:xaeros-world-map:${worldmap_version}_Fabric_1.20.3"
-	modImplementation "maven.modrinth:xaeros-minimap:${minimap_version}_Fabric_1.20.3"
-	modCompileOnly files("libs/BetterPvP_${minimap_version}_Fabric_1.20.3.jar")
-	modImplementation files("libs/baritone-unoptimized-fabric-1.10.2.jar")
+	modImplementation "maven.modrinth:xaeros-world-map:${worldmap_version}_Fabric_1.20.4"
+	modImplementation "maven.modrinth:xaeros-minimap:${minimap_version}_Fabric_1.20.4"
+	modCompileOnly files("libs/BetterPvP_${minimap_version}_Fabric_1.20.4.jar")
+	modCompileOnly files("libs/baritone-unoptimized-fabric-1.10.4.jar")
 	modCompileOnly "maven.modrinth:waystones:15.0.1+fabric-1.20.2"
 	modCompileOnly "maven.modrinth:balm:8.0.1+fabric-1.20.2"
 	modCompileOnly "maven.modrinth:fwaystones:3.3.1+mc1.20.2"
 	modCompileOnly "maven.modrinth:owo-lib:0.11.3+1.20.2"
 //	runtimeOnly "blue.endless:jankson:1.2.3"
 //	modRuntimeOnly "maven.modrinth:auth-me:7.0.2+1.20"
-	modRuntimeOnly "maven.modrinth:cloth-config:12.0.111+fabric"
+//	modRuntimeOnly "maven.modrinth:cloth-config:12.0.111+fabric"
 }
 
 processResources {

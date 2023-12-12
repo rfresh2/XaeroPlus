@@ -30,21 +30,17 @@ repositories {
 }
 
 loom {
-	forge {
+    accessWidenerPath = file('src/main/resources/xaeroplus.accesswidener')
+    forge {
 		mixinConfigs = ["xaeroplus.mixins.json"]
+		convertAccessWideners = true
+		extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
 	}
 }
 
 configurations {
 	jarLibs
 	shadow.extendsFrom jarLibs
-}
-
-afterEvaluate {
-	loom.runs.configureEach {
-		// https://fabricmc.net/wiki/tutorial:mixin_hotswaps
-		vmArg "-javaagent:${ configurations.compileClasspath.find { it.name.contains("sponge-mixin") } }"
-	}
 }
 
 ext {

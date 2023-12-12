@@ -3,9 +3,9 @@ package xaeroplus.module.impl;
 import com.collarmc.pounce.Subscribe;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.EndPortalBlock;
-import net.minecraft.block.NetherPortalBlock;
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ReferenceSet;
+import net.minecraft.block.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
@@ -28,8 +28,8 @@ import xaeroplus.feature.render.highlights.ChunkHighlightLocalCache;
 import xaeroplus.feature.render.highlights.ChunkHighlightSavingCache;
 import xaeroplus.module.Module;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.ChunkScanner;
 import xaeroplus.util.ChunkUtils;
-import xaeroplus.util.MutableBlockPos;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -144,21 +144,22 @@ public class Portals extends Module {
         });
     }
 
+    private static final ReferenceSet<Block> PORTAL_BLOCKS = new ReferenceOpenHashSet<>();
+    static {
+        PORTAL_BLOCKS.add(Blocks.NETHER_PORTAL);
+        PORTAL_BLOCKS.add(Blocks.END_PORTAL);
+        PORTAL_BLOCKS.add(Blocks.END_PORTAL_FRAME);
+    }
+
     private boolean findPortalInChunk(final Chunk chunk) {
         final boolean chunkHadPortal = portalsCache.isHighlighted(chunk.getPos().x, chunk.getPos().z, ChunkUtils.getActualDimension());
-        final MutableBlockPos pos = new MutableBlockPos(0, 0, 0);
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
-                for (int y = mc.world.getBottomY(); y < mc.world.getTopY(); y++) {
-                    pos.setPos(x, y, z);
-                    BlockState blockState = chunk.getBlockState(pos);
-                    if (blockState.getBlock() instanceof NetherPortalBlock || blockState.getBlock() instanceof EndPortalBlock) {
-                        return portalsCache.addHighlight(chunk.getPos().x, chunk.getPos().z);
-                    }
-                }
-            }
-        }
-        if (chunkHadPortal) {
+//        var before = System.nanoTime();
+        var hasPortal = ChunkScanner.chunkContainsBlocks(chunk, PORTAL_BLOCKS, mc.world.getBottomY());
+//        var after = System.nanoTime();
+//        XaeroPlus.LOGGER.info("Scanned chunk {} in {} ns", chunk.getPos(), after - before);
+        if (hasPortal) {
+            return portalsCache.addHighlight(chunk.getPos().x, chunk.getPos().z);
+        } else if (chunkHadPortal) {
             portalsCache.removeHighlight(chunk.getPos().x, chunk.getPos().z);
         }
         return true;

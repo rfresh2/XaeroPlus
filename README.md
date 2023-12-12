@@ -24,16 +24,14 @@
 XaeroPlus is a client-side Minecraft mod that depends on and modifies the Xaero's WorldMap and Minimap mods with extra
 features and performance improvements - particularly for use on anarchy servers like 2b2t.
 
+XaeroPlus is not affiliated or endorsed by xaero96. Please report issues to XaeroPlus's [Github](https://github.com/rfresh2/XaeroPlus/issues) or [discord server](https://discord.gg/nJZrSaRKtb).
+
 <details>
 <summary>Example Map</summary>
 <p align="center">
   <img src="https://i.imgur.com/oYYhDoS.jpeg">
 </p>
 </details>
-
-# Discord Server
-
-https://discord.gg/nJZrSaRKtb
 
 # Download
 

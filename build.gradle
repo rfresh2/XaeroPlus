@@ -30,7 +30,7 @@ repositories {
 }
 
 loom {
-
+	accessWidenerPath = file('src/main/resources/xaeroplus.accesswidener')
 }
 
 configurations {

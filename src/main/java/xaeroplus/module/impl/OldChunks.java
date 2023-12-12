@@ -3,8 +3,9 @@ package xaeroplus.module.impl;
 import com.collarmc.pounce.Subscribe;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ReferenceSet;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.registry.RegistryKey;
@@ -23,11 +24,9 @@ import xaeroplus.feature.render.highlights.ChunkHighlightLocalCache;
 import xaeroplus.feature.render.highlights.ChunkHighlightSavingCache;
 import xaeroplus.module.Module;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.ChunkScanner;
 import xaeroplus.util.ChunkUtils;
-import xaeroplus.util.MutableBlockPos;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -50,8 +49,8 @@ public class OldChunks extends Module {
             .build());
 
     private boolean inverse = false;
-    private static final HashSet<Block> OVERWORLD_BLOCKS = new HashSet<>();
-    private static final Set<Block> NETHER_BLOCKS = new HashSet<>();
+    private static final ReferenceSet<Block> OVERWORLD_BLOCKS = new ReferenceOpenHashSet<>();
+    private static final ReferenceSet<Block> NETHER_BLOCKS = new ReferenceOpenHashSet<>();
     static {
         OVERWORLD_BLOCKS.addAll(asList(Blocks.COPPER_ORE,
                                        Blocks.DEEPSLATE_COPPER_ORE,
@@ -136,25 +135,11 @@ public class OldChunks extends Module {
         if (actualDimension != OVERWORLD && actualDimension != NETHER) {
             return true;
         }
-        final MutableBlockPos pos = new MutableBlockPos(0, 0, 0);
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
-                for (int y = 5; y < mc.world.getTopY(); y++) {
-                    pos.setPos(x, y, z);
-                    BlockState blockState = chunk.getBlockState(pos);
-                    if (actualDimension == OVERWORLD) {
-                        if (OVERWORLD_BLOCKS.contains(blockState.getBlock())) {
-                            return modernChunksCache.addHighlight(chunk.getPos().x, chunk.getPos().z);
-                        }
-                    } else if (actualDimension == NETHER) {
-                        if (NETHER_BLOCKS.contains(blockState.getBlock())) {
-                            return modernChunksCache.addHighlight(chunk.getPos().x, chunk.getPos().z);
-                        }
-                    }
-                }
-            }
+        if (ChunkScanner.chunkContainsBlocks(chunk, actualDimension == OVERWORLD ? OVERWORLD_BLOCKS : NETHER_BLOCKS, 5)) {
+            return modernChunksCache.addHighlight(chunk.getPos().x, chunk.getPos().z);
+        } else {
+            return oldChunksCache.addHighlight(chunk.getPos().x, chunk.getPos().z);
         }
-        return oldChunksCache.addHighlight(chunk.getPos().x, chunk.getPos().z);
     }
 
     @Subscribe

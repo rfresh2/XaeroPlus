@@ -30,8 +30,11 @@ repositories {
 }
 
 loom {
-	forge {
+    accessWidenerPath = file('src/main/resources/xaeroplus.accesswidener')
+    forge {
 		mixinConfigs = ["xaeroplus.mixins.json"]
+		convertAccessWideners = true
+		extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
 	}
 }
 

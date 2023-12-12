@@ -1,13 +1,13 @@
 package xaeroplus.module;
 
+import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import xaeroplus.module.impl.*;
-
-import java.util.LinkedHashMap;
 
 import static java.util.Arrays.asList;
 
 public class ModuleManager {
-    private static final LinkedHashMap<Class<? extends Module>, Module> modulesClassMap = new LinkedHashMap<>();
+    private static final Reference2ObjectMap<Class<? extends Module>, Module> modulesClassMap = new Reference2ObjectOpenHashMap<>();
 
     public static void init() {
         asList(

@@ -15,6 +15,7 @@
 <img src="https://img.shields.io/badge/MC-1.12.2-brightgreen.svg" alt="Minecraft"/>
   <img src="https://img.shields.io/badge/MC-1.20.1-brightgreen.svg" alt="Minecraft"/>
   <img src="https://img.shields.io/badge/MC-1.20.2-brightgreen.svg" alt="Minecraft"/>
+  <img src="https://img.shields.io/badge/MC-1.20.4-brightgreen.svg" alt="Minecraft"/>
   <img src="https://img.shields.io/github/languages/code-size/rfresh2/XaeroPlus.svg" alt="Code size"/>
   <img src="https://img.shields.io/github/repo-size/rfresh2/XaeroPlus.svg" alt="GitHub repo size"/>
   <img src="https://tokei.rs/b1/github/rfresh2/XaeroPlus?category=code&style=flat" alt="Lines of Code"/>

@@ -1,10 +1,10 @@
 package xaeroplus.module.impl;
 
-import com.collarmc.pounce.Subscribe;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
+import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.block.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
@@ -90,12 +90,12 @@ public class Portals extends Module {
         return dim != OVERWORLD && dim != NETHER && dim != END;
     }
 
-    @Subscribe
+    @EventHandler
     public void onChunkData(final ChunkDataEvent event) {
         findPortalInChunkAsync(event.chunk());
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceived(final PacketReceivedEvent event) {
         if (event.packet() instanceof BlockUpdateS2CPacket) {
             final BlockUpdateS2CPacket packet = (BlockUpdateS2CPacket) event.packet();
@@ -106,7 +106,7 @@ public class Portals extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
         if (XaeroPlusSettingRegistry.portalsSaveLoadToDisk.getValue()) {
             if (inUnknownDimension() && portalsCache instanceof ChunkHighlightSavingCache) {
@@ -117,7 +117,7 @@ public class Portals extends Module {
         portalsCache.handleWorldChange();
     }
 
-    @Subscribe
+    @EventHandler
     public void onClientTickEvent(final ClientTickEvent.Post event) {
         portalsCache.handleTick();
     }

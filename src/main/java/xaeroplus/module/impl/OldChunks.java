@@ -1,10 +1,10 @@
 package xaeroplus.module.impl;
 
-import com.collarmc.pounce.Subscribe;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
+import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
@@ -111,7 +111,7 @@ public class OldChunks extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onChunkData(final ChunkDataEvent event) {
         searchChunkAsync(event.chunk());
     }
@@ -142,7 +142,7 @@ public class OldChunks extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
         if (XaeroPlusSettingRegistry.oldChunksSaveLoadToDisk.getValue()) {
             if (inUnknownDimension() && oldChunksCache instanceof ChunkHighlightSavingCache) {
@@ -159,7 +159,7 @@ public class OldChunks extends Module {
         return dim != OVERWORLD && dim != NETHER && dim != END;
     }
 
-    @Subscribe
+    @EventHandler
     public void onClientTickEvent(final ClientTickEvent.Post event) {
         oldChunksCache.handleTick();
         modernChunksCache.handleTick();

@@ -25,7 +25,6 @@ repositories {
 		name = "jitpack.io"
 		url = "https://jitpack.io"
 	}
-	jcenter()
 	mavenLocal()
 }
 
@@ -52,9 +51,11 @@ dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	forge "net.minecraftforge:forge:${project.forge_version}"
+	implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.2"))
+	implementation(include "io.github.llamalad7:mixinextras-forge:0.3.2")
 
-	forgeRuntimeLibrary(jarLibs "com.github.ben-manes.caffeine:caffeine:3.1.8")
-	forgeRuntimeLibrary(jarLibs "com.github.collarmc:pounce:0e8492b68e")
+	implementation(jarLibs "com.github.ben-manes.caffeine:caffeine:3.1.8")
+    implementation(include "net.lenni0451:LambdaEvents:2.4.0")
     forgeRuntimeLibrary(jarLibs 'org.xerial:sqlite-jdbc:3.44.1.0')
 
 	modImplementation "maven.modrinth:xaeros-world-map:${worldmap_version}_Forge_1.20.2"
@@ -117,7 +118,6 @@ shadowJar {
 	exclude 'org/sqlite/native/Windows/aarch64/**'
 	exclude 'org/sqlite/native/Windows/armv7/**'
 	exclude 'org/slf4j/**'
-	relocate "com.collarmc.pounce", "xaeroplus.com.collarmc.pounce.shadow"
 	relocate "com.github.benmanes.caffeine", "xaeroplus.com.github.benmanes.caffeine.shadow"
 }
 

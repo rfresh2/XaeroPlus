@@ -35,10 +35,6 @@ public class MixinMinimapRenderer {
     protected MinimapInterface minimapInterface;
     @Shadow
     protected IXaeroMinimap modMain;
-    @Shadow
-    private double lastMapDimensionScale = 1.0;
-    @Shadow
-    private double lastPlayerDimDiv = 1.0;
 
     @Inject(method = "renderMinimap", at = @At("HEAD"))
     public void renderMinimap(

@@ -12,11 +12,11 @@ import xaeroplus.event.ClientTickEvent;
 public class MixinMinecraftClient {
     @Inject(method = "tick", at = @At("HEAD"))
     public void tickHead(final CallbackInfo ci) {
-        XaeroPlus.EVENT_BUS.dispatch(ClientTickEvent.Pre.INSTANCE);
+        XaeroPlus.EVENT_BUS.call(ClientTickEvent.Pre.INSTANCE);
     }
 
     @Inject(method = "tick", at = @At("RETURN"))
     public void tickReturn(final CallbackInfo ci) {
-        XaeroPlus.EVENT_BUS.dispatch(ClientTickEvent.Post.INSTANCE);
+        XaeroPlus.EVENT_BUS.call(ClientTickEvent.Post.INSTANCE);
     }
 }

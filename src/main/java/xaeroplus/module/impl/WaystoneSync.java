@@ -1,10 +1,7 @@
 package xaeroplus.module.impl;
 
-import com.collarmc.pounce.Subscribe;
 import com.google.common.hash.Hashing;
-import net.blay09.mods.balm.api.Balm;
-import net.blay09.mods.waystones.api.IWaystone;
-import net.blay09.mods.waystones.api.KnownWaystonesEvent;
+import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
 import xaero.common.XaeroMinimapSession;
@@ -16,24 +13,19 @@ import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.feature.extensions.IWaypointDimension;
 import xaeroplus.feature.render.ColorHelper.WaystoneColor;
 import xaeroplus.module.Module;
-import xaeroplus.util.ChunkUtils;
+import xaeroplus.util.BlayWaystonesHelper;
 import xaeroplus.util.WaypointsHelper;
 import xaeroplus.util.WaystonesHelper;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static net.minecraft.world.World.*;
 import static xaero.common.settings.ModSettings.COLORS;
 
 @Module.ModuleInfo()
 public class WaystoneSync extends Module {
     private boolean subscribed = false;
-    private boolean shouldSync = false;
-    // standard waystones we need to resync
-    private List<IWaystone> toSyncWaystones = new ArrayList<>();
-    // cache of currently synced standard waystones
-    private List<IWaystone> currentWaystones = new ArrayList<>();
+    private BlayWaystonesHelper blayWaystonesHelper = new BlayWaystonesHelper();
     private WaystoneColor color = WaystoneColor.RANDOM;
     private boolean separateWaypointSet = false;
 
@@ -42,52 +34,37 @@ public class WaystoneSync extends Module {
         if (WaystonesHelper.isWaystonesPresent()) {
             if (!subscribed) {
                 subscribed = true;
-                subscribeWaystonesEvent();
+                blayWaystonesHelper.subscribeWaystonesEvent();
             }
         }
     }
 
-    private void subscribeWaystonesEvent() {
-        Balm.getEvents().onEvent(KnownWaystonesEvent.class, this::onKnownWaystonesEvent);
-    }
-
     @Override
     public void onDisable() {
-        toSyncWaystones = new ArrayList<>();
+        blayWaystonesHelper.toSyncWaystones = new ArrayList<>();
     }
 
-    @Subscribe
+    @EventHandler
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
         if (event.worldId() == null) {
-            toSyncWaystones = new ArrayList<>();
+            blayWaystonesHelper.toSyncWaystones = new ArrayList<>();
         }
     }
 
-    private void onKnownWaystonesEvent(final KnownWaystonesEvent event) {
-        toSyncWaystones = event.getWaystones();
-        shouldSync = true;
-        currentWaystones = event.getWaystones();
-    }
-
-    @Subscribe
+    @EventHandler
     public void onClientTickEvent(final ClientTickEvent.Post event) {
         if (WaystonesHelper.isWaystonesPresent()) {
-            if (shouldSync) {
+            if (blayWaystonesHelper.shouldSync) {
                 if (syncMainWaystones()) {
-                    shouldSync = false;
-                    toSyncWaystones = new ArrayList<>();
+                    blayWaystonesHelper.shouldSync = false;
+                    blayWaystonesHelper.toSyncWaystones = new ArrayList<>();
                 }
             }
         }
     }
 
     public boolean syncMainWaystones() {
-        return commonWaystoneSync(toSyncWaystones.stream()
-                                      .map(waystone -> new Waystone(waystone.getName(),
-                                                                    waystone.getDimension(),
-                                                                    waystone.getPos().getX(),
-                                                                    waystone.getPos().getY() + 1, // avoid teleporting directly into the waystone
-                                                                    waystone.getPos().getZ())).toList());
+        return commonWaystoneSync(blayWaystonesHelper.getToSyncWaystones());
     }
 
     public boolean commonWaystoneSync(final List<Waystone> waystones) {
@@ -205,17 +182,9 @@ public class WaystoneSync extends Module {
     }
 
     public void reloadStandardWaystones() {
-        this.toSyncWaystones = this.currentWaystones;
-        this.shouldSync = true;
+        blayWaystonesHelper.toSyncWaystones = blayWaystonesHelper.currentWaystones;
+        blayWaystonesHelper.shouldSync = true;
     }
 
-    private int getCurrentDimensionInt() {
-        RegistryKey<World> actualDimension = ChunkUtils.getActualDimension();
-        if (actualDimension == OVERWORLD) return 0;
-        else if (actualDimension == NETHER) return -1;
-        else if (actualDimension == END) return 1;
-        else return Integer.MIN_VALUE;
-    }
-
-    private record Waystone(String name, RegistryKey<World> dimension, int x, int y, int z) { }
+    public record Waystone(String name, RegistryKey<World> dimension, int x, int y, int z) { }
 }

@@ -1,11 +1,12 @@
 package xaeroplus;
 
-import com.collarmc.pounce.EventBus;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.SemanticVersion;
 import net.fabricmc.loader.api.VersionParsingException;
+import net.lenni0451.lambdaevents.LambdaManager;
+import net.lenni0451.lambdaevents.generator.LambdaMetaFactoryGenerator;
 import net.minecraft.client.option.KeyBinding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class XaeroPlus implements ClientModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger("XaeroPlus");
-	public static final EventBus EVENT_BUS = new EventBus(Runnable::run);
+	public static final LambdaManager EVENT_BUS = LambdaManager.basic(new LambdaMetaFactoryGenerator());
 	public static AtomicBoolean initialized = new AtomicBoolean(false);
 	public static void initialize() {
 		if (initialized.compareAndSet(false, true)) {

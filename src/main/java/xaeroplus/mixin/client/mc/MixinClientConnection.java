@@ -15,6 +15,6 @@ public class MixinClientConnection {
 
     @Inject(method = "handlePacket", at = @At("HEAD"))
     private static void receivePacket(final Packet<?> packet, final PacketListener listener, final CallbackInfo ci) {
-        XaeroPlus.EVENT_BUS.dispatch(new PacketReceivedEvent(packet));
+        XaeroPlus.EVENT_BUS.call(new PacketReceivedEvent(packet));
     }
 }

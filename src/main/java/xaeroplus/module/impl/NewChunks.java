@@ -1,9 +1,9 @@
 package xaeroplus.module.impl;
 
-import com.collarmc.pounce.Subscribe;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
+import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.nbt.NbtCompound;
@@ -68,7 +68,7 @@ public class NewChunks extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onPacketReceivedEvent(final PacketReceivedEvent event) {
         if (mc.world == null || ((AccessorWorldRenderer) mc.worldRenderer).getChunks() == null) return;
         // credits to BleachHack for this fluid flow based detection method
@@ -130,7 +130,7 @@ public class NewChunks extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
         if (XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.getValue()) {
             if (inUnknownDimension() && newChunksCache instanceof ChunkHighlightSavingCache) {
@@ -146,7 +146,7 @@ public class NewChunks extends Module {
         return dim != OVERWORLD && dim != NETHER && dim != END;
     }
 
-    @Subscribe
+    @EventHandler
     public void onClientTickEvent(final ClientTickEvent.Post event) {
         newChunksCache.handleTick();
     }

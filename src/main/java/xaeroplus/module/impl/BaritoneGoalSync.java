@@ -3,7 +3,7 @@ package xaeroplus.module.impl;
 import baritone.api.pathing.goals.Goal;
 import baritone.api.pathing.goals.GoalXZ;
 import baritone.api.utils.interfaces.IGoalRenderPos;
-import com.collarmc.pounce.Subscribe;
+import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -31,7 +31,7 @@ import static net.minecraft.world.World.OVERWORLD;
 @Module.ModuleInfo()
 public class BaritoneGoalSync extends Module {
 
-    @Subscribe
+    @EventHandler
     public void onClientTickEvent(final ClientTickEvent.Post event) {
         if (!BaritoneHelper.isBaritonePresent()) return;
         XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();

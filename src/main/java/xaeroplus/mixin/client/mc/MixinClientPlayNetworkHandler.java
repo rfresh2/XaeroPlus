@@ -17,6 +17,6 @@ public class MixinClientPlayNetworkHandler {
 
     @Inject(method = "onChunkData", at = @At("RETURN"))
     public void onChunkData(final ChunkDataS2CPacket packet, final CallbackInfo ci) {
-        XaeroPlus.EVENT_BUS.dispatch(new ChunkDataEvent(world.getChunk(packet.getChunkX(), packet.getChunkZ())));
+        XaeroPlus.EVENT_BUS.call(new ChunkDataEvent(world.getChunk(packet.getChunkX(), packet.getChunkZ())));
     }
 }

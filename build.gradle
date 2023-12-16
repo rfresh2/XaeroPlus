@@ -25,7 +25,6 @@ repositories {
 		name = "jitpack.io"
 		url = "https://jitpack.io"
 	}
-	jcenter()
 	mavenLocal()
 }
 
@@ -42,6 +41,7 @@ afterEvaluate {
 	loom.runs.configureEach {
 		// https://fabricmc.net/wiki/tutorial:mixin_hotswaps
 		vmArg "-javaagent:${ configurations.compileClasspath.find { it.name.contains("sponge-mixin") } }"
+//		vmArg("-Dmixin.debug.export=true")
 	}
 }
 
@@ -57,8 +57,8 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	jarLibs 'com.github.ben-manes.caffeine:caffeine:3.1.8'
-	jarLibs "com.github.collarmc:pounce:0e8492b68e"
-    jarLibs 'org.xerial:sqlite-jdbc:3.44.1.0'
+	implementation(include "net.lenni0451:LambdaEvents:2.4.0")
+	jarLibs 'org.xerial:sqlite-jdbc:3.44.1.0'
 
 	modImplementation "maven.modrinth:xaeros-world-map:${worldmap_version}_Fabric_1.20.4"
 	modImplementation "maven.modrinth:xaeros-minimap:${minimap_version}_Fabric_1.20.4"
@@ -67,7 +67,7 @@ dependencies {
 	modCompileOnly "maven.modrinth:waystones:15.0.1+fabric-1.20.2"
 	modCompileOnly "maven.modrinth:balm:8.0.1+fabric-1.20.2"
 	modCompileOnly "maven.modrinth:fwaystones:3.3.1+mc1.20.2"
-	modCompileOnly "maven.modrinth:owo-lib:0.11.3+1.20.2"
+//	modCompileOnly "maven.modrinth:owo-lib:0.11.3+1.20.2"
 //	runtimeOnly "blue.endless:jankson:1.2.3"
 //	modRuntimeOnly "maven.modrinth:auth-me:7.0.2+1.20"
 //	modRuntimeOnly "maven.modrinth:cloth-config:12.0.111+fabric"
@@ -125,7 +125,6 @@ shadowJar {
 	exclude 'org/sqlite/native/Windows/aarch64/**'
 	exclude 'org/sqlite/native/Windows/armv7/**'
 	exclude 'org/slf4j/**'
-	relocate "com.collarmc.pounce", "xaeroplus.com.collarmc.pounce.shadow"
 	relocate "com.github.benmanes.caffeine", "xaeroplus.com.github.benmanes.caffeine.shadow"
 }
 

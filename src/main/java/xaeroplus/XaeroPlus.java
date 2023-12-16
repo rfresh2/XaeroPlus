@@ -1,7 +1,9 @@
 package xaeroplus;
 
-import com.collarmc.pounce.EventBus;
 import com.github.benmanes.caffeine.cache.RemovalCause;
+import com.llamalad7.mixinextras.MixinExtrasBootstrap;
+import net.lenni0451.lambdaevents.LambdaManager;
+import net.lenni0451.lambdaevents.generator.LambdaMetaFactoryGenerator;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
@@ -23,13 +25,15 @@ import static net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get;
 @Mod(value = "xaeroplus")
 public class XaeroPlus {
 	public static final Logger LOGGER = LoggerFactory.getLogger("XaeroPlus");
-	public static final EventBus EVENT_BUS = new EventBus(Runnable::run);
+    public static final LambdaManager EVENT_BUS = LambdaManager.basic(new LambdaMetaFactoryGenerator());
 	public static final IEventBus FORGE_EVENT_BUS = MinecraftForge.EVENT_BUS;
 
 	public XaeroPlus() {
 		IEventBus modEventBus = get().getModEventBus();
 		DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> {
 			return () -> {
+				MixinExtrasBootstrap.init();
+				LOGGER.info("Initializing XaeroPlus");
 				modEventBus.addListener(this::onInitialize);
 				modEventBus.addListener(this::onRegisterKeyMappingsEvent);
 				FORGE_EVENT_BUS.register(modEventBus);

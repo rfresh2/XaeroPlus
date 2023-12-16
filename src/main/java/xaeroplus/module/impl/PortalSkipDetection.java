@@ -1,9 +1,9 @@
 package xaeroplus.module.impl;
 
-import com.collarmc.pounce.Subscribe;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
@@ -56,7 +56,7 @@ public class PortalSkipDetection extends Module {
     private OldChunks oldChunksModule;
     private NewChunks newChunksModule;
 
-    @Subscribe
+    @EventHandler
     public void onClientTickEvent(final ClientTickEvent.Post event) {
         if (!worldCacheInitialized
             || portalSkipDetectionSearchFuture != null
@@ -77,7 +77,7 @@ public class PortalSkipDetection extends Module {
         }
     }
 
-    @Subscribe
+    @EventHandler
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
         reset();
         initializeWorld();

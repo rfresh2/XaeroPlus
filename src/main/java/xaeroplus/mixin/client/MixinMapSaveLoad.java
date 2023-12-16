@@ -1,100 +1,32 @@
 package xaeroplus.mixin.client;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.world.biome.Biome;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import xaero.map.MapProcessor;
 import xaero.map.WorldMap;
-import xaero.map.biome.BiomeGetter;
-import xaero.map.cache.BlockStateShortShapeCache;
 import xaero.map.file.MapSaveLoad;
-import xaero.map.file.RegionDetection;
-import xaero.map.file.worldsave.WorldDataHandler;
-import xaero.map.region.*;
-import xaero.map.world.MapDimension;
+import xaero.map.region.LeveledRegion;
+import xaero.map.region.MapRegion;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 
-import java.io.*;
-import java.nio.file.Files;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import static xaeroplus.Globals.decompressZipToBytes;
 
 @Mixin(value = MapSaveLoad.class, remap = false)
 public abstract class MixinMapSaveLoad {
-    @Shadow
-    private MapProcessor mapProcessor;
-    @Shadow
-    private ArrayList<BlockState> regionLoadPalette;
-    @Shadow
-    private ArrayList<RegistryKey<Biome>> regionLoadBiomePalette;
-    @Shadow
-    private HashMap<BlockState, Integer> regionSavePalette;
-    @Shadow
-    private HashMap<RegistryKey<Biome>, Integer> regionSaveBiomePalette;
-    @Shadow
-    public abstract File getFile(MapRegion region);
-    @Shadow
-    public abstract File getNormalFile(MapRegion region);
-    @Shadow
-    public abstract void backupFile(File file, int saveVersion);
-    @Shadow
-    private BlockStateShortShapeCache blockStateShortShapeCache;
-    @Shadow
-    protected abstract void loadPixel(
-            Integer next,
-            MapBlock pixel,
-            DataInputStream in,
-            int minorSaveVersion,
-            int majorSaveVersion,
-            boolean is115not114,
-            RegistryWrapper<Block> blockLookup,
-            BiomeGetter biomeGetter,
-            Registry<Biome> biomeRegistry
-    ) throws IOException;
-    @Shadow
-    public abstract void safeDelete(Path filePath, String extension);
-    @Shadow
-    public abstract File getTempFile(File realFile);
-    @Shadow
-    protected abstract void savePixel(MapBlock pixel, DataOutputStream out, Registry<Biome> biomeRegistry);
-    @Shadow
-    public abstract void safeMoveAndReplace(Path fromPath, Path toPath, String fromExtension, String toExtension);
-    @Shadow
-    public abstract Path getMWSubFolder(String world, String dim, String mw);
-    @Shadow
-    public abstract void detectRegionsFromFiles(
-            MapDimension mapDimension,
-            String worldId,
-            String dimId,
-            String mwId,
-            Path folder,
-            String regex,
-            int xIndex,
-            int zIndex,
-            int emptySize,
-            int attempts,
-            Consumer<RegionDetection> detectionConsumer
-    );
-
     @Inject(method = "getOldFolder", at = @At(value = "HEAD"), cancellable = true)
     public void getOldFolder(final String oldUnfixedMainId, final String dim, final CallbackInfoReturnable<Path> cir) {
         if (!Globals.nullOverworldDimensionFolder) {
@@ -106,450 +38,38 @@ public abstract class MixinMapSaveLoad {
         }
     }
 
-    /**
-     * @author rfresh2
-     * @reason faster zip writes
-     */
-    @Overwrite
-    public boolean loadRegion(MapRegion region,
-                              RegistryWrapper<Block> blockLookup,
-                              Registry<Block> blockRegistry,
-                              Registry<Fluid> fluidRegistry,
-                              BiomeGetter biomeGetter,
-                              int extraAttempts) {
-        boolean multiplayer = region.isNormalMapData();
-        int emptySize = multiplayer ? 0 : 8192;
-        int minorSaveVersion = -1;
-        int majorSaveVersion = 0;
-        boolean versionReached = false;
-
-        try {
-            File file = this.getFile(region);
-            if (region.hasHadTerrain() && file != null && file.exists() && Files.size(file.toPath()) > (long) emptySize) {
-                synchronized (region) {
-                    region.setLoadState((byte) 1);
-                }
-
-                region.setSaveExists(true);
-                region.restoreBufferUpdateObjects();
-                int totalChunks = 0;
-                if (multiplayer) {
-                    this.regionLoadPalette.clear();
-                    this.regionLoadBiomePalette.clear();
-                    try (DataInputStream in = new DataInputStream(new ByteArrayInputStream(decompressZipToBytes(file.toPath())))) {
-                        // fast zip
-                        int firstByte = in.read();
-                        boolean is115not114 = false;
-                        if (firstByte == 255) {
-                            int fullVersion = in.readInt();
-                            minorSaveVersion = fullVersion & 65535;
-                            majorSaveVersion = fullVersion >> 16 & 65535;
-                            if (majorSaveVersion == 2 && minorSaveVersion >= 5) {
-                                is115not114 = in.read() == 1;
-                            }
-
-                            if (8 < minorSaveVersion || 6 < majorSaveVersion) {
-                                WorldMap.LOGGER.info("Trying to load a newer region " + region + " save using an older version of Xaero's World Map!");
-                                this.backupFile(file, fullVersion);
-                                region.setSaveExists(null);
-                                return false;
-                            }
-
-                            firstByte = -1;
-                        }
-
-                        versionReached = true;
-                        synchronized (region.getLevel() == 3 ? region : region.getParent()) {
-                            synchronized (region) {
-                                for (int o = 0; o < 8; ++o) {
-                                    for (int p = 0; p < 8; ++p) {
-                                        MapTileChunk chunk = region.getChunk(o, p);
-                                        if (chunk != null) {
-                                            chunk.setLoadState((byte) 1);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        Registry<Biome> biomeRegistry = region.getBiomeRegistry();
-
-                        while (true) {
-                            int chunkCoords = firstByte == -1 ? in.read() : firstByte;
-                            if (chunkCoords == -1) {
-                                break;
-                            }
-
-                            firstByte = -1;
-                            int o = chunkCoords >> 4;
-                            int p = chunkCoords & 15;
-                            MapTileChunk chunk = region.getChunk(o, p);
-                            if (chunk == null) {
-                                region.setChunk(o, p, chunk = new MapTileChunk(region, (region.getRegionX() << 3) + o, (region.getRegionZ() << 3) + p));
-                            }
-
-                            if (region.isMetaLoaded()) {
-                                chunk.getLeafTexture().setBufferedTextureVersion(region.getAndResetCachedTextureVersion(o, p));
-                            }
-
-                            chunk.resetHeights();
-
-                            for(int i = 0; i < 4; ++i) {
-                                for(int j = 0; j < 4; ++j) {
-                                    Integer nextTile = in.readInt();
-                                    if (nextTile != -1) {
-                                        MapTile tile = this.mapProcessor
-                                                .getTilePool()
-                                                .get(this.mapProcessor.getDimensionName(this.mapProcessor.getMapWorld().getCurrentDimensionId()), chunk.getX() * 4 + i, chunk.getZ() * 4 + j);
-
-                                        for(int x = 0; x < 16; ++x) {
-                                            MapBlock[] c = tile.getBlockColumn(x);
-
-                                            for(int z = 0; z < 16; ++z) {
-                                                if (c[z] == null) {
-                                                    c[z] = new MapBlock();
-                                                } else {
-                                                    c[z].prepareForWriting(0);
-                                                }
-
-                                                this.loadPixel(
-                                                        nextTile, c[z], in, minorSaveVersion, majorSaveVersion, is115not114, blockLookup, biomeGetter, biomeRegistry
-                                                );
-                                                nextTile = null;
-                                            }
-                                        }
-
-                                        if (minorSaveVersion >= 4) {
-                                            tile.setWorldInterpretationVersion(in.read());
-                                        }
-
-                                        if (minorSaveVersion >= 6) {
-                                            tile.setWrittenCave(in.readInt(), minorSaveVersion >= 7 ? in.read() : 32);
-                                        }
-
-                                        chunk.setTile(i, j, tile, this.blockStateShortShapeCache);
-                                        tile.setLoaded(true);
-                                    }
-                                }
-                            }
-
-                            if (!chunk.includeInSave()) {
-                                if (!chunk.hasHighlightsIfUndiscovered()) {
-                                    region.uncountTextureBiomes(chunk.getLeafTexture());
-                                    region.setChunk(o, p, null);
-                                    chunk.getLeafTexture().deleteTexturesAndBuffers();
-                                    MapTileChunk var60 = null;
-                                }
-                            } else {
-                                region.pushWriterPause();
-                                ++totalChunks;
-                                chunk.setToUpdateBuffers(true);
-                                chunk.setLoadState((byte)2);
-                                region.popWriterPause();
-                            }
-                        }
-                    }
-
-                    if (totalChunks > 0) {
-                        if (WorldMap.settings.debug) {
-                            WorldMap.LOGGER
-                                    .info(
-                                            "Region loaded: "
-                                                    + region
-                                                    + " "
-                                                    + region.getWorldId()
-                                                    + " "
-                                                    + region.getDimId()
-                                                    + " "
-                                                    + region.getMwId()
-                                                    + ", "
-                                                    + majorSaveVersion
-                                                    + " "
-                                                    + minorSaveVersion
-                                    );
-                        }
-                        return true;
-                    } else {
-                        region.setSaveExists(null);
-                        this.safeDelete(file.toPath(), ".zip");
-                        if (WorldMap.settings.debug) {
-                            WorldMap.LOGGER
-                                    .info(
-                                            "Cancelled loading an empty region: "
-                                                    + region
-                                                    + " "
-                                                    + region.getWorldId()
-                                                    + " "
-                                                    + region.getDimId()
-                                                    + " "
-                                                    + region.getMwId()
-                                                    + ", "
-                                                    + majorSaveVersion
-                                                    + " "
-                                                    + minorSaveVersion
-                                    );
-                        }
-
-                        return false;
-                    }
-                } else {
-                    int[] chunkCount = new int[1];
-                    WorldDataHandler.Result buildResult = this.mapProcessor
-                            .getWorldDataHandler()
-                        .buildRegion(region, blockLookup, blockRegistry, fluidRegistry, true, chunkCount);
-                    if (buildResult == WorldDataHandler.Result.CANCEL) {
-                        if (region.hasHadTerrain()) {
-                            RegionDetection restoredDetection = new RegionDetection(
-                                    region.getWorldId(),
-                                    region.getDimId(),
-                                    region.getMwId(),
-                                    region.getRegionX(),
-                                    region.getRegionZ(),
-                                    region.getRegionFile(),
-                                    this.mapProcessor.getGlobalVersion(),
-                                    true
-                            );
-                            restoredDetection.transferInfoFrom(region);
-                            region.getDim().getLayeredMapRegions().getLayer(region.getCaveLayer()).addRegionDetection(restoredDetection);
-                        }
-
-                        this.mapProcessor.removeMapRegion(region);
-                        WorldMap.LOGGER
-                                .info("Region cancelled from world save: " + region + " " + region.getWorldId() + " " + region.getDimId() + " " + region.getMwId());
-                        return false;
-                    } else {
-                        region.setRegionFile(file);
-                        boolean result = buildResult == WorldDataHandler.Result.SUCCESS && chunkCount[0] > 0;
-                        if (!result) {
-                            region.setSaveExists(null);
-                            if (WorldMap.settings.debug) {
-                                WorldMap.LOGGER
-                                        .info(
-                                                "Region failed to load from world save: "
-                                                        + region
-                                                        + " "
-                                                        + region.getWorldId()
-                                                        + " "
-                                                        + region.getDimId()
-                                                        + " "
-                                                        + region.getMwId()
-                                        );
-                            }
-                        } else if (WorldMap.settings.debug) {
-                            WorldMap.LOGGER
-                                    .info("Region loaded from world save: " + region + " " + region.getWorldId() + " " + region.getDimId() + " " + region.getMwId());
-                        }
-
-                        return result;
-                    }
-                }
-            } else {
-                if (region.getLoadState() == 4 || region.hasHadTerrain()) {
-                    region.setSaveExists(null);
-                }
-
-                if (region.hasHadTerrain()) {
-                    return false;
-                } else {
-                    synchronized(region) {
-                        region.setLoadState((byte)1);
-                    }
-
-                    region.restoreBufferUpdateObjects();
-                    if (WorldMap.settings.debug) {
-                        WorldMap.LOGGER
-                                .info("Highlight region fake-loaded: " + region + " " + region.getWorldId() + " " + region.getDimId() + " " + region.getMwId());
-                    }
-
-                    return true;
-                }
-            }
-        } catch (IOException var49) {
-            WorldMap.LOGGER.error("IO exception while trying to load " + region, var49);
-            if (extraAttempts > 0) {
-                synchronized(region) {
-                    region.setLoadState((byte)4);
-                }
-
-                WorldMap.LOGGER.info("Retrying...");
-
-                try {
-                    Thread.sleep(20L);
-                } catch (InterruptedException var42) {
-                }
-
-                return this.loadRegion(region, blockLookup, blockRegistry, fluidRegistry, biomeGetter, extraAttempts - 1);
-            } else {
-                region.setSaveExists(null);
-                return false;
-            }
-        } catch (Throwable var50) {
-            region.setSaveExists(null);
-            WorldMap.LOGGER.error("Region failed to load: " + region + (versionReached ? " " + majorSaveVersion + " " + minorSaveVersion : ""), var50);
-            return false;
-        }
+    @WrapOperation(method = "saveRegion", at = @At(
+        value = "NEW",
+        args = "class=java/io/DataOutputStream"
+    ))
+    public DataOutputStream replaceSaveRegionZipOutputStream(final OutputStream out, final Operation<DataOutputStream> original,
+                                                             @Share("byteOut") final LocalRef<ByteArrayOutputStream> byteOutRef,
+                                                             @Local(name = "zipOut") final ZipOutputStream zipOut,
+                                                             @Share("zipOutShare") final LocalRef<ZipOutputStream> zipOutShare) {
+        zipOutShare.set(zipOut);
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        byteOutRef.set(byteOut);
+        return new DataOutputStream(byteOut);
     }
 
-    /**
-     * @author rfresh2
-     * @reason zip fast
-     */
-    @Overwrite
-    private boolean saveRegion(MapRegion region, int extraAttempts) {
-        try {
-            if (!region.hasHadTerrain()) {
-                if (WorldMap.settings.debug) {
-                    WorldMap.LOGGER.info("Save not required for highlight-only region: " + region + " " + region.getWorldId() + " " + region.getDimId());
-                }
+    @Inject(method = "saveRegion", at = @At(
+        value = "INVOKE",
+        target = "Ljava/util/zip/ZipOutputStream;closeEntry()V"
+    ))
+    public void saveRegionWriteZipOutputStream(final MapRegion region, final int extraAttempts, final CallbackInfoReturnable<Boolean> cir,
+                                               @Share("byteOut") final LocalRef<ByteArrayOutputStream> byteOutRef,
+                                               @Local(name = "zipOut") final ZipOutputStream zipOut) throws IOException {
+        byteOutRef.get().writeTo(zipOut);
+    }
 
-                return region.countChunks() > 0;
-            } else if (!region.isResaving() && !region.isNormalMapData()) {
-                if (WorldMap.settings.debug) {
-                    WorldMap.LOGGER.info("Save not required for world save map: " + region + " " + region.getWorldId() + " " + region.getDimId());
-                }
-
-                return region.countChunks() > 0;
-            } else {
-                File permFile = this.getNormalFile(region);
-                if (!permFile.toPath().startsWith(WorldMap.saveFolder.toPath())) {
-                    throw new IllegalArgumentException();
-                } else {
-                    File file = this.getTempFile(permFile);
-                    if (file == null) {
-                        return true;
-                    } else {
-                        if (!file.exists()) {
-                            file.createNewFile();
-                        }
-
-                        boolean hasAnything = false;
-                        boolean regionWasSavedEmpty = true;
-                        ByteArrayOutputStream byteOut = new ByteArrayOutputStream(); // does not need to be closed
-
-                        try(DataOutputStream out = new DataOutputStream(byteOut);
-                            ZipOutputStream zipOut = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(file.toPath())))) {
-                            //zip fast
-                            ZipEntry e = new ZipEntry("region.xaero");
-                            zipOut.putNextEntry(e);
-                            int fullVersion = 393224;
-                            out.write(255);
-                            out.writeInt(fullVersion);
-                            this.regionSavePalette.clear();
-                            this.regionSaveBiomePalette.clear();
-                            Registry<Biome> biomeRegistry = region.getBiomeRegistry();
-
-                            for(int o = 0; o < 8; ++o) {
-                                for(int p = 0; p < 8; ++p) {
-                                    MapTileChunk chunk = region.getChunk(o, p);
-                                    if (chunk != null) {
-                                        hasAnything = true;
-                                        if (!chunk.includeInSave()) {
-                                            if (!chunk.hasHighlightsIfUndiscovered()) {
-                                                region.uncountTextureBiomes(chunk.getLeafTexture());
-                                                region.setChunk(o, p, null);
-                                                synchronized(chunk) {
-                                                    chunk.getLeafTexture().deleteTexturesAndBuffers();
-                                                }
-                                            }
-
-                                            BranchLeveledRegion parentRegion = region.getParent();
-                                            if (parentRegion != null) {
-                                                parentRegion.setShouldCheckForUpdatesRecursive(true);
-                                            }
-                                        } else {
-                                            out.write(o << 4 | p);
-                                            boolean chunkIsEmpty = true;
-
-                                            for(int i = 0; i < 4; ++i) {
-                                                for(int j = 0; j < 4; ++j) {
-                                                    MapTile tile = chunk.getTile(i, j);
-                                                    if (tile != null && tile.isLoaded()) {
-                                                        chunkIsEmpty = false;
-
-                                                        for(int x = 0; x < 16; ++x) {
-                                                            MapBlock[] c = tile.getBlockColumn(x);
-
-                                                            for(int z = 0; z < 16; ++z) {
-                                                                this.savePixel(c[z], out, biomeRegistry);
-                                                            }
-                                                        }
-
-                                                        out.write(tile.getWorldInterpretationVersion());
-                                                        out.writeInt(tile.getWrittenCaveStart());
-                                                        out.write(tile.getWrittenCaveDepth());
-                                                    } else {
-                                                        out.writeInt(-1);
-                                                    }
-                                                }
-                                            }
-
-                                            if (!chunkIsEmpty) {
-                                                regionWasSavedEmpty = false;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            byteOut.writeTo(zipOut);
-                            zipOut.closeEntry();
-                        }
-
-                        if (regionWasSavedEmpty) {
-                            this.safeDelete(permFile.toPath(), ".zip");
-                            this.safeDelete(file.toPath(), ".temp");
-                            if (WorldMap.settings.debug) {
-                                WorldMap.LOGGER
-                                    .info(
-                                        "Save cancelled because the region would be saved empty: "
-                                            + region
-                                            + " "
-                                            + region.getWorldId()
-                                            + " "
-                                            + region.getDimId()
-                                            + " "
-                                            + region.getMwId()
-                                    );
-                            }
-
-                            return hasAnything;
-                        } else {
-                            this.safeMoveAndReplace(file.toPath(), permFile.toPath(), ".temp", ".zip");
-                            if (WorldMap.settings.debug) {
-                                WorldMap.LOGGER
-                                    .info(
-                                        "Region saved: "
-                                            + region
-                                            + " "
-                                            + region.getWorldId()
-                                            + " "
-                                            + region.getDimId()
-                                            + " "
-                                            + region.getMwId()
-                                            + ", "
-                                            + this.mapProcessor.getMapWriter().getUpdateCounter()
-                                    );
-                            }
-
-                            return true;
-                        }
-                    }
-                }
-            }
-        } catch (IOException var30) {
-            WorldMap.LOGGER.error("IO exception while trying to save " + region, var30);
-            if (extraAttempts > 0) {
-                WorldMap.LOGGER.info("Retrying...");
-
-                try {
-                    Thread.sleep(20L);
-                } catch (InterruptedException var27) {
-                }
-
-                return this.saveRegion(region, extraAttempts - 1);
-            } else {
-                return true;
-            }
-        }
+    @Inject(method = "saveRegion", at = @At(
+        value = "INVOKE",
+        target = "Ljava/io/DataOutputStream;close()V"
+    ))
+    public void closeZipOutputStream(final MapRegion region, final int extraAttempts, final CallbackInfoReturnable<Boolean> cir,
+                                     @Share("zipOutShare") final LocalRef<ZipOutputStream> zipOutShare
+    ) throws IOException {
+        zipOutShare.get().close();
     }
 
     @Redirect(method = "run", at = @At(value = "INVOKE", target = "Lxaero/map/region/LeveledRegion;isAllCachePrepared()Z", ordinal = 0))

@@ -1,437 +1,94 @@
 package xaeroplus.mixin.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.llamalad7.mixinextras.injector.WrapWithCondition;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.world.World;
-import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL14;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import xaero.common.IXaeroMinimap;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.XaeroMinimapSession;
-import xaero.common.effect.Effects;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRenderer;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
 import xaero.common.minimap.render.MinimapRendererHelper;
-import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.mods.SupportXaeroWorldmap;
 import xaero.map.MapProcessor;
-import xaero.map.WorldMap;
-import xaero.map.WorldMapSession;
-import xaero.map.graphics.CustomRenderTypes;
-import xaero.map.graphics.shader.MapShaders;
-import xaero.map.misc.Misc;
-import xaero.map.region.LeveledRegion;
-import xaero.map.region.MapRegion;
 import xaero.map.region.MapTileChunk;
 import xaeroplus.Globals;
-import xaeroplus.feature.extensions.CustomSupportXaeroWorldMap;
 import xaeroplus.feature.render.MinimapBackgroundDrawHelper;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.function.IntConsumer;
-
 @Mixin(value = SupportXaeroWorldmap.class, remap = false)
-public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWorldMap {
-    @Shadow
-    public int compatibilityVersion;
-    @Shadow
-    private IXaeroMinimap modMain;
-    @Shadow
-    private int destinationCaving;
-    @Shadow
-    private long lastDestinationCavingSwitch;
-    @Shadow
-    private int previousRenderedCaveLayer;
-    @Shadow
-    private int lastRenderedCaveLayer;
-    @Shadow
-    private ArrayList<MapRegion> regionBuffer;
-    @Final
-    @Shadow
-    private static HashMap<MapTileChunk, Long> seedsUsed;
+public abstract class MixinSupportXaeroWorldmap {
+    @Inject(method = "drawMinimap", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/map/settings/ModSettings;getRegionCacheHashCode()I"
+    ), remap = true)
+    public void overrideRegionRange(final XaeroMinimapSession minimapSession, final MatrixStack matrixStack, final MinimapRendererHelper helper, final int xFloored, final int zFloored, final int minViewX, final int minViewZ, final int maxViewX, final int maxViewZ, final boolean zooming, final double zoom, final double mapDimensionScale, final VertexConsumer overlayBufferBuilder, final MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers, final CallbackInfo ci,
+                                  @Local(name = "mapX") int mapX,
+                                  @Local(name = "mapZ") int mapZ,
+                                  @Local(name = "minX") LocalIntRef minXRef,
+                                  @Local(name = "maxX") LocalIntRef maxXRef,
+                                  @Local(name = "minZ") LocalIntRef minZRef,
+                                  @Local(name = "maxZ") LocalIntRef maxZRef
+    ) {
+        final int scaledSize = Globals.minimapScalingFactor * 4;
+        minXRef.set((mapX >> 2) - scaledSize);
+        maxXRef.set((mapX >> 2) + scaledSize);
+        minZRef.set((mapZ >> 2) - scaledSize);
+        maxZRef.set((mapZ >> 2) + scaledSize);
+    }
 
-    @Shadow
-    public abstract float getMinimapBrightness();
-    @Shadow
-    public abstract void prepareMapTexturedRect(
-            Matrix4f matrix,
-            float x,
-            float y,
-            int textureX,
-            int textureY,
-            float width,
-            float height,
-            MapTileChunk chunk,
-            MultiTextureRenderTypeRenderer noLightRenderer,
-            MultiTextureRenderTypeRenderer withLightrenderer,
-            MinimapRendererHelper helper
-    );
-    @Shadow
-    public abstract void renderSlimeChunks(
-        MapTileChunk chunk, Long seed, int drawX, int drawZ, MatrixStack matrixStack, MinimapRendererHelper helper, VertexConsumer overlayBufferBuilder
-    );
-    @Shadow
-    public abstract boolean hasDimensionSwitching();
-    @Shadow
-    public abstract double getMapDimensionScale();
-    @Shadow
-    public abstract RegistryKey<World> getMapDimension();
-    @Shadow
-    public abstract void bumpLoadedRegion(MapProcessor mapProcessor, MapRegion region);
-
-    @Override
-    public void drawMinimapWithDrawContext(
-            DrawContext guiGraphics,
-            XaeroMinimapSession minimapSession,
-            MatrixStack matrixStack,
-            MinimapRendererHelper helper,
-            int xFloored,
-            int zFloored,
-            int minViewX,
-            int minViewZ,
-            int maxViewX,
-            int maxViewZ,
-            boolean zooming,
-            double zoom,
-            double mapDimensionScale,
-            VertexConsumer overlayBufferBuilder,
-            MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers) {
-        WorldMapSession worldmapSession = WorldMapSession.getCurrentSession();
-        if (worldmapSession != null) {
-            MapProcessor mapProcessor = worldmapSession.getMapProcessor();
-            synchronized(mapProcessor.renderThreadPauseSync) {
-                if (!mapProcessor.isRenderingPaused()) {
-                    if (mapProcessor.getCurrentDimension() == null) {
-                        return;
-                    }
-                    int compatibilityVersion = this.compatibilityVersion;
-                    String worldString = mapProcessor.getCurrentWorldId();
-                    if (worldString == null) {
-                        return;
-                    }
-
-                    MapShaders.ensureShaders();
-                    int mapX = xFloored >> 4;
-                    int mapZ = zFloored >> 4;
-                    int chunkX = mapX >> 2;
-                    int chunkZ = mapZ >> 2;
-                    int tileX = mapX & 3;
-                    int tileZ = mapZ & 3;
-                    int insideX = xFloored & 15;
-                    int insideZ = zFloored & 15;
-                    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-                    RenderSystem.enableBlend();
-                    final int scaledSize = Globals.minimapScalingFactor * 4;
-                    int minX = (mapX >> 2) - scaledSize;
-                    int maxX = (mapX >> 2) + scaledSize;
-                    int minZ = (mapZ >> 2) - scaledSize;
-                    int maxZ = (mapZ >> 2) + scaledSize;
-                    boolean wmHasFullReload = compatibilityVersion >= 23;
-                    int globalRegionCacheHashCode = WorldMap.settings.getRegionCacheHashCode();
-                    boolean reloadEverything = WorldMap.settings.reloadEverything;
-                    int globalReloadVersion = WorldMap.settings.reloadVersion;
-                    boolean slimeChunks = this.modMain.getSettings().getSlimeChunks(minimapSession.getWaypointsManager());
-                    boolean wmHasDimensionSwitch = this.hasDimensionSwitching();
-                    if (wmHasDimensionSwitch) {
-                        mapProcessor.initMinimapRender(xFloored, zFloored);
-                    }
-
-                    if (!wmHasDimensionSwitch) {
-                        mapProcessor.updateCaveStart();
-                    }
-
-                    int renderedCaveLayer = mapProcessor.getCurrentCaveLayer();
-                    int globalCaveStart = !wmHasDimensionSwitch
-                        ? mapProcessor.getMapWorld().getCurrentDimension().getLayeredMapRegions().getLayer(renderedCaveLayer).getCaveStart()
-                        : 0;
-                    int globalCaveDepth = !wmHasDimensionSwitch ? WorldMap.settings.caveModeDepth : 0;
-                    float brightness = this.getMinimapBrightness();
-                    if (renderedCaveLayer != this.lastRenderedCaveLayer) {
-                        this.previousRenderedCaveLayer = this.lastRenderedCaveLayer;
-                    }
-
-                    PlayerEntity player = MinecraftClient.getInstance().player;
-                    boolean noCaveMaps = player.hasStatusEffect(Effects.NO_CAVE_MAPS) || player.hasStatusEffect(Effects.NO_CAVE_MAPS_HARMFUL);
-                    boolean playerIsMoving = !wmHasDimensionSwitch
-                        && (player.prevX != player.getX() || player.prevY != player.getY() || player.prevZ != player.getZ());
-                    boolean shouldRequestLoading = true;
-                    Object nextToLoadObj = null;
-                    shouldRequestLoading = false;
-                    if (!wmHasDimensionSwitch) {
-                        LeveledRegion<?> nextToLoad = mapProcessor.getMapSaveLoad().getNextToLoadByViewing();
-                        nextToLoadObj = nextToLoad;
-                        if (nextToLoad != null) {
-                            if (wmHasFullReload) {
-                                shouldRequestLoading = nextToLoad.shouldAllowAnotherRegionToLoad();
-                            } else {
-                                synchronized(nextToLoad) {
-                                    if (!nextToLoad.reloadHasBeenRequested()
-                                        && !nextToLoad.hasRemovableSourceData()
-                                        && (!(nextToLoad instanceof MapRegion) || !((MapRegion)nextToLoad).isRefreshing())) {
-                                        shouldRequestLoading = true;
-                                    }
-                                }
-                            }
-                        } else {
-                            shouldRequestLoading = true;
-                        }
-
-                        this.regionBuffer.clear();
-                        int comparisonChunkX = (player.getBlockPos().getX() >> 4) - 16;
-                        int comparisonChunkZ = (player.getBlockPos().getZ() >> 4) - 16;
-                        LeveledRegion.setComparison(comparisonChunkX, comparisonChunkZ, 0, comparisonChunkX, comparisonChunkZ);
-                    }
-                    MultiTextureRenderTypeRenderer mapWithLightRenderer = null;
-                    MultiTextureRenderTypeRenderer mapNoLightRenderer = null;
-                    Runnable finalizer = null;
-                    IntConsumer binder;
-                    IntConsumer shaderBinder;
-                    if (zooming) {
-                        binder = t -> {
-                            MultiTextureRenderTypeRendererProvider.defaultTextureBind(t);
-                            GL11.glTexParameteri(3553, 10240, 9729);
-                        };
-                        shaderBinder = t -> {
-                            RenderSystem.setShaderTexture(0, t);
-                            MultiTextureRenderTypeRendererProvider.defaultTextureBind(t);
-                            GL11.glTexParameteri(3553, 10240, 9729);
-                        };
-                        finalizer = () -> GL11.glTexParameteri(3553, 10240, 9728);
-                    } else {
-                        binder = MultiTextureRenderTypeRendererProvider::defaultTextureBind;
-                        shaderBinder = t -> RenderSystem.setShaderTexture(0, t);
-                    }
-
-                    mapWithLightRenderer = multiTextureRenderTypeRenderers.getRenderer(shaderBinder, binder, finalizer, CustomRenderTypes.MAP);
-                    mapNoLightRenderer = multiTextureRenderTypeRenderers.getRenderer(shaderBinder, binder, finalizer, CustomRenderTypes.MAP);
-                    WaypointWorld world = minimapSession.getWaypointsManager().getAutoWorld();
-                    Long seed = slimeChunks && world != null ? this.modMain.getSettings().getSlimeChunksSeed(world.getFullId()) : null;
-                    this.renderChunksWithDrawContext(
-                        guiGraphics,
-                        matrixStack,
-                        minX,
-                        maxX,
-                        minZ,
-                        maxZ,
-                        minViewX,
-                        maxViewX,
-                        minViewZ,
-                        maxViewZ,
-                        mapProcessor,
-                        renderedCaveLayer,
-                        shouldRequestLoading,
-                        reloadEverything,
-                        globalReloadVersion,
-                        globalRegionCacheHashCode,
-                        globalCaveStart,
-                        globalCaveDepth,
-                        playerIsMoving,
-                        noCaveMaps,
-                        slimeChunks,
-                        chunkX,
-                        chunkZ,
-                        tileX,
-                        tileZ,
-                        insideX,
-                        insideZ,
-                        seed,
-                        mapWithLightRenderer,
-                        mapNoLightRenderer,
-                        helper,
-                        overlayBufferBuilder
-                    );
-
-                    MapShaders.WORLD_MAP.setBrightness(brightness);
-                    MapShaders.WORLD_MAP.setWithLight(true);
-                    multiTextureRenderTypeRenderers.draw(mapWithLightRenderer);
-                    MapShaders.WORLD_MAP.setWithLight(false);
-                    multiTextureRenderTypeRenderers.draw(mapNoLightRenderer);
-                    GL14.glBlendFuncSeparate(770, 771, 1, 0);
-                    RenderSystem.disableBlend();
-                    this.lastRenderedCaveLayer = renderedCaveLayer;
-                    if (wmHasDimensionSwitch) {
-                        mapProcessor.finalizeMinimapRender();
-                    } else {
-                        int toRequest = 1;
-                        int counter = 0;
-
-                        for(int i = 0; i < this.regionBuffer.size() && counter < toRequest; ++i) {
-                            MapRegion region = this.regionBuffer.get(i);
-                            if (region != nextToLoadObj || this.regionBuffer.size() <= 1) {
-                                synchronized(region) {
-                                    if (!wmHasFullReload || region.canRequestReload_unsynced()) {
-                                        if (wmHasFullReload
-                                            || !region.reloadHasBeenRequested()
-                                            && !region.recacheHasBeenRequested()
-                                            && (!(region instanceof MapRegion) || !region.isRefreshing())
-                                            && (region.getLoadState() == 0 || region.getLoadState() == 4 || region.getLoadState() == 2 && region.isBeingWritten())) {
-                                            if (region.getLoadState() == 2) {
-                                                region.requestRefresh(mapProcessor);
-                                            } else {
-                                                mapProcessor.getMapSaveLoad().requestLoad(region, "Minimap sorted", false);
-                                            }
-
-                                            if (counter == 0) {
-                                                mapProcessor.getMapSaveLoad().setNextToLoadByViewing(region);
-                                            }
-
-                                            ++counter;
-                                            if (region.getLoadState() == 4) {
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+    @Inject(method = "renderChunks", at = @At("HEAD"), remap = true)
+    public void setupTransparentMMBgBuffer(final MatrixStack matrixStack, final int minX, final int maxX, final int minZ, final int maxZ, final int minViewX, final int maxViewX, final int minViewZ, final int maxViewZ, final MapProcessor mapProcessor, final int renderedCaveLayer, final boolean shouldRequestLoading, final boolean reloadEverything, final int globalReloadVersion, final int globalRegionCacheHashCode, final int globalCaveStart, final int globalCaveDepth, final boolean playerIsMoving, final boolean noCaveMaps, final boolean slimeChunks, final int chunkX, final int chunkZ, final int tileX, final int tileZ, final int insideX, final int insideZ, final Long seed, final MultiTextureRenderTypeRenderer mapWithLightRenderer, final MultiTextureRenderTypeRenderer mapNoLightRenderer, final MinimapRendererHelper helper, final VertexConsumer overlayBufferBuilder, final CallbackInfo ci,
+                                           @Share("bgTesselator") LocalRef<Tessellator> bgTesselatorRef,
+                                           @Share("bgBufferBuilder") LocalRef<BufferBuilder> bgBufferBuilderRef
+    ) {
+        if (XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) {
+            var bgTesselator = Tessellator.getInstance();
+            bgTesselatorRef.set(bgTesselator);
+            var bgBufferBuilder = bgTesselator.getBuffer();
+            bgBufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+            bgBufferBuilderRef.set(bgBufferBuilder);
         }
     }
 
-    @Override
-    public void renderChunksWithDrawContext(
-        DrawContext guiGraphics,
-        MatrixStack matrixStack,
-        int minX,
-        int maxX,
-        int minZ,
-        int maxZ,
-        int minViewX,
-        int maxViewX,
-        int minViewZ,
-        int maxViewZ,
-        MapProcessor mapProcessor,
-        int renderedCaveLayer,
-        boolean shouldRequestLoading,
-        boolean reloadEverything,
-        int globalReloadVersion,
-        int globalRegionCacheHashCode,
-        int globalCaveStart,
-        int globalCaveDepth,
-        boolean playerIsMoving,
-        boolean noCaveMaps,
-        boolean slimeChunks,
-        int chunkX,
-        int chunkZ,
-        int tileX,
-        int tileZ,
-        int insideX,
-        int insideZ,
-        Long seed,
-        MultiTextureRenderTypeRenderer mapWithLightRenderer,
-        MultiTextureRenderTypeRenderer mapNoLightRenderer,
-        MinimapRendererHelper helper,
-        VertexConsumer overlayBufferBuilder
+    @Inject(method = "renderChunks", at = @At(
+        value = "INVOKE",
+        target = "Lorg/lwjgl/opengl/GL11;glTexParameterf(IIF)V"
+    ), remap = true)
+    public void renderTransparentMMBg(final MatrixStack matrixStack, final int minX, final int maxX, final int minZ, final int maxZ, final int minViewX, final int maxViewX, final int minViewZ, final int maxViewZ, final MapProcessor mapProcessor, final int renderedCaveLayer, final boolean shouldRequestLoading, final boolean reloadEverything, final int globalReloadVersion, final int globalRegionCacheHashCode, final int globalCaveStart, final int globalCaveDepth, final boolean playerIsMoving, final boolean noCaveMaps, final boolean slimeChunks, final int chunkX, final int chunkZ, final int tileX, final int tileZ, final int insideX, final int insideZ, final Long seed, final MultiTextureRenderTypeRenderer mapWithLightRenderer, final MultiTextureRenderTypeRenderer mapNoLightRenderer, final MinimapRendererHelper helper, final VertexConsumer overlayBufferBuilder, final CallbackInfo ci,
+                                      @Share("bgBufferBuilder") LocalRef<BufferBuilder> bgBufferBuilderRef,
+                                      @Local(name = "chunk") MapTileChunk chunk
     ) {
-        final boolean isDimensionSwitched = Globals.getCurrentDimensionId() != MinecraftClient.getInstance().world.getRegistryKey();
-        MapRegion prevRegion = null;
-        Tessellator bgTesselator = Tessellator.getInstance();
-        BufferBuilder bgBufferBuilder = bgTesselator.getBuffer();
-        if (XaeroPlusSettingRegistry.transparentMinimapBackground.getValue())
-            bgBufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-        Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-        boolean wmHasFullReload = this.compatibilityVersion >= 23;
-        boolean wmHasDimensionSwitch = this.hasDimensionSwitching();
-
-        for(int i = minX; i <= maxX; ++i) {
-            for(int j = minZ; j <= maxZ; ++j) {
-                MapRegion region;
-                if (wmHasDimensionSwitch) {
-                    region = mapProcessor.getMinimapMapRegion(i >> 3, j >> 3);
-                    mapProcessor.beforeMinimapRegionRender(region);
-                } else {
-                    region = mapProcessor.getMapRegion(renderedCaveLayer, i >> 3, j >> 3, mapProcessor.regionExists(renderedCaveLayer, i >> 3, j >> 3));
-                }
-
-                if (!wmHasDimensionSwitch && region != null && region != prevRegion) {
-                    synchronized(region) {
-                        int regionHashCode = region.getCacheHashCode();
-                        int regionReloadVersion = region.getReloadVersion();
-                        if (shouldRequestLoading
-                            && (
-                                wmHasFullReload && region.canRequestReload_unsynced()
-                                    || !wmHasFullReload
-                                    && !region.recacheHasBeenRequested()
-                                    && !region.reloadHasBeenRequested()
-                                    && (!(region instanceof MapRegion) || !region.isRefreshing())
-                            )
-                            && (
-                            region.getLoadState() == 0
-                                || (region.getLoadState() == 4 || region.getLoadState() == 2 && region.isBeingWritten())
-                                && (
-                                reloadEverything && regionReloadVersion != globalReloadVersion
-                                    || regionHashCode != globalRegionCacheHashCode
-                                    || !playerIsMoving && region.caveStartOutdated(globalCaveStart, globalCaveDepth)
-                                    || region.getVersion() != mapProcessor.getGlobalVersion()
-                                    || (region.isMetaLoaded() || region.getLoadState() != 0 || !region.hasHadTerrain())
-                                    && region.getHighlightsHash()
-                                    != region.getDim().getHighlightHandler().getRegionHash(region.getRegionX(), region.getRegionZ())
-                                    || region.getLoadState() != 2 && region.shouldCache()
-                            )
-                        )
-                            && !this.regionBuffer.contains(region)) {
-                            region.calculateSortingChunkDistance();
-                            Misc.addToListOfSmallest(10, this.regionBuffer, region);
-                        }
-                    }
-                }
-
-                prevRegion = region;
-                if (i >= minViewX && i <= maxViewX && j >= minViewZ && j <= maxViewZ) {
-                    MapTileChunk chunk = region == null ? null : region.getChunk(i & 7, j & 7);
-                    boolean chunkIsVisible = chunk != null && chunk.getLeafTexture().getGlColorTexture() != -1;
-                    if (!chunkIsVisible && (!noCaveMaps || this.previousRenderedCaveLayer == Integer.MAX_VALUE)) {
-                        MapRegion previousLayerRegion;
-                        if (wmHasDimensionSwitch) {
-                            previousLayerRegion = mapProcessor.getLeafMapRegion(this.previousRenderedCaveLayer, i >> 3, j >> 3, false);
-                        } else {
-                            previousLayerRegion = mapProcessor.getMapRegion(this.previousRenderedCaveLayer, i >> 3, j >> 3, false);
-                        }
-                        if (previousLayerRegion != null) {
-                            MapTileChunk previousLayerChunk = previousLayerRegion.getChunk(i & 7, j & 7);
-                            if (previousLayerChunk != null && previousLayerChunk.getLeafTexture().getGlColorTexture() != -1) {
-                                region = previousLayerRegion;
-                                chunk = previousLayerChunk;
-                                chunkIsVisible = true;
-                            }
-                        }
-                    }
-
-                    if (chunkIsVisible) {
-                        this.bumpLoadedRegion(mapProcessor, region);
-                        int drawX = ((chunk.getX() - chunkX) << 6) - (tileX << 4) - insideX;
-                        int drawZ = ((chunk.getZ() - chunkZ) << 6) - (tileZ << 4) - insideZ;
-                        if (XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) {
-                            MinimapBackgroundDrawHelper.addMMBackgroundToBuffer(guiGraphics.getMatrices().peek().getPositionMatrix(),
-                                                                                bgBufferBuilder,
-                                                                                drawX,
-                                                                                drawZ,
-                                                                                chunk);
-                        }
-                        GL11.glTexParameterf(3553, 33082, 0.0F);
-
-                        this.prepareMapTexturedRect(
-                            matrix, (float)drawX, (float)drawZ, 0, 0, 64.0F, 64.0F, chunk, mapNoLightRenderer, mapWithLightRenderer, helper
-                        );
-                        if (slimeChunks && !isDimensionSwitched) {
-                            this.renderSlimeChunks(chunk, seed, drawX, drawZ, matrixStack, helper, overlayBufferBuilder);
-                        }
-                    }
-                }
-            }
+        if (XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) {
+            // need these calc'd before they're init lol
+            var drawX = ((chunk.getX() - chunkX) << 6) - (tileX << 4) - insideX;
+            var drawZ = ((chunk.getZ() - chunkZ) << 6) - (tileZ << 4) - insideZ;
+            MinimapBackgroundDrawHelper.addMMBackgroundToBuffer(Globals.minimapDrawContext.getMatrices().peek().getPositionMatrix(),
+                                                                bgBufferBuilderRef.get(),
+                                                                drawX,
+                                                                drawZ,
+                                                                chunk);
         }
+    }
+
+    @WrapWithCondition(method = "renderChunks", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/common/mods/SupportXaeroWorldmap;renderSlimeChunks(Lxaero/map/region/MapTileChunk;Ljava/lang/Long;IILnet/minecraft/client/util/math/MatrixStack;Lxaero/common/minimap/render/MinimapRendererHelper;Lnet/minecraft/client/render/VertexConsumer;)V"
+    ), remap = true)
+    public boolean hideSlimeChunksWhileDimSwitched(SupportXaeroWorldmap instance, MapTileChunk chunk, Long seed, int drawX, int drawZ, MatrixStack matrixStack, MinimapRendererHelper helper, VertexConsumer overlayBufferBuilder) {
+        return Globals.getCurrentDimensionId() != MinecraftClient.getInstance().world.getRegistryKey();
+    }
+
+    @Inject(method = "renderChunks", at = @At("TAIL"), remap = true)
+    public void drawXPFeatures(final MatrixStack matrixStack, final int minX, final int maxX, final int minZ, final int maxZ, final int minViewX, final int maxViewX, final int minViewZ, final int maxViewZ, final MapProcessor mapProcessor, final int renderedCaveLayer, final boolean shouldRequestLoading, final boolean reloadEverything, final int globalReloadVersion, final int globalRegionCacheHashCode, final int globalCaveStart, final int globalCaveDepth, final boolean playerIsMoving, final boolean noCaveMaps, final boolean slimeChunks, final int chunkX, final int chunkZ, final int tileX, final int tileZ, final int insideX, final int insideZ, final Long seed, final MultiTextureRenderTypeRenderer mapWithLightRenderer, final MultiTextureRenderTypeRenderer mapNoLightRenderer, final MinimapRendererHelper helper, final VertexConsumer overlayBufferBuilder, final CallbackInfo ci,
+                               @Share("bgTesselator") LocalRef<Tessellator> bgTesselatorRef) {
         Globals.drawManager.drawMinimapFeatures(
             minViewX,
             maxViewX,
@@ -446,6 +103,6 @@ public abstract class MixinSupportXaeroWorldmap implements CustomSupportXaeroWor
             matrixStack,
             overlayBufferBuilder,
             helper);
-        if (XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) bgTesselator.draw();
+        if (XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) bgTesselatorRef.get().draw();
     }
 }

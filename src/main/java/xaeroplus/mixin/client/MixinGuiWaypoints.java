@@ -31,7 +31,6 @@ import xaeroplus.settings.XaeroPlusSettingRegistry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Mixin(value = GuiWaypoints.class, remap = false)
 public abstract class MixinGuiWaypoints extends ScreenBase {
@@ -127,7 +126,7 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
     }
 
     @Shadow
-    abstract boolean isOneSelected();
+    protected abstract boolean isOneSelected();
 
     @Redirect(method = "updateButtons", at = @At(value = "INVOKE", target = "Lxaero/common/gui/GuiWaypoints;isOneSelected()Z"))
     public boolean shareButtonRedirect(final GuiWaypoints instance) {
@@ -155,16 +154,18 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
     private void updateSortedList() {
         WaypointsSort sortType = this.displayedWorld.getContainer().getRootContainer().getSortType();
         ArrayList<Waypoint> waypointsList = this.displayedWorld.getCurrentSet().getList();
-        GuiWaypoints.distanceDivided = this.waypointsManager.getDimensionDivision(this.displayedWorld.getContainer().getKey());
+        GuiWaypoints.distanceDivided = this.waypointsManager.getDimensionDivision(this.displayedWorld);
         Camera camera = this.client.gameRenderer.getCamera();
 
-        final List<Waypoint> disabledWaypoints = waypointsList.stream()
-                .filter(Waypoint::isDisabled)
-                .collect(Collectors.toList());
-        final List<Waypoint> enabledWaypoints = waypointsList.stream()
-                .filter(waypoint -> !waypoint.isDisabled())
-                .collect(Collectors.toList());
-        if (!java.util.Objects.equals(Globals.waypointsSearchFilter, "")) {
+        final List<Waypoint> disabledWaypoints = new ArrayList<>();
+        final List<Waypoint> enabledWaypoints = new ArrayList<>();
+        for (Waypoint w : waypointsList) {
+            if (w.isDisabled())
+                disabledWaypoints.add(w);
+             else
+                 enabledWaypoints.add(w);
+        }
+        if (!Globals.waypointsSearchFilter.isEmpty()) {
             enabledWaypoints.removeIf(waypoint -> !waypoint.getName().toLowerCase().contains(Globals.waypointsSearchFilter.toLowerCase()));
             disabledWaypoints.removeIf(waypoint -> !waypoint.getName().toLowerCase().contains(Globals.waypointsSearchFilter.toLowerCase()));
         }

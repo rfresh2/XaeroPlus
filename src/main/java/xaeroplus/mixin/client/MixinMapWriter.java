@@ -91,6 +91,9 @@ public abstract class MixinMapWriter {
         }
     }
 
+    // What we want: a = !b && !c
+    // But we're wrapping b
+    // so instead we do a = !(b || c)
     @WrapOperation(method = "loadPixel", at = @At(
         value = "INVOKE",
         target = "Lxaero/map/region/OverlayBuilder;isEmpty()Z"
@@ -98,7 +101,7 @@ public abstract class MixinMapWriter {
     public boolean checkObsidianRoofColumn(final OverlayBuilder instance, final Operation<Boolean> original,
                                            @Share("columnRoofObsidian") final LocalBooleanRef columnRoofObsidianRef) {
         if (!XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()) return original.call(instance);
-        return original.call(instance) && !columnRoofObsidianRef.get();
+        return original.call(instance) || columnRoofObsidianRef.get();
     }
 
     @ModifyExpressionValue(method = "loadPixelHelp", at = @At(

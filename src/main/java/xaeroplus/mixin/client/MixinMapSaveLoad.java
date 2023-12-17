@@ -1,7 +1,5 @@
 package xaeroplus.mixin.client;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
@@ -38,11 +36,11 @@ public abstract class MixinMapSaveLoad {
         }
     }
 
-    @WrapOperation(method = "saveRegion", at = @At(
+    @Redirect(method = "saveRegion", at = @At(
         value = "NEW",
         args = "class=java/io/DataOutputStream"
     ))
-    public DataOutputStream replaceSaveRegionZipOutputStream(final OutputStream out, final Operation<DataOutputStream> original,
+    public DataOutputStream replaceSaveRegionZipOutputStream(final OutputStream out,
                                                              @Share("byteOut") final LocalRef<ByteArrayOutputStream> byteOutRef,
                                                              @Local(name = "zipOut") final ZipOutputStream zipOut,
                                                              @Share("zipOutShare") final LocalRef<ZipOutputStream> zipOutShare) {

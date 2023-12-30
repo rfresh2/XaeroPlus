@@ -8,16 +8,20 @@ import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRenderer;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.mods.SupportXaeroWorldmap;
 import xaero.map.MapProcessor;
+import xaero.map.WorldMapSession;
 import xaero.map.region.MapTileChunk;
 import xaeroplus.Globals;
 import xaeroplus.feature.render.MinimapBackgroundDrawHelper;
@@ -104,5 +108,26 @@ public abstract class MixinSupportXaeroWorldmap {
             overlayBufferBuilder,
             helper);
         if (XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) bgTesselatorRef.get().draw();
+    }
+
+    @Inject(method = "tryToGetMultiworldId", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/map/WorldMapSession;getMapProcessor()Lxaero/map/MapProcessor;"
+    ), cancellable = true, remap = true)
+    public void preventPossibleNPE(final RegistryKey<World> dimId, final CallbackInfoReturnable<String> cir,
+                                   @Local WorldMapSession session) {
+        // possible race condition where WM session is not initialized when client ticks start
+        /**
+         * Caused by: java.lang.NullPointerException: Cannot invoke "xaero.map.WorldMapSession.getMapProcessor()" because "worldmapSession" is null
+         *     at xaero.common.mods.SupportXaeroWorldmap.tryToGetMultiworldId(SupportXaeroWorldmap.java:362)
+         *     at xaero.common.minimap.waypoints.WaypointsManager.getNewAutoWorldID(WaypointsManager.java:194)
+         *     at xaero.common.minimap.waypoints.WaypointsManager.updateWorldIds(WaypointsManager.java:381)
+         *     at xaero.common.events.FMLEventHandler.handlePlayerTickStart(FMLEventHandler.java:40)
+         *     at xaero.common.events.FMLCommonEventHandler.handlePlayerTickStart(FMLCommonEventHandler.java:21)
+         *     at net.minecraft.class_1657.handler$dae000$xaerominimap$onTickStart(class_1657.java:6382)
+         */
+        if (session == null) {
+            cir.setReturnValue(null);
+        }
     }
 }

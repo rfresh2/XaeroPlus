@@ -5,10 +5,9 @@ import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xaero.pvp.BetterPVP;
 import xaeroplus.XaeroPlus;
 
-@Mixin(value = BetterPVP.class, remap = false)
+@Mixin(targets = {"xaero.pvp.BetterPVP"}, remap = false)
 @Pseudo
 public class MixinBetterPVP {
 

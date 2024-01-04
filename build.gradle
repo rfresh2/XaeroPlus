@@ -62,7 +62,6 @@ dependencies {
 
 	modImplementation "maven.modrinth:xaeros-world-map:${worldmap_version}_Fabric_1.20"
 	modImplementation "maven.modrinth:xaeros-minimap:${minimap_version}_Fabric_1.20"
-	modCompileOnly files("libs/BetterPvP_${minimap_version}_Fabric_1.20.jar")
 	modCompileOnly files("libs/baritone-api-fabric-1.20.1-elytra-beta-v1.jar")
 	modCompileOnly "maven.modrinth:waystones:14.0.2+fabric-1.20"
 	modCompileOnly "maven.modrinth:balm:7.1.4+fabric-1.20.1"

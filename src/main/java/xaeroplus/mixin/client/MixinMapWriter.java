@@ -25,7 +25,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.map.MapProcessor;
@@ -195,66 +194,16 @@ public abstract class MixinMapWriter {
         }
     }
 
-    @Redirect(method = "writeChunk", at = @At(value = "INVOKE", target = "Lxaero/map/MapWriter;loadPixel(Lnet/minecraft/world/World;Lnet/minecraft/registry/Registry;Lxaero/map/region/MapBlock;Lxaero/map/region/MapBlock;Lnet/minecraft/world/chunk/WorldChunk;IIIIZZIZZLnet/minecraft/registry/Registry;ZILnet/minecraft/util/math/BlockPos$Mutable;)V"), remap = true)
-    public void redirectLoadPixelForNetherFix(MapWriter instance,
-                                              World world,
-                                              Registry<Block> blockRegistry,
-                                              MapBlock pixel,
-                                              MapBlock currentPixel,
-                                              WorldChunk bchunk,
-                                              int insideX,
-                                              int insideZ,
-                                              int highY,
-                                              int lowY,
-                                              boolean cave,
-                                              boolean fullCave,
-                                              int mappedHeight,
-                                              boolean canReuseBiomeColours,
-                                              boolean ignoreHeightmaps,
-                                              Registry<Biome> biomeRegistry,
-                                              boolean flowers,
-                                              int worldBottomY,
-                                              BlockPos.Mutable mutableBlockPos3) {
+    @Inject(method = "loadPixel", at = @At("HEAD"), remap = true)
+    public void netherCaveFixInject(final World world, final Registry<Block> blockRegistry, final MapBlock pixel, final MapBlock currentPixel, final WorldChunk bchunk, final int insideX, final int insideZ, final int highY, final int lowY, final boolean cave, final boolean fullCave, final int mappedHeight, final boolean canReuseBiomeColours, final boolean ignoreHeightmaps, final Registry<Biome> biomeRegistry, final boolean flowers, final int worldBottomY, final BlockPos.Mutable mutableBlockPos3, final CallbackInfo ci,
+                                    @Local(index = 10, argsOnly = true) LocalBooleanRef caveRef,
+                                    @Local(index = 11, argsOnly = true) LocalBooleanRef fullCaveRef
+                                    ) {
         if (XaeroPlusSettingRegistry.netherCaveFix.getValue()) {
-            final boolean nether = world.getRegistryKey() == NETHER;
-            final boolean shouldForceFullInNether = !cave && nether;
-            instance.loadPixel(world,
-                               blockRegistry,
-                               pixel,
-                               currentPixel,
-                               bchunk,
-                               insideX,
-                               insideZ,
-                               highY,
-                               lowY,
-                               shouldForceFullInNether || cave,
-                               shouldForceFullInNether || fullCave,
-                               mappedHeight,
-                               canReuseBiomeColours,
-                               ignoreHeightmaps,
-                               biomeRegistry,
-                               flowers,
-                               worldBottomY,
-                               mutableBlockPos3);
-        } else {
-            instance.loadPixel(world,
-                               blockRegistry,
-                               pixel,
-                               currentPixel,
-                               bchunk,
-                               insideX,
-                               insideZ,
-                               highY,
-                               lowY,
-                               cave,
-                               fullCave,
-                               mappedHeight,
-                               canReuseBiomeColours,
-                               ignoreHeightmaps,
-                               biomeRegistry,
-                               flowers,
-                               worldBottomY,
-                               mutableBlockPos3);
+            var nether = world.getRegistryKey() == NETHER;
+            var shouldForceFullInNether = !cave && nether;
+            caveRef.set(shouldForceFullInNether || cave);
+            fullCaveRef.set(shouldForceFullInNether || fullCave);
         }
     }
 }

@@ -1,9 +1,9 @@
 package xaeroplus.feature.render;
 
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 
 @FunctionalInterface
 public interface ChunkHighlightPredicate {
-    boolean isHighlighted(int chunkX, int chunkZ, RegistryKey<World> dimension);
+    boolean isHighlighted(int chunkX, int chunkZ, ResourceKey<Level> dimension);
 }

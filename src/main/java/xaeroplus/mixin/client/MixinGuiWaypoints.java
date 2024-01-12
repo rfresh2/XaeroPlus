@@ -1,13 +1,13 @@
 package xaeroplus.mixin.client;
 
 import com.google.common.base.Objects;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.text.Text;
+import net.minecraft.client.Camera;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -44,32 +44,32 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
     @Shadow
     private WaypointsManager waypointsManager;
     @Shadow
-    private ButtonWidget shareButton;
-    private TextFieldWidget searchField;
+    private Button shareButton;
+    private EditBox searchField;
     private MySmallButton toggleAllButton;
 
-    protected MixinGuiWaypoints(final IXaeroMinimap modMain, final Screen parent, final Screen escape, final Text titleIn) {
+    protected MixinGuiWaypoints(final IXaeroMinimap modMain, final Screen parent, final Screen escape, final Component titleIn) {
         super(modMain, parent, escape, titleIn);
     }
 
     @Inject(method = "init", at = @At("TAIL"), remap = true)
     public void initGui(CallbackInfo ci) {
-        this.searchField = new TextFieldWidget(this.textRenderer, this.width / 2 - 297, 32, 80, 20, Text.literal("Search"));
-        this.searchField.setText("");
+        this.searchField = new EditBox(this.font, this.width / 2 - 297, 32, 80, 20, Component.literal("Search"));
+        this.searchField.setValue("");
         this.searchField.setFocused(true);
-        this.searchField.setCursor(0, false);
-        this.searchField.setSelectionStart(0);
-        this.addSelectableChild(searchField);
+        this.searchField.moveCursorTo(0, false);
+        this.searchField.setCursorPosition(0);
+        this.addWidget(searchField);
         this.setFocused(this.searchField);
 
         Globals.waypointsSearchFilter = "";
         // todo: this button is a bit larger than i want but cba to figure out exact size rn
-        this.addDrawableChild(
+        this.addRenderableWidget(
                 this.toggleAllButton = new MySmallButton(
                         TOGGLE_ALL_ID,
                         this.width / 2 + 213,
                         this.height - 53,
-                        Text.translatable("gui.waypoints.toggle_enable_all"),
+                        Component.translatable("gui.waypoints.toggle_enable_all"),
                         b -> {
                             waypointsSorted.stream().findFirst().ifPresent(firstWaypoint -> {
                                 boolean firstIsEnabled = firstWaypoint.isDisabled();
@@ -84,7 +84,7 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         if (dropDownClosed) {
             if (this.searchField.mouseClicked(x, y, button)) {
                 this.searchField.setFocused(true);
-                this.searchField.setCursorToEnd(false);
+                this.searchField.moveCursorToEnd(false);
                 this.searchField.setEditable(true);
             } else {
                 this.searchField.setFocused(false);
@@ -107,11 +107,11 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         return result;
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lxaero/common/gui/ScreenBase;render(Lnet/minecraft/client/gui/DrawContext;IIF)V", shift = At.Shift.AFTER), remap = true)
-    public void drawScreenInject(final DrawContext guiGraphics, final int mouseX, final int mouseY, final float partial, final CallbackInfo ci) {
-        if (!this.searchField.isFocused() && this.searchField.getText().isEmpty()) {
-            xaero.map.misc.Misc.setFieldText(this.searchField, I18n.translate("gui.xaero_settings_search_placeholder", new Object[0]), -11184811);
-            this.searchField.setCursorToStart(false);
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lxaero/common/gui/ScreenBase;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", shift = At.Shift.AFTER), remap = true)
+    public void drawScreenInject(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partial, final CallbackInfo ci) {
+        if (!this.searchField.isFocused() && this.searchField.getValue().isEmpty()) {
+            xaero.map.misc.Misc.setFieldText(this.searchField, I18n.get("gui.xaero_settings_search_placeholder", new Object[0]), -11184811);
+            this.searchField.moveCursorToStart(false);
         }
         this.searchField.render(guiGraphics, mouseX, mouseY, partial);
         if (!this.searchField.isFocused()) {
@@ -132,9 +132,9 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
 
     private void updateSearch() {
         if (this.searchField.isFocused()) {
-            String newValue = this.searchField.getText();
+            String newValue = this.searchField.getValue();
             if (!Objects.equal(Globals.waypointsSearchFilter, newValue)) {
-                Globals.waypointsSearchFilter = this.searchField.getText();
+                Globals.waypointsSearchFilter = this.searchField.getValue();
                 updateSortedList();
             }
         }
@@ -149,7 +149,7 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         WaypointsSort sortType = this.displayedWorld.getContainer().getRootContainer().getSortType();
         ArrayList<Waypoint> waypointsList = this.displayedWorld.getCurrentSet().getList();
         GuiWaypoints.distanceDivided = this.waypointsManager.getDimensionDivision(this.displayedWorld);
-        Camera camera = this.client.gameRenderer.getCamera();
+        Camera camera = this.minecraft.gameRenderer.getMainCamera();
 
         final List<Waypoint> disabledWaypoints = new ArrayList<>();
         final List<Waypoint> enabledWaypoints = new ArrayList<>();

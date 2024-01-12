@@ -5,11 +5,10 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.*;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.world.World;
+import com.mojang.blaze3d.vertex.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -32,8 +31,8 @@ public abstract class MixinSupportXaeroWorldmap {
     @Inject(method = "drawMinimap", at = @At(
         value = "INVOKE",
         target = "Lxaero/map/settings/ModSettings;getRegionCacheHashCode()I"
-    ), remap = true)
-    public void overrideRegionRange(final XaeroMinimapSession minimapSession, final MatrixStack matrixStack, final MinimapRendererHelper helper, final int xFloored, final int zFloored, final int minViewX, final int minViewZ, final int maxViewX, final int maxViewZ, final boolean zooming, final double zoom, final double mapDimensionScale, final VertexConsumer overlayBufferBuilder, final MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers, final CallbackInfo ci,
+    ), remap = false)
+    public void overrideRegionRange(final XaeroMinimapSession minimapSession, final PoseStack matrixStack, final MinimapRendererHelper helper, final int xFloored, final int zFloored, final int minViewX, final int minViewZ, final int maxViewX, final int maxViewZ, final boolean zooming, final double zoom, final double mapDimensionScale, final VertexConsumer overlayBufferBuilder, final MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers, final CallbackInfo ci,
                                   @Local(name = "mapX") int mapX,
                                   @Local(name = "mapZ") int mapZ,
                                   @Local(name = "minX") LocalIntRef minXRef,
@@ -48,16 +47,16 @@ public abstract class MixinSupportXaeroWorldmap {
         maxZRef.set((mapZ >> 2) + scaledSize);
     }
 
-    @Inject(method = "renderChunks", at = @At("HEAD"), remap = true)
-    public void setupTransparentMMBgBuffer(final MatrixStack matrixStack, final int minX, final int maxX, final int minZ, final int maxZ, final int minViewX, final int maxViewX, final int minViewZ, final int maxViewZ, final MapProcessor mapProcessor, final int renderedCaveLayer, final boolean shouldRequestLoading, final boolean reloadEverything, final int globalReloadVersion, final int globalRegionCacheHashCode, final int globalCaveStart, final int globalCaveDepth, final boolean playerIsMoving, final boolean noCaveMaps, final boolean slimeChunks, final int chunkX, final int chunkZ, final int tileX, final int tileZ, final int insideX, final int insideZ, final Long seed, final MultiTextureRenderTypeRenderer mapWithLightRenderer, final MultiTextureRenderTypeRenderer mapNoLightRenderer, final MinimapRendererHelper helper, final VertexConsumer overlayBufferBuilder, final CallbackInfo ci,
-                                           @Share("bgTesselator") LocalRef<Tessellator> bgTesselatorRef,
+    @Inject(method = "renderChunks", at = @At("HEAD"), remap = false)
+    public void setupTransparentMMBgBuffer(final PoseStack matrixStack, final int minX, final int maxX, final int minZ, final int maxZ, final int minViewX, final int maxViewX, final int minViewZ, final int maxViewZ, final MapProcessor mapProcessor, final int renderedCaveLayer, final boolean shouldRequestLoading, final boolean reloadEverything, final int globalReloadVersion, final int globalRegionCacheHashCode, final int globalCaveStart, final int globalCaveDepth, final boolean playerIsMoving, final boolean noCaveMaps, final boolean slimeChunks, final int chunkX, final int chunkZ, final int tileX, final int tileZ, final int insideX, final int insideZ, final Long seed, final MultiTextureRenderTypeRenderer mapWithLightRenderer, final MultiTextureRenderTypeRenderer mapNoLightRenderer, final MinimapRendererHelper helper, final VertexConsumer overlayBufferBuilder, final CallbackInfo ci,
+                                           @Share("bgTesselator") LocalRef<Tesselator> bgTesselatorRef,
                                            @Share("bgBufferBuilder") LocalRef<BufferBuilder> bgBufferBuilderRef
     ) {
         if (XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) {
-            var bgTesselator = Tessellator.getInstance();
+            var bgTesselator = Tesselator.getInstance();
             bgTesselatorRef.set(bgTesselator);
-            var bgBufferBuilder = bgTesselator.getBuffer();
-            bgBufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+            var bgBufferBuilder = bgTesselator.getBuilder();
+            bgBufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
             bgBufferBuilderRef.set(bgBufferBuilder);
         }
     }
@@ -65,8 +64,8 @@ public abstract class MixinSupportXaeroWorldmap {
     @Inject(method = "renderChunks", at = @At(
         value = "INVOKE",
         target = "Lorg/lwjgl/opengl/GL11;glTexParameterf(IIF)V"
-    ), remap = true)
-    public void renderTransparentMMBg(final MatrixStack matrixStack, final int minX, final int maxX, final int minZ, final int maxZ, final int minViewX, final int maxViewX, final int minViewZ, final int maxViewZ, final MapProcessor mapProcessor, final int renderedCaveLayer, final boolean shouldRequestLoading, final boolean reloadEverything, final int globalReloadVersion, final int globalRegionCacheHashCode, final int globalCaveStart, final int globalCaveDepth, final boolean playerIsMoving, final boolean noCaveMaps, final boolean slimeChunks, final int chunkX, final int chunkZ, final int tileX, final int tileZ, final int insideX, final int insideZ, final Long seed, final MultiTextureRenderTypeRenderer mapWithLightRenderer, final MultiTextureRenderTypeRenderer mapNoLightRenderer, final MinimapRendererHelper helper, final VertexConsumer overlayBufferBuilder, final CallbackInfo ci,
+    ), remap = false)
+    public void renderTransparentMMBg(final PoseStack matrixStack, final int minX, final int maxX, final int minZ, final int maxZ, final int minViewX, final int maxViewX, final int minViewZ, final int maxViewZ, final MapProcessor mapProcessor, final int renderedCaveLayer, final boolean shouldRequestLoading, final boolean reloadEverything, final int globalReloadVersion, final int globalRegionCacheHashCode, final int globalCaveStart, final int globalCaveDepth, final boolean playerIsMoving, final boolean noCaveMaps, final boolean slimeChunks, final int chunkX, final int chunkZ, final int tileX, final int tileZ, final int insideX, final int insideZ, final Long seed, final MultiTextureRenderTypeRenderer mapWithLightRenderer, final MultiTextureRenderTypeRenderer mapNoLightRenderer, final MinimapRendererHelper helper, final VertexConsumer overlayBufferBuilder, final CallbackInfo ci,
                                       @Share("bgBufferBuilder") LocalRef<BufferBuilder> bgBufferBuilderRef,
                                       @Local(name = "chunk") MapTileChunk chunk
     ) {
@@ -74,7 +73,7 @@ public abstract class MixinSupportXaeroWorldmap {
             // need these calc'd before they're init lol
             var drawX = ((chunk.getX() - chunkX) << 6) - (tileX << 4) - insideX;
             var drawZ = ((chunk.getZ() - chunkZ) << 6) - (tileZ << 4) - insideZ;
-            MinimapBackgroundDrawHelper.addMMBackgroundToBuffer(Globals.minimapDrawContext.getMatrices().peek().getPositionMatrix(),
+            MinimapBackgroundDrawHelper.addMMBackgroundToBuffer(Globals.minimapDrawContext.pose().last().pose(),
                                                                 bgBufferBuilderRef.get(),
                                                                 drawX,
                                                                 drawZ,
@@ -84,15 +83,15 @@ public abstract class MixinSupportXaeroWorldmap {
 
     @WrapWithCondition(method = "renderChunks", at = @At(
         value = "INVOKE",
-        target = "Lxaero/common/mods/SupportXaeroWorldmap;renderSlimeChunks(Lxaero/map/region/MapTileChunk;Ljava/lang/Long;IILnet/minecraft/client/util/math/MatrixStack;Lxaero/common/minimap/render/MinimapRendererHelper;Lnet/minecraft/client/render/VertexConsumer;)V"
-    ), remap = true)
-    public boolean hideSlimeChunksWhileDimSwitched(SupportXaeroWorldmap instance, MapTileChunk chunk, Long seed, int drawX, int drawZ, MatrixStack matrixStack, MinimapRendererHelper helper, VertexConsumer overlayBufferBuilder) {
-        return Globals.getCurrentDimensionId() != MinecraftClient.getInstance().world.getRegistryKey();
+        target = "Lxaero/common/mods/SupportXaeroWorldmap;renderSlimeChunks(Lxaero/map/region/MapTileChunk;Ljava/lang/Long;IILcom/mojang/blaze3d/vertex/PoseStack;Lxaero/common/minimap/render/MinimapRendererHelper;Lcom/mojang/blaze3d/vertex/VertexConsumer;)V"
+    ), remap = false)
+    public boolean hideSlimeChunksWhileDimSwitched(SupportXaeroWorldmap instance, MapTileChunk chunk, Long seed, int drawX, int drawZ, PoseStack matrixStack, MinimapRendererHelper helper, VertexConsumer overlayBufferBuilder) {
+        return Globals.getCurrentDimensionId() != Minecraft.getInstance().level.dimension();
     }
 
-    @Inject(method = "renderChunks", at = @At("TAIL"), remap = true)
-    public void drawXPFeatures(final MatrixStack matrixStack, final int minX, final int maxX, final int minZ, final int maxZ, final int minViewX, final int maxViewX, final int minViewZ, final int maxViewZ, final MapProcessor mapProcessor, final int renderedCaveLayer, final boolean shouldRequestLoading, final boolean reloadEverything, final int globalReloadVersion, final int globalRegionCacheHashCode, final int globalCaveStart, final int globalCaveDepth, final boolean playerIsMoving, final boolean noCaveMaps, final boolean slimeChunks, final int chunkX, final int chunkZ, final int tileX, final int tileZ, final int insideX, final int insideZ, final Long seed, final MultiTextureRenderTypeRenderer mapWithLightRenderer, final MultiTextureRenderTypeRenderer mapNoLightRenderer, final MinimapRendererHelper helper, final VertexConsumer overlayBufferBuilder, final CallbackInfo ci,
-                               @Share("bgTesselator") LocalRef<Tessellator> bgTesselatorRef) {
+    @Inject(method = "renderChunks", at = @At("TAIL"), remap = false)
+    public void drawXPFeatures(final PoseStack matrixStack, final int minX, final int maxX, final int minZ, final int maxZ, final int minViewX, final int maxViewX, final int minViewZ, final int maxViewZ, final MapProcessor mapProcessor, final int renderedCaveLayer, final boolean shouldRequestLoading, final boolean reloadEverything, final int globalReloadVersion, final int globalRegionCacheHashCode, final int globalCaveStart, final int globalCaveDepth, final boolean playerIsMoving, final boolean noCaveMaps, final boolean slimeChunks, final int chunkX, final int chunkZ, final int tileX, final int tileZ, final int insideX, final int insideZ, final Long seed, final MultiTextureRenderTypeRenderer mapWithLightRenderer, final MultiTextureRenderTypeRenderer mapNoLightRenderer, final MinimapRendererHelper helper, final VertexConsumer overlayBufferBuilder, final CallbackInfo ci,
+                               @Share("bgTesselator") LocalRef<Tesselator> bgTesselatorRef) {
         Globals.drawManager.drawMinimapFeatures(
             minViewX,
             maxViewX,
@@ -107,14 +106,14 @@ public abstract class MixinSupportXaeroWorldmap {
             matrixStack,
             overlayBufferBuilder,
             helper);
-        if (XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) bgTesselatorRef.get().draw();
+        if (XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) bgTesselatorRef.get().end();
     }
 
     @Inject(method = "tryToGetMultiworldId", at = @At(
         value = "INVOKE",
         target = "Lxaero/map/WorldMapSession;getMapProcessor()Lxaero/map/MapProcessor;"
-    ), cancellable = true, remap = true)
-    public void preventPossibleNPE(final RegistryKey<World> dimId, final CallbackInfoReturnable<String> cir,
+    ), cancellable = true, remap = false)
+    public void preventPossibleNPE(final ResourceKey<Level> dimId, final CallbackInfoReturnable<String> cir,
                                    @Local WorldMapSession session) {
         // possible race condition where WM session is not initialized when client ticks start
         /**

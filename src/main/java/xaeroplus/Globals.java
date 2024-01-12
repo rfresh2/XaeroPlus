@@ -3,11 +3,11 @@ package xaeroplus;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import xaero.map.core.XaeroWorldMapCore;
 import xaeroplus.feature.render.DrawManager;
 import xaeroplus.settings.XaeroPlusSetting;
@@ -24,7 +24,7 @@ import java.util.concurrent.Executors;
 import java.util.function.Supplier;
 import java.util.zip.ZipInputStream;
 
-import static net.minecraft.world.World.OVERWORLD;
+import static net.minecraft.world.level.Level.OVERWORLD;
 
 /**
  * static variables and functions to share or persist across mixins
@@ -39,8 +39,8 @@ public class Globals {
     public static int minimapScalingFactor = 1;
     public static boolean shouldResetFBO = false;
     public static String LOCK_ID = UUID.randomUUID().toString();
-    public static DrawContext minimapDrawContext = null;
-    public static RegistryKey<World> getCurrentDimensionId() {
+    public static GuiGraphics minimapDrawContext = null;
+    public static ResourceKey<Level> getCurrentDimensionId() {
         try {
             var dim = XaeroWorldMapCore.currentSession.getMapProcessor().getMapWorld().getCurrentDimensionId();
             if (dim == null) return OVERWORLD;
@@ -51,7 +51,7 @@ public class Globals {
         }
     }
     public static String waypointsSearchFilter = "";
-    public static List<ButtonWidget> guiMapButtonTempList = Lists.<ButtonWidget>newArrayList();
+    public static List<Button> guiMapButtonTempList = Lists.<Button>newArrayList();
     public static Supplier<ExecutorService> cacheRefreshExecutorService = Suppliers.memoize(() -> Executors.newFixedThreadPool(
             // limited benefits by refreshing on more threads as it will consume the entire CPU and start lagging the game
             Math.max(1, Math.min(Runtime.getRuntime().availableProcessors() / 2, 4)),
@@ -60,7 +60,7 @@ public class Globals {
                 .setDaemon(true)
                 .build()));
 
-    public static final Identifier xpGuiTextures = new Identifier("xaeroplus", "gui/xpgui.png");
+    public static final ResourceLocation xpGuiTextures = new ResourceLocation("xaeroplus", "gui/xpgui.png");
 
     public static DrawManager drawManager = new DrawManager();
 
@@ -71,7 +71,7 @@ public class Globals {
         minimapScalingFactor = (int) XaeroPlusSettingRegistry.minimapScaling.getValue();
     }
 
-    public static void switchToDimension(final RegistryKey<World> newDimId) {
+    public static void switchToDimension(final ResourceKey<Level> newDimId) {
         if (newDimId == null) return;
         try {
             var session = XaeroWorldMapCore.currentSession;

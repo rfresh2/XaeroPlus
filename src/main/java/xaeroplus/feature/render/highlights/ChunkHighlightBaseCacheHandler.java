@@ -2,8 +2,8 @@ package xaeroplus.feature.render.highlights;
 
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import xaeroplus.XaeroPlus;
 
 import java.util.concurrent.TimeUnit;
@@ -45,7 +45,7 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
         return true;
     }
 
-    public boolean isHighlighted(final int x, final int z, RegistryKey<World> dimensionId) {
+    public boolean isHighlighted(final int x, final int z, ResourceKey<Level> dimensionId) {
         return isHighlighted(chunkPosToLong(x, z));
     }
 

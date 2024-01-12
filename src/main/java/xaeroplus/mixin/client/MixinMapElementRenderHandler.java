@@ -2,11 +2,11 @@ package xaeroplus.mixin.client;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.texture.TextureManager;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.texture.TextureManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -26,16 +26,16 @@ public class MixinMapElementRenderHandler {
         method = "renderWithRenderer",
         at = @At(
             value = "INVOKE",
-            target = "Lxaero/map/element/MapElementRenderer;beforeRender(ILnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/gui/DrawContext;DDDDFDDLnet/minecraft/client/texture/TextureManager;Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;Z)V"
-        ), remap = true)
+            target = "Lxaero/map/element/MapElementRenderer;beforeRender(ILnet/minecraft/client/Minecraft;Lnet/minecraft/client/gui/GuiGraphics;DDDDFDDLnet/minecraft/client/renderer/texture/TextureManager;Lnet/minecraft/client/gui/Font;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;Z)V"
+        ), remap = false)
     public void renderWithRendererInject(MapElementRenderer renderer,
                                          Object hovered,
                                          GuiMap mapScreen,
-                                         DrawContext guiGraphics,
-                                         VertexConsumerProvider.Immediate renderTypeBuffers,
+                                         GuiGraphics guiGraphics,
+                                         MultiBufferSource.BufferSource renderTypeBuffers,
                                          MultiTextureRenderTypeRendererProvider rendererProvider,
                                          TextureManager textureManager,
-                                         TextRenderer font,
+                                         Font font,
                                          double cameraX,
                                          double cameraZ,
                                          int width,
@@ -49,7 +49,7 @@ public class MixinMapElementRenderHandler {
                                          float brightness,
                                          boolean cave,
                                          HoveredMapElementHolder oldHovered,
-                                         MinecraftClient mc,
+                                         Minecraft mc,
                                          boolean pre,
                                          float partialTicks,
                                          int elementIndex,

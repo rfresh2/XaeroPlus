@@ -3,7 +3,7 @@ package xaeroplus.util;
 import baritone.api.BaritoneAPI;
 import baritone.api.pathing.goals.Goal;
 import baritone.api.pathing.goals.GoalXZ;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 /**
  * Only need this class because we cannot have a method with the Goal return type in BaritoneGoalSync

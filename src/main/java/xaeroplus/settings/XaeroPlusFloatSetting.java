@@ -1,6 +1,6 @@
 package xaeroplus.settings;
 
-import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.KeyMapping;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax.SettingLocation;
 
@@ -20,7 +20,7 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
     private XaeroPlusFloatSetting(final String settingName,
                                   final String settingNameTranslationKey,
                                   final String tooltipTranslationKey,
-                                  final KeyBinding keyBinding,
+                                  final KeyMapping keyBinding,
                                   final Supplier<Boolean> visibilitySupplier,
                                   final float valueMin,
                                   final float valueStep,

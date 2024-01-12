@@ -1,8 +1,8 @@
 package xaeroplus.mixin.client;
 
-import net.minecraft.text.MutableText;
-import net.minecraft.text.PlainTextContent;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.PlainTextContents;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -21,14 +21,14 @@ public class MixinMinimapModOption {
     @Mutable
     @Final
     @Shadow
-    private Text caption;
+    private Component caption;
     @Inject(method = "<init>", at = @At("RETURN"))
     public void constructorInject(final ModOptions option, final CallbackInfo ci) {
         if (option.getEnumString().startsWith(SETTING_PREFIX)) {
             XaeroPlusSettingsReflectionHax.ALL_MINIMAP_SETTINGS.get().stream()
                     .filter(s -> s.getSettingName().equals(option.getEnumString()))
                     .findFirst()
-                    .ifPresent(s -> caption = MutableText.of(new PlainTextContent.Literal(SETTING_PREFIX)).append(Text.translatable(s.getSettingNameTranslationKey())));
+                    .ifPresent(s -> caption = MutableComponent.create(new PlainTextContents.LiteralContents(SETTING_PREFIX)).append(Component.translatable(s.getSettingNameTranslationKey())));
         }
     }
 }

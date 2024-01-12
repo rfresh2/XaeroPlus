@@ -5,13 +5,13 @@ import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
 import net.lenni0451.lambdaevents.EventHandler;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.EmptyChunk;
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.EmptyLevelChunk;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.ChunkDataEvent;
@@ -31,7 +31,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static java.util.Arrays.asList;
-import static net.minecraft.world.World.*;
+import static net.minecraft.world.level.Level.*;
 import static xaeroplus.feature.render.ColorHelper.getColor;
 
 @Module.ModuleInfo()
@@ -41,7 +41,7 @@ public class OldChunks extends Module {
     private static final String OLD_CHUNKS_DATABASE_NAME = "XaeroPlusOldChunks";
     private static final String MODERN_CHUNKS_DATABASE_NAME = "XaeroPlusModernChunks";
     private int oldChunksColor = getColor(0, 0, 255, 100);
-    private final MinecraftClient mc = MinecraftClient.getInstance();
+    private final Minecraft mc = Minecraft.getInstance();
     private final ExecutorService searchExecutor = Executors.newFixedThreadPool(
         1,
         new ThreadFactoryBuilder()
@@ -116,7 +116,7 @@ public class OldChunks extends Module {
         searchChunkAsync(event.chunk());
     }
 
-    private void searchChunkAsync(final Chunk chunk) {
+    private void searchChunkAsync(final ChunkAccess chunk) {
         searchExecutor.submit(() -> {
             try {
                 int iterations = 0;
@@ -130,8 +130,8 @@ public class OldChunks extends Module {
         });
     }
 
-    private boolean searchChunk(final Chunk chunk) {
-        RegistryKey<World> actualDimension = ChunkUtils.getActualDimension();
+    private boolean searchChunk(final ChunkAccess chunk) {
+        ResourceKey<Level> actualDimension = ChunkUtils.getActualDimension();
         if (actualDimension != OVERWORLD && actualDimension != NETHER) {
             return true;
         }
@@ -155,7 +155,7 @@ public class OldChunks extends Module {
     }
 
     public boolean inUnknownDimension() {
-        final RegistryKey<World> dim = ChunkUtils.getActualDimension();
+        final ResourceKey<Level> dim = ChunkUtils.getActualDimension();
         return dim != OVERWORLD && dim != NETHER && dim != END;
     }
 
@@ -179,16 +179,16 @@ public class OldChunks extends Module {
     }
 
     private void searchAllLoadedChunks() {
-        if (mc.world == null || inUnknownDimension()) return;
-        final int renderDist = mc.options.getViewDistance().getValue();
+        if (mc.level == null || inUnknownDimension()) return;
+        final int renderDist = mc.options.renderDistance().get();
         final int xMin = ChunkUtils.getPlayerChunkX() - renderDist;
         final int xMax = ChunkUtils.getPlayerChunkX() + renderDist;
         final int zMin = ChunkUtils.getPlayerChunkZ() - renderDist;
         final int zMax = ChunkUtils.getPlayerChunkZ() + renderDist;
         for (int x = xMin; x <= xMax; x++) {
             for (int z = zMin; z <= zMax; z++) {
-                Chunk chunk = mc.world.getChunkManager().getWorldChunk(x, z, false);
-                if (chunk instanceof EmptyChunk) continue;
+                ChunkAccess chunk = mc.level.getChunkSource().getChunk(x, z, false);
+                if (chunk instanceof EmptyLevelChunk) continue;
                 searchChunkAsync(chunk);
             }
         }
@@ -213,18 +213,18 @@ public class OldChunks extends Module {
         oldChunksColor = ColorHelper.getColorWithAlpha(oldChunksColor, (int) (a));
     }
 
-    public boolean isHighlighted(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> dimensionId) {
+    public boolean isHighlighted(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> dimensionId) {
         if (inverse)
             return isOldChunkInverse(chunkPosX, chunkPosZ, dimensionId);
         else
             return isOldChunk(chunkPosX, chunkPosZ, dimensionId);
     }
 
-    public boolean isOldChunk(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> dimensionId) {
+    public boolean isOldChunk(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> dimensionId) {
         return oldChunksCache.isHighlighted(chunkPosX, chunkPosZ, dimensionId);
     }
 
-    public boolean isOldChunkInverse(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> dimensionId) {
+    public boolean isOldChunkInverse(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> dimensionId) {
         return modernChunksCache.isHighlighted(chunkPosX, chunkPosZ, dimensionId);
     }
 

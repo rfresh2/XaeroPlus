@@ -1,7 +1,7 @@
 package xaeroplus.mixin.client;
 
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -19,7 +19,7 @@ import java.util.Hashtable;
 public class MixinMapWorld {
 
     @Shadow
-    private Hashtable<RegistryKey<World>, MapDimension> dimensions;
+    private Hashtable<ResourceKey<Level>, MapDimension> dimensions;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     public void init(String mainId, String oldUnfixedMainId, MapProcessor mapProcessor, final CallbackInfo ci) {
@@ -35,7 +35,7 @@ public class MixinMapWorld {
      * @reason fast dimension map lookup without synchronization
      */
     @Overwrite
-    public MapDimension getDimension(RegistryKey<World> dimId) {
+    public MapDimension getDimension(ResourceKey<Level> dimId) {
         if (dimId == null) return null;
         else return this.dimensions.get(dimId);
     }

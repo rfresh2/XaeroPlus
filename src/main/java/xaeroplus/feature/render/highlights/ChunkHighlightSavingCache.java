@@ -3,8 +3,8 @@ package xaeroplus.feature.render.highlights;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import xaero.map.core.XaeroWorldMapCore;
 import xaero.map.gui.GuiMap;
 import xaeroplus.Globals;
@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static net.minecraft.world.World.*;
+import static net.minecraft.world.level.Level.*;
 import static xaeroplus.util.ChunkUtils.getActualDimension;
 import static xaeroplus.util.GuiMapHelper.*;
 
@@ -49,7 +49,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
         }
     }
 
-    public void addHighlight(final int x, final int z, final long foundTime, final RegistryKey<World> dimension) {
+    public void addHighlight(final int x, final int z, final long foundTime, final ResourceKey<Level> dimension) {
         ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimension);
         if (cacheForDimension == null) return;
         cacheForDimension.addHighlight(x, z, foundTime);
@@ -67,7 +67,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
         }
     }
 
-    public boolean isHighlighted(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> dimensionId) {
+    public boolean isHighlighted(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> dimensionId) {
         ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimensionId);
         if (cacheForDimension == null) return false;
         return cacheForDimension.isHighlighted(chunkPosX, chunkPosZ, dimensionId);
@@ -109,7 +109,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
     }
 
     public ChunkHighlightCacheDimensionHandler getCacheForCurrentDimension() {
-        RegistryKey<World> mcDimension = getActualDimension();
+        ResourceKey<Level> mcDimension = getActualDimension();
         if (mcDimension.equals(NETHER)) {
             return netherCache;
         } else if (mcDimension.equals(OVERWORLD)) {
@@ -121,7 +121,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
         }
     }
 
-    public ChunkHighlightCacheDimensionHandler getCacheForDimension(final RegistryKey<World> dimension) {
+    public ChunkHighlightCacheDimensionHandler getCacheForDimension(final ResourceKey<Level> dimension) {
         if (dimension.equals(NETHER)) {
             return netherCache;
         } else if (dimension.equals(OVERWORLD)) {
@@ -138,7 +138,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
                 Collectors.toList());
     }
 
-    public List<ChunkHighlightCacheDimensionHandler> getCachesExceptDimension(final RegistryKey<World> dimension) {
+    public List<ChunkHighlightCacheDimensionHandler> getCachesExceptDimension(final ResourceKey<Level> dimension) {
         if (dimension.equals(NETHER)) {
             return Stream.of(overworldCache, endCache).filter(Objects::nonNull).collect(Collectors.toList());
         } else if (dimension.equals(OVERWORLD)) {
@@ -154,7 +154,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
         try {
             final String worldId = XaeroWorldMapCore.currentSession.getMapProcessor().getCurrentWorldId();
             if (worldId == null) return;
-            final RegistryKey<World> dimension = getActualDimension();
+            final ResourceKey<Level> dimension = getActualDimension();
             if (dimension != OVERWORLD && dimension != NETHER && dimension != END) {
                 XaeroPlus.LOGGER.error("Unexpected dimension ID: " + dimension + ". Disable Save/Load to Disk to restore functionality.");
                 return;
@@ -218,7 +218,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
         Optional<GuiMap> guiMapOptional = getGuiMap();
         if (guiMapOptional.isPresent()) {
             final GuiMap guiMap = guiMapOptional.get();
-            final RegistryKey<World> mapDimension = Globals.getCurrentDimensionId();
+            final ResourceKey<Level> mapDimension = Globals.getCurrentDimensionId();
             final int mapCenterX = getGuiMapCenterRegionX(guiMap);
             final int mapCenterZ = getGuiMapCenterRegionZ(guiMap);
             final int mapSize = getGuiMapRegionSize(guiMap);

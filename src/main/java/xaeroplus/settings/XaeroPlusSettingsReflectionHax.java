@@ -1,8 +1,8 @@
 package xaeroplus.settings;
 
 import com.google.common.base.Suppliers;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import xaero.map.WorldMapSession;
 import xaero.map.gui.CursorBox;
 import xaero.map.settings.ModOptions;
@@ -198,19 +198,19 @@ public class XaeroPlusSettingsReflectionHax {
     }
 
     static void markChunksDirtyInWriteDistance() {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        if (mc.world != null && mc.player != null) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level != null && mc.player != null) {
             WorldMapSession session = WorldMapSession.getCurrentSession();
             if (session != null) {
-                session.getMapProcessor().getMapWriter().setDirtyInWriteDistance(mc.player, mc.world);
+                session.getMapProcessor().getMapWriter().setDirtyInWriteDistance(mc.player, mc.level);
                 session.getMapProcessor().getMapWriter().requestCachedColoursClear();
             }
         }
     }
 
-    public static Supplier<Map<KeyBinding, XaeroPlusBooleanSetting>> keybindingMapSupplier = Suppliers.memoize(() ->
+    public static Supplier<Map<KeyMapping, XaeroPlusBooleanSetting>> keybindingMapSupplier = Suppliers.memoize(() ->
             memoizingKeybindsList.get().stream().collect(Collectors.toMap(XaeroPlusSetting::getKeyBinding, s -> s)));
 
-    public static Supplier<List<KeyBinding>> keybindsSupplier = Suppliers.memoize(() -> new ArrayList<>(
+    public static Supplier<List<KeyMapping>> keybindsSupplier = Suppliers.memoize(() -> new ArrayList<>(
         keybindingMapSupplier.get().keySet()));
 }

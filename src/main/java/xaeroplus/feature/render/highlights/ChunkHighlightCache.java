@@ -1,13 +1,13 @@
 package xaeroplus.feature.render.highlights;
 
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 
 public interface ChunkHighlightCache {
     boolean addHighlight(final int x, final int z);
     boolean removeHighlight(final int x, final int z);
-    boolean isHighlighted(final int x, final int z, RegistryKey<World> dimensionId);
+    boolean isHighlighted(final int x, final int z, ResourceKey<Level> dimensionId);
     void handleWorldChange();
     void handleTick();
     void onEnable();

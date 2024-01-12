@@ -1,6 +1,6 @@
 package xaeroplus.mixin.client;
 
-import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.components.Button;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -32,7 +32,7 @@ public class MixinGuiAddWaypoint {
         ),
         locals = LocalCapture.CAPTURE_FAILHARD)
     public void addWaypointInject(
-        ButtonWidget b,
+        Button b,
         final CallbackInfo ci,
         boolean creatingAWaypoint,
         String[] destinationWorldKeys,

@@ -1,10 +1,10 @@
 package xaeroplus.mixin.client;
 
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
-import net.minecraft.client.gui.screen.ConfirmScreen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.ConfirmScreen;
+import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -16,20 +16,20 @@ import java.net.URI;
 @Mixin(value = GuiUpdateAll.class, remap = false)
 public abstract class MixinGuiUpdateAll extends ConfirmScreen {
 
-    public MixinGuiUpdateAll(final BooleanConsumer callback, final Text title, final Text message) {
+    public MixinGuiUpdateAll(final BooleanConsumer callback, final Component title, final Component message) {
         super(callback, title, message);
     }
 
     @Inject(method = "init", at = @At("TAIL"), remap = true)
     public void initGui(CallbackInfo ci) {
-        this.addDrawableChild(ButtonWidget.builder(Text.translatable("gui.xaeroplus.check_github_button"), (button -> {
+        this.addRenderableWidget(Button.builder(Component.translatable("gui.xaeroplus.check_github_button"), (button -> {
             try {
-                 Util.getOperatingSystem().open(new URI("https://github.com/rfresh2/XaeroPlus"));
+                 Util.getPlatform().openUri(new URI("https://github.com/rfresh2/XaeroPlus"));
             } catch (Exception e) {
                  // ???
             }
         }))
-        .dimensions(this.width / 2 - 100,
+        .bounds(this.width / 2 - 100,
             this.height / 6 + 168,
             200,
             20)

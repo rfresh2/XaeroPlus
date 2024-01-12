@@ -1,9 +1,9 @@
 package xaeroplus.feature.extensions;
 
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 
 public interface IWaypointDimension {
-    RegistryKey<World> getDimension();
-    void setDimension(RegistryKey<World> dimension);
+    ResourceKey<Level> getDimension();
+    void setDimension(ResourceKey<Level> dimension);
 }

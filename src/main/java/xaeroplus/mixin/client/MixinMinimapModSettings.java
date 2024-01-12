@@ -1,6 +1,6 @@
 package xaeroplus.mixin.client;
 
-import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.KeyMapping;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -111,7 +111,7 @@ public class MixinMinimapModSettings {
     }
 
     @Inject(method = "isKeyRepeat", at = @At("RETURN"), cancellable = true)
-    public void isKeyRepeat(KeyBinding kb, CallbackInfoReturnable<Boolean> cir) {
+    public void isKeyRepeat(KeyMapping kb, CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(cir.getReturnValue() && XaeroPlusSettingsReflectionHax.keybindingMapSupplier.get().get(kb) == null);
     }
 

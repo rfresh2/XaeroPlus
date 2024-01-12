@@ -2,8 +2,8 @@ package xaeroplus.module.impl;
 
 import com.google.common.hash.Hashing;
 import net.lenni0451.lambdaevents.EventHandler;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.waypoints.*;
 import xaero.map.mods.SupportMods;
@@ -135,7 +135,7 @@ public class WaystoneSync extends Module {
     private WaypointWorld getWaypointWorldForWaystone(final Waystone waystone,
                                                       final WaypointsManager waypointsManager,
                                                       final String currentContainerId) {
-        final RegistryKey<World> waystoneDimension = waystone.dimension();
+        final ResourceKey<Level> waystoneDimension = waystone.dimension();
         final String waystoneDimensionDirectoryName = waypointsManager.getDimensionDirectoryName(waystoneDimension);
         final int waystoneDim = WaypointsHelper.getDimensionForWaypointWorldKey(waystoneDimensionDirectoryName);
         final WaypointWorld currentWpWorld = waypointsManager.getCurrentWorld();
@@ -147,7 +147,7 @@ public class WaystoneSync extends Module {
         }
         final String worldContainerSuffix;
         if (waystoneDim == Integer.MIN_VALUE) // non-vanilla dimensions
-            worldContainerSuffix = waystoneDimension.getValue().getNamespace() + "$" + waystoneDimension.getValue().getPath().replace("/", "%");
+            worldContainerSuffix = waystoneDimension.location().getNamespace() + "$" + waystoneDimension.location().getPath().replace("/", "%");
         else
             // this is a crapshoot
             // waypoint containers have no single naming scheme. this can change depending on the server, the world, and the dimension
@@ -186,5 +186,5 @@ public class WaystoneSync extends Module {
         blayWaystonesHelper.shouldSync = true;
     }
 
-    public record Waystone(String name, RegistryKey<World> dimension, int x, int y, int z) { }
+    public record Waystone(String name, ResourceKey<Level> dimension, int x, int y, int z) { }
 }

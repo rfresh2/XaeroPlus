@@ -1,7 +1,7 @@
 package xaeroplus.mixin.client;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -13,11 +13,11 @@ import xaeroplus.feature.extensions.GuiXaeroPlusWorldMapSettings;
 
 @Mixin(value = GuiWorldMapSettings.class, remap = false)
 public abstract class MixinGuiWorldMapSettings extends GuiSettings {
-    public MixinGuiWorldMapSettings(final Text title, final Screen backScreen, final Screen escScreen) {
+    public MixinGuiWorldMapSettings(final Component title, final Screen backScreen, final Screen escScreen) {
         super(title, backScreen, escScreen);
     }
 
-    @Inject(method = "<init>(Lnet/minecraft/client/gui/screen/Screen;Lnet/minecraft/client/gui/screen/Screen;)V", at = @At("RETURN"), remap = true)
+    @Inject(method = "<init>(Lnet/minecraft/client/gui/screens/Screen;Lnet/minecraft/client/gui/screens/Screen;)V", at = @At("RETURN"), remap = true)
     public void init(final Screen parent, final Screen escapeScreen, final CallbackInfo ci) {
         final int oldLen = this.entries.length;
         final int newLen = 1;

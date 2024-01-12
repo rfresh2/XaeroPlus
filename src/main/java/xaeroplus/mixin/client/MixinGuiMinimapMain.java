@@ -1,7 +1,7 @@
 package xaeroplus.mixin.client;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,7 +20,7 @@ public abstract class MixinGuiMinimapMain extends GuiSettings {
     @Shadow
     private ISettingEntry[] mainEntries;
 
-    public MixinGuiMinimapMain(final AXaeroMinimap modMain, final Text title, final Screen backScreen, final Screen escScreen) {
+    public MixinGuiMinimapMain(final AXaeroMinimap modMain, final Component title, final Screen backScreen, final Screen escScreen) {
         super(modMain, title, backScreen, escScreen);
     }
 

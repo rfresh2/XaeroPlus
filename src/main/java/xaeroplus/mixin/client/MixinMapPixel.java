@@ -1,13 +1,13 @@
 package xaeroplus.mixin.client;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.dimension.DimensionType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -32,7 +32,7 @@ public abstract class MixinMapPixel {
     public void getPixelColours(
             final int[] result_dest,
             final MapWriter mapWriter,
-            final World world,
+            final Level world,
             MapDimension dim,
             final Registry<Block> blockRegistry,
             final MapTileChunk tileChunk,
@@ -48,7 +48,7 @@ public abstract class MixinMapPixel {
             final int caveStart,
             final int caveDepth,
             final ArrayList<Overlay> overlays,
-            final BlockPos.Mutable mutableGlobalPos,
+            final BlockPos.MutableBlockPos mutableGlobalPos,
             final Registry<Biome> biomeRegistry,
             Registry<DimensionType> dimensionTypes,
             final float shadowR,

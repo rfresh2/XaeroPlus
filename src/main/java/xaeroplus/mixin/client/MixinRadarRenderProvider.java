@@ -1,8 +1,8 @@
 package xaeroplus.mixin.client;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,12 +25,12 @@ public class MixinRadarRenderProvider {
     @Shadow
     private MinimapRadarList currentList;
 
-    @Inject(method = "setupContextAndGetNext(ILxaero/common/minimap/render/radar/element/RadarRenderContext;)Lnet/minecraft/entity/Entity;",
+    @Inject(method = "setupContextAndGetNext(ILxaero/common/minimap/render/radar/element/RadarRenderContext;)Lnet/minecraft/world/entity/Entity;",
             at = @At(value = "RETURN"), remap = true)
     public void setupContextAndGetNextInject(final int location, final RadarRenderContext context, final CallbackInfoReturnable<Entity> cir) {
         final Entity e = cir.getReturnValue();
-        if (e instanceof PlayerEntity) {
-            if (!Objects.equals(e, MinecraftClient.getInstance().player)) {
+        if (e instanceof Player) {
+            if (!Objects.equals(e, Minecraft.getInstance().player)) {
                 if (XaeroPlusSettingRegistry.alwaysRenderPlayerIconOnRadar.getValue()) {
                     context.icon = true;
                 }

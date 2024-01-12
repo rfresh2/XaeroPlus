@@ -5,11 +5,11 @@ import xaeroplus.feature.render.ColorHelper;
 import xaeroplus.feature.render.ColorHelper.WaystoneColor;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.*;
+import xaeroplus.settings.XaeroPlusSettingsReflectionHax.SettingLocation;
 import xaeroplus.util.BaritoneHelper;
 import xaeroplus.util.WaystonesHelper;
 
-import static net.minecraft.world.World.*;
-import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.SettingLocation;
+import static net.minecraft.world.level.Level.*;
 import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.markChunksDirtyInWriteDistance;
 
 /**

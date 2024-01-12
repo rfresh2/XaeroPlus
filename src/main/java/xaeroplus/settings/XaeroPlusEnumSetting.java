@@ -1,6 +1,6 @@
 package xaeroplus.settings;
 
-import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.KeyMapping;
 import org.apache.commons.lang3.ArrayUtils;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax.SettingLocation;
@@ -18,7 +18,7 @@ public class XaeroPlusEnumSetting<T extends Enum<T>> extends XaeroPlusSetting {
     private XaeroPlusEnumSetting(final String settingName,
                                  final String settingNameTranslationKey,
                                  final String tooltipTranslationKey,
-                                 final KeyBinding keyBinding,
+                                 final KeyMapping keyBinding,
                                  final Supplier<Boolean> visibilitySupplier,
                                  final Consumer<T> settingChangeConsumer,
                                  final T[] enumValues,

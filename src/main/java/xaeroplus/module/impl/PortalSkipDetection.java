@@ -4,9 +4,9 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.lenni0451.lambdaevents.EventHandler;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.world.World;
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMapSession;
 import xaero.map.core.XaeroWorldMapCore;
@@ -125,7 +125,7 @@ public class PortalSkipDetection extends Module {
         windowRegionX = regionX;
         windowRegionZ = regionZ;
         windowRegionSize = regionSize;
-        if (MinecraftClient.getInstance().world == null) return;
+        if (Minecraft.getInstance().level == null) return;
         portalSkipDetectionSearchFuture = executorService.submit(this::searchForPortalSkipChunks);
     }
 
@@ -134,7 +134,7 @@ public class PortalSkipDetection extends Module {
             final int windowRegionX = this.windowRegionX;
             final int windowRegionZ = this.windowRegionZ;
             final int windowRegionSize = this.windowRegionSize;
-            final RegistryKey<World> currentlyViewedDimension = Globals.getCurrentDimensionId();
+            final ResourceKey<Level> currentlyViewedDimension = Globals.getCurrentDimensionId();
             final LongOpenHashSet portalDetectionSearchChunks = new LongOpenHashSet();
             for (int regionX = windowRegionX - windowRegionSize; regionX <= windowRegionX + windowRegionSize; regionX++) {
                 final int baseChunkCoordX = ChunkUtils.regionCoordToChunkCoord(regionX);
@@ -177,7 +177,7 @@ public class PortalSkipDetection extends Module {
         }
     }
 
-    private boolean isNewishChunk(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> currentlyViewedDimension) {
+    private boolean isNewishChunk(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> currentlyViewedDimension) {
         if (newChunks && oldChunksInverse) {
             return isNewChunk(chunkPosX, chunkPosZ, currentlyViewedDimension) || isOldChunksInverse(chunkPosX, chunkPosZ, currentlyViewedDimension);
         } else if (newChunks) {
@@ -189,21 +189,21 @@ public class PortalSkipDetection extends Module {
         }
     }
 
-    private boolean isNewChunk(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> currentlyViewedDimension) {
+    private boolean isNewChunk(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> currentlyViewedDimension) {
         if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue() && newChunksModule != null)
             return newChunksModule.isNewChunk(chunkPosX, chunkPosZ, currentlyViewedDimension);
         else
             return false;
     }
 
-    private boolean isOldChunksInverse(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> currentlyViewedDimension) {
+    private boolean isOldChunksInverse(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> currentlyViewedDimension) {
         if (XaeroPlusSettingRegistry.oldChunksEnabledSetting.getValue() && oldChunksModule != null)
             return oldChunksModule.isOldChunkInverse(chunkPosX, chunkPosZ, currentlyViewedDimension);
         else
             return false;
     }
 
-    private boolean isChunkSeen(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> currentlyViewedDimension) {
+    private boolean isChunkSeen(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> currentlyViewedDimension) {
         final WorldMapSession currentSession = XaeroWorldMapCore.currentSession;
         if (currentSession == null) return false;
         final MapProcessor mapProcessor = currentSession.getMapProcessor();
@@ -234,7 +234,7 @@ public class PortalSkipDetection extends Module {
         portalSkipChunksColor = ColorHelper.getColorWithAlpha(portalSkipChunksColor, (int) a);
     }
 
-    public boolean isPortalSkipChunk(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> dimension) {
+    public boolean isPortalSkipChunk(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> dimension) {
         return isPortalSkipChunk(chunkPosToLong(chunkPosX, chunkPosZ));
     }
 

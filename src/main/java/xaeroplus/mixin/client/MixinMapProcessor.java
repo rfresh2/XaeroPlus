@@ -1,8 +1,8 @@
 package xaeroplus.mixin.client;
 
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.world.World;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,14 +28,14 @@ public abstract class MixinMapProcessor {
     @Shadow private String currentMWId;
 
     @Inject(method = "getMainId", at = @At("HEAD"), cancellable = true, remap = true)
-    private void getMainId(final boolean rootFolderFormat, boolean preIP6Fix, final ClientPlayNetworkHandler connection, final CallbackInfoReturnable<String> cir) {
+    private void getMainId(final boolean rootFolderFormat, boolean preIP6Fix, final ClientPacketListener connection, final CallbackInfoReturnable<String> cir) {
         DataFolderResolveUtil.resolveDataFolder(connection, cir);
     }
 
     @Inject(method = "getDimensionName", at = @At(value = "HEAD"), cancellable = true, remap = true)
-    public void getDimensionName(final RegistryKey<World> id, final CallbackInfoReturnable<String> cir) {
+    public void getDimensionName(final ResourceKey<Level> id, final CallbackInfoReturnable<String> cir) {
         if (!Globals.nullOverworldDimensionFolder) {
-            if (id == World.OVERWORLD) {
+            if (id == Level.OVERWORLD) {
                 cir.setReturnValue("DIM0");
             }
         }
@@ -59,7 +59,7 @@ public abstract class MixinMapProcessor {
 
     @Inject(method = "updateWorldSynced", at = @At(
         value = "INVOKE",
-        target = "Lxaero/map/world/MapWorld;onWorldChangeUnsynced(Lnet/minecraft/client/world/ClientWorld;)V",
+        target = "Lxaero/map/world/MapWorld;onWorldChangeUnsynced(Lnet/minecraft/client/multiplayer/ClientLevel;)V",
         shift = At.Shift.AFTER
     ), remap = true)
     public void fireWorldChangedEvent(final CallbackInfo ci) {

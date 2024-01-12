@@ -4,9 +4,9 @@ import baritone.api.pathing.goals.Goal;
 import baritone.api.pathing.goals.GoalXZ;
 import baritone.api.utils.interfaces.IGoalRenderPos;
 import net.lenni0451.lambdaevents.EventHandler;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.minimap.waypoints.WaypointSet;
@@ -25,8 +25,8 @@ import xaeroplus.util.ChunkUtils;
 import java.util.List;
 import java.util.Optional;
 
-import static net.minecraft.world.World.NETHER;
-import static net.minecraft.world.World.OVERWORLD;
+import static net.minecraft.world.level.Level.NETHER;
+import static net.minecraft.world.level.Level.OVERWORLD;
 
 @Module.ModuleInfo()
 public class BaritoneGoalSync extends Module {
@@ -60,8 +60,8 @@ public class BaritoneGoalSync extends Module {
         final int z = OptimizedMath.myFloor(baritoneGoalBlockPos.getZ() * dimDiv);
         if (baritoneGoalWaypoint.isPresent()) {
             final Waypoint waypoint = baritoneGoalWaypoint.get();
-            RegistryKey<World> customDim = Globals.getCurrentDimensionId();
-            RegistryKey<World> actualDim = ChunkUtils.getActualDimension();
+            ResourceKey<Level> customDim = Globals.getCurrentDimensionId();
+            ResourceKey<Level> actualDim = ChunkUtils.getActualDimension();
             double customDimDiv = 1.0;
             if (customDim != actualDim) {
                 if (customDim == NETHER && actualDim == OVERWORLD) {

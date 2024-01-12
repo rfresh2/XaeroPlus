@@ -1,6 +1,6 @@
 package xaeroplus.mixin.client;
 
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -14,7 +14,7 @@ import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
 public class MixinKeyEventHandler {
     private static boolean init = false;
     @Inject(method = "onKeyInput", at = @At("HEAD"))
-    public void onKeyInputInject(final MinecraftClient mc, final AXaeroMinimap modMain, final XaeroMinimapSession minimapSession, final CallbackInfo ci) {
+    public void onKeyInputInject(final Minecraft mc, final AXaeroMinimap modMain, final XaeroMinimapSession minimapSession, final CallbackInfo ci) {
         if (init || XaeroPlusSettingsReflectionHax.keybindsSupplier.get().isEmpty()) return;
         init = true;
         modMain.getControlsRegister().keybindings.addAll(XaeroPlusSettingsReflectionHax.keybindsSupplier.get());

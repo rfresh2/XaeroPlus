@@ -1,6 +1,6 @@
 package xaeroplus.settings;
 
-import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.KeyMapping;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax.SettingLocation;
 
@@ -20,7 +20,7 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
                                     final String tooltipTranslationKey,
                                     final Supplier<Boolean> visibilitySupplier,
                                     final Consumer<Boolean> settingChangeConsumer,
-                                    final KeyBinding keyBinding) {
+                                    final KeyMapping keyBinding) {
         super(settingName, settingNameTranslationKey, tooltipTranslationKey, keyBinding, visibilitySupplier);
         this.value = value;
         this.settingChangeConsumer = settingChangeConsumer;
@@ -38,7 +38,7 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
                 tooltipTranslationKey,
                 null,
                 null,
-                new KeyBinding(settingNameTranslationKey, -1, "XaeroPlus"));
+                new KeyMapping(settingNameTranslationKey, -1, "XaeroPlus"));
         settingLocation.getSettingsList().add(setting);
         return setting;
     }
@@ -56,7 +56,7 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
                 tooltipTranslationKey,
                 null,
                 settingChangeConsumer,
-                new KeyBinding(settingNameTranslationKey, -1, "XaeroPlus"));
+                new KeyMapping(settingNameTranslationKey, -1, "XaeroPlus"));
         settingLocation.getSettingsList().add(setting);
         return setting;
     }
@@ -74,7 +74,7 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
                 tooltipTranslationKey,
                 visibilitySupplier,
                 null,
-                new KeyBinding(settingNameTranslationKey, -1, "XaeroPlus"));
+                new KeyMapping(settingNameTranslationKey, -1, "XaeroPlus"));
         settingLocation.getSettingsList().add(setting);
         return setting;
     }
@@ -93,7 +93,7 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
                 tooltipTranslationKey,
                 visibilitySupplier,
                 settingChangeConsumer,
-                new KeyBinding(settingNameTranslationKey, -1, "XaeroPlus"));
+                new KeyMapping(settingNameTranslationKey, -1, "XaeroPlus"));
         settingLocation.getSettingsList().add(setting);
         return setting;
     }

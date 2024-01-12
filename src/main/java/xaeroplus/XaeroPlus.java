@@ -7,7 +7,7 @@ import net.fabricmc.loader.api.SemanticVersion;
 import net.fabricmc.loader.api.VersionParsingException;
 import net.lenni0451.lambdaevents.LambdaManager;
 import net.lenni0451.lambdaevents.generator.LambdaMetaFactoryGenerator;
-import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.KeyMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xaeroplus.module.ModuleManager;
@@ -29,7 +29,7 @@ public class XaeroPlus implements ClientModInitializer {
 			ModuleManager.init();
 			boolean a = Globals.FOLLOW; // force static instances to init
 			XaeroPlusSettingRegistry.fastMapSetting.getValue(); // force static instances to init
-			List<KeyBinding> keybinds = XaeroPlusSettingsReflectionHax.keybindsSupplier.get();
+			List<KeyMapping> keybinds = XaeroPlusSettingsReflectionHax.keybindsSupplier.get();
 			keybinds.forEach(KeyBindingHelper::registerKeyBinding);
 		}
 	}

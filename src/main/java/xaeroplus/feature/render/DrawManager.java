@@ -2,13 +2,13 @@ package xaeroplus.feature.render;
 
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
 import it.unimi.dsi.fastutil.longs.LongList;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaeroplus.Globals;
 import xaeroplus.util.ChunkUtils;
@@ -65,7 +65,7 @@ public class DrawManager {
         int tileZ,
         int insideX,
         int insideZ,
-        final MatrixStack matrixStack,
+        final PoseStack matrixStack,
         final VertexConsumer overlayBufferBuilder,
         MinimapRendererHelper helper
         ) {
@@ -101,7 +101,7 @@ public class DrawManager {
         final int level,
         final int flooredCameraX,
         final int flooredCameraZ,
-        final MatrixStack matrixStack,
+        final PoseStack matrixStack,
         final VertexConsumer overlayBuffer
     ) {
         final int mx = leafRegionX + level;
@@ -134,7 +134,7 @@ public class DrawManager {
                                             int tileZ,
                                             int insideX,
                                             int insideZ,
-                                            final MatrixStack matrixStack,
+                                            final PoseStack matrixStack,
                                             final VertexConsumer overlayBufferBuilder,
                                             MinimapRendererHelper helper
     ) {
@@ -157,7 +157,7 @@ public class DrawManager {
                 var left = drawX + 16 * (chunkPosX - cx * 4);
                 var top = drawZ + 16 * (chunkPosZ - cz * 4);
                 helper.addColoredRectToExistingBuffer(
-                    matrixStack.peek().getPositionMatrix(),
+                    matrixStack.last().pose(),
                     overlayBufferBuilder,
                     left,
                     top,
@@ -172,7 +172,7 @@ public class DrawManager {
                                              final long[] regionsArray,
                                              final int flooredCameraX,
                                              final int flooredCameraZ,
-                                             final MatrixStack matrixStack,
+                                             final PoseStack matrixStack,
                                              final VertexConsumer overlayBuffer
     ) {
         int color = feature.chunkHighlightProvider().colorSupplier().get();
@@ -191,7 +191,7 @@ public class DrawManager {
                 final float right = left + 16;
                 final float bottom = top + 16;
                 MinimapBackgroundDrawHelper.fillIntoExistingBuffer(
-                    matrixStack.peek().getPositionMatrix(),
+                    matrixStack.last().pose(),
                     overlayBuffer,
                     left,
                     top,

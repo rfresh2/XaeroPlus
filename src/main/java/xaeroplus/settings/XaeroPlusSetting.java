@@ -1,7 +1,7 @@
 package xaeroplus.settings;
 
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.resources.language.I18n;
 
 import java.util.function.Supplier;
 
@@ -12,14 +12,14 @@ public abstract class XaeroPlusSetting {
     private String tooltipTranslationKey;
     private static boolean ingameOnly = false;
     private static boolean requiresMinimap = false;
-    private KeyBinding keyBinding;
+    private KeyMapping keyBinding;
     private Supplier<Boolean> visibilitySupplier;
 
 
     public XaeroPlusSetting(String settingName,
                             String settingNameTranslationKey,
                             String tooltipTranslationKey, // nullable
-                            KeyBinding keyBinding, // nullable
+                            KeyMapping keyBinding, // nullable
                             Supplier<Boolean> visibilitySupplier // nullable
     ) {
         this.settingName = settingName;
@@ -42,7 +42,7 @@ public abstract class XaeroPlusSetting {
     }
 
     public String getTranslatedName() {
-        return SETTING_PREFIX + I18n.translate(getSettingNameTranslationKey());
+        return SETTING_PREFIX + I18n.get(getSettingNameTranslationKey());
     }
 
     public String getTooltipTranslationKey() {
@@ -55,10 +55,10 @@ public abstract class XaeroPlusSetting {
     public boolean isRequiresMinimap() {
         return requiresMinimap;
     }
-    public KeyBinding getKeyBinding() {
+    public KeyMapping getKeyBinding() {
         return keyBinding;
     }
-    public void setKeyBinding(KeyBinding keyBinding) {
+    public void setKeyBinding(KeyMapping keyBinding) {
         this.keyBinding = keyBinding;
     }
     public boolean isVisible() {

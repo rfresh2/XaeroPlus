@@ -1,10 +1,10 @@
 package xaeroplus.mixin.client.mc;
 
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.util.math.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.LightTexture;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,12 +15,12 @@ import xaero.common.minimap.waypoints.render.WaypointsIngameRenderer;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.extensions.CustomWaypointsIngameRenderer;
 
-@Mixin(value = WorldRenderer.class)
+@Mixin(value = LevelRenderer.class)
 public class MixinWorldRenderer {
 
     private int errorCount = 0;
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WorldRenderer;checkEmpty(Lnet/minecraft/client/util/math/MatrixStack;)V", ordinal = 1, shift = At.Shift.AFTER))
-    public void renderBlockEntitiesInject(final MatrixStack matrixStack, final float tickDelta, final long limitTime, final boolean renderBlockOutline, final Camera camera, final GameRenderer gameRenderer, final LightmapTextureManager lightmapTextureManager, final Matrix4f positionMatrix, final CallbackInfo ci) {
+    @Inject(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LevelRenderer;checkPoseStack(Lcom/mojang/blaze3d/vertex/PoseStack;)V", ordinal = 1, shift = At.Shift.AFTER))
+    public void renderBlockEntitiesInject(final PoseStack matrixStack, final float tickDelta, final long limitTime, final boolean renderBlockOutline, final Camera camera, final GameRenderer gameRenderer, final LightTexture lightmapTextureManager, final Matrix4f positionMatrix, final CallbackInfo ci) {
         final XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
         if (minimapSession == null) return;
         try {

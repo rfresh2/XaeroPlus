@@ -11,15 +11,15 @@ import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import com.llamalad7.mixinextras.sugar.ref.LocalLongRef;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -40,7 +40,7 @@ import xaeroplus.util.ChunkUtils;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.Objects.nonNull;
-import static net.minecraft.world.World.NETHER;
+import static net.minecraft.world.level.Level.NETHER;
 
 @Mixin(value = MapWriter.class, remap = false)
 public abstract class MixinMapWriter {
@@ -60,8 +60,8 @@ public abstract class MixinMapWriter {
     @Shadow
     private MapProcessor mapProcessor;
 
-    @Inject(method = "loadPixel", at = @At("HEAD"), remap = true)
-    public void setObsidianColumnLocalVar(final World world, final Registry<Block> blockRegistry, final MapBlock pixel, final MapBlock currentPixel, final WorldChunk bchunk, final int insideX, final int insideZ, final int highY, final int lowY, final boolean cave, final boolean fullCave, final int mappedHeight, final boolean canReuseBiomeColours, final boolean ignoreHeightmaps, final Registry<Biome> biomeRegistry, final boolean flowers, final int worldBottomY, final BlockPos.Mutable mutableBlockPos3, final CallbackInfo ci,
+    @Inject(method = "loadPixel", at = @At("HEAD"), remap = false)
+    public void setObsidianColumnLocalVar(final Level world, final Registry<Block> blockRegistry, final MapBlock pixel, final MapBlock currentPixel, final LevelChunk bchunk, final int insideX, final int insideZ, final int highY, final int lowY, final boolean cave, final boolean fullCave, final int mappedHeight, final boolean canReuseBiomeColours, final boolean ignoreHeightmaps, final Registry<Biome> biomeRegistry, final boolean flowers, final int worldBottomY, final BlockPos.MutableBlockPos mutableBlockPos3, final CallbackInfo ci,
                                           @Share("columnRoofObsidian") LocalBooleanRef columnRoofObsidianRef) {
         if (!XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()) return;
         columnRoofObsidianRef.set(false);
@@ -69,10 +69,10 @@ public abstract class MixinMapWriter {
 
     @Inject(method = "loadPixel", at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/block/BlockState;getFluidState()Lnet/minecraft/fluid/FluidState;",
+        target = "Lnet/minecraft/world/level/block/state/BlockState;getFluidState()Lnet/minecraft/world/level/material/FluidState;",
         ordinal = 0
     ), remap = true)
-    public void obsidianRoofHeadInject(final World world, final Registry<Block> blockRegistry, final MapBlock pixel, final MapBlock currentPixel, final WorldChunk bchunk, final int insideX, final int insideZ, final int highY, final int lowY, final boolean cave, final boolean fullCave, final int mappedHeight, final boolean canReuseBiomeColours, final boolean ignoreHeightmaps, final Registry<Biome> biomeRegistry, final boolean flowers, final int worldBottomY, final BlockPos.Mutable mutableBlockPos3, final CallbackInfo ci,
+    public void obsidianRoofHeadInject(final Level world, final Registry<Block> blockRegistry, final MapBlock pixel, final MapBlock currentPixel, final LevelChunk bchunk, final int insideX, final int insideZ, final int highY, final int lowY, final boolean cave, final boolean fullCave, final int mappedHeight, final boolean canReuseBiomeColours, final boolean ignoreHeightmaps, final Registry<Biome> biomeRegistry, final boolean flowers, final int worldBottomY, final BlockPos.MutableBlockPos mutableBlockPos3, final CallbackInfo ci,
                                        @Local(name = "state") LocalRef<BlockState> stateRef,
                                        @Local(name = "h") LocalIntRef hRef,
                                        @Local(name = "transparentSkipY") LocalIntRef transparentSkipYRef,
@@ -82,7 +82,7 @@ public abstract class MixinMapWriter {
         Block b = stateRef.get().getBlock();
         boolean roofObsidian = (hRef.get() >= XaeroPlusSettingRegistry.transparentObsidianRoofYSetting.getValue() && b == Blocks.OBSIDIAN);
         if (roofObsidian && XaeroPlusSettingRegistry.transparentObsidianRoofDarkeningSetting.getValue() == 0) {
-            stateRef.set(Blocks.AIR.getDefaultState());
+            stateRef.set(Blocks.AIR.defaultBlockState());
             transparentSkipYRef.set(transparentSkipYRef.get() - 1);
         }
         if (roofObsidian && !columnRoofObsidianRef.get()) {
@@ -96,7 +96,7 @@ public abstract class MixinMapWriter {
     @WrapOperation(method = "loadPixel", at = @At(
         value = "INVOKE",
         target = "Lxaero/map/region/OverlayBuilder;isEmpty()Z"
-    ), remap = true)
+    ), remap = false)
     public boolean checkObsidianRoofColumn(final OverlayBuilder instance, final Operation<Boolean> original,
                                            @Share("columnRoofObsidian") final LocalBooleanRef columnRoofObsidianRef) {
         if (!XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()) return original.call(instance);
@@ -105,9 +105,9 @@ public abstract class MixinMapWriter {
 
     @ModifyExpressionValue(method = "loadPixelHelp", at = @At(
         value = "INVOKE",
-        target = "Lxaero/map/MapWriter;shouldOverlayCached(Lnet/minecraft/state/State;)Z",
+        target = "Lxaero/map/MapWriter;shouldOverlayCached(Lnet/minecraft/world/level/block/state/StateHolder;)Z",
         ordinal = 0
-    ), remap = true)
+    ), remap = false)
     public boolean obsidianRoofOverlayMod(final boolean original,
                                           @Local(name = "b") Block b,
                                           @Local(name = "h") int h
@@ -119,10 +119,10 @@ public abstract class MixinMapWriter {
 
     @WrapOperation(method = "loadPixelHelp", at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/block/BlockState;getOpacity(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)I",
+        target = "Lnet/minecraft/world/level/block/state/BlockState;getLightBlock(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)I",
         ordinal = 1
     ), remap = true)
-    public int getOpacityForObsidianRoof(BlockState instance, BlockView world, BlockPos pos, Operation<Integer> original,
+    public int getOpacityForObsidianRoof(BlockState instance, BlockGetter world, BlockPos pos, Operation<Integer> original,
                                          @Local(name = "h") int h) {
         if (!XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()) return original.call(instance, world, pos);
         return instance.getBlock() == Blocks.OBSIDIAN && h > XaeroPlusSettingRegistry.transparentObsidianRoofYSetting.getValue()
@@ -153,9 +153,9 @@ public abstract class MixinMapWriter {
         return 0;
     }
 
-    @Inject(method = "writeChunk", at = @At(value = "HEAD"), cancellable = true, remap = true)
+    @Inject(method = "writeChunk", at = @At(value = "HEAD"), cancellable = true, remap = false)
     public void writeChunk(
-            World world,
+            Level world,
             Registry<Block> blockRegistry,
             int distance,
             boolean onlyLoad,
@@ -166,7 +166,7 @@ public abstract class MixinMapWriter {
             boolean ignoreHeightmaps,
             boolean flowers,
             boolean detailedDebug,
-            BlockPos.Mutable mutableBlockPos3,
+            BlockPos.MutableBlockPos mutableBlockPos3,
             BlockTintProvider blockTintProvider,
             int caveDepth,
             int caveStart,
@@ -194,13 +194,13 @@ public abstract class MixinMapWriter {
         }
     }
 
-    @Inject(method = "loadPixel", at = @At("HEAD"), remap = true)
-    public void netherCaveFixInject(final World world, final Registry<Block> blockRegistry, final MapBlock pixel, final MapBlock currentPixel, final WorldChunk bchunk, final int insideX, final int insideZ, final int highY, final int lowY, final boolean cave, final boolean fullCave, final int mappedHeight, final boolean canReuseBiomeColours, final boolean ignoreHeightmaps, final Registry<Biome> biomeRegistry, final boolean flowers, final int worldBottomY, final BlockPos.Mutable mutableBlockPos3, final CallbackInfo ci,
+    @Inject(method = "loadPixel", at = @At("HEAD"), remap = false)
+    public void netherCaveFixInject(final Level world, final Registry<Block> blockRegistry, final MapBlock pixel, final MapBlock currentPixel, final LevelChunk bchunk, final int insideX, final int insideZ, final int highY, final int lowY, final boolean cave, final boolean fullCave, final int mappedHeight, final boolean canReuseBiomeColours, final boolean ignoreHeightmaps, final Registry<Biome> biomeRegistry, final boolean flowers, final int worldBottomY, final BlockPos.MutableBlockPos mutableBlockPos3, final CallbackInfo ci,
                                     @Local(index = 10, argsOnly = true) LocalBooleanRef caveRef,
                                     @Local(index = 11, argsOnly = true) LocalBooleanRef fullCaveRef
                                     ) {
         if (XaeroPlusSettingRegistry.netherCaveFix.getValue()) {
-            var nether = world.getRegistryKey() == NETHER;
+            var nether = world.dimension() == NETHER;
             var shouldForceFullInNether = !cave && nether;
             caveRef.set(shouldForceFullInNether || cave);
             fullCaveRef.set(shouldForceFullInNether || fullCave);

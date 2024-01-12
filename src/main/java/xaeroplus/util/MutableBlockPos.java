@@ -1,6 +1,6 @@
 package xaeroplus.util;
 
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 public class MutableBlockPos extends BlockPos {
     public MutableBlockPos(final int i, final int j, final int k) {

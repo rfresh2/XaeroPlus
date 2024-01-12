@@ -2,10 +2,10 @@ package xaeroplus.mixin.client;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -53,19 +53,19 @@ public abstract class MixinGuiWaypointsList {
     @Inject(method = "drawWaypointSlot", at = @At(
         value = "INVOKE",
         target = "Lxaero/common/minimap/waypoints/Waypoint;isGlobal()Z"
-    ), remap = true)
-    public void shiftIconsLeft(final DrawContext guiGraphics, final Waypoint w, final int x, final int y, final CallbackInfo ci,
+    ), remap = false)
+    public void shiftIconsLeft(final GuiGraphics guiGraphics, final Waypoint w, final int x, final int y, final CallbackInfo ci,
                                @Local(name = "rectX") LocalIntRef rectX) {
         rectX.set(rectX.get() - 30);
     }
 
     @Inject(method = "drawWaypointSlot", at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;draw()V"
+        target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endBatch()V"
     ), remap = true)
-    public void drawWaypointDistances(final DrawContext guiGraphics, final Waypoint w, final int x, final int y, final CallbackInfo ci) {
+    public void drawWaypointDistances(final GuiGraphics guiGraphics, final Waypoint w, final int x, final int y, final CallbackInfo ci) {
         if (XaeroPlusSettingRegistry.showWaypointDistances.getValue()) {
-            Entity renderViewEntity = MinecraftClient.getInstance().getCameraEntity();
+            Entity renderViewEntity = Minecraft.getInstance().getCameraEntity();
             final double playerX = renderViewEntity.getX();
             final double playerZ = renderViewEntity.getZ();
             final double playerY = renderViewEntity.getY();
@@ -75,8 +75,8 @@ public abstract class MixinGuiWaypointsList {
             final int wpZ = w.getZ(dimensionDivision);
             final double distance = Math.sqrt(Math.pow(playerX - wpX, 2) + Math.pow(playerY - wpY, 2) + Math.pow(playerZ - wpZ, 2));
             final String text = NumberFormat.getIntegerInstance().format(distance) + "m";
-            final TextRenderer fontRenderer = MinecraftClient.getInstance().textRenderer;
-            guiGraphics.drawTextWithShadow(fontRenderer, text, x + 250, y + 1, 0xFFFFFF);
+            final Font fontRenderer = Minecraft.getInstance().font;
+            guiGraphics.drawString(fontRenderer, text, x + 250, y + 1, 0xFFFFFF);
         }
     }
 }

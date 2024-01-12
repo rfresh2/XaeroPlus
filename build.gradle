@@ -25,6 +25,10 @@ repositories {
 		name = "jitpack.io"
 		url = "https://jitpack.io"
 	}
+	maven {
+		name = 'ParchmentMC'
+		url = 'https://maven.parchmentmc.org'
+	}
 	mavenLocal()
 }
 
@@ -49,7 +53,10 @@ ext {
 
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    mappings loom.layered {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-1.20.1:2023.09.03@zip")
+    }
 	forge "net.minecraftforge:forge:${project.forge_version}"
 	implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.2"))
 	implementation(include "io.github.llamalad7:mixinextras-forge:0.3.2")

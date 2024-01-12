@@ -3,7 +3,7 @@ package xaeroplus;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import net.lenni0451.lambdaevents.LambdaManager;
 import net.lenni0451.lambdaevents.generator.LambdaMetaFactoryGenerator;
-import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.KeyMapping;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -47,7 +47,7 @@ public class XaeroPlus {
 		ModuleManager.init();
 		boolean a = Globals.FOLLOW; // force static instances to init
 		XaeroPlusSettingRegistry.fastMapSetting.getValue(); // force static instances to init
-		List<KeyBinding> keybinds = XaeroPlusSettingsReflectionHax.keybindsSupplier.get();
+		List<KeyMapping> keybinds = XaeroPlusSettingsReflectionHax.keybindsSupplier.get();
 		keybinds.forEach(event::register);
 	}
 }

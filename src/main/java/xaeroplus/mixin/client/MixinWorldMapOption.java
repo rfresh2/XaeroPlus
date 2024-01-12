@@ -1,8 +1,8 @@
 package xaeroplus.mixin.client;
 
-import net.minecraft.text.LiteralTextContent;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.LiteralContents;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -21,14 +21,14 @@ public class MixinWorldMapOption {
     @Mutable
     @Final
     @Shadow
-    private Text caption;
+    private Component caption;
     @Inject(method = "<init>", at = @At("RETURN"))
     public void constructorInject(final ModOptions option, final CallbackInfo ci) {
         if (option.getEnumString().startsWith(SETTING_PREFIX)) {
             XaeroPlusSettingsReflectionHax.XAERO_PLUS_WORLDMAP_SETTINGS.stream()
                     .filter(s -> s.getSettingName().equals(option.getEnumString()))
                     .findFirst()
-                    .ifPresent(s -> caption = MutableText.of(new LiteralTextContent(SETTING_PREFIX)).append(Text.translatable(s.getSettingNameTranslationKey())));
+                    .ifPresent(s -> caption = MutableComponent.create(new LiteralContents(SETTING_PREFIX)).append(Component.translatable(s.getSettingNameTranslationKey())));
         }
     }
 }

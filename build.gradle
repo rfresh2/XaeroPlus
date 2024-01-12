@@ -25,6 +25,10 @@ repositories {
 		name = "jitpack.io"
 		url = "https://jitpack.io"
 	}
+	maven {
+		name = 'ParchmentMC'
+		url = 'https://maven.parchmentmc.org'
+	}
 	mavenLocal()
 }
 
@@ -52,7 +56,10 @@ ext {
 
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	mappings loom.layered {
+		officialMojangMappings()
+		parchment("org.parchmentmc.data:parchment-1.20.2:2023.12.10@zip")
+	}
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
@@ -63,8 +70,8 @@ dependencies {
 	modImplementation "maven.modrinth:xaeros-world-map:${worldmap_version}_Fabric_1.20.2"
 	modImplementation "maven.modrinth:xaeros-minimap:${minimap_version}_Fabric_1.20.2"
 	modImplementation files("libs/baritone-unoptimized-fabric-1.10.2.jar")
-	modCompileOnly "maven.modrinth:waystones:15.0.1+fabric-1.20.2"
-	modCompileOnly "maven.modrinth:balm:8.0.1+fabric-1.20.2"
+	modImplementation "maven.modrinth:waystones:15.2.0+fabric-1.20.2"
+	modImplementation "maven.modrinth:balm:8.0.5+fabric-1.20.2"
 	modCompileOnly "maven.modrinth:fwaystones:3.3.1+mc1.20.2"
 //	modCompileOnly "maven.modrinth:owo-lib:0.11.3+1.20.2"
 //	runtimeOnly "blue.endless:jankson:1.2.3"

@@ -1,12 +1,12 @@
 package xaeroplus.mixin.client;
 
-import net.minecraft.block.Block;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluid;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,14 +16,14 @@ import xaero.map.region.MapTile;
 import xaero.map.region.MapTileChunk;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 
-import static net.minecraft.world.World.NETHER;
+import static net.minecraft.world.level.Level.NETHER;
 
 @Mixin(value = WorldDataReader.class, remap = false)
 public abstract class MixinWorldDataReader {
 
     @Shadow
     protected abstract boolean buildTile(
-            NbtCompound nbttagcompound,
+            CompoundTag nbttagcompound,
             MapTile tile,
             MapTileChunk tileChunk,
             int chunkX,
@@ -34,8 +34,8 @@ public abstract class MixinWorldDataReader {
             int caveDepth,
             boolean worldHasSkylight,
             boolean ignoreHeightmaps,
-            ServerWorld serverWorld,
-            RegistryWrapper<Block> blockLookup,
+            ServerLevel serverWorld,
+            HolderLookup<Block> blockLookup,
             Registry<Block> blockRegistry,
             Registry<Fluid> fluidRegistry,
             Registry<Biome> biomeRegistry,
@@ -47,11 +47,11 @@ public abstract class MixinWorldDataReader {
     @Redirect(method = "buildTileChunk",
             at = @At(
                     value = "INVOKE",
-                    target = "Lxaero/map/file/worldsave/WorldDataReader;buildTile(Lnet/minecraft/nbt/NbtCompound;Lxaero/map/region/MapTile;Lxaero/map/region/MapTileChunk;IIIIIIZZLnet/minecraft/server/world/ServerWorld;Lnet/minecraft/registry/RegistryWrapper;Lnet/minecraft/registry/Registry;Lnet/minecraft/registry/Registry;Lnet/minecraft/registry/Registry;ZII)Z"),
+                    target = "Lxaero/map/file/worldsave/WorldDataReader;buildTile(Lnet/minecraft/nbt/CompoundTag;Lxaero/map/region/MapTile;Lxaero/map/region/MapTileChunk;IIIIIIZZLnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/HolderLookup;Lnet/minecraft/core/Registry;Lnet/minecraft/core/Registry;Lnet/minecraft/core/Registry;ZII)Z"),
             remap = true
     )
     public boolean redirectBuildTile(final WorldDataReader instance,
-                                     NbtCompound nbttagcompound,
+                                     CompoundTag nbttagcompound,
                                      MapTile tile,
                                      MapTileChunk tileChunk,
                                      int chunkX,
@@ -62,8 +62,8 @@ public abstract class MixinWorldDataReader {
                                      int caveDepth,
                                      boolean worldHasSkylight,
                                      boolean ignoreHeightmaps,
-                                     ServerWorld serverWorld,
-                                     RegistryWrapper<Block> blockLookup,
+                                     ServerLevel serverWorld,
+                                     HolderLookup<Block> blockLookup,
                                      Registry<Block> blockRegistry,
                                      Registry<Fluid> fluidRegistry,
                                      Registry<Biome> biomeRegistry,

@@ -1,8 +1,8 @@
 package xaeroplus.feature.extensions;
 
-import net.minecraft.client.util.math.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import xaero.common.XaeroMinimapSession;
 
 public interface CustomWaypointsIngameRenderer {
-    void renderWaypointBeacons(final XaeroMinimapSession minimapSession, final MatrixStack matrixStack, final float tickDelta);
+    void renderWaypointBeacons(final XaeroMinimapSession minimapSession, final PoseStack matrixStack, final float tickDelta);
 }

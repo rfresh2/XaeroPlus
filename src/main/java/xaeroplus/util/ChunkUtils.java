@@ -1,13 +1,13 @@
 package xaeroplus.util;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
 import xaeroplus.Globals;
 
-import static net.minecraft.world.World.NETHER;
-import static net.minecraft.world.World.OVERWORLD;
+import static net.minecraft.world.level.Level.NETHER;
+import static net.minecraft.world.level.Level.OVERWORLD;
 
 public class ChunkUtils {
 
@@ -41,8 +41,8 @@ public class ChunkUtils {
 
     public static double getPlayerX() {
         try {
-            MinecraftClient mc = MinecraftClient.getInstance();
-            RegistryKey<World> dim = mc.world.getRegistryKey();
+            Minecraft mc = Minecraft.getInstance();
+            ResourceKey<Level> dim = mc.level.dimension();
             // when player is in the nether or the custom dimension is the nether, perform coordinate translation
             if ((dim == NETHER || Globals.getCurrentDimensionId() == NETHER) && dim != Globals.getCurrentDimensionId()) {
                 if (Globals.getCurrentDimensionId() == OVERWORLD) {
@@ -58,8 +58,8 @@ public class ChunkUtils {
     }
     public static double getPlayerZ() {
         try {
-            MinecraftClient mc = MinecraftClient.getInstance();
-            RegistryKey<World> dim = mc.world.getRegistryKey();
+            Minecraft mc = Minecraft.getInstance();
+            ResourceKey<Level> dim = mc.level.dimension();
             // when player is in the nether or the custom dimension is the nether, perform coordinate translation
             if ((dim == NETHER || Globals.getCurrentDimensionId() == NETHER) && dim != Globals.getCurrentDimensionId()) {
                 if (Globals.getCurrentDimensionId() == OVERWORLD) {
@@ -75,7 +75,7 @@ public class ChunkUtils {
     }
     public static int actualPlayerChunkX() {
         try {
-            return MinecraftClient.getInstance().player.getChunkPos().x;
+            return Minecraft.getInstance().player.chunkPosition().x;
         } catch (final NullPointerException e) {
             return 0;
         }
@@ -85,7 +85,7 @@ public class ChunkUtils {
     }
     public static int actualPlayerChunkZ() {
         try {
-            return MinecraftClient.getInstance().player.getChunkPos().z;
+            return Minecraft.getInstance().player.chunkPosition().z;
         } catch (final NullPointerException e) {
             return 0;
         }
@@ -105,9 +105,9 @@ public class ChunkUtils {
     public static int getPlayerRegionZ() {
         return getPlayerChunkZ() >> 5;
     }
-    public static RegistryKey<World> getActualDimension() {
+    public static ResourceKey<Level> getActualDimension() {
         try {
-            return MinecraftClient.getInstance().world.getRegistryKey();
+            return Minecraft.getInstance().level.dimension();
         } catch (final Exception e) {
             return OVERWORLD;
         }

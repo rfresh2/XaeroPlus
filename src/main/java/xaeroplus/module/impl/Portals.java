@@ -5,16 +5,20 @@ import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
 import net.lenni0451.lambdaevents.EventHandler;
-import net.minecraft.block.*;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.EmptyChunk;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
+import net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EndPortalBlock;
+import net.minecraft.world.level.block.NetherPortalBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.EmptyLevelChunk;
+import net.minecraft.world.level.chunk.LevelChunk;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.ChunkDataEvent;
@@ -34,13 +38,14 @@ import xaeroplus.util.ChunkUtils;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static net.minecraft.world.World.*;
+import static net.minecraft.world.level.Level.*;
 import static xaeroplus.feature.render.ColorHelper.getColor;
+
 
 @Module.ModuleInfo()
 public class Portals extends Module {
     private ChunkHighlightCache portalsCache = new ChunkHighlightLocalCache();
-    private final MinecraftClient mc = MinecraftClient.getInstance();
+    private final Minecraft mc = Minecraft.getInstance();
     private int portalsColor = getColor(0, 255, 0, 100);
     private static final String DATABASE_NAME = "XaeroPlusPortals";
     private final ExecutorService searchExecutor = Executors.newFixedThreadPool(
@@ -86,7 +91,7 @@ public class Portals extends Module {
     }
 
     public boolean inUnknownDimension() {
-        final RegistryKey<World> dim = ChunkUtils.getActualDimension();
+        final ResourceKey<Level> dim = ChunkUtils.getActualDimension();
         return dim != OVERWORLD && dim != NETHER && dim != END;
     }
 
@@ -97,12 +102,12 @@ public class Portals extends Module {
 
     @EventHandler
     public void onPacketReceived(final PacketReceivedEvent event) {
-        if (event.packet() instanceof BlockUpdateS2CPacket) {
-            final BlockUpdateS2CPacket packet = (BlockUpdateS2CPacket) event.packet();
-            handleBlockChange(packet.getPos(), packet.getState());
-        } else if (event.packet() instanceof ChunkDeltaUpdateS2CPacket) {
-            final ChunkDeltaUpdateS2CPacket packet = (ChunkDeltaUpdateS2CPacket) event.packet();
-            packet.visitUpdates(this::handleBlockChange);
+        if (event.packet() instanceof ClientboundBlockUpdatePacket) {
+            final ClientboundBlockUpdatePacket packet = (ClientboundBlockUpdatePacket) event.packet();
+            handleBlockChange(packet.getPos(), packet.getBlockState());
+        } else if (event.packet() instanceof ClientboundSectionBlocksUpdatePacket) {
+            final ClientboundSectionBlocksUpdatePacket packet = (ClientboundSectionBlocksUpdatePacket) event.packet();
+            packet.runUpdates(this::handleBlockChange);
         }
     }
 
@@ -122,11 +127,11 @@ public class Portals extends Module {
         portalsCache.handleTick();
     }
 
-    private void findPortalInChunkAsync(final Chunk chunk) {
+    private void findPortalInChunkAsync(final ChunkAccess chunk) {
         findPortalInChunkAsync(chunk, 0);
     }
 
-    private void findPortalInChunkAsync(final Chunk chunk, final int waitMs) {
+    private void findPortalInChunkAsync(final ChunkAccess chunk, final int waitMs) {
         if (inUnknownDimension()) return;
         if (chunk == null) return;
         searchExecutor.execute(() -> {
@@ -151,10 +156,10 @@ public class Portals extends Module {
         PORTAL_BLOCKS.add(Blocks.END_PORTAL_FRAME);
     }
 
-    private boolean findPortalInChunk(final Chunk chunk) {
+    private boolean findPortalInChunk(final ChunkAccess chunk) {
         final boolean chunkHadPortal = portalsCache.isHighlighted(chunk.getPos().x, chunk.getPos().z, ChunkUtils.getActualDimension());
 //        var before = System.nanoTime();
-        var hasPortal = ChunkScanner.chunkContainsBlocks(chunk, PORTAL_BLOCKS, mc.world.getBottomY());
+        var hasPortal = ChunkScanner.chunkContainsBlocks(chunk, PORTAL_BLOCKS, mc.level.getMinBuildHeight());
 //        var after = System.nanoTime();
 //        XaeroPlus.LOGGER.info("Scanned chunk {} in {} ns", chunk.getPos(), after - before);
         if (hasPortal) {
@@ -166,26 +171,26 @@ public class Portals extends Module {
     }
 
     private boolean findPortalAtBlockPos(final BlockPos pos) {
-        if (mc.world == null || inUnknownDimension()) return false;
+        if (mc.level == null || inUnknownDimension()) return false;
         int chunkX = ChunkUtils.posToChunkPos(pos.getX());
         int chunkZ = ChunkUtils.posToChunkPos(pos.getZ());
-        WorldChunk worldChunk = mc.world.getChunkManager().getWorldChunk(chunkX, chunkZ, false);
-        if (worldChunk == null || worldChunk instanceof EmptyChunk) return false;
+        LevelChunk worldChunk = mc.level.getChunkSource().getChunk(chunkX, chunkZ, false);
+        if (worldChunk == null || worldChunk instanceof EmptyLevelChunk) return false;
         BlockState blockState = worldChunk.getBlockState(pos);
         return (blockState.getBlock() instanceof NetherPortalBlock || blockState.getBlock() instanceof EndPortalBlock);
     }
 
     private void searchAllLoadedChunks() {
-        if (mc.world == null || inUnknownDimension()) return;
-        final int renderDist = mc.options.getViewDistance().getValue();
+        if (mc.level == null || inUnknownDimension()) return;
+        final int renderDist = mc.options.renderDistance().get();
         final int xMin = ChunkUtils.getPlayerChunkX() - renderDist;
         final int xMax = ChunkUtils.getPlayerChunkX() + renderDist;
         final int zMin = ChunkUtils.getPlayerChunkZ() - renderDist;
         final int zMax = ChunkUtils.getPlayerChunkZ() + renderDist;
         for (int x = xMin; x <= xMax; x++) {
             for (int z = zMin; z <= zMax; z++) {
-                Chunk chunk = mc.world.getChunkManager().getWorldChunk(x, z, false);
-                if (chunk instanceof EmptyChunk) continue;
+                ChunkAccess chunk = mc.level.getChunkSource().getChunk(x, z, false);
+                if (chunk instanceof EmptyLevelChunk) continue;
                 findPortalInChunkAsync(chunk);
             }
         }
@@ -197,9 +202,9 @@ public class Portals extends Module {
         int chunkZ = ChunkUtils.posToChunkPos(pos.getZ());
         if (portalsCache.isHighlighted(chunkX, chunkZ, ChunkUtils.getActualDimension())) {
             if (findPortalAtBlockPos(pos)) {
-                if (mc.world == null || mc.world.getChunkManager() == null) return;
-                WorldChunk worldChunk = mc.world.getChunkManager().getWorldChunk(chunkX, chunkZ, false);
-                if (worldChunk != null && !(worldChunk instanceof EmptyChunk)) {
+                if (mc.level == null || mc.level.getChunkSource() == null) return;
+                LevelChunk worldChunk = mc.level.getChunkSource().getChunk(chunkX, chunkZ, false);
+                if (worldChunk != null && !(worldChunk instanceof EmptyLevelChunk)) {
                     // todo: this isn't guaranteed to search _after_ the block update is processed
                     findPortalInChunkAsync(worldChunk, 250);
                 }
@@ -221,7 +226,7 @@ public class Portals extends Module {
         portalsColor = ColorHelper.getColorWithAlpha(portalsColor, (int) (a));
     }
 
-    public boolean isPortalChunk(final int chunkPosX, final int chunkPosZ, final RegistryKey<World> dimensionId) {
+    public boolean isPortalChunk(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> dimensionId) {
         return portalsCache.isHighlighted(chunkPosX, chunkPosZ, dimensionId);
     }
 }

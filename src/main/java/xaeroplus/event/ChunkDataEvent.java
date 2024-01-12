@@ -1,6 +1,6 @@
 package xaeroplus.event;
 
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.level.chunk.LevelChunk;
 
-public record ChunkDataEvent(WorldChunk chunk) {
+public record ChunkDataEvent(LevelChunk chunk) {
 }

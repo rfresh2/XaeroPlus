@@ -1,7 +1,7 @@
 package xaeroplus.util;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import xaero.map.gui.GuiMap;
 import xaero.map.gui.GuiSettings;
 import xaeroplus.mixin.client.MixinGuiMapAccessor;
@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public class GuiMapHelper {
     public static Optional<GuiMap> getGuiMap() {
-        Screen currentScreen = MinecraftClient.getInstance().currentScreen;
+        Screen currentScreen = Minecraft.getInstance().screen;
         if (currentScreen instanceof GuiMap) {
             return Optional.of((GuiMap) currentScreen);
         } else if (currentScreen instanceof GuiSettings screen) {
@@ -38,7 +38,7 @@ public class GuiMapHelper {
     }
 
     public static boolean isGuiMapLoaded() {
-        return MinecraftClient.getInstance().currentScreen instanceof GuiMap;
+        return Minecraft.getInstance().screen instanceof GuiMap;
     }
 
     public static int getGuiMapCenterRegionX(final GuiMap guiMap) {

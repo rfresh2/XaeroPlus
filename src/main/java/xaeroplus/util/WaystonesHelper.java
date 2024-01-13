@@ -1,6 +1,6 @@
 package xaeroplus.util;
 
-import net.blay09.mods.waystones.Waystones;
+import net.blay09.mods.waystones.api.event.WaystonesListReceivedEvent;
 import xaeroplus.XaeroPlus;
 
 public class WaystonesHelper {
@@ -10,7 +10,8 @@ public class WaystonesHelper {
     public static boolean isWaystonesPresent() {
         if (!checked) {
             try {
-                Class.forName(Waystones.class.getName());
+                // events changed in recent versions of Waystones
+                Class.forName(WaystonesListReceivedEvent.class.getName());
                 XaeroPlus.LOGGER.info("Found Waystones. Enabling Waystones support.");
                 isWaystonesPresent = true;
             } catch (final Throwable e) {

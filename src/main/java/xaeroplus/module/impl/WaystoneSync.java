@@ -41,13 +41,13 @@ public class WaystoneSync extends Module {
 
     @Override
     public void onDisable() {
-        blayWaystonesHelper.toSyncWaystones = new ArrayList<>();
+        blayWaystonesHelper.currentWaystones = new ArrayList<>();
     }
 
     @EventHandler
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
         if (event.worldId() == null) {
-            blayWaystonesHelper.toSyncWaystones = new ArrayList<>();
+            blayWaystonesHelper.currentWaystones = new ArrayList<>();
         }
     }
 
@@ -57,14 +57,14 @@ public class WaystoneSync extends Module {
             if (blayWaystonesHelper.shouldSync) {
                 if (syncMainWaystones()) {
                     blayWaystonesHelper.shouldSync = false;
-                    blayWaystonesHelper.toSyncWaystones = new ArrayList<>();
+                    blayWaystonesHelper.currentWaystones = new ArrayList<>();
                 }
             }
         }
     }
 
     public boolean syncMainWaystones() {
-        return commonWaystoneSync(blayWaystonesHelper.getToSyncWaystones());
+        return commonWaystoneSync(blayWaystonesHelper.getCurrentWaystones());
     }
 
     public boolean commonWaystoneSync(final List<Waystone> waystones) {
@@ -182,7 +182,7 @@ public class WaystoneSync extends Module {
     }
 
     public void reloadStandardWaystones() {
-        blayWaystonesHelper.toSyncWaystones = blayWaystonesHelper.currentWaystones;
+        blayWaystonesHelper.currentWaystones = blayWaystonesHelper.currentWaystones;
         blayWaystonesHelper.shouldSync = true;
     }
 

@@ -70,8 +70,8 @@ dependencies {
 	modImplementation "maven.modrinth:xaeros-world-map:${worldmap_version}_Fabric_1.20.4"
 	modImplementation "maven.modrinth:xaeros-minimap:${minimap_version}_Fabric_1.20.4"
 	modCompileOnly files("libs/baritone-unoptimized-fabric-1.10.4.jar")
-	modCompileOnly "maven.modrinth:waystones:15.0.1+fabric-1.20.2"
-	modCompileOnly "maven.modrinth:balm:8.0.1+fabric-1.20.2"
+	modImplementation "maven.modrinth:waystones:16.0.3+fabric-1.20.4"
+	modImplementation "maven.modrinth:balm:9.0.4+fabric-1.20.4"
 	modCompileOnly "maven.modrinth:fwaystones:3.3.1+mc1.20.2"
 //	modCompileOnly "maven.modrinth:owo-lib:0.11.3+1.20.2"
 //	runtimeOnly "blue.endless:jankson:1.2.3"

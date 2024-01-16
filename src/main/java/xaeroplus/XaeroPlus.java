@@ -42,7 +42,7 @@ public class XaeroPlus implements ClientModInitializer {
 	private static void minimapCompatibleVersionCheck() {
 		try {
 			SemanticVersion compatibleMinimapVersion = SemanticVersion.parse(getCompatibleMinimapVersion());
-			if (!checkVersion("xaerominimap", compatibleMinimapVersion) && !checkVersion("xaerobetterpvp", compatibleMinimapVersion)) {
+			if (!checkVersion("xaerominimap", compatibleMinimapVersion) && !checkVersion("xaerobetterpvp", compatibleMinimapVersion) && !checkVersion("xaerominimapfair", compatibleMinimapVersion)) {
 				throw new RuntimeException("XaeroPlus requires version: '" + compatibleMinimapVersion + "' of Xaero's Minimap or BetterPVP installed");
 			}
 		} catch (VersionParsingException e) {

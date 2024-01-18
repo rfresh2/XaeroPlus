@@ -29,6 +29,10 @@ repositories {
 		name = 'ParchmentMC'
 		url = 'https://maven.parchmentmc.org'
 	}
+	maven {
+		name = 'Lenni0451'
+		url = 'https://maven.lenni0451.net/releases'
+	}
 	mavenLocal()
 }
 
@@ -62,7 +66,7 @@ dependencies {
 	implementation(include "io.github.llamalad7:mixinextras-forge:0.3.2")
 
 	implementation(include 'com.github.ben-manes.caffeine:caffeine:3.1.8')
-    implementation(include "net.lenni0451:LambdaEvents:2.4.0")
+    implementation(include "net.lenni0451:LambdaEvents:2.4.1")
     forgeRuntimeLibrary(jarLibs 'org.xerial:sqlite-jdbc:3.44.1.0')
 
 	modImplementation "maven.modrinth:xaeros-world-map:${worldmap_version}_Forge_1.20.2"

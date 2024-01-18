@@ -29,6 +29,10 @@ repositories {
 		name = 'ParchmentMC'
 		url = 'https://maven.parchmentmc.org'
 	}
+	maven {
+		name = 'Lenni0451'
+		url = 'https://maven.lenni0451.net/releases'
+	}
 	mavenLocal()
 }
 
@@ -64,7 +68,7 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	implementation(include 'com.github.ben-manes.caffeine:caffeine:3.1.8')
-	implementation(include "net.lenni0451:LambdaEvents:2.4.0")
+	implementation(include "net.lenni0451:LambdaEvents:2.4.1")
 	jarLibs 'org.xerial:sqlite-jdbc:3.44.1.0'
 
 	modImplementation "maven.modrinth:xaeros-world-map:${worldmap_version}_Fabric_1.20.2"

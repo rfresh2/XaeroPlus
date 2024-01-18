@@ -23,6 +23,8 @@
   "setting.world_map.transparent_obsidian_roof_y.tooltip": "Définit le niveau min en Y du toit transparent en Obsidienne.",
   "setting.world_map.transparent_obsidian_roof_darkening": "Toit Obsidienne Obscurcissant",
   "setting.world_map.transparent_obsidian_roof_darkening.tooltip": "Définit l'opacité des tuiles d'obsidienne transparentes.",
+  "setting.world_map.transparent_obsidian_roof_snow_opacity": "Opacité de la neige sur le toit",
+  "setting.world_map.transparent_obsidian_roof_snow_opacity.tooltip": "Définit l'opacité de la neige au sommet du toit d'obsidienne.",
   "setting.world_map.min_zoom": "Min WorldMap Zoom",
   "setting.world_map.min_zoom.tooltip": "Réglage minimum du zoom sur la carte du monde. Ce réglage correspond à 10x ce que vous voyez sur la carte du monde.",
   "setting.world_map.skip_world_render": "Sauter le rendu de l'arrière-plan",

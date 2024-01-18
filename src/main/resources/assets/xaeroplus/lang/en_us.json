@@ -23,6 +23,8 @@
   "setting.world_map.transparent_obsidian_roof_y.tooltip": "Sets the min Y level of the transparent obsidian roof.",
   "setting.world_map.transparent_obsidian_roof_darkening": "Roof Obsidian Darkening",
   "setting.world_map.transparent_obsidian_roof_darkening.tooltip": "Sets the opacity of the transparent obsidian roof tiles.",
+  "setting.world_map.transparent_obsidian_roof_snow_opacity": "Roof Snow Opacity",
+  "setting.world_map.transparent_obsidian_roof_snow_opacity.tooltip": "Sets the opacity of snow on top of the obsidian roof.",
   "setting.world_map.min_zoom": "Min WorldMap Zoom",
   "setting.world_map.min_zoom.tooltip": "Minimum WorldMap Zoom Setting. This is 10x what you see on the WorldMap.",
   "setting.world_map.skip_world_render": "Skip Background Render",

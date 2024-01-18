@@ -23,6 +23,8 @@
   "setting.world_map.transparent_obsidian_roof_y.tooltip": "设置黑曜石平台透明化的最小 Y 值。",
   "setting.world_map.transparent_obsidian_roof_darkening": "黑曜石平台暗色化",
   "setting.world_map.transparent_obsidian_roof_darkening.tooltip": "设置透明黑曜石平台的不透明度。",
+  "setting.world_map.transparent_obsidian_roof_snow_opacity": "屋顶雪不透明度",
+  "setting.world_map.transparent_obsidian_roof_snow_opacity.tooltip": "设置黑曜石屋顶上雪的不透明度。",
   "setting.world_map.min_zoom": "最小世界地图缩放",
   "setting.world_map.min_zoom.tooltip": "最小世界地图缩放设置。这是你在世界地图上看到的 10 倍。",
   "setting.world_map.skip_world_render": "跳过背景渲染",

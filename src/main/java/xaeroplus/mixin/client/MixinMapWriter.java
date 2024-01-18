@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.objectweb.asm.Opcodes;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -59,6 +60,9 @@ public abstract class MixinMapWriter {
 
     @Shadow
     private MapProcessor mapProcessor;
+    @Shadow
+    @Final
+    private BlockPos.MutableBlockPos mutableLocalPos;
 
     @Inject(method = "loadPixel", at = @At("HEAD"), remap = true)
     public void setObsidianColumnLocalVar(final Level world, final Registry<Block> blockRegistry, final MapBlock pixel, final MapBlock currentPixel, final LevelChunk bchunk, final int insideX, final int insideZ, final int highY, final int lowY, final boolean cave, final boolean fullCave, final int mappedHeight, final boolean canReuseBiomeColours, final boolean ignoreHeightmaps, final Registry<Biome> biomeRegistry, final boolean flowers, final int worldBottomY, final BlockPos.MutableBlockPos mutableBlockPos3, final CallbackInfo ci,
@@ -79,14 +83,24 @@ public abstract class MixinMapWriter {
                                        @Share("columnRoofObsidian") LocalBooleanRef columnRoofObsidianRef
     ) {
         if (!XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()) return;
-        Block b = stateRef.get().getBlock();
-        boolean roofObsidian = (hRef.get() >= XaeroPlusSettingRegistry.transparentObsidianRoofYSetting.getValue() && b == Blocks.OBSIDIAN);
-        if (roofObsidian && XaeroPlusSettingRegistry.transparentObsidianRoofDarkeningSetting.getValue() == 0) {
-            stateRef.set(Blocks.AIR.defaultBlockState());
-            transparentSkipYRef.set(transparentSkipYRef.get() - 1);
-        }
-        if (roofObsidian && !columnRoofObsidianRef.get()) {
-            columnRoofObsidianRef.set(true);
+        final Block b = stateRef.get().getBlock();
+        final boolean blockHeightAboveYLimit = hRef.get() >= XaeroPlusSettingRegistry.transparentObsidianRoofYSetting.getValue();
+
+        if (blockHeightAboveYLimit) {
+            boolean shouldMakeTransparent = (b == Blocks.OBSIDIAN);
+            if (b == Blocks.SNOW) {
+                this.mutableLocalPos.setY(hRef.get() - 1);
+                BlockState belowState = bchunk.getBlockState(this.mutableLocalPos);
+                this.mutableLocalPos.setY(hRef.get());
+                shouldMakeTransparent = belowState.getBlock() == Blocks.OBSIDIAN;
+            }
+            if (shouldMakeTransparent) {
+                if (XaeroPlusSettingRegistry.transparentObsidianRoofDarkeningSetting.getValue() == 0) {
+                    stateRef.set(Blocks.AIR.defaultBlockState());
+                    transparentSkipYRef.set(transparentSkipYRef.get() - 1);
+                }
+                if (!columnRoofObsidianRef.get()) columnRoofObsidianRef.set(true);
+            }
         }
     }
 
@@ -109,12 +123,22 @@ public abstract class MixinMapWriter {
         ordinal = 0
     ), remap = true)
     public boolean obsidianRoofOverlayMod(final boolean original,
+                                          @Local(argsOnly = true) LevelChunk bChunk,
                                           @Local(name = "b") Block b,
                                           @Local(name = "h") int h
     ) {
-        if (!XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()) return original;
-        boolean roofObsidian = b == Blocks.OBSIDIAN && h > XaeroPlusSettingRegistry.transparentObsidianRoofYSetting.getValue();
-        return original || roofObsidian;
+        if (XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()
+            && h > XaeroPlusSettingRegistry.transparentObsidianRoofYSetting.getValue()) {
+            if (b == Blocks.OBSIDIAN) {
+                return true;
+            } else if (b == Blocks.SNOW) {
+                this.mutableLocalPos.setY(h - 1);
+                BlockState belowState = bChunk.getBlockState(this.mutableLocalPos);
+                this.mutableLocalPos.setY(h);
+                return belowState.getBlock() == Blocks.OBSIDIAN;
+            }
+        }
+        return original;
     }
 
     @WrapOperation(method = "loadPixelHelp", at = @At(
@@ -124,10 +148,21 @@ public abstract class MixinMapWriter {
     ), remap = true)
     public int getOpacityForObsidianRoof(BlockState instance, BlockGetter world, BlockPos pos, Operation<Integer> original,
                                          @Local(name = "h") int h) {
-        if (!XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()) return original.call(instance, world, pos);
-        return instance.getBlock() == Blocks.OBSIDIAN && h > XaeroPlusSettingRegistry.transparentObsidianRoofYSetting.getValue()
-            ? 5
-            : original.call(instance, world, pos);
+        if (XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()
+            && h > XaeroPlusSettingRegistry.transparentObsidianRoofYSetting.getValue()) {
+            boolean shouldMakeTransparent = instance.getBlock() == Blocks.OBSIDIAN;
+            if (instance.getBlock() == Blocks.SNOW) {
+                this.mutableLocalPos.setY(h - 1);
+                BlockState belowState = world.getBlockState(this.mutableLocalPos);
+                this.mutableLocalPos.setY(h);
+                if (belowState.getBlock() == Blocks.OBSIDIAN)
+                    shouldMakeTransparent = true;
+            }
+            if (shouldMakeTransparent) {
+                return 5;
+            }
+        }
+        return original.call(instance, world, pos);
     }
 
     @Inject(method = "onRender", at = @At(

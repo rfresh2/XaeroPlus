@@ -23,6 +23,8 @@
   "setting.world_map.transparent_obsidian_roof_y.tooltip": "Ustawia minimalny poziom Y przezroczystego obsydianowego dachu.",
   "setting.world_map.transparent_obsidian_roof_darkening": "Przyciemnienie Obsydianowego Dachu",
   "setting.world_map.transparent_obsidian_roof_darkening.tooltip": "Ustawia nieprzezroczystość kafelków przezroczystego obsydianowego dachu.",
+  "setting.world_map.transparent_obsidian_roof_snow_opacity": "Nieprzezroczystość śniegu na dachu",
+  "setting.world_map.transparent_obsidian_roof_snow_opacity.tooltip": "Ustawia nieprzezroczystość śniegu na obsydianowym dachu.",
   "setting.world_map.min_zoom": "Minimalne Zbliżenie Mapy Świata",
   "setting.world_map.min_zoom.tooltip": "Ustawienie Minimalnego Zbliżenie Mapy Świata. To 10 razy więcej niż widzisz na Mapie Świata.",
   "setting.world_map.skip_world_render": "Pomiń Renderowanie Tła",

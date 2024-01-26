@@ -51,8 +51,8 @@ configurations {
 }
 
 ext {
-	worldmap_version = "1.37.2"
-	minimap_version = "23.9.3"
+	worldmap_version = "1.37.7"
+	minimap_version = "23.9.7"
 }
 
 dependencies {
@@ -67,7 +67,7 @@ dependencies {
 
 	implementation(include 'com.github.ben-manes.caffeine:caffeine:3.1.8')
     implementation(include "net.lenni0451:LambdaEvents:2.4.1")
-    forgeRuntimeLibrary(jarLibs 'org.xerial:sqlite-jdbc:3.44.1.0')
+    forgeRuntimeLibrary(jarLibs 'org.xerial:sqlite-jdbc:3.45.0.0')
 
 	modImplementation "maven.modrinth:xaeros-world-map:${worldmap_version}_Forge_1.20"
 	modImplementation "maven.modrinth:xaeros-minimap:${minimap_version}_Forge_1.20"

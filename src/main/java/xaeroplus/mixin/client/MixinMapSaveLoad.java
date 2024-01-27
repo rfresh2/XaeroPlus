@@ -16,6 +16,7 @@ import xaero.map.region.LeveledRegion;
 import xaero.map.region.MapRegion;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -46,6 +47,7 @@ public abstract class MixinMapSaveLoad {
                                                              @Share("byteOut") final LocalRef<ByteArrayOutputStream> byteOutRef,
                                                              @Local(name = "zipOut") final ZipOutputStream zipOut,
                                                              @Share("zipOutShare") final LocalRef<ZipOutputStream> zipOutShare) {
+        if (!XaeroPlusSettingRegistry.fastZipWrite.getValue()) return new DataOutputStream(out);
         zipOutShare.set(zipOut);
         ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
         byteOutRef.set(byteOut);
@@ -59,6 +61,7 @@ public abstract class MixinMapSaveLoad {
     public void saveRegionWriteZipOutputStream(final MapRegion region, final int extraAttempts, final CallbackInfoReturnable<Boolean> cir,
                                                @Share("byteOut") final LocalRef<ByteArrayOutputStream> byteOutRef,
                                                @Local(name = "zipOut") final ZipOutputStream zipOut) throws IOException {
+        if (!XaeroPlusSettingRegistry.fastZipWrite.getValue()) return;
         byteOutRef.get().writeTo(zipOut);
     }
 
@@ -69,6 +72,7 @@ public abstract class MixinMapSaveLoad {
     public void closeZipOutputStream(final MapRegion region, final int extraAttempts, final CallbackInfoReturnable<Boolean> cir,
                                      @Share("zipOutShare") final LocalRef<ZipOutputStream> zipOutShare
     ) throws IOException {
+        if (!XaeroPlusSettingRegistry.fastZipWrite.getValue()) return;
         zipOutShare.get().close();
     }
 

@@ -41,6 +41,13 @@ public final class XaeroPlusSettingRegistry {
             "setting.world_map.fast_mapping_rate_limit.tooltip",
             25,
             SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting fastZipWrite = XaeroPlusBooleanSetting.create(
+        "Fast Zip Writes",
+        "setting.world_map.fast_zip_writes",
+        "setting.world_map.fast_zip_writes.tooltip",
+        true,
+        SettingLocation.WORLD_MAP_MAIN
+    );
     public static final XaeroPlusBooleanSetting baritoneWaypointSyncSetting = XaeroPlusBooleanSetting.create(
             "Baritone Goal Waypoint",
             "setting.world_map.baritone_waypoint",

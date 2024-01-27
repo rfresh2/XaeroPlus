@@ -16,7 +16,6 @@ import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 
-import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -42,14 +41,12 @@ public abstract class MixinMapSaveLoad {
         args = "class=java/io/DataOutputStream"
     ))
     public DataOutputStream replaceSaveRegionZipOutputStream(final OutputStream out,
-                                                             @Share("byteOut") final LocalRef<ByteArrayOutputStream> byteOutRef,
                                                              @Local(name = "zipOut") final ZipOutputStream zipOut,
                                                              @Share("zipOutShare") final LocalRef<ZipOutputStream> zipOutShare) {
         if (!XaeroPlusSettingRegistry.fastZipWrite.getValue()) return new DataOutputStream(out);
+        Globals.zipFastByteBuffer.reset();
         zipOutShare.set(zipOut);
-        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-        byteOutRef.set(byteOut);
-        return new DataOutputStream(byteOut);
+        return new DataOutputStream(Globals.zipFastByteBuffer);
     }
 
     @Inject(method = "saveRegion", at = @At(
@@ -57,10 +54,10 @@ public abstract class MixinMapSaveLoad {
         target = "Ljava/util/zip/ZipOutputStream;closeEntry()V"
     ))
     public void saveRegionWriteZipOutputStream(final MapRegion region, final int extraAttempts, final CallbackInfoReturnable<Boolean> cir,
-                                               @Share("byteOut") final LocalRef<ByteArrayOutputStream> byteOutRef,
                                                @Local(name = "zipOut") final ZipOutputStream zipOut) throws IOException {
         if (!XaeroPlusSettingRegistry.fastZipWrite.getValue()) return;
-        byteOutRef.get().writeTo(zipOut);
+        Globals.zipFastByteBuffer.writeTo(zipOut);
+        Globals.zipFastByteBuffer.reset();
     }
 
     @Inject(method = "saveRegion", at = @At(

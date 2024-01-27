@@ -14,6 +14,7 @@ import xaeroplus.settings.XaeroPlusSetting;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -52,6 +53,10 @@ public class Globals {
     }
     public static String waypointsSearchFilter = "";
     public static List<Button> guiMapButtonTempList = Lists.<Button>newArrayList();
+    // This can only be shared under the assumption region and texture cache writes are non-concurrent
+    // sharing the underlying byte array reduces GC spam
+    // at cost of a few MB higher idle RAM usage
+    public static ByteArrayOutputStream zipFastByteBuffer = new ByteArrayOutputStream();
     public static Supplier<ExecutorService> cacheRefreshExecutorService = Suppliers.memoize(() -> Executors.newFixedThreadPool(
             // limited benefits by refreshing on more threads as it will consume the entire CPU and start lagging the game
             Math.max(1, Math.min(Runtime.getRuntime().availableProcessors() / 2, 4)),

@@ -5,6 +5,8 @@
   "setting.world_map.fast_mapping_delay.tooltip": "L'option Cartographie Rapide doit être activée. \n C'est approximativement le délai en millisecondes entre les opérations de mise à jour de la minimap.",
   "setting.world_map.fast_mapping_rate_limit": "Limite de débit pour la Cartographie Rapide",
   "setting.world_map.fast_mapping_rate_limit.tooltip": "L'option Cartographie Rapide doit être activée. \n Limite le nombre de chunks pouvant être écrits à chaque tick.",
+  "setting.world_map.fast_zip_writes": "Écritures Zip rapides",
+  "setting.world_map.fast_zip_writes.tooltip": "Écrit les fichiers zip des tuiles de carte plus rapidement mais utilise plus de RAM. Désactivez ceci si vous avez peu de RAM disponible",
   "setting.world_map.baritone_waypoint": "Baryton Objectif Waypoint",
   "setting.world_map.baritone_waypoint.tooltip": "Synchronise les objectifs de Baritone en tant que waypoints temporaires.",
   "setting.world_map.disable_waypoint_sharing": "Désactiver le partage de points de cheminement",

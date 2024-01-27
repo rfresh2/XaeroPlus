@@ -1,16 +1,16 @@
 package xaeroplus.mixin.client;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.map.region.LeveledRegion;
 import xaero.map.region.texture.RegionTexture;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 import java.io.*;
 import java.util.zip.ZipOutputStream;
@@ -19,12 +19,13 @@ import java.util.zip.ZipOutputStream;
 public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
     // todo: benchmark loadTexture zipfast vs current
 
-    @WrapOperation(method = "saveCacheTextures", at = @At(
+    @Redirect(method = "saveCacheTextures", at = @At(
         value = "NEW",
         args = "class=java/io/DataOutputStream"
     ))
-    public DataOutputStream replaceSaveCacheTexturesZipOutputStream(final OutputStream out, final Operation<DataOutputStream> original,
-                                                   @Share("byteOut") final LocalRef<ByteArrayOutputStream> byteOutRef) {
+    public DataOutputStream replaceSaveCacheTexturesZipOutputStream(final OutputStream out,
+                                                                    @Share("byteOut") final LocalRef<ByteArrayOutputStream> byteOutRef) {
+        if (!XaeroPlusSettingRegistry.fastZipWrite.getValue()) return new DataOutputStream(out);
         ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
         byteOutRef.set(byteOut);
         return new DataOutputStream(byteOut);
@@ -37,6 +38,7 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
     public void writeSaveCacheTexturesZipOutputStream(final File tempFile, final int extraAttempts, final CallbackInfoReturnable<Boolean> cir,
                                      @Local(name = "zipOutput") LocalRef<ZipOutputStream> zipOutputRef,
                                      @Share("byteOut") final LocalRef<ByteArrayOutputStream> byteOutRef) {
+        if (!XaeroPlusSettingRegistry.fastZipWrite.getValue()) return;
         try {
             byteOutRef.get().writeTo(zipOutputRef.get());
         } catch (final IOException e) {

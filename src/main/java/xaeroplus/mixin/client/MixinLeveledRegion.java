@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.map.region.LeveledRegion;
 import xaero.map.region.texture.RegionTexture;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 import java.io.*;
 import java.util.zip.ZipOutputStream;
@@ -24,6 +25,7 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
     ))
     public DataOutputStream replaceSaveCacheTexturesZipOutputStream(final OutputStream out,
                                                                     @Share("byteOut") final LocalRef<ByteArrayOutputStream> byteOutRef) {
+        if (!XaeroPlusSettingRegistry.fastZipWrite.getValue()) return new DataOutputStream(out);
         ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
         byteOutRef.set(byteOut);
         return new DataOutputStream(byteOut);
@@ -36,6 +38,7 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
     public void writeSaveCacheTexturesZipOutputStream(final File tempFile, final int extraAttempts, final CallbackInfoReturnable<Boolean> cir,
                                      @Local(name = "zipOutput") LocalRef<ZipOutputStream> zipOutputRef,
                                      @Share("byteOut") final LocalRef<ByteArrayOutputStream> byteOutRef) {
+        if (!XaeroPlusSettingRegistry.fastZipWrite.getValue()) return;
         try {
             byteOutRef.get().writeTo(zipOutputRef.get());
         } catch (final IOException e) {

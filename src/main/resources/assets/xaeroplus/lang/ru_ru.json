@@ -5,6 +5,8 @@
   "setting.world_map.fast_mapping_delay.tooltip": "Быстрое картографирование должно быть включено. \n Это примерно задержка в миллисекундах между операциями обновления мини-карты, как при рендеринге, так и при фактической записи файла.",
   "setting.world_map.fast_mapping_rate_limit": "Ограничение скорости быстрого картографирования",
   "setting.world_map.fast_mapping_rate_limit.tooltip": "Быстрое картографирование должно быть включено. \n Ограничивает количество фрагментов, которые могут быть записаны за один цикл. Более низкие значения улучшают FPS на больших расстояниях рендеринга.",
+  "setting.world_map.fast_zip_writes": "Быстрая запись в почтовый индекс",
+  "setting.world_map.fast_zip_writes.tooltip": "Записывает ZIP-файлы фрагментов карты быстрее, но использует больше оперативной памяти. Отключите это, если у вас мало оперативной памяти.",
   "setting.world_map.baritone_waypoint": "Точка Цели Baritone",
   "setting.world_map.baritone_waypoint.tooltip": "Синхронизирует цели Baritone в качестве временных путевых точек.",
   "setting.world_map.disable_waypoint_sharing": "Отключить обмен маршрутными точками",

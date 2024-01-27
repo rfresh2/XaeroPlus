@@ -9,6 +9,8 @@ import xaeroplus.settings.XaeroPlusSettingsReflectionHax.SettingLocation;
 import xaeroplus.util.BaritoneHelper;
 import xaeroplus.util.WaystonesHelper;
 
+import java.io.ByteArrayOutputStream;
+
 import static net.minecraft.world.level.Level.*;
 import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.markChunksDirtyInWriteDistance;
 
@@ -45,6 +47,9 @@ public final class XaeroPlusSettingRegistry {
         "Fast Zip Writes",
         "setting.world_map.fast_zip_writes",
         "setting.world_map.fast_zip_writes.tooltip",
+        (b) -> {
+            if (!b) Globals.zipFastByteBuffer = new ByteArrayOutputStream(); // release any existing sized buffer to gc
+        },
         true,
         SettingLocation.WORLD_MAP_MAIN
     );

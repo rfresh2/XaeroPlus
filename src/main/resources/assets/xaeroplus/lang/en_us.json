@@ -5,6 +5,8 @@
   "setting.world_map.fast_mapping_delay.tooltip": "Fast Mapping must be enabled. \n This is roughly the delay in milliseconds between minimap update operations, both render and actual file writes.",
   "setting.world_map.fast_mapping_rate_limit": "Fast Mapping Rate Limit",
   "setting.world_map.fast_mapping_rate_limit.tooltip": "Fast Mapping must be enabled. \n Limits how many chunks can be written in a single cycle. Lower values improve FPS at high render distances.",
+  "setting.world_map.fast_zip_writes": "Fast Zip Writes",
+  "setting.world_map.fast_zip_writes.tooltip": "Writes Map tile zip files faster but uses more RAM. Disable this if you have low RAM available",
   "setting.world_map.baritone_waypoint": "Baritone Goal Waypoint",
   "setting.world_map.baritone_waypoint.tooltip": "Syncs Baritone goals as temporary waypoints.",
   "setting.world_map.disable_waypoint_sharing": "Disable Waypoint Sharing",

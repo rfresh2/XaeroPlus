@@ -51,7 +51,7 @@ configurations {
 }
 
 ext {
-	worldmap_version = "1.37.7"
+	worldmap_version = "1.37.8"
 	minimap_version = "23.9.7"
 }
 

@@ -1,3 +1,5 @@
 accessWidener v2 named
 accessible class net/minecraft/world/level/chunk/PalettedContainer$Data
 accessible field net/minecraft/world/level/chunk/PalettedContainer data Lnet/minecraft/world/level/chunk/PalettedContainer$Data;
+accessible field com/mojang/blaze3d/platform/GlStateManager BLEND Lcom/mojang/blaze3d/platform/GlStateManager$BlendState;
+accessible class com/mojang/blaze3d/platform/GlStateManager$BlendState

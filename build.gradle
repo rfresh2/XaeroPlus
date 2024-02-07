@@ -33,11 +33,18 @@ repositories {
 		name = 'Lenni0451'
 		url = 'https://maven.lenni0451.net/releases'
 	}
+	maven { url "https://maven.shedaniel.me/" }
+	maven { url "https://maven.terraformersmc.com/releases/" }
 	mavenLocal()
 }
 
 loom {
 	accessWidenerPath = file('src/main/resources/xaeroplus.accesswidener')
+	runs {
+		client {
+			programArgs("--username", "rfresh2")
+		}
+	}
 }
 
 configurations {
@@ -69,18 +76,24 @@ dependencies {
 
 	implementation(include 'com.github.ben-manes.caffeine:caffeine:3.1.8')
 	implementation(include "net.lenni0451:LambdaEvents:2.4.1")
-	jarLibs 'org.xerial:sqlite-jdbc:3.45.0.0'
+	jarLibs 'org.xerial:sqlite-jdbc:3.45.1.0'
 
 	modImplementation "maven.modrinth:xaeros-world-map:${worldmap_version}_Fabric_1.20.4"
 	modImplementation "maven.modrinth:xaeros-minimap:${minimap_version}_Fabric_1.20.4"
 	modCompileOnly files("libs/baritone-unoptimized-fabric-1.10.4.jar")
 	modImplementation "maven.modrinth:waystones:16.0.3+fabric-1.20.4"
 	modImplementation "maven.modrinth:balm:9.0.4+fabric-1.20.4"
-	modCompileOnly "maven.modrinth:fwaystones:3.3.1+mc1.20.2"
+	modCompileOnly "maven.modrinth:fwaystones:3.3.2+mc1.20.4"
 //	modCompileOnly "maven.modrinth:owo-lib:0.11.3+1.20.2"
 //	runtimeOnly "blue.endless:jankson:1.2.3"
 //	modRuntimeOnly "maven.modrinth:auth-me:7.0.2+1.20"
-//	modRuntimeOnly "maven.modrinth:cloth-config:12.0.111+fabric"
+//    runtimeOnly "maven.modrinth:immediatelyfast:1.2.10+1.20.4-fabric"
+//    runtimeOnly "maven.modrinth:modmenu:9.0.0"
+//    runtimeOnly "maven.modrinth:sodium:mc1.20.4-0.5.8"
+//    runtimeOnly "maven.modrinth:fpsdisplay:3.1.0+1.20.x"
+//    runtimeOnly("me.shedaniel.cloth:cloth-config-fabric:13.0.121") {
+//        exclude(group: "net.fabricmc.fabric-api")
+//    }
 }
 
 processResources {

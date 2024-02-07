@@ -31,16 +31,14 @@ public final class XaeroPlusSettingRegistry {
             ModuleManager.getModule(FpsLimiter.class).setEnabled(b);
         },
         false,
-        SettingLocation.MINIMAP
-    );
+        SettingLocation.MINIMAP);
     public static final XaeroPlusFloatSetting minimapFpsLimit = XaeroPlusFloatSetting.create(
         "Minimap FPS Limit",
         "setting.minimap.fps_limiter_limit",
-        5f, 100f, 5f,
+        5f, 120f, 5f,
         "setting.minimap.fps_limiter_limit.tooltip",
-        30f,
-        SettingLocation.MINIMAP
-    );
+        60f,
+        SettingLocation.MINIMAP);
     public static final XaeroPlusBooleanSetting fastMapSetting = XaeroPlusBooleanSetting.create(
             "Fast Mapping",
             "setting.world_map.fast_mapping",
@@ -180,7 +178,7 @@ public final class XaeroPlusSettingRegistry {
             "Skip Background Render",
             "setting.world_map.skip_world_render",
             "setting.world_map.skip_world_render.tooltip",
-            false,
+            true,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting newChunksEnabledSetting = XaeroPlusBooleanSetting.create(
             "NewChunks Highlighting",
@@ -448,7 +446,7 @@ public final class XaeroPlusSettingRegistry {
             "Waypoint Beacons",
             "setting.waypoints.waypoint_beacons",
             "setting.waypoints.waypoint_beacons.tooltip",
-            true,
+            false,
             SettingLocation.WAYPOINTS);
     public static final XaeroPlusFloatSetting waypointBeaconScaleMin = XaeroPlusFloatSetting.create(
             "Waypoint Beacon Scale Min",

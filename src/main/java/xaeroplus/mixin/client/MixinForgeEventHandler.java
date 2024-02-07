@@ -12,7 +12,6 @@ import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 @Mixin(value = ForgeEventHandler.class, remap = false)
 public abstract class MixinForgeEventHandler {
-
     @Inject(method = "handleClientPlayerChatReceivedEvent", at = @At("HEAD"), cancellable = true)
     public void onPlayerChatReceived(final ChatType.Bound chatType, final Component component, final GameProfile gameProfile, final CallbackInfoReturnable<Boolean> cir) {
         if (component == null) return;

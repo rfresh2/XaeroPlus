@@ -12,6 +12,7 @@ public class ModuleManager {
     public static void init() {
         asList(
                 new BaritoneGoalSync(),
+                new FpsLimiter(),
                 new NewChunks(),
                 new OldChunks(),
                 new Portals(),

@@ -23,6 +23,24 @@ public final class XaeroPlusSettingRegistry {
      * The order settings are defined here determines the order in the settings GUI's.
      */
 
+    public static final XaeroPlusBooleanSetting minimapFpsLimiter = XaeroPlusBooleanSetting.create(
+        "Minimap FPS Limiter",
+        "setting.minimap.fps_limiter",
+        "setting.minimap.fps_limiter.tooltip",
+        (b) -> {
+            ModuleManager.getModule(FpsLimiter.class).setEnabled(b);
+        },
+        false,
+        SettingLocation.MINIMAP
+    );
+    public static final XaeroPlusFloatSetting minimapFpsLimit = XaeroPlusFloatSetting.create(
+        "Minimap FPS Limit",
+        "setting.minimap.fps_limiter_limit",
+        5f, 100f, 5f,
+        "setting.minimap.fps_limiter_limit.tooltip",
+        30f,
+        SettingLocation.MINIMAP
+    );
     public static final XaeroPlusBooleanSetting fastMapSetting = XaeroPlusBooleanSetting.create(
             "Fast Mapping",
             "setting.world_map.fast_mapping",

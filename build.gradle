@@ -43,6 +43,11 @@ loom {
 		convertAccessWideners = true
 		extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
 	}
+	runs {
+		client {
+			programArgs("--username", "rfresh2")
+		}
+	}
 }
 
 configurations {
@@ -67,13 +72,14 @@ dependencies {
 
 	implementation(include 'com.github.ben-manes.caffeine:caffeine:3.1.8')
     implementation(include "net.lenni0451:LambdaEvents:2.4.1")
-    forgeRuntimeLibrary(jarLibs 'org.xerial:sqlite-jdbc:3.45.0.0')
+    forgeRuntimeLibrary(jarLibs 'org.xerial:sqlite-jdbc:3.45.1.0')
 
 	modImplementation "maven.modrinth:xaeros-world-map:${worldmap_version}_Forge_1.20.4"
 	modImplementation "maven.modrinth:xaeros-minimap:${minimap_version}_Forge_1.20.4"
 	modCompileOnly files("libs/baritone-unoptimized-forge-1.10.2.jar")
     modImplementation "maven.modrinth:waystones:16.0.3+forge-1.20.4"
     modImplementation "maven.modrinth:balm:9.0.4+forge-1.20.4"
+    runtimeOnly "maven.modrinth:immediatelyfast:1.2.10+1.20.4-forge"
 }
 
 processResources {

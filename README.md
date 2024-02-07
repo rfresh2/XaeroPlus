@@ -57,36 +57,38 @@ Or a modpack zip with these jars is included in the Github releases.
 
 # Modifications
 
-* [Dimension hot-switching on WorldMap and Minimap.](https://cdn.discordapp.com/attachments/971140948593635335/1109733484144107572/Temurin-1.8.0_352_2023.03.31_-_20.11.27.50.mp4)
+* [1.5-3x your FPS by limiting the framerate the minimap is rendered at!](https://youtu.be/hIG-VyGQLao)
+  * Tip: For least visual impact, lock the minimap's north
+* [Dimension hot-switching on WorldMap and Minimap.](https://youtu.be/hXZQtX2df3I)
   * Recommended: Create keybinds for Minimap dimension switching.
-* [Adjustable minimap scaling that increases how many chunks are visible](https://cdn.discordapp.com/attachments/971140948593635335/1109734742842146937/Temurin-1.8.0_352_2023.03.29_-_16.16.08.32.DVR.mp4)
-* [NewChunks Highlighting in MiniMap and WorldMap.](https://cdn.discordapp.com/attachments/971140948593635335/1109735633045434408/Base_Profile_2023.01.02_-_11.26.22.02.DVR.mp4)
+* [Adjustable minimap scaling that increases how many chunks are visible](https://youtu.be/dNqxGzGAHyk)
+* [NewChunks Highlighting in MiniMap and WorldMap.](https://youtu.be/n-Tf6TJSsiA)
 * [Baritone](https://github.com/cabaletta/baritone) integration
   * Baritone Goals synced as temporary waypoints
-  * [Point and Click Travel](https://cdn.discordapp.com/attachments/1005598555186139156/1125306712300204082/Base_Profile_2023.07.02_-_23.04.34.09.DVR.mp4)
+  * [Point and Click Travel](https://youtu.be/gbguyfXLgi0)
 * [Waystones](https://legacy.curseforge.com/minecraft/mc-mods/waystones) and [Fabric Waystones](https://legacy.curseforge.com/minecraft/mc-mods/fabric-waystones) integration
   * Syncs Waystones as temporary waypoints
-* [Portals Highlighting in Minimap and WorldMap](https://cdn.discordapp.com/attachments/1127463054804779028/1133251771217752175/Base_Profile_2023.07.24_-_21.02.36.03.mp4)
-* [Portal Skip Highlighting in Minimap and WorldMap](https://cdn.discordapp.com/attachments/1029572347818151947/1109656254265163816/Base_Profile_2023.05.20_-_18.34.34.34.DVR.mp4). Detects chunks where a portal could have been loaded.
+* [Portals Highlighting in Minimap and WorldMap](https://youtu.be/zstGVfVRrAs)
+* [Portal Skip Highlighting in Minimap and WorldMap](https://youtu.be/g_yQ8D95RY0). Detects chunks where a portal could have been loaded.
 * OldChunks Highlighting in Minimap and WorldMap.
   * Intended for use on 2b2t. Highlights chunks that were generated in 1.12.2 or lower in the Overworld and Nether based on the natural blocks present in the chunk.
-* [Transparent minimap background instead of wasted black screen space.](https://cdn.discordapp.com/attachments/963821382569979904/1088651890335686716/2023-03-23_19.26.36.png)
-* [Fast map region writes](https://cdn.discordapp.com/attachments/963821382569979904/1049947847467995196/Temurin-1.8.0_345_2022.12.06_-_22.44.28.05.DVR.mp4). Prevent missed chunks in map while traveling at very high speeds.
+* [Transparent minimap background instead of wasted black screen space.](https://imgur.com/a/jGgHqL4)
+* [Fast map region writes](https://youtu.be/B5d7FaHXDCk). Prevent missed chunks in map while traveling at very high speeds.
 * Allow multiple MC instances to read/write to the same map concurrently
 * Transparent obsidian roof. Useful for mapping 2b2t spawn.
 * Setting to always view and create waypoints in the Overworld when in Nether.
-* [Render server view distance square around the player.](https://cdn.discordapp.com/attachments/971140948593635335/1109733753686851594/Temurin-1.8.0_352_2023.03.29_-_21.37.26.35.DVR.mp4)
+* [Render server view distance square around the player.](https://youtu.be/iY_JTGFK6Yg)
 * WorldMap GUI:
   * WorldMap zoom unlocked
   * GUI on WorldMap to pan the map to user entered coordinates.
   * WorldMap Follow mode and GUI button
   * F1 on WorldMap hides GUI and overlays
 * Waypoints GUI:
-  * [Search](https://cdn.discordapp.com/attachments/971140948593635335/1109736194163617842/Base_Profile_2023.05.04_-_16.48.38.73.DVR.mp4)
+  * [Search](https://youtu.be/7DRMUsmZDxc)
   * Display distance to waypoints on Waypoints GUI
   * Always sort enabled waypoints before disabled waypoints
   * GUI button to enable/disable all waypoints
-* [Waypoint Beacons](https://cdn.discordapp.com/attachments/971140948593635335/1125611814089134180/2023-07-03_19.18.51.png)
+* [Waypoint Beacons](https://imgur.com/a/jGgHqL4)
 * Minecraft world always renders in background while in a Xaero GUI for client travel mods compatibility
 * Minimap entity dot fix. Hides the entity dot when arrow mode is selected.
 * WorldMap and Waypoint directories optionally indexed by:

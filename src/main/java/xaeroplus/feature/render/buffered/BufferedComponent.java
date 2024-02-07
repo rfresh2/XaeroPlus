@@ -25,11 +25,6 @@ public class BufferedComponent {
     private long fpsTimer = System.currentTimeMillis();
     private int guiScale = 0;
     private boolean isRendering = false;
-    private boolean blendStateCaptured = false;
-    private int srcRgb = 1;
-    private int dstRgb = 0;
-    private int srcAlpha = 1;
-    private int dstAlpha = 0;
     private final Supplier<Integer> fpsLimitSupplier;
 
     public BufferedComponent(final Supplier<Integer> fpsLimitSupplier) {
@@ -57,7 +52,6 @@ public class BufferedComponent {
      * @return true if the original render call should be cancelled
      */
     public boolean render() {
-        if (!blendStateCaptured) return false;
         int screenWidth = minecraft.getWindow().getGuiScaledWidth();
         int screenHeight = minecraft.getWindow().getGuiScaledHeight();
         boolean forceRender = false;
@@ -73,7 +67,6 @@ public class BufferedComponent {
         boolean updateFrame = forceRender || System.currentTimeMillis() > fpsTimer;
         if (!updateFrame) {
             renderTextureOverlay(renderTarget.getColorTextureId());
-            applyCapturedBlendState();
             return true;
         }
         renderTarget.setClearColor(0, 0, 0, 0);
@@ -81,13 +74,12 @@ public class BufferedComponent {
         renderTarget.bindWrite(false);
         isRendering = true;
         FpsLimiter.renderTargetOverwrite = renderTarget;
-        correctBlendMode();
+        applyBlend();
         renderTarget.bindWrite(false);
         return false;
     }
 
     public void postRender() {
-        if (!blendStateCaptured) captureBlendState();
         if (!isRendering) return;
         FpsLimiter.renderTargetOverwrite = null;
         renderTarget.unbindWrite();
@@ -95,7 +87,6 @@ public class BufferedComponent {
         fpsTimer = System.currentTimeMillis() + (1000 / fpsLimitSupplier.get());
         isRendering = false;
         renderTextureOverlay(renderTarget.getColorTextureId());
-        applyCapturedBlendState();
     }
 
     private void renderTextureOverlay(int textureid) {
@@ -112,24 +103,12 @@ public class BufferedComponent {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
-    public static void correctBlendMode() {
+    public static void applyBlend() {
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(
             GlStateManager.SourceFactor.SRC_ALPHA,
             GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
             GlStateManager.SourceFactor.ONE,
             GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-    }
-
-    public void captureBlendState() {
-        blendStateCaptured = true;
-        srcRgb = GlStateManager.BLEND.srcRgb;
-        srcAlpha = GlStateManager.BLEND.srcAlpha;
-        dstRgb = GlStateManager.BLEND.dstRgb;
-        dstAlpha = GlStateManager.BLEND.dstAlpha;
-    }
-
-    public void applyCapturedBlendState() {
-        GlStateManager._blendFuncSeparate(srcRgb, dstRgb, srcAlpha, dstAlpha);
     }
 }

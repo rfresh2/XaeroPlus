@@ -12,6 +12,8 @@ import java.util.function.Supplier;
 
 @Module.ModuleInfo()
 public class FpsLimiter extends Module {
+    // todo: Buffer and mutate the rotation framebuffer separately to not cause visual
+    //  impact while minimap north is not locked
     // this must be initialized AFTER MC's screen is initialized
     private final Supplier<BufferedComponent> minimapComponentSupplier = Suppliers.memoize(
         () -> new BufferedComponent(() -> (int) XaeroPlusSettingRegistry.minimapFpsLimit.getValue()));

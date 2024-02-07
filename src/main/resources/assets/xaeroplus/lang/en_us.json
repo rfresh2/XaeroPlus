@@ -1,4 +1,8 @@
 {
+  "setting.minimap.fps_limiter": "Minimap FPS Limiter",
+  "setting.minimap.fps_limiter.tooltip": "Renders the minimap at a limited rate, reducing its impact on the game's FPS",
+  "setting.minimap.fps_limiter_limit": "Minimap FPS Limit",
+  "setting.minimap.fps_limiter_limit.tooltip": "The FPS limit to set. Lower FPS limit = higher game FPS",
   "setting.world_map.fast_mapping": "Fast Mapping",
   "setting.world_map.fast_mapping.tooltip": "Increases mapping speed, might hurt FPS. Adjust rate limit and delay to regain FPS.",
   "setting.world_map.fast_mapping_delay": "Fast Mapping Delay",

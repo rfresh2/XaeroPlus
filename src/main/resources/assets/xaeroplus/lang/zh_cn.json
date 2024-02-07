@@ -1,4 +1,8 @@
 {
+  "setting.minimap.fps_limiter": "小地图 FPS 限制器",
+  "setting.minimap.fps_limiter.tooltip": "以有限的速率渲染小地图，减少对游戏 FPS 的影响",
+  "setting.minimap.fps_limiter_limit": "小地图 FPS 限制",
+  "setting.minimap.fps_limiter_limit.tooltip": "要设置的 FPS 限制。 较低的 FPS 限制 = 较高的游戏 FPS",
   "setting.world_map.fast_mapping": "快速绘制",
   "setting.world_map.fast_mapping.tooltip": "提高绘制速度。",
   "setting.world_map.fast_mapping_delay": "快速绘制延迟",

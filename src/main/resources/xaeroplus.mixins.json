@@ -26,6 +26,8 @@
     "MixinGuiWaypointSettings",
     "MixinGuiWaypointsList",
     "MixinGuiWorldMapSettings",
+    "MixinImprovedFramebuffer",
+    "MixinInterfaceRendererGuiOverlay",
     "MixinKeyEventHandler",
     "MixinLeveledRegion",
     "MixinMapElementRenderHandler",
@@ -64,6 +66,7 @@
     "mc.AccessorWorldRenderer",
     "mc.MixinClientConnection",
     "mc.MixinClientPlayNetworkHandler",
+    "mc.MixinGlStateManager",
     "mc.MixinMinecraftClient",
     "mc.MixinWorldRenderer"
   ]

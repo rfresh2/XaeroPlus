@@ -1,4 +1,8 @@
 {
+  "setting.minimap.fps_limiter": "Limiteur de FPS sur mini-carte",
+  "setting.minimap.fps_limiter.tooltip": "Restitue la mini-carte à un rythme limité, réduisant ainsi son impact sur le FPS du jeu.",
+  "setting.minimap.fps_limiter_limit": "Limite FPS de la mini-carte",
+  "setting.minimap.fps_limiter_limit.tooltip": "La limite FPS à définir. Limite inférieure de FPS = FPS de jeu plus élevé",
   "setting.world_map.fast_mapping": "Cartographie Rapide",
   "setting.world_map.fast_mapping.tooltip": "Augmente la vitesse de cartographie.",
   "setting.world_map.fast_mapping_delay": "Délai de cartographie rapide",

@@ -87,11 +87,11 @@ dependencies {
 //	modCompileOnly "maven.modrinth:owo-lib:0.11.3+1.20.2"
 //	runtimeOnly "blue.endless:jankson:1.2.3"
 //	modRuntimeOnly "maven.modrinth:auth-me:7.0.2+1.20"
-//    runtimeOnly "maven.modrinth:immediatelyfast:1.2.10+1.20.4-fabric"
-//    runtimeOnly "maven.modrinth:modmenu:9.0.0"
-//    runtimeOnly "maven.modrinth:sodium:mc1.20.4-0.5.8"
-//    runtimeOnly "maven.modrinth:fpsdisplay:3.1.0+1.20.x"
-//    runtimeOnly("me.shedaniel.cloth:cloth-config-fabric:13.0.121") {
+//    modRuntimeOnly "maven.modrinth:immediatelyfast:1.2.10+1.20.4-fabric"
+//    modRuntimeOnly "maven.modrinth:modmenu:9.0.0"
+//    modRuntimeOnly "maven.modrinth:sodium:mc1.20.4-0.5.8"
+//    modRuntimeOnly "maven.modrinth:fpsdisplay:3.1.0+1.20.x"
+//    modRuntimeOnly("me.shedaniel.cloth:cloth-config-fabric:13.0.121") {
 //        exclude(group: "net.fabricmc.fabric-api")
 //    }
 }

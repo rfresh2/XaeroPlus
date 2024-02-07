@@ -79,7 +79,7 @@ dependencies {
 	modImplementation files("libs/baritone-unoptimized-forge-1.10.2.jar")
 	modCompileOnly "maven.modrinth:waystones:15.0.1+forge-1.20.2"
 	modCompileOnly "maven.modrinth:balm:8.0.1+forge-1.20.2"
-    runtimeOnly "maven.modrinth:immediatelyfast:1.2.10+1.20.4-forge"
+    modRuntimeOnly "maven.modrinth:immediatelyfast:1.2.10+1.20.4-forge"
 }
 
 processResources {

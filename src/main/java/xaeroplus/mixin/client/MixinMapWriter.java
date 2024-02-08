@@ -63,6 +63,9 @@ public abstract class MixinMapWriter {
     @Shadow
     @Final
     private BlockPos.MutableBlockPos mutableLocalPos;
+    @Shadow
+    public long writeFreeSinceLastWrite;
+
 
     @Inject(method = "loadPixel", at = @At("HEAD"), remap = true)
     public void setObsidianColumnLocalVar(final Level world, final Registry<Block> blockRegistry, final MapBlock pixel, final MapBlock currentPixel, final LevelChunk bchunk, final int insideX, final int insideZ, final int highY, final int lowY, final boolean cave, final boolean fullCave, final int mappedHeight, final boolean canReuseBiomeColours, final boolean ignoreHeightmaps, final Registry<Biome> biomeRegistry, final boolean flowers, final int worldBottomY, final BlockPos.MutableBlockPos mutableBlockPos3, final CallbackInfo ci,
@@ -174,8 +177,13 @@ public abstract class MixinMapWriter {
     public void fastMapMaxTilesPerCycleSetting(final BiomeColorCalculator biomeColorCalculator, final OverlayManager overlayManager, final CallbackInfo ci,
                                         @Local(name = "tilesToUpdate") LocalLongRef tilesToUpdateRef,
                                         @Local(name = "sizeTiles") int sizeTiles) {
-        if (!(XaeroPlusSettingRegistry.fastMapSetting.getValue() && this.mapProcessor.getCurrentCaveLayer() == Integer.MAX_VALUE)) return; // do default logic when fast mapping is off or we're mapping caves
-        tilesToUpdateRef.set((long) Math.min(sizeTiles, XaeroPlusSettingRegistry.fastMapMaxTilesPerCycle.getValue()));
+        if (XaeroPlusSettingRegistry.fastMapSetting.getValue()) {
+            this.writeFreeSinceLastWrite = Math.max(1L, this.writeFreeSinceLastWrite);
+            if (this.mapProcessor.getCurrentCaveLayer() == Integer.MAX_VALUE) {
+                tilesToUpdateRef.set((long) Math.min(sizeTiles,
+                                                     XaeroPlusSettingRegistry.fastMapMaxTilesPerCycle.getValue()));
+            }
+        }
     }
 
     @ModifyExpressionValue(method = "onRender", at = @At(
@@ -184,8 +192,12 @@ public abstract class MixinMapWriter {
         ordinal = 2
     ))
     public long removeWriteTimeLimiterPerFrame(long original) {
-        if (!(XaeroPlusSettingRegistry.fastMapSetting.getValue() && this.mapProcessor.getCurrentCaveLayer() == Integer.MAX_VALUE)) return original;
-        return 0;
+        if (XaeroPlusSettingRegistry.fastMapSetting.getValue()) {
+            if (this.mapProcessor.getCurrentCaveLayer() == Integer.MAX_VALUE) {
+                return 0;
+            }
+        }
+        return original;
     }
 
     @Inject(method = "writeChunk", at = @At(value = "HEAD"), cancellable = true, remap = true)
@@ -214,6 +226,7 @@ public abstract class MixinMapWriter {
             int chunkZ,
             final CallbackInfoReturnable<Boolean> cir) {
         if (!XaeroPlusSettingRegistry.fastMapSetting.getValue()) return;
+        if (this.mapProcessor.getCurrentCaveLayer() != Integer.MAX_VALUE) return;
 
         final Long cacheable = ChunkUtils.chunkPosToLong(chunkX, chunkZ);
         final Long cacheValue = tileUpdateCache.getIfPresent(cacheable);

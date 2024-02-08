@@ -17,7 +17,8 @@ public class ModuleManager {
                 new OldChunks(),
                 new Portals(),
                 new PortalSkipDetection(),
-                new WaystoneSync())
+                new WaystoneSync(),
+                new WorldTools())
                 .forEach(ModuleManager::addModule);
     }
 

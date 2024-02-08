@@ -115,3 +115,6 @@ jobs:
         dependencies: |
           xaerominimap@${{ env.MINIMAP_VERSION }}(required){modrinth:1bokaNcj}{curseforge:263420}
           xaeroworldmap@${{ env.WORLDMAP_VERSION }}(required){modrinth:NcUtCpym}{curseforge:317780}
+          fabric-api@${{ env.FABRIC_API_VERSION }}(required){modrinth:P7dR8mSH}{curseforge:306612}
+          worldtools(optional){modrinth:FlFKBOIX}{curseforge:909868}
+          waystones(optional){modrinth:LOpKHB2A}{curseforge:245755}

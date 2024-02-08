@@ -8,6 +8,7 @@ import xaeroplus.module.impl.*;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax.SettingLocation;
 import xaeroplus.util.BaritoneHelper;
 import xaeroplus.util.WaystonesHelper;
+import xaeroplus.util.WorldToolsHelper;
 
 import java.io.ByteArrayOutputStream;
 
@@ -276,6 +277,32 @@ public final class XaeroPlusSettingRegistry {
             (b) -> ModuleManager.getModule(Portals.class).setRgbColor(b.getColor()),
             ColorHelper.HighlightColor.values(),
             ColorHelper.HighlightColor.MAGENTA,
+            SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting worldToolsEnabledSetting = XaeroPlusBooleanSetting.create(
+        "WorldTools Highlights",
+        "setting.world_map.world_tools",
+        "setting.world_map.world_tools.tooltip",
+        WorldToolsHelper::isWorldToolsPresent,
+        (b) -> ModuleManager.getModule(WorldTools.class).setEnabled(b),
+        false,
+        SettingLocation.WORLD_MAP_MAIN);
+    public static XaeroPlusFloatSetting worldToolsAlphaSetting = XaeroPlusFloatSetting.create(
+            "WorldTools Highlights Opacity",
+            "setting.world_map.world_tools_opacity",
+            0f, 255f, 10f,
+            "setting.world_map.world_tools_opacity.tooltip",
+            WorldToolsHelper::isWorldToolsPresent,
+            (b) -> ModuleManager.getModule(WorldTools.class).setAlpha(b),
+            100,
+            SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> worldToolsColorSetting = XaeroPlusEnumSetting.create(
+            "WorldTools Highlights Color",
+            "setting.world_map.world_tools_color",
+            "setting.world_map.world_tools_color.tooltip",
+            WorldToolsHelper::isWorldToolsPresent,
+            (b) -> ModuleManager.getModule(WorldTools.class).setRgbColor(b.getColor()),
+            ColorHelper.HighlightColor.values(),
+            ColorHelper.HighlightColor.GREEN,
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting portalSkipDetectionEnabledSetting = XaeroPlusBooleanSetting.create(
             "PortalSkip Detection",

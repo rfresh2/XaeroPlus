@@ -59,8 +59,6 @@ Or a modpack zip with these jars is included in the Github releases.
 
 * [1.5-3x your FPS by limiting the framerate the minimap is rendered at!](https://youtu.be/hIG-VyGQLao)
   * Tip: For least visual impact, lock the minimap's north
-* [Dimension hot-switching on WorldMap and Minimap.](https://youtu.be/hXZQtX2df3I)
-  * Recommended: Create keybinds for Minimap dimension switching.
 * [Adjustable minimap scaling that increases how many chunks are visible](https://youtu.be/dNqxGzGAHyk)
 * [NewChunks Highlighting in MiniMap and WorldMap.](https://youtu.be/n-Tf6TJSsiA)
 * [Baritone](https://github.com/cabaletta/baritone) integration
@@ -68,6 +66,8 @@ Or a modpack zip with these jars is included in the Github releases.
   * [Point and Click Travel](https://youtu.be/gbguyfXLgi0)
 * [Waystones](https://legacy.curseforge.com/minecraft/mc-mods/waystones) and [Fabric Waystones](https://legacy.curseforge.com/minecraft/mc-mods/fabric-waystones) integration
   * Syncs Waystones as temporary waypoints
+* [WorldTools](https://modrinth.com/mod/worldtools/) World Downloader integration
+  * [Highlights saved chunks while downloading](https://youtu.be/mtCqwJ_RGcc)
 * [Portals Highlighting in Minimap and WorldMap](https://youtu.be/zstGVfVRrAs)
 * [Portal Skip Highlighting in Minimap and WorldMap](https://youtu.be/g_yQ8D95RY0). Detects chunks where a portal could have been loaded.
 * OldChunks Highlighting in Minimap and WorldMap.
@@ -78,6 +78,8 @@ Or a modpack zip with these jars is included in the Github releases.
 * Transparent obsidian roof. Useful for mapping 2b2t spawn.
 * Setting to always view and create waypoints in the Overworld when in Nether.
 * [Render server view distance square around the player.](https://youtu.be/iY_JTGFK6Yg)
+* [Dimension hot-switching on WorldMap and Minimap.](https://youtu.be/hXZQtX2df3I)
+  * Recommended: Create keybinds for Minimap dimension switching.
 * WorldMap GUI:
   * WorldMap zoom unlocked
   * GUI on WorldMap to pan the map to user entered coordinates.

@@ -15,15 +15,15 @@ public class ChunkUtils {
      * Caching helpers
      **/
     public static long chunkPosToLong(final ChunkPos chunkPos) {
-        return (long) chunkPos.x & 4294967295L | ((long) chunkPos.z & 4294967295L) << 32;
+        return chunkPos.toLong();
     }
 
     public static long chunkPosToLong(final int x, final int z) {
-        return (long) x & 4294967295L | ((long) z & 4294967295L) << 32;
+        return ChunkPos.asLong(x, z);
     }
 
     public static ChunkPos longToChunkPos(final long l) {
-        return new ChunkPos((int) (l & 4294967295L), (int) (l >> 32 & 4294967295L));
+        return new ChunkPos(l);
     }
 
     public static int posToChunkPos(final int i) {
@@ -31,11 +31,11 @@ public class ChunkUtils {
     }
 
     public static int longToChunkX(final long l) {
-        return (int)(l & 4294967295L);
+        return ChunkPos.getX(l);
     }
 
     public static int longToChunkZ(final long l) {
-        return (int)(l >> 32 & 4294967295L);
+        return ChunkPos.getZ(l);
     }
     /** Player position util functions **/
 

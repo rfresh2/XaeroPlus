@@ -48,3 +48,11 @@ mandatory = true
 versionRange = "[${worldmap_version}]"
 ordering = "BEFORE"
 side = "CLIENT"
+
+[[dependencies.xaeroplus]]
+modId = "worldtools"
+mandatory = false
+versionRange = "[1.2.0,)"
+ordering = "BEFORE"
+side = "CLIENT"
+

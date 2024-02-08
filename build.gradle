@@ -84,6 +84,7 @@ dependencies {
 	modImplementation "maven.modrinth:waystones:15.2.0+fabric-1.20.2"
 	modImplementation "maven.modrinth:balm:8.0.5+fabric-1.20.2"
 	modCompileOnly "maven.modrinth:fwaystones:3.3.1+mc1.20.2"
+    modCompileOnly "maven.modrinth:worldtools:1.2.0+1.20.2"
 //	modCompileOnly "maven.modrinth:owo-lib:0.11.3+1.20.2"
 //	runtimeOnly "blue.endless:jankson:1.2.3"
 //	modRuntimeOnly "maven.modrinth:auth-me:7.0.2+1.20"

@@ -5,6 +5,7 @@
   "injectors": {
     "defaultRequire": 1
   },
+  "plugin": "xaeroplus.util.compat.XaeroPlusCompatibleMinimapMixinPlugin",
   "client": [
     "AccessorGuiCaveModeOptions",
     "AccessorRightClickOption",

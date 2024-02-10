@@ -284,7 +284,7 @@ public final class XaeroPlusSettingRegistry {
         "setting.world_map.world_tools.tooltip",
         WorldToolsHelper::isWorldToolsPresent,
         (b) -> ModuleManager.getModule(WorldTools.class).setEnabled(b),
-        false,
+        true,
         SettingLocation.WORLD_MAP_MAIN);
     public static XaeroPlusFloatSetting worldToolsAlphaSetting = XaeroPlusFloatSetting.create(
             "WorldTools Highlights Opacity",

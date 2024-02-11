@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[48,)"
+loaderVersion = "[1,)"
 #issueTrackerURL = ""
 license = "MIT"
 
@@ -15,16 +15,16 @@ logoFile = "icon.jpg"
 displayTest="IGNORE_ALL_VERSION"
 
 [[dependencies.xaeroplus]]
-modId = "forge"
+modId = "neoforge"
 mandatory = true
-versionRange = "[48,)"
+versionRange = "[1,)"
 ordering = "NONE"
 side = "CLIENT"
 
 [[dependencies.xaeroplus]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.20,)"
+versionRange = "[1.20.2]"
 ordering = "NONE"
 side = "CLIENT"
 
@@ -56,3 +56,5 @@ versionRange = "[1.2.0,)"
 ordering = "BEFORE"
 side = "CLIENT"
 
+[[mixins]]
+config = "xaeroplus.mixins.json"

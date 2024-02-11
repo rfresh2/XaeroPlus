@@ -1,12 +1,12 @@
-name: Forge-1.20.2 PR Build
+name: NeoForge-1.20.2 PR Build
 
 on:
   pull_request:
     branches:
-      - "forge-1.20.2"
+      - "neoforge-1.20.2"
 env:
   MINECRAFT_VERSION: "1.20.2"
-  MOD_LOADER: "Forge"
+  MOD_LOADER: "NeoForge"
 
 jobs:
   build:

@@ -18,6 +18,10 @@ repositories {
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
 	maven {
+		name = "NeoForge"
+		url = "https://maven.neoforged.net/releases/"
+	}
+	maven {
 		name = "Modrinth"
 		url = "https://api.modrinth.com/maven"
 	}
@@ -37,11 +41,8 @@ repositories {
 }
 
 loom {
-    accessWidenerPath = file('src/main/resources/xaeroplus.accesswidener')
-    forge {
-		mixinConfigs = ["xaeroplus.mixins.json"]
-		convertAccessWideners = true
-		extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
+	neoForge {
+		accessWidenerPath = file('src/main/resources/xaeroplus.accesswidener')
 	}
 	runs {
 		client {
@@ -56,8 +57,8 @@ configurations {
 }
 
 ext {
-	worldmap_version = "1.37.8"
-	minimap_version = "23.9.7"
+	worldmap_version = "1.38.0"
+	minimap_version = "24.0.0"
 }
 
 dependencies {
@@ -66,21 +67,19 @@ dependencies {
         officialMojangMappings()
 		parchment("org.parchmentmc.data:parchment-${project.minecraft_version}:${project.parchment_version}@zip")
     }
-	forge "net.minecraftforge:forge:${project.forge_version}"
-	implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.2"))
-	implementation(include "io.github.llamalad7:mixinextras-forge:0.3.2")
+	neoForge "net.neoforged:neoforge:${project.neoforge_version}"
 
 	implementation(include 'com.github.ben-manes.caffeine:caffeine:3.1.8')
     implementation(include "net.lenni0451:LambdaEvents:2.4.1")
     forgeRuntimeLibrary(jarLibs 'org.xerial:sqlite-jdbc:3.45.1.0')
 
-	modImplementation "maven.modrinth:xaeros-world-map:${worldmap_version}_Forge_1.20.2"
-	modImplementation "maven.modrinth:xaeros-minimap:${minimap_version}_Forge_1.20.2"
-	modImplementation files("libs/baritone-unoptimized-forge-1.10.2.jar")
-	modCompileOnly "maven.modrinth:waystones:15.0.1+forge-1.20.2"
-	modCompileOnly "maven.modrinth:balm:8.0.1+forge-1.20.2"
+	modImplementation "maven.modrinth:xaeros-world-map:${worldmap_version}_NeoForge_1.20.2"
+	modImplementation "maven.modrinth:xaeros-minimap:${minimap_version}_NeoForge_1.20.2"
+	modCompileOnly files("libs/baritone-unoptimized-forge-1.10.2.jar")
+	modCompileOnly "maven.modrinth:waystones:15.2.0+neoforge-1.20.2"
+	modCompileOnly "maven.modrinth:balm:8.0.5+neoforge-1.20.2"
     modCompileOnly "maven.modrinth:worldtools:1.2.0+1.20.2"
-    modRuntimeOnly "maven.modrinth:immediatelyfast:1.2.10+1.20.4-forge"
+//    modRuntimeOnly "maven.modrinth:immediatelyfast:1.2.10+1.20.4-forge"
 }
 
 processResources {

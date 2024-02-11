@@ -21,8 +21,8 @@ public class WorldToolsHelper {
                     .getVersion();
                 var a = CaptureManager.INSTANCE.getCapturing();
                 var b = HotCache.INSTANCE.isChunkSaved(0, 0);
-                if (Version.parse(minVersion).compareTo(worldtoolsVersion) < 0) {
-                    XaeroPlus.LOGGER.info("Incompatible WorldTools version. >={} required. Disabling WorldTools support.", minVersion);
+                if (Version.parse(minVersion).compareTo(worldtoolsVersion) > 0) {
+                    XaeroPlus.LOGGER.info("Incompatible WorldTools version. >={} required. Disabling WorldTools support. Found: {}", minVersion, worldtoolsVersion);
                     isWorldToolsPresent = false;
                 } else {
                     XaeroPlus.LOGGER.info("Found WorldTools. Enabling WorldTools support.");

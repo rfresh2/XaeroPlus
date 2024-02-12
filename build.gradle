@@ -1,5 +1,5 @@
 plugins {
-	id 'dev.architectury.loom' version '1.5-SNAPSHOT'
+	id 'dev.architectury.loom' version '1.5.388'
 	id 'maven-publish'
 	id 'com.github.johnrengelman.shadow' version '8.1.1'
 }

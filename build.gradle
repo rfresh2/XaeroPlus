@@ -93,7 +93,7 @@ dependencies {
 	modRuntimeOnly "maven.modrinth:modmenu:7.2.2"
 	modRuntimeOnly "maven.modrinth:sodium:mc1.20.1-0.5.3"
 	modRuntimeOnly "maven.modrinth:fpsdisplay:3.1.0+1.20.x"
-	modRuntimeOnly("me.shedaniel.cloth:cloth-config-fabric:11.1.118") {
+	modRuntimeOnly("me.shedaniel.cloth:cloth-config-fabric:13.0.121") {
 		exclude(group: "net.fabricmc.fabric-api")
 	}
 }

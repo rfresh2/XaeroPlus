@@ -7,11 +7,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import xaero.common.events.ForgeEventHandler;
+import xaero.common.events.ClientEvents;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 
-@Mixin(value = ForgeEventHandler.class, remap = false)
-public abstract class MixinForgeEventHandler {
+@Mixin(value = ClientEvents.class, remap = false)
+public abstract class MixinClientEvents {
     @Inject(method = "handleClientPlayerChatReceivedEvent", at = @At("HEAD"), cancellable = true)
     public void onPlayerChatReceived(final ChatType.Bound chatType, final Component component, final GameProfile gameProfile, final CallbackInfoReturnable<Boolean> cir) {
         if (component == null) return;

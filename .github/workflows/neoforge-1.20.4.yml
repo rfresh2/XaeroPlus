@@ -1,13 +1,13 @@
-name: Forge 1.20.4 Build And Release
+name: NeoForge 1.20.4 Build And Release
 
 on:
   push:
     branches:
-      - "forge-1.20.4"
+      - "neoforge-1.20.4"
 env:
   MINECRAFT_VERSION: "1.20.4"
   MINECRAFT_VERSION_SHORT: "1.20.4"
-  MOD_LOADER: "Forge"
+  MOD_LOADER: "NeoForge"
 
 jobs:
   build:
@@ -102,7 +102,7 @@ jobs:
           XaeroPlus-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar
           XaeroPlus-modpack-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}.zip
         github-tag: ${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}
-        github-commitish: forge-1.20.4
+        github-commitish: neoforge-1.20.4
 
         files: |
           XaeroPlus-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar

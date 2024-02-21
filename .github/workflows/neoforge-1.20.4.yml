@@ -30,6 +30,9 @@ jobs:
     - name: Elevate wrapper permissions
       run: chmod +x ./gradlew
 
+    - name: Build mod
+      run: ./gradlew build
+
     - name: Get WorldMap Version
       run: |
         echo "WORLDMAP_VERSION=$(./gradlew -q printWorldMapVersion)" >> $GITHUB_ENV
@@ -37,9 +40,6 @@ jobs:
     - name: Get Minimap Version
       run: |
         echo "MINIMAP_VERSION=$(./gradlew -q printMinimapVersion)" >> $GITHUB_ENV
-
-    - name: Build mod
-      run: ./gradlew build
 
     - name: Rename built mod
       run: mv build/libs/xaeroplus-${{ env.MINECRAFT_VERSION }}.jar XaeroPlus-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar

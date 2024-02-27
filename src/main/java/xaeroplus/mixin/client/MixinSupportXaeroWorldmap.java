@@ -89,7 +89,7 @@ public abstract class MixinSupportXaeroWorldmap {
         return Globals.getCurrentDimensionId() != Minecraft.getInstance().level.dimension();
     }
 
-    @Inject(method = "renderChunks", at = @At("TAIL"), remap = false)
+    @Inject(method = "renderChunks", at = @At("RETURN"), remap = false)
     public void drawXPFeatures(final PoseStack matrixStack, final int minX, final int maxX, final int minZ, final int maxZ, final int minViewX, final int maxViewX, final int minViewZ, final int maxViewZ, final MapProcessor mapProcessor, final int renderedCaveLayer, final boolean shouldRequestLoading, final boolean reloadEverything, final int globalReloadVersion, final int globalRegionCacheHashCode, final int globalCaveStart, final int globalCaveDepth, final boolean playerIsMoving, final boolean noCaveMaps, final boolean slimeChunks, final int chunkX, final int chunkZ, final int tileX, final int tileZ, final int insideX, final int insideZ, final Long seed, final MultiTextureRenderTypeRenderer mapWithLightRenderer, final MultiTextureRenderTypeRenderer mapNoLightRenderer, final MinimapRendererHelper helper, final VertexConsumer overlayBufferBuilder, final CallbackInfo ci,
                                @Share("bgTesselator") LocalRef<Tesselator> bgTesselatorRef) {
         Globals.drawManager.drawMinimapFeatures(

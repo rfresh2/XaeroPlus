@@ -12,7 +12,7 @@ import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
 @Mixin(value = ControlsHandler.class, remap = false)
 public class MixinControlsHandler {
 
-    @Inject(method = "keyDown", at = @At("TAIL"))
+    @Inject(method = "keyDown", at = @At("RETURN"))
     public void keyDown(KeyMapping kb, boolean tickEnd, boolean isRepeat, CallbackInfo ci) {
         if (!tickEnd) {
             XaeroPlusBooleanSetting setting = XaeroPlusSettingsReflectionHax.keybindingMapSupplier.get().get(kb);

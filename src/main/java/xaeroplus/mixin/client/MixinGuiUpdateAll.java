@@ -20,7 +20,7 @@ public abstract class MixinGuiUpdateAll extends ConfirmScreen {
         super(callback, title, message);
     }
 
-    @Inject(method = "init", at = @At("TAIL"), remap = true)
+    @Inject(method = "init", at = @At("RETURN"), remap = true)
     public void initGui(CallbackInfo ci) {
         this.addRenderableWidget(Button.builder(Component.translatable("gui.xaeroplus.check_github_button"), (button -> {
             try {

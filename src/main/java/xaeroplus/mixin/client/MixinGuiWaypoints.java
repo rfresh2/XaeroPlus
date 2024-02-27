@@ -58,7 +58,7 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         this.searchField.tick();
     }
 
-    @Inject(method = "init", at = @At("TAIL"), remap = true)
+    @Inject(method = "init", at = @At("RETURN"), remap = true)
     public void initGui(CallbackInfo ci) {
         this.searchField = new EditBox(this.font, this.width / 2 - 297, 32, 80, 20, Component.literal("Search"));
         this.searchField.setValue("");

@@ -32,7 +32,7 @@ public class MixinWorldMapModSettings {
         XaeroPlusModSettingsHooks.saveSettings(WorldMap.optionsFile, XAERO_PLUS_WORLDMAP_SETTINGS);
     }
 
-    @Inject(method = "loadSettingsFile", at = @At("TAIL"))
+    @Inject(method = "loadSettingsFile", at = @At("RETURN"))
     public void loadSettings(final File file, CallbackInfo ci) throws IOException {
         XaeroPlusModSettingsHooks.loadSettings(file, XAERO_PLUS_WORLDMAP_SETTINGS);
     }

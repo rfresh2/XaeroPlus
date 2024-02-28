@@ -72,9 +72,7 @@ public class NewChunks extends Module {
     public void onPacketReceivedEvent(final PacketReceivedEvent event) {
         if (mc.level == null || ((AccessorWorldRenderer) mc.levelRenderer).getChunks() == null) return;
         // credits to BleachHack for this fluid flow based detection method
-        if (event.packet() instanceof ClientboundSectionBlocksUpdatePacket) {
-            ClientboundSectionBlocksUpdatePacket packet = (ClientboundSectionBlocksUpdatePacket) event.packet();
-
+        if (event.packet() instanceof ClientboundSectionBlocksUpdatePacket packet) {
             packet.runUpdates((pos, state) -> {
                 if (!state.getFluidState().isEmpty() && !state.getFluidState().isSource()) {
                     ChunkPos chunkPos = new ChunkPos(pos);
@@ -87,9 +85,7 @@ public class NewChunks extends Module {
                     }
                 }
             });
-        } else if (event.packet() instanceof ClientboundBlockUpdatePacket) {
-            ClientboundBlockUpdatePacket packet = (ClientboundBlockUpdatePacket) event.packet();
-
+        } else if (event.packet() instanceof ClientboundBlockUpdatePacket packet) {
             if (!packet.getBlockState().getFluidState().isEmpty() && !packet.getBlockState().getFluidState().isSource()) {
                 ChunkPos chunkPos = new ChunkPos(packet.getPos());
 
@@ -101,11 +97,8 @@ public class NewChunks extends Module {
                     }
                 }
             }
-        } else if (event.packet() instanceof ClientboundLevelChunkWithLightPacket) {
-            ClientboundLevelChunkWithLightPacket packet = (ClientboundLevelChunkWithLightPacket) event.packet();
-
+        } else if (event.packet() instanceof ClientboundLevelChunkWithLightPacket packet) {
             ChunkPos pos = new ChunkPos(packet.getX(), packet.getZ());
-
             if (!newChunksCache.isHighlighted(pos.x, pos.z, getActualDimension()) && mc.level.getChunkSource().getChunkForLighting(packet.getX(), packet.getZ()) == null) {
                 LevelChunk chunk = new LevelChunk(mc.level, pos);
                 try {

@@ -10,3 +10,9 @@ pluginManagement {
 		gradlePluginPortal()
 	}
 }
+
+include("common")
+include("fabric")
+//include("forge")
+
+rootProject.name = "XaeroPlus"

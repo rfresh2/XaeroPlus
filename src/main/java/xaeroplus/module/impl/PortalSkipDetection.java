@@ -208,11 +208,11 @@ public class PortalSkipDetection extends Module {
         if (currentSession == null) return false;
         final MapProcessor mapProcessor = currentSession.getMapProcessor();
         if (mapProcessor == null) return false;
-        final MapRegion mapRegion = mapProcessor.getMapRegion(
-            0,
-                ChunkUtils.chunkCoordToMapRegionCoord(chunkPosX),
-                ChunkUtils.chunkCoordToMapRegionCoord(chunkPosZ),
-                false);
+        final MapRegion mapRegion = mapProcessor.getLeafMapRegion(
+            mapProcessor.getCurrentCaveLayer(),
+            ChunkUtils.chunkCoordToMapRegionCoord(chunkPosX),
+            ChunkUtils.chunkCoordToMapRegionCoord(chunkPosZ),
+            false);
         if (mapRegion == null) return false;
         final MapTileChunk mapChunk = mapRegion.getChunk(chunkCoordToMapTileChunkCoordLocal(chunkPosX), chunkCoordToMapTileChunkCoordLocal(chunkPosZ));
         if (mapChunk == null) return false;

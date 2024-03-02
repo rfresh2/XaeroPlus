@@ -1,6 +1,9 @@
 package xaeroplus.settings;
 
+import xaero.map.WorldMap;
+import xaero.minimap.XaeroMinimap;
 import xaeroplus.Globals;
+import xaeroplus.XaeroPlus;
 import xaeroplus.feature.render.ColorHelper;
 import xaeroplus.feature.render.ColorHelper.WaystoneColor;
 import xaeroplus.module.ModuleManager;
@@ -11,6 +14,7 @@ import xaeroplus.util.WaystonesHelper;
 import xaeroplus.util.WorldToolsHelper;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 import static net.minecraft.world.level.Level.*;
 import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.markChunksDirtyInWriteDistance;
@@ -489,4 +493,22 @@ public final class XaeroPlusSettingRegistry {
             "setting.waypoints.waypoint_beacon_distance_min.tooltip",
             0f,
             SettingLocation.WAYPOINTS);
+    public static final XaeroPlusBooleanSetting disableXaeroInternetAccess = XaeroPlusBooleanSetting.create(
+        "Disable Xaero Internet Access",
+        "Disable Xaero Internet Access",
+        "Disable Xaero Internet Access",
+        (b) -> {
+            if (XaeroPlus.initialized.get()) {
+                WorldMap.settings.allowInternetAccess = !b;
+                XaeroMinimap.INSTANCE.getSettings().allowInternetAccess = !b;
+                try {
+                    WorldMap.settings.saveSettings();
+                    XaeroMinimap.INSTANCE.getSettings().saveSettings();
+                } catch (IOException e) {
+                    XaeroPlus.LOGGER.warn("Failed saving Xaero settings");
+                }
+            }
+        },
+        true,
+        SettingLocation.WORLD_MAP_MAIN);
 }

@@ -10,6 +10,7 @@ import xaero.map.WorldMap;
 import xaero.map.settings.ModOptions;
 import xaero.map.settings.ModSettings;
 import xaeroplus.settings.XaeroPlusModSettingsHooks;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +22,8 @@ public class MixinWorldMapModSettings {
 
     @Shadow
     public int defaultCaveModeType;
+
+    @Shadow public boolean allowInternetAccess;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     public void initInject(final CallbackInfo ci) {
@@ -35,6 +38,7 @@ public class MixinWorldMapModSettings {
     @Inject(method = "loadSettingsFile", at = @At("RETURN"))
     public void loadSettings(final File file, CallbackInfo ci) throws IOException {
         XaeroPlusModSettingsHooks.loadSettings(file, XAERO_PLUS_WORLDMAP_SETTINGS);
+        this.allowInternetAccess = !XaeroPlusSettingRegistry.disableXaeroInternetAccess.getValue();
     }
 
     @Inject(method = "getClientBooleanValue", at = @At("HEAD"), cancellable = true)

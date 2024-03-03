@@ -25,7 +25,7 @@ public class XaeroPlusForge {
 
     public XaeroPlusForge() {
         IEventBus modEventBus = get().getModEventBus();
-        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> {
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> {
             return () -> {
                 modEventBus.addListener(this::onInitialize);
                 modEventBus.addListener(this::onRegisterKeyMappingsEvent);

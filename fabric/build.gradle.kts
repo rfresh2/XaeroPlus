@@ -37,7 +37,7 @@ val fabric_version: String by rootProject
 dependencies {
 	modImplementation("net.fabricmc:fabric-loader:${loader_version}")
 	modApi("net.fabricmc.fabric-api:fabric-api:${fabric_version}")
-	shadow(libs.sqlite)
+	shadowCommon(libs.sqlite)
 	modImplementation("maven.modrinth:xaeros-world-map:${worldmap_version}_Fabric_1.20")
 	modImplementation("maven.modrinth:xaeros-minimap:${minimap_version}_Fabric_1.20")
 	modCompileOnly(files("libs/baritone-api-fabric-1.20.1-elytra-beta-v1.jar"))
@@ -69,7 +69,8 @@ tasks {
 	}
 
 	shadowJar {
-		configurations = listOf(project.configurations.shadow.get(), shadowCommon)
+		configurations = listOf(shadowCommon)
+		exclude("architectury.common.json")
 	}
 
 	remapJar {
@@ -77,4 +78,9 @@ tasks {
 		dependsOn(shadowJar)
 		inputFile.set(shadowJar.get().archiveFile)
 	}
+}
+
+val javaComponent = components.findByName("java") as AdhocComponentWithVariants
+javaComponent.withVariantsFromConfiguration(project.configurations.getByName("shadowRuntimeElements")) {
+	skip()
 }

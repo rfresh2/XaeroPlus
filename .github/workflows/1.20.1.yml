@@ -1,0 +1,59 @@
+name: 1.20.1 Build
+
+on:
+  push:
+    branches:
+      - "1.20.1"
+env:
+  MINECRAFT_VERSION: "1.20.1"
+  MINECRAFT_VERSION_SHORT: "1.20"
+  FABRIC_API_VERSION: "0.91.0+1.20.1"
+  FABRIC_API_MODRINTH_VERSION_ID: "YblXfKtI"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v4
+
+    - name: Gradle Wrapper Verification
+      uses: gradle/wrapper-validation-action@v2
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Elevate wrapper permissions
+      run: chmod +x ./gradlew
+
+    - name: Get WorldMap Version
+      run: |
+        echo "WORLDMAP_VERSION=$(./gradlew -q printWorldMapVersion)" >> $GITHUB_ENV
+
+    - name: Get Minimap Version
+      run: |
+        echo "MINIMAP_VERSION=$(./gradlew -q printMinimapVersion)" >> $GITHUB_ENV
+
+    - name: Build Mods
+      run: ./gradlew build
+
+    - name: Rename Fabric mod
+      run: mv fabric/build/libs/xaeroplus-${{ env.MINECRAFT_VERSION }}.jar XaeroPlus-Fabric-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar
+
+    - name: Rename Forge mod
+      run: mv forge/build/libs/xaeroplus-${{ env.MINECRAFT_VERSION }}.jar XaeroPlus-Forge-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar
+
+    - name: Upload Fabric Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Fabric-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}
+        path: XaeroPlus-Fabric-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar
+
+    - name: Upload Forge Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Forge-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}
+        path: XaeroPlus-Forge-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar

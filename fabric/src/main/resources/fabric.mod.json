@@ -23,7 +23,6 @@
     "xaeroplus.mixins.json",
     "xaeroplus-fabric.mixins.json"
   ],
-  "accessWidener": "xaeroplus.accesswidener",
   "depends": {
     "fabricloader": ">=0.15",
     "minecraft": "~1.20",

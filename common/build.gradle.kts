@@ -16,7 +16,7 @@ dependencies {
     modCompileOnly("maven.modrinth:xaeros-minimap:${minimap_version}_Fabric_1.20")
     implementation(libs.caffeine)
     implementation(libs.lambdaEvents)
-    modCompileOnly(files("libs/baritone-api-fabric-1.20.1-elytra-beta-v1.jar"))
+    modCompileOnly(files("../fabric/libs/baritone-api-fabric-1.20.1-elytra-beta-v1.jar"))
     modCompileOnly(libs.waystones.fabric)
     modCompileOnly(libs.balm.fabric)
     modCompileOnly(libs.fabric.waystones)

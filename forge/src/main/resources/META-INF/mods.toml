@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[47,)"
+loaderVersion = "[48,)"
 #issueTrackerURL = ""
 license = "MIT"
 
@@ -24,7 +24,7 @@ side = "CLIENT"
 [[dependencies.xaeroplus]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.20,)"
+versionRange = "[1.20.2]"
 ordering = "NONE"
 side = "CLIENT"
 

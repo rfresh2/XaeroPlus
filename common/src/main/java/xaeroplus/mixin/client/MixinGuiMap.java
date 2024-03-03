@@ -478,12 +478,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         }
     }
 
-    @Inject(method = "tick", at = @At("RETURN"), remap = true)
-    public void onTick(final CallbackInfo ci) {
-        xTextEntryField.tick();
-        zTextEntryField.tick();
-    }
-
     // todo: mixin on mouseClicked to close coord entry fields when clicking on something else
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true, remap = true)

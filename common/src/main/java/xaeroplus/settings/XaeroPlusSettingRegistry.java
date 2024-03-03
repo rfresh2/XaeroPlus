@@ -14,7 +14,6 @@ import xaeroplus.util.WaystonesHelper;
 import xaeroplus.util.WorldToolsHelper;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 import static net.minecraft.world.level.Level.*;
 import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.markChunksDirtyInWriteDistance;
@@ -496,17 +495,22 @@ public final class XaeroPlusSettingRegistry {
     public static final XaeroPlusBooleanSetting disableXaeroInternetAccess = XaeroPlusBooleanSetting.create(
         "Disable Xaero Internet Access",
         "Disable Xaero Internet Access",
-        "Disable Xaero Internet Access",
+        "Does not affect XaeroPlus. Disables Xaero mods from using the internet to query for updates and patreon subscriptions. Xaero mods do not expose this setting in the GUI normally.",
         (b) -> {
             if (XaeroPlus.initialized.get()) {
-                WorldMap.settings.allowInternetAccess = !b;
-                XaeroMinimap.INSTANCE // $REMAP
-                    .getSettings().allowInternetAccess = !b;
                 try {
-                    WorldMap.settings.saveSettings();
-                    XaeroMinimap.INSTANCE // $REMAP
-                        .getSettings().saveSettings();
-                } catch (IOException e) {
+                    var wmSettings = WorldMap.settings;
+                    if (wmSettings != null) {
+                        wmSettings.allowInternetAccess = !b;
+                        wmSettings.saveSettings();
+                    }
+                    var mmSettings = XaeroMinimap.INSTANCE // $REMAP
+                        .getSettings();
+                    if (mmSettings != null) {
+                        mmSettings.allowInternetAccess = !b;
+                        mmSettings.saveSettings();
+                    }
+                } catch (final Exception e) {
                     XaeroPlus.LOGGER.warn("Failed saving Xaero settings");
                 }
             }

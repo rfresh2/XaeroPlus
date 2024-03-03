@@ -59,7 +59,6 @@ dependencies {
 
 tasks {
 	processResources {
-		from(project(":common").sourceSets.main.get().resources)
 		filesMatching("fabric.mod.json") {
 			expand(mapOf(
 				"version" to project.version,

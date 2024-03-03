@@ -1,3 +1,7 @@
-AXaeroMinimap:IXaeroMinimap
-remap = true) // $REMAP:remap=false)
-XaeroMinimap.INSTANCE // $REMAP:XaeroMinimap.instance
+AXaeroMinimap::IXaeroMinimap
+# forge needs certain mixins not remapped
+remap = true) // $REMAP::remap=false)
+# renamed field
+XaeroMinimap.INSTANCE // $REMAP::XaeroMinimap.instance
+# fabric minimap compatibility mixin plugin
+"plugin": "xaeroplus.fabric.util.compat.XaeroPlusCompatibleMinimapMixinPlugin",::

@@ -54,17 +54,18 @@ tasks {
 
             val remapFile = file("remap/remap.txt")
             // read remap file to a map
-            // format is: 'fabricClassName:forgeClassName'
+            // format is: 'fabricClassName::forgeClassName'
             val remap = hashMapOf<String, String>()
             remapFile.forEachLine { line ->
-                val parts = line.split(":")
+                if (!line.contains("::")) return@forEachLine
+                val parts = line.split("::")
                 remap[parts[0]] = parts[1]
                 println("Loaded Forge Remap: '${parts[0]}' to '${parts[1]}'")
             }
 
             // exec remap on every source file
             remapDir.walk().forEach { file ->
-                if (file.isFile && file.extension == "java") {
+                if (file.isFile && (file.extension == "java" || file.extension == "json")) {
                     var text = file.readText()
                     remap.forEach { (fabric, forge) ->
                         text = text.replace(fabric, forge)

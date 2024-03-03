@@ -504,6 +504,7 @@ public final class XaeroPlusSettingRegistry {
                         wmSettings.allowInternetAccess = !b;
                         wmSettings.saveSettings();
                     }
+                    if (Class.forName("xaero.minimap.XaeroMinimap") == null) return;
                     var mmSettings = XaeroMinimap.INSTANCE // $REMAP
                         .getSettings();
                     if (mmSettings != null) {

@@ -48,8 +48,7 @@ public abstract class MixinWorldDataReader {
             at = @At(
                     value = "INVOKE",
                     target = "Lxaero/map/file/worldsave/WorldDataReader;buildTile(Lnet/minecraft/nbt/CompoundTag;Lxaero/map/region/MapTile;Lxaero/map/region/MapTileChunk;IIIIIIZZLnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/HolderLookup;Lnet/minecraft/core/Registry;Lnet/minecraft/core/Registry;Lnet/minecraft/core/Registry;ZII)Z"),
-            remap = true
-    )
+            remap = true) // $REMAP
     public boolean redirectBuildTile(final WorldDataReader instance,
                                      CompoundTag nbttagcompound,
                                      MapTile tile,

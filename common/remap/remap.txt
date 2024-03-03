@@ -1,0 +1,3 @@
+AXaeroMinimap:IXaeroMinimap
+remap = true) // $REMAP:remap=false)
+XaeroMinimap.INSTANCE // $REMAP:XaeroMinimap.instance

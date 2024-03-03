@@ -50,7 +50,7 @@ public abstract class MixinWaypointsManager {
     @Inject(
         method = "teleportToWaypoint(Lxaero/common/minimap/waypoints/Waypoint;Lxaero/common/minimap/waypoints/WaypointWorld;Lnet/minecraft/client/gui/screens/Screen;Z)V",
         at = @At("HEAD"),
-        remap = true)
+        remap = true) // $REMAP
     public void teleportToWaypointHead(final Waypoint selected, final WaypointWorld displayedWorld, final Screen screen, final boolean respectHiddenCoords, final CallbackInfo ci) {
         this.selected = selected;
         this.displayedWorld = displayedWorld;
@@ -62,8 +62,7 @@ public abstract class MixinWaypointsManager {
             value = "INVOKE",
             target = "Lxaero/common/minimap/waypoints/WaypointsManager;getAutoWorld()Lxaero/common/minimap/waypoints/WaypointWorld;"
         ),
-        remap = true
-    )
+        remap = true) // $REMAP
     public WaypointWorld getAutoWorldRedirect(final WaypointsManager instance) {
         if (!XaeroPlusSettingRegistry.owAutoWaypointDimension.getValue()) return instance.getAutoWorld();
         ResourceKey<Level> waypointDimension = ((IWaypointDimension) selected).getDimension();

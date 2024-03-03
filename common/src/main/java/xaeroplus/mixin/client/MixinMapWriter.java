@@ -124,7 +124,7 @@ public abstract class MixinMapWriter {
         value = "INVOKE",
         target = "Lxaero/map/MapWriter;shouldOverlayCached(Lnet/minecraft/world/level/block/state/StateHolder;)Z",
         ordinal = 0
-    ), remap = true)
+    ), remap = true) // $REMAP
     public boolean obsidianRoofOverlayMod(final boolean original,
                                           @Local(argsOnly = true) LevelChunk bChunk,
                                           @Local(name = "b") Block b,

@@ -1,5 +1,7 @@
-package xaeroplus.mixin.client;
+package xaeroplus.forge.mixin.client;
 
+import com.mojang.authlib.GameProfile;
+import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -9,9 +11,9 @@ import xaero.common.events.ForgeEventHandler;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 @Mixin(value = ForgeEventHandler.class, remap = false)
-public abstract class MixinForgeEventHandler {
-    @Inject(method = "handleClientSystemChatReceivedEvent", at = @At("HEAD"), cancellable = true)
-    public void onSystemChatReceived(final Component component, final CallbackInfoReturnable<Boolean> cir) {
+public class MixinForgeEventHandler {
+    @Inject(method = "handleClientPlayerChatReceivedEvent", at = @At("HEAD"), cancellable = true)
+    public void onPlayerChatReceived(final ChatType.Bound chatType, final Component component, final GameProfile gameProfile, final CallbackInfoReturnable<Boolean> cir) {
         if (component == null) return;
         if (XaeroPlusSettingRegistry.disableReceivingWaypoints.getValue()) {
             // cancelling at head so we avoid hitting the logic to parse the waypoint string

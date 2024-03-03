@@ -7,6 +7,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
+import xaeroplus.fabric.util.FabricWaystonesHelperInit;
 import xaeroplus.fabric.util.compat.IncompatibleMinimapWarningScreen;
 import xaeroplus.fabric.util.compat.MinimapBaseVersionCheck;
 import xaeroplus.module.ModuleManager;
@@ -24,6 +25,7 @@ public class XaeroPlusFabric implements ClientModInitializer {
 			XaeroPlusSettingRegistry.fastMapSetting.getValue(); // force static instances to init
 			List<KeyMapping> keybinds = XaeroPlusSettingsReflectionHax.keybindsSupplier.get();
 			keybinds.forEach(KeyBindingHelper::registerKeyBinding);
+			FabricWaystonesHelperInit.doInit();
 		}
 	}
 

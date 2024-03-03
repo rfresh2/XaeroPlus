@@ -62,7 +62,7 @@ public class MixinMinimapRenderer {
     @Redirect(method = "renderMinimap", at = @At(
         value = "INVOKE",
         target = "Lxaero/common/minimap/element/render/over/MinimapElementOverMapRendererHandler;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/player/Player;DDDDDDDZFLcom/mojang/blaze3d/pipeline/RenderTarget;Lxaero/common/AXaeroMinimap;Lxaero/common/minimap/render/MinimapRendererHelper;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/gui/Font;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;IIIIZF)V"),
-        remap = true)
+        remap = true) // $REMAP
     public void editOvermapRender(final MinimapElementOverMapRendererHandler instance,
                                   final GuiGraphics guiGraphics,
                                   final Entity renderEntity,
@@ -126,7 +126,7 @@ public class MixinMinimapRenderer {
     @Redirect(method = "renderMinimap", at = @At(
         value = "INVOKE",
         target = "Lxaero/common/minimap/render/MinimapFBORenderer;renderMainEntityDot(Lnet/minecraft/client/gui/GuiGraphics;Lxaero/common/minimap/MinimapProcessor;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;DDDDFLxaero/common/minimap/radar/MinimapRadar;ZIZZZDLxaero/common/settings/ModSettings;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;F)V"),
-        remap = true)
+        remap = true) // $REMAP
     public void redirectRenderMainEntityDot(final MinimapFBORenderer instance,
                                             final GuiGraphics guiGraphics,
                                             final MinimapProcessor minimap,

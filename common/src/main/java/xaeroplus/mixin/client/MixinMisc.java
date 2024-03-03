@@ -20,14 +20,4 @@ public class MixinMisc {
             cir.setReturnValue(false);
         }
     }
-
-    // TODO: fabric mixin
-//    /**
-//     * @author rfresh2
-//     * @reason hide unset keybind text
-//     */
-//    @Overwrite
-//    public static String getKeyName(KeyMapping kb) {
-//        return kb != null && KeyBindingHelper.getBoundKeyOf(kb).getValue() != -1 ? kb.getTranslatedKeyMessage().getString().toUpperCase() : "";
-//    }
 }

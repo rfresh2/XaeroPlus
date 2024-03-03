@@ -75,7 +75,9 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
     @ModifyArg(method = "renderChunks", at = @At(
         value = "INVOKE",
         target = "Lxaero/common/minimap/render/MinimapFBORenderer;renderChunksToFBO(Lxaero/common/XaeroMinimapSession;Lnet/minecraft/client/gui/GuiGraphics;Lxaero/common/minimap/MinimapProcessor;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;DDDDIIFFIZZZIDDZZLxaero/common/graphics/CustomVertexConsumers;)V"
-    ), index = 10, remap = true)
+    ),
+        index = 10,
+        remap = true) // $REMAP
     public int modifyViewW(final int viewW) {
         return viewW * Globals.minimapScalingFactor;
     }
@@ -213,7 +215,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
     @Redirect(method = "renderChunksToFBO", at = @At(
         value = "INVOKE",
         target = "Lxaero/common/minimap/render/MinimapRendererHelper;drawMyTexturedModalRect(Lcom/mojang/blaze3d/vertex/PoseStack;FFIIFFFF)V"
-    ), remap = true)
+    ), remap = true) // $REMAP
     public void redirectModelViewDraw(final MinimapRendererHelper instance, final PoseStack matrixStack, final float x, final float y, final int textureX, final int textureY, final float width, final float height, final float theight, final float factor,
                                       @Share("scaledSize") LocalIntRef scaledSize) {
         final float scaledSizeM = Globals.minimapScalingFactor * 512f;

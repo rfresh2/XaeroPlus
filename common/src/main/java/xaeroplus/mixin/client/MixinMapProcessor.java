@@ -59,9 +59,9 @@ public abstract class MixinMapProcessor {
 
     @Inject(method = "updateWorldSynced", at = @At(
         value = "INVOKE",
-        target = "Lxaero/map/world/MapWorld;onWorldChangeUnsynced(Lnet/minecraft/client/multiplayer/ClientLevel;)V",
-        shift = At.Shift.AFTER
-    ), remap = true)
+        target = "Lxaero/map/MapProcessor;popRenderPause(ZZ)V",
+        ordinal = 0
+    ))
     public void fireWorldChangedEvent(final CallbackInfo ci) {
         XaeroPlus.EVENT_BUS.call(new XaeroWorldChangeEvent(this.currentWorldId, this.currentDimId, this.currentMWId));
     }

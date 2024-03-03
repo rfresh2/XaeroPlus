@@ -500,10 +500,12 @@ public final class XaeroPlusSettingRegistry {
         (b) -> {
             if (XaeroPlus.initialized.get()) {
                 WorldMap.settings.allowInternetAccess = !b;
-                XaeroMinimap.INSTANCE.getSettings().allowInternetAccess = !b;
+                XaeroMinimap.INSTANCE // $REMAP
+                    .getSettings().allowInternetAccess = !b;
                 try {
                     WorldMap.settings.saveSettings();
-                    XaeroMinimap.INSTANCE.getSettings().saveSettings();
+                    XaeroMinimap.INSTANCE // $REMAP
+                        .getSettings().saveSettings();
                 } catch (IOException e) {
                     XaeroPlus.LOGGER.warn("Failed saving Xaero settings");
                 }

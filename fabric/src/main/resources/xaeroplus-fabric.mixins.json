@@ -8,6 +8,8 @@
   "plugin": "xaeroplus.fabric.util.compat.XaeroPlusCompatibleMinimapMixinPlugin",
   "client": [
     "MixinBetterPVP",
+    "MixinForgeEventHandler",
+    "MixinMisc",
     "MixinWorldMap",
     "MixinXaeroMinimap"
   ]

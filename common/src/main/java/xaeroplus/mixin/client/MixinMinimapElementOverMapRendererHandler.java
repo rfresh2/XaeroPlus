@@ -23,7 +23,7 @@ public class MixinMinimapElementOverMapRendererHandler {
     @Redirect(method = "transformAndRenderForRenderer", at = @At(
         value = "INVOKE",
         target = "Lxaero/common/minimap/element/render/MinimapElementRenderer;renderElement(IZZLnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/gui/Font;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lxaero/common/minimap/render/MinimapRendererHelper;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/player/Player;DDDIDFLjava/lang/Object;DDZF)Z"
-    ), remap = true)
+    ), remap = true) // $REMAP
     public boolean redirectRenderElement(final MinimapElementRenderer instance,
                                          final int location,
                                          final boolean highlit,

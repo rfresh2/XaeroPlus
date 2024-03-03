@@ -18,7 +18,7 @@ public class Model {
 
     public Model(Vector3f[] modelData, Vector2f[] uvData) {
 
-        BufferBuilder bufferbuilder = new BufferBuilder(modelData.length);
+        BufferBuilder bufferbuilder = new BufferBuilder(modelData.length * 4 * 5);
 
         bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
         for (int i = 0; i < modelData.length; i++) {

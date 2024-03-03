@@ -2,7 +2,7 @@ package xaeroplus.mixin.client;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.LiteralContents;
+import net.minecraft.network.chat.contents.PlainTextContents;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -28,7 +28,7 @@ public class MixinWorldMapOption {
             XaeroPlusSettingsReflectionHax.XAERO_PLUS_WORLDMAP_SETTINGS.stream()
                     .filter(s -> s.getSettingName().equals(option.getEnumString()))
                     .findFirst()
-                    .ifPresent(s -> caption = MutableComponent.create(new LiteralContents(SETTING_PREFIX)).append(Component.translatable(s.getSettingNameTranslationKey())));
+                    .ifPresent(s -> caption = MutableComponent.create(new PlainTextContents.LiteralContents(SETTING_PREFIX)).append(Component.translatable(s.getSettingNameTranslationKey())));
         }
     }
 }

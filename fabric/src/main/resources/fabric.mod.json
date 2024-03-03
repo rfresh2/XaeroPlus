@@ -12,7 +12,7 @@
     "sources": "https://github.com/rfresh2/XaeroPlus"
   },
   "license": "MIT",
-  "icon": "assets/xaeroplus/icon.jpg",
+  "icon": "assets/xaeroplus/icon.png",
   "environment": "client",
   "entrypoints": {
     "client": [
@@ -25,7 +25,7 @@
   ],
   "depends": {
     "fabricloader": ">=0.15",
-    "minecraft": "1.20.2",
+    "minecraft": "1.20.4",
     "java": ">=17",
     "fabric-api": "*",
     "xaeroworldmap": "${worldmap_version}"

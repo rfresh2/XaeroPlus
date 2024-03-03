@@ -1,6 +1,7 @@
 package xaeroplus.forge;
 
 import com.github.benmanes.caffeine.cache.RemovalCause;
+import com.llamalad7.mixinextras.MixinExtrasBootstrap;
 import net.minecraft.client.KeyMapping;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
@@ -27,6 +28,8 @@ public class XaeroPlusForge {
         IEventBus modEventBus = get().getModEventBus();
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> {
             return () -> {
+                MixinExtrasBootstrap.init();
+                XaeroPlus.LOGGER.info("Initializing XaeroPlus");
                 modEventBus.addListener(this::onInitialize);
                 modEventBus.addListener(this::onRegisterKeyMappingsEvent);
                 FORGE_EVENT_BUS.register(modEventBus);

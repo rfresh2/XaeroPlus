@@ -37,9 +37,9 @@ sourceSets.main.get().resources.srcDir(common.layout.buildDirectory.get().asFile
 
 dependencies {
     neoForge("net.neoforged:neoforge:${neoforge_version}")
-    modImplementation("maven.modrinth:xaeros-world-map:${worldmap_version}_NeoForge_1.20.2")
-    modImplementation("maven.modrinth:xaeros-minimap:${minimap_version}_NeoForge_1.20.2")
-    modImplementation(files("../forge/libs/baritone-unoptimized-forge-1.10.2.jar"))
+    modImplementation("maven.modrinth:xaeros-world-map:${worldmap_version}_NeoForge_1.20.4")
+    modImplementation("maven.modrinth:xaeros-minimap:${minimap_version}_NeoForge_1.20.4")
+    modImplementation(files("libs/baritone-unoptimized-neoforge-1.10.2.jar"))
     modCompileOnly(libs.waystones.neoforge)
     modCompileOnly(libs.balm.neoforge)
     modCompileOnly(libs.worldtools)

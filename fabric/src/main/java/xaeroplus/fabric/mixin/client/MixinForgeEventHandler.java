@@ -17,6 +17,15 @@ import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 @Mixin(value = ForgeEventHandler.class, remap = false)
 public class MixinForgeEventHandler {
+    @Inject(method = "handleClientSystemChatReceivedEvent", at = @At("HEAD"), cancellable = true)
+    public void onSystemChatReceived(final Component component, final CallbackInfoReturnable<Boolean> cir) {
+        if (component == null) return;
+        if (XaeroPlusSettingRegistry.disableReceivingWaypoints.getValue()) {
+            // cancelling at head so we avoid hitting the logic to parse the waypoint string
+            cir.setReturnValue(false); // false will show the raw message in chat to the player
+        }
+    }
+
     @Inject(method = "handleClientPlayerChatReceivedEvent", at = @At("HEAD"), cancellable = true)
     public void onPlayerChatReceived(final ChatType chatType, final Component component, final GameProfile gameProfile, final CallbackInfoReturnable<Boolean> cir) {
         if (component == null) return;

@@ -73,6 +73,9 @@ allprojects {
     group = rootProject.properties["maven_group"].toString()
 
     repositories {
+        maven("https://maven.neoforged.net/releases/") {
+            name = "NeoForge"
+        }
         maven("https://api.modrinth.com/maven") {
             name = "Modrinth"
         }

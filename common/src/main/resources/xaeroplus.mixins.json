@@ -12,7 +12,6 @@
     "MixinCommonGuiSettings",
     "MixinControlsHandler",
     "MixinCrashHandler",
-    "MixinForgeEventHandler",
     "MixinGuiAddWaypoint",
     "MixinGuiEntityRadarSettings",
     "MixinGuiMap",

@@ -46,6 +46,9 @@ jobs:
     - name: Rename Forge mod
       run: mv forge/build/libs/xaeroplus-${{ env.MINECRAFT_VERSION }}.jar XaeroPlus-Forge-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar
 
+    - name: Rename NeoForge mod
+      run: mv neo/build/libs/xaeroplus-${{ env.MINECRAFT_VERSION }}.jar XaeroPlus-NeoForge-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM24.0.0-MM1.38.0.jar
+
     - name: Upload Fabric Artifact
       uses: actions/upload-artifact@v4
       with:
@@ -57,3 +60,9 @@ jobs:
       with:
         name: Forge-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}
         path: XaeroPlus-Forge-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar
+
+    - name: Upload NeoForge Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: NeoForge-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM24.0.0-MM1.38.0
+        path: XaeroPlus-NeoForge-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM24.0.0-MM1.38.0.jar

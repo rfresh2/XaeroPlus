@@ -491,8 +491,8 @@ public final class XaeroPlusSettingRegistry {
             SettingLocation.WAYPOINTS);
     public static final XaeroPlusBooleanSetting disableXaeroInternetAccess = XaeroPlusBooleanSetting.create(
         "Disable Xaero Internet Access",
-        "Disable Xaero Internet Access",
-        "Does not affect XaeroPlus. Disables WorldMap and Minimap mods from using the internet to query for updates and patreon subscriptions. Xaero mods do not expose this setting in the GUI normally.",
+        "setting.world_map.disable_internet",
+        "setting.world_map.disable_internet.tooltip",
         false,
         SettingLocation.WORLD_MAP_MAIN);
 }

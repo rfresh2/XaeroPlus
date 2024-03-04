@@ -1,9 +1,6 @@
 package xaeroplus.settings;
 
-import xaero.map.WorldMap;
-import xaero.minimap.XaeroMinimap;
 import xaeroplus.Globals;
-import xaeroplus.XaeroPlus;
 import xaeroplus.feature.render.ColorHelper;
 import xaeroplus.feature.render.ColorHelper.WaystoneColor;
 import xaeroplus.module.ModuleManager;
@@ -494,28 +491,8 @@ public final class XaeroPlusSettingRegistry {
             SettingLocation.WAYPOINTS);
     public static final XaeroPlusBooleanSetting disableXaeroInternetAccess = XaeroPlusBooleanSetting.create(
         "Disable Xaero Internet Access",
-        "Disable Xaero Internet Access",
-        "Does not affect XaeroPlus. Disables Xaero mods from using the internet to query for updates and patreon subscriptions. Xaero mods do not expose this setting in the GUI normally.",
-        (b) -> {
-            if (XaeroPlus.initialized.get()) {
-                try {
-                    var wmSettings = WorldMap.settings;
-                    if (wmSettings != null) {
-                        wmSettings.allowInternetAccess = !b;
-                        wmSettings.saveSettings();
-                    }
-                    if (Class.forName("xaero.minimap.XaeroMinimap") == null) return;
-                    var mmSettings = XaeroMinimap.INSTANCE // $REMAP
-                        .getSettings();
-                    if (mmSettings != null) {
-                        mmSettings.allowInternetAccess = !b;
-                        mmSettings.saveSettings();
-                    }
-                } catch (final Exception e) {
-                    XaeroPlus.LOGGER.warn("Failed saving Xaero settings");
-                }
-            }
-        },
-        true,
+        "setting.world_map.disable_internet",
+        "setting.world_map.disable_internet.tooltip",
+        false,
         SettingLocation.WORLD_MAP_MAIN);
 }

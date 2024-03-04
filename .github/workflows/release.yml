@@ -19,6 +19,10 @@ on:
         description: "Base ref for changelog generator"
         required: true
         type: string
+      headRef:
+        description: "Head ref for changelog generator"
+        required: true
+        type: string
 
 env:
   MINECRAFT_VERSION: "1.20.1"
@@ -88,6 +92,7 @@ jobs:
         with:
           myToken: ${{ secrets.GITHUB_TOKEN }}
           base-ref: ${{ inputs.baseRef }}
+          head-ref: ${{ inputs.headRef }}
 
     outputs:
       changelog: ${{ steps.changelog.outputs.changelog }}

@@ -128,6 +128,8 @@
   "setting.waypoints.waypoint_beacon_scale_min.tooltip": "Ustawia skalę minimalną beacona punktu nawigacyjny, gdy jest daleko. \n Ta wartośc to odległość gracza od miejsca, gdzie renderowany jest beacon w chunkach. \n 0 = automatycznie dopasuj do render distance gracza",
   "setting.waypoints.waypoint_beacon_distance_min": "Minimalny Dystans Beacona Punktu nawigacyjny",
   "setting.waypoints.waypoint_beacon_distance_min.tooltip": "Ustawia minimalny dystans na osiach xz od gracza, w której musi znajdować się punkt nawigacyjny, aby wyrenderować beacon.",
+  "setting.world_map.disable_internet": "Wyłącz dostęp do Internetu Xaero",
+  "setting.world_map.disable_internet.tooltip": "Wyłącza modom WorldMap i Minimap korzystanie z Internetu w celu sprawdzania dostępności aktualizacji i subskrypcji Patreona przy uruchomieniu.\n Mody Xaero normalnie nie udostępniają tego ustawienia w GUI.\n XaeroPlus nie korzysta z Internetu niezależnie od tego ustawienia.",
   "gui.world_map.toggle_follow_mode": "Przełącz Tryb Podążąnia",
   "gui.xaeroplus.on": "Włączony",
   "gui.xaeroplus.off": "Wyłączony",

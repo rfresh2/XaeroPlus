@@ -33,6 +33,8 @@ val minecraft_version: String by rootProject
 val parchment_version: String by rootProject
 val loader_version: String by rootProject
 val fabric_version: String by rootProject
+val destArchiveVersion = "${project.version}+${loom.platform.get().id()}-${minecraft_version}"
+val destArchiveClassifier = "WM${worldmap_version}-MM${minimap_version}"
 
 dependencies {
 	modImplementation("net.fabricmc:fabric-loader:${loader_version}")
@@ -77,6 +79,8 @@ tasks {
 		injectAccessWidener = true
 		dependsOn(shadowJar)
 		inputFile.set(shadowJar.get().archiveFile)
+		archiveVersion = destArchiveVersion
+		archiveClassifier = destArchiveClassifier
 	}
 }
 

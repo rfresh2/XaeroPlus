@@ -31,6 +31,8 @@ val minecraft_version: String by rootProject
 val parchment_version: String by rootProject
 val loader_version: String by rootProject
 val neoforge_version: String by rootProject
+val destArchiveVersion = "${project.version}+${loom.platform.get().id()}-${minecraft_version}"
+val destArchiveClassifier = "WM${worldmap_version}-MM${minimap_version}"
 
 sourceSets.main.get().java.srcDir(common.layout.buildDirectory.get().asFile.path + "/remappedSources/forge/java")
 sourceSets.main.get().resources.srcDir(common.layout.buildDirectory.get().asFile.path + "/remappedSources/forge/resources")
@@ -68,6 +70,8 @@ tasks {
         transformers.add(TransformPlatformOnly())
         transformers.add(TransformNeoForgeAnnotations())
         transformers.add(TransformNeoForgeEnvironment())
+        archiveVersion = destArchiveVersion
+        archiveClassifier = destArchiveClassifier
     }
 
     shadowJar {
@@ -77,5 +81,7 @@ tasks {
     remapJar {
         dependsOn(shadowJar, transformNeo)
         inputFile.set(shadowJar.get().archiveFile.get())
+        archiveVersion = destArchiveVersion
+        archiveClassifier = destArchiveClassifier
     }
 }

@@ -113,4 +113,7 @@ tasks {
     register("printMinimapVersion") {
         println(minimap_version)
     }
+    register("printXaeroPlusVersion") {
+        println(version)
+    }
 }

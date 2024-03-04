@@ -11,6 +11,10 @@ on:
         description: "Forge Release"
         required: true
         type: boolean
+      neo:
+        description: "Neo Release"
+        required: true
+        type: boolean
       baseRef:
         description: "Base ref for changelog generator"
         required: true
@@ -64,6 +68,10 @@ jobs:
         run: |
           echo "XP_FORGE=XaeroPlus-${{ env.XP_VERSION}}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}" >> $GITHUB_ENV
 
+      - name: Get Neo Jar Filename
+        run: |
+          echo "XP_NEO=XaeroPlus-${{ env.XP_VERSION}}+neo-${{ env.MINECRAFT_VERSION }}-WM1.38.0-MM24.0.0" >> $GITHUB_ENV
+
       - name: Upload Fabric Artifact
         if: ${{ inputs.fabric }}
         uses: actions/upload-artifact@v4
@@ -76,7 +84,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.XP_FORGE }}
-          path: forge/build/libs/${{ env.XP_FORGE }}.jar
+          path: forge/build/libs/${{ env.XP_FORGE }}.
+
+      - name: Upload Neo Artifact
+        if: ${{ inputs.neo }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.XP_NEO }}
+          path: neo/build/libs/${{ env.XP_NEO }}.jar
 
       - name: Generate changelog
         id: changelog
@@ -90,6 +105,7 @@ jobs:
       xp_version: ${{ env.XP_VERSION }}
       xp_fabric: ${{ env.XP_FABRIC }}
       xp_forge: ${{ env.XP_FORGE }}
+      xp_neo: ${{ env.XP_NEO }}
       worldmap_version: ${{ env.WORLDMAP_VERSION }}
       minimap_version: ${{ env.MINIMAP_VERSION }}
 
@@ -153,7 +169,6 @@ jobs:
           version: ${{ needs.build.outputs.xp_version }}
           loaders: |
             forge
-            neoforge
           game-versions: |
             ${{ env.MINECRAFT_VERSION }}
           dependencies: |
@@ -162,8 +177,33 @@ jobs:
             worldtools(optional){modrinth:FlFKBOIX}{curseforge:909868}
             waystones(optional){modrinth:LOpKHB2A}{curseforge:245755}
 
+      - name: Release Neo CurseForge and Modrinth
+        if: ${{ inputs.neo }}
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          changelog: ${{ needs.build.outputs.changelog }}
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          curseforge-id: 866084
+
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          modrinth-id: EnPUzSTg
+
+          files: |
+            artifacts/${{ needs.build.outputs.xp_neo }}.jar
+          name: ${{ needs.build.outputs.xp_version }}+${{ env.MINECRAFT_VERSION }} [NeoForge]
+          version: ${{ needs.build.outputs.xp_version }}
+          loaders: |
+            neoforge
+          game-versions: |
+            ${{ env.MINECRAFT_VERSION }}
+          dependencies: |
+            xaerominimap@24.0.0(required){modrinth:1bokaNcj}{curseforge:263420}
+            xaeroworldmap@1.38.0(required){modrinth:NcUtCpym}{curseforge:317780}
+            worldtools(optional){modrinth:FlFKBOIX}{curseforge:909868}
+            waystones(optional){modrinth:LOpKHB2A}{curseforge:245755}
+
       - name: Github Release
-        if: ${{ inputs.fabric }} || ${{ inputs.forge }}
+        if: ${{ inputs.fabric }} || ${{ inputs.forge }} || ${{ inputs.neo }}
         uses: ncipollo/release-action@v1
         with:
           tag: "${{ needs.build.outputs.xp_version }}"

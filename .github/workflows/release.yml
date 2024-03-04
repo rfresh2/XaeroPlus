@@ -11,6 +11,10 @@ on:
         description: "Forge Release"
         required: true
         type: boolean
+      neo:
+        description: "Neo Release"
+        required: true
+        type: boolean
       baseRef:
         description: "Base ref for changelog generator"
         required: true
@@ -121,8 +125,8 @@ jobs:
 
           files: |
             artifacts/${{ needs.build.outputs.xp_fabric }}.jar
-          name: ${{ needs.build.outputs.xp_version }}+${{ env.MINECRAFT_VERSION }} [Fabric]
-          version: ${{ needs.build.outputs.xp_version }}
+          name: ${{ needs.build.outputs.xp_version }} (Fabric)
+          version: ${{ needs.build.outputs.xp_version }}+fabric-${{ env.MINECRAFT_VERSION }}
           loaders: |
             fabric
             quilt
@@ -149,8 +153,8 @@ jobs:
 
           files: |
             artifacts/${{ needs.build.outputs.xp_forge }}.jar
-          name: ${{ needs.build.outputs.xp_version }}+${{ env.MINECRAFT_VERSION }} [Forge]
-          version: ${{ needs.build.outputs.xp_version }}
+          name: ${{ needs.build.outputs.xp_version }} (Forge)
+          version: ${{ needs.build.outputs.xp_version }}+forge-${{ env.MINECRAFT_VERSION }}
           loaders: |
             forge
             neoforge

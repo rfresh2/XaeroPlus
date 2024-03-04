@@ -90,12 +90,12 @@ public abstract class MixinMapWriter {
         final boolean blockHeightAboveYLimit = hRef.get() >= XaeroPlusSettingRegistry.transparentObsidianRoofYSetting.getValue();
 
         if (blockHeightAboveYLimit) {
-            boolean shouldMakeTransparent = (b == Blocks.OBSIDIAN);
+            boolean shouldMakeTransparent = (b == Blocks.OBSIDIAN || b == Blocks.CRYING_OBSIDIAN);
             if (b == Blocks.SNOW) {
                 this.mutableLocalPos.setY(hRef.get() - 1);
                 BlockState belowState = bchunk.getBlockState(this.mutableLocalPos);
                 this.mutableLocalPos.setY(hRef.get());
-                shouldMakeTransparent = belowState.getBlock() == Blocks.OBSIDIAN;
+                shouldMakeTransparent = belowState.getBlock() == Blocks.OBSIDIAN || belowState.getBlock() == Blocks.CRYING_OBSIDIAN;
             }
             if (shouldMakeTransparent) {
                 if (XaeroPlusSettingRegistry.transparentObsidianRoofDarkeningSetting.getValue() == 0) {
@@ -132,13 +132,13 @@ public abstract class MixinMapWriter {
     ) {
         if (XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()
             && h > XaeroPlusSettingRegistry.transparentObsidianRoofYSetting.getValue()) {
-            if (b == Blocks.OBSIDIAN) {
+            if (b == Blocks.OBSIDIAN || b == Blocks.CRYING_OBSIDIAN) {
                 return true;
             } else if (b == Blocks.SNOW) {
                 this.mutableLocalPos.setY(h - 1);
                 BlockState belowState = bChunk.getBlockState(this.mutableLocalPos);
                 this.mutableLocalPos.setY(h);
-                return belowState.getBlock() == Blocks.OBSIDIAN;
+                return belowState.getBlock() == Blocks.OBSIDIAN || belowState.getBlock() == Blocks.CRYING_OBSIDIAN;
             }
         }
         return original;
@@ -153,12 +153,12 @@ public abstract class MixinMapWriter {
                                          @Local(name = "h") int h) {
         if (XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()
             && h > XaeroPlusSettingRegistry.transparentObsidianRoofYSetting.getValue()) {
-            boolean shouldMakeTransparent = instance.getBlock() == Blocks.OBSIDIAN;
+            boolean shouldMakeTransparent = instance.getBlock() == Blocks.OBSIDIAN || instance.getBlock() == Blocks.CRYING_OBSIDIAN;
             if (instance.getBlock() == Blocks.SNOW) {
                 this.mutableLocalPos.setY(h - 1);
                 BlockState belowState = world.getBlockState(this.mutableLocalPos);
                 this.mutableLocalPos.setY(h);
-                if (belowState.getBlock() == Blocks.OBSIDIAN)
+                if (belowState.getBlock() == Blocks.OBSIDIAN || belowState.getBlock() == Blocks.CRYING_OBSIDIAN)
                     shouldMakeTransparent = true;
             }
             if (shouldMakeTransparent) {

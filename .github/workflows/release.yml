@@ -137,8 +137,8 @@ jobs:
 
           files: |
             artifacts/${{ needs.build.outputs.xp_fabric }}.jar
-          name: ${{ needs.build.outputs.xp_version }}+${{ env.MINECRAFT_VERSION }} [Fabric]
-          version: ${{ needs.build.outputs.xp_version }}
+          name: ${{ needs.build.outputs.xp_version }} (Fabric)
+          version: ${{ needs.build.outputs.xp_version }}+fabric-${{ env.MINECRAFT_VERSION }}
           loaders: |
             fabric
             quilt
@@ -165,8 +165,8 @@ jobs:
 
           files: |
             artifacts/${{ needs.build.outputs.xp_forge }}.jar
-          name: ${{ needs.build.outputs.xp_version }}+${{ env.MINECRAFT_VERSION }} [Forge]
-          version: ${{ needs.build.outputs.xp_version }}
+          name: ${{ needs.build.outputs.xp_version }} (Forge)
+          version: ${{ needs.build.outputs.xp_version }}+forge-${{ env.MINECRAFT_VERSION }}
           loaders: |
             forge
           game-versions: |
@@ -190,8 +190,8 @@ jobs:
 
           files: |
             artifacts/${{ needs.build.outputs.xp_neo }}.jar
-          name: ${{ needs.build.outputs.xp_version }}+${{ env.MINECRAFT_VERSION }} [NeoForge]
-          version: ${{ needs.build.outputs.xp_version }}
+          name: ${{ needs.build.outputs.xp_version }} (NeoForge)
+          version: ${{ needs.build.outputs.xp_version }}+neo-${{ env.MINECRAFT_VERSION }}
           loaders: |
             neoforge
           game-versions: |

@@ -35,6 +35,8 @@ val minecraft_version: String by rootProject
 val parchment_version: String by rootProject
 val loader_version: String by rootProject
 val forge_version: String by rootProject
+val destArchiveVersion = "${project.version}+${loom.platform.get().id()}-${minecraft_version}"
+val destArchiveClassifier = "WM${worldmap_version}-MM${minimap_version}"
 
 sourceSets.main.get().java.srcDir(common.layout.buildDirectory.get().asFile.path + "/remappedSources/forge/java")
 sourceSets.main.get().resources.srcDir(common.layout.buildDirectory.get().asFile.path + "/remappedSources/forge/resources")
@@ -76,6 +78,8 @@ tasks {
         transformers.add(TransformForgeEnvironment())
         transformers.add(FixForgeMixin())
         loom.setGenerateSrgTiny(true)
+        archiveVersion = destArchiveVersion
+        archiveClassifier = destArchiveClassifier
     }
 
     shadowJar {
@@ -85,5 +89,7 @@ tasks {
     remapJar {
         dependsOn(shadowJar, transformForge)
         inputFile.set(shadowJar.get().archiveFile.get())
+        archiveVersion = destArchiveVersion
+        archiveClassifier = destArchiveClassifier
     }
 }

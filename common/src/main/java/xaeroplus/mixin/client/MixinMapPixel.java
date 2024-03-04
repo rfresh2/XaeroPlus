@@ -61,7 +61,7 @@ public abstract class MixinMapPixel {
             final CallbackInfo ci
     ) {
         if (XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()) {
-            if (state.getBlock() == Blocks.OBSIDIAN) {
+            if (state.getBlock() == Blocks.OBSIDIAN || state.getBlock() == Blocks.CRYING_OBSIDIAN) {
                 result_dest[3] = (int) XaeroPlusSettingRegistry.transparentObsidianRoofDarkeningSetting.getValue();
             } else if (state.getBlock() == Blocks.SNOW) {
                 result_dest[3] = (int) XaeroPlusSettingRegistry.transparentObsidianRoofSnowOpacitySetting.getValue();

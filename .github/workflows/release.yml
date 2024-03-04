@@ -1,0 +1,175 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      fabric:
+        description: "Fabric Release"
+        required: true
+        type: boolean
+      forge:
+        description: "Forge Release"
+        required: true
+        type: boolean
+      baseRef:
+        description: "Base ref for changelog generator"
+        required: true
+        type: string
+
+env:
+  MINECRAFT_VERSION: "1.20.1"
+  MINECRAFT_VERSION_SHORT: "1.20"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Gradle Wrapper Verification
+        uses: gradle/wrapper-validation-action@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Elevate wrapper permissions
+        run: chmod +x ./gradlew
+
+      - name: Build
+        uses: gradle/gradle-build-action@v3
+        with:
+          arguments: build
+
+      - name: Get WorldMap Version
+        run: |
+          echo "WORLDMAP_VERSION=$(./gradlew -q printWorldMapVersion)" >> $GITHUB_ENV
+
+      - name: Get Minimap Version
+        run: |
+          echo "MINIMAP_VERSION=$(./gradlew -q printMinimapVersion)" >> $GITHUB_ENV
+
+      - name: Get XaeroPlus Version
+        run: |
+          echo "XP_VERSION=$(./gradlew -q printXaeroPlusVersion)" >> $GITHUB_ENV
+
+      - name: Get Fabric Jar Filename
+        run: |
+          echo "XP_FABRIC=XaeroPlus-${{ env.XP_VERSION}}+fabric-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}" >> $GITHUB_ENV
+
+      - name: Get Forge Jar Filename
+        run: |
+          echo "XP_FORGE=XaeroPlus-${{ env.XP_VERSION}}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}" >> $GITHUB_ENV
+
+      - name: Upload Fabric Artifact
+        if: ${{ inputs.fabric }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.XP_FABRIC }}
+          path: fabric/build/libs/${{ env.XP_FABRIC }}.jar
+
+      - name: Upload Forge Artifact
+        if: ${{ inputs.forge }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.XP_FORGE }}
+          path: forge/build/libs/${{ env.XP_FORGE }}.jar
+
+      - name: Generate changelog
+        id: changelog
+        uses: metcalfc/changelog-generator@v4.3.1
+        with:
+          myToken: ${{ secrets.GITHUB_TOKEN }}
+          base-ref: ${{ inputs.baseRef }}
+
+    outputs:
+      changelog: ${{ steps.changelog.outputs.changelog }}
+      xp_version: ${{ env.XP_VERSION }}
+      xp_fabric: ${{ env.XP_FABRIC }}
+      xp_forge: ${{ env.XP_FORGE }}
+      worldmap_version: ${{ env.WORLDMAP_VERSION }}
+      minimap_version: ${{ env.MINIMAP_VERSION }}
+
+  release:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Download job artifacts
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          path: artifacts/
+
+      - name: Release Fabric CurseForge and Modrinth
+        if: ${{ inputs.fabric }}
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          changelog: ${{ needs.build.outputs.changelog }}
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          curseforge-id: 866084
+
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          modrinth-id: EnPUzSTg
+
+          files: |
+            artifacts/${{ needs.build.outputs.xp_fabric }}.jar
+          name: ${{ needs.build.outputs.xp_version }}+${{ env.MINECRAFT_VERSION }} [Fabric]
+          version: ${{ needs.build.outputs.xp_version }}
+          loaders: |
+            fabric
+            quilt
+          game-versions: |
+            ${{ env.MINECRAFT_VERSION }}
+          dependencies: |
+            xaerominimap@${{ needs.build.outputs.minimap_version }}(required){modrinth:1bokaNcj}{curseforge:263420}
+            xaeroworldmap@${{ needs.build.outputs.worldmap_version }}(required){modrinth:NcUtCpym}{curseforge:317780}
+            fabric-api(required){modrinth:P7dR8mSH}{curseforge:306612}
+            worldtools(optional){modrinth:FlFKBOIX}{curseforge:909868}
+            waystones(optional){modrinth:LOpKHB2A}{curseforge:245755}
+            fwaystones(optional){modrinth:sTZr7NVo}{curseforge:410902}
+
+      - name: Release Forge CurseForge and Modrinth
+        if: ${{ inputs.forge }}
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          changelog: ${{ needs.build.outputs.changelog }}
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          curseforge-id: 866084
+
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          modrinth-id: EnPUzSTg
+
+          files: |
+            artifacts/${{ needs.build.outputs.xp_forge }}.jar
+          name: ${{ needs.build.outputs.xp_version }}+${{ env.MINECRAFT_VERSION }} [Forge]
+          version: ${{ needs.build.outputs.xp_version }}
+          loaders: |
+            forge
+            neoforge
+          game-versions: |
+            ${{ env.MINECRAFT_VERSION }}
+          dependencies: |
+            xaerominimap@${{ needs.build.outputs.minimap_version }}(required){modrinth:1bokaNcj}{curseforge:263420}
+            xaeroworldmap@${{ needs.build.outputs.worldmap_version }}(required){modrinth:NcUtCpym}{curseforge:317780}
+            worldtools(optional){modrinth:FlFKBOIX}{curseforge:909868}
+            waystones(optional){modrinth:LOpKHB2A}{curseforge:245755}
+
+      - name: Github Release
+        if: ${{ inputs.fabric }} || ${{ inputs.forge }}
+        uses: ncipollo/release-action@v1
+        with:
+          tag: "${{ needs.build.outputs.xp_version }}"
+          commit: 1.20.1
+          artifacts: "artifacts/*.jar"
+          allowUpdates: true
+          makeLatest: true
+          body: ${{ needs.build.outputs.changelog }}
+          omitBodyDuringUpdate: true

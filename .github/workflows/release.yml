@@ -74,7 +74,7 @@ jobs:
 
       - name: Get Neo Jar Filename
         run: |
-          echo "XP_NEO=XaeroPlus-${{ env.XP_VERSION}}+neo-${{ env.MINECRAFT_VERSION }}-WM1.38.0-MM24.0.0" >> $GITHUB_ENV
+          echo "XP_NEO=XaeroPlus-${{ env.XP_VERSION}}+neoforge-${{ env.MINECRAFT_VERSION }}-WM1.38.0-MM24.0.0" >> $GITHUB_ENV
 
       - name: Upload Fabric Artifact
         if: ${{ inputs.fabric }}
@@ -196,7 +196,7 @@ jobs:
           files: |
             artifacts/${{ needs.build.outputs.xp_neo }}.jar
           name: ${{ needs.build.outputs.xp_version }} (NeoForge)
-          version: ${{ needs.build.outputs.xp_version }}+neo-${{ env.MINECRAFT_VERSION }}
+          version: ${{ needs.build.outputs.xp_version }}+neoforge-${{ env.MINECRAFT_VERSION }}
           loaders: |
             neoforge
           game-versions: |

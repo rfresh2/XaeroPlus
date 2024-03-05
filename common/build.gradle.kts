@@ -57,7 +57,7 @@ tasks {
             // format is: 'fabricClassName::forgeClassName'
             val remap = hashMapOf<String, String>()
             remapFile.forEachLine { line ->
-                if (!line.contains("::")) return@forEachLine
+                if (line.startsWith("#") || !line.contains("::")) return@forEachLine
                 val parts = line.split("::")
                 remap[parts[0]] = parts[1]
                 println("Loaded Forge Remap: '${parts[0]}' to '${parts[1]}'")

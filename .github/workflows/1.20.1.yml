@@ -57,13 +57,15 @@ jobs:
         echo "XP_FORGE=XaeroPlus-${{ env.XP_VERSION}}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}" >> $GITHUB_ENV
 
     - name: Upload Fabric Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ env.XP_FABRIC }}
         path: fabric/build/libs/${{ env.XP_FABRIC }}.jar
+        if-no-files-found: error
 
     - name: Upload Forge Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ env.XP_FORGE }}
         path: forge/build/libs/${{ env.XP_FORGE }}.jar
+        if-no-files-found: error

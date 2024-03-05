@@ -78,6 +78,7 @@ jobs:
         with:
           name: ${{ env.XP_FABRIC }}
           path: fabric/build/libs/${{ env.XP_FABRIC }}.jar
+          if-no-files-found: error
 
       - name: Upload Forge Artifact
         if: ${{ inputs.forge }}
@@ -85,6 +86,7 @@ jobs:
         with:
           name: ${{ env.XP_FORGE }}
           path: forge/build/libs/${{ env.XP_FORGE }}.jar
+          if-no-files-found: error
 
       - name: Generate changelog
         id: changelog

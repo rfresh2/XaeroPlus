@@ -80,7 +80,6 @@ public class MixinMinimapModSettings {
     @Inject(method = "loadSettingsFile", at = @At("RETURN"))
     public void loadSettings(final File file, CallbackInfo ci) throws IOException {
         XaeroPlusModSettingsHooks.loadSettings(file, ALL_MINIMAP_SETTINGS.get());
-        this.allowInternetAccess = !XaeroPlusSettingRegistry.disableXaeroInternetAccess.getValue();
     }
 
     @Inject(method = "getClientBooleanValue", at = @At("HEAD"), cancellable = true)

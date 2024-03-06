@@ -221,4 +221,43 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         final float scaledSizeM = Globals.minimapScalingFactor * 512f;
         this.helper.drawMyTexturedModalRect(matrixStack, -scaledSize.get(), -scaledSize.get(), 0, 0, scaledSizeM, scaledSizeM, scaledSizeM, scaledSizeM);
     }
+
+    @Inject(method = "renderChunksToFBO", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;draw(Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRenderer;)V"
+    ))
+    public void drawMinimapFeaturesCaveMode(final XaeroMinimapSession minimapSession, final GuiGraphics guiGraphics, final MinimapProcessor minimap, final Player player, final Entity renderEntity, final double playerX, final double playerZ, final double playerDimDiv, final double mapDimensionScale, final int bufferSize, final int viewW, final float sizeFix, final float partial, final int level, final boolean retryIfError, final boolean useWorldMap, final boolean lockedNorth, final int shape, final double ps, final double pc, final boolean cave, final boolean circle, final CustomVertexConsumers cvc, final CallbackInfo ci,
+                                            @Local(name = "xFloored") int xFloored,
+                                            @Local(name = "zFloored") int zFloored,
+                                            @Local(name = "overlayBufferBuilder") VertexConsumer overlayBufferBuilder,
+                                            @Local(name = "matrixStack") PoseStack matrixStack,
+                                            @Local(name = "minX") LocalIntRef minXRef,
+                                            @Local(name = "maxX") LocalIntRef maxXRef,
+                                            @Local(name = "minZ") LocalIntRef minZRef,
+                                            @Local(name = "maxZ") LocalIntRef maxZRef
+                                            ) {
+        int mapX = xFloored >> 4;
+        int mapZ = zFloored >> 4;
+        int chunkX = mapX >> 2;
+        int chunkZ = mapZ >> 2;
+        int tileX = mapX & 3;
+        int tileZ = mapZ & 3;
+        int insideX = xFloored & 15;
+        int insideZ = zFloored & 15;
+        Globals.drawManager.drawMinimapFeatures(
+            minXRef.get(),
+            maxXRef.get(),
+            minZRef.get(),
+            maxZRef.get(),
+            chunkX,
+            chunkZ,
+            tileX,
+            tileZ,
+            insideX,
+            insideZ,
+            matrixStack,
+            overlayBufferBuilder,
+            helper
+        );
+    }
 }

@@ -22,11 +22,9 @@ public class MixinWorldMapModSettings {
     @Shadow
     public int defaultCaveModeType;
 
-    @Shadow public boolean allowInternetAccess;
-
     @Inject(method = "<init>", at = @At("RETURN"))
     public void initInject(final CallbackInfo ci) {
-        this.defaultCaveModeType = 0; // set default cave mode type to 0
+        this.defaultCaveModeType = 2; // FULL
     }
 
     @Inject(method = "saveSettings", at = @At(value = "RETURN"))

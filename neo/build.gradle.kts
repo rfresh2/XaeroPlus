@@ -83,5 +83,6 @@ tasks {
         inputFile.set(shadowJar.get().archiveFile.get())
         archiveVersion = destArchiveVersion
         archiveClassifier = destArchiveClassifier
+        atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
     }
 }

@@ -46,6 +46,7 @@
     "MixinMinimapModOptionsAccessor",
     "MixinMinimapModSettings",
     "MixinMinimapRenderer",
+    "MixinMinimapWriter",
     "MixinMisc",
     "MixinPatreon",
     "MixinRadarRenderContext",

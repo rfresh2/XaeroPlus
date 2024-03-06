@@ -40,6 +40,7 @@ dependencies {
 	modImplementation("net.fabricmc:fabric-loader:${loader_version}")
 	modApi("net.fabricmc.fabric-api:fabric-api:${fabric_version}")
 	shadowCommon(libs.sqlite)
+	implementation(libs.sqlite)
 	modImplementation("maven.modrinth:xaeros-world-map:${worldmap_version}_Fabric_1.20")
 	modImplementation("maven.modrinth:xaeros-minimap:${minimap_version}_Fabric_1.20")
 	modCompileOnly(files("libs/baritone-api-fabric-1.20.1-elytra-beta-v1.jar"))

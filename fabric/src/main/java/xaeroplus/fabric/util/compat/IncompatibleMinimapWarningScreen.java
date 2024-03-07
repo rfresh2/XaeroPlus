@@ -1,10 +1,11 @@
 package xaeroplus.fabric.util.compat;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.loader.api.Version;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.multiplayer.WarningScreen;
 import net.minecraft.network.chat.Component;
@@ -57,8 +58,8 @@ public class IncompatibleMinimapWarningScreen extends WarningScreen {
     }
 
     @Override
-    protected void renderTitle(GuiGraphics guiGraphics) {
-        guiGraphics.drawCenteredString(this.font, this.title, width / 2, 30, 16777215);
+    protected void renderTitle(PoseStack guiGraphics) {
+        GuiComponent.drawCenteredString(guiGraphics, this.font, this.title, width / 2, 30, 16777215);
     }
 
     @Override

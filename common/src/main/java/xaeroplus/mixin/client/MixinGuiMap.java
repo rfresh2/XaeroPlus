@@ -13,7 +13,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Renderable;
@@ -24,7 +23,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
@@ -193,7 +191,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         ordinal = 0,
         shift = At.Shift.AFTER
     ), remap = true)
-    public void toggleRadarWhileDimensionSwitched(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci, @Local(name = "currentFutureDim") MapDimension currentFutureDim) {
+    public void toggleRadarWhileDimensionSwitched(final PoseStack guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci, @Local(name = "currentFutureDim") MapDimension currentFutureDim) {
         if (!XaeroPlusSettingRegistry.radarWhileDimensionSwitchedSetting.getValue()) {
             if (currentFutureDim.getDimId() != ChunkUtils.getActualDimension())
                 WorldMap.settings.minimapRadar = false;
@@ -212,7 +210,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     }
 
     @Inject(method = "render", at = @At(value = "FIELD", target = "Lxaero/map/gui/GuiMap;lastStartTime:J", opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER), remap = true)
-    public void injectFollowMode(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci) {
+    public void injectFollowMode(final PoseStack guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci) {
         if (FOLLOW && isNull(this.cameraDestination) && isNull(this.cameraDestinationAnimX) && isNull(this.cameraDestinationAnimZ)) {
             this.cameraDestination = new int[]{(int) getPlayerX(), (int) getPlayerZ()};
         }
@@ -241,7 +239,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         target = "Lxaero/map/region/LeveledRegion;loadingAnimation()Z",
         shift = At.Shift.BEFORE
     ), remap = true)
-    public void drawWorldMapFeatures(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci,
+    public void drawWorldMapFeatures(final PoseStack guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci,
                                      @Local(name = "leafRegionMinX") int leafRegionMinX,
                                      @Local(name = "leafRegionMinZ") int leafRegionMinZ,
                                      @Local(name = "leveledSideInRegions") int leveledSideInRegions,
@@ -288,9 +286,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @WrapOperation(method = "render", at = @At(
         value = "INVOKE",
-        target = "Lxaero/map/element/MapElementRenderHandler;render(Lxaero/map/gui/GuiMap;Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;DDIIDDDDDFZLxaero/map/element/HoveredMapElementHolder;Lnet/minecraft/client/Minecraft;F)Lxaero/map/element/HoveredMapElementHolder;"
+        target = "Lxaero/map/element/MapElementRenderHandler;render(Lxaero/map/gui/GuiMap;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;DDIIDDDDDFZLxaero/map/element/HoveredMapElementHolder;Lnet/minecraft/client/Minecraft;F)Lxaero/map/element/HoveredMapElementHolder;"
     ), remap = true)
-    public HoveredMapElementHolder<?, ?> hideMapElementsOnF1(MapElementRenderHandler handler, GuiMap mapScreen, GuiGraphics guiGraphics, MultiBufferSource.BufferSource renderTypeBuffers, MultiTextureRenderTypeRendererProvider rendererProvider, double cameraX, double cameraZ, int width, int height, double screenSizeBasedScale, double scale, double playerDimDiv, double mouseX, double mouseZ, float brightness, boolean cave, HoveredMapElementHolder<?, ?> oldHovered, Minecraft mc, float partialTicks, Operation<HoveredMapElementHolder<?, ?>> original) {
+    public HoveredMapElementHolder<?, ?> hideMapElementsOnF1(MapElementRenderHandler handler, GuiMap mapScreen, PoseStack guiGraphics, MultiBufferSource.BufferSource renderTypeBuffers, MultiTextureRenderTypeRendererProvider rendererProvider, double cameraX, double cameraZ, int width, int height, double screenSizeBasedScale, double scale, double playerDimDiv, double mouseX, double mouseZ, float brightness, boolean cave, HoveredMapElementHolder<?, ?> oldHovered, Minecraft mc, float partialTicks, Operation<HoveredMapElementHolder<?, ?>> original) {
         if (!Minecraft.getInstance().options.hideGui) {
             return original.call(handler, mapScreen, guiGraphics, renderTypeBuffers, rendererProvider, cameraX, cameraZ, width, height, screenSizeBasedScale, scale, playerDimDiv, mouseX, mouseZ, brightness, cave, oldHovered, mc, partialTicks);
         } else {
@@ -322,7 +320,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         opcode = Opcodes.GETFIELD,
         shift = At.Shift.BEFORE
     ), remap = true)
-    public void showRenderDistanceWorldMap(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci,
+    public void showRenderDistanceWorldMap(final PoseStack guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci,
                                            @Local(name = "flooredCameraX") int flooredCameraX,
                                            @Local(name = "flooredCameraZ") int flooredCameraZ,
                                            @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers,
@@ -411,25 +409,25 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @WrapWithCondition(method = "render", at = @At(
         value = "INVOKE",
-        target = "Lxaero/map/graphics/MapRenderHelper;drawCenteredStringWithBackground(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIFFFFLcom/mojang/blaze3d/vertex/VertexConsumer;)V"
+        target = "Lxaero/map/graphics/MapRenderHelper;drawCenteredStringWithBackground(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIFFFFLcom/mojang/blaze3d/vertex/VertexConsumer;)V"
     ), remap = true)
-    public boolean hideRenderedStringsOnF1(final GuiGraphics guiGraphics, final Font font, final String string, final int x, final int y, final int color, final float bgRed, final float bgGreen, final float bgBlue, final float bgAlpha, final VertexConsumer backgroundVertexBuffer) {
+    public boolean hideRenderedStringsOnF1(final PoseStack matrixStack, final Font font, final String string, final int x, final int y, final int color, final float bgRed, final float bgGreen, final float bgBlue, final float bgAlpha, final VertexConsumer backgroundVertexBuffer) {
         return !Minecraft.getInstance().options.hideGui;
     }
 
     @WrapWithCondition(method = "render", at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Lnet/minecraft/resources/ResourceLocation;IIIIII)V"
+        target = "Lxaero/map/gui/GuiMap;blit(Lcom/mojang/blaze3d/vertex/PoseStack;IIIIII)V"
     ), remap = true)
-    public boolean hideCompassOnF1(final GuiGraphics instance, final ResourceLocation texture, final int x, final int y, final int u, final int v, final int width, final int height) {
+    public boolean hideCompassOnF1(final PoseStack instance, final int x, final int y, final int u, final int v, final int width, final int height) {
         return !Minecraft.getInstance().options.hideGui;
     }
 
     @Inject(method = "render", at = @At(
         value = "INVOKE",
-        target = "Lxaero/map/gui/ScreenBase;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V"
+        target = "Lxaero/map/gui/ScreenBase;render(Lcom/mojang/blaze3d/vertex/PoseStack;IIF)V"
     ), remap = true)
-    public void hideButtonsOnF1(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci) {
+    public void hideButtonsOnF1(final PoseStack guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci) {
         if (Minecraft.getInstance().options.hideGui) {
             List<Button> buttonList = getButtonList();
             if (!buttonList.isEmpty()) {
@@ -453,7 +451,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         target = "Lxaero/map/graphics/MapRenderHelper;restoreDefaultShaderBlendState()V",
         shift = At.Shift.BEFORE
     ), remap = true)
-    public void renderCoordinatesGotoTextEntryFields(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci) {
+    public void renderCoordinatesGotoTextEntryFields(final PoseStack guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.screen != null && mc.screen.getClass().equals(GuiMap.class) && xTextEntryField.isVisible() && zTextEntryField.isVisible()) {
             xTextEntryField.render(guiGraphics, scaledMouseX, scaledMouseY, partialTicks);
@@ -463,9 +461,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @WrapWithCondition(method = "render", at = @At(
         value = "INVOKE",
-        target = "Lxaero/map/graphics/MapRenderHelper;drawCenteredStringWithBackground(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIFFFFLcom/mojang/blaze3d/vertex/VertexConsumer;)V"
+        target = "Lxaero/map/graphics/MapRenderHelper;drawCenteredStringWithBackground(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIFFFFLcom/mojang/blaze3d/vertex/VertexConsumer;)V"
     ), remap = true)
-    public boolean hideMoreRenderedStringsOnF1(final GuiGraphics guiGraphics, final Font font, final Component text, final int x, final int y, final int color, final float bgRed, final float bgGreen, final float bgBlue, final float bgAlpha, final VertexConsumer backgroundVertexBuffer) {
+    public boolean hideMoreRenderedStringsOnF1(final PoseStack guiGraphics, final Font font, final Component text, final int x, final int y, final int color, final float bgRed, final float bgGreen, final float bgBlue, final float bgAlpha, final VertexConsumer backgroundVertexBuffer) {
         return !Minecraft.getInstance().options.hideGui;
     }
 

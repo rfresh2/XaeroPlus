@@ -1,8 +1,8 @@
 package xaeroplus.mixin.client;
 
 import com.google.common.base.Objects;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
@@ -113,8 +113,8 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         return result;
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lxaero/common/gui/ScreenBase;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", shift = At.Shift.AFTER), remap = true)
-    public void drawScreenInject(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partial, final CallbackInfo ci) {
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lxaero/common/gui/ScreenBase;render(Lcom/mojang/blaze3d/vertex/PoseStack;IIF)V", shift = At.Shift.AFTER), remap = true)
+    public void drawScreenInject(final PoseStack guiGraphics, final int mouseX, final int mouseY, final float partial, final CallbackInfo ci) {
         if (!this.searchField.isFocused() && this.searchField.getValue().isEmpty()) {
             xaero.map.misc.Misc.setFieldText(this.searchField, I18n.get("gui.xaero_settings_search_placeholder", new Object[0]), -11184811);
             this.searchField.moveCursorToStart();

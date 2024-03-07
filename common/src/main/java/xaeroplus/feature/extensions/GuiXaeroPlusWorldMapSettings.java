@@ -1,6 +1,6 @@
 package xaeroplus.feature.extensions;
 
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import xaero.map.gui.GuiSettings;
@@ -16,7 +16,7 @@ public class GuiXaeroPlusWorldMapSettings extends GuiSettings {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int par1, int par2, float par3) {
+    public void render(PoseStack guiGraphics, int par1, int par2, float par3) {
         this.renderEscapeScreen(guiGraphics, par1, par2, par3);
         super.render(guiGraphics, par1, par2, par3);
     }

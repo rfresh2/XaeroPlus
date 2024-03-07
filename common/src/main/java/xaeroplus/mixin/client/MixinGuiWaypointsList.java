@@ -2,9 +2,10 @@ package xaeroplus.mixin.client;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -54,7 +55,7 @@ public abstract class MixinGuiWaypointsList {
         value = "INVOKE",
         target = "Lxaero/common/minimap/waypoints/Waypoint;isGlobal()Z"
     ), remap = false)
-    public void shiftIconsLeft(final GuiGraphics guiGraphics, final Waypoint w, final int x, final int y, final CallbackInfo ci,
+    public void shiftIconsLeft(final PoseStack guiGraphics, final Waypoint w, final int x, final int y, final CallbackInfo ci,
                                @Local(name = "rectX") LocalIntRef rectX) {
         rectX.set(rectX.get() - 30);
     }
@@ -63,7 +64,7 @@ public abstract class MixinGuiWaypointsList {
         value = "INVOKE",
         target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endBatch()V"
     ), remap = true)
-    public void drawWaypointDistances(final GuiGraphics guiGraphics, final Waypoint w, final int x, final int y, final CallbackInfo ci) {
+    public void drawWaypointDistances(final PoseStack guiGraphics, final Waypoint w, final int x, final int y, final CallbackInfo ci) {
         if (XaeroPlusSettingRegistry.showWaypointDistances.getValue()) {
             Entity renderViewEntity = Minecraft.getInstance().getCameraEntity();
             final double playerX = renderViewEntity.getX();
@@ -76,7 +77,7 @@ public abstract class MixinGuiWaypointsList {
             final double distance = Math.sqrt(Math.pow(playerX - wpX, 2) + Math.pow(playerY - wpY, 2) + Math.pow(playerZ - wpZ, 2));
             final String text = NumberFormat.getIntegerInstance().format(distance) + "m";
             final Font fontRenderer = Minecraft.getInstance().font;
-            guiGraphics.drawString(fontRenderer, text, x + 250, y + 1, 0xFFFFFF);
+            GuiComponent.drawString(guiGraphics, fontRenderer, text, x + 250, y + 1, 0xFFFFFF);
         }
     }
 }

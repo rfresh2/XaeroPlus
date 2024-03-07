@@ -3,7 +3,7 @@ package xaeroplus.fabric.mixin.client;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
@@ -28,9 +28,9 @@ public class MixinForgeEventHandler {
     @WrapOperation(method = "handleRenderGameOverlayEventPre", at =
     @At(
         value = "INVOKE",
-        target = "Lxaero/common/events/ForgeEventHandler;handleRenderGameOverlayEventPreOverridable(Lnet/minecraft/client/gui/GuiGraphics;F)V"
+        target = "Lxaero/common/events/ForgeEventHandler;handleRenderGameOverlayEventPreOverridable(Lcom/mojang/blaze3d/vertex/PoseStack;F)V"
     ), remap = true)
-    public void handleRenderGameOverlayEventPre(final ForgeEventHandler instance, final GuiGraphics guiGraphics, final float partialTicks, final Operation<Void> original) {
+    public void handleRenderGameOverlayEventPre(final ForgeEventHandler instance, final PoseStack guiGraphics, final float partialTicks, final Operation<Void> original) {
         MinimapRenderEvent event = new MinimapRenderEvent();
         XaeroPlus.EVENT_BUS.call(event);
         if (!event.cancelled) original.call(instance, guiGraphics, partialTicks);

@@ -26,7 +26,7 @@ public class Model {
             Vector2f uv = uvData[i];
             bufferbuilder.vertex(pos.x(), pos.y(), pos.z()).uv(uv.x(), uv.y()).endVertex();
         }
-        toDraw = new VertexBuffer(VertexBuffer.Usage.STATIC);
+        toDraw = new VertexBuffer();
         upload(bufferbuilder.end());
     }
 

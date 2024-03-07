@@ -1,6 +1,6 @@
 package xaeroplus.mixin.client;
 
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,7 +23,7 @@ public abstract class MixinGuiSettingsWorldMap extends ScreenBase {
     }
 
     @Inject(method = "render", at = @At("RETURN"), remap = true)
-    public void drawScreen(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float delta, final CallbackInfo ci) {
+    public void drawScreen(final PoseStack guiGraphics, final int mouseX, final int mouseY, final float delta, final CallbackInfo ci) {
         WidgetScreenHandler widgetScreenHandler = XaeroMinimapCore.modMain.getWidgetScreenHandler();
         ((MixinWidgetScreenHandlerAccessor) widgetScreenHandler).getWidgets().forEach(widget -> {
             WidgetRenderer widgetRenderer = widget.getType().widgetRenderer;

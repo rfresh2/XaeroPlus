@@ -1,8 +1,8 @@
 package xaeroplus.mixin.client;
 
 import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -22,13 +22,13 @@ public class MixinMinimapElementOverMapRendererHandler {
 
     @Redirect(method = "transformAndRenderForRenderer", at = @At(
         value = "INVOKE",
-        target = "Lxaero/common/minimap/element/render/MinimapElementRenderer;renderElement(IZZLnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/gui/Font;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lxaero/common/minimap/render/MinimapRendererHelper;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/player/Player;DDDIDFLjava/lang/Object;DDZF)Z"
+        target = "Lxaero/common/minimap/element/render/MinimapElementRenderer;renderElement(IZZLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/gui/Font;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lxaero/common/minimap/render/MinimapRendererHelper;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/player/Player;DDDIDFLjava/lang/Object;DDZF)Z"
     ), remap = true) // $REMAP
     public boolean redirectRenderElement(final MinimapElementRenderer instance,
                                          final int location,
                                          final boolean highlit,
                                          final boolean outOfBounds,
-                                         final GuiGraphics drawContext,
+                                         final PoseStack drawContext,
                                          final MultiBufferSource.BufferSource immediate,
                                          final Font fontRenderer,
                                          final RenderTarget framebuffer,

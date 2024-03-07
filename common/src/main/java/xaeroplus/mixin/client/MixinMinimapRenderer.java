@@ -1,8 +1,8 @@
 package xaeroplus.mixin.client;
 
 import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -39,7 +39,7 @@ public class MixinMinimapRenderer {
     @Inject(method = "renderMinimap", at = @At("HEAD"))
     public void renderMinimap(
             final XaeroMinimapSession minimapSession,
-            final GuiGraphics guiGraphics,
+            final PoseStack guiGraphics,
             final MinimapProcessor minimap,
             final int x,
             final int y,
@@ -61,10 +61,10 @@ public class MixinMinimapRenderer {
 
     @Redirect(method = "renderMinimap", at = @At(
         value = "INVOKE",
-        target = "Lxaero/common/minimap/element/render/over/MinimapElementOverMapRendererHandler;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/player/Player;DDDDDDDZFLcom/mojang/blaze3d/pipeline/RenderTarget;Lxaero/common/AXaeroMinimap;Lxaero/common/minimap/render/MinimapRendererHelper;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/gui/Font;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;IIIIZF)V"),
+        target = "Lxaero/common/minimap/element/render/over/MinimapElementOverMapRendererHandler;render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/player/Player;DDDDDDDZFLcom/mojang/blaze3d/pipeline/RenderTarget;Lxaero/common/AXaeroMinimap;Lxaero/common/minimap/render/MinimapRendererHelper;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/gui/Font;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;IIIIZF)V"),
         remap = true) // $REMAP
     public void editOvermapRender(final MinimapElementOverMapRendererHandler instance,
-                                  final GuiGraphics guiGraphics,
+                                  final PoseStack guiGraphics,
                                   final Entity renderEntity,
                                   final Player player,
                                   final double renderX,
@@ -125,10 +125,10 @@ public class MixinMinimapRenderer {
 
     @Redirect(method = "renderMinimap", at = @At(
         value = "INVOKE",
-        target = "Lxaero/common/minimap/render/MinimapFBORenderer;renderMainEntityDot(Lnet/minecraft/client/gui/GuiGraphics;Lxaero/common/minimap/MinimapProcessor;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;DDDDFLxaero/common/minimap/radar/MinimapRadar;ZIZZZDLxaero/common/settings/ModSettings;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;F)V"),
+        target = "Lxaero/common/minimap/render/MinimapFBORenderer;renderMainEntityDot(Lcom/mojang/blaze3d/vertex/PoseStack;Lxaero/common/minimap/MinimapProcessor;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;DDDDFLxaero/common/minimap/radar/MinimapRadar;ZIZZZDLxaero/common/settings/ModSettings;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;F)V"),
         remap = true) // $REMAP
     public void redirectRenderMainEntityDot(final MinimapFBORenderer instance,
-                                            final GuiGraphics guiGraphics,
+                                            final PoseStack guiGraphics,
                                             final MinimapProcessor minimap,
                                             final Player p,
                                             final Entity renderEntity,

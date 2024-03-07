@@ -41,19 +41,19 @@ dependencies {
 	modApi("net.fabricmc.fabric-api:fabric-api:${fabric_version}")
 	shadowCommon(libs.sqlite)
 	implementation(libs.sqlite)
-	modImplementation("maven.modrinth:xaeros-world-map:${worldmap_version}_Fabric_1.20")
-	modImplementation("maven.modrinth:xaeros-minimap:${minimap_version}_Fabric_1.20")
+	modImplementation("maven.modrinth:xaeros-world-map:${worldmap_version}_Fabric_1.19.4")
+	modImplementation("maven.modrinth:xaeros-minimap:${minimap_version}_Fabric_1.19.4")
 	modCompileOnly(files("libs/baritone-api-fabric-1.20.1-elytra-beta-v1.jar"))
 	modCompileOnly(libs.waystones.fabric)
 	modCompileOnly(libs.balm.fabric)
 	modCompileOnly(libs.fabric.waystones)
-	modRuntimeOnly("maven.modrinth:immediatelyfast:1.2.10+1.20.4-fabric")
-	modRuntimeOnly("maven.modrinth:modmenu:7.2.2")
-	modRuntimeOnly("maven.modrinth:sodium:mc1.20.1-0.5.3")
-	modRuntimeOnly("maven.modrinth:fpsdisplay:3.1.0+1.20.x")
-	modRuntimeOnly("me.shedaniel.cloth:cloth-config-fabric:11.1.118") {
-		exclude(group = "net.fabricmc.fabric-api")
-	}
+//	modRuntimeOnly("maven.modrinth:immediatelyfast:1.2.10+1.20.4-fabric")
+//	modRuntimeOnly("maven.modrinth:modmenu:7.2.2")
+//	modRuntimeOnly("maven.modrinth:sodium:mc1.20.1-0.5.3")
+//	modRuntimeOnly("maven.modrinth:fpsdisplay:3.1.0+1.20.x")
+//	modRuntimeOnly("me.shedaniel.cloth:cloth-config-fabric:11.1.118") {
+//		exclude(group = "net.fabricmc.fabric-api")
+//	}
 	implementation(include(libs.caffeine.get())!!)
 	implementation(include(libs.lambdaEvents.get())!!)
 	common(project(path = ":common", configuration = "namedElements")) { isTransitive = false }

@@ -3,7 +3,7 @@ package xaeroplus;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -40,7 +40,7 @@ public class Globals {
     public static int minimapScalingFactor = 1;
     public static boolean shouldResetFBO = false;
     public static String LOCK_ID = UUID.randomUUID().toString();
-    public static GuiGraphics minimapDrawContext = null;
+    public static PoseStack minimapDrawContext = null;
     public static ResourceKey<Level> getCurrentDimensionId() {
         try {
             var dim = XaeroWorldMapCore.currentSession.getMapProcessor().getMapWorld().getCurrentDimensionId();

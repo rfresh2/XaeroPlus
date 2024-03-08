@@ -26,7 +26,6 @@ on:
 
 env:
   MINECRAFT_VERSION: "1.19.4"
-  MINECRAFT_VERSION_SHORT: "1.19.4"
 
 jobs:
   build:

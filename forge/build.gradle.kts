@@ -29,12 +29,9 @@ loom {
     }
 }
 
-val worldmap_version: String by rootProject
-val minimap_version: String by rootProject
-val minecraft_version: String by rootProject
-val parchment_version: String by rootProject
-val loader_version: String by rootProject
-val forge_version: String by rootProject
+val worldmap_version: String by gradle.extra
+val minimap_version: String by gradle.extra
+val minecraft_version: String by gradle.extra
 val destArchiveVersion = "${project.version}+${loom.platform.get().id()}-${minecraft_version}"
 val destArchiveClassifier = "WM${worldmap_version}-MM${minimap_version}"
 
@@ -42,12 +39,12 @@ sourceSets.main.get().java.srcDir(common.layout.buildDirectory.get().asFile.path
 sourceSets.main.get().resources.srcDir(common.layout.buildDirectory.get().asFile.path + "/remappedSources/forge/resources")
 
 dependencies {
-    forge("net.minecraftforge:forge:${forge_version}")
-    implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.5")!!)
-    implementation(include("io.github.llamalad7:mixinextras-forge:0.3.5")!!)
-    modImplementation("maven.modrinth:xaeros-world-map:${worldmap_version}_Forge_1.19.4")
-    modImplementation("curse.maven:xaeros-minimap-263420:5060706")
-    modCompileOnly(files("libs/baritone-unoptimized-forge-1.10.1.jar"))
+    forge(libs.forge)
+    implementation(annotationProcessor(libs.mixinextras.common.get())!!)
+    implementation(include(libs.mixinextras.forge.get())!!)
+    modImplementation(libs.worldmap.forge)
+    modImplementation(libs.minimap.forge)
+    modImplementation(files("libs/baritone-unoptimized-forge-1.10.1.jar"))
     modCompileOnly(libs.waystones.forge)
     modCompileOnly(libs.balm.forge)
     modCompileOnly(libs.worldtools)

@@ -3,7 +3,7 @@ package xaeroplus.mixin.client.mc;
 import com.mojang.blaze3d.platform.GlStateManager;
 import org.spongepowered.asm.mixin.Mixin;
 
-@Mixin(value = GlStateManager.class, remap = false)
+@Mixin(value = GlStateManager.class)
 public class MixinGlStateManager {
     // TODO: FIX ON FORGE
 

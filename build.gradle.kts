@@ -7,10 +7,9 @@ plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1" apply false
 }
 
-val minecraft_version: String by rootProject
-val parchment_version: String by rootProject
-val worldmap_version: String by rootProject
-val minimap_version: String by rootProject
+val minecraft_version: String by gradle.extra
+val mc = libs.minecraft.get()
+val parchment = libs.parchment.get()
 
 architectury {
     minecraft = minecraft_version
@@ -30,10 +29,10 @@ subprojects {
     }
 
     dependencies {
-        "minecraft"("com.mojang:minecraft:${minecraft_version}")
+        "minecraft"(mc)
         "mappings"((project.extensions.getByType(LoomGradleExtensionAPI::class)).layered {
             officialMojangMappings()
-            parchment("org.parchmentmc.data:parchment-${minecraft_version}:${parchment_version}@zip")
+            parchment(parchment)
         })
     }
 
@@ -66,11 +65,11 @@ allprojects {
     apply(plugin = "maven-publish")
 
     configure<BasePluginExtension> {
-        archivesName = rootProject.properties["archives_base_name"].toString()
+        archivesName = gradle.extra.get("archives_base_name").toString()
     }
 
-    version = rootProject.properties["mod_version"].toString()
-    group = rootProject.properties["maven_group"].toString()
+    version = gradle.extra.get("mod_version").toString()
+    group = gradle.extra.get("maven_group").toString()
 
     repositories {
         maven("https://maven.neoforged.net/releases/") {
@@ -108,10 +107,10 @@ allprojects {
 
 tasks {
     register("printWorldMapVersion") {
-        println(worldmap_version)
+        println(gradle.extra.get("worldmap_version"))
     }
     register("printMinimapVersion") {
-        println(minimap_version)
+        println(gradle.extra.get("minimap_version"))
     }
     register("printXaeroPlusVersion") {
         println(version)

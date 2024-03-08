@@ -6,14 +6,10 @@ loom {
     accessWidenerPath = file("src/main/resources/xaeroplus.accesswidener")
 }
 
-val worldmap_version: String by rootProject
-val minimap_version: String by rootProject
-val loader_version: String by rootProject
-
 dependencies {
-    modImplementation("net.fabricmc:fabric-loader:${loader_version}")
-    modCompileOnly("maven.modrinth:xaeros-world-map:${worldmap_version}_Fabric_1.20.4")
-    modCompileOnly("maven.modrinth:xaeros-minimap:${minimap_version}_Fabric_1.20.4")
+    modImplementation(libs.fabric.loader)
+    modCompileOnly(libs.worldmap.fabric)
+    modCompileOnly(libs.minimap.fabric)
     implementation(libs.caffeine)
     implementation(libs.lambdaEvents)
     modCompileOnly(files("../fabric/libs/baritone-unoptimized-fabric-1.10.4.jar"))

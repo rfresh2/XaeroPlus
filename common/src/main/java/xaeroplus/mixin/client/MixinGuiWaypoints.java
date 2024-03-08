@@ -62,7 +62,7 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
     public void initGui(CallbackInfo ci) {
         this.searchField = new EditBox(this.font, this.width / 2 - 297, 32, 80, 20, Component.literal("Search"));
         this.searchField.setValue("");
-        this.searchField.setFocused(true);
+        this.searchField.setFocus(true);
         this.searchField.moveCursorTo(0);
         this.searchField.setCursorPosition(0);
         this.addWidget(searchField);
@@ -89,11 +89,11 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         boolean dropDownClosed = this.openDropdown == null;
         if (dropDownClosed) {
             if (this.searchField.mouseClicked(x, y, button)) {
-                this.searchField.setFocused(true);
+                this.searchField.setFocus(true);
                 this.searchField.moveCursorToEnd();
                 this.searchField.setEditable(true);
             } else {
-                this.searchField.setFocused(false);
+                this.searchField.setFocus(false);
             }
         }
     }

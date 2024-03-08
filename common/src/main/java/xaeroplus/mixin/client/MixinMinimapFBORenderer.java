@@ -98,10 +98,10 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
 
     @Redirect(method = "renderChunksToFBO", at = @At(
         value = "INVOKE",
-        target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V",
+        target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(DDD)V",
         ordinal = 0
     ), remap = true)
-    public void modifyShaderMatrixStackTranslate(final PoseStack instance, final float x, final float y, final float z,
+    public void modifyShaderMatrixStackTranslate(final PoseStack instance, final double x, final double y, final double z,
                                                  @Share("scaledSize") LocalIntRef scaledSize) {
         instance.translate(scaledSize.get(), scaledSize.get(), -2000.0F);
     }
@@ -118,12 +118,12 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             GuiComponent.fill(guiGraphics, -scaledSize.get(), -scaledSize.get(), scaledSize.get(), scaledSize.get(), ColorHelper.getColor(0, 0, 0, 0));
     }
 
-    @ModifyArg(method = "renderChunksToFBO", at = @At(
+    @Redirect(method = "renderChunksToFBO", at = @At(
         value = "INVOKE",
         target = "Lcom/mojang/blaze3d/systems/RenderSystem;lineWidth(F)V"
-    ), remap = false)
-    public float modifyChunkGridLineWidth(final float original) {
-        return original * Globals.minimapScalingFactor;
+    ), remap = true)
+    public void modifyChunkGridLineWidth(final float original) {
+        RenderSystem.lineWidth(((float)this.modMain.getSettings().chunkGridLineWidth) * Globals.minimapScalingFactor);
     }
 
     @Inject(method = "renderChunksToFBO", at = @At(

@@ -1,15 +1,15 @@
-name: 1.19.4 Build
+name: 1.19.2 Build
 
 on:
   pull_request:
   push:
     branches:
-      - "1.19.4"
+      - "1.19.2"
 
 env:
-  MINECRAFT_VERSION: "1.19.4"
-  MINECRAFT_VERSION_SHORT: "1.19.4"
-  FABRIC_API_VERSION: "0.87.2+1.19.4"
+  MINECRAFT_VERSION: "1.19.2"
+  MINECRAFT_VERSION_SHORT: "1.19.2"
+  FABRIC_API_VERSION: "0.77.0+1.19.2"
   FABRIC_API_MODRINTH_VERSION_ID: "nyAmoHlr"
 
 jobs:

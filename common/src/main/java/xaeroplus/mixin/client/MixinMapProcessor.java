@@ -1,6 +1,5 @@
 package xaeroplus.mixin.client;
 
-import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
@@ -28,8 +27,8 @@ public abstract class MixinMapProcessor {
     @Shadow private String currentMWId;
 
     @Inject(method = "getMainId", at = @At("HEAD"), cancellable = true, remap = false)
-    private void getMainId(final boolean rootFolderFormat, boolean preIP6Fix, final ClientPacketListener connection, final CallbackInfoReturnable<String> cir) {
-        DataFolderResolveUtil.resolveDataFolder(connection, cir);
+    private void getMainId(final boolean rootFolderFormat, boolean preIP6Fix, final CallbackInfoReturnable<String> cir) {
+        DataFolderResolveUtil.resolveDataFolder(cir);
     }
 
     @Inject(method = "getDimensionName", at = @At(value = "HEAD"), cancellable = true, remap = false)

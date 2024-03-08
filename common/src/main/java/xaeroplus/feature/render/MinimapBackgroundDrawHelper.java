@@ -1,7 +1,7 @@
 package xaeroplus.feature.render;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import org.joml.Matrix4f;
+import com.mojang.math.Matrix4f;
 import xaero.map.region.MapTileChunk;
 import xaeroplus.feature.extensions.SeenChunksTrackingMapTileChunk;
 

@@ -4,7 +4,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.dimension.DimensionType;
@@ -30,35 +29,34 @@ public abstract class MixinMapPixel {
 
     @Inject(method = "getPixelColours", at = @At("RETURN"), remap = false)
     public void getPixelColours(
-            final int[] result_dest,
-            final MapWriter mapWriter,
-            final Level world,
-            MapDimension dim,
-            final Registry<Block> blockRegistry,
-            final MapTileChunk tileChunk,
-            final MapTileChunk prevChunk,
-            final MapTileChunk prevChunkDiagonal,
-            final MapTileChunk prevChunkHorisontal,
-            final MapTile mapTile,
-            final int x,
-            final int z,
-            final MapBlock block,
-            final int height,
-            final int topHeight,
-            final int caveStart,
-            final int caveDepth,
-            final ArrayList<Overlay> overlays,
-            final BlockPos.MutableBlockPos mutableGlobalPos,
-            final Registry<Biome> biomeRegistry,
-            Registry<DimensionType> dimensionTypes,
-            final float shadowR,
-            final float shadowG,
-            final float shadowB,
-            final BlockTintProvider blockTintProvider,
-            final MapProcessor mapProcessor,
-            final OverlayManager overlayManager,
-            final BlockStateShortShapeCache blockStateShortShapeCache,
-            final CallbackInfo ci
+        final int[] result_dest,
+        final MapWriter mapWriter,
+        final Level world,
+        final MapDimension dim,
+        final MapTileChunk tileChunk,
+        final MapTileChunk prevChunk,
+        final MapTileChunk prevChunkDiagonal,
+        final MapTileChunk prevChunkHorisontal,
+        final MapTile mapTile,
+        final int x,
+        final int z,
+        final MapBlock block,
+        final int height,
+        final int topHeight,
+        final int caveStart,
+        final int caveDepth,
+        final ArrayList<Overlay> overlays,
+        final BlockPos.MutableBlockPos mutableGlobalPos,
+        final Registry<Biome> biomeRegistry,
+        final Registry<DimensionType> dimensionTypes,
+        final float shadowR,
+        final float shadowG,
+        final float shadowB,
+        final BlockTintProvider blockTintProvider,
+        final MapProcessor mapProcessor,
+        final OverlayManager overlayManager,
+        final BlockStateShortShapeCache blockStateShortShapeCache,
+        final CallbackInfo ci
     ) {
         if (XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()) {
             if (state.getBlock() == Blocks.OBSIDIAN || state.getBlock() == Blocks.CRYING_OBSIDIAN) {

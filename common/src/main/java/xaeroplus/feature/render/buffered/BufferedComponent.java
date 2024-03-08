@@ -4,13 +4,14 @@ import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
 import xaeroplus.module.impl.FpsLimiter;
 
 import java.util.function.Supplier;
+
+import static xaeroplus.feature.render.buffered.Model.Vector2f;
 
 /**
  * Significant inspiration and code present has been adapted from: https://github.com/tr7zw/Exordium

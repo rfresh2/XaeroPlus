@@ -5,10 +5,9 @@ import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexBuffer;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
 import net.minecraft.client.renderer.ShaderInstance;
-import org.joml.Matrix4f;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
 
 /**
  * Significant inspiration and code present has been adapted from: https://github.com/tr7zw/Exordium
@@ -52,4 +51,6 @@ public class Model {
     public void close() {
         toDraw.close();
     }
+
+    public record Vector2f(float x, float y)  {}
 }

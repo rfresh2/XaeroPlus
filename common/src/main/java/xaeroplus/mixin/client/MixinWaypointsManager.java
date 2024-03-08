@@ -2,7 +2,6 @@ package xaeroplus.mixin.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
@@ -41,8 +40,8 @@ public abstract class MixinWaypointsManager {
     public abstract String getDimensionDirectoryName(ResourceKey<Level> dimKey);
 
     @Inject(method = "getMainContainer", at = @At("HEAD"), cancellable = true)
-    private void getMainContainer(boolean preIp6Fix, ClientPacketListener connection, CallbackInfoReturnable<String> cir) {
-        DataFolderResolveUtil.resolveDataFolder(connection, cir);
+    private void getMainContainer(final boolean preIP6Fix, final CallbackInfoReturnable<String> cir) {
+        DataFolderResolveUtil.resolveDataFolder(cir);
     }
 
     Waypoint selected = null;

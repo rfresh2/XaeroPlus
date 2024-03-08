@@ -10,12 +10,11 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
@@ -33,6 +32,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.graphics.shader.MinimapShaders;
+import xaero.common.misc.OptimizedMath;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMap;
 import xaero.map.animation.SlowingAnimation;
@@ -41,7 +41,6 @@ import xaero.map.element.MapElementRenderHandler;
 import xaero.map.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
 import xaero.map.gui.*;
 import xaero.map.gui.dropdown.rightclick.RightClickOption;
-import xaero.map.misc.OptimizedMath;
 import xaero.map.mods.SupportMods;
 import xaero.map.world.MapDimension;
 import xaeroplus.Globals;
@@ -109,7 +108,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         super(parent, escape, titleIn);
     }
 
-    @Shadow public abstract <T extends GuiEventListener & Renderable & NarratableEntry> T addButton(final T guiEventListener);
+    @Shadow public abstract<T extends GuiEventListener & Widget & NarratableEntry> T addButton(final T guiEventListener);
 
     @Shadow public abstract <T extends GuiEventListener & NarratableEntry> T addWidget(final T guiEventListener);
 
@@ -121,44 +120,44 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Inject(method = "init", at = @At(value = "RETURN"), remap = true)
     public void customInitGui(CallbackInfo ci) {
         // left side
-        followButton = new GuiTexturedButton(0, this.dimensionToggleButton.getY() - 20, 20, 20, FOLLOW ? 133 : 149, 16, 16, 16,
+        followButton = new GuiTexturedButton(0, this.dimensionToggleButton.y - 20, 20, 20, FOLLOW ? 133 : 149, 16, 16, 16,
                                              WorldMap.guiTextures,
                                              this::onFollowButton,
                                              () -> new CursorBox(Component.translatable("gui.world_map.toggle_follow_mode")
                                                                          .append(" " + I18n.get(FOLLOW ? "gui.xaeroplus.off" : "gui.xaeroplus.on"))));
         addButton(followButton);
-        coordinateGotoButton = new GuiTexturedButton(0, followButton.getY() - 20 , 20, 20, 229, 16, 16, 16,
+        coordinateGotoButton = new GuiTexturedButton(0, followButton.y - 20 , 20, 20, 229, 16, 16, 16,
                                                      WorldMap.guiTextures,
                                                      this::onGotoCoordinatesButton,
                                                      () -> new CursorBox(Component.translatable("gui.world_map.go_to_coordinates")));
         addButton(coordinateGotoButton);
-        xTextEntryField = new EditBox(Minecraft.getInstance().font, 20, coordinateGotoButton.getY() - 10, 50, 20, Component.nullToEmpty("X:"));
+        xTextEntryField = new EditBox(Minecraft.getInstance().font, 20, coordinateGotoButton.y - 10, 50, 20, Component.nullToEmpty("X:"));
         xTextEntryField.setVisible(false);
         xTextEntryField.setCursorPosition(0);
-        xTextEntryField.setHint(Component.literal("X:").withStyle(ChatFormatting.DARK_GRAY));
-        zTextEntryField = new EditBox(Minecraft.getInstance().font, 20, xTextEntryField.getY() + 20, 50, 20, Component.nullToEmpty("Z:"));
+        xTextEntryField.setSuggestion("X:");
+        zTextEntryField = new EditBox(Minecraft.getInstance().font, 20, xTextEntryField.y + 20, 50, 20, Component.nullToEmpty("Z:"));
         zTextEntryField.setVisible(false);
         zTextEntryField.setCursorPosition(0);
-        zTextEntryField.setHint(Component.literal("Z:").withStyle(ChatFormatting.DARK_GRAY));
+        zTextEntryField.setSuggestion("Z:");
         this.addWidget(xTextEntryField);
         this.addWidget(zTextEntryField);
         // right side
         if (!SupportMods.pac()) {  // remove useless button when pac is not installed
             this.removeWidget(this.claimsButton);
-            this.exportButton.setY(this.claimsButton.getY());
-            this.keybindingsButton.setY(this.claimsButton.getY() - 20);
-            this.zoomOutButton.setY(this.keybindingsButton.getY() - 20);
-            this.zoomInButton.setY(this.zoomOutButton.getY() - 20);
+            this.exportButton.y = this.claimsButton.y;
+            this.keybindingsButton.y = this.claimsButton.y - 20;
+            this.zoomOutButton.y = this.keybindingsButton.y - 20;
+            this.zoomInButton.y = this.zoomOutButton.y - 20;
         }
-        switchToEndButton = new GuiTexturedButton(this.width - 20, zoomInButton.getY() - 20, 20, 20, 31, 0, 16, 16,
+        switchToEndButton = new GuiTexturedButton(this.width - 20, zoomInButton.y - 20, 20, 20, 31, 0, 16, 16,
                                                   Globals.xpGuiTextures,
                                                   (button -> onSwitchDimensionButton(END)),
                                                   () -> new CursorBox(Component.translatable("setting.keybinds.switch_to_end")));
-        switchToOverworldButton = new GuiTexturedButton(this.width - 20, this.switchToEndButton.getY() - 20, 20, 20, 16, 0, 16, 16,
+        switchToOverworldButton = new GuiTexturedButton(this.width - 20, this.switchToEndButton.y - 20, 20, 20, 16, 0, 16, 16,
                                                         Globals.xpGuiTextures,
                                                         (button -> onSwitchDimensionButton(OVERWORLD)),
                                                         () -> new CursorBox(Component.translatable("setting.keybinds.switch_to_overworld")));
-        switchToNetherButton = new GuiTexturedButton(this.width - 20, this.switchToOverworldButton.getY() - 20, 20, 20, 0, 0, 16, 16,
+        switchToNetherButton = new GuiTexturedButton(this.width - 20, this.switchToOverworldButton.y - 20, 20, 20, 0, 0, 16, 16,
                                                      Globals.xpGuiTextures,
                                                      (button -> onSwitchDimensionButton(NETHER)),
                                                      () -> new CursorBox(Component.translatable("setting.keybinds.switch_to_nether")));
@@ -419,7 +418,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         value = "INVOKE",
         target = "Lxaero/map/gui/GuiMap;blit(Lcom/mojang/blaze3d/vertex/PoseStack;IIIIII)V"
     ), remap = true)
-    public boolean hideCompassOnF1(final PoseStack instance, final int x, final int y, final int u, final int v, final int width, final int height) {
+    public boolean hideCompassOnF1(final GuiMap instance, PoseStack poseStack, int x, int y, int uOffset, int vOffset, int uWidth, int vHeight) {
         return !Minecraft.getInstance().options.hideGui;
     }
 
@@ -579,7 +578,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             // todo: this isn't setting the entry field active and available to type in for some reason
             this.setFocused(xTextEntryField);
             xTextEntryField.setEditable(true);
-            xTextEntryField.setFocused(true);
+            xTextEntryField.setFocus(true);
         }
     }
 

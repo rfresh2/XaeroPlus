@@ -41,19 +41,25 @@ public class IncompatibleMinimapWarningScreen extends WarningScreen {
     @Override
     protected void initButtons(final int yOffset) {
         addRenderableWidget(
-            Button.builder(Component.translatable("gui.xaeroplus.minimap_incompatible.download_minimap"), button -> {
+            new Button(
+                width / 2 - 100 - 75,
+                100 + yOffset,
+                150,
+                20,
+                Component.translatable("gui.xaeroplus.minimap_incompatible.download_minimap"), button -> {
                     Util.getPlatform().openUri("https://modrinth.com/mod/xaeros-minimap/versions");
                     Minecraft.getInstance().close();
             })
-            .bounds(width / 2 - 100 - 75, 100 + yOffset, 150, 20)
-            .build()
         );
         addRenderableWidget(
-            Button.builder(Component.translatable("gui.xaeroplus.minimap_incompatible.exit"), button -> {
+            new Button(
+                width / 2 + 100 - 75,
+                100 + yOffset,
+                150,
+                20,
+                Component.translatable("gui.xaeroplus.minimap_incompatible.exit"), button -> {
                 Minecraft.getInstance().close();
             })
-            .bounds(width / 2 + 100 - 75, 100 + yOffset, 150, 20)
-            .build()
         );
     }
 

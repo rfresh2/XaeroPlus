@@ -7,10 +7,33 @@ pluginManagement {
 		gradlePluginPortal()
 	}
 }
+gradle.extra.apply {
+	set("mod_version", "2.1")
+	set("maven_group", "xaeroplus")
+	set("archives_base_name", "XaeroPlus")
+	set("minecraft_version", "1.19.2")
+	set("parchment_version", "2022.11.27")
+	set("fabric_loader_version", "0.15.2")
+	set("fabric_api_version", "0.77.0+1.19.2")
+	set("forge_loader_version", "43.3.7")
+	set("worldmap_version", "1.37.8")
+	set("minimap_version", "23.9.7")
+}
 
 dependencyResolutionManagement {
 	versionCatalogs {
 		create("libs") {
+			library("minecraft", "com.mojang:minecraft:${gradle.extra.get("minecraft_version")}")
+			library("fabric-loader", "net.fabricmc:fabric-loader:${gradle.extra.get("fabric_loader_version")}")
+			library("forge", "net.minecraftforge:forge:${gradle.extra.get("minecraft_version")}-${gradle.extra.get("forge_loader_version")}")
+			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:${gradle.extra.get("fabric_api_version")}")
+			library("parchment", "org.parchmentmc.data:parchment-${gradle.extra.get("minecraft_version")}:${gradle.extra.get("parchment_version")}")
+			library("worldmap-fabric", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version")}_Fabric_1.19.1")
+			library("worldmap-forge", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version")}_Forge_1.19.1")
+			library("minimap-fabric", "maven.modrinth:xaeros-minimap:${gradle.extra.get("minimap_version")}_Fabric_1.19.1")
+			library("minimap-forge", "maven.modrinth:xaeros-minimap:${gradle.extra.get("minimap_version")}_Forge_1.19.1")
+			library("mixinextras-common", "io.github.llamalad7:mixinextras-common:0.3.5")
+			library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.3.5")
 			library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.1.8")
 			library("lambdaEvents", "net.lenni0451:LambdaEvents:2.4.1")
 			library("waystones-fabric", "maven.modrinth:waystones:11.4.2+fabric-1.19.2")

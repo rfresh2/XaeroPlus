@@ -46,7 +46,7 @@ dependencies {
     implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.5")!!)
     implementation(include("io.github.llamalad7:mixinextras-forge:0.3.5")!!)
     modImplementation("maven.modrinth:xaeros-world-map:${worldmap_version}_Forge_1.19.4")
-    modImplementation("maven.modrinth:xaeros-minimap:${minimap_version}_Forge_1.19.4")
+    modImplementation("curse.maven:xaeros-minimap-263420:5060706")
     modCompileOnly(files("libs/baritone-unoptimized-forge-1.10.1.jar"))
     modCompileOnly(libs.waystones.forge)
     modCompileOnly(libs.balm.forge)

@@ -42,7 +42,7 @@ dependencies {
 	shadowCommon(libs.sqlite)
 	implementation(libs.sqlite)
 	modImplementation("maven.modrinth:xaeros-world-map:${worldmap_version}_Fabric_1.19.4")
-	modImplementation("maven.modrinth:xaeros-minimap:${minimap_version}_Fabric_1.19.4")
+	modImplementation("curse.maven:xaeros-minimap-263420:5060707")
 	modCompileOnly(files("libs/baritone-api-fabric-1.20.1-elytra-beta-v1.jar"))
 	modCompileOnly(libs.waystones.fabric)
 	modCompileOnly(libs.balm.fabric)

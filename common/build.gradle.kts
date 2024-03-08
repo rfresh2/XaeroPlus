@@ -13,7 +13,7 @@ val loader_version: String by rootProject
 dependencies {
     modImplementation("net.fabricmc:fabric-loader:${loader_version}")
     modCompileOnly("maven.modrinth:xaeros-world-map:${worldmap_version}_Fabric_1.19.4")
-    modCompileOnly("maven.modrinth:xaeros-minimap:${minimap_version}_Fabric_1.19.4")
+    modCompileOnly("curse.maven:xaeros-minimap-263420:5060707")
     implementation(libs.caffeine)
     implementation(libs.lambdaEvents)
     modCompileOnly(files("../fabric/libs/baritone-api-fabric-1.20.1-elytra-beta-v1.jar"))

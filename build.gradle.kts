@@ -76,6 +76,9 @@ allprojects {
         maven("https://api.modrinth.com/maven") {
             name = "Modrinth"
         }
+        maven("https://cursemaven.com") {
+            name = "CurseForge"
+        }
         maven("https://jitpack.io") {
             name = "jitpack.io"
         }

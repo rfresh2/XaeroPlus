@@ -27,31 +27,28 @@ afterEvaluate {
 	}
 }
 
-val worldmap_version: String by rootProject
-val minimap_version: String by rootProject
-val minecraft_version: String by rootProject
-val parchment_version: String by rootProject
-val loader_version: String by rootProject
-val fabric_version: String by rootProject
+val worldmap_version: String by gradle.extra
+val minimap_version: String by gradle.extra
+val minecraft_version: String by gradle.extra
 val destArchiveVersion = "${project.version}+${loom.platform.get().id()}-${minecraft_version}"
 val destArchiveClassifier = "WM${worldmap_version}-MM${minimap_version}"
 
 dependencies {
-	modImplementation("net.fabricmc:fabric-loader:${loader_version}")
-	modApi("net.fabricmc.fabric-api:fabric-api:${fabric_version}")
+	modImplementation(libs.fabric.loader)
+	modApi(libs.fabric.api)
 	shadowCommon(libs.sqlite)
-    implementation(libs.sqlite)
-    modImplementation("maven.modrinth:xaeros-world-map:${worldmap_version}_Fabric_1.20.2")
-	modImplementation("maven.modrinth:xaeros-minimap:${minimap_version}_Fabric_1.20.2")
-	modCompileOnly(files("libs/baritone-unoptimized-fabric-1.10.2.jar"))
+	implementation(libs.sqlite)
+	modImplementation(libs.worldmap.fabric)
+	modImplementation(libs.minimap.fabric)
+    modCompileOnly(files("libs/baritone-unoptimized-fabric-1.10.2.jar"))
 	modCompileOnly(libs.waystones.fabric)
 	modCompileOnly(libs.balm.fabric)
 	modCompileOnly(libs.fabric.waystones)
-	modRuntimeOnly("maven.modrinth:immediatelyfast:1.2.10+1.20.4-fabric")
-	modRuntimeOnly("maven.modrinth:modmenu:8.0.1")
-	modRuntimeOnly("maven.modrinth:sodium:mc1.20.2-0.5.3")
-	modRuntimeOnly("maven.modrinth:fpsdisplay:3.1.0+1.20.x")
-	modRuntimeOnly("me.shedaniel.cloth:cloth-config-fabric:12.0.111") {
+	modRuntimeOnly(libs.immediatelyfast)
+	modRuntimeOnly(libs.modmenu)
+	modRuntimeOnly(libs.sodium)
+	modRuntimeOnly(libs.fpsdisplay)
+	modRuntimeOnly(libs.cloth.config.fabric) {
 		exclude(group = "net.fabricmc.fabric-api")
 	}
 	implementation(include(libs.caffeine.get())!!)

@@ -25,12 +25,12 @@ loom {
 // todo: reset when other loaders mods are updated
 val worldmap_version = "1.38.0"
 val minimap_version = "24.0.0"
-//val worldmap_version: String by rootProject
-//val minimap_version: String by rootProject
-val minecraft_version: String by rootProject
-val parchment_version: String by rootProject
-val loader_version: String by rootProject
-val neoforge_version: String by rootProject
+//val worldmap_version: String by gradle.extra
+//val minimap_version: String by gradle.extra
+val minecraft_version: String by gradle.extra
+val parchment_version: String by gradle.extra
+val loader_version: String by gradle.extra
+val neoforge_version: String by gradle.extra
 val destArchiveVersion = "${project.version}+${loom.platform.get().id()}-${minecraft_version}"
 val destArchiveClassifier = "WM${worldmap_version}-MM${minimap_version}"
 
@@ -38,9 +38,9 @@ sourceSets.main.get().java.srcDir(common.layout.buildDirectory.get().asFile.path
 sourceSets.main.get().resources.srcDir(common.layout.buildDirectory.get().asFile.path + "/remappedSources/forge/resources")
 
 dependencies {
-    neoForge("net.neoforged:neoforge:${neoforge_version}")
-    modImplementation("maven.modrinth:xaeros-world-map:${worldmap_version}_NeoForge_1.20.2")
-    modImplementation("maven.modrinth:xaeros-minimap:${minimap_version}_NeoForge_1.20.2")
+    neoForge(libs.neoforge)
+    modImplementation(libs.worldmap.neo)
+    modImplementation(libs.minimap.neo)
     modImplementation(files("../forge/libs/baritone-unoptimized-forge-1.10.2.jar"))
     modCompileOnly(libs.waystones.neoforge)
     modCompileOnly(libs.balm.neoforge)

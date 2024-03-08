@@ -23,7 +23,7 @@ public class MixinImprovedFramebuffer {
     @WrapOperation(method = "beginWrite", at = @At(
         value = "INVOKE",
         target = "Lcom/mojang/blaze3d/platform/GlStateManager;_glBindFramebuffer(II)V"
-    ), remap = false)
+    ), remap = true)
     private static void redirectBindFramebuffer(final int i, final int j, final Operation<Void> original) {
         if (!XaeroPlusSettingRegistry.minimapFpsLimiter.getValue()) original.call(i, j);
         // sidestep our redirect mixin in GlStateManager to allow xaero to bind and render to its custom FBOs

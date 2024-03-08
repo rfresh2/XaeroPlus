@@ -118,12 +118,12 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             GuiComponent.fill(guiGraphics, -scaledSize.get(), -scaledSize.get(), scaledSize.get(), scaledSize.get(), ColorHelper.getColor(0, 0, 0, 0));
     }
 
-    @ModifyArg(method = "renderChunksToFBO", at = @At(
+    @Redirect(method = "renderChunksToFBO", at = @At(
         value = "INVOKE",
         target = "Lcom/mojang/blaze3d/systems/RenderSystem;lineWidth(F)V"
-    ), remap = false)
-    public float modifyChunkGridLineWidth(final float original) {
-        return original * Globals.minimapScalingFactor;
+    ), remap = true)
+    public void modifyChunkGridLineWidth(final float original) {
+        RenderSystem.lineWidth(((float)this.modMain.getSettings().chunkGridLineWidth) * Globals.minimapScalingFactor);
     }
 
     @Inject(method = "renderChunksToFBO", at = @At(

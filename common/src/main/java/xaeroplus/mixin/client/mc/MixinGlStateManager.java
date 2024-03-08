@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaeroplus.module.impl.FpsLimiter;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 
-@Mixin(value = GlStateManager.class, remap = false)
+@Mixin(value = GlStateManager.class)
 public class MixinGlStateManager {
     @Inject(method = "_glBindFramebuffer", at = @At("HEAD"), cancellable = true)
     private static void _glBindFramebuffer(int i, int j, CallbackInfo ci) {

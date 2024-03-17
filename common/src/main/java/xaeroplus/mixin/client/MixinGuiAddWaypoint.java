@@ -27,7 +27,7 @@ public class MixinGuiAddWaypoint {
         method = "lambda$init$3",
         at = @At(
             value = "INVOKE",
-            target = "Lxaero/common/AXaeroMinimap;getSettings()Lxaero/common/settings/ModSettings;",
+            target = "Lxaero/common/IXaeroMinimap;getSettings()Lxaero/common/settings/ModSettings;",
             ordinal = 1
         ),
         locals = LocalCapture.CAPTURE_FAILHARD)

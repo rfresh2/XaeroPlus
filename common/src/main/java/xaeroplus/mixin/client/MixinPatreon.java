@@ -10,7 +10,7 @@ import xaeroplus.settings.XaeroPlusSettingRegistry;
 @Mixin(value = Patreon.class, remap = false)
 public class MixinPatreon {
 
-    @Inject(method = "checkPatreon(Lxaero/common/AXaeroMinimap;)V", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "checkPatreon(Lxaero/common/IXaeroMinimap;)V", at = @At("HEAD"), cancellable = true)
     private static void disableInternetAccessCheck(final CallbackInfo ci) {
         if (XaeroPlusSettingRegistry.disableXaeroInternetAccess.getValue()) ci.cancel();
     }

@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.gui.GuiWaypoints;
 import xaero.common.gui.MySmallButton;
 import xaero.common.gui.ScreenBase;
@@ -36,19 +36,16 @@ import java.util.List;
 public abstract class MixinGuiWaypoints extends ScreenBase {
 
     private final int TOGGLE_ALL_ID = 69;
-    private final int SEARCH_ID = 70;
     @Shadow
     private WaypointWorld displayedWorld;
     @Shadow
     private ArrayList<Waypoint> waypointsSorted;
     @Shadow
     private WaypointsManager waypointsManager;
-    @Shadow
-    private Button shareButton;
     private EditBox searchField;
     private MySmallButton toggleAllButton;
 
-    protected MixinGuiWaypoints(final AXaeroMinimap modMain, final Screen parent, final Screen escape, final Component titleIn) {
+    protected MixinGuiWaypoints(final IXaeroMinimap modMain, final Screen parent, final Screen escape, final Component titleIn) {
         super(modMain, parent, escape, titleIn);
     }
 

@@ -1,4 +1,3 @@
-AXaeroMinimap::IXaeroMinimap
 # forge needs certain mixins not remapped
 remap = true) // $REMAP::remap=false)
 # fabric minimap compatibility mixin plugin

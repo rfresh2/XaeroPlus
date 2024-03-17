@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.graphics.CustomVertexConsumers;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
@@ -34,7 +34,7 @@ public class MixinMinimapRenderer {
     @Shadow
     protected MinimapInterface minimapInterface;
     @Shadow
-    protected AXaeroMinimap modMain;
+    protected IXaeroMinimap modMain;
 
     @Inject(method = "renderMinimap", at = @At("HEAD"))
     public void renderMinimap(
@@ -61,7 +61,7 @@ public class MixinMinimapRenderer {
 
     @Redirect(method = "renderMinimap", at = @At(
         value = "INVOKE",
-        target = "Lxaero/common/minimap/element/render/over/MinimapElementOverMapRendererHandler;render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/player/Player;DDDDDDDZFLcom/mojang/blaze3d/pipeline/RenderTarget;Lxaero/common/AXaeroMinimap;Lxaero/common/minimap/render/MinimapRendererHelper;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/gui/Font;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;IIIIZF)V"),
+        target = "Lxaero/common/minimap/element/render/over/MinimapElementOverMapRendererHandler;render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/player/Player;DDDDDDDZFLcom/mojang/blaze3d/pipeline/RenderTarget;Lxaero/common/IXaeroMinimap;Lxaero/common/minimap/render/MinimapRendererHelper;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/gui/Font;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;IIIIZF)V"),
         remap = true) // $REMAP
     public void editOvermapRender(final MinimapElementOverMapRendererHandler instance,
                                   final PoseStack guiGraphics,
@@ -77,7 +77,7 @@ public class MixinMinimapRenderer {
                                   final boolean cave,
                                   final float partialTicks,
                                   final RenderTarget framebuffer,
-                                  final AXaeroMinimap modMain,
+                                  final IXaeroMinimap modMain,
                                   final MinimapRendererHelper helper,
                                   final MultiBufferSource.BufferSource renderTypeBuffers,
                                   final Font font,

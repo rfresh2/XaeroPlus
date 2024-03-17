@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.minimap.waypoints.WaypointSet;
@@ -36,9 +36,7 @@ public class MixinMinimapModSettings {
     @Shadow
     public boolean keepUnlockedWhenEnlarged;
     @Shadow
-    protected AXaeroMinimap modMain;
-
-    @Shadow public boolean allowInternetAccess;
+    protected IXaeroMinimap modMain;
 
     @Inject(method = "<init>", at = @At(value = "RETURN"))
     private void init(CallbackInfo ci) {

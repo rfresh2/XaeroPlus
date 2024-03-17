@@ -90,7 +90,7 @@ public abstract class MixinWaypointsManager {
         method = "createTemporaryWaypoints(Lxaero/common/minimap/waypoints/WaypointWorld;IIIZD)V",
         at = @At(
             value = "INVOKE",
-            target = "Lxaero/common/AXaeroMinimap;getSettings()Lxaero/common/settings/ModSettings;",
+            target = "Lxaero/common/IXaeroMinimap;getSettings()Lxaero/common/settings/ModSettings;",
             ordinal = 1
         ),
         locals = LocalCapture.CAPTURE_FAILHARD)

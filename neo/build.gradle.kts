@@ -22,11 +22,8 @@ loom {
     }
 }
 
-// todo: reset when other loaders mods are updated
-val worldmap_version = "1.38.0"
-val minimap_version = "24.0.0"
-//val worldmap_version: String by gradle.extra
-//val minimap_version: String by gradle.extra
+val worldmap_version: String by gradle.extra
+val minimap_version: String by gradle.extra
 val minecraft_version: String by gradle.extra
 val parchment_version: String by gradle.extra
 val loader_version: String by gradle.extra

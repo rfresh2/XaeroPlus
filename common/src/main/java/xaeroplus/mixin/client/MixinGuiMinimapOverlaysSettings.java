@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.gui.ConfigSettingEntry;
 import xaero.common.gui.GuiMinimapOverlaysSettings;
 import xaero.common.gui.GuiSettings;
@@ -16,12 +16,12 @@ import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
 @Mixin(value = GuiMinimapOverlaysSettings.class, remap = false)
 public abstract class MixinGuiMinimapOverlaysSettings extends GuiSettings {
 
-    public MixinGuiMinimapOverlaysSettings(final AXaeroMinimap modMain, final Component title, final Screen backScreen, final Screen escScreen) {
+    public MixinGuiMinimapOverlaysSettings(final IXaeroMinimap modMain, final Component title, final Screen backScreen, final Screen escScreen) {
         super(modMain, title, backScreen, escScreen);
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    public void init(final AXaeroMinimap modMain, final Screen backScreen, final Screen escScreen, final CallbackInfo ci) {
+    public void init(final IXaeroMinimap modMain, final Screen backScreen, final Screen escScreen, final CallbackInfo ci) {
         final ConfigSettingEntry[] configSettingEntries = XaeroPlusSettingsReflectionHax.getMiniMapOverlayConfigSettingEntries()
                 .toArray(new ConfigSettingEntry[0]);
         final int oldLen = this.entries.length;

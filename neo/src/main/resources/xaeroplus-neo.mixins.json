@@ -6,8 +6,5 @@
     "defaultRequire": 1
   },
   "client": [
-    "MixinClientEvents",
-    "MixinMisc",
-    "MixinModClientEvents"
   ]
 }

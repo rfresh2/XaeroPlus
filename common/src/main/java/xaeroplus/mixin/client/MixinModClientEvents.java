@@ -1,4 +1,4 @@
-package xaeroplus.neo.mixin.client;
+package xaeroplus.mixin.client;
 
 import net.minecraft.client.gui.GuiGraphics;
 import org.spongepowered.asm.mixin.Mixin;

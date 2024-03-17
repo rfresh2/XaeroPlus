@@ -1,4 +1,4 @@
-package xaeroplus.neo.mixin.client;
+package xaeroplus.mixin.client;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.network.chat.ChatType;
@@ -12,8 +12,8 @@ import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 @Mixin(value = ClientEvents.class, remap = false)
 public abstract class MixinClientEvents {
-    @Inject(method = "handleClientPlayerChatReceivedEvent", at = @At("HEAD"), cancellable = true)
-    public void onPlayerChatReceived(final ChatType.Bound chatType, final Component component, final GameProfile gameProfile, final CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "handleClientSystemChatReceivedEvent", at = @At("HEAD"), cancellable = true)
+    public void onSystemChatReceived(final Component component, final CallbackInfoReturnable<Boolean> cir) {
         if (component == null) return;
         if (XaeroPlusSettingRegistry.disableReceivingWaypoints.getValue()) {
             // cancelling at head so we avoid hitting the logic to parse the waypoint string
@@ -21,8 +21,8 @@ public abstract class MixinClientEvents {
         }
     }
 
-    @Inject(method = "handleClientSystemChatReceivedEvent", at = @At("HEAD"), cancellable = true)
-    public void onSystemChatReceived(final Component component, final CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "handleClientPlayerChatReceivedEvent", at = @At("HEAD"), cancellable = true)
+    public void onPlayerChatReceived(final ChatType.Bound chatType, final Component component, final GameProfile gameProfile, final CallbackInfoReturnable<Boolean> cir) {
         if (component == null) return;
         if (XaeroPlusSettingRegistry.disableReceivingWaypoints.getValue()) {
             // cancelling at head so we avoid hitting the logic to parse the waypoint string

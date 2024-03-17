@@ -9,6 +9,7 @@
   "client": [
     "AccessorGuiCaveModeOptions",
     "AccessorRightClickOption",
+    "MixinClientEvents",
     "MixinCommonGuiSettings",
     "MixinCommonInternet",
     "MixinControlsHandler",
@@ -47,6 +48,7 @@
     "MixinMinimapRenderer",
     "MixinMinimapWriter",
     "MixinMisc",
+    "MixinModClientEvents",
     "MixinPatreon",
     "MixinRadarRenderContext",
     "MixinRadarRenderProvider",

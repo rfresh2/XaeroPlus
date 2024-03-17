@@ -17,7 +17,10 @@ public class ForgeEventHandler {
             WaypointsIngameRenderer waypointsIngameRenderer = minimapSession.getModMain().getInterfaces().getMinimapInterface().getWaypointsIngameRenderer();
             ((CustomWaypointsIngameRenderer) waypointsIngameRenderer).renderWaypointBeacons(minimapSession, event.getContext(), event.getPartialTicks());
         } catch (final Exception e) {
-            if (errorCount++ < 2) XaeroPlus.LOGGER.info("Error rendering waypoints", e);
+            if (errorCount++ < 2) {
+                XaeroPlus.LOGGER.info("Error rendering waypoints", e);
+                errorCount = 2;
+            }
         }
     }
 }

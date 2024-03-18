@@ -8,7 +8,7 @@ pluginManagement {
 	}
 }
 gradle.extra.apply {
-	set("mod_version", "2.2")
+	set("mod_version", "2.3")
 	set("maven_group", "xaeroplus")
 	set("archives_base_name", "XaeroPlus")
 	set("minecraft_version", "1.19.2")
@@ -17,7 +17,7 @@ gradle.extra.apply {
 	set("fabric_api_version", "0.77.0+1.19.2")
 	set("forge_loader_version", "43.3.7")
     set("worldmap_version", "1.38.1")
-    set("minimap_version", "24.0.1")
+	set("minimap_version", "24.0.2")
 }
 
 dependencyResolutionManagement {
@@ -31,7 +31,7 @@ dependencyResolutionManagement {
 			library("worldmap-fabric", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version")}_Fabric_1.19.1")
 			library("worldmap-forge", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version")}_Forge_1.19.1")
 			library("minimap-fabric", "maven.modrinth:xaeros-minimap:${gradle.extra.get("minimap_version")}_Fabric_1.19.1")
-			library("minimap-forge", "maven.modrinth:xaeros-minimap:${gradle.extra.get("minimap_version")}_Forge_1.19.1")
+			library("minimap-forge", "maven.modrinth:xaeros-minimap:${"24.0.1"}_Forge_1.19.1")
 			library("mixinextras-common", "io.github.llamalad7:mixinextras-common:0.3.5")
 			library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.3.5")
 			library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.1.8")

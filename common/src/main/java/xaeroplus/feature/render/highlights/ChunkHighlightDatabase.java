@@ -25,7 +25,7 @@ public class ChunkHighlightDatabase implements Closeable {
         this.databaseName = databaseName;
         try {
             final Path dbPath = WorldMap.saveFolder.toPath().resolve(worldId).resolve(databaseName + ".db");
-            connection = DriverManager.getConnection("jdbc:sqlite:" + dbPath);
+            connection = DriverManager.getConnection("jdbc:rfresh_sqlite:" + dbPath);
             createHighlightsTables();
         } catch (Exception e) {
             XaeroPlus.LOGGER.error("Error while creating chunk highlight database: {}", databaseName, e);

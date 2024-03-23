@@ -62,7 +62,7 @@ jobs:
 
     - name: Get Neo Jar Filename
       run: |
-        echo "XP_NEO=XaeroPlus-${{ env.XP_VERSION}}+neoforge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}" >> $GITHUB_ENV
+        echo "XP_NEO=XaeroPlus-${{ env.XP_VERSION}}+neoforge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
 
     - name: Upload Fabric Artifact
       uses: actions/upload-artifact@v4

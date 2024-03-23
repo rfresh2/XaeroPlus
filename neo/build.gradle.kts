@@ -22,14 +22,14 @@ loom {
     }
 }
 
-val worldmap_version: String by gradle.extra
-val minimap_version: String by gradle.extra
+val worldmap_version_forge: String by gradle.extra
+val minimap_version_forge: String by gradle.extra
 val minecraft_version: String by gradle.extra
 val parchment_version: String by gradle.extra
 val loader_version: String by gradle.extra
 val neoforge_version: String by gradle.extra
 val destArchiveVersion = "${project.version}+${loom.platform.get().id()}-${minecraft_version}"
-val destArchiveClassifier = "WM${worldmap_version}-MM${minimap_version}"
+val destArchiveClassifier = "WM${worldmap_version_forge}-MM${minimap_version_forge}"
 
 sourceSets.main.get().java.srcDir(common.layout.buildDirectory.get().asFile.path + "/remappedSources/forge/java")
 sourceSets.main.get().resources.srcDir(common.layout.buildDirectory.get().asFile.path + "/remappedSources/forge/resources")
@@ -54,8 +54,8 @@ tasks {
         filesMatching("META-INF/mods.toml") {
             expand(mapOf(
                 "version" to project.version,
-                "worldmap_version" to worldmap_version,
-                "minimap_version" to minimap_version
+                "worldmap_version" to worldmap_version_forge,
+                "minimap_version" to minimap_version_forge
             ))
         }
     }

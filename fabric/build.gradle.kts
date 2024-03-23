@@ -27,11 +27,11 @@ afterEvaluate {
 	}
 }
 
-val worldmap_version: String by gradle.extra
-val minimap_version: String by gradle.extra
+val worldmap_version_fabric: String by gradle.extra
+val minimap_version_fabric: String by gradle.extra
 val minecraft_version: String by gradle.extra
 val destArchiveVersion = "${project.version}+${loom.platform.get().id()}-${minecraft_version}"
-val destArchiveClassifier = "WM${worldmap_version}-MM${minimap_version}"
+val destArchiveClassifier = "WM${worldmap_version_fabric}-MM${minimap_version_fabric}"
 
 dependencies {
 	modImplementation(libs.fabric.loader)
@@ -62,8 +62,8 @@ tasks {
 		filesMatching("fabric.mod.json") {
 			expand(mapOf(
 				"version" to project.version,
-				"worldmap_version" to worldmap_version,
-				"minimap_version" to minimap_version
+				"worldmap_version" to worldmap_version_fabric,
+				"minimap_version" to minimap_version_fabric
 			))
 		}
 	}

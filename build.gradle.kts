@@ -106,11 +106,17 @@ allprojects {
 }
 
 tasks {
-    register("printWorldMapVersion") {
-        println(gradle.extra.get("worldmap_version"))
+    register("printWorldMapVersionFabric") {
+        println(gradle.extra.get("worldmap_version_fabric"))
     }
-    register("printMinimapVersion") {
-        println(gradle.extra.get("minimap_version"))
+    register("printMinimapVersionFabric") {
+        println(gradle.extra.get("minimap_version_fabric"))
+    }
+    register("printWorldMapVersionForge") {
+        println(gradle.extra.get("worldmap_version_forge"))
+    }
+    register("printMinimapVersionForge") {
+        println(gradle.extra.get("minimap_version_forge"))
     }
     register("printXaeroPlusVersion") {
         println(version)

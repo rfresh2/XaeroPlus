@@ -51,13 +51,21 @@ jobs:
         with:
           arguments: build
 
-      - name: Get WorldMap Version
+      - name: Get WorldMap Version Fabric
         run: |
-          echo "WORLDMAP_VERSION=$(./gradlew -q printWorldMapVersion)" >> $GITHUB_ENV
+          echo "WORLDMAP_VERSION_FABRIC=$(./gradlew -q printWorldMapVersionFabric)" >> $GITHUB_ENV
 
-      - name: Get Minimap Version
+      - name: Get Minimap Version Fabric
         run: |
-          echo "MINIMAP_VERSION=$(./gradlew -q printMinimapVersion)" >> $GITHUB_ENV
+          echo "MINIMAP_VERSION_FABRIC=$(./gradlew -q printMinimapVersionFabric)" >> $GITHUB_ENV
+
+      - name: Get WorldMap Version Forge
+        run: |
+          echo "WORLDMAP_VERSION_FORGE=$(./gradlew -q printWorldMapVersionForge)" >> $GITHUB_ENV
+
+      - name: Get Minimap Version Forge
+        run: |
+          echo "MINIMAP_VERSION_FORGE=$(./gradlew -q printMinimapVersionForge)" >> $GITHUB_ENV
 
       - name: Get XaeroPlus Version
         run: |
@@ -65,11 +73,11 @@ jobs:
 
       - name: Get Fabric Jar Filename
         run: |
-          echo "XP_FABRIC=XaeroPlus-${{ env.XP_VERSION}}+fabric-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}" >> $GITHUB_ENV
+          echo "XP_FABRIC=XaeroPlus-${{ env.XP_VERSION}}+fabric-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FABRIC }}-MM${{ env.MINIMAP_VERSION_FABRIC }}" >> $GITHUB_ENV
 
       - name: Get Forge Jar Filename
         run: |
-          echo "XP_FORGE=XaeroPlus-${{ env.XP_VERSION}}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}" >> $GITHUB_ENV
+          echo "XP_FORGE=XaeroPlus-${{ env.XP_VERSION}}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
 
       - name: Upload Fabric Artifact
         if: ${{ inputs.fabric }}
@@ -100,8 +108,10 @@ jobs:
       xp_version: ${{ env.XP_VERSION }}
       xp_fabric: ${{ env.XP_FABRIC }}
       xp_forge: ${{ env.XP_FORGE }}
-      worldmap_version: ${{ env.WORLDMAP_VERSION }}
-      minimap_version: ${{ env.MINIMAP_VERSION }}
+      worldmap_version_fabric: ${{ env.WORLDMAP_VERSION_FABRIC }}
+      minimap_version_fabric: ${{ env.MINIMAP_VERSION_FABRIC }}
+      worldmap_version_forge: ${{ env.WORLDMAP_VERSION_FORGE }}
+      minimap_version_forge: ${{ env.MINIMAP_VERSION_FORGE }}
 
   release:
     needs:
@@ -139,8 +149,8 @@ jobs:
           game-versions: |
             ${{ env.MINECRAFT_VERSION }}
           dependencies: |
-            xaerominimap@${{ needs.build.outputs.minimap_version }}(required){modrinth:1bokaNcj}{curseforge:263420}
-            xaeroworldmap@${{ needs.build.outputs.worldmap_version }}(required){modrinth:NcUtCpym}{curseforge:317780}
+            xaerominimap@${{ needs.build.outputs.minimap_version_fabric }}(required){modrinth:1bokaNcj}{curseforge:263420}
+            xaeroworldmap@${{ needs.build.outputs.worldmap_version_fabric }}(required){modrinth:NcUtCpym}{curseforge:317780}
             fabric-api(required){modrinth:P7dR8mSH}{curseforge:306612}
             worldtools(optional){modrinth:FlFKBOIX}{curseforge:909868}
             waystones(optional){modrinth:LOpKHB2A}{curseforge:245755}
@@ -167,8 +177,8 @@ jobs:
           game-versions: |
             ${{ env.MINECRAFT_VERSION }}
           dependencies: |
-            xaerominimap@${{ needs.build.outputs.minimap_version }}(required){modrinth:1bokaNcj}{curseforge:263420}
-            xaeroworldmap@${{ needs.build.outputs.worldmap_version }}(required){modrinth:NcUtCpym}{curseforge:317780}
+            xaerominimap@${{ needs.build.outputs.minimap_version_forge }}(required){modrinth:1bokaNcj}{curseforge:263420}
+            xaeroworldmap@${{ needs.build.outputs.worldmap_version_forge }}(required){modrinth:NcUtCpym}{curseforge:317780}
             worldtools(optional){modrinth:FlFKBOIX}{curseforge:909868}
             waystones(optional){modrinth:LOpKHB2A}{curseforge:245755}
 

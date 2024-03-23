@@ -9,6 +9,7 @@
   "client": [
     "MixinBetterPVP",
     "MixinWorldMap",
-    "MixinXaeroMinimap"
+    "MixinXaeroMinimap",
+    "mc.MixinMinecraftClientFabric"
   ]
 }

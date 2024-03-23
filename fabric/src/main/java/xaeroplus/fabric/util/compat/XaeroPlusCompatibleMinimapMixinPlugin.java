@@ -38,7 +38,8 @@ public class XaeroPlusCompatibleMinimapMixinPlugin implements IMixinConfigPlugin
             xaeroWorldMapSettingsMixins = Set.of(
                 "MixinWorldMap",
                 "MixinWorldMapModSettings",
-                "MixinWorldMapOption"
+                "MixinWorldMapOption",
+                "MixinMinecraftClientFabric" // Prevents incompatible screen from being closed
             );
         }
     }

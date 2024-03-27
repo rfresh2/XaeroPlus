@@ -16,11 +16,13 @@ gradle.extra.apply {
 	set("fabric_loader_version", "0.15.2")
 	set("fabric_api_version", "0.91.1+1.20.2")
 	set("forge_loader_version", "48.0.7")
-    set("worldmap_version_fabric", "1.38.1")
+	set("neoforge_version", "20.2.88")
+	set("worldmap_version_fabric", "1.38.1")
 	set("minimap_version_fabric", "24.0.3")
     set("worldmap_version_forge", "1.38.1")
     set("minimap_version_forge", "24.0.3")
-	set("neoforge_version", "20.2.88")
+	set("worldmap_version_neo", "1.38.2")
+	set("minimap_version_neo", "24.0.3")
 }
 
 dependencyResolutionManagement {
@@ -34,10 +36,10 @@ dependencyResolutionManagement {
 			library("neoforge", "net.neoforged:neoforge:${gradle.extra.get("neoforge_version")}")
 			library("worldmap-fabric", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version_fabric")}_Fabric_${gradle.extra.get("minecraft_version")}")
 			library("worldmap-forge", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version_forge")}_Forge_${gradle.extra.get("minecraft_version")}")
-			library("worldmap-neo", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version_forge")}_NeoForge_${gradle.extra.get("minecraft_version")}")
+			library("worldmap-neo", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version_neo")}_NeoForge_${gradle.extra.get("minecraft_version")}")
 			library("minimap-fabric", "maven.modrinth:xaeros-minimap:${gradle.extra.get("minimap_version_fabric")}_Fabric_${gradle.extra.get("minecraft_version")}")
 			library("minimap-forge", "maven.modrinth:xaeros-minimap:${gradle.extra.get("minimap_version_forge")}_Forge_${gradle.extra.get("minecraft_version")}")
-			library("minimap-neo", "maven.modrinth:xaeros-minimap:${gradle.extra.get("minimap_version_forge")}_NeoForge_${gradle.extra.get("minecraft_version")}")
+			library("minimap-neo", "maven.modrinth:xaeros-minimap:${gradle.extra.get("minimap_version_neo")}_NeoForge_${gradle.extra.get("minecraft_version")}")
 			library("mixinextras-common", "io.github.llamalad7:mixinextras-common:0.3.5")
 			library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.3.5")
 			library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.1.8")

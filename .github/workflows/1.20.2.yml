@@ -48,6 +48,14 @@ jobs:
       run: |
         echo "MINIMAP_VERSION_FORGE=$(./gradlew -q printMinimapVersionForge)" >> $GITHUB_ENV
 
+    - name: Get WorldMap Version NeoForge
+      run: |
+        echo "WORLDMAP_VERSION_NEO=$(./gradlew -q printWorldMapVersionNeo)" >> $GITHUB_ENV
+
+    - name: Get Minimap Version NeoForge
+      run: |
+        echo "MINIMAP_VERSION_NEO=$(./gradlew -q printMinimapVersionNeo)" >> $GITHUB_ENV
+
     - name: Get XaeroPlus Version
       run: |
         echo "XP_VERSION=$(./gradlew -q printXaeroPlusVersion)" >> $GITHUB_ENV
@@ -62,7 +70,7 @@ jobs:
 
     - name: Get Neo Jar Filename
       run: |
-        echo "XP_NEO=XaeroPlus-${{ env.XP_VERSION}}+neoforge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
+        echo "XP_NEO=XaeroPlus-${{ env.XP_VERSION}}+neoforge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_NEO }}-MM${{ env.MINIMAP_VERSION_NEO }}" >> $GITHUB_ENV
 
     - name: Upload Fabric Artifact
       uses: actions/upload-artifact@v4

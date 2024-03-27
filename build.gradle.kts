@@ -118,6 +118,12 @@ tasks {
     register("printMinimapVersionForge") {
         println(gradle.extra.get("minimap_version_forge"))
     }
+    register("printWorldMapVersionNeo") {
+        println(gradle.extra.get("worldmap_version_neo"))
+    }
+    register("printMinimapVersionNeo") {
+        println(gradle.extra.get("minimap_version_neo"))
+    }
     register("printXaeroPlusVersion") {
         println(version)
     }

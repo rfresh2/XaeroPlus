@@ -8,7 +8,7 @@ pluginManagement {
 	}
 }
 gradle.extra.apply {
-	set("mod_version", "2.6")
+	set("mod_version", "2.7")
 	set("maven_group", "xaeroplus")
 	set("archives_base_name", "XaeroPlus")
 	set("minecraft_version", "1.20.1")
@@ -37,7 +37,7 @@ dependencyResolutionManagement {
 			library("mixinextras-common", "io.github.llamalad7:mixinextras-common:0.3.5")
 			library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.3.5")
 			library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.1.8")
-			library("lambdaEvents", "net.lenni0451:LambdaEvents:2.4.1")
+			library("lambdaEvents", "net.lenni0451:LambdaEvents:2.4.2")
 			library("waystones-fabric", "maven.modrinth:waystones:14.0.2+fabric-1.20")
 			library("waystones-forge", "maven.modrinth:waystones:14.0.2+forge-1.20")
 			library("balm-fabric", "maven.modrinth:balm:7.1.4+fabric-1.20.1")

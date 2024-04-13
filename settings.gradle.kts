@@ -17,12 +17,12 @@ gradle.extra.apply {
 	set("fabric_api_version", "0.91.2+1.20.4")
 	set("forge_loader_version", "49.0.3")
     set("neoforge_version", "20.4.167")
-    set("worldmap_version_fabric", "1.38.1")
-	set("minimap_version_fabric", "24.0.3")
-    set("worldmap_version_forge", "1.38.1")
-    set("minimap_version_forge", "24.0.3")
-    set("worldmap_version_neo", "1.38.2")
-    set("minimap_version_neo", "24.0.3")
+    set("worldmap_version_fabric", "1.38.3")
+	set("minimap_version_fabric", "24.1.0")
+    set("worldmap_version_forge", "1.38.3")
+    set("minimap_version_forge", "24.1.0")
+    set("worldmap_version_neo", "1.38.3")
+    set("minimap_version_neo", "24.1.0")
 }
 
 dependencyResolutionManagement {

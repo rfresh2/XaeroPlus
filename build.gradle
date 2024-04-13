@@ -114,8 +114,8 @@ dependencies {
     jarLibs 'com.github.ben-manes.caffeine:caffeine:2.9.3'
     jarLibs 'org.xerial:sqlite-jdbc:3.45.0.0'
 
-    implementation(fg.deobf("maven.modrinth:xaeros-world-map:1.38.1_Forge_1.12"))
-    implementation(fg.deobf("maven.modrinth:xaeros-minimap:24.0.1_Forge_1.12"))
+    implementation(fg.deobf("maven.modrinth:xaeros-world-map:1.38.3_Forge_1.12"))
+    implementation(fg.deobf("maven.modrinth:xaeros-minimap:24.1.0_Forge_1.12"))
     implementation(fg.deobf('cabaletta:baritone-deobf-unoptimized-mcp-dev:1.2')).setChanging(true)
     compileOnly(fg.deobf("curse.maven:waystones-245755:2859589"))
 

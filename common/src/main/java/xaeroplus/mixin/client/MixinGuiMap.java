@@ -352,7 +352,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 float settingWidth = (float) XaeroMinimapSession.getCurrentSession()
                     .getModMain()
                     .getSettings().chunkGridLineWidth;
-                float lineScale = (float) Math.min(settingWidth * this.scale, settingWidth);
+                float lineScale = (float) Math.max(1.0, Math.min(settingWidth * scale, settingWidth));
                 RenderSystem.lineWidth(lineScale);
 
                 // todo: horizontal lines seem to have a smaller width here for some reason

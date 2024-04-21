@@ -157,7 +157,8 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             final int z1 = z0 + width * 16;
             VertexConsumer lineBufferBuilder = renderTypeBuffers.getBuffer(CustomRenderTypes.MAP_LINES);
             MinimapShaders.FRAMEBUFFER_LINES.setFrameSize((float) scalingFramebuffer.viewWidth, (float) scalingFramebuffer.viewHeight);
-            RenderSystem.lineWidth((float) modMain.getSettings().chunkGridLineWidth * Globals.minimapScalingFactor);
+            float lineWidth = (float) Math.max(1.0, modMain.getSettings().chunkGridLineWidth * Globals.minimapScalingFactor);
+            RenderSystem.lineWidth(lineWidth);
             PoseStack.Pose matrices = matrixStack.last();
 
             helper.addColoredLineToExistingBuffer(

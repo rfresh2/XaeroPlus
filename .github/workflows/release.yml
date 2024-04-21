@@ -141,7 +141,7 @@ jobs:
 
           files: |
             artifacts/${{ needs.build.outputs.xp_fabric }}.jar
-          name: ${{ needs.build.outputs.xp_version }} (Fabric)
+          name: ${{ needs.build.outputs.xp_version }} (Fabric) (WM${{ needs.build.outputs.worldmap_version_fabric }} MM${{ needs.build.outputs.minimap_version_fabric }})
           version: ${{ needs.build.outputs.xp_version }}+fabric-${{ env.MINECRAFT_VERSION }}
           loaders: |
             fabric
@@ -169,7 +169,7 @@ jobs:
 
           files: |
             artifacts/${{ needs.build.outputs.xp_forge }}.jar
-          name: ${{ needs.build.outputs.xp_version }} (Forge)
+          name: ${{ needs.build.outputs.xp_version }} (Forge) (WM${{ needs.build.outputs.worldmap_version_forge }} MM${{ needs.build.outputs.minimap_version_forge }})
           version: ${{ needs.build.outputs.xp_version }}+forge-${{ env.MINECRAFT_VERSION }}
           loaders: |
             forge
@@ -191,5 +191,10 @@ jobs:
           artifacts: "artifacts/*.jar"
           allowUpdates: true
           makeLatest: true
-          body: ${{ needs.build.outputs.changelog }}
+          body: |
+            For WorldMap and Minimap Versions:
+            * Fabric: WM${{ needs.build.outputs.worldmap_version_fabric }} MM${{ needs.build.outputs.minimap_version_fabric }}
+            * Forge: WM${{ needs.build.outputs.worldmap_version_forge }} MM${{ needs.build.outputs.minimap_version_forge }}
+            
+            ${{ needs.build.outputs.changelog }}
           omitBodyDuringUpdate: true

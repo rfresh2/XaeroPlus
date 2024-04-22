@@ -2,10 +2,17 @@ package xaeroplus.util;
 
 import com.google.common.net.InternetDomainName;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import xaero.map.MapProcessor;
+import xaero.map.WorldMapSession;
+import xaero.map.core.XaeroWorldMapCore;
+import xaero.map.file.MapSaveLoad;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+
+import java.nio.file.Path;
 
 import static java.util.Objects.nonNull;
 
@@ -55,6 +62,19 @@ public class DataFolderResolveUtil {
                     XaeroPlus.LOGGER.error("Unable to resolve valid Base domain. Falling back to default Xaero data folder resolution");
                 }
             }
+        }
+    }
+
+    public static Component getCurrentDataDirPath() {
+        try {
+            WorldMapSession currentSession = XaeroWorldMapCore.currentSession;
+            MapProcessor mapProcessor = currentSession.getMapProcessor();
+            String mainId = mapProcessor.getMapWorld().getMainId();
+            Path rootFolder = MapSaveLoad.getRootFolder(mainId);
+            return (Component.literal(rootFolder.toString()));
+        } catch (final Throwable e) {
+            XaeroPlus.LOGGER.error("Failed to get data directory", e);
+            return Component.literal("Failed to get data directory");
         }
     }
 }

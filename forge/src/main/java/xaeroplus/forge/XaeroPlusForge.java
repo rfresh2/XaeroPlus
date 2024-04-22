@@ -2,8 +2,11 @@ package xaeroplus.forge;
 
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.llamalad7.mixinextras.MixinExtrasBootstrap;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -15,6 +18,7 @@ import xaeroplus.XaeroPlus;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
+import xaeroplus.util.DataFolderResolveUtil;
 
 import java.util.List;
 
@@ -32,6 +36,7 @@ public class XaeroPlusForge {
                 XaeroPlus.LOGGER.info("Initializing XaeroPlus");
                 modEventBus.addListener(this::onInitialize);
                 modEventBus.addListener(this::onRegisterKeyMappingsEvent);
+                FORGE_EVENT_BUS.addListener(this::onRegisterClientCommandsEvent);
                 FORGE_EVENT_BUS.register(modEventBus);
                 RemovalCause explicit = RemovalCause.EXPLICIT; // force class load to stop forge shitting itself at runtime??
             };
@@ -50,5 +55,12 @@ public class XaeroPlusForge {
             List<KeyMapping> keybinds = XaeroPlusSettingsReflectionHax.keybindsSupplier.get();
             keybinds.forEach(event::register);
         }
+    }
+
+    public void onRegisterClientCommandsEvent(final RegisterClientCommandsEvent event) {
+        event.getDispatcher().register(LiteralArgumentBuilder.<CommandSourceStack>literal("xaeroDataDir").executes(c -> {
+            c.getSource().sendSuccess(DataFolderResolveUtil::getCurrentDataDirPath, false);
+            return 1;
+        }));
     }
 }

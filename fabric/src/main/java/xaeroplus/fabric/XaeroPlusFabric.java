@@ -1,6 +1,8 @@
 package xaeroplus.fabric;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.KeyMapping;
@@ -13,6 +15,7 @@ import xaeroplus.fabric.util.compat.MinimapBaseVersionCheck;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
+import xaeroplus.util.DataFolderResolveUtil;
 
 import java.util.List;
 
@@ -39,6 +42,12 @@ public class XaeroPlusFabric implements ClientModInitializer {
 			var anyPresentVersion = versionCheckResult.minimapVersion().or(versionCheckResult::betterPvpVersion);
 			Minecraft.getInstance().setScreen(
 				new IncompatibleMinimapWarningScreen(anyPresentVersion, versionCheckResult.expectedVersion()));
+		});
+		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+			dispatcher.register(ClientCommandManager.literal("xaeroDataDir").executes(c -> {
+				c.getSource().sendFeedback(DataFolderResolveUtil.getCurrentDataDirPath());
+				return 1;
+			}));
 		});
 	}
 }

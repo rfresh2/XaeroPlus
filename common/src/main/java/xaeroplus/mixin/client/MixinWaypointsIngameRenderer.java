@@ -85,7 +85,7 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
     public void renderWaypointBeacons(final XaeroMinimapSession minimapSession, final PoseStack matrixStack, final float tickDelta) {
         if (!XaeroPlusSettingRegistry.waypointBeacons.getValue()) return;
         final WaypointsManager waypointsManager = minimapSession.getWaypointsManager();
-        double dimDiv = waypointsManager.getDimensionDivision(waypointsManager.getCurrentContainerID());
+        double dimDiv = waypointsManager.getDimensionDivision(waypointsManager.getCurrentWorld());
         beaconWaypoints.forEach(w -> renderWaypointBeacon(w, dimDiv, tickDelta, matrixStack));
         beaconWaypoints.clear();
     }

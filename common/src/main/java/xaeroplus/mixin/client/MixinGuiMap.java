@@ -546,8 +546,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     public void addColoredLineToExistingBuffer(
             PoseStack.Pose matrices, VertexConsumer vertexBuffer, float x1, float y1, float x2, float y2, float r, float g, float b, float a
     ) {
-        vertexBuffer.vertex(matrices.pose(), x1, y1, 0.0F).color(r, g, b, a).normal(matrices.normal(), x2 - x1, y2 - y1, 0.0F).endVertex();
-        vertexBuffer.vertex(matrices.pose(), x2, y2, 0.0F).color(r, g, b, a).normal(matrices.normal(), x2 - x1, y2 - y1, 0.0F).endVertex();
+        vertexBuffer.vertex(matrices.pose(), x1, y1, 0.0F).color(r, g, b, a).normal(matrices, x2 - x1, y2 - y1, 0.0F).endVertex();
+        vertexBuffer.vertex(matrices.pose(), x2, y2, 0.0F).color(r, g, b, a).normal(matrices, x2 - x1, y2 - y1, 0.0F).endVertex();
     }
 
     public void onFollowButton(final Button b) {

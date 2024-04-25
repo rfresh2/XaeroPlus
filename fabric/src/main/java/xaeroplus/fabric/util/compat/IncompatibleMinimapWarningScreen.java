@@ -6,12 +6,13 @@ import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.multiplayer.WarningScreen;
+import net.minecraft.client.gui.components.MultiLineLabel;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
 import java.util.Optional;
 
-public class IncompatibleMinimapWarningScreen extends WarningScreen {
+public class IncompatibleMinimapWarningScreen extends Screen {
 
     private static Component getMessage(final Optional<Version> currentVersion, final Version compatibleMinimapVersion) {
         var msg = Component.empty();
@@ -29,40 +30,49 @@ public class IncompatibleMinimapWarningScreen extends WarningScreen {
         );
         return msg;
     }
+
+    private final Component titleComponent;
+    private final Component messageComponent;
+    private MultiLineLabel message = MultiLineLabel.EMPTY;
+
+
     public IncompatibleMinimapWarningScreen(Optional<Version> currentVersion, final Version compatibleMinimapVersion) {
-        super(
-            Component.translatable("gui.xaeroplus.minimap_incompatible.title").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD),
-            getMessage(currentVersion, compatibleMinimapVersion),
-            getMessage(currentVersion, compatibleMinimapVersion)
-        );
+        super(Component.literal("XaeroPlus"));
+        titleComponent = Component.translatable("gui.xaeroplus.minimap_incompatible.title").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD);
+        messageComponent = getMessage(currentVersion, compatibleMinimapVersion);
     }
 
     @Override
-    protected void initButtons(final int yOffset) {
+    public void init() {
+        this.message = MultiLineLabel.create(this.font, this.messageComponent, this.width - 100);
         addRenderableWidget(
             Button.builder(Component.translatable("gui.xaeroplus.minimap_incompatible.download_minimap"), button -> {
                     Util.getPlatform().openUri("https://modrinth.com/mod/xaeros-minimap/versions");
                     Minecraft.getInstance().close();
             })
-            .bounds(width / 2 - 100 - 75, 100 + yOffset, 150, 20)
+            .bounds(width / 2 - 100 - 75, 150, 150, 20)
             .build()
         );
+
         addRenderableWidget(
             Button.builder(Component.translatable("gui.xaeroplus.minimap_incompatible.exit"), button -> {
-                Minecraft.getInstance().close();
-            })
-            .bounds(width / 2 + 100 - 75, 100 + yOffset, 150, 20)
-            .build()
+                    Minecraft.getInstance().close();
+                })
+                .bounds(width / 2 + 100 - 75, 150, 150, 20)
+                .build()
         );
-    }
-
-    @Override
-    protected void renderTitle(GuiGraphics guiGraphics) {
-        guiGraphics.drawCenteredString(this.font, this.title, width / 2, 30, 16777215);
     }
 
     @Override
     public boolean shouldCloseOnEsc() {
         return false;
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        guiGraphics.drawCenteredString(this.font, titleComponent, this.width / 2, 50, 16777215);
+        int i = this.width / 2 - this.message.getWidth() / 2;
+        this.message.renderLeftAligned(guiGraphics, i, 75, 18, 16777215);
     }
 }

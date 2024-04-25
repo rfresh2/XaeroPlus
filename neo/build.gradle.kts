@@ -38,7 +38,7 @@ dependencies {
     neoForge(libs.neoforge)
     modImplementation(libs.worldmap.neo)
     modImplementation(libs.minimap.neo)
-    modImplementation(files("libs/baritone-unoptimized-neoforge-1.10.2.jar"))
+    modCompileOnly(files("libs/baritone-unoptimized-neoforge-1.10.2.jar"))
     modCompileOnly(libs.waystones.neoforge)
     modCompileOnly(libs.balm.neoforge)
     modCompileOnly(libs.worldtools)
@@ -51,7 +51,7 @@ dependencies {
 
 tasks {
     processResources {
-        filesMatching("META-INF/mods.toml") {
+        filesMatching("META-INF/neoforge.mods.toml") {
             expand(mapOf(
                 "version" to project.version,
                 "worldmap_version" to worldmap_version_neo,

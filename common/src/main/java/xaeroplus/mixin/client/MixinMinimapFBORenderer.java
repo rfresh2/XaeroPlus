@@ -11,6 +11,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
@@ -99,12 +101,12 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
 
     @Redirect(method = "renderChunksToFBO", at = @At(
         value = "INVOKE",
-        target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V",
+        target = "Lorg/joml/Matrix4fStack;translate(FFF)Lorg/joml/Matrix4f;",
         ordinal = 0
     ), remap = true)
-    public void modifyShaderMatrixStackTranslate(final PoseStack instance, final float x, final float y, final float z,
-                                                 @Share("scaledSize") LocalIntRef scaledSize) {
-        instance.translate(scaledSize.get(), scaledSize.get(), -2000.0F);
+    public Matrix4f modifyShaderMatrixStackTranslate(final Matrix4fStack instance, final float x, final float y, final float z,
+                                                     @Share("scaledSize") LocalIntRef scaledSize) {
+        return instance.translate(scaledSize.get(), scaledSize.get(), -2000.0F);
     }
 
     @Redirect(method = "renderChunksToFBO", at = @At(

@@ -45,7 +45,7 @@ dependencies {
     modCompileOnly(libs.fabric.waystones)
     shadow(libs.sqlite)
     forgeRuntimeLibrary(implementation(include(libs.caffeine.get())!!)!!)
-    forgeRuntimeLibrary(implementation(include(libs.lambdaEvents.get())!!)!!)
+    forgeRuntimeLibrary(implementation(shadow(libs.lambdaEvents.get())!!)!!)
     compileOnly(project(":common"))
 }
 
@@ -73,6 +73,7 @@ tasks {
 
     shadowJar {
         configurations = listOf(project.configurations.shadow.get())
+        relocate("net.lenni0451.lambdaevents", "xaeroplus.lambdaevents")
     }
 
     remapJar {

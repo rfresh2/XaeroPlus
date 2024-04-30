@@ -16,42 +16,42 @@ displayTest="IGNORE_ALL_VERSION"
 
 [[dependencies.xaeroplus]]
 modId = "neoforge"
-mandatory = true
+type = "required"
 versionRange = "[1,)"
 ordering = "NONE"
 side = "CLIENT"
 
 [[dependencies.xaeroplus]]
 modId = "minecraft"
-mandatory = true
+type = "required"
 versionRange = "[1.20.5, 1.20.6]"
 ordering = "NONE"
 side = "CLIENT"
 
 [[dependencies.xaeroplus]]
 modId = "xaerominimap"
-mandatory = false
+type = "optional"
 versionRange = "[${minimap_version}]"
 ordering = "BEFORE"
 side = "CLIENT"
 
 [[dependencies.xaeroplus]]
 modId = "xaerobetterpvp"
-mandatory = false
+type = "optional"
 versionRange = "[${minimap_version}]"
 ordering = "BEFORE"
 side = "CLIENT"
 
 [[dependencies.xaeroplus]]
 modId = "xaeroworldmap"
-mandatory = true
+type = "required"
 versionRange = "[${worldmap_version}]"
 ordering = "BEFORE"
 side = "CLIENT"
 
 [[dependencies.xaeroplus]]
 modId = "worldtools"
-mandatory = false
+type = "optional"
 versionRange = "[1.2.0,)"
 ordering = "BEFORE"
 side = "CLIENT"

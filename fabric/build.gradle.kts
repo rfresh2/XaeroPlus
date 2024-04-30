@@ -36,6 +36,7 @@ val destArchiveClassifier = "WM${worldmap_version_fabric}-MM${minimap_version_fa
 dependencies {
 	modImplementation(libs.fabric.loader)
 	modApi(libs.fabric.api)
+	implementation(include(annotationProcessor(libs.mixinsquared.fabric.get())!!)!!)
 	shadowCommon(libs.sqlite)
 	implementation(libs.sqlite)
 	modImplementation(libs.worldmap.fabric)
@@ -44,11 +45,7 @@ dependencies {
 	modCompileOnly(libs.waystones.fabric)
 	modCompileOnly(libs.balm.fabric)
 	modCompileOnly(libs.fabric.waystones)
-	// todo: there's some issue with xaero's new minimap render start mixin on 1.20.6 and IF's hud batching
-	//		might be an issue with blend or FBO's. Issue is reproducible without XP.
-	//		but i've only reproduced it in a dev env (runClient). Seems to work fine when running MC normally.
-	//		not sure why, all variables should be the same
-//	modRuntimeOnly(libs.immediatelyfast)
+	modRuntimeOnly(libs.immediatelyfast)
 	modRuntimeOnly(libs.modmenu)
 	modRuntimeOnly(libs.sodium)
 //	modRuntimeOnly(libs.fpsdisplay)

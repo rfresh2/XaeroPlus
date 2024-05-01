@@ -12,7 +12,7 @@ dependencies {
     modCompileOnly(libs.minimap.fabric)
     implementation(libs.caffeine)
     implementation(libs.lambdaEvents)
-    modCompileOnly(files("../fabric/libs/baritone-unoptimized-fabric-1.10.4.jar"))
+    modCompileOnly(files("../fabric/libs/baritone-unoptimized-fabric-1.10.5.jar"))
     modCompileOnly(libs.waystones.fabric)
     modCompileOnly(libs.balm.fabric)
     modCompileOnly(libs.fabric.waystones)

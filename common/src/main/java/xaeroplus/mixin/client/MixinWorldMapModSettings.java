@@ -6,7 +6,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import xaero.map.WorldMap;
 import xaero.map.settings.ModOptions;
 import xaero.map.settings.ModSettings;
 import xaeroplus.settings.XaeroPlusModSettingsHooks;
@@ -29,7 +28,7 @@ public class MixinWorldMapModSettings {
 
     @Inject(method = "saveSettings", at = @At(value = "RETURN"))
     public void saveSettings(final CallbackInfo ci) throws IOException {
-        XaeroPlusModSettingsHooks.saveSettings(WorldMap.optionsFile, XAERO_PLUS_WORLDMAP_SETTINGS);
+        XaeroPlusModSettingsHooks.saveSettings();
     }
 
     @Inject(method = "loadSettingsFile", at = @At("RETURN"))

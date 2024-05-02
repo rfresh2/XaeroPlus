@@ -72,7 +72,7 @@ public class MixinMinimapModSettings {
 
     @Inject(method = "saveSettings", at = @At("RETURN"))
     public void saveSettings(final CallbackInfo ci) throws IOException {
-        XaeroPlusModSettingsHooks.saveSettings(this.modMain.getConfigFile(), ALL_MINIMAP_SETTINGS.get());
+        XaeroPlusModSettingsHooks.saveSettings();
     }
 
     @Inject(method = "loadSettingsFile", at = @At("RETURN"))

@@ -19,7 +19,6 @@ import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.markChunksDirtyI
  * Registry for XaeroPlus-specific settings
  */
 public final class XaeroPlusSettingRegistry {
-
     /**
      * The order settings are defined here determines the order in the settings GUI's.
      */

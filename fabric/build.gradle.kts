@@ -36,7 +36,6 @@ val destArchiveClassifier = "WM${worldmap_version_fabric}-MM${minimap_version_fa
 dependencies {
 	modImplementation(libs.fabric.loader)
 	modApi(libs.fabric.api)
-	implementation(include(annotationProcessor(libs.mixinsquared.fabric.get())!!)!!)
 	shadowCommon(libs.sqlite)
 	implementation(libs.sqlite)
 	modImplementation(libs.worldmap.fabric)

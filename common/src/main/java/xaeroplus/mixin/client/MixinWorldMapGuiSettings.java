@@ -1,15 +1,21 @@
 package xaeroplus.mixin.client;
 
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import xaero.map.gui.ConfigSettingEntry;
-import xaero.map.gui.GuiSettings;
-import xaero.map.gui.ISettingEntry;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import xaero.map.gui.*;
 import xaero.map.misc.KeySortableByOther;
 import xaero.map.settings.ModOptions;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSetting;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
 
 import java.lang.reflect.Field;
@@ -17,7 +23,45 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 @Mixin(value = GuiSettings.class, remap = false)
-public class MixinWorldMapGuiSettings {
+public abstract class MixinWorldMapGuiSettings extends ScreenBase {
+    protected MixinWorldMapGuiSettings(final Screen parent, final Screen escape, final Component titleIn) {
+        super(parent, escape, titleIn);
+    }
+
+    @Shadow
+    protected int entriesPerPage;
+
+    @Shadow private MyTinyButton nextButton;
+
+    @Shadow private MyTinyButton prevButton;
+
+    @Inject(method = "init", at = @At("HEAD"))
+    public void adjustEntriesPerPage(final CallbackInfo ci) {
+        this.entriesPerPage = 12; // fills height = 240
+        if (XaeroPlusSettingRegistry.expandSettingEntries.getValue() && this.height > 350) {
+            int extraRows = Math.min((height - 240) / 50, 6);
+            this.entriesPerPage = 12 + (2 * extraRows);
+        }
+    }
+
+    @Inject(method = "init", at = @At(
+        value = "RETURN"
+    ))
+    public void adjustForwardBackButtonPositionsForExtraRows(final CallbackInfo ci) {
+        if (!XaeroPlusSettingRegistry.expandSettingEntries.getValue()) return;
+        int extraRows = (this.entriesPerPage - 12) / 2;
+        int yAdjust = (extraRows * 24);
+        this.nextButton.y = this.nextButton.y + yAdjust;
+        this.prevButton.y = this.prevButton.y + yAdjust;
+        this.children().stream()
+            .filter(child -> child instanceof Button)
+            .map(child -> (Button) child)
+            .filter(button -> button.getMessage().getContents() instanceof TranslatableContents)
+            .filter(button -> ((TranslatableContents) button.getMessage().getContents()).getKey().equals("gui.xaero_back"))
+            .findFirst()
+            .ifPresent(button -> button.y = button.y + yAdjust);
+    }
+
     @Redirect(method = "init", at = @At(value = "INVOKE", target = "Ljava/util/ArrayList;add(Ljava/lang/Object;)Z"), remap = true)
     public boolean settingListToRenderRedirect(final ArrayList instance, final Object entryObject) {
         final KeySortableByOther<ISettingEntry> entry = (KeySortableByOther<ISettingEntry>) entryObject;

@@ -6,5 +6,6 @@
     "defaultRequire": 1
   },
   "client": [
+    "MixinSodiumOptionsGUI"
   ]
 }

@@ -49,6 +49,7 @@ dependencies {
     modCompileOnly(libs.balm.forge)
     modCompileOnly(libs.worldtools)
     modCompileOnly(libs.fabric.waystones)
+    modCompileOnly(libs.embeddium)
     shadow(libs.sqlite)
     forgeRuntimeLibrary(implementation(include(libs.caffeine.get())!!)!!)
     forgeRuntimeLibrary(implementation(include(libs.lambdaEvents.get())!!)!!)

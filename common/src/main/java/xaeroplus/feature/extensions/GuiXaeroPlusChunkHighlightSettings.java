@@ -8,17 +8,10 @@ import xaero.map.gui.ISettingEntry;
 import xaero.map.gui.ScreenSwitchSettingEntry;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
 
-public class GuiXaeroPlusWorldMapSettings extends GuiSettings {
-
-    public GuiXaeroPlusWorldMapSettings(Screen parent, Screen escapeScreen) {
+public class GuiXaeroPlusChunkHighlightSettings extends GuiSettings {
+    public GuiXaeroPlusChunkHighlightSettings(Screen parent, Screen escapeScreen) {
         super(Component.translatable("gui.xaeroplus.world_map_settings"), parent, escapeScreen);
-        var mainSettingsEntries = XaeroPlusSettingsReflectionHax.getWorldMapConfigSettingEntries();
-        var chunkHighlightSettingSwitchEntry = GuiXaeroPlusChunkHighlightSettings.getScreenSwitchSettingEntry(parent);
-        this.entries = new ISettingEntry[mainSettingsEntries.size() + 1];
-        this.entries[0] = chunkHighlightSettingSwitchEntry;
-        for (int i = 0; i < mainSettingsEntries.size(); i++) {
-            this.entries[i + 1] = mainSettingsEntries.get(i);
-        }
+        this.entries = XaeroPlusSettingsReflectionHax.getChunkHighlightConfigSettingEntries().toArray(new ISettingEntry[0]);
     }
 
     @Override
@@ -29,8 +22,8 @@ public class GuiXaeroPlusWorldMapSettings extends GuiSettings {
 
     public static ScreenSwitchSettingEntry getScreenSwitchSettingEntry(Screen parent) {
         return new ScreenSwitchSettingEntry(
-            "gui.xaeroplus.world_map_settings",
-            GuiXaeroPlusWorldMapSettings::new,
+            "gui.xaeroplus.chunk_highlight_settings",
+            GuiXaeroPlusChunkHighlightSettings::new,
             null,
             true
         );

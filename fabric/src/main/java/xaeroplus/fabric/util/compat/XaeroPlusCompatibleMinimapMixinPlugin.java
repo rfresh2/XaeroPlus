@@ -9,39 +9,18 @@ import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Avoids applying XP mixins if Minimap is not present or not at a compatible version
+ *
+ * We want to either accept BetterPVP or Minimap at a specific version. But we can't make fabric.json enforce this so we have to do it ourselves
+ */
 public class XaeroPlusCompatibleMinimapMixinPlugin implements IMixinConfigPlugin {
     private VersionCheckResult versionCheckResult;
-    // if we do not apply our settings mixins, they will be overwritten during xaero mod loading
-    // if there is any version of minimap present we should try to apply these
-    // could cause crashes in certain cases, but we can't really do anything about it - at least until XP settings are moved to a separate file
-    private boolean tryMinimapSettingsMixins;
-    private Set<String> xaeroMinimapSettingsMixins;
-    // always try to apply these even when minimap is not present
-    private Set<String> xaeroWorldMapSettingsMixins;
 
     @Override
     public void onLoad(final String mixinPackage) {
         if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) return;
         versionCheckResult = MinimapBaseVersionCheck.versionCheck();
-        tryMinimapSettingsMixins = versionCheckResult.anyPresentMinimapVersion().isPresent();
-        if (!versionCheckResult.minimapCompatible()) {
-            if (tryMinimapSettingsMixins) {
-                xaeroMinimapSettingsMixins = Set.of(
-                    "MixinBetterPVP",
-                    "MixinCrashHandler",
-                    "MixinMinimapModOption",
-                    "MixinMinimapModOptionsAccessor",
-                    "MixinMinimapModSettings",
-                    "MixinXaeroMinimap"
-                );
-            }
-            xaeroWorldMapSettingsMixins = Set.of(
-                "MixinWorldMap",
-                "MixinWorldMapModSettings",
-                "MixinWorldMapOption",
-                "MixinMinecraftClientFabric" // Prevents incompatible screen from being closed
-            );
-        }
     }
 
     @Override
@@ -53,15 +32,7 @@ public class XaeroPlusCompatibleMinimapMixinPlugin implements IMixinConfigPlugin
     public boolean shouldApplyMixin(final String targetClassName, final String mixinClassName) {
         if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) return true;
         if (versionCheckResult.minimapCompatible()) return true;
-        if (mixinClassName.startsWith("xaeroplus")) {
-            var classNameSplit = mixinClassName.split("\\.");
-            var mixinName = classNameSplit[classNameSplit.length - 1];
-            if (xaeroWorldMapSettingsMixins.contains(mixinName)) return true;
-            if (tryMinimapSettingsMixins)
-                return xaeroMinimapSettingsMixins.contains(mixinName);
-            return false;
-        }
-        return true;
+        return !mixinClassName.startsWith("xaeroplus");
     }
 
     @Override

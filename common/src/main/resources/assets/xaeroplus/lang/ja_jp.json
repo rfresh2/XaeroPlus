@@ -130,10 +130,13 @@
     "setting.waypoints.waypoint_beacon_distance_min.tooltip": "ビーコンをレンダリングするために、ウェイポイントがプレイヤーからxzの最小距離を設定します。",
     "setting.world_map.disable_internet": "Xaeroのインターネットアクセスを無効にする",
     "setting.world_map.disable_internet.tooltip": "WorldMapとMinimapのMODが起動時にインターネットを使用してアップデートとパトロン購読をチェックするのを無効にします。\nXaeroのMODは通常GUIでこの設定を公開しません。\nXaeroPlusはこの設定に関係なくインターネットを使用しません。",
+    "setting.world_map.expanded_settings": "拡張設定",
+    "setting.world_map.expanded_settings.tooltip": "大きな画面では、ページごとに表示される設定の数が増加します。\n",
     "gui.world_map.toggle_follow_mode": "フォローモードの切り替え",
     "gui.xaeroplus.on": "On",
     "gui.xaeroplus.off": "Off",
     "gui.xaeroplus.world_map_settings": "XaeroPlus WorldMapの設定",
+    "gui.xaeroplus.chunk_highlight_settings": "チャンクハイライト設定",
     "gui.xaeroplus.random": "ランダム",
     "gui.xaeroplus.minimap_incompatible.title": "XaeroPlusにはXaero's MinimapまたはBetterPVPが必要です。",
     "gui.xaeroplus.minimap_incompatible.currently_installed_version": "現在のバージョン: ",
@@ -153,4 +156,3 @@
     "setting.world_map.waystone_waypoint_set": "Waystone Waypoint Set",
     "setting.world_map.waystone_waypoint_set.tooltip": "ウェイストーンのウェイポイントをデフォルトのウェイポイントセットに追加する代わりに、別のウェイポイントセットを作成します。"
   }
-  

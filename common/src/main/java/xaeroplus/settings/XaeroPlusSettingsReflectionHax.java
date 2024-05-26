@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 // yucky reflection and utils so our settings can be in xaero's gui's
 public class XaeroPlusSettingsReflectionHax {
     public static final List<XaeroPlusSetting> XAERO_PLUS_WORLDMAP_SETTINGS = new ArrayList<>();
+    public static final List<XaeroPlusSetting> XAERO_PLUS_CHUNK_HIGHLIGHT_SETTINGS = new ArrayList<>();
     public static final List<XaeroPlusSetting> XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS = new ArrayList<>();
     public static final List<XaeroPlusSetting> XAERO_PLUS_MINIMAP_ENTITY_RADAR_SETTINGS = new ArrayList<>();
     public static final List<XaeroPlusSetting> XAERO_PLUS_MINIMAP_SETTINGS = new ArrayList<>();
@@ -33,6 +34,7 @@ public class XaeroPlusSettingsReflectionHax {
     public static final List<XaeroPlusSetting> XAERO_PLUS_KEYBIND_SETTINGS = new ArrayList<>();
     public static final Supplier<List<XaeroPlusSetting>> ALL_SETTINGS = Suppliers.memoize(() ->
             Stream.of(XAERO_PLUS_WORLDMAP_SETTINGS.stream(),
+                            XAERO_PLUS_CHUNK_HIGHLIGHT_SETTINGS.stream(),
                             XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS.stream(),
                             XAERO_PLUS_MINIMAP_ENTITY_RADAR_SETTINGS.stream(),
                             XAERO_PLUS_MINIMAP_SETTINGS.stream(),
@@ -42,6 +44,7 @@ public class XaeroPlusSettingsReflectionHax {
 
     public enum SettingLocation {
         WORLD_MAP_MAIN(XAERO_PLUS_WORLDMAP_SETTINGS),
+        CHUNK_HIGHLIGHTS(XAERO_PLUS_CHUNK_HIGHLIGHT_SETTINGS),
         MINIMAP_OVERLAYS(XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS),
         MINIMAP(XAERO_PLUS_MINIMAP_SETTINGS),
         KEYBINDS(XAERO_PLUS_KEYBIND_SETTINGS),
@@ -61,6 +64,7 @@ public class XaeroPlusSettingsReflectionHax {
 
     private static final Supplier<List<XaeroPlusBooleanSetting>> memoizingKeybindsList = Suppliers.memoize(() ->
             Stream.of(XAERO_PLUS_WORLDMAP_SETTINGS.stream(),
+                            XAERO_PLUS_CHUNK_HIGHLIGHT_SETTINGS.stream(),
                             XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS.stream(),
                             XAERO_PLUS_MINIMAP_ENTITY_RADAR_SETTINGS.stream(),
                             XAERO_PLUS_MINIMAP_SETTINGS.stream(),
@@ -72,6 +76,7 @@ public class XaeroPlusSettingsReflectionHax {
                 .filter(setting -> setting.getKeyBinding() != null)
                 .collect(Collectors.toList()));
     private static List<ModOptions> WORLDMAP_MOD_OPTIONS_LIST = null;
+    private static List<ModOptions> CHUNK_HIGHLIGHTS_MOD_OPTIONS_LIST = null;
     private static List<xaero.common.settings.ModOptions> MINIMAP_OVERLAY_MOD_OPTIONS_LIST = null;
     private static List<xaero.common.settings.ModOptions> MINIMAP_MOD_OPTIONS_LIST = null;
     private static List<xaero.common.settings.ModOptions> MINIMAP_ENTITY_RADAR_MOD_OPTIONS_LIST = null;
@@ -92,6 +97,15 @@ public class XaeroPlusSettingsReflectionHax {
         return WORLDMAP_MOD_OPTIONS_LIST.stream()
                 .map(xaero.map.gui.ConfigSettingEntry::new)
                 .collect(Collectors.toList());
+    }
+
+    public static List<xaero.map.gui.ConfigSettingEntry> getChunkHighlightConfigSettingEntries() {
+        if (CHUNK_HIGHLIGHTS_MOD_OPTIONS_LIST == null) {
+            CHUNK_HIGHLIGHTS_MOD_OPTIONS_LIST = constructXaeroPlusWorldMapModOptions(XAERO_PLUS_CHUNK_HIGHLIGHT_SETTINGS);
+        }
+        return CHUNK_HIGHLIGHTS_MOD_OPTIONS_LIST.stream()
+            .map(xaero.map.gui.ConfigSettingEntry::new)
+            .collect(Collectors.toList());
     }
 
     public static List<xaero.common.gui.ConfigSettingEntry> getMiniMapOverlayConfigSettingEntries() {

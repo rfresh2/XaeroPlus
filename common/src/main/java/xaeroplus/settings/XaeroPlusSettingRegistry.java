@@ -494,4 +494,10 @@ public final class XaeroPlusSettingRegistry {
         "setting.world_map.disable_internet.tooltip",
         false,
         SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting expandSettingEntries = XaeroPlusBooleanSetting.create(
+        "Expanded Setting Entries",
+        "setting.world_map.expanded_settings",
+        "setting.world_map.expanded_settings.tooltip",
+        false,
+        SettingLocation.WORLD_MAP_MAIN);
 }

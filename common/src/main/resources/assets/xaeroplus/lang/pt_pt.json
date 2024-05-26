@@ -130,6 +130,8 @@
   "setting.waypoints.waypoint_beacon_distance_min.tooltip": "Define a distância xz mínima entre o jogador e a localização para renderizar o sinalizador.",
   "setting.world_map.disable_internet": "Desati. Acesso à Internet ao Xaero",
   "setting.world_map.disable_internet.tooltip": "Desativa o acesso à Internet para verificação de atualizações ou subscrição do Patreon dos mods do mapa-mundo e mini-mapa. \n Normalmente os mods Xaero não mostram esta configuração no GUI. \n O XaeroPlus não usa a Internet independentemente desta definição.",
+  "setting.world_map.expanded_settings": "Configurações expandidas",
+  "setting.world_map.expanded_settings.tooltip": "Aumenta o número de configurações mostradas por página em telas maiores",
   "gui.world_map.toggle_follow_mode": "Alternar Modo Seguir",
   "gui.xaeroplus.on": "Lig.",
   "gui.xaeroplus.off": "Deslig.",

@@ -48,6 +48,7 @@ dependencyResolutionManagement {
 			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.2.10+1.20.4-fabric")
 			library("modmenu", "maven.modrinth:modmenu:7.2.2")
 			library("sodium", "maven.modrinth:sodium:mc1.20.1-0.5.3")
+			library("embeddium", "maven.modrinth:embeddium:0.3.19+mc1.20.1")
 			library("fpsdisplay", "maven.modrinth:fpsdisplay:3.1.0+1.20.x")
 			library("cloth-config-fabric", "me.shedaniel.cloth:cloth-config-fabric:11.1.118")
 		}

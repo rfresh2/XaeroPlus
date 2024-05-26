@@ -35,6 +35,8 @@ public class XaeroPlusForge {
                 modEventBus.addListener(this::onRegisterKeyMappingsEvent);
                 FORGE_EVENT_BUS.addListener(this::onRegisterClientCommandsEvent);
                 FORGE_EVENT_BUS.register(modEventBus);
+                if (EmbeddiumHelper.isEmbeddiumPresent())
+                    FORGE_EVENT_BUS.addListener(XaeroPlusEmbeddiumOptionsInit::onEmbeddiumOptionGUIConstructionEvent);
                 RemovalCause explicit = RemovalCause.EXPLICIT; // force class load to stop forge shitting itself at runtime??
             };
         });

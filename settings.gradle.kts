@@ -8,7 +8,7 @@ pluginManagement {
 	}
 }
 gradle.extra.apply {
-	set("mod_version", "2.11")
+	set("mod_version", "2.12")
 	set("maven_group", "xaeroplus")
 	set("archives_base_name", "XaeroPlus")
 	set("minecraft_version", "1.20.2")
@@ -56,7 +56,8 @@ dependencyResolutionManagement {
 			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.2.10+1.20.4-fabric")
 			library("modmenu", "maven.modrinth:modmenu:8.0.1")
 			library("sodium", "maven.modrinth:sodium:mc1.20.2-0.5.3")
-			library("fpsdisplay", "maven.modrinth:fpsdisplay:3.1.0+1.20.x")
+            library("embeddium", "maven.modrinth:embeddium:0.2.10+mc1.20.2")
+            library("fpsdisplay", "maven.modrinth:fpsdisplay:3.1.0+1.20.x")
 			library("cloth-config-fabric", "me.shedaniel.cloth:cloth-config-fabric:12.0.111")
 		}
 	}

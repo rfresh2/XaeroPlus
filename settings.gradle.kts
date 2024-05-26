@@ -8,7 +8,7 @@ pluginManagement {
 	}
 }
 gradle.extra.apply {
-	set("mod_version", "2.11")
+	set("mod_version", "2.12")
 	set("maven_group", "xaeroplus")
 	set("archives_base_name", "XaeroPlus")
 	set("minecraft_version", "1.19.4")
@@ -45,7 +45,8 @@ dependencyResolutionManagement {
 			library("fabric-waystones", "maven.modrinth:fwaystones:3.1.1+mc1.19.4")
 			library("worldtools", "maven.modrinth:worldtools:1.2.0+1.20.1")
             library("sqlite", "com.github.rfresh2:sqlite-jdbc:2ba0c66439") // relocated xerial sqlite to avoid conflicts with other mods
-		}
+			library("sodium", "maven.modrinth:sodium:mc1.19.4-0.4.10")
+        }
 	}
 }
 

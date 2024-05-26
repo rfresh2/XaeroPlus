@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.commands.CommandSourceStack;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
@@ -20,7 +21,7 @@ import xaeroplus.util.DataFolderResolveUtil;
 
 import java.util.List;
 
-@Mod(value = "xaeroplus")
+@Mod(value = "xaeroplus", dist = Dist.CLIENT)
 public class XaeroPlusNeo {
     public static final IEventBus FORGE_EVENT_BUS = NeoForge.EVENT_BUS;
     public XaeroPlusNeo(IEventBus modEventBus) {
@@ -29,6 +30,8 @@ public class XaeroPlusNeo {
             modEventBus.addListener(this::onRegisterKeyMappingsEvent);
             FORGE_EVENT_BUS.addListener(this::onRegisterClientCommandsEvent);
 //			FORGE_EVENT_BUS.register(modEventBus);
+            if (EmbeddiumHelper.isEmbeddiumPresent())
+                FORGE_EVENT_BUS.addListener(XaeroPlusEmbeddiumOptionsInit::onEmbeddiumOptionGUIConstructionEvent);
             RemovalCause explicit = RemovalCause.EXPLICIT; // force class load to stop forge shitting itself at runtime??
         }
     }

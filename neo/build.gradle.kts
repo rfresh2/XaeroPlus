@@ -43,6 +43,7 @@ dependencies {
     modCompileOnly(libs.balm.neoforge)
     modCompileOnly(libs.worldtools)
     modCompileOnly(libs.fabric.waystones)
+    modCompileOnly(libs.embeddium)
     modRuntimeOnly(libs.immediatelyfast.neo)
     shadow(libs.sqlite)
     forgeRuntimeLibrary(implementation(include(libs.caffeine.get())!!)!!)

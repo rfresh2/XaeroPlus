@@ -9,6 +9,7 @@
   "client": [
     "MixinBetterPVP",
     "MixinPlatformContextFabric",
+    "MixinSodiumOptionsGUI",
     "MixinWorldMap",
     "MixinWorldMapFabric",
     "MixinXaeroMinimap",

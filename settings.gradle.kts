@@ -9,7 +9,7 @@ pluginManagement {
 	}
 }
 gradle.extra.apply {
-	set("mod_version", "2.11")
+	set("mod_version", "2.12")
 	set("maven_group", "xaeroplus")
 	set("archives_base_name", "XaeroPlus")
 	set("minecraft_version", "1.20.6")
@@ -17,7 +17,7 @@ gradle.extra.apply {
 	set("fabric_loader_version", "0.15.10")
 	set("fabric_api_version", "0.97.8+1.20.6")
 	set("forge_loader_version", "49.0.3")
-    set("neoforge_version", "20.6.1-beta")
+    set("neoforge_version", "20.6.80-beta")
     set("worldmap_version_fabric", "1.38.6")
 	set("minimap_version_fabric", "24.1.4")
     set("worldmap_version_forge", "1.38.6")
@@ -60,7 +60,8 @@ dependencyResolutionManagement {
 			library("sodium", "maven.modrinth:sodium:mc1.20.6-0.5.8")
 			library("fpsdisplay", "maven.modrinth:fpsdisplay:3.1.0+1.20.x")
 			library("cloth-config-fabric", "me.shedaniel.cloth:cloth-config-fabric:14.0.126")
-		}
+            library("embeddium", "maven.modrinth:embeddium:0.3.19+mc1.20.6")
+        }
 	}
 }
 

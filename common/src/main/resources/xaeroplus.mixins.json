@@ -9,6 +9,7 @@
   "client": [
     "AccessorGuiCaveModeOptions",
     "AccessorRightClickOption",
+    "AccessorWorldMapScreenSwitchSettingEntry",
     "MixinClientEvents",
     "MixinCommonGuiSettings",
     "MixinCommonInternet",

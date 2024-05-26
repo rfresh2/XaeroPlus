@@ -134,6 +134,7 @@
   "gui.xaeroplus.on": "开启",
   "gui.xaeroplus.off": "关闭",
   "gui.xaeroplus.world_map_settings": "XaeroPlus 世界地图设置",
+  "gui.xaeroplus.chunk_highlight_settings": "块突出显示设置",
   "gui.xaeroplus.random": "随机的",
   "gui.xaeroplus.minimap_incompatible.title": "XaeroPlus 需要 Xaero 的小地图或 BetterPVP",
   "gui.xaeroplus.minimap_incompatible.currently_installed_version": "当前安装的版本：",

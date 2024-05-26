@@ -134,6 +134,7 @@
   "gui.xaeroplus.on": "Lig.",
   "gui.xaeroplus.off": "Deslig.",
   "gui.xaeroplus.world_map_settings": "Configurações do XaeroPlus Mapa-Mundo",
+  "gui.xaeroplus.chunk_highlight_settings": "Configurações de destaque de pedaços",
   "gui.xaeroplus.random": "Aleatório",
   "gui.xaeroplus.minimap_incompatible.title": "XaeroPlus precisa do Xaero's Minimap ou BetterPVP",
   "gui.xaeroplus.minimap_incompatible.currently_installed_version": "Versão instalada: ",

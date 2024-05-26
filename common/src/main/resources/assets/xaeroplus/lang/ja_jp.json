@@ -134,6 +134,7 @@
     "gui.xaeroplus.on": "On",
     "gui.xaeroplus.off": "Off",
     "gui.xaeroplus.world_map_settings": "XaeroPlus WorldMapの設定",
+    "gui.xaeroplus.chunk_highlight_settings": "チャンクハイライト設定",
     "gui.xaeroplus.random": "ランダム",
     "gui.xaeroplus.minimap_incompatible.title": "XaeroPlusにはXaero's MinimapまたはBetterPVPが必要です。",
     "gui.xaeroplus.minimap_incompatible.currently_installed_version": "現在のバージョン: ",
@@ -153,4 +154,3 @@
     "setting.world_map.waystone_waypoint_set": "Waystone Waypoint Set",
     "setting.world_map.waystone_waypoint_set.tooltip": "ウェイストーンのウェイポイントをデフォルトのウェイポイントセットに追加する代わりに、別のウェイポイントセットを作成します。"
   }
-  

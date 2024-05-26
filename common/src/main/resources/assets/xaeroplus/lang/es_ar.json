@@ -134,6 +134,7 @@
   "gui.xaeroplus.on": "Encendido",
   "gui.xaeroplus.off": "Apagado",
   "gui.xaeroplus.world_map_settings": "Configuración del MapaMundi de XaeroPlus",
+  "gui.xaeroplus.chunk_highlight_settings": "Configuración de resaltado de fragmentos",
   "gui.xaeroplus.random": "Aleatorio",
   "gui.xaeroplus.minimap_incompatible.title": "XaeroPlus Requiere Xaero's Minimap o BetterPVP",
   "gui.xaeroplus.minimap_incompatible.currently_installed_version": "Versión Actualmente Instalada: ",

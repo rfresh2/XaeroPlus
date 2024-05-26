@@ -134,6 +134,7 @@
   "gui.xaeroplus.on": "On",
   "gui.xaeroplus.off": "Off",
   "gui.xaeroplus.world_map_settings": "XaeroPlus WorldMap Settings",
+  "gui.xaeroplus.chunk_highlight_settings": "Chunk Highlight Settings",
   "gui.xaeroplus.random": "Random",
   "gui.xaeroplus.minimap_incompatible.title": "XaeroPlus Requires Xaero's Minimap or BetterPVP",
   "gui.xaeroplus.minimap_incompatible.currently_installed_version": "Currently Installed Version: ",

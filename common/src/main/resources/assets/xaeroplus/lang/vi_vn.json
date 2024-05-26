@@ -134,6 +134,7 @@
     "gui.xaeroplus.on": "Bật",
     "gui.xaeroplus.off": "Tắt",
     "gui.xaeroplus.world_map_settings": "Cài Đặt XaeroPlus WorldMap",
+    "gui.xaeroplus.chunk_highlight_settings": "Cài đặt đánh dấu đoạn",
     "gui.xaeroplus.random": "Ngẫu Nhiên",
     "gui.xaeroplus.minimap_incompatible.title": "XaeroPlus Yêu Cầu Xaero's Minimap hoặc BetterPVP",
     "gui.xaeroplus.minimap_incompatible.currently_installed_version": "Phiên Bản Đã Cài Đặt: ",
@@ -153,4 +154,3 @@
     "setting.world_map.waystone_waypoint_set": "Bộ Điểm Đến Waystone",
     "setting.world_map.waystone_waypoint_set.tooltip": "Tạo một bộ điểm đến riêng biệt cho điểm đến waystone thay vì thêm chúng vào bộ mặc định."
   }
-  

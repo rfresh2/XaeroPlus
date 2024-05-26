@@ -186,14 +186,14 @@ public final class XaeroPlusSettingRegistry {
             "setting.world_map.new_chunks_highlighting.tooltip",
             (b) -> ModuleManager.getModule(NewChunks.class).setEnabled(b),
             false,
-            SettingLocation.WORLD_MAP_MAIN);
+            SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting newChunksSaveLoadToDisk = XaeroPlusBooleanSetting.create(
             "Save/Load NewChunks to Disk",
             "setting.world_map.new_chunks_save_load_to_disk",
             "setting.world_map.new_chunks_save_load_to_disk.tooltip",
             (b) -> ModuleManager.getModule(NewChunks.class).setNewChunksCache(b),
             true,
-            SettingLocation.WORLD_MAP_MAIN);
+            SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusFloatSetting newChunksAlphaSetting = XaeroPlusFloatSetting.create(
             "New Chunks Opacity",
             "setting.world_map.new_chunks_opacity",
@@ -201,7 +201,7 @@ public final class XaeroPlusSettingRegistry {
             "setting.world_map.new_chunks_opacity.tooltip",
             (b) -> ModuleManager.getModule(NewChunks.class).setAlpha(b),
             100,
-            SettingLocation.WORLD_MAP_MAIN);
+            SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> newChunksColorSetting = XaeroPlusEnumSetting.create(
             "New Chunks Color",
             "setting.world_map.new_chunks_color",
@@ -209,28 +209,28 @@ public final class XaeroPlusSettingRegistry {
             (b) -> ModuleManager.getModule(NewChunks.class).setRgbColor(b.getColor()),
             ColorHelper.HighlightColor.values(),
             ColorHelper.HighlightColor.RED,
-            SettingLocation.WORLD_MAP_MAIN);
+            SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting oldChunksEnabledSetting = XaeroPlusBooleanSetting.create(
             "OldChunks Highlighting",
             "setting.world_map.old_chunks_highlighting",
             "setting.world_map.old_chunks_highlighting.tooltip",
             (b) -> ModuleManager.getModule(OldChunks.class).setEnabled(b),
             false,
-            SettingLocation.WORLD_MAP_MAIN);
+            SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting oldChunksInverse = XaeroPlusBooleanSetting.create(
             "OldChunks Inverse",
             "setting.world_map.old_chunks_inverse",
             "setting.world_map.old_chunks_inverse.tooltip",
             (b) -> ModuleManager.getModule(OldChunks.class).setInverse(b),
             false,
-            SettingLocation.WORLD_MAP_MAIN);
+            SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting oldChunksSaveLoadToDisk = XaeroPlusBooleanSetting.create(
             "Save/Load OldChunks to Disk",
             "setting.world_map.old_chunks_save_load_to_disk",
             "setting.world_map.old_chunks_save_load_to_disk.tooltip",
             (b) -> ModuleManager.getModule(OldChunks.class).setOldChunksCache(b),
             true,
-            SettingLocation.WORLD_MAP_MAIN);
+            SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusFloatSetting oldChunksAlphaSetting = XaeroPlusFloatSetting.create(
             "Old Chunks Opacity",
             "setting.world_map.old_chunks_opacity",
@@ -238,7 +238,7 @@ public final class XaeroPlusSettingRegistry {
             "setting.world_map.old_chunks_opacity.tooltip",
             (b) -> ModuleManager.getModule(OldChunks.class).setAlpha(b),
             100,
-            SettingLocation.WORLD_MAP_MAIN);
+            SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> oldChunksColorSetting = XaeroPlusEnumSetting.create(
             "Old Chunks Color",
             "setting.world_map.old_chunks_color",
@@ -246,21 +246,21 @@ public final class XaeroPlusSettingRegistry {
             (b) -> ModuleManager.getModule(OldChunks.class).setRgbColor(b.getColor()),
             ColorHelper.HighlightColor.values(),
             ColorHelper.HighlightColor.YELLOW,
-            SettingLocation.WORLD_MAP_MAIN);
+            SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting portalsEnabledSetting = XaeroPlusBooleanSetting.create(
             "Portal Highlights",
             "setting.world_map.portals",
             "setting.world_map.portals.tooltip",
             (b) -> ModuleManager.getModule(Portals.class).setEnabled(b),
             false,
-            SettingLocation.WORLD_MAP_MAIN);
+            SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting portalsSaveLoadToDisk = XaeroPlusBooleanSetting.create(
             "Save/Load Portals to Disk",
             "setting.world_map.portals_save_load_to_disk",
             "setting.world_map.portals_save_load_to_disk.tooltip",
             (b) -> ModuleManager.getModule(Portals.class).setPortalsCache(b),
             true,
-            SettingLocation.WORLD_MAP_MAIN);
+            SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusFloatSetting portalsAlphaSetting = XaeroPlusFloatSetting.create(
             "Portal Highlights Opacity",
             "setting.world_map.portals_opacity",
@@ -268,7 +268,7 @@ public final class XaeroPlusSettingRegistry {
             "setting.world_map.portals_opacity.tooltip",
             (b) -> ModuleManager.getModule(Portals.class).setAlpha(b),
             100,
-            SettingLocation.WORLD_MAP_MAIN);
+            SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> portalsColorSetting = XaeroPlusEnumSetting.create(
             "Portal Highlights Color",
             "setting.world_map.portals_color",
@@ -276,7 +276,7 @@ public final class XaeroPlusSettingRegistry {
             (b) -> ModuleManager.getModule(Portals.class).setRgbColor(b.getColor()),
             ColorHelper.HighlightColor.values(),
             ColorHelper.HighlightColor.MAGENTA,
-            SettingLocation.WORLD_MAP_MAIN);
+            SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting worldToolsEnabledSetting = XaeroPlusBooleanSetting.create(
         "WorldTools Highlights",
         "setting.world_map.world_tools",
@@ -284,7 +284,7 @@ public final class XaeroPlusSettingRegistry {
         WorldToolsHelper::isWorldToolsPresent,
         (b) -> ModuleManager.getModule(WorldTools.class).setEnabled(b),
         true,
-        SettingLocation.WORLD_MAP_MAIN);
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static XaeroPlusFloatSetting worldToolsAlphaSetting = XaeroPlusFloatSetting.create(
             "WorldTools Highlights Opacity",
             "setting.world_map.world_tools_opacity",
@@ -293,7 +293,7 @@ public final class XaeroPlusSettingRegistry {
             WorldToolsHelper::isWorldToolsPresent,
             (b) -> ModuleManager.getModule(WorldTools.class).setAlpha(b),
             100,
-            SettingLocation.WORLD_MAP_MAIN);
+            SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> worldToolsColorSetting = XaeroPlusEnumSetting.create(
             "WorldTools Highlights Color",
             "setting.world_map.world_tools_color",
@@ -302,14 +302,14 @@ public final class XaeroPlusSettingRegistry {
             (b) -> ModuleManager.getModule(WorldTools.class).setRgbColor(b.getColor()),
             ColorHelper.HighlightColor.values(),
             ColorHelper.HighlightColor.GREEN,
-            SettingLocation.WORLD_MAP_MAIN);
+            SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting portalSkipDetectionEnabledSetting = XaeroPlusBooleanSetting.create(
             "PortalSkip Detection",
             "setting.world_map.portal_skip_detection",
             "setting.world_map.portal_skip_detection.tooltip",
             (b) -> ModuleManager.getModule(PortalSkipDetection.class).setEnabled(b),
             false,
-            SettingLocation.WORLD_MAP_MAIN);
+            SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusFloatSetting portalSkipDetectionAlphaSetting = XaeroPlusFloatSetting.create(
             "PortalSkip Opacity",
             "setting.world_map.portal_skip_opacity",
@@ -317,7 +317,7 @@ public final class XaeroPlusSettingRegistry {
             "setting.world_map.portal_skip_opacity.tooltip",
             (b) -> ModuleManager.getModule(PortalSkipDetection.class).setAlpha(b),
             100,
-            SettingLocation.WORLD_MAP_MAIN);
+            SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> portalSkipDetectionColorSetting = XaeroPlusEnumSetting.create(
             "PortalSkip Color",
             "setting.world_map.portal_skip_color",
@@ -325,7 +325,7 @@ public final class XaeroPlusSettingRegistry {
             (b) -> ModuleManager.getModule(PortalSkipDetection.class).setRgbColor(b.getColor()),
             ColorHelper.HighlightColor.values(),
             ColorHelper.HighlightColor.WHITE,
-            SettingLocation.WORLD_MAP_MAIN);
+            SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusFloatSetting portalSkipPortalRadius = XaeroPlusFloatSetting.create(
             "PortalSkip Portal Radius",
             "setting.world_map.portal_skip_portal_radius",
@@ -333,7 +333,7 @@ public final class XaeroPlusSettingRegistry {
             "setting.world_map.portal_skip_portal_radius.tooltip",
             (b) -> ModuleManager.getModule(PortalSkipDetection.class).setPortalRadius(b),
             15,
-            SettingLocation.WORLD_MAP_MAIN);
+            SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusFloatSetting portalSkipDetectionSearchDelayTicksSetting = XaeroPlusFloatSetting.create(
             "PortalSkip Search Delay",
             "setting.world_map.portal_skip_search_delay",
@@ -341,21 +341,21 @@ public final class XaeroPlusSettingRegistry {
             "setting.world_map.portal_skip_search_delay.tooltip",
             (b) -> ModuleManager.getModule(PortalSkipDetection.class).setSearchDelayTicks(b),
             10,
-            SettingLocation.WORLD_MAP_MAIN);
+            SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting portalSkipNewChunksSetting = XaeroPlusBooleanSetting.create(
             "PortalSkip NewChunks",
             "setting.world_map.portal_skip_new_chunks",
             "setting.world_map.portal_skip_new_chunks.tooltip",
             (b) -> ModuleManager.getModule(PortalSkipDetection.class).setNewChunks(b),
             true,
-            SettingLocation.WORLD_MAP_MAIN);
+            SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting portalSkipOldChunkInverseSetting = XaeroPlusBooleanSetting.create(
             "PortalSkip OldChunks Inverse",
             "setting.world_map.portal_skip_old_chunks_inverse",
             "setting.world_map.portal_skip_old_chunks_inverse.tooltip",
             (b) -> ModuleManager.getModule(PortalSkipDetection.class).setOldChunksInverse(b),
             true,
-            SettingLocation.WORLD_MAP_MAIN);
+            SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting owAutoWaypointDimension = XaeroPlusBooleanSetting.create(
             "Prefer Overworld Waypoints",
             "setting.world_map.ow_auto_waypoint_dimension",

@@ -134,6 +134,7 @@
   "gui.xaeroplus.on": "On",
   "gui.xaeroplus.off": "Off",
   "gui.xaeroplus.world_map_settings": "Paramètres de WorldMap XaeroPlus",
+  "gui.xaeroplus.chunk_highlight_settings": "Paramètres de surbrillance des morceaux",
   "gui.xaeroplus.random": "Aléatoire",
   "gui.xaeroplus.minimap_incompatible.title": "XaeroPlus nécessite la mini-carte de Xaero ou BetterPVP",
   "gui.xaeroplus.minimap_incompatible.currently_installed_version": "Version actuellement installée: ",

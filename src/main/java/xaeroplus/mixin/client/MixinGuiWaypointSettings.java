@@ -1,6 +1,7 @@
 package xaeroplus.mixin.client;
 
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.util.text.ITextComponent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -14,7 +15,7 @@ import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
 
 @Mixin(value = GuiWaypointSettings.class, remap = false)
 public abstract class MixinGuiWaypointSettings extends GuiMinimapSettings {
-    public MixinGuiWaypointSettings(final IXaeroMinimap modMain, final String screenTitle, final GuiScreen par1Screen, final GuiScreen escScreen) {
+    public MixinGuiWaypointSettings(final IXaeroMinimap modMain, final ITextComponent screenTitle, final GuiScreen par1Screen, final GuiScreen escScreen) {
         super(modMain, screenTitle, par1Screen, escScreen);
     }
 

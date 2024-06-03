@@ -145,6 +145,8 @@ public abstract class MixinMapSaveLoad {
                             MapTileChunk chunk = region.getChunk(o, p);
                             if (chunk == null) {
                                 region.setChunk(o, p, chunk = new MapTileChunk(region, (region.getRegionX() << 3) + o, (region.getRegionZ() << 3) + p));
+                            } else if (chunk.getLoadState() >= 2) {
+                                throw new Exception("Map data for region " + region + " is probably corrupt! Has the same map tile chunk saved twice.");
                             }
 
                             if (region.isMetaLoaded()) {

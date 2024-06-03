@@ -16,11 +16,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.effect.Effects;
 import xaero.common.graphics.ImprovedFramebuffer;
-import xaero.common.minimap.MinimapInterface;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.element.render.map.MinimapElementMapRendererHandler;
 import xaero.common.minimap.region.MinimapChunk;
@@ -34,6 +32,8 @@ import xaero.common.minimap.waypoints.render.WaypointsGuiRenderer;
 import xaero.common.misc.Misc;
 import xaero.common.misc.OptimizedMath;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.Minimap;
+import xaero.hud.minimap.MinimapLogs;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ColorHelper;
 import xaeroplus.util.CustomMinimapFBORenderer;
@@ -57,7 +57,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
     @Shadow
     private boolean loadedFBO;
 
-    public MixinMinimapFBORenderer(IXaeroMinimap modMain, Minecraft mc, WaypointsGuiRenderer waypointsGuiRenderer, MinimapInterface minimapInterface, CompassRenderer compassRenderer) {
+    public MixinMinimapFBORenderer(IXaeroMinimap modMain, Minecraft mc, WaypointsGuiRenderer waypointsGuiRenderer, Minimap minimapInterface, CompassRenderer compassRenderer) {
         super(modMain, mc, waypointsGuiRenderer, minimapInterface, compassRenderer);
     }
 
@@ -76,10 +76,10 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             this.radarRenderer = RadarRenderer.Builder.begin()
                     .setModMain(this.modMain)
                     .setEntityIconManager(this.entityIconManager)
-                    .setMinimapInterface(this.minimapInterface)
+                    .setMinimap(this.minimap)
                     .build();
             this.minimapElementMapRendererHandler.add(this.radarRenderer);
-            this.minimapInterface.getOverMapRendererHandler().add(this.radarRenderer);
+            this.minimap.getOverMapRendererHandler().add(this.radarRenderer);
             if (this.modMain.getSupportMods().worldmap()) {
                 this.modMain.getSupportMods().worldmapSupport.createRadarRenderWrapper(this.radarRenderer);
             }

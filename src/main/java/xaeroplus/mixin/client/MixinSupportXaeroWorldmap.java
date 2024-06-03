@@ -52,24 +52,18 @@ public abstract class MixinSupportXaeroWorldmap {
     @Shadow
     private IXaeroMinimap modMain;
     @Shadow
-    private int destinationCaving;
-    @Shadow
-    private long lastDestinationCavingSwitch;
-    @Shadow
     private int previousRenderedCaveLayer;
     @Shadow
     private int lastRenderedCaveLayer;
+    @Shadow
     private ArrayList<MapRegion> regionBuffer;
     @Final
     @Shadow
     private static HashMap<MapTileChunk, Long> seedsUsed;
-
     @Shadow
     public abstract float getMinimapBrightness();
-
     @Shadow
     protected abstract void bindMapTextureWithLighting(int compatibilityVersion, float brightness, MapTileChunk chunk, boolean zooming);
-
     @Shadow
     public abstract boolean hasCaveLayers();
     @Shadow

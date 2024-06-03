@@ -14,7 +14,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
-import xaero.common.minimap.MinimapInterface;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.element.render.over.MinimapElementOverMapRendererHandler;
 import xaero.common.minimap.radar.MinimapRadar;
@@ -22,6 +21,7 @@ import xaero.common.minimap.render.MinimapFBORenderer;
 import xaero.common.minimap.render.MinimapRenderer;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.Minimap;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.CustomMinimapFBORenderer;
 import xaeroplus.util.Globals;
@@ -30,21 +30,17 @@ import xaeroplus.util.Globals;
 public class MixinMinimapRenderer {
 
     @Shadow
-    protected MinimapInterface minimapInterface;
+    protected Minimap minimap;
     @Shadow
     protected IXaeroMinimap modMain;
-    @Shadow
-    private double lastMapDimensionScale = 1.0;
-    @Shadow
-    private double lastPlayerDimDiv = 1.0;
 
     @Inject(method = "renderMinimap", at = @At("HEAD"))
     public void renderMinimap(
             final XaeroMinimapSession minimapSession, final MinimapProcessor minimap, final int x, final int y, final int width, final int height, final ScaledResolution scaledRes, final int size, final float partial, final CallbackInfo ci
     ) {
-        if (this.minimapInterface.usingFBO() && Globals.shouldResetFBO) {
+        if (this.minimap.usingFBO() && Globals.shouldResetFBO) {
             Globals.minimapScalingFactor = (int) XaeroPlusSettingRegistry.minimapScaling.getValue();
-            ((CustomMinimapFBORenderer) this.minimapInterface.getMinimapFBORenderer()).reloadMapFrameBuffers();
+            ((CustomMinimapFBORenderer) this.minimap.getMinimapFBORenderer()).reloadMapFrameBuffers();
             Globals.shouldResetFBO = false;
         }
     }

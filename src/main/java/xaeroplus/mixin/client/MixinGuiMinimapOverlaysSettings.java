@@ -1,6 +1,7 @@
 package xaeroplus.mixin.client;
 
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.util.text.ITextComponent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -15,7 +16,7 @@ import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
 @Mixin(value = GuiMinimapOverlaysSettings.class, remap = false)
 public abstract class MixinGuiMinimapOverlaysSettings extends GuiSettings {
 
-    public MixinGuiMinimapOverlaysSettings(IXaeroMinimap modMain, String title, GuiScreen backScreen, GuiScreen escScreen) {
+    public MixinGuiMinimapOverlaysSettings(IXaeroMinimap modMain, ITextComponent title, GuiScreen backScreen, GuiScreen escScreen) {
         super(modMain, title, backScreen, escScreen);
     }
 

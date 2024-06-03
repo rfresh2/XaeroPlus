@@ -16,10 +16,10 @@ gradle.extra.apply {
 	set("fabric_loader_version", "0.15.2")
 	set("fabric_api_version", "0.87.2+1.19.4")
 	set("forge_loader_version", "45.2.8")
-    set("worldmap_version_fabric", "1.38.4")
-	set("minimap_version_fabric", "24.1.1")
-    set("worldmap_version_forge", "1.38.4")
-	set("minimap_version_forge", "24.1.1")
+    set("worldmap_version_fabric", "1.38.8")
+    set("minimap_version_fabric", "24.2.0")
+    set("worldmap_version_forge", "1.38.8")
+    set("minimap_version_forge", "24.2.0")
 }
 
 dependencyResolutionManagement {

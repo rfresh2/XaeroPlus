@@ -17,7 +17,6 @@ import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.graphics.CustomVertexConsumers;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
-import xaero.common.minimap.MinimapInterface;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.element.render.over.MinimapElementOverMapRendererHandler;
 import xaero.common.minimap.radar.MinimapRadar;
@@ -25,6 +24,7 @@ import xaero.common.minimap.render.MinimapFBORenderer;
 import xaero.common.minimap.render.MinimapRenderer;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.Minimap;
 import xaeroplus.Globals;
 import xaeroplus.feature.extensions.CustomMinimapFBORenderer;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
@@ -32,7 +32,7 @@ import xaeroplus.settings.XaeroPlusSettingRegistry;
 @Mixin(value = MinimapRenderer.class, remap = false)
 public class MixinMinimapRenderer {
     @Shadow
-    protected MinimapInterface minimapInterface;
+    protected Minimap minimap;
     @Shadow
     protected IXaeroMinimap modMain;
 
@@ -51,9 +51,9 @@ public class MixinMinimapRenderer {
             final CustomVertexConsumers cvc,
             final CallbackInfo ci
     ) {
-        if (this.minimapInterface.usingFBO() && Globals.shouldResetFBO) {
+        if (this.minimap.usingFBO() && Globals.shouldResetFBO) {
             Globals.minimapScalingFactor = (int) XaeroPlusSettingRegistry.minimapScaling.getValue();
-            ((CustomMinimapFBORenderer) this.minimapInterface.getMinimapFBORenderer()).reloadMapFrameBuffers();
+            ((CustomMinimapFBORenderer) this.minimap.getMinimapFBORenderer()).reloadMapFrameBuffers();
             Globals.shouldResetFBO = false;
             minimap.setToResetImage(true);
         }

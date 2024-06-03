@@ -24,7 +24,9 @@ public abstract class MixinGuiMinimapMain extends GuiSettings {
         super(modMain, title, backScreen, escScreen);
     }
 
-    @Inject(method = "<init>", at = @At("RETURN"))
+    @Inject(method = "<init>(Lxaero/common/IXaeroMinimap;Lnet/minecraft/client/gui/screens/Screen;Lnet/minecraft/client/gui/screens/Screen;)V",
+        at = @At("RETURN"),
+        remap = true) // $REMAP
     public void init(final IXaeroMinimap modMain, final Screen par1GuiScreen, final Screen escScreen, final CallbackInfo ci) {
         final ConfigSettingEntry[] configSettingEntries = XaeroPlusSettingsReflectionHax.getMiniMapConfigSettingEntries()
                 .toArray(new ConfigSettingEntry[0]);

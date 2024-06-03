@@ -1,5 +1,6 @@
 package xaeroplus.mixin.client;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceKey;
@@ -11,7 +12,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.minimap.waypoints.WaypointsManager;
@@ -91,8 +91,7 @@ public abstract class MixinWaypointsManager {
             value = "INVOKE",
             target = "Lxaero/common/IXaeroMinimap;getSettings()Lxaero/common/settings/ModSettings;",
             ordinal = 1
-        ),
-        locals = LocalCapture.CAPTURE_FAILHARD)
+        ))
     public void createTempWaypointInject(final WaypointWorld wpw,
                                          final int x,
                                          final int y,
@@ -100,9 +99,7 @@ public abstract class MixinWaypointsManager {
                                          final boolean yIncluded,
                                          final double dimScale,
                                          final CallbackInfo ci,
-                                         double waypointDestDimScale,
-                                         final double dimDiv,
-                                         final Waypoint waypoint) {
+                                         @Local Waypoint waypoint) {
         ((IWaypointDimension) waypoint).setDimension(wpw.getDimId());
     }
 }

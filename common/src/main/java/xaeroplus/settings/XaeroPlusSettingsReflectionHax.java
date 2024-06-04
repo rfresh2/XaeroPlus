@@ -31,6 +31,11 @@ public class XaeroPlusSettingsReflectionHax {
                             XAERO_PLUS_WAYPOINT_SETTINGS.stream())
             .flatMap(x -> x)
             .collect(Collectors.toList()));
+    public static final Supplier<List<XaeroPlusSetting>> ALL_WORLD_MAP_SETTINGS = Suppliers.memoize(() ->
+        Stream.of(XAERO_PLUS_WORLDMAP_SETTINGS.stream(),
+                  XAERO_PLUS_CHUNK_HIGHLIGHT_SETTINGS.stream())
+            .flatMap(x -> x)
+            .collect(Collectors.toList()));
     public static final List<XaeroPlusSetting> XAERO_PLUS_KEYBIND_SETTINGS = new ArrayList<>();
     public static final Supplier<List<XaeroPlusSetting>> ALL_SETTINGS = Suppliers.memoize(() ->
             Stream.of(XAERO_PLUS_WORLDMAP_SETTINGS.stream(),

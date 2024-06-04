@@ -10,7 +10,7 @@ import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
 
 public class GuiXaeroPlusChunkHighlightSettings extends GuiSettings {
     public GuiXaeroPlusChunkHighlightSettings(Screen parent, Screen escapeScreen) {
-        super(Component.translatable("gui.xaeroplus.world_map_settings"), parent, escapeScreen);
+        super(Component.translatable("gui.xaeroplus.chunk_highlight_settings"), parent, escapeScreen);
         this.entries = XaeroPlusSettingsReflectionHax.getChunkHighlightConfigSettingEntries().toArray(new ISettingEntry[0]);
     }
 

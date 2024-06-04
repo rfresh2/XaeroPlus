@@ -13,7 +13,7 @@ import xaeroplus.settings.XaeroPlusModSettingsHooks;
 import java.io.File;
 import java.io.IOException;
 
-import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.XAERO_PLUS_WORLDMAP_SETTINGS;
+import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.ALL_WORLD_MAP_SETTINGS;
 
 @Mixin(value = ModSettings.class, remap = false)
 public class MixinWorldMapModSettings {
@@ -33,41 +33,41 @@ public class MixinWorldMapModSettings {
 
     @Inject(method = "loadSettingsFile", at = @At("RETURN"))
     public void loadSettings(final File file, CallbackInfo ci) throws IOException {
-        XaeroPlusModSettingsHooks.loadSettings(file, XAERO_PLUS_WORLDMAP_SETTINGS);
+        XaeroPlusModSettingsHooks.loadSettings(file, ALL_WORLD_MAP_SETTINGS.get());
     }
 
     @Inject(method = "getClientBooleanValue", at = @At("HEAD"), cancellable = true)
     public void getClientBooleanValue(ModOptions o, CallbackInfoReturnable<Boolean> cir) {
-        XaeroPlusModSettingsHooks.getClientBooleanValue(o.getEnumString(), XAERO_PLUS_WORLDMAP_SETTINGS, cir);
+        XaeroPlusModSettingsHooks.getClientBooleanValue(o.getEnumString(), ALL_WORLD_MAP_SETTINGS.get(), cir);
     }
 
     @Inject(method = "setOptionValue", at = @At("HEAD"))
     public void setOptionValue(ModOptions o, Object value, final CallbackInfo ci) {
-        XaeroPlusModSettingsHooks.setOptionValue(o.getEnumString(), value, XAERO_PLUS_WORLDMAP_SETTINGS);
+        XaeroPlusModSettingsHooks.setOptionValue(o.getEnumString(), value, ALL_WORLD_MAP_SETTINGS.get());
     }
 
     @Inject(method = "getOptionValue", at = @At("HEAD"), cancellable = true)
     public void getOptionValue(final ModOptions o, final CallbackInfoReturnable<Object> cir) {
-        XaeroPlusModSettingsHooks.getOptionValue(o.getEnumString(), cir, XAERO_PLUS_WORLDMAP_SETTINGS);
+        XaeroPlusModSettingsHooks.getOptionValue(o.getEnumString(), cir, ALL_WORLD_MAP_SETTINGS.get());
     }
 
     @Inject(method = "setOptionDoubleValue", at = @At("HEAD"))
     public void setOptionDoubleValue(ModOptions o, double f, CallbackInfo ci) {
-        XaeroPlusModSettingsHooks.setOptionDoubleValue(o.getEnumString(), f, XAERO_PLUS_WORLDMAP_SETTINGS);
+        XaeroPlusModSettingsHooks.setOptionDoubleValue(o.getEnumString(), f, ALL_WORLD_MAP_SETTINGS.get());
     }
 
     @Inject(method = "getOptionDoubleValue", at = @At("HEAD"), cancellable = true)
     public void getOptionDoubleValue(ModOptions o, CallbackInfoReturnable<Double> cir) {
-        XaeroPlusModSettingsHooks.getOptionDoubleValue(o.getEnumString(), cir, XAERO_PLUS_WORLDMAP_SETTINGS);
+        XaeroPlusModSettingsHooks.getOptionDoubleValue(o.getEnumString(), cir, ALL_WORLD_MAP_SETTINGS.get());
     }
 
     @Inject(method = "getOptionValueName", at = @At("HEAD"), cancellable = true)
     public void getOptionValueName(ModOptions o, CallbackInfoReturnable<String> cir) {
-        XaeroPlusModSettingsHooks.getOptionValueName(o.getEnumString(), cir, XAERO_PLUS_WORLDMAP_SETTINGS);
+        XaeroPlusModSettingsHooks.getOptionValueName(o.getEnumString(), cir, ALL_WORLD_MAP_SETTINGS.get());
     }
 
     @Inject(method = "getSliderOptionText", at = @At("HEAD"), cancellable = true)
     public void getSliderOptionText(final ModOptions o, final CallbackInfoReturnable<String> cir) {
-        XaeroPlusModSettingsHooks.getSliderOptionText(o.getEnumString(), cir, XAERO_PLUS_WORLDMAP_SETTINGS);
+        XaeroPlusModSettingsHooks.getSliderOptionText(o.getEnumString(), cir, ALL_WORLD_MAP_SETTINGS.get());
     }
 }

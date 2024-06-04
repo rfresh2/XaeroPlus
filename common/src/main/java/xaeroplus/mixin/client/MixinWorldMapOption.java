@@ -25,7 +25,7 @@ public class MixinWorldMapOption {
     @Inject(method = "<init>", at = @At("RETURN"))
     public void constructorInject(final ModOptions option, final CallbackInfo ci) {
         if (option.getEnumString().startsWith(SETTING_PREFIX)) {
-            XaeroPlusSettingsReflectionHax.XAERO_PLUS_WORLDMAP_SETTINGS.stream()
+            XaeroPlusSettingsReflectionHax.ALL_WORLD_MAP_SETTINGS.get().stream()
                     .filter(s -> s.getSettingName().equals(option.getEnumString()))
                     .findFirst()
                     .ifPresent(s -> caption = MutableComponent.create(new LiteralContents(SETTING_PREFIX)).append(Component.translatable(s.getSettingNameTranslationKey())));

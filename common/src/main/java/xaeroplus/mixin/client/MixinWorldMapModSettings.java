@@ -1,5 +1,6 @@
 package xaeroplus.mixin.client;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -31,8 +32,15 @@ public class MixinWorldMapModSettings {
         XaeroPlusModSettingsHooks.saveSettings();
     }
 
+    @Inject(method = "loadSettings", at = @At(value = "INVOKE", target = "Lxaero/map/settings/ModSettings;saveSettings()V"))
+    public void loadSettings(final CallbackInfo ci, @Local File mainConfigFile) throws IOException {
+        if (!mainConfigFile.exists()) {
+            XaeroPlusModSettingsHooks.loadSettings(null, ALL_WORLD_MAP_SETTINGS.get());
+        }
+    }
+
     @Inject(method = "loadSettingsFile", at = @At("RETURN"))
-    public void loadSettings(final File file, CallbackInfo ci) throws IOException {
+    public void loadSettingsFile(final File file, CallbackInfo ci) throws IOException {
         XaeroPlusModSettingsHooks.loadSettings(file, ALL_WORLD_MAP_SETTINGS.get());
     }
 

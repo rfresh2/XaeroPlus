@@ -1,5 +1,6 @@
 package xaeroplus.settings;
 
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
@@ -35,12 +36,12 @@ public class XaeroPlusModSettingsHooks {
         Files.move(tempFile.toPath(), XaeroPlus.configFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
 
-    public static void loadSettings(File file, List<XaeroPlusSetting> settings) throws IOException {
+    public static void loadSettings(@Nullable File file, List<XaeroPlusSetting> settings) throws IOException {
         loadCount++;
         // load from XP config file
         if (loadCount == 1) loadXPSettings();
         // load legacy XP settings from xaero config files
-        loadXPSettingsFromFile(file, settings);
+        if (file != null) loadXPSettingsFromFile(file, settings);
         // 1 for minimap, 1 for worldmap
         // the reason we need to track load count is on Fabric, WorldMap or Minimap mods could load first
         // but we have legacy settings that are stored in their config files

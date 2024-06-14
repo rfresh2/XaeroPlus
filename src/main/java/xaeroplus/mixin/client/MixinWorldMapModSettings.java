@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import xaero.map.WorldMap;
 import xaero.map.settings.ModOptions;
 import xaero.map.settings.ModSettings;
@@ -13,6 +14,7 @@ import xaeroplus.settings.XaeroPlusModSettingsHooks;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.XAERO_PLUS_WORLDMAP_SETTINGS;
 
@@ -30,6 +32,17 @@ public class MixinWorldMapModSettings {
     @Inject(method = "saveSettings", at = @At("TAIL"))
     public void saveSettings(final CallbackInfo ci) throws IOException {
         XaeroPlusModSettingsHooks.saveSettings(WorldMap.optionsFile, XAERO_PLUS_WORLDMAP_SETTINGS);
+    }
+
+    @Inject(
+        method = "loadSettings", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/map/settings/ModSettings;saveSettings()V"),
+        locals = LocalCapture.CAPTURE_FAILHARD)
+    public void loadSettings(final CallbackInfo ci, File mainConfigFile, Path configFolderPath) throws IOException {
+        if (!mainConfigFile.exists()) {
+            XaeroPlusModSettingsHooks.loadSettings(null, XAERO_PLUS_WORLDMAP_SETTINGS);
+        }
     }
 
     @Inject(method = "loadSettingsFile", at = @At("TAIL"))

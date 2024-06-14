@@ -30,21 +30,23 @@ public class XaeroPlusModSettingsHooks {
 
     public static void loadSettings(File file, List<XaeroPlusSetting> settings) throws IOException {
         loadCount++;
-        try(BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String s;
-            while ((s = reader.readLine()) != null) {
-                String[] args = s.split(":");
-                Optional<XaeroPlusSetting> settingOptional = settings.stream()
+        if (file != null) {
+            try(BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                String s;
+                while ((s = reader.readLine()) != null) {
+                    String[] args = s.split(":");
+                    Optional<XaeroPlusSetting> settingOptional = settings.stream()
                         .filter(setting -> setting.getSettingName().equalsIgnoreCase(args[0]))
                         .findFirst();
-                if (settingOptional.isPresent()) {
-                    final XaeroPlusSetting setting = settingOptional.get();
-                    if (setting instanceof XaeroPlusBooleanSetting) {
-                        ((XaeroPlusBooleanSetting) setting).setValue(Boolean.parseBoolean(args[1]));
-                    } else if (setting instanceof XaeroPlusFloatSetting) {
-                        ((XaeroPlusFloatSetting) setting).setValue(Float.parseFloat(args[1]));
-                    } else if (setting instanceof XaeroPlusEnumSetting) {
-                        ((XaeroPlusEnumSetting) setting).setValueIndex((int) Float.parseFloat(args[1]));
+                    if (settingOptional.isPresent()) {
+                        final XaeroPlusSetting setting = settingOptional.get();
+                        if (setting instanceof XaeroPlusBooleanSetting) {
+                            ((XaeroPlusBooleanSetting) setting).setValue(Boolean.parseBoolean(args[1]));
+                        } else if (setting instanceof XaeroPlusFloatSetting) {
+                            ((XaeroPlusFloatSetting) setting).setValue(Float.parseFloat(args[1]));
+                        } else if (setting instanceof XaeroPlusEnumSetting) {
+                            ((XaeroPlusEnumSetting) setting).setValueIndex((int) Float.parseFloat(args[1]));
+                        }
                     }
                 }
             }

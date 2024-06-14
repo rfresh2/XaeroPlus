@@ -22,6 +22,7 @@ import xaeroplus.util.WaypointsHelper;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.ALL_MINIMAP_SETTINGS;
 
@@ -76,8 +77,19 @@ public class MixinMinimapModSettings {
         XaeroPlusModSettingsHooks.saveSettings(this.modMain.getConfigFile(), ALL_MINIMAP_SETTINGS.get());
     }
 
+    @Inject(
+        method = "loadSettings", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/common/settings/ModSettings;saveSettings()V"),
+        locals = LocalCapture.CAPTURE_FAILHARD)
+    public void loadSettings(final CallbackInfo ci, File mainConfigFile, Path configFolderPath) throws IOException {
+        if (!mainConfigFile.exists()) {
+            XaeroPlusModSettingsHooks.loadSettings(null, ALL_MINIMAP_SETTINGS.get());
+        }
+    }
+
     @Inject(method = "loadSettingsFile", at = @At("TAIL"))
-    public void loadSettings(final File file, CallbackInfo ci) throws IOException {
+    public void loadSettingsFile(final File file, CallbackInfo ci) throws IOException {
         XaeroPlusModSettingsHooks.loadSettings(file, ALL_MINIMAP_SETTINGS.get());
     }
 

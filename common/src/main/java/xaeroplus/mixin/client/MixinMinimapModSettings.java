@@ -1,5 +1,6 @@
 package xaeroplus.mixin.client;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.KeyMapping;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -75,8 +76,15 @@ public class MixinMinimapModSettings {
         XaeroPlusModSettingsHooks.saveSettings();
     }
 
+    @Inject(method = "loadSettings", at = @At(value = "INVOKE", target = "Lxaero/common/settings/ModSettings;saveSettings()V"))
+    public void loadSettings(final CallbackInfo ci, @Local File mainConfigFile) throws IOException {
+        if (!mainConfigFile.exists()) {
+            XaeroPlusModSettingsHooks.loadSettings(null, ALL_MINIMAP_SETTINGS.get());
+        }
+    }
+
     @Inject(method = "loadSettingsFile", at = @At("RETURN"))
-    public void loadSettings(final File file, CallbackInfo ci) throws IOException {
+    public void loadSettingsFile(final File file, CallbackInfo ci) throws IOException {
         XaeroPlusModSettingsHooks.loadSettings(file, ALL_MINIMAP_SETTINGS.get());
     }
 

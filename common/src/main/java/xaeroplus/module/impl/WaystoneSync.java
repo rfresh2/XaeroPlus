@@ -164,18 +164,18 @@ public class WaystoneSync extends Module {
             worldContainerSuffix = String.valueOf(waystoneDim);
         final WaypointWorldContainer waypointWorldContainer = waypointsManager.getWorldContainer(currentContainerId.substring(
             0,
-            currentContainerId.lastIndexOf(37) + 1) + worldContainerSuffix);;
-        WaypointWorld crossDimWaypointWorld = waypointWorldContainer.worlds.get("waypoints");
+            currentContainerId.lastIndexOf(37) + 1) + worldContainerSuffix);
+        WaypointWorld crossDimWaypointWorld = waypointWorldContainer.worlds.get(currentWpWorld.getId());
         if (crossDimWaypointWorld == null) {
-            waypointWorldContainer.worlds.put("waypoints", new WaypointWorld(waypointWorldContainer, "waypoints", waystoneDimension));
-            crossDimWaypointWorld = waypointWorldContainer.worlds.get("waypoints");
+            waypointWorldContainer.worlds.put(currentWpWorld.getId(), new WaypointWorld(waypointWorldContainer, currentWpWorld.getId(), waystoneDimension));
+            crossDimWaypointWorld = waypointWorldContainer.worlds.get(currentWpWorld.getId());
         }
         return crossDimWaypointWorld;
     }
 
     private int getWaystoneColor(Waystone waystone) {
         if (color == WaystoneColor.RANDOM) {
-            return Math.abs(Hashing. murmur3_128().hashUnencodedChars(waystone.name()).asInt()) % COLORS.length;
+            return Math.abs(Hashing.murmur3_128().hashUnencodedChars(waystone.name()).asInt()) % COLORS.length;
         } else {
             return color.getColorIndex();
         }

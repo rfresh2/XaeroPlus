@@ -18,7 +18,10 @@ import xaeroplus.util.FabricWaystonesHelper;
 import xaeroplus.util.WaypointsHelper;
 import xaeroplus.util.WaystonesHelper;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static xaero.common.settings.ModSettings.COLORS;
@@ -43,23 +46,24 @@ public class WaystoneSync extends Module {
 
     @Override
     public void onDisable() {
-        blayWaystonesHelper.toSyncWaystones = new ArrayList<>();
+        blayWaystonesHelper.currentWaystoneTypeMap.clear();
     }
 
     @EventHandler
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
         if (event.worldId() == null) {
-            blayWaystonesHelper.toSyncWaystones = new ArrayList<>();
+            blayWaystonesHelper.currentWaystoneTypeMap.clear();
         }
     }
 
     @EventHandler
     public void onClientTickEvent(final ClientTickEvent.Post event) {
         if (WaystonesHelper.isWaystonesPresent()) {
-            if (blayWaystonesHelper.shouldSync) {
-                if (syncMainWaystones()) {
-                    blayWaystonesHelper.shouldSync = false;
-                    blayWaystonesHelper.toSyncWaystones = new ArrayList<>();
+            synchronized (blayWaystonesHelper.lock) {
+                if (blayWaystonesHelper.shouldSync) {
+                    if (syncMainWaystones()) {
+                        blayWaystonesHelper.shouldSync = false;
+                    }
                 }
             }
         } else if (WaystonesHelper.isFabricWaystonesPresent()) {
@@ -74,7 +78,7 @@ public class WaystoneSync extends Module {
     }
 
     public boolean syncMainWaystones() {
-        return commonWaystoneSync(blayWaystonesHelper.getToSyncWaystones());
+        return commonWaystoneSync(blayWaystonesHelper.getCurrentWaystones());
     }
 
     public boolean commonWaystoneSync(final List<Waystone> waystones) {
@@ -192,7 +196,6 @@ public class WaystoneSync extends Module {
     }
 
     public void reloadStandardWaystones() {
-        blayWaystonesHelper.toSyncWaystones = blayWaystonesHelper.currentWaystones;
         blayWaystonesHelper.shouldSync = true;
     }
 

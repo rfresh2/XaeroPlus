@@ -1,6 +1,5 @@
 package xaeroplus.mixin.client;
 
-import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -29,7 +28,6 @@ import xaero.common.minimap.waypoints.render.WaypointFilterParams;
 import xaero.common.minimap.waypoints.render.WaypointsIngameRenderer;
 import xaero.common.settings.ModSettings;
 import xaeroplus.feature.extensions.CustomWaypointsIngameRenderer;
-import xaeroplus.feature.render.ColorHelper;
 import xaeroplus.mixin.client.mc.AccessorWorldRenderer;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 
@@ -77,7 +75,7 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
     };
 
     @Inject(method = "renderWaypointsIterator", at = @At("HEAD"))
-    public void injectRenderWaypoints(final PoseStack matrixStack, final PoseStack matrixStackOverlay, final MinimapRendererHelper helper, final Iterator<Waypoint> iter, final double d3, final double d4, final double d5, final Entity entity, final BufferBuilder bufferbuilder, final Tesselator tessellator, final double dimDiv, final double actualEntityX, final double actualEntityY, final double actualEntityZ, final double smoothEntityY, final double fov, final int screenHeight, final float cameraAngleYaw, final float cameraAnglePitch, final Vector3f lookVector, final double clampDepth, final MultiBufferSource.BufferSource renderTypeBuffer, final VertexConsumer waypointBackgroundConsumer, final Font fontrenderer, final Matrix4f waypointsProjection, final int screenWidth, final boolean detailedDisplayAllowed, final double minDistance, final String subworldName, final CallbackInfo ci) {
+    public void injectRenderWaypoints(final PoseStack matrixStack, final PoseStack matrixStackOverlay, final MinimapRendererHelper helper, final Iterator<Waypoint> iter, final double d3, final double d4, final double d5, final Entity entity, final Tesselator tessellator, final double dimDiv, final double actualEntityX, final double actualEntityY, final double actualEntityZ, final double smoothEntityY, final double fov, final int screenHeight, final float cameraAngleYaw, final float cameraAnglePitch, final Vector3f lookVector, final double clampDepth, final MultiBufferSource.BufferSource renderTypeBuffer, final VertexConsumer waypointBackgroundConsumer, final Font fontrenderer, final Matrix4f waypointsProjection, final int screenWidth, final boolean detailedDisplayAllowed, final double minDistance, final String subworldName, final CallbackInfo ci) {
         beaconWaypoints = sortingList.stream().filter(beaconViewFilter).sorted().collect(Collectors.toList());
     }
 
@@ -118,8 +116,18 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
         final long time = mc.level.getGameTime();
         matrixStack.pushPose();
         matrixStack.translate(x, y, z);
-        BeaconRenderer.renderBeaconBeam(matrixStack, entityVertexConsumers, BEAM_LOCATION, tickDelta, 1.0f, time, 0, 355,
-                                             ColorHelper.getColorRGBA(color), 0.2f, 0.25f);
+        BeaconRenderer.renderBeaconBeam(
+            matrixStack,
+            entityVertexConsumers,
+            BEAM_LOCATION,
+            tickDelta,
+            1.0f,
+            time,
+            0,
+            355,
+            color,
+            0.2f,
+            0.25f);
         matrixStack.popPose();
     }
 }

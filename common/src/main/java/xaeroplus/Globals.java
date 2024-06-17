@@ -65,7 +65,7 @@ public class Globals {
                 .setDaemon(true)
                 .build()));
 
-    public static final ResourceLocation xpGuiTextures = new ResourceLocation("xaeroplus", "gui/xpgui.png");
+    public static final ResourceLocation xpGuiTextures = ResourceLocation.fromNamespaceAndPath("xaeroplus", "gui/xpgui.png");
 
     public static DrawManager drawManager = new DrawManager();
 

@@ -24,7 +24,7 @@ public class FabricWaystonesHelperInit {
         if (waystones == null) return Collections.emptyList();
         return waystones.values().stream()
             .map(waystone -> new WaystoneSync.Waystone(waystone.getWaystoneName(),
-                                                       ResourceKey.create(Registries.DIMENSION, new ResourceLocation(waystone.getWorldName())),
+                                                       ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(waystone.getWorldName())),
                                                        waystone.way_getPos().getX(),
                                                        waystone.way_getPos().getY() + 1,// avoid teleporting directly into the waystone
                                                        waystone.way_getPos().getZ()))

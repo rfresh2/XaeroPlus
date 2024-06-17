@@ -1,12 +1,12 @@
-name: 1.20.6 Build
+name: 1.21 Build
 
 on:
   pull_request:
   push:
     branches:
-      - "1.20.6"
+      - "1.21"
 env:
-  MINECRAFT_VERSION: "1.20.6"
+  MINECRAFT_VERSION: "1.21"
 
 jobs:
   build:

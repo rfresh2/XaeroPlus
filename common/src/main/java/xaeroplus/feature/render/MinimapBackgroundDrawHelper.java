@@ -67,9 +67,9 @@ public class MinimapBackgroundDrawHelper {
     }
 
     public static void fillIntoExistingBuffer(Matrix4f matrix, VertexConsumer bufferBuilder, float x1, float y1, float x2, float y2, float r, float g, float b, float a) {
-        bufferBuilder.vertex(matrix, x1, y2, 0.0F).color(r, g, b, a).endVertex();
-        bufferBuilder.vertex(matrix, x2, y2, 0.0F).color(r, g, b, a).endVertex();
-        bufferBuilder.vertex(matrix, x2, y1, 0.0F).color(r, g, b, a).endVertex();
-        bufferBuilder.vertex(matrix, x1, y1, 0.0F).color(r, g, b, a).endVertex();
+        bufferBuilder.addVertex(matrix, x1, y2, 0.0F).setColor(r, g, b, a);
+        bufferBuilder.addVertex(matrix, x2, y2, 0.0F).setColor(r, g, b, a);
+        bufferBuilder.addVertex(matrix, x2, y1, 0.0F).setColor(r, g, b, a);
+        bufferBuilder.addVertex(matrix, x1, y1, 0.0F).setColor(r, g, b, a);
     }
 }

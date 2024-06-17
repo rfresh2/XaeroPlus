@@ -18,7 +18,10 @@ import xaeroplus.util.FabricWaystonesHelper;
 import xaeroplus.util.WaypointsHelper;
 import xaeroplus.util.WaystonesHelper;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static xaero.common.settings.ModSettings.COLORS;
@@ -43,23 +46,24 @@ public class WaystoneSync extends Module {
 
     @Override
     public void onDisable() {
-        blayWaystonesHelper.currentWaystones = new ArrayList<>();
+        blayWaystonesHelper.currentWaystoneTypeMap.clear();
     }
 
     @EventHandler
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
         if (event.worldId() == null) {
-            blayWaystonesHelper.currentWaystones = new ArrayList<>();
+            blayWaystonesHelper.currentWaystoneTypeMap.clear();
         }
     }
 
     @EventHandler
     public void onClientTickEvent(final ClientTickEvent.Post event) {
         if (WaystonesHelper.isWaystonesPresent()) {
-            if (blayWaystonesHelper.shouldSync) {
-                if (syncMainWaystones()) {
-                    blayWaystonesHelper.shouldSync = false;
-                    blayWaystonesHelper.currentWaystones = new ArrayList<>();
+            synchronized (blayWaystonesHelper.lock) {
+                if (blayWaystonesHelper.shouldSync) {
+                    if (syncMainWaystones()) {
+                        blayWaystonesHelper.shouldSync = false;
+                    }
                 }
             }
         } else if (WaystonesHelper.isFabricWaystonesPresent()) {
@@ -164,11 +168,11 @@ public class WaystoneSync extends Module {
             worldContainerSuffix = String.valueOf(waystoneDim);
         final WaypointWorldContainer waypointWorldContainer = waypointsManager.getWorldContainer(currentContainerId.substring(
             0,
-            currentContainerId.lastIndexOf(37) + 1) + worldContainerSuffix);;
-        WaypointWorld crossDimWaypointWorld = waypointWorldContainer.worlds.get("waypoints");
+            currentContainerId.lastIndexOf(37) + 1) + worldContainerSuffix);
+        WaypointWorld crossDimWaypointWorld = waypointWorldContainer.worlds.get("mw$default");
         if (crossDimWaypointWorld == null) {
-            waypointWorldContainer.worlds.put("waypoints", new WaypointWorld(waypointWorldContainer, "waypoints", waystoneDimension));
-            crossDimWaypointWorld = waypointWorldContainer.worlds.get("waypoints");
+            waypointWorldContainer.worlds.put("mw$default", new WaypointWorld(waypointWorldContainer, "mw$default", waystoneDimension));
+            crossDimWaypointWorld = waypointWorldContainer.worlds.get("mw$default");
         }
         return crossDimWaypointWorld;
     }

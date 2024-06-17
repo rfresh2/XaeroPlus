@@ -55,8 +55,7 @@ public abstract class MixinSupportXaeroWorldmap {
         if (XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) {
             var bgTesselator = Tesselator.getInstance();
             bgTesselatorRef.set(bgTesselator);
-            var bgBufferBuilder = bgTesselator.getBuilder();
-            bgBufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+            var bgBufferBuilder = bgTesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
             bgBufferBuilderRef.set(bgBufferBuilder);
         }
     }
@@ -91,7 +90,7 @@ public abstract class MixinSupportXaeroWorldmap {
 
     @Inject(method = "renderChunks", at = @At("RETURN"), remap = false)
     public void drawXPFeatures(final PoseStack matrixStack, final int minX, final int maxX, final int minZ, final int maxZ, final int minViewX, final int maxViewX, final int minViewZ, final int maxViewZ, final MapProcessor mapProcessor, final boolean noCaveMaps, final boolean slimeChunks, final int chunkX, final int chunkZ, final int tileX, final int tileZ, final int insideX, final int insideZ, final Long seed, final MultiTextureRenderTypeRenderer mapWithLightRenderer, final MultiTextureRenderTypeRenderer mapNoLightRenderer, final MinimapRendererHelper helper, final VertexConsumer overlayBufferBuilder, final CallbackInfo ci,
-                               @Share("bgTesselator") LocalRef<Tesselator> bgTesselatorRef) {
+                               @Share("bgBufferBuilder") LocalRef<BufferBuilder> bgBufferBuilderRef) {
         Globals.drawManager.drawMinimapFeatures(
             minViewX,
             maxViewX,
@@ -106,7 +105,10 @@ public abstract class MixinSupportXaeroWorldmap {
             matrixStack,
             overlayBufferBuilder,
             helper);
-        if (XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) bgTesselatorRef.get().end();
+        if (XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) {
+            MeshData meshData = bgBufferBuilderRef.get().build();
+            if (meshData != null) BufferUploader.drawWithShader(meshData);
+        }
     }
 
     @Inject(method = "tryToGetMultiworldId", at = @At(

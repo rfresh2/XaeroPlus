@@ -9,17 +9,41 @@ import it.unimi.dsi.fastutil.longs.LongArraySet;
 import it.unimi.dsi.fastutil.longs.LongList;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import net.lenni0451.lambdaevents.EventHandler;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaeroplus.Globals;
+import xaeroplus.XaeroPlus;
+import xaeroplus.event.DimensionSwitchEvent;
+import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.util.ChunkUtils;
+
+import java.util.concurrent.TimeUnit;
 
 public class DrawManager {
     private final Reference2ObjectMap<Class<?>, DrawFeature> chunkHighlightDrawFeatures = new Reference2ObjectOpenHashMap<>();
+
+    public DrawManager() {
+        XaeroPlus.EVENT_BUS.register(this);
+    }
 
     public synchronized void registerChunkHighlightProvider(Class<?> clazz, ChunkHighlightProvider feature) {
         chunkHighlightDrawFeatures.put(clazz, new DrawFeature(
             feature,
             createChunkHighlightRenderCache(feature)));
+    }
+
+    @EventHandler
+    public void onDimensionChange(DimensionSwitchEvent event) {
+        chunkHighlightDrawFeatures.values().forEach(feature -> {
+            feature.chunkRenderCache().synchronous().invalidateAll();
+        });
+    }
+
+    @EventHandler
+    public void onXaeroWorldChange(XaeroWorldChangeEvent event) {
+        chunkHighlightDrawFeatures.values().forEach(feature -> {
+            feature.chunkRenderCache().synchronous().invalidateAll();
+        });
     }
 
     public synchronized void unregister(Class<?> clazz) {
@@ -28,8 +52,8 @@ public class DrawManager {
 
     private AsyncLoadingCache<Long, LongList> createChunkHighlightRenderCache(final ChunkHighlightProvider chunkHighlightProvider) {
         return Caffeine.newBuilder()
-            .expireAfterWrite(3000, java.util.concurrent.TimeUnit.MILLISECONDS)
-            .refreshAfterWrite(500, java.util.concurrent.TimeUnit.MILLISECONDS)
+            .expireAfterWrite(10, TimeUnit.SECONDS)
+            .refreshAfterWrite(500, TimeUnit.MILLISECONDS)
             .executor(Globals.cacheRefreshExecutorService.get())
             .buildAsync(regionLong -> loadHighlightChunksInRegion(regionLong, chunkHighlightProvider.chunkHighlightPredicate()));
     }
@@ -77,11 +101,10 @@ public class DrawManager {
                 regions.add(ChunkUtils.chunkPosToLong(regX, regZ));
             }
         }
-        var regionsArray = regions.toLongArray();
         for (DrawFeature feature : chunkHighlightDrawFeatures.values()) {
             drawMinimapChunkHighlights(
                 feature,
-                regionsArray,
+                regions,
                 chunkX,
                 chunkZ,
                 tileX,
@@ -112,11 +135,10 @@ public class DrawManager {
                 regions.add(ChunkUtils.chunkPosToLong(regX, regZ));
             }
         }
-        final long[] regionsArray = regions.toLongArray();
         for (DrawFeature feature : chunkHighlightDrawFeatures.values()) {
             drawWorldMapChunkHighlights(
                 feature,
-                regionsArray,
+                regions,
                 flooredCameraX,
                 flooredCameraZ,
                 matrixStack,
@@ -127,7 +149,7 @@ public class DrawManager {
 
 
     private void drawMinimapChunkHighlights(final DrawFeature feature,
-                                            final long[] regionsArray,
+                                            final LongArraySet regions,
                                             int chunkX,
                                             int chunkZ,
                                             int tileX,
@@ -141,8 +163,7 @@ public class DrawManager {
         int color = feature.chunkHighlightProvider().colorSupplier().get();
         float a = ((color >> 24) & 255) / 255.0f;
         if (a == 0.0f) return;
-        for (int r = 0; r < regionsArray.length; r++) {
-            var regionLong = regionsArray[r];
+        for (long regionLong : regions) {
             var regionX = ChunkUtils.longToChunkX(regionLong);
             var regionZ = ChunkUtils.longToChunkZ(regionLong);
             var cx = regionX & 7;
@@ -169,7 +190,7 @@ public class DrawManager {
     }
 
     private void drawWorldMapChunkHighlights(final DrawFeature feature,
-                                             final long[] regionsArray,
+                                             final LongArraySet regions,
                                              final int flooredCameraX,
                                              final int flooredCameraZ,
                                              final PoseStack matrixStack,
@@ -181,8 +202,8 @@ public class DrawManager {
         float r = (float)(color >> 16 & 255) / 255.0F;
         float g = (float)(color >> 8 & 255) / 255.0F;
         float b = (float)(color & 255) / 255.0F;
-        for (int reg = 0; reg < regionsArray.length; reg++) {
-            var highlights = feature.getChunkHighlights(regionsArray[reg]);
+        for (long regionLong : regions) {
+            var highlights = feature.getChunkHighlights(regionLong);
             for (int i = 0; i < highlights.size(); i++) {
                 var chunkX = ChunkUtils.longToChunkX(highlights.getLong(i));
                 var chunkZ = ChunkUtils.longToChunkZ(highlights.getLong(i));

@@ -11,6 +11,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.map.MapProcessor;
 import xaero.map.world.MapDimension;
 import xaero.map.world.MapWorld;
+import xaeroplus.XaeroPlus;
+import xaeroplus.event.DimensionSwitchEvent;
 import xaeroplus.util.DelegatingHashTable;
 
 import java.util.Hashtable;
@@ -20,6 +22,8 @@ public class MixinMapWorld {
 
     @Shadow
     private Hashtable<ResourceKey<Level>, MapDimension> dimensions;
+    @Shadow
+    private ResourceKey<Level> currentDimensionId;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     public void init(String mainId, String oldUnfixedMainId, MapProcessor mapProcessor, final CallbackInfo ci) {
@@ -38,5 +42,10 @@ public class MixinMapWorld {
     public MapDimension getDimension(ResourceKey<Level> dimId) {
         if (dimId == null) return null;
         else return this.dimensions.get(dimId);
+    }
+
+    @Inject(method = "switchToFutureUnsynced", at = @At("RETURN"))
+    public void onDimensionSwitch(final CallbackInfo ci) {
+        XaeroPlus.EVENT_BUS.call(new DimensionSwitchEvent(currentDimensionId));
     }
 }

@@ -31,6 +31,8 @@
   "setting.world_map.transparent_obsidian_roof_darkening.tooltip": "Устанавливает непрозрачность прозрачной обсидиановой черепицы для крыши.",
   "setting.world_map.transparent_obsidian_roof_snow_opacity": "Непрозрачность снега на крыше",
   "setting.world_map.transparent_obsidian_roof_snow_opacity.tooltip": "Устанавливает непрозрачность снега поверх обсидиановой крыши.",
+  "setting.world_map.overlay_opacity_fix": "Исправление непрозрачности наложения",
+  "setting.world_map.overlay_opacity_fix.tooltip": "Исправляет ошибку в логике непрозрачности/яркости пикселей карты, из-за которой некоторые пиксели становились аномально яркими.\nМожно заметить на таких структурах, как водяные столбы из 128+ блоков, их цвет резко меняется на этой высоте при перевороте яркости.",
   "setting.world_map.min_zoom": "Мин. Зум Карты Мира",
   "setting.world_map.min_zoom.tooltip": "Минимальная настройка масштабирования карты мира. Это в 10 раз больше, чем вы видите на карте мира.",
   "setting.world_map.skip_world_render": "Пропустить Рендер Заднего Фона",

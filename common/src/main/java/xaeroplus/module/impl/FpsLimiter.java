@@ -10,7 +10,6 @@ import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 import java.util.function.Supplier;
 
-@Module.ModuleInfo()
 public class FpsLimiter extends Module {
     // todo: Buffer and mutate the rotation framebuffer separately to not cause visual
     //  impact while minimap north is not locked

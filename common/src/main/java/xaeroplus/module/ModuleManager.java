@@ -18,8 +18,8 @@ public class ModuleManager {
                 new Portals(),
                 new PortalSkipDetection(),
                 new WaystoneSync(),
-                new WorldTools())
-                .forEach(ModuleManager::addModule);
+                new WorldTools()
+        ).forEach(ModuleManager::addModule);
     }
 
     private static void addModule(Module module) {

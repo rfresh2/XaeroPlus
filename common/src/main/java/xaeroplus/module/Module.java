@@ -2,24 +2,9 @@ package xaeroplus.module;
 
 import xaeroplus.XaeroPlus;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 public abstract class Module {
 
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.TYPE)
-    public @interface ModuleInfo {
-        boolean enabled() default false;
-    }
-
-    private boolean enabled = getDeclaration().enabled();
-
-    private ModuleInfo getDeclaration() {
-        return getClass().getAnnotation(ModuleInfo.class);
-    }
+    private boolean enabled = false;
 
     protected void onEnable() {
 
@@ -66,7 +51,7 @@ public abstract class Module {
     public void toggle() {
         if (isEnabled()) {
             disable();
-        } else if (!isEnabled()) {
+        } else {
             enable();
         }
     }

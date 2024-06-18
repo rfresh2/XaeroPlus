@@ -5,6 +5,7 @@ plugins {
     id("architectury-plugin") version "3.4-SNAPSHOT"
     id("dev.architectury.loom") version "1.6-SNAPSHOT" apply false
     id("com.github.johnrengelman.shadow") version "8.1.1" apply false
+    idea
 }
 
 val minecraft_version: String by gradle.extra
@@ -117,5 +118,15 @@ tasks {
     }
     register("printXaeroPlusVersion") {
         println(version)
+    }
+}
+
+idea {
+    module {
+        excludeDirs.add(project.layout.buildDirectory.asFile.get())
+        excludeDirs.addAll(subprojects.map { p -> p.layout.buildDirectory.asFile.get() }.toList())
+        excludeDirs.addAll(subprojects.map { p -> p.layout.projectDirectory }.map { d -> d.asFile.resolve("run") }.toList())
+        val forgeRemapDir = subprojects.first { p -> p.name == "common" }.layout.buildDirectory.dir("remappedSources/forge").get().asFile
+        excludeDirs.addAll(listOf(forgeRemapDir.resolve("java"), forgeRemapDir.resolve("resources")))
     }
 }

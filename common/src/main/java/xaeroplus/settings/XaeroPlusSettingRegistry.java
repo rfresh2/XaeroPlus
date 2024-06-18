@@ -161,11 +161,17 @@ public final class XaeroPlusSettingRegistry {
             SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting transparentObsidianRoofSnowOpacitySetting = XaeroPlusFloatSetting.create(
         "Roof Snow Opacity",
-        "setting.world_map.transparent_obsidian_roof_snow_opacity", // todo: translations
+        "setting.world_map.transparent_obsidian_roof_snow_opacity",
         0, 255, 5,
         "setting.world_map.transparent_obsidian_roof_snow_opacity.tooltip",
         (v) -> markChunksDirtyInWriteDistance(),
         10,
+        SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting overlayOpacityFix = XaeroPlusBooleanSetting.create(
+        "Overlay Opacity Fix",
+        "setting.world_map.overlay_opacity_fix",
+        "setting.world_map.overlay_opacity_fix.tooltip",
+        true,
         SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting worldMapMinZoomSetting = XaeroPlusFloatSetting.create(
             "Min WorldMap Zoom",

@@ -13,7 +13,6 @@ import xaeroplus.util.WorldToolsHelper;
 
 import static xaeroplus.feature.render.ColorHelper.getColor;
 
-@Module.ModuleInfo()
 public class WorldTools extends Module {
 
     private int worldToolsColor = getColor(0, 255, 0, 100);

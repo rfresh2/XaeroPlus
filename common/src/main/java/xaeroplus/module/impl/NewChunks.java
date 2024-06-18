@@ -3,13 +3,16 @@ package xaeroplus.module.impl;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ReferenceSet;
 import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.*;
@@ -21,10 +24,12 @@ import xaeroplus.feature.render.highlights.ChunkHighlightSavingCache;
 import xaeroplus.mixin.client.mc.AccessorWorldRenderer;
 import xaeroplus.module.Module;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.ChunkScanner;
 import xaeroplus.util.ChunkUtils;
 
 import java.util.concurrent.TimeUnit;
 
+import static java.util.Arrays.asList;
 import static net.minecraft.world.level.Level.*;
 import static xaeroplus.feature.render.ColorHelper.getColor;
 import static xaeroplus.util.ChunkUtils.getActualDimension;
@@ -95,23 +100,27 @@ public class NewChunks extends Module {
         }
     }
 
+    private static final ReferenceSet<Block> liquidBlockTypeFilter = new ReferenceOpenHashSet<>(2);
+    static {
+        liquidBlockTypeFilter.addAll(asList(
+            Blocks.WATER,
+            Blocks.LAVA
+        ));
+    }
     @EventHandler
     public void onChunkData(final ChunkDataEvent event) {
         if (mc.level == null || ((AccessorWorldRenderer) mc.levelRenderer).getChunks() == null) return;
         var chunk = event.chunk();
         var chunkPos = chunk.getPos();
         if (newChunksCache.isHighlighted(chunkPos.x, chunkPos.z, getActualDimension())) return;
-        for (int x = 0; x < 16; x++) {
-            for (int y = mc.level.getMinBuildHeight(); y < mc.level.getMaxBuildHeight(); y++) {
-                for (int z = 0; z < 16; z++) {
-                    FluidState fluid = chunk.getFluidState(x, y, z);
-                    if (!fluid.isEmpty() && !fluid.isSource()) {
-                        oldChunksCache.put(ChunkUtils.chunkPosToLong(chunkPos), (byte) 0);
-                        return;
-                    }
-                }
+        ChunkScanner.chunkScanBlockstatePredicate(chunk, liquidBlockTypeFilter, state -> {
+            var fluid = state.getFluidState();
+            if (!fluid.isEmpty() && !fluid.isSource()) {
+                oldChunksCache.put(ChunkUtils.chunkPosToLong(chunkPos), (byte) 0);
+                return true;
             }
-        }
+            return false;
+        }, mc.level.getMinBuildHeight());
     }
 
     @EventHandler

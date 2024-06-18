@@ -31,6 +31,8 @@
     "setting.world_map.transparent_obsidian_roof_darkening.tooltip": "透明な黒曜石の屋根の不透明度を設定します。",
     "setting.world_map.transparent_obsidian_roof_snow_opacity": "屋根の雪の不透明度",
     "setting.world_map.transparent_obsidian_roof_snow_opacity.tooltip": "黒曜石の屋根の上に積もった雪の不透明度を設定します。",
+    "setting.world_map.overlay_opacity_fix": "オーバーレイの不透明度の修正",
+    "setting.world_map.overlay_opacity_fix.tooltip": "マップ ピクセルの不透明度/明るさのロジックのバグを修正し、特定のピクセルが異常に明るくなる原因を解消しました。\n128 ブロック以上の水柱などの構造物では、明るさが反転するとその高さで色が急激に変化することが確認できます。",
     "setting.world_map.min_zoom": "最小ワールドマップのズーム",
     "setting.world_map.min_zoom.tooltip": "ワールドマップの最小ズーム設定。これは普段のワールドマップの10倍です。",
     "setting.world_map.skip_world_render": "背景レンダリングをスキップする",

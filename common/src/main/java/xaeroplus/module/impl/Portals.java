@@ -7,8 +7,6 @@ import it.unimi.dsi.fastutil.objects.ReferenceSet;
 import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
-import net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -21,10 +19,7 @@ import net.minecraft.world.level.chunk.EmptyLevelChunk;
 import net.minecraft.world.level.chunk.LevelChunk;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
-import xaeroplus.event.ChunkDataEvent;
-import xaeroplus.event.ClientTickEvent;
-import xaeroplus.event.PacketReceivedEvent;
-import xaeroplus.event.XaeroWorldChangeEvent;
+import xaeroplus.event.*;
 import xaeroplus.feature.render.ChunkHighlightProvider;
 import xaeroplus.feature.render.ColorHelper;
 import xaeroplus.feature.render.highlights.ChunkHighlightCache;
@@ -41,8 +36,6 @@ import java.util.concurrent.Executors;
 import static net.minecraft.world.level.Level.*;
 import static xaeroplus.feature.render.ColorHelper.getColor;
 
-
-@Module.ModuleInfo()
 public class Portals extends Module {
     private ChunkHighlightCache portalsCache = new ChunkHighlightLocalCache();
     private final Minecraft mc = Minecraft.getInstance();
@@ -101,14 +94,13 @@ public class Portals extends Module {
     }
 
     @EventHandler
-    public void onPacketReceived(final PacketReceivedEvent event) {
-        if (event.packet() instanceof ClientboundBlockUpdatePacket) {
-            final ClientboundBlockUpdatePacket packet = (ClientboundBlockUpdatePacket) event.packet();
-            handleBlockChange(packet.getPos(), packet.getBlockState());
-        } else if (event.packet() instanceof ClientboundSectionBlocksUpdatePacket) {
-            final ClientboundSectionBlocksUpdatePacket packet = (ClientboundSectionBlocksUpdatePacket) event.packet();
-            packet.runUpdates(this::handleBlockChange);
-        }
+    public void onMultiBlockUpdate(final ChunkBlocksUpdateEvent event) {
+        event.packet().runUpdates(this::handleBlockChange);
+    }
+
+    @EventHandler
+    public void onBlockUpdate(final ChunkBlockUpdateEvent event) {
+        handleBlockChange(event.packet().getPos(), event.packet().getBlockState());
     }
 
     @EventHandler

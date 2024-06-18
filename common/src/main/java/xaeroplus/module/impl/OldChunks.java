@@ -34,7 +34,6 @@ import static java.util.Arrays.asList;
 import static net.minecraft.world.level.Level.*;
 import static xaeroplus.feature.render.ColorHelper.getColor;
 
-@Module.ModuleInfo()
 public class OldChunks extends Module {
     private ChunkHighlightCache oldChunksCache = new ChunkHighlightLocalCache();
     private ChunkHighlightCache modernChunksCache = new ChunkHighlightLocalCache();

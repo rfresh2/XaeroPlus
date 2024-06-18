@@ -8,8 +8,6 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.PalettedContainer;
 
-import java.util.function.Predicate;
-
 public class ChunkScanner {
 
     public static boolean chunkContainsBlocks(ChunkAccess chunk, ReferenceSet<Block> filter, int yLevelMin) {
@@ -39,7 +37,7 @@ public class ChunkScanner {
         return false;
     }
 
-    public static void chunkScanBlockstatePredicate(ChunkAccess chunk, ReferenceSet<Block> filter, Predicate<BlockState> statePredicate, int yLevelMin) {
+    public static void chunkScanBlockstatePredicate(ChunkAccess chunk, ReferenceSet<Block> filter, BlockStateScanPredicate statePredicate, int yLevelMin) {
         final LevelChunkSection[] sectionArray = chunk.getSections();
         for (int i = 0; i < sectionArray.length; i++) {
             var sectionBottomY = chunk.getMinBuildHeight() + (i * 16);
@@ -56,12 +54,16 @@ public class ChunkScanner {
                 for (int z = 0; z < 16; z++) {
                     for (int y = yScanStart; y < 16; y++) {
                         BlockState state = blockStateContainer.get(x, y, z);
-                        if (statePredicate.test(state))
+                        if (statePredicate.test(chunk, state))
                             return;
                     }
                 }
             }
         }
+    }
+
+    public interface BlockStateScanPredicate {
+        boolean test(ChunkAccess chunkAccess, BlockState state);
     }
 
     public static void chunkVisitor(ChunkAccess chunk, ChunkVisitor visitor) {

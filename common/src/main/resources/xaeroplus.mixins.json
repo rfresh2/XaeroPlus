@@ -50,6 +50,7 @@
     "MixinMinimapWriter",
     "MixinMisc",
     "MixinModClientEvents",
+    "MixinOverlay",
     "MixinPatreon",
     "MixinRadarRenderContext",
     "MixinRadarRenderProvider",

@@ -71,7 +71,6 @@
     "MixinWorldMapOption",
     "mc.AccessorGameOptions",
     "mc.AccessorWorldRenderer",
-    "mc.MixinClientConnection",
     "mc.MixinClientPlayNetworkHandler",
     "mc.MixinGlStateManager",
     "mc.MixinMinecraftClient",

@@ -28,7 +28,6 @@ import java.util.Optional;
 import static net.minecraft.world.level.Level.NETHER;
 import static net.minecraft.world.level.Level.OVERWORLD;
 
-@Module.ModuleInfo()
 public class BaritoneGoalSync extends Module {
 
     @EventHandler

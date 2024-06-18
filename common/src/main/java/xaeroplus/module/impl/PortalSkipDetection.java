@@ -34,7 +34,6 @@ import java.util.concurrent.Future;
 import static xaeroplus.util.ChunkUtils.*;
 import static xaeroplus.util.GuiMapHelper.*;
 
-@Module.ModuleInfo()
 public class PortalSkipDetection extends Module {
     private final ExecutorService executorService = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder()
                                                                                           .setNameFormat("XaeroPlus-PortalSkipDetection-Search")

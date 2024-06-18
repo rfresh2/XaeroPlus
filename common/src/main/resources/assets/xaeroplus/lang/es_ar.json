@@ -31,6 +31,8 @@
   "setting.world_map.transparent_obsidian_roof_darkening.tooltip": "Establece la opacidad del techo de obsidiana transparente.",
   "setting.world_map.transparent_obsidian_roof_snow_opacity": "Opacidad Techo Nieve",
   "setting.world_map.transparent_obsidian_roof_snow_opacity.tooltip": "Establece la opacidad de la nieve en la parte superior del techo de obsidiana.",
+  "setting.world_map.overlay_opacity_fix": "Corrección de opacidad de superposición",
+  "setting.world_map.overlay_opacity_fix.tooltip": "Corrige un error en la lógica de opacidad/brillo de los píxeles del mapa que provoca que ciertos píxeles sean anormalmente brillantes.\nSe puede notar en estructuras como más de 128 columnas de agua de bloques, hay un cambio abrupto en su color a esa altura a medida que se invierte el brillo.",
   "setting.world_map.min_zoom": "Zoom Mínimo Mapamundi",
   "setting.world_map.min_zoom.tooltip": "Ajuste mínimo de zoom del Mapamundi. Esto es 10x lo que ves en el Mapamundi.",
   "setting.world_map.skip_world_render": "Skippear Renderizado Fondo",

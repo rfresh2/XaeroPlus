@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 
 import static xaero.common.settings.ModSettings.COLORS;
 
-@Module.ModuleInfo()
 public class WaystoneSync extends Module {
     private boolean subscribed = false;
     private BlayWaystonesHelper blayWaystonesHelper = new BlayWaystonesHelper();

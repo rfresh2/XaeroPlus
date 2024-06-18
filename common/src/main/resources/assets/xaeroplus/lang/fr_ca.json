@@ -31,6 +31,8 @@
   "setting.world_map.transparent_obsidian_roof_darkening.tooltip": "Définit l'opacité des tuiles d'obsidienne transparentes.",
   "setting.world_map.transparent_obsidian_roof_snow_opacity": "Opacité de la neige sur le toit",
   "setting.world_map.transparent_obsidian_roof_snow_opacity.tooltip": "Définit l'opacité de la neige au sommet du toit d'obsidienne.",
+  "setting.world_map.overlay_opacity_fix": "Correction de l'opacité de superposition",
+  "setting.world_map.overlay_opacity_fix.tooltip": "Corrige un bug dans la logique d'opacité/luminosité des pixels de la carte, provoquant une luminosité anormale de certains pixels.\nPeut être remarqué sur des structures telles que plus de 128 blocs de colonnes d'eau, il y a un changement brusque de couleur à cette hauteur lorsque la luminosité est inversée.",
   "setting.world_map.min_zoom": "Min WorldMap Zoom",
   "setting.world_map.min_zoom.tooltip": "Réglage minimum du zoom sur la carte du monde. Ce réglage correspond à 10x ce que vous voyez sur la carte du monde.",
   "setting.world_map.skip_world_render": "Sauter le rendu de l'arrière-plan",

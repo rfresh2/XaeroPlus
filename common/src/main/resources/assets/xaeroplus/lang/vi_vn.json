@@ -31,6 +31,8 @@
     "setting.world_map.transparent_obsidian_roof_darkening.tooltip": "Thiết lập độ mờ của các ô mái obsidian trong suốt.",
     "setting.world_map.transparent_obsidian_roof_snow_opacity": "Độ Mờ Tuyết Mái",
     "setting.world_map.transparent_obsidian_roof_snow_opacity.tooltip": "Thiết lập độ mờ của tuyết trên mái obsidian.",
+    "setting.world_map.overlay_opacity_fix": "Sửa lỗi độ mờ lớp phủ",
+    "setting.world_map.overlay_opacity_fix.tooltip": "Vá lỗi về logic độ mờ/độ sáng của các pixel bản đồ khiến một số pixel nhất định sáng bất thường.\nCó thể nhận thấy trên các cấu trúc như hơn 128 cột nước khối, có sự thay đổi đột ngột về màu sắc của chúng ở độ cao đó khi độ sáng bị đảo ngược.",
     "setting.world_map.min_zoom": "Thu Phóng Tối Thiểu WorldMap",
     "setting.world_map.min_zoom.tooltip": "Thiết lập thu phóng tối thiểu của WorldMap. Đây là 10 lần số bạn thấy trên WorldMap.",
     "setting.world_map.skip_world_render": "Bỏ Qua Hiển Thị Nền",

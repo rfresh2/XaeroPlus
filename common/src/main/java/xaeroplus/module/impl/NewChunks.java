@@ -1,5 +1,7 @@
 package xaeroplus.module.impl;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
@@ -26,6 +28,8 @@ import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ChunkScanner;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.MutableBlockPos;
+
+import java.time.Duration;
 
 import static java.util.Arrays.asList;
 import static net.minecraft.world.level.Level.*;
@@ -106,21 +110,54 @@ public class NewChunks extends Module {
         }
     }
 
+
+    final Cache<Long, Byte> seenChunksCache = Caffeine.newBuilder()
+        .maximumSize(1000)
+        .executor(Globals.cacheRefreshExecutorService.get())
+        .expireAfterAccess(Duration.ofMinutes(5))
+        .build();
+
     @EventHandler
     public void onChunkData(final ChunkDataEvent event) {
         var level = mc.level;
         if (level == null || ((AccessorWorldRenderer) mc.levelRenderer).getChunks() == null) return;
         var chunk = event.chunk();
         var chunkPos = chunk.getPos();
+        long chunkLong = ChunkUtils.chunkPosToLong(chunkPos);
+
+        // only scan the first time we see the chunk
+        // mc server can send us the same chunk multiple times in certain cases
+        // or the player could have travelled back into chunks we just saw
+        if (seenChunksCache.getIfPresent(chunkLong) != null) return;
+        seenChunksCache.put(chunkLong, Byte.MAX_VALUE);
+
         if (newChunksCache.isHighlighted(chunkPos.x, chunkPos.z, getActualDimension())) return;
-        ChunkScanner.chunkScanBlockstatePredicate(chunk, liquidBlockTypeFilter, (c, state) -> {
+
+        ChunkScanner.chunkVisitor(chunk, (c, state, relX, y, relZ) -> {
+            int x = ChunkUtils.chunkCoordToCoord(c.getPos().x) + relX;
+            int z = ChunkUtils.chunkCoordToCoord(c.getPos().z) + relZ;
+
             var fluid = state.getFluidState();
             if (!fluid.isEmpty() && !fluid.isSource()) {
-                inverseNewChunksCache.addHighlight(c.getPos().x, c.getPos().z);
-                return true;
+                if (fluid.getAmount() < 2) {
+                    inverseNewChunksCache.addHighlight(c.getPos().x, chunk.getPos().z);
+                    return true;
+                }
+                boolean foundColumn = true;
+                for (int i = 1; i <= 5; i++) {
+                    var aboveState = chunk.getFluidState(x, y + i, z);
+                    if (aboveState.isEmpty()) {
+                        foundColumn = false;
+                        break;
+                    }
+                }
+                if (foundColumn) {
+                    inverseNewChunksCache.addHighlight(c.getPos().x, c.getPos().z);
+                    return true;
+                }
             }
             return false;
-        }, level.getMinBuildHeight());
+        });
     }
 
     @EventHandler
@@ -134,6 +171,7 @@ public class NewChunks extends Module {
         newChunksCache.handleWorldChange();
         inverseNewChunksCache.handleWorldChange();
         inverseNewChunksCache.reset();
+        seenChunksCache.invalidateAll(); // side effect - switching dimensions resets our state
     }
 
     public boolean inUnknownDimension() {

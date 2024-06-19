@@ -79,7 +79,7 @@ public class ChunkScanner {
                 for (int z = 0; z < 16; z++) {
                     for (int y = 0; y < 16; y++) {
                         BlockState state = blockStateContainer.get(x, y, z);
-                        if (visitor.visit(state, x, (i * 16) + y, z)) return;
+                        if (visitor.visit(chunk, state, x, (i * 16) + y, z)) return;
                     }
                 }
             }
@@ -89,6 +89,6 @@ public class ChunkScanner {
     @FunctionalInterface
     public interface ChunkVisitor {
         // if true, stop scanning
-        boolean visit(BlockState blockState, int relativeX, int y, int relativeZ);
+        boolean visit(ChunkAccess chunk, BlockState blockState, int relativeX, int y, int relativeZ);
     }
 }

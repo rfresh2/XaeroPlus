@@ -216,6 +216,21 @@ public final class XaeroPlusSettingRegistry {
             ColorHelper.HighlightColor.values(),
             ColorHelper.HighlightColor.RED,
             SettingLocation.CHUNK_HIGHLIGHTS);
+    public static final XaeroPlusBooleanSetting newChunksInverseHighlightsSetting = XaeroPlusBooleanSetting.create(
+        "New Chunks Render Inverse",
+        "setting.world_map.new_chunks_inverse_enabled",
+        "setting.world_map.new_chunks_inverse_enabled.tooltip",
+        (b) -> ModuleManager.getModule(NewChunks.class).setInverseRenderEnabled(b),
+        false,
+        SettingLocation.CHUNK_HIGHLIGHTS);
+    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> newChunksInverseColorSetting = XaeroPlusEnumSetting.create(
+        "New Chunks Inverse Color",
+        "setting.world_map.new_chunks_inverse_color",
+        "setting.world_map.new_chunks_inverse_color.tooltip",
+        (b) -> ModuleManager.getModule(NewChunks.class).setInverseRgbColor(b.getColor()),
+        ColorHelper.HighlightColor.values(),
+        ColorHelper.HighlightColor.GREEN,
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting oldChunksEnabledSetting = XaeroPlusBooleanSetting.create(
             "OldChunks Highlighting",
             "setting.world_map.old_chunks_highlighting",

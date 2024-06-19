@@ -40,14 +40,19 @@ public class NewChunks extends Module {
     // chunks where liquid started flowing from source blocks after we loaded it
     private ChunkHighlightCache newChunksCache = new ChunkHighlightLocalCache();
     // chunks where liquid was already flowing or flowed when we loaded it
-    // todo: setting to save these to a db?
-    private final ChunkHighlightLocalCache inverseNewChunksCache = new ChunkHighlightLocalCache();
+    private ChunkHighlightCache inverseNewChunksCache = new ChunkHighlightLocalCache();
+    private final Cache<Long, Byte> seenChunksCache = Caffeine.newBuilder()
+        .maximumSize(1000)
+        .executor(Globals.cacheRefreshExecutorService.get())
+        .expireAfterAccess(Duration.ofMinutes(5))
+        .build();
     private boolean renderInverse = false;
     private int newChunksColor = getColor(255, 0, 0, 100);
     private int inverseColor = getColor(0, 255, 0, 100);
     private final Minecraft mc = Minecraft.getInstance();
     private static final Direction[] searchDirs = new Direction[] { Direction.EAST, Direction.NORTH, Direction.WEST, Direction.SOUTH, Direction.UP };
     private static final String DATABASE_NAME = "XaeroPlusNewChunks";
+    private static final String INVERSE_DATABASE_NAME = "XaeroPlusNewChunksLiquidInverse";
     private static final ReferenceSet<Block> liquidBlockTypeFilter = new ReferenceOpenHashSet<>(2);
     static {
         liquidBlockTypeFilter.addAll(asList(
@@ -68,6 +73,21 @@ public class NewChunks extends Module {
             if (this.isEnabled()) {
                 newChunksCache.onEnable();
                 if (map != null) newChunksCache.loadPreviousState(map);
+            }
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Error closing new chunks cache", e);
+        }
+        try {
+            final Long2LongMap map = inverseNewChunksCache.getHighlightsState();
+            inverseNewChunksCache.onDisable();
+            if (disk) {
+                inverseNewChunksCache = new ChunkHighlightSavingCache(INVERSE_DATABASE_NAME);
+            } else {
+                inverseNewChunksCache = new ChunkHighlightLocalCache();
+            }
+            if (this.isEnabled()) {
+                inverseNewChunksCache.onEnable();
+                if (map != null) inverseNewChunksCache.loadPreviousState(map);
             }
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error closing new chunks cache", e);
@@ -95,6 +115,7 @@ public class NewChunks extends Module {
             int chunkX = ChunkUtils.posToChunkPos(pos.getX());
             int chunkZ = ChunkUtils.posToChunkPos(pos.getZ());
             if (inverseNewChunksCache.isHighlighted(chunkX, chunkZ, ChunkUtils.getActualDimension())) return;
+            if (newChunksCache.isHighlighted(chunkX, chunkZ, getActualDimension())) return;
             final int srcX = pos.getX();
             final int srcY = pos.getY();
             final int srcZ = pos.getZ();
@@ -110,13 +131,6 @@ public class NewChunks extends Module {
         }
     }
 
-
-    final Cache<Long, Byte> seenChunksCache = Caffeine.newBuilder()
-        .maximumSize(1000)
-        .executor(Globals.cacheRefreshExecutorService.get())
-        .expireAfterAccess(Duration.ofMinutes(5))
-        .build();
-
     @EventHandler
     public void onChunkData(final ChunkDataEvent event) {
         var level = mc.level;
@@ -130,10 +144,10 @@ public class NewChunks extends Module {
         // or the player could have travelled back into chunks we just saw
         if (seenChunksCache.getIfPresent(chunkLong) != null) return;
         seenChunksCache.put(chunkLong, Byte.MAX_VALUE);
-
         if (newChunksCache.isHighlighted(chunkPos.x, chunkPos.z, getActualDimension())) return;
+        if (inverseNewChunksCache.isHighlighted(chunkPos.x, chunkPos.z, getActualDimension())) return;
 
-        ChunkScanner.chunkVisitor(chunk, (c, state, relX, y, relZ) -> {
+        ChunkScanner.chunkScanBlockstatePredicate(chunk, liquidBlockTypeFilter, (c, state, relX, y, relZ) -> {
             int x = ChunkUtils.chunkCoordToCoord(c.getPos().x) + relX;
             int z = ChunkUtils.chunkCoordToCoord(c.getPos().z) + relZ;
 
@@ -157,7 +171,7 @@ public class NewChunks extends Module {
                 }
             }
             return false;
-        });
+        }, level.getMinBuildHeight());
     }
 
     @EventHandler
@@ -165,12 +179,12 @@ public class NewChunks extends Module {
         if (XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.getValue()) {
             if (inUnknownDimension() && newChunksCache instanceof ChunkHighlightSavingCache) {
                 XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.setValue(false);
+                XaeroPlusSettingRegistry.newChunksInverseHighlightsSetting.setValue(false);
                 XaeroPlus.LOGGER.warn("Entered unknown dimension with saving cache on, disabling disk saving");
             }
         }
         newChunksCache.handleWorldChange();
         inverseNewChunksCache.handleWorldChange();
-        inverseNewChunksCache.reset();
         seenChunksCache.invalidateAll(); // side effect - switching dimensions resets our state
     }
 

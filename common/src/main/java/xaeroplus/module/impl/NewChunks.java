@@ -32,7 +32,6 @@ import xaeroplus.util.MutableBlockPos;
 import java.time.Duration;
 
 import static java.util.Arrays.asList;
-import static net.minecraft.world.level.Level.*;
 import static xaeroplus.feature.render.ColorHelper.getColor;
 import static xaeroplus.util.ChunkUtils.getActualDimension;
 
@@ -160,7 +159,7 @@ public class NewChunks extends Module {
                 boolean foundColumn = true;
                 for (int i = 1; i <= 5; i++) {
                     var aboveState = chunk.getFluidState(x, y + i, z);
-                    if (aboveState.isEmpty()) {
+                    if (aboveState.isEmpty() || aboveState.isSource()) {
                         foundColumn = false;
                         break;
                     }

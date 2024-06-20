@@ -47,8 +47,8 @@ public class ChunkHighlightDatabase implements Closeable {
 
     private void createHighlightsTableIfNotExists(ResourceKey<Level> dimension) {
         try (var statement = connection.createStatement()) {
-            statement.executeQuery("CREATE TABLE IF NOT EXISTS \"" + getTableName(dimension) + "\" (x INTEGER, z INTEGER, foundTime INTEGER)").close();
-            statement.executeQuery("CREATE UNIQUE INDEX IF NOT EXISTS \"unique_xz_" + getTableName(dimension) + "\" ON \"" + getTableName(dimension) + "\" (x, z)").close();
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS \"" + getTableName(dimension) + "\" (x INTEGER, z INTEGER, foundTime INTEGER)");
+            statement.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS \"unique_xz_" + getTableName(dimension) + "\" ON \"" + getTableName(dimension) + "\" (x, z)");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -72,7 +72,7 @@ public class ChunkHighlightDatabase implements Closeable {
                     .map(chunk -> "(" + chunk.x() + ", " + chunk.z() + ", " + chunk.foundTime() + ")")
                     .collect(Collectors.joining(", "));
             try (var stmt = connection.createStatement()) {
-                stmt.execute(statement);
+                stmt.executeUpdate(statement);
             }
         } catch (Exception e) {
             XaeroPlus.LOGGER.error("Error inserting chunks into database", e);
@@ -84,18 +84,19 @@ public class ChunkHighlightDatabase implements Closeable {
             final int regionXMin, final int regionXMax,
             final int regionZMin, final int regionZMax) {
         try (var statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(
-                    "SELECT * FROM \"" + getTableName(dimension) + "\" "
-                            + "WHERE x >= " + regionCoordToChunkCoord(regionXMin) + " AND x <= " + regionCoordToChunkCoord(regionXMax)
-                            + " AND z >= " + regionCoordToChunkCoord(regionZMin) + " AND z <= " + regionCoordToChunkCoord(regionZMax));
-            List<ChunkHighlightData> chunks = new ArrayList<>();
-            while (resultSet.next()) {
-                chunks.add(new ChunkHighlightData(
+            try (ResultSet resultSet = statement.executeQuery(
+                "SELECT * FROM \"" + getTableName(dimension) + "\" "
+                    + "WHERE x >= " + regionCoordToChunkCoord(regionXMin) + " AND x <= " + regionCoordToChunkCoord(regionXMax)
+                    + " AND z >= " + regionCoordToChunkCoord(regionZMin) + " AND z <= " + regionCoordToChunkCoord(regionZMax))) {
+                List<ChunkHighlightData> chunks = new ArrayList<>();
+                while (resultSet.next()) {
+                    chunks.add(new ChunkHighlightData(
                         resultSet.getInt("x"),
                         resultSet.getInt("z"),
                         resultSet.getInt("foundTime")));
+                }
+                return chunks;
             }
-            return chunks;
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error getting chunks from database", e);
             // fall through
@@ -105,7 +106,7 @@ public class ChunkHighlightDatabase implements Closeable {
 
     public void removeHighlight(final int x, final int z, final ResourceKey<Level> dimension) {
         try (var statement = connection.createStatement()) {
-            statement.execute("DELETE FROM \"" + getTableName(dimension) + "\" WHERE x = " + x + " AND z = " + z);
+            statement.executeUpdate("DELETE FROM \"" + getTableName(dimension) + "\" WHERE x = " + x + " AND z = " + z);
         } catch (Exception e) {
             XaeroPlus.LOGGER.error("Error while removing highlight from database", e);
         }

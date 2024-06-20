@@ -2,7 +2,6 @@ package xaeroplus.feature.render.highlights.db;
 
 import xaeroplus.XaeroPlus;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.time.Instant;
@@ -43,7 +42,9 @@ public class DatabaseMigrator {
             }
 
             String dbBackupLocation = backupPath.resolve(databaseName + "-" + Instant.now().toEpochMilli() + ".db").toString();
-            Files.copy(dbPath, Path.of(dbBackupLocation));
+            try (var statement = connection.createStatement()) {
+                statement.executeUpdate("BACKUP TO '" + dbBackupLocation + "'");
+            }
             XaeroPlus.LOGGER.info("Backed up database: {} to: {}", databaseName, dbBackupLocation);
             return true;
         } catch (final Exception e) {

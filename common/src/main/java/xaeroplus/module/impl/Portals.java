@@ -33,7 +33,6 @@ import xaeroplus.util.ChunkUtils;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static net.minecraft.world.level.Level.*;
 import static xaeroplus.feature.render.ColorHelper.getColor;
 
 public class Portals extends Module {
@@ -83,11 +82,6 @@ public class Portals extends Module {
         Globals.drawManager.unregister(this.getClass());
     }
 
-    public boolean inUnknownDimension() {
-        final ResourceKey<Level> dim = ChunkUtils.getActualDimension();
-        return dim != OVERWORLD && dim != NETHER && dim != END;
-    }
-
     @EventHandler
     public void onChunkData(final ChunkDataEvent event) {
         findPortalInChunkAsync(event.chunk());
@@ -105,12 +99,6 @@ public class Portals extends Module {
 
     @EventHandler
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
-        if (XaeroPlusSettingRegistry.portalsSaveLoadToDisk.getValue()) {
-            if (inUnknownDimension() && portalsCache instanceof ChunkHighlightSavingCache) {
-                XaeroPlusSettingRegistry.portalsSaveLoadToDisk.setValue(false);
-                XaeroPlus.LOGGER.warn("Entered unknown dimension with saving cache on, disabling disk saving");
-            }
-        }
         portalsCache.handleWorldChange();
     }
 
@@ -124,7 +112,6 @@ public class Portals extends Module {
     }
 
     private void findPortalInChunkAsync(final ChunkAccess chunk, final int waitMs) {
-        if (inUnknownDimension()) return;
         if (chunk == null) return;
         searchExecutor.execute(() -> {
             try {
@@ -163,7 +150,7 @@ public class Portals extends Module {
     }
 
     private boolean findPortalAtBlockPos(final BlockPos pos) {
-        if (mc.level == null || inUnknownDimension()) return false;
+        if (mc.level == null) return false;
         int chunkX = ChunkUtils.posToChunkPos(pos.getX());
         int chunkZ = ChunkUtils.posToChunkPos(pos.getZ());
         LevelChunk worldChunk = mc.level.getChunkSource().getChunk(chunkX, chunkZ, false);
@@ -173,7 +160,7 @@ public class Portals extends Module {
     }
 
     private void searchAllLoadedChunks() {
-        if (mc.level == null || inUnknownDimension()) return;
+        if (mc.level == null) return;
         final int renderDist = mc.options.renderDistance().get();
         final int xMin = ChunkUtils.getPlayerChunkX() - renderDist;
         final int xMax = ChunkUtils.getPlayerChunkX() + renderDist;
@@ -189,7 +176,6 @@ public class Portals extends Module {
     }
 
     private void handleBlockChange(final BlockPos pos, final BlockState state) {
-        if (inUnknownDimension()) return;
         int chunkX = ChunkUtils.posToChunkPos(pos.getX());
         int chunkZ = ChunkUtils.posToChunkPos(pos.getZ());
         if (portalsCache.isHighlighted(chunkX, chunkZ, ChunkUtils.getActualDimension())) {

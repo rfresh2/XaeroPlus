@@ -2,36 +2,35 @@ package xaeroplus.feature.render.highlights;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import xaeroplus.XaeroPlus;
 import xaeroplus.util.ChunkUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static xaeroplus.util.ChunkUtils.chunkPosToLong;
 import static xaeroplus.util.ChunkUtils.regionCoordToChunkCoord;
 
 public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCacheHandler {
-    private final int dimension;
+    @NotNull private final ResourceKey<Level> dimension;
     private int windowRegionX = 0;
     private int windowRegionZ = 0;
     // square centered at windowX, windowZ with size windowSize
     private int windowRegionSize = 0;
-    private final ChunkHighlightDatabase database;
-    private final ListeningExecutorService executorService;
+    @NotNull private final ChunkHighlightDatabase database;
+    @NotNull private final ListeningExecutorService executorService;
 
-    public ChunkHighlightCacheDimensionHandler(final int dimension, final ChunkHighlightDatabase database) {
+    public ChunkHighlightCacheDimensionHandler(
+        @NotNull ResourceKey<Level> dimension,
+        @NotNull ChunkHighlightDatabase database,
+        @NotNull ListeningExecutorService executorService) {
         this.dimension = dimension;
         this.database = database;
-        this.executorService = MoreExecutors.listeningDecorator(
-            Executors.newSingleThreadExecutor(
-                new ThreadFactoryBuilder()
-                    .setNameFormat("XaeroPlus-ChunkHighlightCacheDimensionHandler-" + database.databaseName + "-Dim" + dimension)
-                    .build()));
+        this.executorService = executorService;
     }
 
     public void setWindow(int regionX, int regionZ, int regionSize) {
@@ -114,10 +113,6 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
         super.removeHighlight(x, z);
         database.removeHighlight(x, z, dimension);
         return true;
-    }
-
-    public void close() {
-        executorService.shutdown();
     }
 
     @Override

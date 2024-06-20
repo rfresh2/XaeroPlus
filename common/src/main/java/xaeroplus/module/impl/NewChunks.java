@@ -32,7 +32,6 @@ import xaeroplus.util.MutableBlockPos;
 import java.time.Duration;
 
 import static java.util.Arrays.asList;
-import static net.minecraft.world.level.Level.*;
 import static xaeroplus.feature.render.ColorHelper.getColor;
 import static xaeroplus.util.ChunkUtils.getActualDimension;
 
@@ -160,7 +159,7 @@ public class NewChunks extends Module {
                 boolean foundColumn = true;
                 for (int i = 1; i <= 5; i++) {
                     var aboveState = chunk.getFluidState(x, y + i, z);
-                    if (aboveState.isEmpty()) {
+                    if (aboveState.isEmpty() || aboveState.isSource()) {
                         foundColumn = false;
                         break;
                     }
@@ -176,21 +175,9 @@ public class NewChunks extends Module {
 
     @EventHandler
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
-        if (XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.getValue()) {
-            if (inUnknownDimension() && newChunksCache instanceof ChunkHighlightSavingCache) {
-                XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.setValue(false);
-                XaeroPlusSettingRegistry.newChunksInverseHighlightsSetting.setValue(false);
-                XaeroPlus.LOGGER.warn("Entered unknown dimension with saving cache on, disabling disk saving");
-            }
-        }
         newChunksCache.handleWorldChange();
         inverseNewChunksCache.handleWorldChange();
         seenChunksCache.invalidateAll(); // side effect - switching dimensions resets our state
-    }
-
-    public boolean inUnknownDimension() {
-        final ResourceKey<Level> dim = ChunkUtils.getActualDimension();
-        return dim != OVERWORLD && dim != NETHER && dim != END;
     }
 
     @EventHandler

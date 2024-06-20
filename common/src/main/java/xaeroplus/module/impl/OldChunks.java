@@ -143,12 +143,6 @@ public class OldChunks extends Module {
 
     @EventHandler
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
-        if (XaeroPlusSettingRegistry.oldChunksSaveLoadToDisk.getValue()) {
-            if (inUnknownDimension() && oldChunksCache instanceof ChunkHighlightSavingCache) {
-                XaeroPlusSettingRegistry.oldChunksSaveLoadToDisk.setValue(false);
-                XaeroPlus.LOGGER.warn("Entered unknown dimension with saving cache on, disabling disk saving");
-            }
-        }
         oldChunksCache.handleWorldChange();
         modernChunksCache.handleWorldChange();
     }

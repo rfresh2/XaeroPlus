@@ -48,7 +48,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
     }
 
     public void addHighlight(final int x, final int z, final long foundTime, final ResourceKey<Level> dimension) {
-        ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimension);
+        ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimension, true);
         if (cacheForDimension == null) return;
         cacheForDimension.addHighlight(x, z, foundTime);
     }
@@ -66,13 +66,13 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
     }
 
     public boolean isHighlighted(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> dimensionId) {
-        ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimensionId);
+        ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimensionId, false);
         if (cacheForDimension == null) return false;
         return cacheForDimension.isHighlighted(chunkPosX, chunkPosZ, dimensionId);
     }
 
     public boolean isHighlighted(final int chunkPosX, final int chunkPosZ) {
-        ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(getActualDimension());
+        ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(getActualDimension(), false);
         if (cacheForDimension == null) return false;
         return cacheForDimension.isHighlighted(chunkPosX, chunkPosZ, getActualDimension());
     }
@@ -105,7 +105,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
 
     public ChunkHighlightCacheDimensionHandler getCacheForCurrentDimension() {
         if (!worldCacheInitialized) return null;
-        return getCacheForDimension(Globals.getCurrentDimensionId());
+        return getCacheForDimension(Globals.getCurrentDimensionId(), true);
     }
 
     private ChunkHighlightCacheDimensionHandler initializeDimensionCacheHandler(final ResourceKey<Level> dimension) {
@@ -114,10 +114,11 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
         return cacheHandler;
     }
 
-    public ChunkHighlightCacheDimensionHandler getCacheForDimension(final ResourceKey<Level> dimension) {
+    public ChunkHighlightCacheDimensionHandler getCacheForDimension(final ResourceKey<Level> dimension, boolean create) {
         if (!worldCacheInitialized) return null;
         var dimensionCache = dimensionCacheMap.get(dimension);
         if (dimensionCache == null) {
+            if (!create) return null;
             XaeroPlus.LOGGER.error("Initializing cache for dimension: {}", dimension.location());
             dimensionCache = initializeDimensionCacheHandler(dimension);
         }
@@ -216,12 +217,12 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
             final int mapCenterX = getGuiMapCenterRegionX(guiMap);
             final int mapCenterZ = getGuiMapCenterRegionZ(guiMap);
             final int mapSize = getGuiMapRegionSize(guiMap);
-            final ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(mapDimension);
+            final ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(mapDimension, true);
             if (cacheForDimension != null) cacheForDimension.setWindow(mapCenterX, mapCenterZ, mapSize);
             getCachesExceptDimension(mapDimension)
                 .forEach(cache -> cache.setWindow(0, 0, 0));
         } else {
-            final ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(Globals.getCurrentDimensionId());
+            final ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(Globals.getCurrentDimensionId(), true);
             if (cacheForDimension != null) cacheForDimension.setWindow(ChunkUtils.getPlayerRegionX(), ChunkUtils.getPlayerRegionZ(), defaultRegionWindowSize);
             getCachesExceptDimension(Globals.getCurrentDimensionId())
                 .forEach(cache -> cache.setWindow(0, 0, 0));

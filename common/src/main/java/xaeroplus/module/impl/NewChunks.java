@@ -176,21 +176,9 @@ public class NewChunks extends Module {
 
     @EventHandler
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
-        if (XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.getValue()) {
-            if (inUnknownDimension() && newChunksCache instanceof ChunkHighlightSavingCache) {
-                XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.setValue(false);
-                XaeroPlusSettingRegistry.newChunksInverseHighlightsSetting.setValue(false);
-                XaeroPlus.LOGGER.warn("Entered unknown dimension with saving cache on, disabling disk saving");
-            }
-        }
         newChunksCache.handleWorldChange();
         inverseNewChunksCache.handleWorldChange();
         seenChunksCache.invalidateAll(); // side effect - switching dimensions resets our state
-    }
-
-    public boolean inUnknownDimension() {
-        final ResourceKey<Level> dim = ChunkUtils.getActualDimension();
-        return dim != OVERWORLD && dim != NETHER && dim != END;
     }
 
     @EventHandler

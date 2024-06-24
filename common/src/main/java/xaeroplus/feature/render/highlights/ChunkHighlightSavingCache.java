@@ -48,6 +48,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
     }
 
     public void addHighlight(final int x, final int z, final long foundTime, final ResourceKey<Level> dimension) {
+        if (dimension == null) return;
         ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimension, true);
         if (cacheForDimension == null) return;
         cacheForDimension.addHighlight(x, z, foundTime);
@@ -66,6 +67,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
     }
 
     public boolean isHighlighted(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> dimensionId) {
+        if (dimensionId == null) return false;
         ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimensionId, false);
         if (cacheForDimension == null) return false;
         return cacheForDimension.isHighlighted(chunkPosX, chunkPosZ, dimensionId);
@@ -109,13 +111,22 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
     }
 
     private ChunkHighlightCacheDimensionHandler initializeDimensionCacheHandler(final ResourceKey<Level> dimension) {
-        var cacheHandler = new ChunkHighlightCacheDimensionHandler(dimension, this.database, this.executorService);
+        if (dimension == null) return null;
+        var db = this.database;
+        var executor = this.executorService;
+        if (db == null || executor == null) {
+            XaeroPlus.LOGGER.error("Unable to initialize dimension cache handler for: {}, database or executor is null", dimension.location());
+            return null;
+        }
+        var cacheHandler = new ChunkHighlightCacheDimensionHandler(dimension, db, executor);
+        db.initializeDimension(dimension);
         this.dimensionCacheMap.put(dimension, cacheHandler);
         return cacheHandler;
     }
 
     public ChunkHighlightCacheDimensionHandler getCacheForDimension(final ResourceKey<Level> dimension, boolean create) {
         if (!worldCacheInitialized) return null;
+        if (dimension == null) return null;
         var dimensionCache = dimensionCacheMap.get(dimension);
         if (dimensionCache == null) {
             if (!create) return null;
@@ -155,10 +166,9 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
                         .build()));
             this.currentWorldId = worldId;
             this.database = new ChunkHighlightDatabase(worldId, databaseName);
-            this.dimensionCacheMap.put(OVERWORLD, new ChunkHighlightCacheDimensionHandler(OVERWORLD, this.database, this.executorService));
-            this.dimensionCacheMap.put(NETHER, new ChunkHighlightCacheDimensionHandler(NETHER, this.database, this.executorService));
-            this.dimensionCacheMap.put(END, new ChunkHighlightCacheDimensionHandler(END, this.database, this.executorService));
-            this.dimensionCacheMap.forEach((key, value) -> this.database.initializeDimension(key));
+            initializeDimensionCacheHandler(OVERWORLD);
+            initializeDimensionCacheHandler(NETHER);
+            initializeDimensionCacheHandler(END);
             this.worldCacheInitialized = true;
             loadChunksInActualDimension();
         } catch (final Exception e) {

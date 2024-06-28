@@ -56,7 +56,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
                     lock.writeLock().unlock();
                 }
             } catch (final Exception e) {
-                XaeroPlus.LOGGER.error("Failed to load highlights in window", e);
+                XaeroPlus.LOGGER.error("Failed to load highlights in window for {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
             }
         });
     }
@@ -82,7 +82,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
                     lock.writeLock().unlock();
                 }
             } catch (final Exception e) {
-                XaeroPlus.LOGGER.error("Error while writing highlights outside window to database", e);
+                XaeroPlus.LOGGER.error("Error while writing highlights outside window to {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
             }
             database.insertHighlightList(chunksToWrite, dimension);
         });
@@ -102,7 +102,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
                     lock.readLock().unlock();
                 }
             } catch (final Exception e) {
-                XaeroPlus.LOGGER.error("Error while writing all chunks to database", e);
+                XaeroPlus.LOGGER.error("Error while writing all chunks to {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
             }
             database.insertHighlightList(chunksToWrite, dimension);
         });

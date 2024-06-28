@@ -32,7 +32,7 @@ public class ChunkHighlightDatabase implements Closeable {
             connection = DriverManager.getConnection("jdbc:rfresh_sqlite:" + dbPath);
             MIGRATOR.migrate(dbPath, databaseName, connection);
         } catch (Exception e) {
-            XaeroPlus.LOGGER.error("Error while creating chunk highlight database: {}", databaseName, e);
+            XaeroPlus.LOGGER.error("Error while creating chunk highlight database: {} for worldId: {}", databaseName, worldId, e);
             throw new RuntimeException(e);
         }
     }
@@ -75,7 +75,7 @@ public class ChunkHighlightDatabase implements Closeable {
                 stmt.executeUpdate(statement);
             }
         } catch (Exception e) {
-            XaeroPlus.LOGGER.error("Error inserting chunks into database", e);
+            XaeroPlus.LOGGER.error("Error inserting {} chunks into {} database in dimension: {}", chunks.size(), databaseName, dimension.location(), e);
         }
     }
 
@@ -98,7 +98,7 @@ public class ChunkHighlightDatabase implements Closeable {
                 return chunks;
             }
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error getting chunks from database", e);
+            XaeroPlus.LOGGER.error("Error getting chunks from {} database in dimension: {}, window: {}-{}, {}-{}", databaseName, dimension.location(), regionXMin, regionXMax, regionZMin, regionZMax, e);
             // fall through
         }
         return Collections.emptyList();
@@ -108,7 +108,7 @@ public class ChunkHighlightDatabase implements Closeable {
         try (var statement = connection.createStatement()) {
             statement.executeUpdate("DELETE FROM \"" + getTableName(dimension) + "\" WHERE x = " + x + " AND z = " + z);
         } catch (Exception e) {
-            XaeroPlus.LOGGER.error("Error while removing highlight from database", e);
+            XaeroPlus.LOGGER.error("Error while removing highlight from {} database in dimension: {}, at {}, {}", databaseName, dimension.location(), x, z, e);
         }
     }
 
@@ -117,7 +117,7 @@ public class ChunkHighlightDatabase implements Closeable {
         try {
             connection.close();
         } catch (Exception e) {
-            XaeroPlus.LOGGER.warn("Failed closing database connection", e);
+            XaeroPlus.LOGGER.warn("Failed closing {} database connection", databaseName, e);
         }
     }
 }

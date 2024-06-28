@@ -42,7 +42,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
             cacheForCurrentDimension.addHighlight(x, z);
             return true;
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.debug("Error adding highlight to saving cache: {}", databaseName, e);
+            XaeroPlus.LOGGER.debug("Error adding highlight to {} disk cache: {}, {}", databaseName, x, z, e);
             return false;
         }
     }
@@ -61,7 +61,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
             cacheForCurrentDimension.removeHighlight(x, z);
             return true;
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.debug("Error removing highlight from saving cache: {}, {}", x, z, e);
+            XaeroPlus.LOGGER.debug("Error removing highlight from {} disk cache: {}, {}", databaseName, x, z, e);
             return false;
         }
     }
@@ -115,7 +115,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
         var db = this.database;
         var executor = this.executorService;
         if (db == null || executor == null) {
-            XaeroPlus.LOGGER.error("Unable to initialize dimension cache handler for: {}, database or executor is null", dimension.location());
+            XaeroPlus.LOGGER.error("Unable to initialize {} disk cache handler for: {}, database or executor is null", databaseName, dimension.location());
             return null;
         }
         var cacheHandler = new ChunkHighlightCacheDimensionHandler(dimension, db, executor);
@@ -130,7 +130,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
         var dimensionCache = dimensionCacheMap.get(dimension);
         if (dimensionCache == null) {
             if (!create) return null;
-            XaeroPlus.LOGGER.error("Initializing cache for dimension: {}", dimension.location());
+            XaeroPlus.LOGGER.info("Initializing {} disk cache for dimension: {}", databaseName, dimension.location());
             dimensionCache = initializeDimensionCacheHandler(dimension);
         }
         return dimensionCache;
@@ -154,15 +154,10 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
         try {
             final String worldId = XaeroWorldMapCore.currentSession.getMapProcessor().getCurrentWorldId();
             if (worldId == null) return;
-            final ResourceKey<Level> dimension = getActualDimension();
-            if (dimension != OVERWORLD && dimension != NETHER && dimension != END) {
-                XaeroPlus.LOGGER.error("Unexpected dimension ID: " + dimension + ". Disable Save/Load to Disk to restore functionality.");
-                return;
-            }
-             this.executorService = MoreExecutors.listeningDecorator(
+            this.executorService = MoreExecutors.listeningDecorator(
                 Executors.newSingleThreadExecutor(
                     new ThreadFactoryBuilder()
-                        .setNameFormat("XaeroPlus-ChunkHighlightCacheHandler-" + currentWorldId)
+                        .setNameFormat("XaeroPlus-" + databaseName + "-DiskCache-" + currentWorldId)
                         .build()));
             this.currentWorldId = worldId;
             this.database = new ChunkHighlightDatabase(worldId, databaseName);

@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaeroplus.XaeroPlus;
+import xaeroplus.util.ChunkUtils;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -27,7 +28,7 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
                 lock.writeLock().unlock();
             }
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Failed to add new highlight", e);
+            XaeroPlus.LOGGER.error("Failed to add new highlight: {}, {}", x, z, e);
         }
         return true;
     }
@@ -40,7 +41,7 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
                 lock.writeLock().unlock();
             }
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Failed to add new highlight", e);
+            XaeroPlus.LOGGER.error("Failed to add new highlight: {}, {}", x, z, e);
         }
         return true;
     }
@@ -57,7 +58,7 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
                 return containsKey;
             }
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error checking if chunk is highlighted", e);
+            XaeroPlus.LOGGER.error("Error checking if chunk is highlighted: {}, {}", ChunkUtils.longToChunkX(chunkPos), ChunkUtils.longToChunkZ(chunkPos), e);
         }
         return false;
     }
@@ -87,7 +88,7 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
                 lock.writeLock().unlock();
             }
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error loading previous state", e);
+            XaeroPlus.LOGGER.error("Error loading previous highlight cache state", e);
         }
     }
 
@@ -99,7 +100,7 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
                 lock.writeLock().unlock();
             }
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Failed replacing cache state", e);
+            XaeroPlus.LOGGER.error("Failed replacing highlight cache state", e);
         }
     }
 
@@ -110,7 +111,7 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
                 lock.writeLock().unlock();
             }
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Failed resetting cache", e);
+            XaeroPlus.LOGGER.error("Failed resetting highlight cache", e);
         }
     }
 }

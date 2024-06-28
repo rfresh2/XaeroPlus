@@ -154,12 +154,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
         try {
             final String worldId = XaeroWorldMapCore.currentSession.getMapProcessor().getCurrentWorldId();
             if (worldId == null) return;
-            final ResourceKey<Level> dimension = getActualDimension();
-            if (dimension != OVERWORLD && dimension != NETHER && dimension != END) {
-                XaeroPlus.LOGGER.error("Unexpected dimension ID: " + dimension + ". Disable Save/Load to Disk to restore functionality.");
-                return;
-            }
-             this.executorService = MoreExecutors.listeningDecorator(
+            this.executorService = MoreExecutors.listeningDecorator(
                 Executors.newSingleThreadExecutor(
                     new ThreadFactoryBuilder()
                         .setNameFormat("XaeroPlus-ChunkHighlightCacheHandler-" + currentWorldId)

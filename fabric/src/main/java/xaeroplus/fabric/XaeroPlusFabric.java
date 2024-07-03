@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.loader.api.Version;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import xaeroplus.Globals;
@@ -39,6 +40,9 @@ public class XaeroPlusFabric implements ClientModInitializer {
 			// needed as we can either accept Xaero's Minimap or BetterPVP but can't describe this in the fabric.mod.json
 			var versionCheckResult = MinimapBaseVersionCheck.versionCheck();
 			if (versionCheckResult.minimapCompatible()) return;
+			XaeroPlus.LOGGER.error("Incompatible Xaero Minimap version detected! Expected: {} Actual: {}",
+								   versionCheckResult.expectedVersion().getFriendlyString(),
+								   versionCheckResult.anyPresentMinimapVersion().map(Version::getFriendlyString).orElse("None!"));
 			var anyPresentVersion = versionCheckResult.minimapVersion().or(versionCheckResult::betterPvpVersion);
 			Minecraft.getInstance().setScreen(
 				new IncompatibleMinimapWarningScreen(anyPresentVersion, versionCheckResult.expectedVersion()));

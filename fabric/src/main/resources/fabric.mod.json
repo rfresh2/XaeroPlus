@@ -17,6 +17,9 @@
   "entrypoints": {
     "client": [
       "xaeroplus.fabric.XaeroPlusFabric"
+    ],
+    "modmenu": [
+      "xaeroplus.fabric.XaeroPlusModMenu"
     ]
   },
   "mixins": [

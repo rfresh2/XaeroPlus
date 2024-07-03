@@ -9,18 +9,18 @@ import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import java.util.List;
 import java.util.Set;
 
+import static xaeroplus.fabric.util.compat.XaeroPlusMinimapCompatibilityChecker.versionCheckResult;
+
 /**
  * Avoids applying XP mixins if Minimap is not present or not at a compatible version
  *
  * We want to either accept BetterPVP or Minimap at a specific version. But we can't make fabric.json enforce this so we have to do it ourselves
  */
 public class XaeroPlusCompatibleMinimapMixinPlugin implements IMixinConfigPlugin {
-    private VersionCheckResult versionCheckResult;
 
     @Override
     public void onLoad(final String mixinPackage) {
         if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) return;
-        versionCheckResult = MinimapBaseVersionCheck.versionCheck();
     }
 
     @Override

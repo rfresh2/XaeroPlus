@@ -32,7 +32,11 @@ public class XaeroPlusCompatibleMinimapMixinPlugin implements IMixinConfigPlugin
     public boolean shouldApplyMixin(final String targetClassName, final String mixinClassName) {
         if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) return true;
         if (versionCheckResult.minimapCompatible()) return true;
-        return !mixinClassName.startsWith("xaeroplus");
+        if (mixinClassName.startsWith("xaeroplus")) {
+            return mixinClassName.contains("MixinMinecraftClientFabric");
+        } else {
+            return true;
+        }
     }
 
     @Override

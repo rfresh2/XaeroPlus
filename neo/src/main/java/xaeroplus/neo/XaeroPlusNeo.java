@@ -6,11 +6,13 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.commands.CommandSourceStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
@@ -33,6 +35,10 @@ public class XaeroPlusNeo {
             if (EmbeddiumHelper.isEmbeddiumPresent())
                 FORGE_EVENT_BUS.addListener(XaeroPlusEmbeddiumOptionsInit::onEmbeddiumOptionGUIConstructionEvent);
             RemovalCause explicit = RemovalCause.EXPLICIT; // force class load to stop forge shitting itself at runtime??
+            ModLoadingContext.get().registerExtensionPoint(
+                IConfigScreenFactory.class,
+                XaeroPlusConfigScreenFactory::new
+            );
         }
     }
 

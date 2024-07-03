@@ -45,7 +45,7 @@ dependencies {
 	modCompileOnly(libs.balm.fabric)
 	modCompileOnly(libs.fabric.waystones)
 	modRuntimeOnly(libs.immediatelyfast)
-	modRuntimeOnly(libs.modmenu)
+	modImplementation(libs.modmenu)
     modCompileOnly(libs.sodium)
 //	modRuntimeOnly(libs.fpsdisplay)
 	modRuntimeOnly(libs.cloth.config.fabric) {

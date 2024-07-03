@@ -12,7 +12,7 @@ import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.fabric.util.FabricWaystonesHelperInit;
 import xaeroplus.fabric.util.compat.IncompatibleMinimapWarningScreen;
-import xaeroplus.fabric.util.compat.MinimapBaseVersionCheck;
+import xaeroplus.fabric.util.compat.XaeroPlusMinimapCompatibilityChecker;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
@@ -20,17 +20,25 @@ import xaeroplus.util.DataFolderResolveUtil;
 
 import java.util.List;
 
+import static xaeroplus.fabric.util.compat.XaeroPlusMinimapCompatibilityChecker.versionCheckResult;
+
 public class XaeroPlusFabric implements ClientModInitializer {
 	public static void initialize() {
 		if (XaeroPlus.initialized.compareAndSet(false, true)) {
 			XaeroPlus.LOGGER.info("Initializing XaeroPlus");
-			ModuleManager.init();
-			boolean a = Globals.FOLLOW; // force static instances to init
-			XaeroPlusSettingRegistry.fastMapSetting.getValue(); // force static instances to init
-			List<KeyMapping> keybinds = XaeroPlusSettingsReflectionHax.keybindsSupplier.get();
-			keybinds.forEach(KeyBindingHelper::registerKeyBinding);
-			FabricWaystonesHelperInit.doInit();
-		}
+            if (!versionCheckResult.minimapCompatible()) {
+				XaeroPlus.LOGGER.error("Incompatible Xaero Minimap version detected! Expected: {} Actual: {}",
+									   versionCheckResult.expectedVersion().getFriendlyString(),
+									   versionCheckResult.anyPresentMinimapVersion().map(Version::getFriendlyString).orElse("None!"));
+				return;
+			}
+            ModuleManager.init();
+            boolean a = Globals.FOLLOW; // force static instances to init
+            XaeroPlusSettingRegistry.fastMapSetting.getValue(); // force static instances to init
+            List<KeyMapping> keybinds = XaeroPlusSettingsReflectionHax.keybindsSupplier.get();
+            keybinds.forEach(KeyBindingHelper::registerKeyBinding);
+            FabricWaystonesHelperInit.doInit();
+        }
 	}
 
 	@Override
@@ -38,11 +46,8 @@ public class XaeroPlusFabric implements ClientModInitializer {
 		initialize();
 		ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
 			// needed as we can either accept Xaero's Minimap or BetterPVP but can't describe this in the fabric.mod.json
-			var versionCheckResult = MinimapBaseVersionCheck.versionCheck();
+			var versionCheckResult = XaeroPlusMinimapCompatibilityChecker.versionCheckResult;
 			if (versionCheckResult.minimapCompatible()) return;
-			XaeroPlus.LOGGER.error("Incompatible Xaero Minimap version detected! Expected: {} Actual: {}",
-								   versionCheckResult.expectedVersion().getFriendlyString(),
-								   versionCheckResult.anyPresentMinimapVersion().map(Version::getFriendlyString).orElse("None!"));
 			var anyPresentVersion = versionCheckResult.minimapVersion().or(versionCheckResult::betterPvpVersion);
 			Minecraft.getInstance().setScreen(
 				new IncompatibleMinimapWarningScreen(anyPresentVersion, versionCheckResult.expectedVersion()));

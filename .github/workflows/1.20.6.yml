@@ -40,13 +40,13 @@ jobs:
       run: |
         echo "MINIMAP_VERSION_FABRIC=$(./gradlew -q printMinimapVersionFabric)" >> $GITHUB_ENV
 
-#    - name: Get WorldMap Version Forge
-#      run: |
-#        echo "WORLDMAP_VERSION_FORGE=$(./gradlew -q printWorldMapVersionForge)" >> $GITHUB_ENV
-#
-#    - name: Get Minimap Version Forge
-#      run: |
-#        echo "MINIMAP_VERSION_FORGE=$(./gradlew -q printMinimapVersionForge)" >> $GITHUB_ENV
+    - name: Get WorldMap Version Forge
+      run: |
+        echo "WORLDMAP_VERSION_FORGE=$(./gradlew -q printWorldMapVersionForge)" >> $GITHUB_ENV
+
+    - name: Get Minimap Version Forge
+      run: |
+        echo "MINIMAP_VERSION_FORGE=$(./gradlew -q printMinimapVersionForge)" >> $GITHUB_ENV
 
     - name: Get WorldMap Version NeoForge
       run: |
@@ -64,9 +64,9 @@ jobs:
       run: |
         echo "XP_FABRIC=XaeroPlus-${{ env.XP_VERSION}}+fabric-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FABRIC }}-MM${{ env.MINIMAP_VERSION_FABRIC }}" >> $GITHUB_ENV
 
-#    - name: Get Forge Jar Filename
-#      run: |
-#        echo "XP_FORGE=XaeroPlus-${{ env.XP_VERSION}}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
+    - name: Get Forge Jar Filename
+      run: |
+        echo "XP_FORGE=XaeroPlus-${{ env.XP_VERSION}}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
 
     - name: Get Neo Jar Filename
       run: |
@@ -79,12 +79,12 @@ jobs:
         path: fabric/build/libs/${{ env.XP_FABRIC }}.jar
         if-no-files-found: error
 
-#    - name: Upload Forge Artifact
-#      uses: actions/upload-artifact@v4
-#      with:
-#        name: ${{ env.XP_FORGE }}
-#        path: forge/build/libs/${{ env.XP_FORGE }}.jar
-#        if-no-files-found: error
+    - name: Upload Forge Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.XP_FORGE }}
+        path: forge/build/libs/${{ env.XP_FORGE }}.jar
+        if-no-files-found: error
 
     - name: Upload NeoForge Artifact
       uses: actions/upload-artifact@v4

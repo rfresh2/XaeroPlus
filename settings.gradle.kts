@@ -31,15 +31,15 @@ dependencyResolutionManagement {
 		create("libs") {
 			library("minecraft", "com.mojang:minecraft:${gradle.extra.get("minecraft_version")}")
 			library("fabric-loader", "net.fabricmc:fabric-loader:${gradle.extra.get("fabric_loader_version")}")
-//			library("forge", "net.minecraftforge:forge:${gradle.extra.get("minecraft_version")}-${gradle.extra.get("forge_loader_version")}")
+			library("forge", "net.minecraftforge:forge:${gradle.extra.get("minecraft_version")}-${gradle.extra.get("forge_loader_version")}")
 			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:${gradle.extra.get("fabric_api_version")}")
 			library("parchment", "org.parchmentmc.data:parchment-1.20.6:${gradle.extra.get("parchment_version")}")
 			library("neoforge", "net.neoforged:neoforge:${gradle.extra.get("neoforge_version")}")
 			library("worldmap-fabric", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version_fabric")}_Fabric_${gradle.extra.get("minecraft_version")}")
-//			library("worldmap-forge", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version_forge")}_Forge_${gradle.extra.get("minecraft_version")}")
+			library("worldmap-forge", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version_forge")}_Forge_${gradle.extra.get("minecraft_version")}")
 			library("worldmap-neo", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version_neo")}_NeoForge_${gradle.extra.get("minecraft_version")}")
 			library("minimap-fabric", "maven.modrinth:xaeros-minimap:${gradle.extra.get("minimap_version_fabric")}_Fabric_${gradle.extra.get("minecraft_version")}")
-//			library("minimap-forge", "maven.modrinth:xaeros-minimap:${gradle.extra.get("minimap_version_forge")}_Forge_${gradle.extra.get("minecraft_version")}")
+			library("minimap-forge", "maven.modrinth:xaeros-minimap:${gradle.extra.get("minimap_version_forge")}_Forge_${gradle.extra.get("minecraft_version")}")
 			library("minimap-neo", "maven.modrinth:xaeros-minimap:${gradle.extra.get("minimap_version_neo")}_NeoForge_${gradle.extra.get("minecraft_version")}")
 			library("mixinextras-common", "io.github.llamalad7:mixinextras-common:0.3.6")
 			library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.3.6")
@@ -61,6 +61,7 @@ dependencyResolutionManagement {
 			library("fpsdisplay", "maven.modrinth:fpsdisplay:3.1.0+1.20.x")
 			library("cloth-config-fabric", "me.shedaniel.cloth:cloth-config-fabric:14.0.126")
             library("embeddium", "maven.modrinth:embeddium:0.3.19+mc1.20.6")
+			library("embeddium-forge", "maven.modrinth:embeddium:0.3.19+mc1.20.6")
         }
 	}
 }
@@ -69,7 +70,7 @@ dependencyResolutionManagement {
 
 include("common")
 include("fabric")
-//include("forge")
+include("forge")
 include("neo")
 
 rootProject.name = "XaeroPlus"

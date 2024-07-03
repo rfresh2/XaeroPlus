@@ -59,13 +59,13 @@ jobs:
         run: |
           echo "MINIMAP_VERSION_FABRIC=$(./gradlew -q printMinimapVersionFabric)" >> $GITHUB_ENV
 
-#      - name: Get WorldMap Version Forge
-#        run: |
-#          echo "WORLDMAP_VERSION_FORGE=$(./gradlew -q printWorldMapVersionForge)" >> $GITHUB_ENV
-#
-#      - name: Get Minimap Version Forge
-#        run: |
-#          echo "MINIMAP_VERSION_FORGE=$(./gradlew -q printMinimapVersionForge)" >> $GITHUB_ENV
+      - name: Get WorldMap Version Forge
+        run: |
+          echo "WORLDMAP_VERSION_FORGE=$(./gradlew -q printWorldMapVersionForge)" >> $GITHUB_ENV
+
+      - name: Get Minimap Version Forge
+        run: |
+          echo "MINIMAP_VERSION_FORGE=$(./gradlew -q printMinimapVersionForge)" >> $GITHUB_ENV
 
       - name: Get WorldMap Version NeoForge
         run: |
@@ -84,9 +84,9 @@ jobs:
         run: |
           echo "XP_FABRIC=XaeroPlus-${{ env.XP_VERSION}}+fabric-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FABRIC }}-MM${{ env.MINIMAP_VERSION_FABRIC }}" >> $GITHUB_ENV
 
-#      - name: Get Forge Jar Filename
-#        run: |
-#          echo "XP_FORGE=XaeroPlus-${{ env.XP_VERSION}}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
+      - name: Get Forge Jar Filename
+        run: |
+          echo "XP_FORGE=XaeroPlus-${{ env.XP_VERSION}}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
 
       - name: Get Neo Jar Filename
         run: |
@@ -100,13 +100,13 @@ jobs:
           path: fabric/build/libs/${{ env.XP_FABRIC }}.jar
           if-no-files-found: error
 
-#      - name: Upload Forge Artifact
-#        if: ${{ inputs.forge }}
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: ${{ env.XP_FORGE }}
-#          path: forge/build/libs/${{ env.XP_FORGE }}.jar
-#          if-no-files-found: error
+      - name: Upload Forge Artifact
+        if: ${{ inputs.forge }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.XP_FORGE }}
+          path: forge/build/libs/${{ env.XP_FORGE }}.jar
+          if-no-files-found: error
 
       - name: Upload Neo Artifact
         if: ${{ inputs.neo }}
@@ -128,12 +128,12 @@ jobs:
       changelog: ${{ steps.changelog.outputs.changelog }}
       xp_version: ${{ env.XP_VERSION }}
       xp_fabric: ${{ env.XP_FABRIC }}
-#      xp_forge: ${{ env.XP_FORGE }}
+      xp_forge: ${{ env.XP_FORGE }}
       xp_neo: ${{ env.XP_NEO }}
       worldmap_version_fabric: ${{ env.WORLDMAP_VERSION_FABRIC }}
       minimap_version_fabric: ${{ env.MINIMAP_VERSION_FABRIC }}
-#      worldmap_version_forge: ${{ env.WORLDMAP_VERSION_FORGE }}
-#      minimap_version_forge: ${{ env.MINIMAP_VERSION_FORGE }}
+      worldmap_version_forge: ${{ env.WORLDMAP_VERSION_FORGE }}
+      minimap_version_forge: ${{ env.MINIMAP_VERSION_FORGE }}
       worldmap_version_neo: ${{ env.WORLDMAP_VERSION_NEO }}
       minimap_version_neo: ${{ env.MINIMAP_VERSION_NEO }}
 
@@ -180,30 +180,30 @@ jobs:
             waystones(optional){modrinth:LOpKHB2A}{curseforge:245755}
             fwaystones(optional){modrinth:sTZr7NVo}{curseforge:410902}
 
-#      - name: Release Forge CurseForge and Modrinth
-#        if: ${{ inputs.forge }}
-#        uses: Kir-Antipov/mc-publish@v3.3
-#        with:
-#          changelog: ${{ needs.build.outputs.changelog }}
-#          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
-#          curseforge-id: 866084
-#
-#          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-#          modrinth-id: EnPUzSTg
-#
-#          files: |
-#            artifacts/${{ needs.build.outputs.xp_forge }}.jar
-#          name: ${{ needs.build.outputs.xp_version }} (Forge) (WM${{ needs.build.outputs.worldmap_version_forge }} MM${{ needs.build.outputs.minimap_version_forge }})
-#          version: ${{ needs.build.outputs.xp_version }}+forge-${{ env.MINECRAFT_VERSION }}
-#          loaders: |
-#            forge
-#          game-versions: |
-#            ${{ env.MINECRAFT_VERSION }}
-#          dependencies: |
-#            xaerominimap@${{ needs.build.outputs.minimap_version_forge }}(required){modrinth:1bokaNcj}{curseforge:263420}
-#            xaeroworldmap@${{ needs.build.outputs.worldmap_version_forge }}(required){modrinth:NcUtCpym}{curseforge:317780}
-#            worldtools(optional){modrinth:FlFKBOIX}{curseforge:909868}
-#            waystones(optional){modrinth:LOpKHB2A}{curseforge:245755}
+      - name: Release Forge CurseForge and Modrinth
+        if: ${{ inputs.forge }}
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          changelog: ${{ needs.build.outputs.changelog }}
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          curseforge-id: 866084
+
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          modrinth-id: EnPUzSTg
+
+          files: |
+            artifacts/${{ needs.build.outputs.xp_forge }}.jar
+          name: ${{ needs.build.outputs.xp_version }} (Forge) (WM${{ needs.build.outputs.worldmap_version_forge }} MM${{ needs.build.outputs.minimap_version_forge }})
+          version: ${{ needs.build.outputs.xp_version }}+forge-${{ env.MINECRAFT_VERSION }}
+          loaders: |
+            forge
+          game-versions: |
+            ${{ env.MINECRAFT_VERSION }}
+          dependencies: |
+            xaerominimap@${{ needs.build.outputs.minimap_version_forge }}(required){modrinth:1bokaNcj}{curseforge:263420}
+            xaeroworldmap@${{ needs.build.outputs.worldmap_version_forge }}(required){modrinth:NcUtCpym}{curseforge:317780}
+            worldtools(optional){modrinth:FlFKBOIX}{curseforge:909868}
+            waystones(optional){modrinth:LOpKHB2A}{curseforge:245755}
 
       - name: Release Neo CurseForge and Modrinth
         if: ${{ inputs.neo }}
@@ -230,24 +230,6 @@ jobs:
             worldtools(optional){modrinth:FlFKBOIX}{curseforge:909868}
             waystones(optional){modrinth:LOpKHB2A}{curseforge:245755}
 
-#      - name: Github Release
-#        if: ${{ inputs.fabric }} || ${{ inputs.forge }} || ${{ inputs.neo }}
-#        uses: ncipollo/release-action@v1
-#        with:
-#          tag: "${{ needs.build.outputs.xp_version }}"
-#          commit: 1.20.1
-#          artifacts: "artifacts/*.jar"
-#          allowUpdates: true
-#          makeLatest: true
-#          body: |
-#            For WorldMap and Minimap Versions:
-#            * Fabric: WM${{ needs.build.outputs.worldmap_version_fabric }} MM${{ needs.build.outputs.minimap_version_fabric }}
-#            * Forge: WM${{ needs.build.outputs.worldmap_version_forge }} MM${{ needs.build.outputs.minimap_version_forge }}
-#            * NeoForge: WM${{ needs.build.outputs.worldmap_version_neo }} MM${{ needs.build.outputs.minimap_version_neo }}
-#
-#            ${{ needs.build.outputs.changelog }}
-#          omitBodyDuringUpdate: true
-
       - name: Github Release
         if: ${{ inputs.fabric }} || ${{ inputs.forge }} || ${{ inputs.neo }}
         uses: ncipollo/release-action@v1
@@ -260,7 +242,8 @@ jobs:
           body: |
             For WorldMap and Minimap Versions:
             * Fabric: WM${{ needs.build.outputs.worldmap_version_fabric }} MM${{ needs.build.outputs.minimap_version_fabric }}
+            * Forge: WM${{ needs.build.outputs.worldmap_version_forge }} MM${{ needs.build.outputs.minimap_version_forge }}
             * NeoForge: WM${{ needs.build.outputs.worldmap_version_neo }} MM${{ needs.build.outputs.minimap_version_neo }}
-            
+
             ${{ needs.build.outputs.changelog }}
           omitBodyDuringUpdate: true

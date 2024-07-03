@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[49,)"
+loaderVersion = "[50,)"
 #issueTrackerURL = ""
 license = "MIT"
 
@@ -17,14 +17,14 @@ displayTest="IGNORE_ALL_VERSION"
 [[dependencies.xaeroplus]]
 modId = "forge"
 mandatory = true
-versionRange = "[49,)"
+versionRange = "[50,)"
 ordering = "NONE"
 side = "CLIENT"
 
 [[dependencies.xaeroplus]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.20.3,1.20.4]"
+versionRange = "[1.20.5,1.20.6]"
 ordering = "NONE"
 side = "CLIENT"
 

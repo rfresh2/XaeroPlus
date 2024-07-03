@@ -8,20 +8,22 @@ import xaeroplus.XaeroPlus;
 
 import java.util.Optional;
 
-public class MinimapBaseVersionCheck {
+public class XaeroPlusMinimapCompatibilityChecker {
 
-    public static VersionCheckResult versionCheck() {
+    public static VersionCheckResult versionCheckResult = XaeroPlusMinimapCompatibilityChecker.versionCheck();
+
+    private static VersionCheckResult versionCheck() {
         try {
-            var compatibleMinimapVersion = SemanticVersion.parse(MinimapBaseVersionCheck.getCompatibleMinimapVersion());
-            var minimapVersion = MinimapBaseVersionCheck.getVersion("xaerominimap");
-            var betterPvpVersion = MinimapBaseVersionCheck.getVersion("xaerobetterpvp");
+            var compatibleMinimapVersion = SemanticVersion.parse(XaeroPlusMinimapCompatibilityChecker.getCompatibleMinimapVersion());
+            var minimapVersion = XaeroPlusMinimapCompatibilityChecker.getVersion("xaerominimap");
+            var betterPvpVersion = XaeroPlusMinimapCompatibilityChecker.getVersion("xaerobetterpvp");
             return new VersionCheckResult(minimapVersion, betterPvpVersion, compatibleMinimapVersion);
         } catch (VersionParsingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    static Optional<Version> getVersion(final String modId) {
+    private static Optional<Version> getVersion(final String modId) {
         try {
             return FabricLoader.getInstance().getAllMods().stream()
                 .filter(modContainer -> modContainer.getMetadata().getId().equals(modId))
@@ -40,7 +42,7 @@ public class MinimapBaseVersionCheck {
         }
     }
 
-    static String getCompatibleMinimapVersion() {
+    private static String getCompatibleMinimapVersion() {
         return FabricLoader.getInstance().getModContainer("xaeroplus").get().getMetadata().getCustomValue("minimap_version").getAsString();
     }
 }

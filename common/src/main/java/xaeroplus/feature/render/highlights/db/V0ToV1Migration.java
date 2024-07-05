@@ -44,16 +44,6 @@ public class V0ToV1Migration implements DatabaseMigration {
 
     @Override
     public void doMigration(String databaseName, final Connection connection) {
-        // create metadata table
-        try {
-            try (var statement = connection.createStatement()) {
-                statement.executeUpdate("CREATE TABLE IF NOT EXISTS metadata (version INTEGER)");
-                statement.executeUpdate("INSERT INTO metadata (version) VALUES (1)");
-            }
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Failed creating metadata table for {} database", databaseName, e);
-        }
-
         // migrate old tables and indexes
         try {
             try (var statement = connection.createStatement()) {

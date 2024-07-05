@@ -32,6 +32,7 @@ public class ChunkHighlightDatabase implements Closeable {
             boolean shouldRunMigrations = dbPath.toFile().exists();
             connection = DriverManager.getConnection("jdbc:rfresh_sqlite:" + dbPath);
             if (shouldRunMigrations) MIGRATOR.migrate(dbPath, databaseName, connection);
+            createMetadataTable();
         } catch (Exception e) {
             XaeroPlus.LOGGER.error("Error while creating chunk highlight database: {} for worldId: {}", databaseName, worldId, e);
             throw new RuntimeException(e);
@@ -44,6 +45,15 @@ public class ChunkHighlightDatabase implements Closeable {
 
     private String getTableName(ResourceKey<Level> dimension) {
         return dimension.location().toString();
+    }
+
+    private void createMetadataTable() {
+        try (var statement = connection.createStatement()) {
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS metadata (id INTEGER PRIMARY KEY, version INTEGER)");
+            statement.executeUpdate("INSERT OR REPLACE INTO metadata (id, version) VALUES (0, 1)");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void createHighlightsTableIfNotExists(ResourceKey<Level> dimension) {

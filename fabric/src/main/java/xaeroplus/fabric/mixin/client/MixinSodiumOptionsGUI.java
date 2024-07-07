@@ -60,6 +60,20 @@ public class MixinSodiumOptionsGUI {
                              config -> (int) XaeroPlusSettingRegistry.minimapFpsLimit.getValue()
                          ))
                          .build())
+                .add(OptionImpl.createBuilder(int.class, XaeroPlusSodiumOptionStorage.INSTANCE)
+                         .setName(Component.translatable("setting.minimap.minimap_scaling"))
+                         .setTooltip(Component.translatable("setting.minimap.minimap_scaling.tooltip"))
+                         .setControl(option -> new SliderControl(
+                             option,
+                             (int) XaeroPlusSettingRegistry.minimapScaling.getValueMin(),
+                             (int) XaeroPlusSettingRegistry.minimapScaling.getValueMax(),
+                             (int) XaeroPlusSettingRegistry.minimapScaling.getValueStep(),
+                             ControlValueFormatter.number()))
+                         .setBinding(new GenericBinding<>(
+                             (config, value) -> XaeroPlusSettingRegistry.minimapScaling.setValue((float) value),
+                             config -> (int) XaeroPlusSettingRegistry.minimapScaling.getValue()
+                         ))
+                         .build())
                 .build()
         )));
     }

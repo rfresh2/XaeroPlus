@@ -58,6 +58,7 @@ import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
 import static net.minecraft.world.level.Level.*;
 import static xaeroplus.Globals.FOLLOW;
+import static xaeroplus.Globals.getCurrentDimensionId;
 import static xaeroplus.util.ChunkUtils.getPlayerX;
 import static xaeroplus.util.ChunkUtils.getPlayerZ;
 
@@ -111,6 +112,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Shadow public abstract<T extends GuiEventListener & Widget & NarratableEntry> T addButton(final T guiEventListener);
 
     @Shadow public abstract <T extends GuiEventListener & NarratableEntry> T addWidget(final T guiEventListener);
+
+    @Shadow private int mouseBlockPosX;
+
+    @Shadow private int mouseBlockPosZ;
 
     @ModifyConstant(method = "changeZoom", constant = @Constant(doubleValue = 0.0625))
     public double customMinZoom(final double original) {
@@ -311,6 +316,31 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     ), remap = true)
     public boolean hideArrowOnF1(boolean original) {
         return original && !Minecraft.getInstance().options.hideGui;
+    }
+
+    @ModifyArg(method = "render",
+        slice = @Slice(
+            from = @At(
+                value = "FIELD",
+                opcode = Opcodes.GETFIELD,
+                target = "Lxaero/map/settings/ModSettings;coordinates:Z"
+            )
+        ),
+        at = @At(
+            value = "INVOKE",
+            target = "Lxaero/map/graphics/MapRenderHelper;drawCenteredStringWithBackground(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIFFFFLcom/mojang/blaze3d/vertex/VertexConsumer;)V",
+            ordinal = 0
+    ), index = 2)
+    public String renderCrossDimensionCursorCoordinates(final String original) {
+        if (!XaeroPlusSettingRegistry.crossDimensionCursorCoordinates.getValue()) return original;
+        ResourceKey<Level> dim = getCurrentDimensionId();
+        if (!(dim == OVERWORLD || dim == NETHER)) return original;
+        double dimDiv = dim == NETHER
+            ? 0.125 // nether -> overworld
+            : 8; // overworld -> nether
+        int x = (int) (mouseBlockPosX / dimDiv);
+        int z = (int) (mouseBlockPosZ / dimDiv);
+        return original + " [" + x + ", " + z + "]";
     }
 
     @Inject(method = "render", at = @At(

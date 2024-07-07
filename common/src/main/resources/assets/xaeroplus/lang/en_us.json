@@ -35,6 +35,8 @@
   "setting.world_map.overlay_opacity_fix.tooltip": "Patches a bug in the opacity/brightness logic of map pixels causing certain pixels to be abnormally bright.\nCan be noticed on structures like 128+ block water columns, there is abrupt shift in their color at that height as the brightness is flipped.",
   "setting.world_map.min_zoom": "Min WorldMap Zoom",
   "setting.world_map.min_zoom.tooltip": "Minimum WorldMap Zoom Setting. This is 10x what you see on the WorldMap.",
+  "setting.world_map.cross_dimension_cursor_coordinates": "Cross Dim Cursor Coords",
+  "setting.world_map.cross_dimension_cursor_coordinates.tooltip": "When viewing the Nether/Overworld dimensions render the corresponding opposite dimension's coordinates on the WorldMap's cursor coordinates.",
   "setting.world_map.skip_world_render": "Skip Background Render",
   "setting.world_map.skip_world_render.tooltip": "Skip MC world render while in a Xaero GUI. Having this on can cause issues with travel mods while you're in a Xaero GUI like the WorldMap.",
   "setting.world_map.new_chunks_highlighting": "NewChunks Highlighting",

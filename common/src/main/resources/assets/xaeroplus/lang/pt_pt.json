@@ -35,6 +35,8 @@
   "setting.world_map.overlay_opacity_fix.tooltip": "Corrige um bug na lógica de opacidade/brilho dos pixels do mapa, fazendo com que certos pixels fiquem anormalmente brilhantes.\nPode ser notado em estruturas como colunas de água com mais de 128 blocos, há uma mudança abrupta em sua cor nessa altura conforme o brilho é invertido.",
   "setting.world_map.min_zoom": "Zoom Min do Mapa-Mundo",
   "setting.world_map.min_zoom.tooltip": "Definição do zoom mínimo do mapa-mundo. Isto é 10x o que é visível no mapa-mundo.",
+  "setting.world_map.cross_dimension_cursor_coordinates": "Coordenadas do Cursor entre Dimensões",
+  "setting.world_map.cross_dimension_cursor_coordinates.tooltip": "Ao visualizar as dimensões Nether/Overworld, renderize as coordenadas da dimensão oposta correspondente nas coordenadas do cursor do WorldMap.",
   "setting.world_map.skip_world_render": "Ignorar Rend. em Segundo Plano",
   "setting.world_map.skip_world_render.tooltip": "Ignora a renderização em segundo plano do mundo enquanto num GUI do Xaero. Isto pode causar problemas em mods de viagem enquanto estiveres num GUI do Xaero como por exemplo o mapa-mundo.",
   "setting.world_map.new_chunks_highlighting": "Destacar Partes Novas",

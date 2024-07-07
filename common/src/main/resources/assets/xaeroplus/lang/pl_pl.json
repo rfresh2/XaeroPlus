@@ -35,6 +35,8 @@
   "setting.world_map.overlay_opacity_fix.tooltip": "Naprawia błąd w logice krycia/jasności pikseli mapy, powodujący, że niektóre piksele są nienormalnie jasne.\nMożna to zauważyć na konstrukcjach takich jak ponad 128 słupów wody. Na tej wysokości następuje nagła zmiana ich koloru wraz ze zmianą jasności.",
   "setting.world_map.min_zoom": "Minimalne Zbliżenie Mapy Świata",
   "setting.world_map.min_zoom.tooltip": "Ustawienie Minimalnego Zbliżenie Mapy Świata. To 10 razy więcej niż widzisz na Mapie Świata.",
+  "setting.world_map.cross_dimension_cursor_coordinates": "Współrzędne kursora międzywymiarowego",
+  "setting.world_map.cross_dimension_cursor_coordinates.tooltip": "Podczas oglądania wymiarów Nether/Overworld wyświetlaj odpowiednie współrzędne przeciwnego wymiaru na współrzędnych kursora WorldMap.",
   "setting.world_map.skip_world_render": "Pomiń Renderowanie Tła",
   "setting.world_map.skip_world_render.tooltip": "Pomiń MC render świata podczas, gdy jesteś w GUI Xaero. Włączenie tego może powodować problemy z modami podróży, gdy jesteś w GUI Xaero, takimi jak WorldMap",
   "setting.world_map.new_chunks_highlighting": "Podświetlanie Nowych Chunków",

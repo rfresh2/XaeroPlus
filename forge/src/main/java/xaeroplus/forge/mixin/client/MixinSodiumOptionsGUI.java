@@ -60,6 +60,20 @@ public class MixinSodiumOptionsGUI {
                              config -> (int) XaeroPlusSettingRegistry.minimapFpsLimit.getValue()
                          ))
                          .build())
+                .add(OptionImpl.createBuilder(int.class, XaeroPlusEmbeddiumOptionStorage.INSTANCE)
+                         .setName(Component.translatable("setting.minimap.fps_limiter_limit"))
+                         .setTooltip(Component.translatable("setting.minimap.fps_limiter_limit.tooltip"))
+                         .setControl(option -> new SliderControl(
+                             option,
+                             (int) XaeroPlusSettingRegistry.minimapFpsLimit.getValueMin(),
+                             (int) XaeroPlusSettingRegistry.minimapFpsLimit.getValueMax(),
+                             (int) XaeroPlusSettingRegistry.minimapFpsLimit.getValueStep(),
+                             ControlValueFormatter.number()))
+                         .setBinding(new GenericBinding<>(
+                             (config, value) -> XaeroPlusSettingRegistry.minimapFpsLimit.setValue((float) value),
+                             config -> (int) XaeroPlusSettingRegistry.minimapFpsLimit.getValue()
+                         ))
+                         .build())
                 .build()
         )));
     }

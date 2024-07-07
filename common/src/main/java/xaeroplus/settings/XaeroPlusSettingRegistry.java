@@ -180,12 +180,12 @@ public final class XaeroPlusSettingRegistry {
             "setting.world_map.min_zoom.tooltip",
             0.1f,
             SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusBooleanSetting skipWorldRenderSetting = XaeroPlusBooleanSetting.create(
-            "Skip Background Render",
-            "setting.world_map.skip_world_render",
-            "setting.world_map.skip_world_render.tooltip",
-            true,
-            SettingLocation.WORLD_MAP_MAIN);
+    public static XaeroPlusBooleanSetting crossDimensionCursorCoordinates = XaeroPlusBooleanSetting.create(
+        "Cross Dim Cursor Coords",
+        "setting.world_map.cross_dimension_cursor_coordinates",
+        "setting.world_map.cross_dimension_cursor_coordinates.tooltip",
+        false,
+        SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting newChunksEnabledSetting = XaeroPlusBooleanSetting.create(
             "NewChunks Highlighting",
             "setting.world_map.new_chunks_highlighting",

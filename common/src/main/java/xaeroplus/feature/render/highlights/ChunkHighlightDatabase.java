@@ -59,6 +59,10 @@ public class ChunkHighlightDatabase implements Closeable {
     private void createHighlightsTableIfNotExists(ResourceKey<Level> dimension) {
         try (var statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS \"" + getTableName(dimension) + "\" (x INTEGER, z INTEGER, foundTime INTEGER)");
+
+            // cleanup oopsie typo in 2.15 v0 to v1 migration
+            statement.executeUpdate("DROP INDEX IF EXISTS \"unique_xz" + getTableName(dimension) + "\"");
+
             statement.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS \"unique_xz_" + getTableName(dimension) + "\" ON \"" + getTableName(dimension) + "\" (x, z)");
         } catch (Exception e) {
             throw new RuntimeException(e);

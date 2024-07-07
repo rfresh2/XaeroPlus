@@ -35,6 +35,8 @@
   "setting.world_map.overlay_opacity_fix.tooltip": "Corrige un error en la lógica de opacidad/brillo de los píxeles del mapa que provoca que ciertos píxeles sean anormalmente brillantes.\nSe puede notar en estructuras como más de 128 columnas de agua de bloques, hay un cambio abrupto en su color a esa altura a medida que se invierte el brillo.",
   "setting.world_map.min_zoom": "Zoom Mínimo Mapamundi",
   "setting.world_map.min_zoom.tooltip": "Ajuste mínimo de zoom del Mapamundi. Esto es 10x lo que ves en el Mapamundi.",
+  "setting.world_map.cross_dimension_cursor_coordinates": "Coordenadas del cursor de dimensión cruzada",
+  "setting.world_map.cross_dimension_cursor_coordinates.tooltip": "Al ver las dimensiones del Nether/Overworld, renderiza las coordenadas de la dimensión opuesta correspondiente en las coordenadas del cursor del WorldMap.",
   "setting.world_map.skip_world_render": "Skippear Renderizado Fondo",
   "setting.world_map.skip_world_render.tooltip": "Omite el renderizado del mundo de Minecraft mientras estás en el GUI de Xaero. Tener esto activado podria generar conflictos con mods de viaje mientras estés en un GUI de Xaero.",
   "setting.world_map.new_chunks_highlighting": "Resaltar ChunksNuevos",

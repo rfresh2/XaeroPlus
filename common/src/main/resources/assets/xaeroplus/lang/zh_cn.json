@@ -35,6 +35,8 @@
   "setting.world_map.overlay_opacity_fix.tooltip": "修复地图像素不透明度/亮度逻辑中的一个错误，该错误导致某些像素异常明亮。\n可以在 128+ 块水柱等结构上注意到，随着亮度的翻转，其颜色在该高度上发生了突然变化。",
   "setting.world_map.min_zoom": "最小世界地图缩放",
   "setting.world_map.min_zoom.tooltip": "最小世界地图缩放设置。这是你在世界地图上看到的 10 倍。",
+  "setting.world_map.cross_dimension_cursor_coordinates": "跨维度光标坐标",
+  "setting.world_map.cross_dimension_cursor_coordinates.tooltip": "在查看下界/主世界维度时，在世界地图的光标坐标上渲染相应的对立维度的坐标。",
   "setting.world_map.skip_world_render": "跳过背景渲染",
   "setting.world_map.skip_world_render.tooltip": "在 Xaero GUI 中跳过 MC 世界渲染。当你使用 Xaero GUI（例如世界地图）时，启用此功能可能会导致旅行模组出现问题。",
   "setting.world_map.new_chunks_highlighting": "高亮新区块",

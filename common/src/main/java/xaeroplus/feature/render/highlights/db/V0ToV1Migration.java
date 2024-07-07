@@ -65,8 +65,8 @@ public class V0ToV1Migration implements DatabaseMigration {
 
                 // rebuild new indexes
                 statement.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS \"unique_xz_" + getTableName(Level.OVERWORLD) + "\" ON \"" + getTableName(Level.OVERWORLD) + "\" (x, z)");
-                statement.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS \"unique_xz" + getTableName(Level.NETHER) + "\" ON \"" + getTableName(Level.NETHER) + "\" (x, z)");
-                statement.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS \"unique_xz" + getTableName(Level.END) + "\" ON \"" + getTableName(Level.END) + "\" (x, z)");
+                statement.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS \"unique_xz_" + getTableName(Level.NETHER) + "\" ON \"" + getTableName(Level.NETHER) + "\" (x, z)");
+                statement.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS \"unique_xz_" + getTableName(Level.END) + "\" ON \"" + getTableName(Level.END) + "\" (x, z)");
             }
 
             try (var statement = connection.createStatement()) {

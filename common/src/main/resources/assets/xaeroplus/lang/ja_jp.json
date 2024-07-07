@@ -35,6 +35,8 @@
     "setting.world_map.overlay_opacity_fix.tooltip": "マップ ピクセルの不透明度/明るさのロジックのバグを修正し、特定のピクセルが異常に明るくなる原因を解消しました。\n128 ブロック以上の水柱などの構造物では、明るさが反転するとその高さで色が急激に変化することが確認できます。",
     "setting.world_map.min_zoom": "最小ワールドマップのズーム",
     "setting.world_map.min_zoom.tooltip": "ワールドマップの最小ズーム設定。これは普段のワールドマップの10倍です。",
+    "setting.world_map.cross_dimension_cursor_coordinates": "次元間カーソル座標",
+    "setting.world_map.cross_dimension_cursor_coordinates.tooltip": "ネザー/オーバーワールドの次元を表示する際に、ワールドマップのカーソル座標に対応する反対の次元の座標をレンダリングします。",
     "setting.world_map.skip_world_render": "背景レンダリングをスキップする",
     "setting.world_map.skip_world_render.tooltip": "Xaero GUI中にMCワールドレンダリングをスキップする。これをオンにすると、ワールドマップのようなXaero GUIにいる間、トラベルMODで問題が発生する可能性があります。",
     "setting.world_map.new_chunks_highlighting": "新しいチャンクのハイライト",

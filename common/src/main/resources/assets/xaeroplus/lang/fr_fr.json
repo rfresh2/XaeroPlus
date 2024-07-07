@@ -35,6 +35,8 @@
   "setting.world_map.overlay_opacity_fix.tooltip": "Corrige un bug dans la logique d'opacité/luminosité des pixels de la carte, provoquant une luminosité anormale de certains pixels.\nPeut être remarqué sur des structures telles que plus de 128 blocs de colonnes d'eau, il y a un changement brusque de couleur à cette hauteur lorsque la luminosité est inversée.",
   "setting.world_map.min_zoom": "Min WorldMap Zoom",
   "setting.world_map.min_zoom.tooltip": "Réglage minimum du zoom sur la carte du monde. Ce réglage correspond à 10x ce que vous voyez sur la carte du monde.",
+  "setting.world_map.cross_dimension_cursor_coordinates": "Coordonnées du curseur inter-dimensionnel",
+  "setting.world_map.cross_dimension_cursor_coordinates.tooltip": "Lors de la visualisation des dimensions Nether/Overworld, affiche les coordonnées de la dimension opposée correspondante sur les coordonnées du curseur de la WorldMap.",
   "setting.world_map.skip_world_render": "Sauter le rendu de l'arrière-plan",
   "setting.world_map.skip_world_render.tooltip": "Skip MC world render while in a Xaero GUI. L'activation de cette option peut causer des problèmes avec les mods de voyage lorsque vous êtes dans une interface graphique Xaero comme la carte du monde.",
   "setting.world_map.new_chunks_highlighting": "Mise en évidence des nouveaux chunks",

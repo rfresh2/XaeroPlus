@@ -19,8 +19,14 @@ public class DatabaseMigrator {
                 if (migration.shouldMigrate(databaseName, connection)) {
                     XaeroPlus.LOGGER.info("Found database: {} that needs migration", databaseName);
                     if (backupDatabase(dbPath, databaseName, connection)) {
-                        migration.doMigration(databaseName, connection);
-                        XaeroPlus.LOGGER.info("Successfully migrated database: {}", databaseName);
+                        try {
+                            connection.setAutoCommit(false);
+                            migration.doMigration(databaseName, connection);
+                            connection.commit();
+                            XaeroPlus.LOGGER.info("Successfully migrated database: {}", databaseName);
+                        } finally {
+                            connection.setAutoCommit(true);
+                        }
                     }
                 }
             }

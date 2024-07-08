@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xaero.map.MapProcessor;
 import xaero.map.core.XaeroWorldMapCore;
 import xaero.map.gui.GuiMap;
 import xaeroplus.Globals;
@@ -89,7 +90,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
                 }, Globals.cacheRefreshExecutorService.get());
     }
 
-    public void reset() {
+    public synchronized void reset() {
         this.worldCacheInitialized = false;
         this.currentWorldId = null;
         if (this.executorService != null) this.executorService.shutdown();
@@ -150,16 +151,21 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
         return caches;
     }
 
-    private void initializeWorld() {
+    private synchronized void initializeWorld() {
         try {
-            final String worldId = XaeroWorldMapCore.currentSession.getMapProcessor().getCurrentWorldId();
+            MapProcessor mapProcessor = XaeroWorldMapCore.currentSession.getMapProcessor();
+            if (mapProcessor == null) return;
+            final String worldId = mapProcessor.getCurrentWorldId();
             if (worldId == null) return;
+            this.currentWorldId = worldId;
             this.executorService = MoreExecutors.listeningDecorator(
                 Executors.newSingleThreadExecutor(
                     new ThreadFactoryBuilder()
-                        .setNameFormat("XaeroPlus-" + databaseName + "-DiskCache-" + currentWorldId)
+                        .setNameFormat("XaeroPlus-" + databaseName + "-DiskCache-" + worldId)
+                        .setUncaughtExceptionHandler((t, e) -> {
+                            XaeroPlus.LOGGER.error("Uncaught exception handler in {}", t.getName(), e);
+                        })
                         .build()));
-            this.currentWorldId = worldId;
             this.database = new ChunkHighlightDatabase(worldId, databaseName);
             initializeDimensionCacheHandler(OVERWORLD);
             initializeDimensionCacheHandler(NETHER);

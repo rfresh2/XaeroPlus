@@ -47,38 +47,22 @@ public class V0ToV1Migration implements DatabaseMigration {
         // migrate old tables and indexes
         try {
             try (var statement = connection.createStatement()) {
-                statement.executeUpdate("CREATE TABLE IF NOT EXISTS \"" + getTableName(Level.OVERWORLD) + "\" (x INTEGER, z INTEGER, foundTime INTEGER)");
-                statement.executeUpdate("CREATE TABLE IF NOT EXISTS \"" + getTableName(Level.NETHER) + "\" (x INTEGER, z INTEGER, foundTime INTEGER)");
-                statement.executeUpdate("CREATE TABLE IF NOT EXISTS \"" + getTableName(Level.END) + "\" (x INTEGER, z INTEGER, foundTime INTEGER)");
-
-                // migrate data
-                statement.executeUpdate("INSERT INTO \"" + getTableName(Level.OVERWORLD) + "\" SELECT * FROM \"0\"");
-                statement.executeUpdate("INSERT INTO \"" + getTableName(Level.NETHER) + "\" SELECT * FROM \"-1\"");
-                statement.executeUpdate("INSERT INTO \"" + getTableName(Level.END) + "\" SELECT * FROM \"1\"");
+                // migrate table name
+                statement.executeUpdate("ALTER TABLE \"0\" RENAME TO \"" + getTableName(Level.OVERWORLD) + "\"");
+                statement.executeUpdate("ALTER TABLE \"-1\" RENAME TO \"" + getTableName(Level.NETHER) + "\"");
+                statement.executeUpdate("ALTER TABLE \"1\" RENAME TO \"" + getTableName(Level.END) + "\"");
             }
 
             try (var statement = connection.createStatement()) {
-                // drop old indexes
-                statement.executeUpdate("DROP INDEX IF EXISTS unique_xzO");
-                statement.executeUpdate("DROP INDEX IF EXISTS unique_xzN");
-                statement.executeUpdate("DROP INDEX IF EXISTS unique_xzE");
-
                 // rebuild new indexes
                 statement.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS \"unique_xz_" + getTableName(Level.OVERWORLD) + "\" ON \"" + getTableName(Level.OVERWORLD) + "\" (x, z)");
                 statement.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS \"unique_xz_" + getTableName(Level.NETHER) + "\" ON \"" + getTableName(Level.NETHER) + "\" (x, z)");
                 statement.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS \"unique_xz_" + getTableName(Level.END) + "\" ON \"" + getTableName(Level.END) + "\" (x, z)");
-            }
 
-            try (var statement = connection.createStatement()) {
-                // drop old tables
-                statement.executeUpdate("DROP TABLE IF EXISTS \"0\"");
-                statement.executeUpdate("DROP TABLE IF EXISTS \"-1\"");
-                statement.executeUpdate("DROP TABLE IF EXISTS \"1\"");
-            }
-
-            try (var statement = connection.createStatement()) {
-                // vacuum db
-                statement.executeUpdate("VACUUM");
+                // drop old indexes
+                statement.executeUpdate("DROP INDEX IF EXISTS unique_xzO");
+                statement.executeUpdate("DROP INDEX IF EXISTS unique_xzN");
+                statement.executeUpdate("DROP INDEX IF EXISTS unique_xzE");
             }
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Failed creating new tables for {} database", databaseName, e);

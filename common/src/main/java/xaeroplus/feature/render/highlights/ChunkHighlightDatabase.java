@@ -52,6 +52,7 @@ public class ChunkHighlightDatabase implements Closeable {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS metadata (id INTEGER PRIMARY KEY, version INTEGER)");
             statement.executeUpdate("INSERT OR REPLACE INTO metadata (id, version) VALUES (0, 1)");
         } catch (Exception e) {
+            XaeroPlus.LOGGER.error("Error creating metadata table for db: {}", databaseName);
             throw new RuntimeException(e);
         }
     }
@@ -65,6 +66,7 @@ public class ChunkHighlightDatabase implements Closeable {
 
             statement.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS \"unique_xz_" + getTableName(dimension) + "\" ON \"" + getTableName(dimension) + "\" (x, z)");
         } catch (Exception e) {
+            XaeroPlus.LOGGER.error("Error creating highlights table for db: {} in dimension: {}", databaseName, dimension.location());
             throw new RuntimeException(e);
         }
     }

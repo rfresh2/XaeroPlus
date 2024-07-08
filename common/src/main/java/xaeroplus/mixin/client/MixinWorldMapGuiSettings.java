@@ -1,14 +1,21 @@
 package xaeroplus.mixin.client;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.map.gui.*;
 import xaero.map.misc.KeySortableByOther;
@@ -31,16 +38,25 @@ public abstract class MixinWorldMapGuiSettings extends ScreenBase {
     @Shadow
     protected int entriesPerPage;
 
+    @Unique
+    private int xaeroPlus$settingEntryWidth = 200;
+
     @Shadow private MyTinyButton nextButton;
 
     @Shadow private MyTinyButton prevButton;
 
     @Inject(method = "init", at = @At("HEAD"))
     public void adjustEntriesPerPage(final CallbackInfo ci) {
+        this.xaeroPlus$settingEntryWidth = 200; // default width
         this.entriesPerPage = 12; // fills height = 240
-        if (XaeroPlusSettingRegistry.expandSettingEntries.getValue() && this.height > 350) {
-            int extraRows = Math.min((height - 240) / 50, 6);
-            this.entriesPerPage = 12 + (2 * extraRows);
+        if (XaeroPlusSettingRegistry.expandSettingEntries.getValue()) {
+            if (this.height > 350) {
+                int extraRows = Math.min((height - 240) / 50, 6);
+                this.entriesPerPage = 12 + (2 * extraRows);
+            }
+            if (this.width > 800) {
+                xaeroPlus$settingEntryWidth = 250;
+            }
         }
     }
 
@@ -87,5 +103,26 @@ public abstract class MixinWorldMapGuiSettings extends ScreenBase {
         }
         instance.add(entryObject);
         return false;
+    }
+
+    @WrapOperation(
+        method = "init",
+        slice = @Slice(
+            from = @At(
+                value = "FIELD",
+                opcode = Opcodes.PUTFIELD,
+                target = "Lxaero/map/gui/GuiSettings;foundSomething:Z"
+            )),
+        at = @At(
+            value = "INVOKE",
+            target = "Lxaero/map/gui/ISettingEntry;createWidget(IIIZ)Lnet/minecraft/client/gui/components/AbstractWidget;",
+            ordinal = 0
+        )
+    )
+    public AbstractWidget adjustSettingEntryWidth(final ISettingEntry instance, final int x, final int y, final int w, final boolean canEditIngameSettings, final Operation<AbstractWidget> original,
+                                                  @Local(name = "i") int i) {
+        if (!XaeroPlusSettingRegistry.expandSettingEntries.getValue()) return original.call(instance, x, y, w, canEditIngameSettings);
+        int xOffset = ((i % 2 == 0) ? -1 : 1) * ((xaeroPlus$settingEntryWidth - 200) / 2);
+        return original.call(instance, x + xOffset, y, xaeroPlus$settingEntryWidth, canEditIngameSettings);
     }
 }

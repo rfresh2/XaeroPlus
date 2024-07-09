@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 public class DrawManager {
     private final Reference2ObjectMap<Class<?>, DrawFeature> chunkHighlightDrawFeatures = new Reference2ObjectOpenHashMap<>();
+    final LongArraySet regionBuf = new LongArraySet(8);
 
     public DrawManager() {
         XaeroPlus.EVENT_BUS.register(this);
@@ -93,18 +94,18 @@ public class DrawManager {
         final VertexConsumer overlayBufferBuilder,
         MinimapRendererHelper helper
         ) {
-        final LongArraySet regions = new LongArraySet(4);
+        regionBuf.clear();
         for (int i = minViewX; i <= maxViewX; i++) {
             for (int j = minViewZ; j <= maxViewZ; j++) {
                 int regX = i >> 3;
                 int regZ = j >> 3;
-                regions.add(ChunkUtils.chunkPosToLong(regX, regZ));
+                regionBuf.add(ChunkUtils.chunkPosToLong(regX, regZ));
             }
         }
         for (DrawFeature feature : chunkHighlightDrawFeatures.values()) {
             drawMinimapChunkHighlights(
                 feature,
-                regions,
+                regionBuf,
                 chunkX,
                 chunkZ,
                 tileX,
@@ -119,35 +120,6 @@ public class DrawManager {
     }
 
     public synchronized void drawWorldMapFeatures(
-        final int leafRegionX,
-        final int leafRegionZ,
-        final int level,
-        final int flooredCameraX,
-        final int flooredCameraZ,
-        final PoseStack matrixStack,
-        final VertexConsumer overlayBuffer
-    ) {
-        final int mx = leafRegionX + level;
-        final int mz = leafRegionZ + level;
-        final LongArraySet regions = new LongArraySet(1);
-        for (int regX = leafRegionX; regX < mx; ++regX) {
-            for (int regZ = leafRegionZ; regZ < mz; ++regZ) {
-                regions.add(ChunkUtils.chunkPosToLong(regX, regZ));
-            }
-        }
-        for (DrawFeature feature : chunkHighlightDrawFeatures.values()) {
-            drawWorldMapChunkHighlights(
-                feature,
-                regions,
-                flooredCameraX,
-                flooredCameraZ,
-                matrixStack,
-                overlayBuffer
-            );
-        }
-    }
-
-    public synchronized void drawWorldMapFeaturesNew(
         final int minRegX,
         final int maxRegX,
         final int minRegZ,
@@ -158,15 +130,14 @@ public class DrawManager {
         final PoseStack matrixStack,
         final VertexConsumer overlayBuffer
     ) {
-        final LongArraySet regions = new LongArraySet(8);
-
+        regionBuf.clear();
         for (int x = minRegX; x <= maxRegX; x++) {
             for (int z = minRegZ; z <= maxRegZ; z++) {
                 final int mx = x + level;
                 final int mz = z + level;
                 for (int regX = x; regX < mx; ++regX) {
                     for (int regZ = z; regZ < mz; ++regZ) {
-                        regions.add(ChunkUtils.chunkPosToLong(regX, regZ));
+                        regionBuf.add(ChunkUtils.chunkPosToLong(regX, regZ));
                     }
                 }
             }
@@ -175,7 +146,7 @@ public class DrawManager {
         for (DrawFeature feature : chunkHighlightDrawFeatures.values()) {
             drawWorldMapChunkHighlights(
                 feature,
-                regions,
+                regionBuf,
                 flooredCameraX,
                 flooredCameraZ,
                 matrixStack,

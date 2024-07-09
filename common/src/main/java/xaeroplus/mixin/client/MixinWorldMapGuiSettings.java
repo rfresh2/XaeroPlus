@@ -117,7 +117,8 @@ public abstract class MixinWorldMapGuiSettings extends ScreenBase {
             value = "INVOKE",
             target = "Lxaero/map/gui/ISettingEntry;createWidget(IIIZ)Lnet/minecraft/client/gui/components/AbstractWidget;",
             ordinal = 0
-        )
+        ),
+        remap = true
     )
     public AbstractWidget adjustSettingEntryWidth(final ISettingEntry instance, final int x, final int y, final int w, final boolean canEditIngameSettings, final Operation<AbstractWidget> original,
                                                   @Local(name = "i") int i) {

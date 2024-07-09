@@ -270,7 +270,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         final int maxX = maxRegX * leveledSideInRegions;
         final int minZ = minRegZ * leveledSideInRegions;
         final int maxZ = maxRegZ * leveledSideInRegions;
-        Globals.drawManager.drawWorldMapFeaturesNew(
+        Globals.drawManager.drawWorldMapFeatures(
             minX,
             maxX,
             minZ,

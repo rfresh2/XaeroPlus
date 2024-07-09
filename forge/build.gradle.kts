@@ -17,6 +17,7 @@ loom {
         mixinConfigs.set(listOf("xaeroplus.mixins.json", "xaeroplus-forge.mixins.json"))
         convertAccessWideners = true
         extraAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
+        useCustomMixin = false
     }
     runs {
         getByName("client") {

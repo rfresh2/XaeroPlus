@@ -239,27 +239,47 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 //        return 100;
 //    }
 
-    @Inject(method = "render", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/map/region/LeveledRegion;loadingAnimation()Z",
-        shift = At.Shift.BEFORE
-    ), remap = true)
+    @Inject(method = "render",
+        slice = @Slice(
+            from = @At(
+                value = "FIELD",
+                target = "Lxaero/map/gui/GuiMap;prevLoadingLeaves:Z",
+                opcode = Opcodes.PUTFIELD
+            )
+        ),
+        at = @At(
+            value = "INVOKE",
+            target = "Lxaero/map/graphics/MapRenderHelper;renderDynamicHighlight(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;IIIIIIFFFFFFFF)V",
+            shift = At.Shift.BEFORE,
+            ordinal = 0
+        ),
+        remap = true)
     public void drawWorldMapFeatures(final PoseStack guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci,
-                                     @Local(name = "leafRegionMinX") int leafRegionMinX,
-                                     @Local(name = "leafRegionMinZ") int leafRegionMinZ,
-                                     @Local(name = "leveledSideInRegions") int leveledSideInRegions,
+                                     @Local(name = "minRegX") int minRegX,
+                                     @Local(name = "maxRegX") int maxRegX,
+                                     @Local(name = "minRegZ") int minRegZ,
+                                     @Local(name = "maxRegZ") int maxRegZ,
+                                     @Local(name = "textureLevel") int textureLevel,
                                      @Local(name = "flooredCameraX") int flooredCameraX,
                                      @Local(name = "flooredCameraZ") int flooredCameraZ,
                                      @Local(name = "matrixStack") PoseStack matrixStack,
                                      @Local(name = "overlayBuffer") VertexConsumer overlayBuffer) {
-        if (!Minecraft.getInstance().options.hideGui)
-            Globals.drawManager.drawWorldMapFeatures(leafRegionMinX,
-                                                     leafRegionMinZ,
-                                                     leveledSideInRegions,
-                                                     flooredCameraX,
-                                                     flooredCameraZ,
-                                                     matrixStack,
-                                                     overlayBuffer);
+        if (Minecraft.getInstance().options.hideGui) return;
+        final int leveledSideInRegions = 1 << textureLevel;
+        for (int leveledRegX = minRegX; leveledRegX <= maxRegX; leveledRegX++) {
+            for (int leveledRegZ = minRegZ; leveledRegZ <= maxRegZ; leveledRegZ++) {
+                final int leafRegionMinX = leveledRegX * leveledSideInRegions;
+                final int leafRegionMinZ = leveledRegZ * leveledSideInRegions;
+                Globals.drawManager.drawWorldMapFeatures(
+                    leafRegionMinX,
+                    leafRegionMinZ,
+                    leveledSideInRegions,
+                    flooredCameraX,
+                    flooredCameraZ,
+                    matrixStack,
+                    overlayBuffer);
+            }
+        }
     }
 
 //    @ModifyConstant(method = "render", constant = @Constant(intValue = 16, ordinal = 0))

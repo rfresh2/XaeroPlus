@@ -147,6 +147,42 @@ public class DrawManager {
         }
     }
 
+    public synchronized void drawWorldMapFeaturesNew(
+        final int minRegX,
+        final int maxRegX,
+        final int minRegZ,
+        final int maxRegZ,
+        final int level,
+        final int flooredCameraX,
+        final int flooredCameraZ,
+        final PoseStack matrixStack,
+        final VertexConsumer overlayBuffer
+    ) {
+        final LongArraySet regions = new LongArraySet(8);
+
+        for (int x = minRegX; x <= maxRegX; x++) {
+            for (int z = minRegZ; z <= maxRegZ; z++) {
+                final int mx = x + level;
+                final int mz = z + level;
+                for (int regX = x; regX < mx; ++regX) {
+                    for (int regZ = z; regZ < mz; ++regZ) {
+                        regions.add(ChunkUtils.chunkPosToLong(regX, regZ));
+                    }
+                }
+            }
+        }
+
+        for (DrawFeature feature : chunkHighlightDrawFeatures.values()) {
+            drawWorldMapChunkHighlights(
+                feature,
+                regions,
+                flooredCameraX,
+                flooredCameraZ,
+                matrixStack,
+                overlayBuffer
+            );
+        }
+    }
 
     private void drawMinimapChunkHighlights(final DrawFeature feature,
                                             final LongArraySet regions,

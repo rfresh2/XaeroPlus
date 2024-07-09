@@ -265,20 +265,20 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                      @Local(name = "overlayBuffer") VertexConsumer overlayBuffer) {
         if (Minecraft.getInstance().options.hideGui) return;
         final int leveledSideInRegions = 1 << textureLevel;
-        for (int leveledRegX = minRegX; leveledRegX <= maxRegX; leveledRegX++) {
-            for (int leveledRegZ = minRegZ; leveledRegZ <= maxRegZ; leveledRegZ++) {
-                final int leafRegionMinX = leveledRegX * leveledSideInRegions;
-                final int leafRegionMinZ = leveledRegZ * leveledSideInRegions;
-                Globals.drawManager.drawWorldMapFeatures(
-                    leafRegionMinX,
-                    leafRegionMinZ,
-                    leveledSideInRegions,
-                    flooredCameraX,
-                    flooredCameraZ,
-                    matrixStack,
-                    overlayBuffer);
-            }
-        }
+        final int minX = minRegX * leveledSideInRegions;
+        final int maxX = maxRegX * leveledSideInRegions;
+        final int minZ = minRegZ * leveledSideInRegions;
+        final int maxZ = maxRegZ * leveledSideInRegions;
+        Globals.drawManager.drawWorldMapFeaturesNew(
+            minX,
+            maxX,
+            minZ,
+            maxZ,
+            leveledSideInRegions,
+            flooredCameraX,
+            flooredCameraZ,
+            matrixStack,
+            overlayBuffer);
     }
 
 //    @ModifyConstant(method = "render", constant = @Constant(intValue = 16, ordinal = 0))

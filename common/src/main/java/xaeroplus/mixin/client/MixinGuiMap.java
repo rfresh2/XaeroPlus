@@ -139,11 +139,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         xTextEntryField = new EditBox(Minecraft.getInstance().font, 20, coordinateGotoButton.y - 10, 50, 20, Component.nullToEmpty("X:"));
         xTextEntryField.setVisible(false);
         xTextEntryField.setCursorPosition(0);
-        xTextEntryField.setSuggestion("X:");
         zTextEntryField = new EditBox(Minecraft.getInstance().font, 20, xTextEntryField.y + 20, 50, 20, Component.nullToEmpty("Z:"));
         zTextEntryField.setVisible(false);
         zTextEntryField.setCursorPosition(0);
-        zTextEntryField.setSuggestion("Z:");
         this.addWidget(xTextEntryField);
         this.addWidget(zTextEntryField);
         // right side

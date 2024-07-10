@@ -1,10 +1,13 @@
 package xaeroplus.mixin.client.mc;
 
+import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket;
+import net.minecraft.world.level.chunk.ChunkStatus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -19,9 +22,23 @@ import xaeroplus.event.ChunkDataEvent;
 public class MixinClientPlayNetworkHandler {
     @Shadow private ClientLevel level;
 
+    @Inject(method = "handleLevelChunkWithLight", at = @At(
+        value = "INVOKE",
+        target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;updateLevelChunk(IILnet/minecraft/network/protocol/game/ClientboundLevelChunkPacketData;)V"
+    )) // on main thread before chunk data buf is read
+    public void onChunkDataPacket(
+        final ClientboundLevelChunkWithLightPacket packet,
+        final CallbackInfo ci,
+        @Share("seenChunk") LocalBooleanRef seenChunkRef) {
+        seenChunkRef.set(level.getChunk(packet.getX(), packet.getZ(), ChunkStatus.FULL, false) != null);
+    }
+
     @Inject(method = "handleLevelChunkWithLight", at = @At("RETURN"))
-    public void onChunkData(final ClientboundLevelChunkWithLightPacket packet, final CallbackInfo ci) {
-        XaeroPlus.EVENT_BUS.call(new ChunkDataEvent(level.getChunk(packet.getX(), packet.getZ())));
+    public void onChunkData(
+        final ClientboundLevelChunkWithLightPacket packet,
+        final CallbackInfo ci,
+        @Share("seenChunk") LocalBooleanRef seenChunkRef) {
+        XaeroPlus.EVENT_BUS.call(new ChunkDataEvent(level.getChunk(packet.getX(), packet.getZ()), seenChunkRef.get()));
     }
 
     @Inject(method = "handleChunkBlocksUpdate", at = @At(

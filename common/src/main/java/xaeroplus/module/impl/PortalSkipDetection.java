@@ -54,7 +54,7 @@ public class PortalSkipDetection extends Module {
     private boolean oldChunksInverse = false;
     private boolean newChunks = false;
     private OldChunks oldChunksModule;
-    private PacketNewChunks newChunksModule;
+    private PaletteNewChunks newChunksModule;
 
     @EventHandler
     public void onClientTickEvent(final ClientTickEvent.Post event) {
@@ -93,7 +93,7 @@ public class PortalSkipDetection extends Module {
             ));
         reset();
         initializeWorld();
-        this.newChunksModule = ModuleManager.getModule(PacketNewChunks.class);
+        this.newChunksModule = ModuleManager.getModule(PaletteNewChunks.class);
         this.oldChunksModule = ModuleManager.getModule(OldChunks.class);
     }
 

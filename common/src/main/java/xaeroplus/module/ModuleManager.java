@@ -15,7 +15,7 @@ public class ModuleManager {
                 new FpsLimiter(),
                 new NewChunks(),
                 new OldChunks(),
-                new PacketNewChunks(),
+                new PaletteNewChunks(),
                 new Portals(),
                 new PortalSkipDetection(),
                 new WaystoneSync(),

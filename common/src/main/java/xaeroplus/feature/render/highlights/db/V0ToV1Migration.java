@@ -5,6 +5,8 @@ import net.minecraft.world.level.Level;
 import xaeroplus.XaeroPlus;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class V0ToV1Migration implements DatabaseMigration {
 
@@ -16,28 +18,12 @@ public class V0ToV1Migration implements DatabaseMigration {
 
     @Override
     public boolean shouldMigrate(String databaseName, Connection connection) {
-        try (var statement = connection.createStatement()) {
-            // list all tables
-            try (var resultSet = statement.executeQuery("SELECT * FROM sqlite_master")) {
-                // check if the metadata table exists
-                while (resultSet.next()) {
-                    if (resultSet.getString("name").equals("metadata")) {
-                        return false;
-                    }
-                }
-            }
-            // check if the old tables exist
-            try (var resultSet = statement.executeQuery("SELECT * FROM sqlite_master")) {
-                while (resultSet.next()) {
-                    if (resultSet.getString("name").equals("0") || resultSet.getString("name").equals("1") || resultSet.getString("name").equals("-1")) {
-                        return true;
-                    }
-                }
-            }
-            // no old tables found
-            return false;
+        try {
+            return tableExists("0", connection)
+                || tableExists("-1", connection)
+                || tableExists("1", connection);
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Failed performing {} database migration", databaseName, e);
+            XaeroPlus.LOGGER.error("Failed checking if {} database should migrate", databaseName, e);
             return false;
         }
     }
@@ -46,12 +32,10 @@ public class V0ToV1Migration implements DatabaseMigration {
     public void doMigration(String databaseName, final Connection connection) {
         // migrate old tables and indexes
         try {
-            try (var statement = connection.createStatement()) {
-                // migrate table name
-                statement.executeUpdate("ALTER TABLE \"0\" RENAME TO \"" + getTableName(Level.OVERWORLD) + "\"");
-                statement.executeUpdate("ALTER TABLE \"-1\" RENAME TO \"" + getTableName(Level.NETHER) + "\"");
-                statement.executeUpdate("ALTER TABLE \"1\" RENAME TO \"" + getTableName(Level.END) + "\"");
-            }
+            // migrate table name
+            mergeTables("0", getTableName(Level.OVERWORLD), connection);
+            mergeTables("-1", getTableName(Level.NETHER), connection);
+            mergeTables("1", getTableName(Level.END), connection);
 
             try (var statement = connection.createStatement()) {
                 // rebuild new indexes
@@ -71,5 +55,28 @@ public class V0ToV1Migration implements DatabaseMigration {
 
     private String getTableName(ResourceKey<Level> dimension) {
         return dimension.location().toString();
+    }
+
+    private boolean tableExists(String tableName, Connection connection) throws SQLException {
+        try (var statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery("SELECT name FROM sqlite_master WHERE type='table' and name='" + tableName + "'");
+            return resultSet.next();
+        }
+    }
+
+    private void mergeTables(String src, String dest, Connection connection) throws SQLException {
+        try (var statement = connection.createStatement()) {
+            // migrate table name
+            if (tableExists(dest, connection)) {
+                // presumably the user downgraded their XaeroPlus version below 2.15
+                // or ran into issues during the migration
+                if (tableExists(src, connection)) { // retains existing data in both src and dest
+                    statement.executeUpdate("INSERT OR IGNORE INTO \"" + dest + "\" SELECT * FROM \"" + src +"\"");
+                    statement.executeUpdate("DROP TABLE IF EXISTS \"" + src + "\"");
+                }
+            } else {
+                statement.executeUpdate("ALTER TABLE \"" + src + "\" RENAME TO \"" + dest + "\"");
+            }
+        }
     }
 }

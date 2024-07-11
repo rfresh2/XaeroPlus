@@ -9,15 +9,15 @@ pluginManagement {
 	}
 }
 gradle.extra.apply {
-	set("mod_version", "2.16")
+	set("mod_version", "2.17")
 	set("maven_group", "xaeroplus")
 	set("archives_base_name", "XaeroPlus")
 	set("minecraft_version", "1.21")
 	set("parchment_version", "2024.06.23")
 	set("fabric_loader_version", "0.15.11")
 	set("fabric_api_version", "0.100.2+1.21")
-	set("forge_loader_version", "51.0.23")
-    set("neoforge_version", "21.0.77-beta")
+	set("forge_loader_version", "51.0.24")
+    set("neoforge_version", "21.0.83-beta")
     set("worldmap_version_fabric", "1.38.8")
     set("minimap_version_fabric", "24.2.1")
     set("worldmap_version_forge", "1.38.8")
@@ -45,14 +45,14 @@ dependencyResolutionManagement {
             library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.4.0")
 			library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.1.8")
 			library("lambdaEvents", "net.lenni0451:LambdaEvents:2.4.2")
-			library("waystones-fabric", "maven.modrinth:waystones:21.0.5+fabric-1.21")
-			library("waystones-forge", "maven.modrinth:waystones:21.0.5+forge-1.21")
-			library("waystones-neoforge", "maven.modrinth:waystones:21.0.5+neoforge-1.21")
-			library("balm-fabric", "maven.modrinth:balm:21.0.6+fabric-1.21")
-			library("balm-forge", "maven.modrinth:balm:21.0.11+forge-1.21")
-			library("balm-neoforge", "maven.modrinth:balm:21.0.11+neoforge-1.21")
+			library("waystones-fabric", "maven.modrinth:waystones:21.0.8+fabric-1.21")
+			library("waystones-forge", "maven.modrinth:waystones:21.0.8+forge-1.21")
+			library("waystones-neoforge", "maven.modrinth:waystones:21.0.8+neoforge-1.21")
+			library("balm-fabric", "maven.modrinth:balm:21.0.12+fabric-1.21")
+			library("balm-forge", "maven.modrinth:balm:21.0.12+forge-1.21")
+			library("balm-neoforge", "maven.modrinth:balm:21.0.12+neoforge-1.21")
 			library("fabric-waystones", "maven.modrinth:fwaystones:3.3.2+mc1.20.4")
-			library("worldtools", "maven.modrinth:worldtools:1.2.0+1.20.4")
+			library("worldtools", "maven.modrinth:worldtools:1.2.4+1.20.4")
             library("sqlite", "com.github.rfresh2:sqlite-jdbc:2ba0c66439") // relocated xerial sqlite to avoid conflicts with other mods
 			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.2.18+1.21-fabric")
 			library("immediatelyfast-neo", "maven.modrinth:immediatelyfast:1.2.18+1.21-neoforge")
@@ -60,7 +60,7 @@ dependencyResolutionManagement {
 			library("sodium", "maven.modrinth:sodium:mc1.21-0.5.11")
 //			library("fpsdisplay", "maven.modrinth:fpsdisplay:3.1.0+1.20.x")
 			library("cloth-config-fabric", "me.shedaniel.cloth:cloth-config-fabric:15.0.127")
-            library("embeddium", "maven.modrinth:embeddium:1.0.3+mc1.21")
+            library("embeddium", "maven.modrinth:embeddium:1.0.5+mc1.21")
         }
 	}
 }

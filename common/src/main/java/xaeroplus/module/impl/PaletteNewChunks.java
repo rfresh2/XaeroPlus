@@ -27,10 +27,10 @@ import xaeroplus.util.ChunkUtils;
 import static net.minecraft.world.level.Level.*;
 import static xaeroplus.feature.render.ColorHelper.getColor;
 
-public class PacketNewChunks extends Module {
+public class PaletteNewChunks extends Module {
     private ChunkHighlightCache newChunksCache = new ChunkHighlightLocalCache();
     private int newChunksColor = getColor(255, 0, 0, 100);
-    private static final String DATABASE_NAME = "XaeroPlusPacketNewChunks";
+    private static final String DATABASE_NAME = "XaeroPlusPaletteNewChunks";
 
     public void setNewChunksCache(final boolean disk) {
         try {
@@ -46,7 +46,7 @@ public class PacketNewChunks extends Module {
                 if (map != null) newChunksCache.loadPreviousState(map);
             }
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error closing new chunks cache", e);
+            XaeroPlus.LOGGER.error("Error closing palette new chunks cache", e);
         }
     }
 
@@ -56,11 +56,11 @@ public class PacketNewChunks extends Module {
         var currentDim = ChunkUtils.getActualDimension();
         try {
             if (currentDim == OVERWORLD || currentDim == NETHER) {
-                if (processNewChunkOverworldOrNether(event.chunk())) {
+                if (checkNewChunkOverworldOrNether(event.chunk())) {
                     newChunksCache.addHighlight(event.chunk().getPos().x, event.chunk().getPos().z);
                 }
             } else if (currentDim == END) {
-                if (processNewChunkEnd(event.chunk())) {
+                if (checkNewChunkEnd(event.chunk())) {
                     newChunksCache.addHighlight(event.chunk().getPos().x, event.chunk().getPos().z);
                 }
             }
@@ -88,20 +88,21 @@ public class PacketNewChunks extends Module {
      * there is a chance for false negatives depending on features like mineshafts, geodes, etc that generate on the bottom section.
      * but it should be possible to repeat similar checks on other sections to get more accurate results
      */
-    private boolean processNewChunkOverworldOrNether(LevelChunk chunk) {
+    private boolean checkNewChunkOverworldOrNether(LevelChunk chunk) {
         var sections = chunk.getSections();
-
         if (sections.length == 0) return false;
         var firstSection = sections[0];
         Palette<BlockState> firstPalette = firstSection.getStates().data.palette();
-        if (firstPalette.getSize() < 1 || firstPalette instanceof SingleValuePalette<BlockState> || firstPalette instanceof GlobalPalette<BlockState> ) return false;
-        BlockState firstId = null;
+        if (firstPalette.getSize() < 1
+            || firstPalette instanceof SingleValuePalette<BlockState>
+            || firstPalette instanceof GlobalPalette<BlockState>)
+            return false;
         try {
-            firstId = firstPalette.valueFor(0);
+            return firstPalette.valueFor(0).getBlock() == Blocks.AIR;
         } catch (final MissingPaletteEntryException e) {
             // fall through
         }
-        return firstId != null && firstId.getBlock() == Blocks.AIR;
+        return false;
     }
 
     /**
@@ -110,14 +111,18 @@ public class PacketNewChunks extends Module {
      * for some reason end generation sets the first palette entry to plains before compaction
      * so we check if the first entry is the correct void biome
      */
-    private boolean processNewChunkEnd(LevelChunk chunk) {
+    private boolean checkNewChunkEnd(LevelChunk chunk) {
         var sections = chunk.getSections();
         if (sections.length == 0) return false;
         var firstSection = sections[0];
         var biomes = firstSection.getBiomes();
         if (biomes instanceof PalettedContainer<Holder<Biome>> biomesPaletteContainer) {
             Palette<Holder<Biome>> firstPalette = biomesPaletteContainer.data.palette();
-            if (firstPalette instanceof LinearPalette<Holder<Biome>> linearPalette && linearPalette.getSize() > 0) {
+            // singleton palette will never have more than 1 value
+            // and we should never have enough entries for a hashmap or global palette
+            // so we only care about linear palettes
+            if (firstPalette instanceof LinearPalette<Holder<Biome>> linearPalette
+                && linearPalette.getSize() > 0) {
                 Holder<Biome> firstId = linearPalette.valueFor(0);
                 return firstId.unwrapKey().filter(k -> k.equals(Biomes.THE_VOID)).isEmpty();
             }
@@ -157,7 +162,7 @@ public class PacketNewChunks extends Module {
     }
 
     public void setRgbColor(final int color) {
-        newChunksColor = ColorHelper.getColorWithAlpha(color, (int) XaeroPlusSettingRegistry.newChunksAlphaSetting.getValue());
+        newChunksColor = ColorHelper.getColorWithAlpha(color, (int) XaeroPlusSettingRegistry.paletteNewChunksAlphaSetting.getValue());
     }
 
     public void setAlpha(final float a) {

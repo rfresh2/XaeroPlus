@@ -35,10 +35,11 @@ import static xaeroplus.util.ChunkUtils.*;
 import static xaeroplus.util.GuiMapHelper.*;
 
 public class PortalSkipDetection extends Module {
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder()
-                                                                                          .setNameFormat("XaeroPlus-PortalSkipDetection-Search")
-                                                                                          .setDaemon(true)
-                                                                                          .build());
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor(
+        new ThreadFactoryBuilder()
+            .setNameFormat("XaeroPlus-PortalSkipDetection-Search")
+            .setDaemon(true)
+            .build());
     private Future<?> portalSkipDetectionSearchFuture = null;
     private int portalSkipChunksColor = ColorHelper.getColor(255, 255, 255, 100);
     private final ChunkHighlightLocalCache cache = new ChunkHighlightLocalCache();
@@ -53,7 +54,7 @@ public class PortalSkipDetection extends Module {
     private boolean oldChunksInverse = false;
     private boolean newChunks = false;
     private OldChunks oldChunksModule;
-    private NewChunks newChunksModule;
+    private PacketNewChunks newChunksModule;
 
     @EventHandler
     public void onClientTickEvent(final ClientTickEvent.Post event) {
@@ -92,7 +93,7 @@ public class PortalSkipDetection extends Module {
             ));
         reset();
         initializeWorld();
-        this.newChunksModule = ModuleManager.getModule(NewChunks.class);
+        this.newChunksModule = ModuleManager.getModule(PacketNewChunks.class);
         this.oldChunksModule = ModuleManager.getModule(OldChunks.class);
     }
 

@@ -186,33 +186,33 @@ public final class XaeroPlusSettingRegistry {
         "setting.world_map.cross_dimension_cursor_coordinates.tooltip",
         false,
         SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusBooleanSetting packetNewChunksEnabledSetting = XaeroPlusBooleanSetting.create(
-        "Packet NewChunks",
-        "setting.world_map.packet_new_chunks_highlighting",
-        "setting.world_map.packet_new_chunks_highlighting.tooltip",
-        (b) -> ModuleManager.getModule(PacketNewChunks.class).setEnabled(b),
+    public static final XaeroPlusBooleanSetting paletteNewChunksEnabledSetting = XaeroPlusBooleanSetting.create(
+        "Palette NewChunks",
+        "setting.world_map.palette_new_chunks_highlighting",
+        "setting.world_map.palette_new_chunks_highlighting.tooltip",
+        (b) -> ModuleManager.getModule(PaletteNewChunks.class).setEnabled(b),
         false,
         SettingLocation.CHUNK_HIGHLIGHTS);
-    public static final XaeroPlusBooleanSetting packetNewChunksSaveLoadToDisk = XaeroPlusBooleanSetting.create(
-        "Save/Load Packet NewChunks to Disk",
-        "setting.world_map.packet_new_chunks_save_load_to_disk",
-        "setting.world_map.packet_new_chunks_save_load_to_disk.tooltip",
-        (b) -> ModuleManager.getModule(PacketNewChunks.class).setNewChunksCache(b),
+    public static final XaeroPlusBooleanSetting paletteNewChunksSaveLoadToDisk = XaeroPlusBooleanSetting.create(
+        "Save/Load Palette NewChunks to Disk",
+        "setting.world_map.palette_new_chunks_save_load_to_disk",
+        "setting.world_map.palette_new_chunks_save_load_to_disk.tooltip",
+        (b) -> ModuleManager.getModule(PaletteNewChunks.class).setNewChunksCache(b),
         true,
         SettingLocation.CHUNK_HIGHLIGHTS);
-    public static final XaeroPlusFloatSetting packetNewChunksAlphaSetting = XaeroPlusFloatSetting.create(
-        "Packet NewChunks Opacity",
-        "setting.world_map.packet_new_chunks_opacity",
+    public static final XaeroPlusFloatSetting paletteNewChunksAlphaSetting = XaeroPlusFloatSetting.create(
+        "Palette NewChunks Opacity",
+        "setting.world_map.palette_new_chunks_opacity",
         0f, 255f, 10f,
-        "setting.world_map.packet_new_chunks_opacity.tooltip",
-        (b) -> ModuleManager.getModule(PacketNewChunks.class).setAlpha(b),
+        "setting.world_map.palette_new_chunks_opacity.tooltip",
+        (b) -> ModuleManager.getModule(PaletteNewChunks.class).setAlpha(b),
         100,
         SettingLocation.CHUNK_HIGHLIGHTS);
-    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> packetNewChunksColorSetting = XaeroPlusEnumSetting.create(
-        "Packet NewChunks Color",
-        "setting.world_map.packet_new_chunks_color",
-        "setting.world_map.packet_new_chunks_color.tooltip",
-        (b) -> ModuleManager.getModule(PacketNewChunks.class).setRgbColor(b.getColor()),
+    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> paletteNewChunksColorSetting = XaeroPlusEnumSetting.create(
+        "Palette NewChunks Color",
+        "setting.world_map.palette_new_chunks_color",
+        "setting.world_map.palette_new_chunks_color.tooltip",
+        (b) -> ModuleManager.getModule(PaletteNewChunks.class).setRgbColor(b.getColor()),
         ColorHelper.HighlightColor.values(),
         ColorHelper.HighlightColor.RED,
         SettingLocation.CHUNK_HIGHLIGHTS);

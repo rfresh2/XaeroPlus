@@ -8,15 +8,15 @@ pluginManagement {
 	}
 }
 gradle.extra.apply {
-	set("mod_version", "2.16")
+	set("mod_version", "2.17")
 	set("maven_group", "xaeroplus")
 	set("archives_base_name", "XaeroPlus")
 	set("minecraft_version", "1.20.4")
 	set("parchment_version", "2024.02.25")
-	set("fabric_loader_version", "0.15.2")
-	set("fabric_api_version", "0.91.2+1.20.4")
-	set("forge_loader_version", "49.0.3")
-    set("neoforge_version", "20.4.167")
+	set("fabric_loader_version", "0.15.11")
+	set("fabric_api_version", "0.97.1+1.20.4")
+	set("forge_loader_version", "49.1.4")
+    set("neoforge_version", "20.4.178")
     set("worldmap_version_fabric", "1.38.8")
     set("minimap_version_fabric", "24.2.0")
     set("worldmap_version_forge", "1.38.8")
@@ -51,14 +51,14 @@ dependencyResolutionManagement {
 			library("balm-forge", "maven.modrinth:balm:9.0.9+forge-1.20.4")
 			library("balm-neoforge", "maven.modrinth:balm:9.0.9+neoforge-1.20.4")
 			library("fabric-waystones", "maven.modrinth:fwaystones:3.3.2+mc1.20.4")
-			library("worldtools", "maven.modrinth:worldtools:1.2.0+1.20.4")
+			library("worldtools", "maven.modrinth:worldtools:1.2.4+1.20.4")
             library("sqlite", "com.github.rfresh2:sqlite-jdbc:2ba0c66439") // relocated xerial sqlite to avoid conflicts with other mods
-			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.2.12+1.20.4-fabric")
+			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.2.18+1.20.4-fabric")
 			library("modmenu", "maven.modrinth:modmenu:9.0.0")
 			library("sodium", "maven.modrinth:sodium:mc1.20.4-0.5.8")
 			library("fpsdisplay", "maven.modrinth:fpsdisplay:4.0.0+1.20.4")
 			library("cloth-config-fabric", "me.shedaniel.cloth:cloth-config-fabric:13.0.121")
-            library("embeddium", "maven.modrinth:embeddium:0.3.11+mc1.20.4")
+            library("embeddium", "maven.modrinth:embeddium:0.3.25+mc1.20.4")
         }
 	}
 }

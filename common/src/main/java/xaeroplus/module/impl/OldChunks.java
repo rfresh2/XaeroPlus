@@ -6,8 +6,12 @@ import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
 import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -112,6 +116,7 @@ public class OldChunks extends Module {
 
     @EventHandler
     public void onChunkData(final ChunkDataEvent event) {
+        if (event.seenChunk()) return;
         searchChunkAsync(event.chunk());
     }
 
@@ -123,22 +128,36 @@ public class OldChunks extends Module {
                     if (searchChunk(chunk)) break;
                     Thread.sleep(500);
                 }
+                if (iterations == 3) {
+                    XaeroPlus.LOGGER.info("[{}, {}] Too many search iterations", chunk.getPos().x, chunk.getPos().z);
+                }
             } catch (final Throwable e) {
                 XaeroPlus.LOGGER.error("Error searching for OldChunk in chunk: {}, {}", chunk.getPos().x, chunk.getPos().z, e);
             }
         });
     }
 
-    private boolean searchChunk(final ChunkAccess chunk) {
+    private boolean searchChunk(final ChunkAccess chunk) throws InterruptedException {
         ResourceKey<Level> actualDimension = ChunkUtils.getActualDimension();
-        if (actualDimension != OVERWORLD && actualDimension != NETHER) {
-            return true;
+        var x = chunk.getPos().x;
+        var z = chunk.getPos().z;
+        if (actualDimension == OVERWORLD || actualDimension == NETHER) {
+            if (ChunkScanner.chunkContainsBlocks(chunk, actualDimension == OVERWORLD ? OVERWORLD_BLOCKS : NETHER_BLOCKS, 5)) {
+                return modernChunksCache.addHighlight(x, z);
+            } else {
+                return oldChunksCache.addHighlight(x, z);
+            }
+        } else if (actualDimension == END) {
+            Holder<Biome> biome = mc.level.getBiome(new BlockPos(ChunkUtils.chunkCoordToCoord(x) + 8, 64, ChunkUtils.chunkCoordToCoord(z) + 8));
+            var biomeKey = biome.unwrapKey().get();
+            if (biomeKey == Biomes.PLAINS) return false; // mitigate race condition where biomes aren't loaded yet for some reason
+            if (biomeKey == Biomes.THE_END) {
+                return oldChunksCache.addHighlight(x, z);
+            } else {
+                return modernChunksCache.addHighlight(x, z);
+            }
         }
-        if (ChunkScanner.chunkContainsBlocks(chunk, actualDimension == OVERWORLD ? OVERWORLD_BLOCKS : NETHER_BLOCKS, 5)) {
-            return modernChunksCache.addHighlight(chunk.getPos().x, chunk.getPos().z);
-        } else {
-            return oldChunksCache.addHighlight(chunk.getPos().x, chunk.getPos().z);
-        }
+        return true;
     }
 
     @EventHandler

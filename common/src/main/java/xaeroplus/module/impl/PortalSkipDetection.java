@@ -129,13 +129,17 @@ public class PortalSkipDetection extends Module {
         portalSkipDetectionSearchFuture = executorService.submit(this::searchForPortalSkipChunks);
     }
 
+    private final LongOpenHashSet portalDetectionSearchChunksBuf = new LongOpenHashSet();
+    private final Long2LongOpenHashMap portalAreaChunksBuf = new Long2LongOpenHashMap();
+    private final LongOpenHashSet portalChunkTempSetBuf = new LongOpenHashSet();
+
     private void searchForPortalSkipChunks() {
         try {
             final int windowRegionX = this.windowRegionX;
             final int windowRegionZ = this.windowRegionZ;
             final int windowRegionSize = this.windowRegionSize;
             final ResourceKey<Level> currentlyViewedDimension = Globals.getCurrentDimensionId();
-            final LongOpenHashSet portalDetectionSearchChunks = new LongOpenHashSet();
+            portalDetectionSearchChunksBuf.clear();
             for (int regionX = windowRegionX - windowRegionSize; regionX <= windowRegionX + windowRegionSize; regionX++) {
                 final int baseChunkCoordX = ChunkUtils.regionCoordToChunkCoord(regionX);
                 for (int regionZ = windowRegionZ - windowRegionSize; regionZ <= windowRegionZ + windowRegionSize; regionZ++) {
@@ -145,23 +149,23 @@ public class PortalSkipDetection extends Module {
                             final int chunkPosX = baseChunkCoordX + chunkX;
                             final int chunkPosZ = baseChunkCoordZ + chunkZ;
                             if (isChunkSeen(chunkPosX, chunkPosZ, currentlyViewedDimension) && !isNewishChunk(chunkPosX, chunkPosZ, currentlyViewedDimension)) {
-                                portalDetectionSearchChunks.add(ChunkUtils.chunkPosToLong(chunkPosX, chunkPosZ));
+                                portalDetectionSearchChunksBuf.add(ChunkUtils.chunkPosToLong(chunkPosX, chunkPosZ));
                             }
                         }
                     }
                 }
             }
-            final Long2LongOpenHashMap portalAreaChunks = new Long2LongOpenHashMap();
-            for (final long chunkPos : portalDetectionSearchChunks) {
+            portalAreaChunksBuf.clear();
+            for (final long chunkPos : portalDetectionSearchChunksBuf) {
                 boolean allSeen = true;
-                final LongOpenHashSet portalChunkTempSet = new LongOpenHashSet();
+                portalChunkTempSetBuf.clear();
                 for (int xOffset = 0; xOffset < portalRadius; xOffset++) {
                     for (int zOffset = 0; zOffset < portalRadius; zOffset++) {
                         final long currentChunkPos = ChunkUtils.chunkPosToLong(ChunkUtils.longToChunkX(chunkPos) + xOffset, ChunkUtils.longToChunkZ(chunkPos) + zOffset);
-                        portalChunkTempSet.add(currentChunkPos);
-                        if (!portalDetectionSearchChunks.contains(currentChunkPos)) {
+                        portalChunkTempSetBuf.add(currentChunkPos);
+                        if (!portalDetectionSearchChunksBuf.contains(currentChunkPos)) {
                             allSeen = false;
-                            portalChunkTempSet.clear();
+                            portalChunkTempSetBuf.clear();
                             break;
                         }
                     }
@@ -169,9 +173,9 @@ public class PortalSkipDetection extends Module {
                         break;
                     }
                 }
-                if (allSeen) portalChunkTempSet.forEach(c -> portalAreaChunks.put(c, 0));
+                if (allSeen) portalChunkTempSetBuf.forEach(c -> portalAreaChunksBuf.put(c, 0));
             }
-            cache.replaceState(portalAreaChunks);
+            cache.replaceState(portalAreaChunksBuf);
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error searching for portal skip chunks", e);
         }

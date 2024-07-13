@@ -137,25 +137,20 @@ public class OldChunks extends Module {
         });
     }
 
-    private boolean searchChunk(final ChunkAccess chunk) throws InterruptedException {
+    private boolean searchChunk(final ChunkAccess chunk) {
         ResourceKey<Level> actualDimension = ChunkUtils.getActualDimension();
         var x = chunk.getPos().x;
         var z = chunk.getPos().z;
         if (actualDimension == OVERWORLD || actualDimension == NETHER) {
-            if (ChunkScanner.chunkContainsBlocks(chunk, actualDimension == OVERWORLD ? OVERWORLD_BLOCKS : NETHER_BLOCKS, 5)) {
-                return modernChunksCache.addHighlight(x, z);
-            } else {
-                return oldChunksCache.addHighlight(x, z);
-            }
+            return ChunkScanner.chunkContainsBlocks(chunk, actualDimension == OVERWORLD ? OVERWORLD_BLOCKS : NETHER_BLOCKS, 5)
+                ? modernChunksCache.addHighlight(x, z)
+                : oldChunksCache.addHighlight(x, z);
         } else if (actualDimension == END) {
             Holder<Biome> biome = mc.level.getBiome(new BlockPos(ChunkUtils.chunkCoordToCoord(x) + 8, 64, ChunkUtils.chunkCoordToCoord(z) + 8));
             var biomeKey = biome.unwrapKey().get();
-            if (biomeKey == Biomes.PLAINS) return false; // mitigate race condition where biomes aren't loaded yet for some reason
-            if (biomeKey == Biomes.THE_END) {
-                return oldChunksCache.addHighlight(x, z);
-            } else {
-                return modernChunksCache.addHighlight(x, z);
-            }
+            return biomeKey == Biomes.THE_END
+                ? oldChunksCache.addHighlight(x, z)
+                : modernChunksCache.addHighlight(x, z);
         }
         return true;
     }

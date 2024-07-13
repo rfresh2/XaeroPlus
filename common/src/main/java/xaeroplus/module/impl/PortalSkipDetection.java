@@ -194,7 +194,7 @@ public class PortalSkipDetection extends Module {
     }
 
     private boolean isNewChunk(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> currentlyViewedDimension) {
-        if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue() && newChunksModule != null)
+        if (XaeroPlusSettingRegistry.paletteNewChunksSaveLoadToDisk.getValue() && newChunksModule != null)
             return newChunksModule.isNewChunk(chunkPosX, chunkPosZ, currentlyViewedDimension);
         else
             return false;

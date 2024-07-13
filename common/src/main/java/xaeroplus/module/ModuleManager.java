@@ -13,7 +13,7 @@ public class ModuleManager {
         asList(
                 new BaritoneGoalSync(),
                 new FpsLimiter(),
-                new NewChunks(),
+                new LiquidNewChunks(),
                 new OldChunks(),
                 new PaletteNewChunks(),
                 new Portals(),

@@ -35,7 +35,7 @@ import static java.util.Arrays.asList;
 import static xaeroplus.feature.render.ColorHelper.getColor;
 import static xaeroplus.util.ChunkUtils.getActualDimension;
 
-public class NewChunks extends Module {
+public class LiquidNewChunks extends Module {
     // chunks where liquid started flowing from source blocks after we loaded it
     private ChunkHighlightCache newChunksCache = new ChunkHighlightLocalCache();
     // chunks where liquid was already flowing or flowed when we loaded it
@@ -238,11 +238,11 @@ public class NewChunks extends Module {
     }
 
     public void setRgbColor(final int color) {
-        newChunksColor = ColorHelper.getColorWithAlpha(color, (int) XaeroPlusSettingRegistry.newChunksAlphaSetting.getValue());
+        newChunksColor = ColorHelper.getColorWithAlpha(color, (int) XaeroPlusSettingRegistry.liquidNewChunksAlphaSetting.getValue());
     }
 
     public void setInverseRgbColor(final int color) {
-        inverseColor = ColorHelper.getColorWithAlpha(color, (int) XaeroPlusSettingRegistry.newChunksAlphaSetting.getValue());
+        inverseColor = ColorHelper.getColorWithAlpha(color, (int) XaeroPlusSettingRegistry.liquidNewChunksAlphaSetting.getValue());
     }
 
     public void setAlpha(final float a) {

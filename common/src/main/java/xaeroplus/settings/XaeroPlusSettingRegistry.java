@@ -216,48 +216,48 @@ public final class XaeroPlusSettingRegistry {
         ColorHelper.HighlightColor.values(),
         ColorHelper.HighlightColor.RED,
         SettingLocation.CHUNK_HIGHLIGHTS);
-    public static final XaeroPlusBooleanSetting newChunksEnabledSetting = XaeroPlusBooleanSetting.create(
+    public static final XaeroPlusBooleanSetting liquidNewChunksEnabledSetting = XaeroPlusBooleanSetting.create(
             "NewChunks Highlighting",
             "setting.world_map.new_chunks_highlighting",
             "setting.world_map.new_chunks_highlighting.tooltip",
-            (b) -> ModuleManager.getModule(NewChunks.class).setEnabled(b),
+            (b) -> ModuleManager.getModule(LiquidNewChunks.class).setEnabled(b),
             false,
             SettingLocation.CHUNK_HIGHLIGHTS);
-    public static final XaeroPlusBooleanSetting newChunksSaveLoadToDisk = XaeroPlusBooleanSetting.create(
+    public static final XaeroPlusBooleanSetting liquidNewChunksSaveLoadToDisk = XaeroPlusBooleanSetting.create(
             "Save/Load NewChunks to Disk",
             "setting.world_map.new_chunks_save_load_to_disk",
             "setting.world_map.new_chunks_save_load_to_disk.tooltip",
-            (b) -> ModuleManager.getModule(NewChunks.class).setNewChunksCache(b),
+            (b) -> ModuleManager.getModule(LiquidNewChunks.class).setNewChunksCache(b),
             true,
             SettingLocation.CHUNK_HIGHLIGHTS);
-    public static final XaeroPlusFloatSetting newChunksAlphaSetting = XaeroPlusFloatSetting.create(
+    public static final XaeroPlusFloatSetting liquidNewChunksAlphaSetting = XaeroPlusFloatSetting.create(
             "New Chunks Opacity",
             "setting.world_map.new_chunks_opacity",
             0f, 255f, 10f,
             "setting.world_map.new_chunks_opacity.tooltip",
-            (b) -> ModuleManager.getModule(NewChunks.class).setAlpha(b),
+            (b) -> ModuleManager.getModule(LiquidNewChunks.class).setAlpha(b),
             100,
             SettingLocation.CHUNK_HIGHLIGHTS);
-    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> newChunksColorSetting = XaeroPlusEnumSetting.create(
+    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> liquidNewChunksColorSetting = XaeroPlusEnumSetting.create(
             "New Chunks Color",
             "setting.world_map.new_chunks_color",
             "setting.world_map.new_chunks_color.tooltip",
-            (b) -> ModuleManager.getModule(NewChunks.class).setRgbColor(b.getColor()),
+            (b) -> ModuleManager.getModule(LiquidNewChunks.class).setRgbColor(b.getColor()),
             ColorHelper.HighlightColor.values(),
             ColorHelper.HighlightColor.RED,
             SettingLocation.CHUNK_HIGHLIGHTS);
-    public static final XaeroPlusBooleanSetting newChunksInverseHighlightsSetting = XaeroPlusBooleanSetting.create(
+    public static final XaeroPlusBooleanSetting liquidNewChunksInverseHighlightsSetting = XaeroPlusBooleanSetting.create(
         "New Chunks Render Inverse",
         "setting.world_map.new_chunks_inverse_enabled",
         "setting.world_map.new_chunks_inverse_enabled.tooltip",
-        (b) -> ModuleManager.getModule(NewChunks.class).setInverseRenderEnabled(b),
+        (b) -> ModuleManager.getModule(LiquidNewChunks.class).setInverseRenderEnabled(b),
         false,
         SettingLocation.CHUNK_HIGHLIGHTS);
-    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> newChunksInverseColorSetting = XaeroPlusEnumSetting.create(
+    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> liquidNewChunksInverseColorSetting = XaeroPlusEnumSetting.create(
         "New Chunks Inverse Color",
         "setting.world_map.new_chunks_inverse_color",
         "setting.world_map.new_chunks_inverse_color.tooltip",
-        (b) -> ModuleManager.getModule(NewChunks.class).setInverseRgbColor(b.getColor()),
+        (b) -> ModuleManager.getModule(LiquidNewChunks.class).setInverseRgbColor(b.getColor()),
         ColorHelper.HighlightColor.values(),
         ColorHelper.HighlightColor.GREEN,
         SettingLocation.CHUNK_HIGHLIGHTS);

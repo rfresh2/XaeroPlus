@@ -94,6 +94,7 @@ public class DrawManager {
         final VertexConsumer overlayBufferBuilder,
         MinimapRendererHelper helper
         ) {
+        if (chunkHighlightDrawFeatures.isEmpty()) return;
         regionBuf.clear();
         for (int i = minViewX; i <= maxViewX; i++) {
             for (int j = minViewZ; j <= maxViewZ; j++) {
@@ -130,6 +131,7 @@ public class DrawManager {
         final PoseStack matrixStack,
         final VertexConsumer overlayBuffer
     ) {
+        if (chunkHighlightDrawFeatures.isEmpty()) return;
         regionBuf.clear();
         for (int x = minRegX; x <= maxRegX; x++) {
             for (int z = minRegZ; z <= maxRegZ; z++) {
@@ -143,6 +145,36 @@ public class DrawManager {
             }
         }
 
+        for (DrawFeature feature : chunkHighlightDrawFeatures.values()) {
+            drawWorldMapChunkHighlights(
+                feature,
+                regionBuf,
+                flooredCameraX,
+                flooredCameraZ,
+                matrixStack,
+                overlayBuffer
+            );
+        }
+    }
+
+    public synchronized void drawWorldMapFeaturesSection(
+        final int leafRegionX,
+        final int leafRegionZ,
+        final int level,
+        final int flooredCameraX,
+        final int flooredCameraZ,
+        final PoseStack matrixStack,
+        final VertexConsumer overlayBuffer
+    ) {
+        if (chunkHighlightDrawFeatures.isEmpty()) return;
+        regionBuf.clear();
+        final int mx = leafRegionX + level;
+        final int mz = leafRegionZ + level;
+        for (int regX = leafRegionX; regX < mx; ++regX) {
+            for (int regZ = leafRegionZ; regZ < mz; ++regZ) {
+                regionBuf.add(ChunkUtils.chunkPosToLong(regX, regZ));
+            }
+        }
         for (DrawFeature feature : chunkHighlightDrawFeatures.values()) {
             drawWorldMapChunkHighlights(
                 feature,

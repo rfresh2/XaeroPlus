@@ -130,8 +130,9 @@ public class Portals extends Module {
 
     private static final ReferenceSet<Block> PORTAL_BLOCKS = new ReferenceOpenHashSet<>();
     static {
-        PORTAL_BLOCKS.add(Blocks.NETHER_PORTAL);
         PORTAL_BLOCKS.add(Blocks.END_PORTAL);
+        PORTAL_BLOCKS.add(Blocks.END_GATEWAY);
+        PORTAL_BLOCKS.add(Blocks.NETHER_PORTAL);
         PORTAL_BLOCKS.add(Blocks.END_PORTAL_FRAME);
     }
 

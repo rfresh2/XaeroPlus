@@ -236,6 +236,31 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 //        return 100;
 //    }
 
+    @Inject(method = "render", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/map/region/LeveledRegion;loadingAnimation()Z",
+        shift = At.Shift.BEFORE
+    ), remap = true)
+    public void drawWorldMapFeatures(final PoseStack guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci,
+                                     @Local(name = "leafRegionMinX") int leafRegionMinX,
+                                     @Local(name = "leafRegionMinZ") int leafRegionMinZ,
+                                     @Local(name = "leveledSideInRegions") int leveledSideInRegions,
+                                     @Local(name = "flooredCameraX") int flooredCameraX,
+                                     @Local(name = "flooredCameraZ") int flooredCameraZ,
+                                     @Local(name = "matrixStack") PoseStack matrixStack,
+                                     @Local(name = "overlayBuffer") VertexConsumer overlayBuffer) {
+        if (Minecraft.getInstance().options.hideGui) return;
+        if (XaeroPlusSettingRegistry.renderHighlightsOnRegionsWithoutTextures.getValue()) return;
+        Globals.drawManager.drawWorldMapFeaturesSection(
+            leafRegionMinX,
+            leafRegionMinZ,
+            leveledSideInRegions,
+            flooredCameraX,
+            flooredCameraZ,
+            matrixStack,
+            overlayBuffer);
+    }
+
     @Inject(method = "render",
         slice = @Slice(
             from = @At(
@@ -262,6 +287,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                      @Local(name = "matrixStack") PoseStack matrixStack,
                                      @Local(name = "overlayBuffer") VertexConsumer overlayBuffer) {
         if (Minecraft.getInstance().options.hideGui) return;
+        if (!XaeroPlusSettingRegistry.renderHighlightsOnRegionsWithoutTextures.getValue()) return;
         final int leveledSideInRegions = 1 << textureLevel;
         final int minX = minRegX * leveledSideInRegions;
         final int maxX = maxRegX * leveledSideInRegions;

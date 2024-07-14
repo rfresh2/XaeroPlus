@@ -551,4 +551,11 @@ public final class XaeroPlusSettingRegistry {
         "setting.world_map.expanded_settings.tooltip",
         false,
         SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting renderHighlightsOnRegionsWithoutTextures = XaeroPlusBooleanSetting.create(
+        "Highlight Regions Without Textures",
+        "setting.world_map.highlight_regions_without_textures",
+        "setting.world_map.highlight_regions_without_textures.tooltip",
+        false,
+        SettingLocation.CHUNK_HIGHLIGHTS
+    );
 }

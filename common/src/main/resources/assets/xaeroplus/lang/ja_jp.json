@@ -45,6 +45,8 @@
     "setting.world_map.palette_new_chunks_opacity.tooltip": "パレットNewChunksハイライトの色の不透明度を設定します",
     "setting.world_map.palette_new_chunks_color": "パレットNewChunksの色",
     "setting.world_map.palette_new_chunks_color.tooltip": "パレットNewChunksハイライトの色を設定します",
+    "setting.world_map.palette_new_chunks_inverse": "パレット新しいチャンクの反転",
+    "setting.world_map.palette_new_chunks_inverse.tooltip": "パレット新しいチャンクの反転をレンダリングします。つまり、すでに生成されたチャンクをロードします。",
     "setting.world_map.new_chunks_highlighting": "液体 NewChunks",
     "setting.world_map.new_chunks_highlighting.tooltip": "チャンク内の液体の流れ状態に基づいてNewChunksを検出します。液体が流れていないチャンクやエンドでは動作しません",
     "setting.world_map.new_chunks_save_load_to_disk": "液体 NewChunksをディスクに保存/読み込み",

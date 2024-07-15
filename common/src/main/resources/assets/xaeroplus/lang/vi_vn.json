@@ -45,6 +45,8 @@
     "setting.world_map.palette_new_chunks_opacity.tooltip": "Đặt độ mờ màu của các điểm nổi bật của Bảng màu NewChunks",
     "setting.world_map.palette_new_chunks_color": "Màu sắc của Bảng màu NewChunks",
     "setting.world_map.palette_new_chunks_color.tooltip": "Đặt màu sắc của các điểm nổi bật của Bảng màu NewChunks",
+    "setting.world_map.palette_new_chunks_inverse": "Bảng Màu PhầnMới ĐảoNgược",
+    "setting.world_map.palette_new_chunks_inverse.tooltip": "Hiển thị đảo ngược của Bảng Màu PhầnMới, nghĩa là các phần bạn tải đã được tạo trước đó",
     "setting.world_map.new_chunks_highlighting": "Chất lỏng NewChunks",
     "setting.world_map.new_chunks_highlighting.tooltip": "Phát hiện NewChunks dựa trên trạng thái dòng chảy chất lỏng trong các chunk. Không hoạt động trong các chunk không có chất lỏng chảy hoặc trong End",
     "setting.world_map.new_chunks_save_load_to_disk": "Lưu/Tải Chất lỏng NewChunks lên Đĩa",

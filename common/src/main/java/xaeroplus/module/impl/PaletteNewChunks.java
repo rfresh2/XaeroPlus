@@ -32,9 +32,12 @@ import static xaeroplus.feature.render.ColorHelper.getColor;
 
 public class PaletteNewChunks extends Module {
     private ChunkHighlightCache newChunksCache = new ChunkHighlightLocalCache();
+    private ChunkHighlightCache newChunksInverseCache = new ChunkHighlightLocalCache();
     private int newChunksColor = getColor(255, 0, 0, 100);
     private static final String DATABASE_NAME = "XaeroPlusPaletteNewChunks";
+    private static final String INVERSE_DATABASE_NAME = "XaeroPlusPaletteNewChunksInverse";
     private final IntSet presentStateIdsBuf = new IntOpenHashSet();
+    private boolean renderInverse = false;
 
     public void setNewChunksCache(final boolean disk) {
         try {
@@ -52,6 +55,21 @@ public class PaletteNewChunks extends Module {
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error closing palette new chunks cache", e);
         }
+        try {
+            final Long2LongMap map = newChunksInverseCache.getHighlightsState();
+            newChunksInverseCache.onDisable();
+            if (disk) {
+                newChunksInverseCache = new ChunkHighlightSavingCache(INVERSE_DATABASE_NAME);
+            } else {
+                newChunksInverseCache = new ChunkHighlightLocalCache();
+            }
+            if (this.isEnabled()) {
+                newChunksInverseCache.onEnable();
+                if (map != null) newChunksInverseCache.loadPreviousState(map);
+            }
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Error closing palette inverser new chunks cache", e);
+        }
     }
 
     @EventHandler
@@ -59,13 +77,19 @@ public class PaletteNewChunks extends Module {
         if (event.seenChunk()) return; // never will be newchunk if we've already cached it
         var currentDim = ChunkUtils.getActualDimension();
         try {
+            var x = event.chunk().getPos().x;
+            var z = event.chunk().getPos().z;
             if (currentDim == OVERWORLD || currentDim == NETHER) {
                 if (checkNewChunkOverworldOrNether(event.chunk())) {
-                    newChunksCache.addHighlight(event.chunk().getPos().x, event.chunk().getPos().z);
+                    newChunksCache.addHighlight(x, z);
+                } else if (!newChunksCache.isHighlighted(x, z, currentDim)) {
+                    newChunksInverseCache.addHighlight(x, z);
                 }
             } else if (currentDim == END) {
                 if (checkNewChunkEnd(event.chunk())) {
-                    newChunksCache.addHighlight(event.chunk().getPos().x, event.chunk().getPos().z);
+                    newChunksCache.addHighlight(x, z);
+                } else if (!newChunksCache.isHighlighted(x, z, currentDim)) {
+                    newChunksInverseCache.addHighlight(x, z);
                 }
             }
         } catch (final Exception e) {
@@ -157,11 +181,13 @@ public class PaletteNewChunks extends Module {
     @EventHandler
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
         newChunksCache.handleWorldChange();
+        newChunksInverseCache.handleWorldChange();
     }
 
     @EventHandler
     public void onClientTickEvent(final ClientTickEvent.Post event) {
         newChunksCache.handleTick();
+        newChunksInverseCache.handleTick();
     }
 
     @Override
@@ -169,15 +195,17 @@ public class PaletteNewChunks extends Module {
         Globals.drawManager.registerChunkHighlightProvider(
             this.getClass(),
             new ChunkHighlightProvider(
-                this::isNewChunk,
+                this::isHighlighted,
                 this::getNewChunksColor
             ));
         newChunksCache.onEnable();
+        newChunksInverseCache.onEnable();
     }
 
     @Override
     public void onDisable() {
         newChunksCache.onDisable();
+        newChunksInverseCache.onDisable();
         Globals.drawManager.unregister(this.getClass());
     }
 
@@ -193,7 +221,21 @@ public class PaletteNewChunks extends Module {
         newChunksColor = ColorHelper.getColorWithAlpha(newChunksColor, (int) (a));
     }
 
+    public void setInverse(final boolean b) {
+        renderInverse = b;
+    }
+
+    public boolean isHighlighted(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> dimensionId) {
+        return renderInverse
+            ? isInverseNewChunk(chunkPosX, chunkPosZ, dimensionId)
+            : isNewChunk(chunkPosX, chunkPosZ, dimensionId);
+    }
+
     public boolean isNewChunk(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> dimensionId) {
         return newChunksCache.isHighlighted(chunkPosX, chunkPosZ, dimensionId);
+    }
+
+    public boolean isInverseNewChunk(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> dimensionId) {
+        return newChunksInverseCache.isHighlighted(chunkPosX, chunkPosZ, dimensionId);
     }
 }

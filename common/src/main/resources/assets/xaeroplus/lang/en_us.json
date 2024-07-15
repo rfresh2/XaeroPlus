@@ -45,6 +45,8 @@
   "setting.world_map.palette_new_chunks_opacity.tooltip": "Sets the color opacity of Palette NewChunk highlights",
   "setting.world_map.palette_new_chunks_color": "Palette NewChunks Color",
   "setting.world_map.palette_new_chunks_color.tooltip": "Sets the color of Palette NewChunk highlights",
+  "setting.world_map.palette_new_chunks_inverse": "Palette NewChunks Inverse",
+  "setting.world_map.palette_new_chunks_inverse.tooltip": "Renders the inverse of Palette NewChunks, meaning chunks you load that were already generated",
   "setting.world_map.new_chunks_highlighting": "Liquid NewChunks",
   "setting.world_map.new_chunks_highlighting.tooltip": "Detects NewChunks based on the liquid flow states in chunks. Does not work in chunks without liquid flowing or in the End",
   "setting.world_map.new_chunks_save_load_to_disk": "Save/Load Liquid NewChunks to Disk",

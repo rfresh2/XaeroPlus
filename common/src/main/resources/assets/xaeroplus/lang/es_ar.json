@@ -45,6 +45,8 @@
   "setting.world_map.palette_new_chunks_opacity.tooltip": "Establece la opacidad del color de los destacados de Paleta NewChunks",
   "setting.world_map.palette_new_chunks_color": "Color de Paleta NewChunks",
   "setting.world_map.palette_new_chunks_color.tooltip": "Establece el color de los destacados de Paleta NewChunks",
+  "setting.world_map.palette_new_chunks_inverse": "Paleta NuevosChuncks Inversa",
+  "setting.world_map.palette_new_chunks_inverse.tooltip": "Renderiza la inversa de Paleta NuevosChuncks, lo que significa que los fragmentos que cargues ya se habían generado",
   "setting.world_map.new_chunks_highlighting": "Líquido NewChunks",
   "setting.world_map.new_chunks_highlighting.tooltip": "Detecta NewChunks basado en los estados de flujo de líquido en chunks. No funciona en chunks sin flujo de líquido o en el End",
   "setting.world_map.new_chunks_save_load_to_disk": "Guardar/Cargar Líquido NewChunks en Disco",

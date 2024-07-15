@@ -216,6 +216,13 @@ public final class XaeroPlusSettingRegistry {
         ColorHelper.HighlightColor.values(),
         ColorHelper.HighlightColor.RED,
         SettingLocation.CHUNK_HIGHLIGHTS);
+    public static final XaeroPlusBooleanSetting paletteNewChunksRenderInverse = XaeroPlusBooleanSetting.create(
+        "Palette NewChunks Inverse",
+        "setting.world_map.palette_new_chunks_inverse",
+        "setting.world_map.palette_new_chunks_inverse.tooltip",
+        (b) -> ModuleManager.getModule(PaletteNewChunks.class).setInverse(b),
+        false,
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting liquidNewChunksEnabledSetting = XaeroPlusBooleanSetting.create(
             "NewChunks Highlighting",
             "setting.world_map.new_chunks_highlighting",

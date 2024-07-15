@@ -108,7 +108,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
 
     public ChunkHighlightCacheDimensionHandler getCacheForCurrentDimension() {
         if (!worldCacheInitialized) return null;
-        return getCacheForDimension(Globals.getCurrentDimensionId(), true);
+        return getCacheForDimension(ChunkUtils.getActualDimension(), true);
     }
 
     private ChunkHighlightCacheDimensionHandler initializeDimensionCacheHandler(final ResourceKey<Level> dimension) {

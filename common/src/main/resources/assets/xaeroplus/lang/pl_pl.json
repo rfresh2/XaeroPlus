@@ -45,6 +45,8 @@
   "setting.world_map.palette_new_chunks_opacity.tooltip": "Ustawia nieprzezroczystość koloru wyróżnień Palety NewChunks",
   "setting.world_map.palette_new_chunks_color": "Kolor Palety NewChunks",
   "setting.world_map.palette_new_chunks_color.tooltip": "Ustawia kolor wyróżnień Palety NewChunks",
+  "setting.world_map.palette_new_chunks_inverse": "Paleta NoweKawałki Odwrotna",
+  "setting.world_map.palette_new_chunks_inverse.tooltip": "Renderuje odwrotność Palety NoweKawałki, co oznacza, że ładowane kawałki zostały już wygenerowane",
   "setting.world_map.new_chunks_highlighting": "Ciecz NewChunks",
   "setting.world_map.new_chunks_highlighting.tooltip": "Wykrywa NewChunks na podstawie stanów przepływu cieczy w chunkach. Nie działa w chunkach bez przepływającej cieczy lub w Endzie",
   "setting.world_map.new_chunks_save_load_to_disk": "Zapisz/Wczytaj Ciecz NewChunks na Dysk",

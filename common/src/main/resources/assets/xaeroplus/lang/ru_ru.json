@@ -45,6 +45,8 @@
   "setting.world_map.palette_new_chunks_opacity.tooltip": "Устанавливает непрозрачность цвета выделения Палитры NewChunks",
   "setting.world_map.palette_new_chunks_color": "Цвет Палитры NewChunks",
   "setting.world_map.palette_new_chunks_color.tooltip": "Устанавливает цвет выделения Палитры NewChunks",
+  "setting.world_map.palette_new_chunks_inverse": "Палитра НовыхЧанков Инверсная",
+  "setting.world_map.palette_new_chunks_inverse.tooltip": "Отображает инверсную палитру НовыхЧанков, то есть чанки, которые вы загружаете и которые уже были сгенерированы",
   "setting.world_map.new_chunks_highlighting": "Жидкость NewChunks",
   "setting.world_map.new_chunks_highlighting.tooltip": "Обнаруживает NewChunks на основе состояний потока жидкости в чанках. Не работает в чанках без потока жидкости или в End",
   "setting.world_map.new_chunks_save_load_to_disk": "Сохранить/Загрузить Жидкость NewChunks на Диск",

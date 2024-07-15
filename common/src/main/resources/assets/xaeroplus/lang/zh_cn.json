@@ -45,6 +45,8 @@
   "setting.world_map.palette_new_chunks_opacity.tooltip": "设置调色板 NewChunks 高亮的不透明度",
   "setting.world_map.palette_new_chunks_color": "调色板 NewChunks 颜色",
   "setting.world_map.palette_new_chunks_color.tooltip": "设置调色板 NewChunks 高亮的颜色",
+  "setting.world_map.palette_new_chunks_inverse": "调色板新块反向",
+  "setting.world_map.palette_new_chunks_inverse.tooltip": "渲染调色板新块的反向，这意味着你加载的块已经生成",
   "setting.world_map.new_chunks_highlighting": "液体 NewChunks",
   "setting.world_map.new_chunks_highlighting.tooltip": "基于块中的液体流动状态检测NewChunks。在没有液体流动的块或末地中不起作用",
   "setting.world_map.new_chunks_save_load_to_disk": "保存/加载液体 NewChunks到磁盘",

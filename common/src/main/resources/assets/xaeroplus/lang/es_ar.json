@@ -11,6 +11,8 @@
   "setting.world_map.fast_mapping_rate_limit.tooltip": "El Mapeo Rápido debe estar habilitado. \n Limita cuántos chunks pueden escribirse en un solo ciclo. Valores más bajos mejoran los FPS a distancias de renderizado altas.",
   "setting.world_map.fast_zip_writes": "Escritura Rápida ZIP",
   "setting.world_map.fast_zip_writes.tooltip": "Escribe archivos ZIP de los mapas más rápido pero utiliza más RAM. Deshabilitalo si tenes pocc RAM disponible.",
+  "setting.world_map.region_write_while_dimension_switched": "Escrituras de Región Mientras Se Cambia de Dimensión",
+  "setting.world_map.region_write_while_dimension_switched.tooltip": "Corrige el WorldMap para que escriba/cargue los fragmentos que cargas mientras ves otra dimensión.",
   "setting.world_map.baritone_waypoint": "Punto Destino Baritone",
   "setting.world_map.baritone_waypoint.tooltip": "Sincroniza los waypoint (puntos de recorrido) de Baritone como waypoints temporarios.",
   "setting.world_map.disable_waypoint_sharing": "Desactivar Compartir waypoint",

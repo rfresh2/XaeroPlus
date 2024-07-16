@@ -11,6 +11,8 @@
     "setting.world_map.fast_mapping_rate_limit.tooltip": "Lập Bản Đồ Nhanh phải được kích hoạt. \n Giới hạn số lượng chunk có thể được viết trong một chu kỳ. Giá trị thấp hơn cải thiện FPS ở khoảng cách hiển thị cao.",
     "setting.world_map.fast_zip_writes": "Ghi Zip Nhanh",
     "setting.world_map.fast_zip_writes.tooltip": "Ghi tệp zip bản đồ nhanh hơn nhưng sử dụng nhiều RAM hơn. Vô hiệu hóa nếu bạn có RAM thấp.",
+    "setting.world_map.region_write_while_dimension_switched": "Ghi Vùng Khi Đổi Chiều Không Gian",
+    "setting.world_map.region_write_while_dimension_switched.tooltip": "Sửa lỗi WorldMap không ghi/tải các phần mà bạn tải khi xem một chiều không gian khác.",
     "setting.world_map.baritone_waypoint": "Điểm Đến Baritone",
     "setting.world_map.baritone_waypoint.tooltip": "Đồng bộ hóa mục tiêu Baritone như các điểm đến tạm thời.",
     "setting.world_map.disable_waypoint_sharing": "Vô Hiệu Hóa Chia Sẻ Điểm Đến",

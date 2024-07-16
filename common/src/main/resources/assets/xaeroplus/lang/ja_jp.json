@@ -11,6 +11,8 @@
     "setting.world_map.fast_mapping_rate_limit.tooltip": "Fast Mappingを有効にする必要があります。\n1サイクルで書き込めるチャンクの数を制限します。値を低くすると、高いレンダリング距離で FPS が向上します。",
     "setting.world_map.fast_zip_writes": "Fast Zip Writes",
     "setting.world_map.fast_zip_writes.tooltip": "Map タイルの zip ファイルをより速く書き込みますが、RAM をより多く使用します。使用可能なRAMが少ない場合は無効にしてください。",
+    "setting.world_map.region_write_while_dimension_switched": "次元切り替え中のリージョン書き込み",
+    "setting.world_map.region_write_while_dimension_switched.tooltip": "他の次元を表示中に読み込んだチャンクを書き込み/読み込みしないWorldMapの修正。",
     "setting.world_map.baritone_waypoint": "Baritone Goal Waypoint",
     "setting.world_map.baritone_waypoint.tooltip": "バリトンのゴールを一時的なウェイポイントとして表示させる。",
     "setting.world_map.disable_waypoint_sharing": "Disable Waypoint Sharing",

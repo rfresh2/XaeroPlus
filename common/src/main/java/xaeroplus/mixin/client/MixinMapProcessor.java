@@ -1,19 +1,34 @@
 package xaeroplus.mixin.client;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.map.MapProcessor;
+import xaero.map.region.MapRegion;
+import xaero.map.world.MapDimension;
+import xaero.map.world.MapWorld;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
+import xaeroplus.feature.extensions.CustomMapProcessor;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.DataFolderResolveUtil;
 
 import java.nio.file.Path;
@@ -22,10 +37,23 @@ import java.nio.file.Paths;
 import static xaeroplus.Globals.LOCK_ID;
 
 @Mixin(value = MapProcessor.class, remap = false)
-public abstract class MixinMapProcessor {
+public abstract class MixinMapProcessor implements CustomMapProcessor {
     @Shadow private String currentWorldId;
     @Shadow private String currentDimId;
     @Shadow private String currentMWId;
+    @Unique private String xaeroPlus$prevWorldId;
+    @Unique private String xaeroPlus$prevDimId;
+    @Unique private String xaeroPlus$prevMWId;
+    @Shadow private ClientLevel world;
+
+    @Unique
+    private static final ThreadLocal<Boolean> xaeroPlus$getLeafRegionActualDimSignal = ThreadLocal.withInitial(() -> false);
+    @Override
+    public ThreadLocal<Boolean> xaeroPlus$getLeafRegionActualDimSignal() {
+        return xaeroPlus$getLeafRegionActualDimSignal;
+    }
+
+    @Shadow public abstract String getDimensionName(final ResourceKey<Level> id);
 
     @Inject(method = "getMainId", at = @At("HEAD"), cancellable = true, remap = false)
     private void getMainId(final boolean rootFolderFormat, boolean preIP6Fix, final ClientPacketListener connection, final CallbackInfoReturnable<String> cir) {
@@ -64,5 +92,85 @@ public abstract class MixinMapProcessor {
     ))
     public void fireWorldChangedEvent(final CallbackInfo ci) {
         XaeroPlus.EVENT_BUS.call(new XaeroWorldChangeEvent(this.currentWorldId, this.currentDimId, this.currentMWId));
+    }
+
+    @Inject(method = "getLeafMapRegion", at = @At("HEAD"))
+    public void signalToLocalShare(final int caveLayer, final int regX, final int regZ, final boolean create, final CallbackInfoReturnable<MapRegion> cir,
+                                   @Share("signal") LocalBooleanRef signal) {
+        signal.set(xaeroPlus$getLeafRegionActualDimSignal().get());
+        xaeroPlus$getLeafRegionActualDimSignal().set(false); // reset
+    }
+
+    @WrapOperation(method = "getLeafMapRegion", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/map/world/MapWorld;getCurrentDimension()Lxaero/map/world/MapDimension;",
+        ordinal = 0
+    ))
+    public MapDimension getLeafMapRegionActualDimensionIfSignalled(final MapWorld instance, final Operation<MapDimension> original,
+                                                                   @Share("signal") LocalBooleanRef signal) {
+        var world = this.world;
+        if (signal.get() && world != null && xaeroPlus$prevDimId != null && xaeroPlus$prevDimId.equals(getDimensionName(world.dimension()))) {
+            return instance.getDimension(world.dimension());
+        } else return original.call(instance);
+    }
+
+    @WrapOperation(method = "getLeafMapRegion", at = @At(
+        value = "NEW",
+        target = "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lxaero/map/world/MapDimension;IIIIZLnet/minecraft/core/Registry;)Lxaero/map/region/MapRegion;"
+    ), remap = true) // $REMAP
+    public MapRegion createMapRegionInActualDimensionIfSignalled(String worldId, String dimId, String mwId, MapDimension dim, int x, int z, int caveLayer, int initialVersion, boolean normalMapData, Registry<Biome> biomeRegistry, Operation<MapRegion> original,
+                                                                 @Share("signal") LocalBooleanRef signal) {
+        var world = this.world;
+        if (signal.get() && world != null && xaeroPlus$prevDimId != null && xaeroPlus$prevDimId.equals(getDimensionName(world.dimension()))) {
+            worldId = xaeroPlus$prevWorldId;
+            dimId = xaeroPlus$prevDimId;
+            mwId = xaeroPlus$prevMWId;
+        }
+        return original.call(
+            worldId,
+            dimId,
+            mwId,
+            dim,
+            x,
+            z,
+            caveLayer,
+            initialVersion,
+            normalMapData,
+            biomeRegistry);
+    }
+
+    @WrapOperation(method = "updateWorldSynced", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/map/world/MapWorld;getCurrentDimension()Lxaero/map/world/MapDimension;",
+        ordinal = 0
+    ),
+    slice = @Slice(
+        from = @At(
+            value = "INVOKE",
+            target = "Lxaero/map/MapProcessor;releaseLocksIfNeeded()V",
+            ordinal = 0
+        )
+    ))
+    public MapDimension updateWorldSyncedGetActualDimension(final MapWorld mapWorld, final Operation<MapDimension> original) {
+        var world = this.world;
+        return XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue() && world != null
+            ? mapWorld.getDimension(world.dimension())
+            : original.call(mapWorld);
+    }
+
+    @WrapOperation(method = "updateWorldSynced", at = @At(
+        value = "FIELD",
+        target = "Lxaero/map/MapProcessor;currentWorldId:Ljava/lang/String;",
+        opcode = Opcodes.PUTFIELD,
+        ordinal = 0
+    ))
+    public void storePrevWorldVarStates(final MapProcessor instance, final String value, final Operation<Void> original) {
+        var world = this.world;
+        if (world != null && getDimensionName(world.dimension()).equals(currentDimId)) {
+            this.xaeroPlus$prevWorldId = this.currentWorldId;
+            this.xaeroPlus$prevDimId = this.currentDimId;
+            this.xaeroPlus$prevMWId = this.currentMWId;
+        }
+        original.call(instance, value);
     }
 }

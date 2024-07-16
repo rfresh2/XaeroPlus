@@ -11,6 +11,8 @@
   "setting.world_map.fast_mapping_rate_limit.tooltip": "必须启用快速绘制。\n 限制每刻内可写入的区块数量。",
   "setting.world_map.fast_zip_writes": "快速 Zip 写入",
   "setting.world_map.fast_zip_writes.tooltip": "写入地图图块 zip 文件速度更快，但使用更多 RAM。 如果可用 RAM 较低，请禁用此功能",
+  "setting.world_map.region_write_while_dimension_switched": "切换维度时的区域写入",
+  "setting.world_map.region_write_while_dimension_switched.tooltip": "修复 WorldMap 在查看另一个维度时不会写入/加载您加载的区块的问题。",
   "setting.world_map.baritone_waypoint": "Baritone 目标路径点",
   "setting.world_map.baritone_waypoint.tooltip": "将 Baritone 的目标点同步为临时路径点。",
   "setting.world_map.disable_waypoint_sharing": "禁用航点共享",

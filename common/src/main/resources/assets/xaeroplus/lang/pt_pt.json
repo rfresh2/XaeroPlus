@@ -11,6 +11,8 @@
   "setting.world_map.fast_mapping_rate_limit.tooltip": "O Mapeamento Rápido tem de estar ativo. \n Limita quantas partes do mapa são gravadas num ciclo. Valores mais baixos aumentam os FPS com alcances visuais maiores.",
   "setting.world_map.fast_zip_writes": "Gravação Rápida de Zips",
   "setting.world_map.fast_zip_writes.tooltip": "Grava ficheiros zip com dados do mapa mais rápido mas usa mais RAM. Desativa esta opção se tiveres pouca RAM disponível.",
+  "setting.world_map.region_write_while_dimension_switched": "Escritas de Região Durante a Mudança de Dimensão",
+  "setting.world_map.region_write_while_dimension_switched.tooltip": "Corrige o WorldMap para escrever/carregar os pedaços que você carrega enquanto visualiza outra dimensão.",
   "setting.world_map.baritone_waypoint": "Loc. de Destino do Baritone",
   "setting.world_map.baritone_waypoint.tooltip": "Sincroniza os destinos do Baritone como localizações temporárias.",
   "setting.world_map.disable_waypoint_sharing": "Desativar Partilha de Localizações",

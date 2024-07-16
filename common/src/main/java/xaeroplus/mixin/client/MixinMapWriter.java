@@ -13,6 +13,7 @@ import com.llamalad7.mixinextras.sugar.ref.LocalLongRef;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
@@ -33,8 +34,11 @@ import xaero.map.MapWriter;
 import xaero.map.biome.BiomeColorCalculator;
 import xaero.map.biome.BlockTintProvider;
 import xaero.map.region.MapBlock;
+import xaero.map.region.MapRegion;
 import xaero.map.region.OverlayBuilder;
 import xaero.map.region.OverlayManager;
+import xaero.map.world.MapWorld;
+import xaeroplus.feature.extensions.CustomMapProcessor;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ChunkUtils;
 
@@ -253,5 +257,59 @@ public abstract class MixinMapWriter {
             caveRef.set(shouldForceFullInNether || cave);
             fullCaveRef.set(shouldForceFullInNether || fullCave);
         }
+    }
+
+    @WrapOperation(method = "onRender", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/map/world/MapWorld;getCurrentDimensionId()Lnet/minecraft/resources/ResourceKey;"),
+        remap = true) // $REMAP
+    public ResourceKey<Level> removeCustomDimSwitchWriterPrevention(final MapWorld mapWorld, final Operation<ResourceKey<Level>> original) {
+        var world = mapProcessor.getWorld();
+        return XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue() && world != null
+            ? world.dimension() // makes if condition in injected code always true
+            : original.call(mapWorld);
+    }
+
+    @WrapOperation(method = "writeChunk", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/map/MapProcessor;getLeafMapRegion(IIIZ)Lxaero/map/region/MapRegion;"
+    ))
+    public MapRegion getActualMapRegionInWriteChunk(final MapProcessor mapProcessor, int caveLayer, int regX, int regZ, boolean create, final Operation<MapRegion> original) {
+        if (XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue()) {
+            ((CustomMapProcessor) mapProcessor).xaeroPlus$getLeafRegionActualDimSignal().set(true);
+        }
+        return original.call(
+            mapProcessor,
+            caveLayer,
+            regX,
+            regZ,
+            create);
+    }
+
+    @WrapOperation(method = "writeChunk", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/map/MapProcessor;getCurrentDimension()Ljava/lang/String;"
+    ))
+    public String getActualDimensionInWriteChunk(final MapProcessor mapProcessor, final Operation<String> original) {
+        var world = mapProcessor.getWorld();
+        return XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue() && world != null
+            ? mapProcessor.getDimensionName(world.dimension())
+            : original.call(mapProcessor);
+    }
+
+    @WrapOperation(method = "onRender", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/map/MapProcessor;getLeafMapRegion(IIIZ)Lxaero/map/region/MapRegion;"
+    ))
+    public MapRegion getActualMapRegionInOnRender(final MapProcessor mapProcessor, int caveLayer, int regX, int regZ, boolean create, final Operation<MapRegion> original) {
+        if (XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue()) {
+            ((CustomMapProcessor) mapProcessor).xaeroPlus$getLeafRegionActualDimSignal().set(true);
+        }
+        return original.call(
+            mapProcessor,
+            caveLayer,
+            regX,
+            regZ,
+            create);
     }
 }

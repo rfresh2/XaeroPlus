@@ -67,8 +67,13 @@ public final class XaeroPlusSettingRegistry {
             if (!b) Globals.zipFastByteBuffer = new ByteArrayOutputStream(); // release any existing sized buffer to gc
         },
         true,
-        SettingLocation.WORLD_MAP_MAIN
-    );
+        SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting writesWhileDimSwitched = XaeroPlusBooleanSetting.create(
+        "Region Writes While Dim Switched",
+        "setting.world_map.region_write_while_dimension_switched",
+        "setting.world_map.region_write_while_dimension_switched.tooltip",
+        false,
+        SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting baritoneWaypointSyncSetting = XaeroPlusBooleanSetting.create(
             "Baritone Goal Waypoint",
             "setting.world_map.baritone_waypoint",

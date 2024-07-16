@@ -11,6 +11,8 @@
   "setting.world_map.fast_mapping_rate_limit.tooltip": "Szybkie Mapowanie musi być włączone. \n Ogranicza liczbę chunktów, które mogą być zapisane co jeden Tick.",
   "setting.world_map.fast_zip_writes": "Szybkie Zip pisze",
   "setting.world_map.fast_zip_writes.tooltip": "Szybciej zapisuje pliki zip kafelków mapy, ale zużywa więcej pamięci RAM. Wyłącz tę opcję, jeśli masz mało dostępnej pamięci RAM",
+  "setting.world_map.region_write_while_dimension_switched": "Zapisywanie Regionu Podczas Zmiany Wymiaru",
+  "setting.world_map.region_write_while_dimension_switched.tooltip": "Naprawia WorldMap, aby zapisywał/ładował kawałki, które ładujesz, oglądając inny wymiar.",
   "setting.world_map.baritone_waypoint": "Punkt nawigacyjny Celu Baritone",
   "setting.world_map.baritone_waypoint.tooltip": "Synchronizuje cele Baritone jako tymczasowe punkty orientacyjne.",
   "setting.world_map.disable_waypoint_sharing": "Wyłącz udostępnianie punktów trasy",

@@ -1,5 +1,7 @@
 package xaeroplus.mixin.client;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -7,18 +9,25 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.map.MapProcessor;
 import xaero.map.cache.BlockStateShortShapeCache;
+import xaero.map.region.MapRegion;
 import xaero.map.region.MapTile;
 import xaero.map.region.MapTileChunk;
 import xaero.map.region.texture.LeafRegionTexture;
+import xaero.map.world.MapDimension;
+import xaero.map.world.MapWorld;
 import xaeroplus.feature.extensions.SeenChunksTrackingMapTileChunk;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 import java.io.DataInputStream;
 
 @Mixin(value = MapTileChunk.class, remap = false)
-public class MixinMapTileChunk implements SeenChunksTrackingMapTileChunk {
+public abstract class MixinMapTileChunk implements SeenChunksTrackingMapTileChunk {
     private final boolean[][] seenTiles = new boolean[4][4];
 
     @Shadow private LeafRegionTexture leafTexture;
+
+    @Shadow public abstract MapRegion getInRegion();
+
     @Override
     public boolean[][] getSeenTiles() {
         return seenTiles;
@@ -45,6 +54,18 @@ public class MixinMapTileChunk implements SeenChunksTrackingMapTileChunk {
             for (int j = 0; j < 4; ++j) {
                 seenTiles[i][j] = leafTexture.getHeight(i << 4, j << 4) != -1;
             }
+        }
+    }
+
+    @WrapOperation(method = "updateBuffers", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/map/world/MapWorld;getCurrentDimension()Lxaero/map/world/MapDimension;"
+    ))
+    public MapDimension useRegionDimensionInsteadOfMapWorld(final MapWorld mapWorld, final Operation<MapDimension> original) {
+        if (XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue()) {
+            return getInRegion().getDim();
+        } else {
+            return original.call(mapWorld);
         }
     }
 }

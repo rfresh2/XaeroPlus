@@ -22,7 +22,6 @@ public final class XaeroPlusSettingRegistry {
     /**
      * The order settings are defined here determines the order in the settings GUI's.
      */
-
     public static final XaeroPlusBooleanSetting minimapFpsLimiter = XaeroPlusBooleanSetting.create(
         "Minimap FPS Limiter",
         "setting.minimap.fps_limiter",
@@ -419,6 +418,29 @@ public final class XaeroPlusSettingRegistry {
             (b) -> ModuleManager.getModule(PortalSkipDetection.class).setOldChunksInverse(b),
             true,
             SettingLocation.CHUNK_HIGHLIGHTS);
+    public static final XaeroPlusBooleanSetting highwayHighlightsSetting = XaeroPlusBooleanSetting.create(
+        "2b2t Highways",
+        "setting.world_map.2b2t_highways_enabled",
+        "setting.world_map.2b2t_highways_enabled.tooltip",
+        (b) -> ModuleManager.getModule(Highways.class).setEnabled(b),
+        false,
+        SettingLocation.CHUNK_HIGHLIGHTS);
+    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> highwaysColorSetting = XaeroPlusEnumSetting.create(
+        "2b2t Highways Color",
+        "setting.world_map.2b2t_highways_color",
+        "setting.world_map.2b2t_highways_color.tooltip",
+        (b) -> ModuleManager.getModule(Highways.class).setRgbColor(b.getColor()),
+        ColorHelper.HighlightColor.values(),
+        ColorHelper.HighlightColor.BLUE,
+        SettingLocation.CHUNK_HIGHLIGHTS);
+    public static final XaeroPlusFloatSetting highwaysColorAlphaSetting = XaeroPlusFloatSetting.create(
+        "2b2t Highways Opacity",
+        "setting.world_map.2b2t_highways_opacity",
+        0f, 255f, 10f,
+        "setting.world_map.2b2t_highways_opacity.tooltip",
+        (b) -> ModuleManager.getModule(Highways.class).setAlpha(b),
+        100,
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting owAutoWaypointDimension = XaeroPlusBooleanSetting.create(
             "Prefer Overworld Waypoints",
             "setting.world_map.ow_auto_waypoint_dimension",

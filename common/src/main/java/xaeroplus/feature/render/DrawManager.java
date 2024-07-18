@@ -5,8 +5,9 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
-import it.unimi.dsi.fastutil.longs.LongArraySet;
 import it.unimi.dsi.fastutil.longs.LongList;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.lenni0451.lambdaevents.EventHandler;
@@ -21,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 public class DrawManager {
     private final Reference2ObjectMap<Class<?>, DrawFeature> chunkHighlightDrawFeatures = new Reference2ObjectOpenHashMap<>();
-    final LongArraySet regionBuf = new LongArraySet(8);
+    private final LongSet regionBuf = new LongOpenHashSet(8);
 
     public DrawManager() {
         XaeroPlus.EVENT_BUS.register(this);
@@ -93,7 +94,7 @@ public class DrawManager {
         final PoseStack matrixStack,
         final VertexConsumer overlayBufferBuilder,
         MinimapRendererHelper helper
-        ) {
+    ) {
         if (chunkHighlightDrawFeatures.isEmpty()) return;
         regionBuf.clear();
         for (int i = minViewX; i <= maxViewX; i++) {
@@ -135,13 +136,7 @@ public class DrawManager {
         regionBuf.clear();
         for (int x = minRegX; x <= maxRegX; x++) {
             for (int z = minRegZ; z <= maxRegZ; z++) {
-                final int mx = x + level;
-                final int mz = z + level;
-                for (int regX = x; regX < mx; ++regX) {
-                    for (int regZ = z; regZ < mz; ++regZ) {
-                        regionBuf.add(ChunkUtils.chunkPosToLong(regX, regZ));
-                    }
-                }
+                regionBuf.add(ChunkUtils.chunkPosToLong(x, z));
             }
         }
 
@@ -188,7 +183,7 @@ public class DrawManager {
     }
 
     private void drawMinimapChunkHighlights(final DrawFeature feature,
-                                            final LongArraySet regions,
+                                            final LongSet regions,
                                             int chunkX,
                                             int chunkZ,
                                             int tileX,
@@ -229,7 +224,7 @@ public class DrawManager {
     }
 
     private void drawWorldMapChunkHighlights(final DrawFeature feature,
-                                             final LongArraySet regions,
+                                             final LongSet regions,
                                              final int flooredCameraX,
                                              final int flooredCameraZ,
                                              final PoseStack matrixStack,

@@ -103,7 +103,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         value = "INVOKE",
         target = "Lorg/joml/Matrix4fStack;translate(FFF)Lorg/joml/Matrix4f;",
         ordinal = 0
-    ), remap = true)
+    ), remap = true) // $REMAP
     public Matrix4f modifyShaderMatrixStackTranslate(final Matrix4fStack instance, final float x, final float y, final float z,
                                                      @Share("scaledSize") LocalIntRef scaledSize) {
         return instance.translate(scaledSize.get(), scaledSize.get(), -2000.0F);

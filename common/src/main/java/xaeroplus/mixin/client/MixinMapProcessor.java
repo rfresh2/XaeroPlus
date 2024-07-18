@@ -9,7 +9,6 @@ import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.biome.Biome;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -114,11 +113,11 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
         } else return original.call(instance);
     }
 
-    @WrapOperation(method = "getLeafMapRegion", at = @At(
+    @Redirect(method = "getLeafMapRegion", at = @At(
         value = "NEW",
         target = "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lxaero/map/world/MapDimension;IIIIZLnet/minecraft/core/Registry;)Lxaero/map/region/MapRegion;"
     ), remap = true) // $REMAP
-    public MapRegion createMapRegionInActualDimensionIfSignalled(String worldId, String dimId, String mwId, MapDimension dim, int x, int z, int caveLayer, int initialVersion, boolean normalMapData, Registry<Biome> biomeRegistry, Operation<MapRegion> original,
+    public MapRegion createMapRegionInActualDimensionIfSignalled(String worldId, String dimId, String mwId, final MapDimension dim, final int x, final int z, final int caveLayer, final int initialVersion, final boolean normalMapData, final Registry biomeRegistry,
                                                                  @Share("signal") LocalBooleanRef signal) {
         var world = this.world;
         if (signal.get() && world != null && xaeroPlus$prevDimId != null && xaeroPlus$prevDimId.equals(getDimensionName(world.dimension()))) {
@@ -126,7 +125,7 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
             dimId = xaeroPlus$prevDimId;
             mwId = xaeroPlus$prevMWId;
         }
-        return original.call(
+        return new MapRegion(
             worldId,
             dimId,
             mwId,

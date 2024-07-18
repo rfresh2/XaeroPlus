@@ -52,26 +52,9 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
 
     public boolean isHighlighted(final long chunkPos) {
         try {
-            if (lock.readLock().tryLock()) {
-                boolean containsKey = chunks.containsKey(chunkPos);
-                lock.readLock().unlock();
-                return containsKey;
-            }
+            return chunks.containsKey(chunkPos);
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error checking if chunk is highlighted: {}, {}", ChunkUtils.longToChunkX(chunkPos), ChunkUtils.longToChunkZ(chunkPos), e);
-        }
-        return false;
-    }
-
-    public boolean isHighlightedWithWait(final long chunkPos) {
-        try {
-            if (lock.readLock().tryLock(1, TimeUnit.SECONDS)) {
-                boolean containsKey = chunks.containsKey(chunkPos);
-                lock.readLock().unlock();
-                return containsKey;
-            }
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error checking if chunk is highlighted", e);
         }
         return false;
     }

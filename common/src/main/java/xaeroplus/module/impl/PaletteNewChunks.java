@@ -76,19 +76,21 @@ public class PaletteNewChunks extends Module {
     public void onChunkData(ChunkDataEvent event) {
         if (event.seenChunk()) return; // never will be newchunk if we've already cached it
         var currentDim = ChunkUtils.getActualDimension();
+        var x = event.chunk().getPos().x;
+        var z = event.chunk().getPos().z;
         try {
-            var x = event.chunk().getPos().x;
-            var z = event.chunk().getPos().z;
+            if (newChunksCache.isHighlighted(x, z, currentDim)) return;
+            if (newChunksInverseCache.isHighlighted(x, z, currentDim)) return;
             if (currentDim == OVERWORLD || currentDim == NETHER) {
                 if (checkNewChunkOverworldOrNether(event.chunk())) {
                     newChunksCache.addHighlight(x, z);
-                } else if (!newChunksCache.isHighlighted(x, z, currentDim)) {
+                } else {
                     newChunksInverseCache.addHighlight(x, z);
                 }
             } else if (currentDim == END) {
                 if (checkNewChunkEnd(event.chunk())) {
                     newChunksCache.addHighlight(x, z);
-                } else if (!newChunksCache.isHighlighted(x, z, currentDim)) {
+                } else {
                     newChunksInverseCache.addHighlight(x, z);
                 }
             }

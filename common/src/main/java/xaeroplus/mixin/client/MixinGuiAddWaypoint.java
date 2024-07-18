@@ -16,7 +16,7 @@ import xaeroplus.feature.extensions.IWaypointDimension;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-@Mixin(value = GuiAddWaypoint.class, remap = true)
+@Mixin(value = GuiAddWaypoint.class, remap = false)
 public class MixinGuiAddWaypoint {
 
     @Shadow(remap = false) private ArrayList<Waypoint> waypointsEdited;

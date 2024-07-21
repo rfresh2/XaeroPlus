@@ -529,6 +529,24 @@ public final class XaeroPlusSettingRegistry {
             (b) -> Globals.switchToDimension(END),
             false,
             SettingLocation.KEYBINDS);
+    public static final XaeroPlusBooleanSetting worldMapBaritoneGoalHereKeybindSetting = XaeroPlusBooleanSetting.create(
+        "WorldMap Baritone Goal Here",
+        "setting.keybinds.world_map_baritone_goal_here",
+        "setting.keybinds.world_map_baritone_goal_here.tooltip",
+        false,
+        SettingLocation.KEYBINDS);
+    public static final XaeroPlusBooleanSetting worldMapBaritonePathHereKeybindSetting = XaeroPlusBooleanSetting.create(
+        "WorldMap Baritone Path Here",
+        "setting.keybinds.world_map_baritone_path_here",
+        "setting.keybinds.world_map_baritone_path_here.tooltip",
+        false,
+        SettingLocation.KEYBINDS);
+    public static final XaeroPlusBooleanSetting worldMapBaritoneElytraHereKeybindSetting = XaeroPlusBooleanSetting.create(
+        "WorldMap Baritone Elytra Here",
+        "setting.keybinds.world_map_baritone_elytra_here",
+        "setting.keybinds.world_map_baritone_elytra_here.tooltip",
+        false,
+        SettingLocation.KEYBINDS);
     public static final XaeroPlusBooleanSetting netherCaveFix = XaeroPlusBooleanSetting.create(
             "Nether Cave Fix",
             "setting.world_map.nether_cave_fix",

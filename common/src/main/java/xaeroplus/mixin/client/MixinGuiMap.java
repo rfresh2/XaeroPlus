@@ -1,7 +1,5 @@
 package xaeroplus.mixin.client;
 
-import baritone.api.BaritoneAPI;
-import baritone.api.pathing.goals.GoalXZ;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -41,12 +39,14 @@ import xaero.map.element.MapElementRenderHandler;
 import xaero.map.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
 import xaero.map.gui.*;
 import xaero.map.gui.dropdown.rightclick.RightClickOption;
+import xaero.map.misc.Misc;
 import xaero.map.mods.SupportMods;
 import xaero.map.world.MapDimension;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.mixin.client.mc.AccessorGameOptions;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.BaritoneExecutor;
 import xaeroplus.util.BaritoneHelper;
 import xaeroplus.util.ChunkUtils;
 
@@ -568,6 +568,19 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             if (code == 257) {
                 onGotoCoordinatesButton(null);
                 cir.setReturnValue(true);
+                return;
+            }
+        }
+        if (BaritoneHelper.isBaritonePresent()) {
+            if (XaeroPlusSettingRegistry.worldMapBaritoneGoalHereKeybindSetting.getKeyBinding().matches(code, scanCode)) {
+                BaritoneExecutor.goal(mouseBlockPosX, mouseBlockPosZ);
+                cir.setReturnValue(true);
+            } else if (XaeroPlusSettingRegistry.worldMapBaritonePathHereKeybindSetting.getKeyBinding().matches(code, scanCode)) {
+                BaritoneExecutor.path(mouseBlockPosX, mouseBlockPosZ);
+                cir.setReturnValue(true);
+            } else if (BaritoneHelper.isBaritoneElytraPresent() && XaeroPlusSettingRegistry.worldMapBaritoneElytraHereKeybindSetting.getKeyBinding().matches(code, scanCode)) {
+                BaritoneExecutor.elytra(mouseBlockPosX, mouseBlockPosZ);
+                cir.setReturnValue(true);
             }
         }
     }
@@ -575,41 +588,31 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Inject(method = "getRightClickOptions", at = @At(value = "RETURN"), remap = false)
     public void getRightClickOptionsInject(final CallbackInfoReturnable<ArrayList<RightClickOption>> cir) {
         if (BaritoneHelper.isBaritonePresent()) {
-            ResourceKey<Level> customDim = Globals.getCurrentDimensionId();
-            ResourceKey<Level> actualDim = ChunkUtils.getActualDimension();
-            double customDimDiv = 1.0;
-            if (customDim != actualDim) {
-                if (customDim == NETHER && actualDim == OVERWORLD) {
-                    customDimDiv = 8;
-                } else if (customDim == OVERWORLD && actualDim == NETHER) {
-                    customDimDiv = 0.125;
-                }
-            }
-            int goalX = (int) (rightClickX * customDimDiv);
-            int goalZ = (int) (rightClickZ * customDimDiv);
             final ArrayList<RightClickOption> options = cir.getReturnValue();
+            int goalX = rightClickX;
+            int goalZ = rightClickZ;
             options.addAll(3, asList(
-                    new RightClickOption(I18n.get("gui.world_map.baritone_goal_here"), options.size(), this) {
+                    new RightClickOption("gui.world_map.baritone_goal_here", options.size(), this) {
                         @Override
                         public void onAction(Screen screen) {
-                            BaritoneAPI.getProvider().getPrimaryBaritone().getCustomGoalProcess().setGoal(new GoalXZ(goalX, goalZ));
+                            BaritoneExecutor.goal(goalX, goalZ);
                         }
-                    },
-                    new RightClickOption(I18n.get("gui.world_map.baritone_path_here"), options.size(), this) {
+                    }.setNameFormatArgs(Misc.getKeyName(XaeroPlusSettingRegistry.worldMapBaritoneGoalHereKeybindSetting.getKeyBinding())),
+                    new RightClickOption("gui.world_map.baritone_path_here", options.size(), this) {
                         @Override
                         public void onAction(Screen screen) {
-                            BaritoneAPI.getProvider().getPrimaryBaritone().getCustomGoalProcess().setGoalAndPath(new GoalXZ(goalX, goalZ));
+                            BaritoneExecutor.path(goalX, goalZ);
                         }
-                    }
+                    }.setNameFormatArgs(Misc.getKeyName(XaeroPlusSettingRegistry.worldMapBaritonePathHereKeybindSetting.getKeyBinding()))
             ));
             if (BaritoneHelper.isBaritoneElytraPresent()) {
                 options.addAll(5, asList(
-                    new RightClickOption(I18n.get("gui.world_map.baritone_elytra_here"), options.size(), this) {
+                    new RightClickOption("gui.world_map.baritone_elytra_here", options.size(), this) {
                         @Override
                         public void onAction(Screen screen) {
-                            BaritoneAPI.getProvider().getPrimaryBaritone().getElytraProcess().pathTo(new GoalXZ(goalX, goalZ));
+                            BaritoneExecutor.elytra(goalX, goalZ);
                         }
-                    }
+                    }.setNameFormatArgs(Misc.getKeyName(XaeroPlusSettingRegistry.worldMapBaritoneElytraHereKeybindSetting.getKeyBinding()))
                 ));
             }
         }

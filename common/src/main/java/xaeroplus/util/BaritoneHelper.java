@@ -4,7 +4,8 @@ import baritone.api.BaritoneAPI;
 import baritone.api.process.IElytraProcess;
 import xaeroplus.XaeroPlus;
 
-public class BaritoneHelper {
+public final class BaritoneHelper {
+    private BaritoneHelper() {}
     private static boolean isBaritonePresent = false;
     private static boolean isBaritoneElytraPresent = false;
     private static boolean checkedBaritone = false;

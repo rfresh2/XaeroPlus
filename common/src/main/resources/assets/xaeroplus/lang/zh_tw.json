@@ -10,7 +10,7 @@
   "setting.world_map.fast_mapping_rate_limit": "快速繪製地圖速率限制",
   "setting.world_map.fast_mapping_rate_limit.tooltip": "必須啟用快速繪製地圖。 \n 限制在單個週期內可以寫入的區塊數量。較低的值可以在高渲染距離下提高 FPS。",
   "setting.world_map.fast_zip_writes": "快速 Zip 寫入",
-  "setting.world_map.fast_zip_writes.tooltip": "更快地寫入地圖圖塊 Zip 檔案，但會使用更多 RAM。如果您的可用 RAM 較低，請停用此功能。",
+  "setting.world_map.fast_zip_writes.tooltip": "更快地寫入地圖圖塊 Zip 檔案，但會使用更多記憶體。如果您的可用記憶體 較低，請停用此功能。",
   "setting.world_map.region_write_while_dimension_switched": "切換維度時寫入區域",
   "setting.world_map.region_write_while_dimension_switched.tooltip": "修復 Xaero 的世界地圖在查看其他維度時未寫入／載入您載入的區塊的問題。",
   "setting.world_map.baritone_waypoint": "Baritone 目標定位點",
@@ -188,4 +188,3 @@
   "setting.world_map.waystone_waypoint_set": "傳送石碑定位點集",
   "setting.world_map.waystone_waypoint_set.tooltip": "為傳送石碑定位點建立一個單獨的定位點集，而不是將它們新增到預設集。"
 }
-

@@ -43,7 +43,8 @@ public class XaeroPlusSettingsReflectionHax {
                             XAERO_PLUS_MINIMAP_OVERLAY_SETTINGS.stream(),
                             XAERO_PLUS_MINIMAP_ENTITY_RADAR_SETTINGS.stream(),
                             XAERO_PLUS_MINIMAP_SETTINGS.stream(),
-                            XAERO_PLUS_KEYBIND_SETTINGS.stream())
+                            XAERO_PLUS_KEYBIND_SETTINGS.stream(),
+                            XAERO_PLUS_WAYPOINT_SETTINGS.stream())
             .flatMap(x -> x)
             .collect(Collectors.toList()));
 

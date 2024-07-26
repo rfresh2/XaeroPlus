@@ -40,7 +40,7 @@ public abstract class MixinSupportXaeroWorldmap {
                                   @Local(name = "minZ") LocalIntRef minZRef,
                                   @Local(name = "maxZ") LocalIntRef maxZRef
     ) {
-        final int scaledSize = Globals.minimapScalingFactor * 4;
+        final int scaledSize = Globals.minimapScaleMultiplier * 4;
         minXRef.set((mapX >> 2) - scaledSize);
         maxXRef.set((mapX >> 2) + scaledSize);
         minZRef.set((mapZ >> 2) - scaledSize);

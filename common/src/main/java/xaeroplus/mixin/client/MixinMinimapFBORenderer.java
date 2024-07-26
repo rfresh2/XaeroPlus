@@ -54,7 +54,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
 
     @ModifyConstant(method = "loadFrameBuffer", constant = @Constant(intValue = 512))
     public int overrideFrameBufferSize(int size) {
-        return Globals.minimapScalingFactor * 512;
+        return Globals.minimapScaleMultiplier * 512;
     }
 
     @Override
@@ -66,7 +66,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
                 this.scalingFramebuffer.destroyBuffers();
             if (this.rotationFramebuffer != null)
                 this.rotationFramebuffer.destroyBuffers();
-            final int scaledSize = Globals.minimapScalingFactor * 512;
+            final int scaledSize = Globals.minimapScaleMultiplier * 512;
             this.scalingFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, false);
             this.rotationFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, true);
             this.rotationFramebuffer.setFilterMode(9729);
@@ -81,7 +81,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         index = 10,
         remap = true) // $REMAP
     public int modifyViewW(final int viewW) {
-        return viewW * Globals.minimapScalingFactor;
+        return viewW * Globals.minimapScaleMultiplier;
     }
 
     @Inject(method = "renderChunksToFBO", at = @At(
@@ -90,7 +90,16 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
     ), remap = true)
     public void modifyScaledSize(final XaeroMinimapSession minimapSession, final GuiGraphics guiGraphics, final MinimapProcessor minimap, final Player player, final Entity renderEntity, final double playerX, final double playerZ, final double playerDimDiv, final double mapDimensionScale, final int bufferSize, final int viewW, final float sizeFix, final float partial, final int level, final boolean retryIfError, final boolean useWorldMap, final boolean lockedNorth, final int shape, final double ps, final double pc, final boolean cave, final boolean circle, final CustomVertexConsumers cvc, final CallbackInfo ci,
                             @Share("scaledSize") LocalIntRef scaledSize) {
-        scaledSize.set(256 * Globals.minimapScalingFactor);
+        int s = 256 * Globals.minimapScaleMultiplier * Globals.minimapSizeMultiplier;
+        if (Globals.minimapSizeMultiplier > 1) {
+            int f = (Globals.minimapSizeMultiplier - 1) * Globals.minimapScaleMultiplier;
+            s -= f * 6;
+            int scaledMinimapSize = modMain.getSettings().getMinimapSize();
+            int minimapNormalSize = scaledMinimapSize / Globals.minimapSizeMultiplier;
+            int minimapScaledSizeDiff = 250 - minimapNormalSize;
+            s -= minimapScaledSizeDiff * f;
+        }
+        scaledSize.set(s);
         Globals.minimapDrawContext = guiGraphics; // storing this for later use in SupportXaeroWorldMap rendering
     }
 
@@ -106,7 +115,8 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
     ), remap = true) // $REMAP
     public Matrix4f modifyShaderMatrixStackTranslate(final Matrix4fStack instance, final float x, final float y, final float z,
                                                      @Share("scaledSize") LocalIntRef scaledSize) {
-        return instance.translate(scaledSize.get(), scaledSize.get(), -2000.0F);
+        float translate = 256.0f * Globals.minimapScaleMultiplier;
+        return instance.translate(translate, translate, -2000.0F);
     }
 
     @Redirect(method = "renderChunksToFBO", at = @At(
@@ -126,7 +136,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         target = "Lcom/mojang/blaze3d/systems/RenderSystem;lineWidth(F)V"
     ), remap = false)
     public float modifyChunkGridLineWidth(final float original) {
-        return original * Globals.minimapScalingFactor;
+        return Math.max(1.0f, original * Globals.minimapScaleMultiplier / (float) Globals.minimapSizeMultiplier);
     }
 
     @Inject(method = "renderChunksToFBO", at = @At(
@@ -160,7 +170,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             final int z1 = z0 + width * 16;
             VertexConsumer lineBufferBuilder = renderTypeBuffers.getBuffer(CustomRenderTypes.MAP_LINES);
             MinimapShaders.FRAMEBUFFER_LINES.setFrameSize((float) scalingFramebuffer.viewWidth, (float) scalingFramebuffer.viewHeight);
-            float lineWidth = (float) Math.max(1.0, modMain.getSettings().chunkGridLineWidth * Globals.minimapScalingFactor);
+            float lineWidth = Math.max(1.0f, modMain.getSettings().chunkGridLineWidth * Globals.minimapScaleMultiplier / (float) Globals.minimapSizeMultiplier);
             RenderSystem.lineWidth(lineWidth);
             PoseStack.Pose matrices = matrixStack.last();
 
@@ -217,11 +227,44 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
 
     @Redirect(method = "renderChunksToFBO", at = @At(
         value = "INVOKE",
+        target = "Lorg/joml/Matrix4fStack;translate(FFF)Lorg/joml/Matrix4f;",
+        ordinal = 0
+    ),
+        slice = @Slice(
+        from = @At(
+            value = "INVOKE",
+            target = "Lxaero/common/graphics/ImprovedFramebuffer;bindRead()V"
+        )
+    ), remap = true)
+    public Matrix4f correctPreRotationTranslationForSizeMult(final Matrix4fStack instance, final float x, final float y, final float z) {
+        return instance.translate(x / Globals.minimapSizeMultiplier, y / Globals.minimapSizeMultiplier, z);
+    }
+
+    @Inject(method = "renderChunksToFBO", at = @At(
+        value = "INVOKE",
+        target = "Lorg/joml/Matrix4fStack;translate(FFF)Lorg/joml/Matrix4f;",
+        ordinal = 1,
+        shift = At.Shift.BEFORE
+    ), slice = @Slice(
+        from = @At(
+            value = "INVOKE",
+            target = "Lxaero/common/graphics/ImprovedFramebuffer;bindRead()V"
+        )
+    ), remap = true)
+    public void correctPostRotationTranslationForSizeMult(final XaeroMinimapSession minimapSession, final GuiGraphics guiGraphics, final MinimapProcessor minimap, final Player player, final Entity renderEntity, final double playerX, final double playerZ, final double playerDimDiv, final double mapDimensionScale, final int bufferSize, final int viewW, final float sizeFix, final float partial, final int level, final boolean retryIfError, final boolean useWorldMap, final boolean lockedNorth, final int shape, final double ps, final double pc, final boolean cave, final boolean circle, final CustomVertexConsumers cvc, final CallbackInfo ci,
+                                                          @Local(name = "halfWView") float halfWView,
+                                                          @Local(name = "shaderMatrixStack") Matrix4fStack shaderMatrixStack) {
+        float sizeMultTranslation = (halfWView / Globals.minimapSizeMultiplier) * (Globals.minimapSizeMultiplier - 1);
+        shaderMatrixStack.translate(sizeMultTranslation, sizeMultTranslation, 1.0f);
+    }
+
+    @Redirect(method = "renderChunksToFBO", at = @At(
+        value = "INVOKE",
         target = "Lxaero/common/minimap/render/MinimapRendererHelper;drawMyTexturedModalRect(Lcom/mojang/blaze3d/vertex/PoseStack;FFIIFFFF)V"
     ), remap = true) // $REMAP
     public void redirectModelViewDraw(final MinimapRendererHelper instance, final PoseStack matrixStack, final float x, final float y, final int textureX, final int textureY, final float width, final float height, final float theight, final float factor,
                                       @Share("scaledSize") LocalIntRef scaledSize) {
-        final float scaledSizeM = Globals.minimapScalingFactor * 512f;
+        final float scaledSizeM = Globals.minimapScaleMultiplier * 512f;
         this.helper.drawMyTexturedModalRect(matrixStack, -scaledSize.get(), -scaledSize.get(), 0, 0, scaledSizeM, scaledSizeM, scaledSizeM, scaledSizeM);
     }
 

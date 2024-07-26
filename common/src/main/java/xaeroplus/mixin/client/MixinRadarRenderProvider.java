@@ -42,8 +42,8 @@ public class MixinRadarRenderProvider {
         }
 
         if (!((IScreenRadarRenderContext) (Object) context).isWorldMap()) {
-            context.nameScale = XaeroMinimapSession.getCurrentSession().getModMain().getSettings().getDotNameScale() * Globals.minimapScaleMultiplier;
-            context.iconScale = this.currentList.getCategory().getSettingValue(EntityRadarCategorySettings.ICON_SCALE) * Globals.minimapScaleMultiplier;
+            context.nameScale = XaeroMinimapSession.getCurrentSession().getModMain().getSettings().getDotNameScale() * Globals.minimapScaleMultiplier / Globals.minimapSizeMultiplier;
+            context.iconScale = this.currentList.getCategory().getSettingValue(EntityRadarCategorySettings.ICON_SCALE) * Globals.minimapScaleMultiplier / Globals.minimapSizeMultiplier;
         }
     }
 }

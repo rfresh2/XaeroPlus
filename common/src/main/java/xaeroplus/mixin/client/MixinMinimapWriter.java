@@ -14,6 +14,6 @@ public class MixinMinimapWriter {
      */
     @Overwrite
     public int getLoadSide() {
-        return 9 * Globals.minimapScalingFactor;
+        return 9 * Globals.minimapScaleMultiplier;
     }
 }

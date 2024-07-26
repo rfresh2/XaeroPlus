@@ -4,6 +4,7 @@ import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
@@ -27,6 +28,7 @@ public class BufferedComponent {
     private int guiScale = 0;
     private boolean isRendering = false;
     private final Supplier<Integer> fpsLimitSupplier;
+    private final Matrix4f modelViewMatrix = new Matrix4f(RenderSystem.getModelViewMatrix());
 
     public BufferedComponent(final Supplier<Integer> fpsLimitSupplier) {
         this.fpsLimitSupplier = fpsLimitSupplier;
@@ -53,18 +55,16 @@ public class BufferedComponent {
      * @return true if the original render call should be cancelled
      */
     public boolean render() {
-        int screenWidth = minecraft.getWindow().getGuiScaledWidth();
-        int screenHeight = minecraft.getWindow().getGuiScaledHeight();
+        int windowWidth = minecraft.getWindow().getWidth();
+        int windowHeight = minecraft.getWindow().getHeight();
         boolean forceRender = false;
-        if (renderTarget.width != minecraft.getWindow().getWidth()
-            || renderTarget.height != minecraft.getWindow().getHeight()
-            || minecraft.options.guiScale().get() != guiScale) {
-            renderTarget.resize(minecraft.getWindow().getWidth(), minecraft.getWindow().getHeight(), true);
-            refreshModel(screenWidth, screenHeight);
-            guiScale = minecraft.options.guiScale().get();
+        if (renderTarget.width != windowWidth
+            || renderTarget.height != windowHeight) {
+            renderTarget.resize(windowWidth, windowHeight, true);
+            refreshModel(windowWidth, windowHeight);
             forceRender = true;
         }
-        if (model == null) refreshModel(screenWidth, screenHeight);
+        if (model == null) refreshModel(windowWidth, windowHeight);
         boolean updateFrame = forceRender || System.currentTimeMillis() > fpsTimer;
         if (!updateFrame) {
             renderTextureOverlay(renderTarget.getColorTextureId());
@@ -98,7 +98,11 @@ public class BufferedComponent {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, textureid);
-        model.draw(RenderSystem.getModelViewMatrix());
+        modelViewMatrix.load(RenderSystem.getModelViewMatrix());
+        float scalar = 1.0f / minecraft.options.guiScale().get();
+        Matrix4f scaleMatrix = Matrix4f.createScaleMatrix(scalar, scalar, scalar);
+        modelViewMatrix.multiply(scaleMatrix);
+        model.draw(modelViewMatrix);
         RenderSystem.depthMask(true);
         RenderSystem.enableDepthTest();
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);

@@ -22,7 +22,7 @@ public abstract class MixinGuiEntityRadarSettings extends GuiMinimapSettings {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     public void init(final IXaeroMinimap modMain, final Screen backScreen, final Screen escScreen, final CallbackInfo ci) {
-        final ConfigSettingEntry[] configSettingEntries = XaeroPlusSettingsReflectionHax.getMiniMapEntityRadarSettingEntries()
+        final ConfigSettingEntry[] configSettingEntries = XaeroPlusSettingsReflectionHax.getMinimapEntityRadarSettingEntries()
                 .toArray(new ConfigSettingEntry[0]);
         final int oldLen = this.entries.length;
         final int newLen = configSettingEntries.length;

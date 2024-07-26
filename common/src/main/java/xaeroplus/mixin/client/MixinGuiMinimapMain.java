@@ -28,7 +28,7 @@ public abstract class MixinGuiMinimapMain extends GuiSettings {
         at = @At("RETURN"),
         remap = true) // $REMAP
     public void init(final IXaeroMinimap modMain, final Screen par1GuiScreen, final Screen escScreen, final CallbackInfo ci) {
-        final ConfigSettingEntry[] configSettingEntries = XaeroPlusSettingsReflectionHax.getMiniMapConfigSettingEntries()
+        final ConfigSettingEntry[] configSettingEntries = XaeroPlusSettingsReflectionHax.getMinimapMainConfigSettingEntries()
                 .toArray(new ConfigSettingEntry[0]);
         final int oldLen = this.mainEntries.length;
         final int newLen = configSettingEntries.length;

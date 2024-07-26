@@ -65,13 +65,13 @@ public class MixinSodiumOptionsGUI {
                          .setTooltip(Component.translatable("setting.minimap.minimap_scaling.tooltip"))
                          .setControl(option -> new SliderControl(
                              option,
-                             (int) XaeroPlusSettingRegistry.minimapScaling.getValueMin(),
-                             (int) XaeroPlusSettingRegistry.minimapScaling.getValueMax(),
-                             (int) XaeroPlusSettingRegistry.minimapScaling.getValueStep(),
+                             (int) XaeroPlusSettingRegistry.minimapScaleMultiplierSetting.getValueMin(),
+                             (int) XaeroPlusSettingRegistry.minimapScaleMultiplierSetting.getValueMax(),
+                             (int) XaeroPlusSettingRegistry.minimapScaleMultiplierSetting.getValueStep(),
                              ControlValueFormatter.number()))
                          .setBinding(new GenericBinding<>(
-                             (config, value) -> XaeroPlusSettingRegistry.minimapScaling.setValue((float) value),
-                             config -> (int) XaeroPlusSettingRegistry.minimapScaling.getValue()
+                             (config, value) -> XaeroPlusSettingRegistry.minimapScaleMultiplierSetting.setValue((float) value),
+                             config -> (int) XaeroPlusSettingRegistry.minimapScaleMultiplierSetting.getValue()
                          ))
                          .build())
                 .build()

@@ -16,11 +16,11 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
 
     private XaeroPlusBooleanSetting(final String settingName,
                                     final String settingNameTranslationKey,
-                                    final boolean value,
                                     final String tooltipTranslationKey,
-                                    final Supplier<Boolean> visibilitySupplier,
+                                    final KeyMapping keyBinding,
+                                    final boolean value,
                                     final Consumer<Boolean> settingChangeConsumer,
-                                    final KeyMapping keyBinding) {
+                                    final Supplier<Boolean> visibilitySupplier) {
         super(settingName, settingNameTranslationKey, tooltipTranslationKey, keyBinding, visibilitySupplier);
         this.value = value;
         this.settingChangeConsumer = settingChangeConsumer;
@@ -32,13 +32,11 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
                                                  boolean defaultValue,
                                                  final SettingLocation settingLocation) {
         final XaeroPlusBooleanSetting setting = new XaeroPlusBooleanSetting(
-                SETTING_PREFIX + settingName,
-                settingNameTranslationKey,
-                defaultValue,
-                tooltipTranslationKey,
-                null,
-                null,
-                new KeyMapping(settingNameTranslationKey, -1, "XaeroPlus"));
+            SETTING_PREFIX + settingName,
+            settingNameTranslationKey,
+            tooltipTranslationKey, new KeyMapping(settingNameTranslationKey, -1, "XaeroPlus"), defaultValue,
+            null, null
+        );
         settingLocation.getSettingsList().add(setting);
         return setting;
     }
@@ -46,17 +44,15 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
     public static XaeroPlusBooleanSetting create(String settingName,
                                                  String settingNameTranslationKey,
                                                  String tooltipTranslationKey,
+                                                 boolean defaultValue,
                                                  Consumer<Boolean> settingChangeConsumer,
-                                                 boolean defaultValue,
                                                  final SettingLocation settingLocation) {
         final XaeroPlusBooleanSetting setting = new XaeroPlusBooleanSetting(
-                SETTING_PREFIX + settingName,
-                settingNameTranslationKey,
-                defaultValue,
-                tooltipTranslationKey,
-                null,
-                settingChangeConsumer,
-                new KeyMapping(settingNameTranslationKey, -1, "XaeroPlus"));
+            SETTING_PREFIX + settingName,
+            settingNameTranslationKey,
+            tooltipTranslationKey, new KeyMapping(settingNameTranslationKey, -1, "XaeroPlus"), defaultValue,
+            settingChangeConsumer, null
+        );
         settingLocation.getSettingsList().add(setting);
         return setting;
     }
@@ -64,17 +60,15 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
     public static XaeroPlusBooleanSetting create(String settingName,
                                                  String settingNameTranslationKey,
                                                  String tooltipTranslationKey,
-                                                 Supplier<Boolean> visibilitySupplier,
                                                  boolean defaultValue,
+                                                 Supplier<Boolean> visibilitySupplier,
                                                  final SettingLocation settingLocation) {
         final XaeroPlusBooleanSetting setting = new XaeroPlusBooleanSetting(
-                SETTING_PREFIX + settingName,
-                settingNameTranslationKey,
-                defaultValue,
-                tooltipTranslationKey,
-                visibilitySupplier,
-                null,
-                new KeyMapping(settingNameTranslationKey, -1, "XaeroPlus"));
+            SETTING_PREFIX + settingName,
+            settingNameTranslationKey,
+            tooltipTranslationKey, new KeyMapping(settingNameTranslationKey, -1, "XaeroPlus"), defaultValue,
+            null, visibilitySupplier
+        );
         settingLocation.getSettingsList().add(setting);
         return setting;
     }
@@ -82,18 +76,16 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
     public static XaeroPlusBooleanSetting create(String settingName,
                                                  String settingNameTranslationKey,
                                                  String tooltipTranslationKey,
-                                                 Supplier<Boolean> visibilitySupplier,
+                                                 boolean defaultValue,
                                                  Consumer<Boolean> settingChangeConsumer,
-                                                 boolean defaultValue,
+                                                 Supplier<Boolean> visibilitySupplier,
                                                  final SettingLocation settingLocation) {
         final XaeroPlusBooleanSetting setting = new XaeroPlusBooleanSetting(
-                SETTING_PREFIX + settingName,
-                settingNameTranslationKey,
-                defaultValue,
-                tooltipTranslationKey,
-                visibilitySupplier,
-                settingChangeConsumer,
-                new KeyMapping(settingNameTranslationKey, -1, "XaeroPlus"));
+            SETTING_PREFIX + settingName,
+            settingNameTranslationKey,
+            tooltipTranslationKey, new KeyMapping(settingNameTranslationKey, -1, "XaeroPlus"), defaultValue,
+            settingChangeConsumer, visibilitySupplier
+        );
         settingLocation.getSettingsList().add(setting);
         return setting;
     }

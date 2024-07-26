@@ -14,6 +14,7 @@ import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.settings.ModOptions;
 import xaero.common.settings.ModSettings;
+import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.extensions.IWaypointDimension;
 import xaeroplus.settings.XaeroPlusModSettingsHooks;
@@ -36,6 +37,8 @@ public class MixinMinimapModSettings {
     public boolean keepUnlockedWhenEnlarged;
     @Shadow
     protected IXaeroMinimap modMain;
+
+    @Shadow private int minimapSize;
 
     @Inject(method = "<init>", at = @At(value = "RETURN"))
     private void init(CallbackInfo ci) {
@@ -67,6 +70,14 @@ public class MixinMinimapModSettings {
             XaeroPlus.LOGGER.error("Failed setting waypoint dimension: {}", waypoint, e);
         }
     }
+
+    @Inject(method = "getMinimapSize", at = @At(
+        value = "RETURN"
+    ), cancellable = true)
+    public void modifyMinimapSize(final CallbackInfoReturnable<Integer> cir) {
+        cir.setReturnValue(cir.getReturnValue() * Globals.minimapSizeMultiplier);
+    }
+
 
     @Inject(method = "saveSettings", at = @At("RETURN"))
     public void saveSettings(final CallbackInfo ci) throws IOException {

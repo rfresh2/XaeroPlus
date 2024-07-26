@@ -51,7 +51,7 @@ public class MixinMinimapElementOverMapRendererHandler {
             return instance.renderElement(location, highlit, outOfBounds, drawContext, immediate, fontRenderer,
                     framebuffer, minimapRendererHelper, renderEntity, entityPlayer, renderX, renderY, renderZ,
                     elementIndex, optionalDepth,
-                    optionalScale / Globals.minimapScalingFactor,
+                    optionalScale / Globals.minimapScaleMultiplier,
                     e, partialX, partialY, cave, partialTicks);
         } else {
             return instance.renderElement(location, highlit, outOfBounds, drawContext, immediate, fontRenderer,

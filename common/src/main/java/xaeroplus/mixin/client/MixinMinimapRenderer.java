@@ -8,10 +8,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
@@ -52,11 +49,62 @@ public class MixinMinimapRenderer {
             final CallbackInfo ci
     ) {
         if (this.minimap.usingFBO() && Globals.shouldResetFBO) {
-            Globals.minimapScalingFactor = (int) XaeroPlusSettingRegistry.minimapScaling.getValue();
+            Globals.minimapScaleMultiplier = (int) XaeroPlusSettingRegistry.minimapScaleMultiplierSetting.getValue();
+            Globals.minimapSizeMultiplier = (int) XaeroPlusSettingRegistry.minimapSizeMultiplierSetting.getValue();
             ((CustomMinimapFBORenderer) this.minimap.getMinimapFBORenderer()).reloadMapFrameBuffers();
             Globals.shouldResetFBO = false;
             minimap.setToResetImage(true);
         }
+    }
+
+    @ModifyConstant(
+        method = "renderMinimap",
+        constant = @Constant(
+            intValue = 256
+        ),
+        slice = @Slice(
+            from = @At(
+                value = "INVOKE",
+                target = "Lxaero/common/minimap/render/MinimapRenderer;renderChunks(Lxaero/common/XaeroMinimapSession;Lnet/minecraft/client/gui/GuiGraphics;Lxaero/common/minimap/MinimapProcessor;DDDDIIFFIZZIDDZZLxaero/common/settings/ModSettings;Lxaero/common/graphics/CustomVertexConsumers;)V"
+            )
+        )
+    )
+    public int modifyMinimapSizeConstantI(final int constant) {
+        return constant * Globals.minimapSizeMultiplier;
+    }
+
+    @ModifyConstant(
+        method = "renderMinimap",
+        constant = @Constant(
+            floatValue = 256.0f,
+            ordinal = 0
+        ),
+        slice = @Slice(
+            from = @At(
+                value = "INVOKE",
+                target = "Lxaero/common/minimap/render/MinimapRenderer;renderChunks(Lxaero/common/XaeroMinimapSession;Lnet/minecraft/client/gui/GuiGraphics;Lxaero/common/minimap/MinimapProcessor;DDDDIIFFIZZIDDZZLxaero/common/settings/ModSettings;Lxaero/common/graphics/CustomVertexConsumers;)V"
+            )
+        )
+    )
+    public float modifyMinimapSizeConstantF(final float constant) {
+        return constant * Globals.minimapSizeMultiplier;
+    }
+
+    @ModifyConstant(
+        method = "renderMinimap",
+        constant = @Constant(
+            floatValue = 256.0f,
+            ordinal = 1
+        ),
+        slice = @Slice(
+            from = @At(
+                value = "INVOKE",
+                target = "Lxaero/common/minimap/render/MinimapRenderer;renderChunks(Lxaero/common/XaeroMinimapSession;Lnet/minecraft/client/gui/GuiGraphics;Lxaero/common/minimap/MinimapProcessor;DDDDIIFFIZZIDDZZLxaero/common/settings/ModSettings;Lxaero/common/graphics/CustomVertexConsumers;)V"
+            )
+        )
+    )
+    public float modifyMinimapSizeConstantFCircle(final float constant) {
+        return constant * Globals.minimapSizeMultiplier;
     }
 
     @Redirect(method = "renderMinimap", at = @At(
@@ -89,7 +137,7 @@ public class MixinMinimapRenderer {
                                   final boolean circle,
                                   final float minimapScale
     ) {
-        double customZoom = zoom / Globals.minimapScalingFactor;
+        double customZoom = (zoom / Globals.minimapScaleMultiplier) * Globals.minimapSizeMultiplier;
         instance.render(
                 guiGraphics,
                 renderEntity,

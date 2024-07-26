@@ -154,14 +154,16 @@ public final class XaeroPlusSettingRegistry {
     public static final XaeroPlusFloatSetting transparentObsidianRoofDarkeningSetting = XaeroPlusFloatSetting.create(
         "Roof Obsidian Opacity",
         "setting.world_map.transparent_obsidian_roof_darkening",
-        "setting.world_map.transparent_obsidian_roof_darkening.tooltip", 0, 255, 5,
+        "setting.world_map.transparent_obsidian_roof_darkening.tooltip",
+        0, 255, 5,
         150,
         (v) -> markChunksDirtyInWriteDistance(),
         SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting transparentObsidianRoofSnowOpacitySetting = XaeroPlusFloatSetting.create(
         "Roof Snow Opacity",
         "setting.world_map.transparent_obsidian_roof_snow_opacity",
-        "setting.world_map.transparent_obsidian_roof_snow_opacity.tooltip", 0, 255, 5,
+        "setting.world_map.transparent_obsidian_roof_snow_opacity.tooltip",
+        0, 255, 5,
         10,
         (v) -> markChunksDirtyInWriteDistance(),
         SettingLocation.WORLD_MAP_MAIN);
@@ -290,7 +292,8 @@ public final class XaeroPlusSettingRegistry {
     public static final XaeroPlusFloatSetting oldChunksAlphaSetting = XaeroPlusFloatSetting.create(
         "Old Chunks Opacity",
         "setting.world_map.old_chunks_opacity",
-        "setting.world_map.old_chunks_opacity.tooltip", 0f, 255f, 10f,
+        "setting.world_map.old_chunks_opacity.tooltip",
+        0f, 255f, 10f,
         100,
         (b) -> ModuleManager.getModule(OldChunks.class).setAlpha(b),
         SettingLocation.CHUNK_HIGHLIGHTS);
@@ -495,11 +498,19 @@ public final class XaeroPlusSettingRegistry {
         "setting.minimap.transparent_background.tooltip",
         false,
         SettingLocation.MINIMAP_VIEW);
-    public static final XaeroPlusFloatSetting minimapScaling = XaeroPlusFloatSetting.create(
+    public static final XaeroPlusFloatSetting minimapScaleMultiplierSetting = XaeroPlusFloatSetting.create(
         "Minimap Scaling Factor",
         "setting.minimap.minimap_scaling",
         "setting.minimap.minimap_scaling.tooltip",
         1f, 5f, 1f,
+        1f,
+        (b) -> Globals.shouldResetFBO = true,
+        SettingLocation.MINIMAP_VIEW);
+    public static final XaeroPlusFloatSetting minimapSizeMultiplierSetting = XaeroPlusFloatSetting.create(
+        "Minimap Size Multiplier",
+        "setting.minimap_size_multiplier",
+        "setting.minimap_size_multiplier.tooltip",
+        1f, 4f, 1f,
         1f,
         (b) -> Globals.shouldResetFBO = true,
         SettingLocation.MINIMAP_VIEW);

@@ -133,7 +133,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         target = "Lcom/mojang/blaze3d/systems/RenderSystem;lineWidth(F)V"
     ), remap = true)
     public void modifyChunkGridLineWidth(final float original) {
-        RenderSystem.lineWidth(((float)this.modMain.getSettings().chunkGridLineWidth) * Globals.minimapScaleMultiplier);
+        RenderSystem.lineWidth(Math.max(1.0f, original * Globals.minimapScaleMultiplier / (float) Globals.minimapSizeMultiplier));
     }
 
     @Inject(method = "renderChunksToFBO", at = @At(
@@ -167,7 +167,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             final int z1 = z0 + width * 16;
             VertexConsumer lineBufferBuilder = renderTypeBuffers.getBuffer(CustomRenderTypes.MAP_LINES);
             MinimapShaders.FRAMEBUFFER_LINES.setFrameSize((float) scalingFramebuffer.viewWidth, (float) scalingFramebuffer.viewHeight);
-            float lineWidth = (float) Math.max(1.0, modMain.getSettings().chunkGridLineWidth * Globals.minimapScaleMultiplier);
+            float lineWidth = Math.max(1.0f, modMain.getSettings().chunkGridLineWidth * Globals.minimapScaleMultiplier / (float) Globals.minimapSizeMultiplier);
             RenderSystem.lineWidth(lineWidth);
             PoseStack.Pose matrices = matrixStack.last();
 
@@ -220,6 +220,38 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
                 0.8f
             );
         }
+    }
+
+    @Redirect(method = "renderChunksToFBO", at = @At(
+        value = "INVOKE",
+        target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V",
+        ordinal = 0
+    ), slice = @Slice(
+        from = @At(
+            value = "INVOKE",
+            target = "Lxaero/common/graphics/ImprovedFramebuffer;bindRead()V"
+        )
+    ), remap = true)
+    public void correctPreRotationTranslationForSizeMult(final PoseStack instance, final float x, final float y, final float z) {
+        instance.translate(x / Globals.minimapSizeMultiplier, y / Globals.minimapSizeMultiplier, z);
+    }
+
+    @Inject(method = "renderChunksToFBO", at = @At(
+        value = "INVOKE",
+        target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(DDD)V",
+        ordinal = 0,
+        shift = At.Shift.BEFORE
+    ), slice = @Slice(
+        from = @At(
+            value = "INVOKE",
+            target = "Lxaero/common/graphics/ImprovedFramebuffer;bindRead()V"
+        )
+    ), remap = true)
+    public void correctPostRotationTranslationForSizeMult(final XaeroMinimapSession minimapSession, final PoseStack guiGraphics, final MinimapProcessor minimap, final Player player, final Entity renderEntity, final double playerX, final double playerZ, final double playerDimDiv, final double mapDimensionScale, final int bufferSize, final int viewW, final float sizeFix, final float partial, final int level, final boolean retryIfError, final boolean useWorldMap, final boolean lockedNorth, final int shape, final double ps, final double pc, final boolean cave, final boolean circle, final CustomVertexConsumers cvc, final CallbackInfo ci,
+                                                          @Local(name = "halfWView") float halfWView,
+                                                          @Local(name = "shaderMatrixStack") PoseStack shaderMatrixStack) {
+        float sizeMultTranslation = (halfWView / Globals.minimapSizeMultiplier) * (Globals.minimapSizeMultiplier - 1);
+        shaderMatrixStack.translate(sizeMultTranslation, sizeMultTranslation, 1.0f);
     }
 
     @Redirect(method = "renderChunksToFBO", at = @At(

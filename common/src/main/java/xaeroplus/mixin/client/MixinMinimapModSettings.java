@@ -14,6 +14,7 @@ import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.settings.ModOptions;
 import xaero.common.settings.ModSettings;
+import xaero.hud.HudSession;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.extensions.IWaypointDimension;
@@ -75,7 +76,15 @@ public class MixinMinimapModSettings {
         value = "RETURN"
     ), cancellable = true)
     public void modifyMinimapSize(final CallbackInfoReturnable<Integer> cir) {
-        cir.setReturnValue(cir.getReturnValue() * Globals.minimapSizeMultiplier);
+        try {
+            var session = HudSession.getCurrentSession();
+            if (session == null) return;
+            if (session.getHudMod().getInterfaces().getMinimapInterface().usingFBO()) {
+                cir.setReturnValue(cir.getReturnValue() * Globals.minimapSizeMultiplier);
+            }
+        } catch (final Exception e) {
+            // fall through
+        }
     }
 
 

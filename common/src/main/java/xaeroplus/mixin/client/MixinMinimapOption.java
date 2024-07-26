@@ -17,7 +17,7 @@ import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
 import static xaeroplus.settings.XaeroPlusSetting.SETTING_PREFIX;
 
 @Mixin(value = Option.class, remap = false)
-public class MixinMinimapModOption {
+public class MixinMinimapOption {
     @Mutable
     @Final
     @Shadow

@@ -22,7 +22,7 @@ public abstract class MixinGuiMinimapOverlaysSettings extends GuiSettings {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     public void init(final IXaeroMinimap modMain, final Screen backScreen, final Screen escScreen, final CallbackInfo ci) {
-        final ConfigSettingEntry[] configSettingEntries = XaeroPlusSettingsReflectionHax.getMiniMapOverlayConfigSettingEntries()
+        final ConfigSettingEntry[] configSettingEntries = XaeroPlusSettingsReflectionHax.getMinimapOverlayConfigSettingEntries()
                 .toArray(new ConfigSettingEntry[0]);
         final int oldLen = this.entries.length;
         final int newLen = configSettingEntries.length;

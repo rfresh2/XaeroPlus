@@ -8,14 +8,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.waypoints.Waypoint;
-import xaero.common.minimap.waypoints.WaypointSet;
 import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.settings.ModOptions;
 import xaero.common.settings.ModSettings;
+import xaero.hud.HudSession;
+import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.extensions.IWaypointDimension;
 import xaeroplus.settings.XaeroPlusModSettingsHooks;
@@ -39,13 +39,15 @@ public class MixinMinimapModSettings {
     @Shadow
     protected IXaeroMinimap modMain;
 
+    @Shadow private int minimapSize;
+
     @Inject(method = "<init>", at = @At(value = "RETURN"))
     private void init(CallbackInfo ci) {
         // don't show cave maps on minimap by default
         caveMaps = 0;
     }
 
-    @Inject(method = "getLockNorth", at = @At("HEAD"), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
+    @Inject(method = "getLockNorth", at = @At("HEAD"), cancellable = true)
     public void getLockNorth(int mapSize, int shape, CallbackInfoReturnable<Boolean> cir) {
         if (!XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) return;
         // prevent lock north from being forced to true when minimap is square and greater than 180 size
@@ -61,15 +63,30 @@ public class MixinMinimapModSettings {
         method = "checkWaypointsLine",
         at = @At(
             value = "INVOKE",
-            target = "Ljava/util/ArrayList;add(Ljava/lang/Object;)Z"),
-        locals = LocalCapture.CAPTURE_FAILHARD)
-    public void createWaypointInject(final String[] args, final WaypointWorld wpw, final CallbackInfoReturnable<Boolean> cir, final String setName, final WaypointSet set, boolean yIncluded, int yCoord, Waypoint waypoint) {
+            target = "Ljava/util/ArrayList;add(Ljava/lang/Object;)Z"))
+    public void createWaypointInject(final String[] args, final WaypointWorld wpw, final CallbackInfoReturnable<Boolean> cir, @Local Waypoint waypoint) {
         try {
             ((IWaypointDimension) waypoint).setDimension(wpw.getDimId());
         } catch (final Throwable e) {
             XaeroPlus.LOGGER.error("Failed setting waypoint dimension: {}", waypoint, e);
         }
     }
+
+    @Inject(method = "getMinimapSize", at = @At(
+        value = "RETURN"
+    ), cancellable = true)
+    public void modifyMinimapSize(final CallbackInfoReturnable<Integer> cir) {
+        try {
+            var session = HudSession.getCurrentSession();
+            if (session == null) return;
+            if (session.getHudMod().getInterfaces().getMinimapInterface().usingFBO()) {
+                cir.setReturnValue(cir.getReturnValue() * Globals.minimapSizeMultiplier);
+            }
+        } catch (final Exception e) {
+            // fall through
+        }
+    }
+
 
     @Inject(method = "saveSettings", at = @At("RETURN"))
     public void saveSettings(final CallbackInfo ci) throws IOException {

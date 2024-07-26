@@ -25,7 +25,6 @@ import static xaeroplus.util.GuiMapHelper.*;
 public class ChunkHighlightSavingCache implements ChunkHighlightCache {
     // these are initialized lazily
     @Nullable private ChunkHighlightDatabase database = null;
-    private static final int defaultRegionWindowSize = 2; // when we are only viewing the minimap
     @Nullable private String currentWorldId;
     private boolean worldCacheInitialized = false;
     @Nullable private final String databaseName;
@@ -36,6 +35,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
         this.databaseName = databaseName;
     }
 
+    @Override
     public boolean addHighlight(final int x, final int z) {
         try {
             ChunkHighlightCacheDimensionHandler cacheForCurrentDimension = getCacheForCurrentDimension();
@@ -55,6 +55,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
         cacheForDimension.addHighlight(x, z, foundTime);
     }
 
+    @Override
     public boolean removeHighlight(final int x, final int z) {
         try {
             ChunkHighlightCacheDimensionHandler cacheForCurrentDimension = getCacheForCurrentDimension();
@@ -67,6 +68,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
         }
     }
 
+    @Override
     public boolean isHighlighted(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> dimensionId) {
         if (dimensionId == null) return false;
         ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimensionId, false);
@@ -80,6 +82,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
         return cacheForDimension.isHighlighted(chunkPosX, chunkPosZ, getActualDimension());
     }
 
+    @Override
     public void handleWorldChange() {
         Futures.whenAllComplete(saveAllChunks())
                 .call(() -> {
@@ -181,15 +184,17 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
         ChunkHighlightCacheDimensionHandler cacheForCurrentDimension = getCacheForCurrentDimension();
         if (cacheForCurrentDimension == null) return;
         cacheForCurrentDimension
-            .setWindow(ChunkUtils.actualPlayerRegionX(), ChunkUtils.actualPlayerRegionZ(), defaultRegionWindowSize);
+            .setWindow(ChunkUtils.actualPlayerRegionX(), ChunkUtils.actualPlayerRegionZ(), getMinimapRegionWindowSize());
     }
 
+    @Override
     public void onEnable() {
         if (!worldCacheInitialized) {
             initializeWorld();
         }
     }
 
+    @Override
     public void onDisable() {
         Futures.whenAllComplete(saveAllChunks()).call(() -> {
             reset();
@@ -207,7 +212,13 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
 
     }
 
+    public int getMinimapRegionWindowSize() {
+        return Math.max(3, Globals.minimapScaleMultiplier);
+    }
+
     int tickCounter = 0;
+
+    @Override
     public void handleTick() {
         if (!worldCacheInitialized) return;
         // limit so we don't overflow
@@ -234,7 +245,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
                 .forEach(cache -> cache.setWindow(0, 0, 0));
         } else {
             final ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(Globals.getCurrentDimensionId(), true);
-            if (cacheForDimension != null) cacheForDimension.setWindow(ChunkUtils.getPlayerRegionX(), ChunkUtils.getPlayerRegionZ(), defaultRegionWindowSize);
+            if (cacheForDimension != null) cacheForDimension.setWindow(ChunkUtils.getPlayerRegionX(), ChunkUtils.getPlayerRegionZ(), getMinimapRegionWindowSize());
             getCachesExceptDimension(Globals.getCurrentDimensionId())
                 .forEach(cache -> cache.setWindow(0, 0, 0));
         }

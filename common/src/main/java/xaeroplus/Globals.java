@@ -37,7 +37,8 @@ public class Globals {
     // cache and only update this on new world loads
     public static boolean nullOverworldDimensionFolder = false;
     public static XaeroPlusSettingRegistry.DataFolderResolutionMode dataFolderResolutionMode = XaeroPlusSettingRegistry.DataFolderResolutionMode.IP;
-    public static int minimapScalingFactor = 1;
+    public static int minimapScaleMultiplier = 1;
+    public static int minimapSizeMultiplier = 1;
     public static boolean shouldResetFBO = false;
     public static String LOCK_ID = UUID.randomUUID().toString();
     public static GuiGraphics minimapDrawContext = null;
@@ -73,7 +74,8 @@ public class Globals {
         XaeroPlusSettingsReflectionHax.ALL_SETTINGS.get().forEach(XaeroPlusSetting::init);
         nullOverworldDimensionFolder = XaeroPlusSettingRegistry.nullOverworldDimensionFolder.getValue();
         dataFolderResolutionMode = XaeroPlusSettingRegistry.dataFolderResolutionMode.getValue();
-        minimapScalingFactor = (int) XaeroPlusSettingRegistry.minimapScaling.getValue();
+        minimapScaleMultiplier = (int) XaeroPlusSettingRegistry.minimapScaleMultiplierSetting.getValue();
+        minimapSizeMultiplier = (int) XaeroPlusSettingRegistry.minimapSizeMultiplierSetting.getValue();
     }
 
     public static void switchToDimension(final ResourceKey<Level> newDimId) {

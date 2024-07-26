@@ -46,20 +46,15 @@ public class ChunkHighlightLocalCache extends ChunkHighlightBaseCacheHandler {
         }
     }
 
-    public void handleWorldChange() {
+    @Override
+    public void handleWorldChange() {}
 
-    }
+    @Override
+    public void handleTick() {}
 
-    public void handleTick() {
+    @Override
+    public void onEnable() {}
 
-    }
-
-    public void onEnable() {
-
-    }
-
-    public void onDisable() {
-
-    }
-
+    @Override
+    public void onDisable() {}
 }

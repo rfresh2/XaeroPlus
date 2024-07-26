@@ -16,6 +16,8 @@ import static xaeroplus.util.ChunkUtils.chunkPosToLong;
 public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCache {
     public final ReadWriteLock lock = new StampedLock().asReadWriteLock();
     public final Long2LongMap chunks = new Long2LongOpenHashMap();
+
+    @Override
     public boolean addHighlight(final int x, final int z) {
         return addHighlight(x, z, System.currentTimeMillis());
     }
@@ -33,6 +35,7 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
         return true;
     }
 
+    @Override
     public boolean removeHighlight(final int x, final int z) {
         final long chunkPos = chunkPosToLong(x, z);
         try {
@@ -46,6 +49,7 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
         return true;
     }
 
+    @Override
     public boolean isHighlighted(final int x, final int z, ResourceKey<Level> dimensionId) {
         return isHighlighted(chunkPosToLong(x, z));
     }
@@ -59,10 +63,12 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
         return false;
     }
 
+    @Override
     public Long2LongMap getHighlightsState() {
         return chunks;
     }
 
+    @Override
     public void loadPreviousState(final Long2LongMap state) {
         if (state == null) return;
         try {

@@ -134,7 +134,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         target = "Lcom/mojang/blaze3d/systems/RenderSystem;lineWidth(F)V"
     ), remap = false)
     public float modifyChunkGridLineWidth(final float original) {
-        return original * Globals.minimapScaleMultiplier;
+        return Math.max(1.0f, original * Globals.minimapScaleMultiplier / (float) Globals.minimapSizeMultiplier);
     }
 
     @Inject(method = "renderChunksToFBO", at = @At(

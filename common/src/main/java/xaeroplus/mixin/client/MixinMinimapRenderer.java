@@ -70,7 +70,11 @@ public class MixinMinimapRenderer {
         )
     )
     public int modifyMinimapSizeConstantI(final int constant) {
-        return constant * Globals.minimapSizeMultiplier;
+        if (this.minimap.usingFBO()) {
+            return constant * Globals.minimapSizeMultiplier;
+        } else {
+            return constant;
+        }
     }
 
     @ModifyConstant(
@@ -87,7 +91,11 @@ public class MixinMinimapRenderer {
         )
     )
     public float modifyMinimapSizeConstantF(final float constant) {
-        return constant * Globals.minimapSizeMultiplier;
+        if (this.minimap.usingFBO()) {
+            return constant * Globals.minimapSizeMultiplier;
+        } else {
+            return constant;
+        }
     }
 
     @ModifyConstant(
@@ -104,7 +112,11 @@ public class MixinMinimapRenderer {
         )
     )
     public float modifyMinimapSizeConstantFCircle(final float constant) {
-        return constant * Globals.minimapSizeMultiplier;
+        if (this.minimap.usingFBO()) {
+            return constant * Globals.minimapSizeMultiplier;
+        } else {
+            return constant;
+        }
     }
 
     @Redirect(method = "renderMinimap", at = @At(
@@ -121,7 +133,7 @@ public class MixinMinimapRenderer {
                                   final double playerDimDiv,
                                   final double ps,
                                   final double pc,
-                                  final double zoom,
+                                  double zoom,
                                   final boolean cave,
                                   final float partialTicks,
                                   final RenderTarget framebuffer,
@@ -137,7 +149,9 @@ public class MixinMinimapRenderer {
                                   final boolean circle,
                                   final float minimapScale
     ) {
-        double customZoom = (zoom / Globals.minimapScaleMultiplier) * Globals.minimapSizeMultiplier;
+        if (this.minimap.usingFBO()) {
+            zoom = (zoom / Globals.minimapScaleMultiplier) * Globals.minimapSizeMultiplier;
+        }
         instance.render(
                 guiGraphics,
                 renderEntity,
@@ -148,7 +162,7 @@ public class MixinMinimapRenderer {
                 playerDimDiv,
                 ps,
                 pc,
-                customZoom,
+                zoom,
                 cave,
                 partialTicks,
                 framebuffer,

@@ -8,11 +8,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.waypoints.Waypoint;
-import xaero.common.minimap.waypoints.WaypointSet;
 import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.settings.ModOptions;
 import xaero.common.settings.ModSettings;
@@ -45,7 +43,7 @@ public class MixinMinimapModSettings {
         caveMaps = 0;
     }
 
-    @Inject(method = "getLockNorth", at = @At("HEAD"), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
+    @Inject(method = "getLockNorth", at = @At("HEAD"), cancellable = true)
     public void getLockNorth(int mapSize, int shape, CallbackInfoReturnable<Boolean> cir) {
         if (!XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) return;
         // prevent lock north from being forced to true when minimap is square and greater than 180 size
@@ -61,9 +59,8 @@ public class MixinMinimapModSettings {
         method = "checkWaypointsLine",
         at = @At(
             value = "INVOKE",
-            target = "Ljava/util/ArrayList;add(Ljava/lang/Object;)Z"),
-        locals = LocalCapture.CAPTURE_FAILHARD)
-    public void createWaypointInject(final String[] args, final WaypointWorld wpw, final CallbackInfoReturnable<Boolean> cir, final String setName, final WaypointSet set, boolean yIncluded, int yCoord, Waypoint waypoint) {
+            target = "Ljava/util/ArrayList;add(Ljava/lang/Object;)Z"))
+    public void createWaypointInject(final String[] args, final WaypointWorld wpw, final CallbackInfoReturnable<Boolean> cir, @Local Waypoint waypoint) {
         try {
             ((IWaypointDimension) waypoint).setDimension(wpw.getDimId());
         } catch (final Throwable e) {

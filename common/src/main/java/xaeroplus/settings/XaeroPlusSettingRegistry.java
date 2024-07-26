@@ -26,46 +26,44 @@ public final class XaeroPlusSettingRegistry {
         "Minimap FPS Limiter",
         "setting.minimap.fps_limiter",
         "setting.minimap.fps_limiter.tooltip",
-        (b) -> {
-            ModuleManager.getModule(FpsLimiter.class).setEnabled(b);
-        },
         false,
-        SettingLocation.MINIMAP);
+        (b) -> ModuleManager.getModule(FpsLimiter.class).setEnabled(b),
+        SettingLocation.MINIMAP_MAIN);
     public static final XaeroPlusFloatSetting minimapFpsLimit = XaeroPlusFloatSetting.create(
         "Minimap FPS Limit",
         "setting.minimap.fps_limiter_limit",
-        5f, 120f, 5f,
         "setting.minimap.fps_limiter_limit.tooltip",
+        5f, 120f, 5f,
         60f,
-        SettingLocation.MINIMAP);
+        SettingLocation.MINIMAP_MAIN);
     public static final XaeroPlusBooleanSetting fastMapSetting = XaeroPlusBooleanSetting.create(
-            "Fast Mapping",
-            "setting.world_map.fast_mapping",
-            "setting.world_map.fast_mapping.tooltip",
-            false,
-            SettingLocation.WORLD_MAP_MAIN);
+        "Fast Mapping",
+        "setting.world_map.fast_mapping",
+        "setting.world_map.fast_mapping.tooltip",
+        false,
+        SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting fastMapWriterDelaySetting = XaeroPlusFloatSetting.create(
-            "Fast Mapping Delay",
-            "setting.world_map.fast_mapping_delay",
-            10, 1000, 10,
-            "setting.world_map.fast_mapping_delay.tooltip",
-            250,
-            SettingLocation.WORLD_MAP_MAIN);
+        "Fast Mapping Delay",
+        "setting.world_map.fast_mapping_delay",
+        "setting.world_map.fast_mapping_delay.tooltip",
+        10, 1000, 10,
+        250,
+        SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting fastMapMaxTilesPerCycle = XaeroPlusFloatSetting.create(
-            "Fast Mapping Rate Limit",
-            "setting.world_map.fast_mapping_rate_limit",
-            10, 120, 10,
-            "setting.world_map.fast_mapping_rate_limit.tooltip",
-            25,
-            SettingLocation.WORLD_MAP_MAIN);
+        "Fast Mapping Rate Limit",
+        "setting.world_map.fast_mapping_rate_limit",
+        "setting.world_map.fast_mapping_rate_limit.tooltip",
+        10, 120, 10,
+        25,
+        SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting fastZipWrite = XaeroPlusBooleanSetting.create(
         "Fast Zip Writes",
         "setting.world_map.fast_zip_writes",
         "setting.world_map.fast_zip_writes.tooltip",
+        true,
         (b) -> {
             if (!b) Globals.zipFastByteBuffer = new ByteArrayOutputStream(); // release any existing sized buffer to gc
         },
-        true,
         SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting writesWhileDimSwitched = XaeroPlusBooleanSetting.create(
         "Region Writes While Dim Switched",
@@ -74,15 +72,15 @@ public final class XaeroPlusSettingRegistry {
         false,
         SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting baritoneWaypointSyncSetting = XaeroPlusBooleanSetting.create(
-            "Baritone Goal Waypoint",
-            "setting.world_map.baritone_waypoint",
-            "setting.world_map.baritone_waypoint.tooltip",
-            BaritoneHelper::isBaritonePresent,
-            (b) -> {
-                if (BaritoneHelper.isBaritonePresent()) ModuleManager.getModule(BaritoneGoalSync.class).setEnabled(b);
-            },
-            true,
-            SettingLocation.WORLD_MAP_MAIN);
+        "Baritone Goal Waypoint",
+        "setting.world_map.baritone_waypoint",
+        "setting.world_map.baritone_waypoint.tooltip",
+        true,
+        (b) -> {
+            if (BaritoneHelper.isBaritonePresent()) ModuleManager.getModule(BaritoneGoalSync.class).setEnabled(b);
+        },
+        BaritoneHelper::isBaritonePresent,
+        SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting disableWaypointSharing = XaeroPlusBooleanSetting.create(
         "Disable Waypoint Sharing",
         "setting.world_map.disable_waypoint_sharing",
@@ -96,80 +94,76 @@ public final class XaeroPlusSettingRegistry {
         false,
         SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting waystonesWaypointSyncSetting = XaeroPlusBooleanSetting.create(
-            "Waystones Sync",
-            "setting.world_map.waystones_sync",
-            "setting.world_map.waystones_sync.tooltip",
-            WaystonesHelper::isAnyWaystonesPresent,
-            (b) -> {
-                if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setEnabled(b);
-            },
-            true,
-            SettingLocation.WORLD_MAP_MAIN);
+        "Waystones Sync",
+        "setting.world_map.waystones_sync",
+        "setting.world_map.waystones_sync.tooltip",
+        true,
+        (b) -> {
+            if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setEnabled(b);
+        },
+        WaystonesHelper::isAnyWaystonesPresent,
+        SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusEnumSetting<WaystoneColor> waystoneColorSetting = XaeroPlusEnumSetting.create(
-            "Waystone Color",
-            "setting.world_map.waystone_color",
-            "setting.world_map.waystone_color.tooltip",
-            WaystonesHelper::isAnyWaystonesPresent,
-            (b) -> {
-                if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setColor(b);
-            },
-            ColorHelper.WaystoneColor.values(),
-            WaystoneColor.RANDOM,
-            SettingLocation.WORLD_MAP_MAIN);
+        "Waystone Color",
+        "setting.world_map.waystone_color",
+        "setting.world_map.waystone_color.tooltip",
+        WaystoneColor.values(),
+        WaystoneColor.RANDOM,
+        (b) -> {
+            if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setColor(b);
+        },
+        WaystonesHelper::isAnyWaystonesPresent,
+        SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting waystoneWaypointSetSetting = XaeroPlusBooleanSetting.create(
-            "Waystone Waypoint Set",
-            "setting.world_map.waystone_waypoint_set",
-            "setting.world_map.waystone_waypoint_set.tooltip",
-            WaystonesHelper::isAnyWaystonesPresent,
-            (b) -> {
-                if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setWaypointSet(b);
-            },
-            false,
-            SettingLocation.WORLD_MAP_MAIN);
+        "Waystone Waypoint Set",
+        "setting.world_map.waystone_waypoint_set",
+        "setting.world_map.waystone_waypoint_set.tooltip",
+        false,
+        (b) -> {
+            if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setWaypointSet(b);
+        },
+        WaystonesHelper::isAnyWaystonesPresent,
+        SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting persistMapDimensionSwitchSetting = XaeroPlusBooleanSetting.create(
-            "Persist Dim Switch",
-            "setting.world_map.persist_dimension_switch",
-            "setting.world_map.persist_dimension_switch.tooltip",
-            true,
-            SettingLocation.WORLD_MAP_MAIN);
+        "Persist Dim Switch",
+        "setting.world_map.persist_dimension_switch",
+        "setting.world_map.persist_dimension_switch.tooltip",
+        true,
+        SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting radarWhileDimensionSwitchedSetting = XaeroPlusBooleanSetting.create(
-            "Radar While Dim Switched",
-            "setting.world_map.radar_while_dimension_switched",
-            "setting.world_map.radar_while_dimension_switched.tooltip",
-            true,
-            SettingLocation.WORLD_MAP_MAIN);
+        "Radar While Dim Switched",
+        "setting.world_map.radar_while_dimension_switched",
+        "setting.world_map.radar_while_dimension_switched.tooltip",
+        true,
+        SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting transparentObsidianRoofSetting = XaeroPlusBooleanSetting.create(
-            "Transparent Obsidian Roof",
-            "setting.world_map.transparent_obsidian_roof",
-            "setting.world_map.transparent_obsidian_roof.tooltip",
-            (v) -> markChunksDirtyInWriteDistance(),
-            false,
-            SettingLocation.WORLD_MAP_MAIN);
+        "Transparent Obsidian Roof",
+        "setting.world_map.transparent_obsidian_roof",
+        "setting.world_map.transparent_obsidian_roof.tooltip",
+        false,
+        (v) -> markChunksDirtyInWriteDistance(),
+        SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting transparentObsidianRoofYSetting = XaeroPlusFloatSetting.create(
-            "Roof Y Level",
-            "setting.world_map.transparent_obsidian_roof_y",
-            0,
-            320,
-            1,
-            "Sets the starting Y level of the roof",
-            (v) -> markChunksDirtyInWriteDistance(),
-            250,
-            SettingLocation.WORLD_MAP_MAIN);
+        "Roof Y Level",
+        "setting.world_map.transparent_obsidian_roof_y",
+        "Sets the starting Y level of the roof",
+        0, 320, 1,
+        250,
+        (v) -> markChunksDirtyInWriteDistance(),
+        SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting transparentObsidianRoofDarkeningSetting = XaeroPlusFloatSetting.create(
-            "Roof Obsidian Opacity",
-            "setting.world_map.transparent_obsidian_roof_darkening",
-            0, 255, 5,
-            "setting.world_map.transparent_obsidian_roof_darkening.tooltip",
-            (v) -> markChunksDirtyInWriteDistance(),
-            150,
-            SettingLocation.WORLD_MAP_MAIN);
+        "Roof Obsidian Opacity",
+        "setting.world_map.transparent_obsidian_roof_darkening",
+        "setting.world_map.transparent_obsidian_roof_darkening.tooltip", 0, 255, 5,
+        150,
+        (v) -> markChunksDirtyInWriteDistance(),
+        SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting transparentObsidianRoofSnowOpacitySetting = XaeroPlusFloatSetting.create(
         "Roof Snow Opacity",
         "setting.world_map.transparent_obsidian_roof_snow_opacity",
-        0, 255, 5,
-        "setting.world_map.transparent_obsidian_roof_snow_opacity.tooltip",
-        (v) -> markChunksDirtyInWriteDistance(),
+        "setting.world_map.transparent_obsidian_roof_snow_opacity.tooltip", 0, 255, 5,
         10,
+        (v) -> markChunksDirtyInWriteDistance(),
         SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting overlayOpacityFix = XaeroPlusBooleanSetting.create(
         "Overlay Opacity Fix",
@@ -178,12 +172,12 @@ public final class XaeroPlusSettingRegistry {
         true,
         SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusFloatSetting worldMapMinZoomSetting = XaeroPlusFloatSetting.create(
-            "Min WorldMap Zoom",
-            "setting.world_map.min_zoom",
-            0, 0.625f, 0.01f,
-            "setting.world_map.min_zoom.tooltip",
-            0.1f,
-            SettingLocation.WORLD_MAP_MAIN);
+        "Min WorldMap Zoom",
+        "setting.world_map.min_zoom",
+        "setting.world_map.min_zoom.tooltip",
+        0, 0.625f, 0.01f,
+        0.1f,
+        SettingLocation.WORLD_MAP_MAIN);
     public static XaeroPlusBooleanSetting crossDimensionCursorCoordinates = XaeroPlusBooleanSetting.create(
         "Cross Dim Cursor Coords",
         "setting.world_map.cross_dimension_cursor_coordinates",
@@ -194,296 +188,297 @@ public final class XaeroPlusSettingRegistry {
         "Palette NewChunks",
         "setting.world_map.palette_new_chunks_highlighting",
         "setting.world_map.palette_new_chunks_highlighting.tooltip",
-        (b) -> ModuleManager.getModule(PaletteNewChunks.class).setEnabled(b),
         false,
+        (b) -> ModuleManager.getModule(PaletteNewChunks.class).setEnabled(b),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting paletteNewChunksSaveLoadToDisk = XaeroPlusBooleanSetting.create(
         "Save/Load Palette NewChunks to Disk",
         "setting.world_map.palette_new_chunks_save_load_to_disk",
         "setting.world_map.palette_new_chunks_save_load_to_disk.tooltip",
-        (b) -> ModuleManager.getModule(PaletteNewChunks.class).setNewChunksCache(b),
         true,
+        (b) -> ModuleManager.getModule(PaletteNewChunks.class).setNewChunksCache(b),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusFloatSetting paletteNewChunksAlphaSetting = XaeroPlusFloatSetting.create(
         "Palette NewChunks Opacity",
         "setting.world_map.palette_new_chunks_opacity",
-        0f, 255f, 10f,
         "setting.world_map.palette_new_chunks_opacity.tooltip",
-        (b) -> ModuleManager.getModule(PaletteNewChunks.class).setAlpha(b),
+        0f, 255f, 10f,
         100,
+        (b) -> ModuleManager.getModule(PaletteNewChunks.class).setAlpha(b),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> paletteNewChunksColorSetting = XaeroPlusEnumSetting.create(
         "Palette NewChunks Color",
         "setting.world_map.palette_new_chunks_color",
         "setting.world_map.palette_new_chunks_color.tooltip",
-        (b) -> ModuleManager.getModule(PaletteNewChunks.class).setRgbColor(b.getColor()),
         ColorHelper.HighlightColor.values(),
         ColorHelper.HighlightColor.RED,
+        (b) -> ModuleManager.getModule(PaletteNewChunks.class).setRgbColor(b.getColor()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting paletteNewChunksRenderInverse = XaeroPlusBooleanSetting.create(
         "Palette NewChunks Inverse",
         "setting.world_map.palette_new_chunks_inverse",
         "setting.world_map.palette_new_chunks_inverse.tooltip",
-        (b) -> ModuleManager.getModule(PaletteNewChunks.class).setInverse(b),
         false,
+        (b) -> ModuleManager.getModule(PaletteNewChunks.class).setInverse(b),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting liquidNewChunksEnabledSetting = XaeroPlusBooleanSetting.create(
-            "NewChunks Highlighting",
-            "setting.world_map.new_chunks_highlighting",
-            "setting.world_map.new_chunks_highlighting.tooltip",
-            (b) -> ModuleManager.getModule(LiquidNewChunks.class).setEnabled(b),
-            false,
-            SettingLocation.CHUNK_HIGHLIGHTS);
+        "NewChunks Highlighting",
+        "setting.world_map.new_chunks_highlighting",
+        "setting.world_map.new_chunks_highlighting.tooltip",
+        false,
+        (b) -> ModuleManager.getModule(LiquidNewChunks.class).setEnabled(b),
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting liquidNewChunksSaveLoadToDisk = XaeroPlusBooleanSetting.create(
-            "Save/Load NewChunks to Disk",
-            "setting.world_map.new_chunks_save_load_to_disk",
-            "setting.world_map.new_chunks_save_load_to_disk.tooltip",
-            (b) -> ModuleManager.getModule(LiquidNewChunks.class).setNewChunksCache(b),
-            true,
-            SettingLocation.CHUNK_HIGHLIGHTS);
+        "Save/Load NewChunks to Disk",
+        "setting.world_map.new_chunks_save_load_to_disk",
+        "setting.world_map.new_chunks_save_load_to_disk.tooltip",
+        true,
+        (b) -> ModuleManager.getModule(LiquidNewChunks.class).setNewChunksCache(b),
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusFloatSetting liquidNewChunksAlphaSetting = XaeroPlusFloatSetting.create(
-            "New Chunks Opacity",
-            "setting.world_map.new_chunks_opacity",
-            0f, 255f, 10f,
-            "setting.world_map.new_chunks_opacity.tooltip",
-            (b) -> ModuleManager.getModule(LiquidNewChunks.class).setAlpha(b),
-            100,
-            SettingLocation.CHUNK_HIGHLIGHTS);
+        "New Chunks Opacity",
+        "setting.world_map.new_chunks_opacity",
+        "setting.world_map.new_chunks_opacity.tooltip",
+        0f, 255f, 10f,
+        100,
+        (b) -> ModuleManager.getModule(LiquidNewChunks.class).setAlpha(b),
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> liquidNewChunksColorSetting = XaeroPlusEnumSetting.create(
-            "New Chunks Color",
-            "setting.world_map.new_chunks_color",
-            "setting.world_map.new_chunks_color.tooltip",
-            (b) -> ModuleManager.getModule(LiquidNewChunks.class).setRgbColor(b.getColor()),
-            ColorHelper.HighlightColor.values(),
-            ColorHelper.HighlightColor.RED,
-            SettingLocation.CHUNK_HIGHLIGHTS);
+        "New Chunks Color",
+        "setting.world_map.new_chunks_color",
+        "setting.world_map.new_chunks_color.tooltip",
+        ColorHelper.HighlightColor.values(),
+        ColorHelper.HighlightColor.RED,
+        (b) -> ModuleManager.getModule(LiquidNewChunks.class).setRgbColor(b.getColor()),
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting liquidNewChunksInverseHighlightsSetting = XaeroPlusBooleanSetting.create(
         "New Chunks Render Inverse",
         "setting.world_map.new_chunks_inverse_enabled",
         "setting.world_map.new_chunks_inverse_enabled.tooltip",
-        (b) -> ModuleManager.getModule(LiquidNewChunks.class).setInverseRenderEnabled(b),
         false,
+        (b) -> ModuleManager.getModule(LiquidNewChunks.class).setInverseRenderEnabled(b),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> liquidNewChunksInverseColorSetting = XaeroPlusEnumSetting.create(
         "New Chunks Inverse Color",
         "setting.world_map.new_chunks_inverse_color",
         "setting.world_map.new_chunks_inverse_color.tooltip",
-        (b) -> ModuleManager.getModule(LiquidNewChunks.class).setInverseRgbColor(b.getColor()),
         ColorHelper.HighlightColor.values(),
         ColorHelper.HighlightColor.GREEN,
+        (b) -> ModuleManager.getModule(LiquidNewChunks.class).setInverseRgbColor(b.getColor()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting oldChunksEnabledSetting = XaeroPlusBooleanSetting.create(
-            "OldChunks Highlighting",
-            "setting.world_map.old_chunks_highlighting",
-            "setting.world_map.old_chunks_highlighting.tooltip",
-            (b) -> ModuleManager.getModule(OldChunks.class).setEnabled(b),
-            false,
-            SettingLocation.CHUNK_HIGHLIGHTS);
+        "OldChunks Highlighting",
+        "setting.world_map.old_chunks_highlighting",
+        "setting.world_map.old_chunks_highlighting.tooltip",
+        false,
+        (b) -> ModuleManager.getModule(OldChunks.class).setEnabled(b),
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting oldChunksInverse = XaeroPlusBooleanSetting.create(
-            "OldChunks Inverse",
-            "setting.world_map.old_chunks_inverse",
-            "setting.world_map.old_chunks_inverse.tooltip",
-            (b) -> ModuleManager.getModule(OldChunks.class).setInverse(b),
-            false,
-            SettingLocation.CHUNK_HIGHLIGHTS);
+        "OldChunks Inverse",
+        "setting.world_map.old_chunks_inverse",
+        "setting.world_map.old_chunks_inverse.tooltip",
+        false,
+        (b) -> ModuleManager.getModule(OldChunks.class).setInverse(b),
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting oldChunksSaveLoadToDisk = XaeroPlusBooleanSetting.create(
-            "Save/Load OldChunks to Disk",
-            "setting.world_map.old_chunks_save_load_to_disk",
-            "setting.world_map.old_chunks_save_load_to_disk.tooltip",
-            (b) -> ModuleManager.getModule(OldChunks.class).setOldChunksCache(b),
-            true,
-            SettingLocation.CHUNK_HIGHLIGHTS);
+        "Save/Load OldChunks to Disk",
+        "setting.world_map.old_chunks_save_load_to_disk",
+        "setting.world_map.old_chunks_save_load_to_disk.tooltip",
+        true,
+        (b) -> ModuleManager.getModule(OldChunks.class).setOldChunksCache(b),
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusFloatSetting oldChunksAlphaSetting = XaeroPlusFloatSetting.create(
-            "Old Chunks Opacity",
-            "setting.world_map.old_chunks_opacity",
-            0f, 255f, 10f,
-            "setting.world_map.old_chunks_opacity.tooltip",
-            (b) -> ModuleManager.getModule(OldChunks.class).setAlpha(b),
-            100,
-            SettingLocation.CHUNK_HIGHLIGHTS);
+        "Old Chunks Opacity",
+        "setting.world_map.old_chunks_opacity",
+        "setting.world_map.old_chunks_opacity.tooltip", 0f, 255f, 10f,
+        100,
+        (b) -> ModuleManager.getModule(OldChunks.class).setAlpha(b),
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> oldChunksColorSetting = XaeroPlusEnumSetting.create(
-            "Old Chunks Color",
-            "setting.world_map.old_chunks_color",
-            "setting.world_map.old_chunks_color.tooltip",
-            (b) -> ModuleManager.getModule(OldChunks.class).setRgbColor(b.getColor()),
-            ColorHelper.HighlightColor.values(),
-            ColorHelper.HighlightColor.YELLOW,
-            SettingLocation.CHUNK_HIGHLIGHTS);
+        "Old Chunks Color",
+        "setting.world_map.old_chunks_color",
+        "setting.world_map.old_chunks_color.tooltip",
+        ColorHelper.HighlightColor.values(),
+        ColorHelper.HighlightColor.YELLOW,
+        (b) -> ModuleManager.getModule(OldChunks.class).setRgbColor(b.getColor()),
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting portalsEnabledSetting = XaeroPlusBooleanSetting.create(
-            "Portal Highlights",
-            "setting.world_map.portals",
-            "setting.world_map.portals.tooltip",
-            (b) -> ModuleManager.getModule(Portals.class).setEnabled(b),
-            false,
-            SettingLocation.CHUNK_HIGHLIGHTS);
+        "Portal Highlights",
+        "setting.world_map.portals",
+        "setting.world_map.portals.tooltip",
+        false,
+        (b) -> ModuleManager.getModule(Portals.class).setEnabled(b),
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting portalsSaveLoadToDisk = XaeroPlusBooleanSetting.create(
-            "Save/Load Portals to Disk",
-            "setting.world_map.portals_save_load_to_disk",
-            "setting.world_map.portals_save_load_to_disk.tooltip",
-            (b) -> ModuleManager.getModule(Portals.class).setPortalsCache(b),
-            true,
-            SettingLocation.CHUNK_HIGHLIGHTS);
+        "Save/Load Portals to Disk",
+        "setting.world_map.portals_save_load_to_disk",
+        "setting.world_map.portals_save_load_to_disk.tooltip",
+        true,
+        (b) -> ModuleManager.getModule(Portals.class).setPortalsCache(b),
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusFloatSetting portalsAlphaSetting = XaeroPlusFloatSetting.create(
-            "Portal Highlights Opacity",
-            "setting.world_map.portals_opacity",
-            0f, 255f, 10f,
-            "setting.world_map.portals_opacity.tooltip",
-            (b) -> ModuleManager.getModule(Portals.class).setAlpha(b),
-            100,
-            SettingLocation.CHUNK_HIGHLIGHTS);
+        "Portal Highlights Opacity",
+        "setting.world_map.portals_opacity",
+        "setting.world_map.portals_opacity.tooltip",
+        0f, 255f, 10f,
+        100,
+        (b) -> ModuleManager.getModule(Portals.class).setAlpha(b),
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> portalsColorSetting = XaeroPlusEnumSetting.create(
-            "Portal Highlights Color",
-            "setting.world_map.portals_color",
-            "setting.world_map.portals_color.tooltip",
-            (b) -> ModuleManager.getModule(Portals.class).setRgbColor(b.getColor()),
-            ColorHelper.HighlightColor.values(),
-            ColorHelper.HighlightColor.MAGENTA,
-            SettingLocation.CHUNK_HIGHLIGHTS);
+        "Portal Highlights Color",
+        "setting.world_map.portals_color",
+        "setting.world_map.portals_color.tooltip",
+        ColorHelper.HighlightColor.values(),
+        ColorHelper.HighlightColor.MAGENTA,
+        (b) -> ModuleManager.getModule(Portals.class).setRgbColor(b.getColor()),
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting worldToolsEnabledSetting = XaeroPlusBooleanSetting.create(
         "WorldTools Highlights",
         "setting.world_map.world_tools",
         "setting.world_map.world_tools.tooltip",
-        WorldToolsHelper::isWorldToolsPresent,
-        (b) -> ModuleManager.getModule(WorldTools.class).setEnabled(b),
         true,
+        (b) -> ModuleManager.getModule(WorldTools.class).setEnabled(b),
+        WorldToolsHelper::isWorldToolsPresent,
         SettingLocation.CHUNK_HIGHLIGHTS);
     public static XaeroPlusFloatSetting worldToolsAlphaSetting = XaeroPlusFloatSetting.create(
-            "WorldTools Highlights Opacity",
-            "setting.world_map.world_tools_opacity",
-            0f, 255f, 10f,
-            "setting.world_map.world_tools_opacity.tooltip",
-            WorldToolsHelper::isWorldToolsPresent,
-            (b) -> ModuleManager.getModule(WorldTools.class).setAlpha(b),
-            100,
-            SettingLocation.CHUNK_HIGHLIGHTS);
+        "WorldTools Highlights Opacity",
+        "setting.world_map.world_tools_opacity",
+        "setting.world_map.world_tools_opacity.tooltip",
+        0f, 255f, 10f,
+        100,
+        (b) -> ModuleManager.getModule(WorldTools.class).setAlpha(b),
+        WorldToolsHelper::isWorldToolsPresent,
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> worldToolsColorSetting = XaeroPlusEnumSetting.create(
-            "WorldTools Highlights Color",
-            "setting.world_map.world_tools_color",
-            "setting.world_map.world_tools_color.tooltip",
-            WorldToolsHelper::isWorldToolsPresent,
-            (b) -> ModuleManager.getModule(WorldTools.class).setRgbColor(b.getColor()),
-            ColorHelper.HighlightColor.values(),
-            ColorHelper.HighlightColor.GREEN,
-            SettingLocation.CHUNK_HIGHLIGHTS);
+        "WorldTools Highlights Color",
+        "setting.world_map.world_tools_color",
+        "setting.world_map.world_tools_color.tooltip",
+        ColorHelper.HighlightColor.values(),
+        ColorHelper.HighlightColor.GREEN,
+        (b) -> ModuleManager.getModule(WorldTools.class).setRgbColor(b.getColor()),
+        WorldToolsHelper::isWorldToolsPresent,
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting portalSkipDetectionEnabledSetting = XaeroPlusBooleanSetting.create(
-            "PortalSkip Detection",
-            "setting.world_map.portal_skip_detection",
-            "setting.world_map.portal_skip_detection.tooltip",
-            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setEnabled(b),
-            false,
-            SettingLocation.CHUNK_HIGHLIGHTS);
+        "PortalSkip Detection",
+        "setting.world_map.portal_skip_detection",
+        "setting.world_map.portal_skip_detection.tooltip",
+        false,
+        (b) -> ModuleManager.getModule(PortalSkipDetection.class).setEnabled(b),
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusFloatSetting portalSkipDetectionAlphaSetting = XaeroPlusFloatSetting.create(
-            "PortalSkip Opacity",
-            "setting.world_map.portal_skip_opacity",
-            0f, 255f, 10f,
-            "setting.world_map.portal_skip_opacity.tooltip",
-            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setAlpha(b),
-            100,
-            SettingLocation.CHUNK_HIGHLIGHTS);
+        "PortalSkip Opacity",
+        "setting.world_map.portal_skip_opacity",
+        "setting.world_map.portal_skip_opacity.tooltip",
+        0f, 255f, 10f,
+        100,
+        (b) -> ModuleManager.getModule(PortalSkipDetection.class).setAlpha(b),
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> portalSkipDetectionColorSetting = XaeroPlusEnumSetting.create(
-            "PortalSkip Color",
-            "setting.world_map.portal_skip_color",
-            "setting.world_map.portal_skip_color.tooltip",
-            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setRgbColor(b.getColor()),
-            ColorHelper.HighlightColor.values(),
-            ColorHelper.HighlightColor.WHITE,
-            SettingLocation.CHUNK_HIGHLIGHTS);
+        "PortalSkip Color",
+        "setting.world_map.portal_skip_color",
+        "setting.world_map.portal_skip_color.tooltip",
+        ColorHelper.HighlightColor.values(),
+        ColorHelper.HighlightColor.WHITE,
+        (b) -> ModuleManager.getModule(PortalSkipDetection.class).setRgbColor(b.getColor()),
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusFloatSetting portalSkipPortalRadius = XaeroPlusFloatSetting.create(
-            "PortalSkip Portal Radius",
-            "setting.world_map.portal_skip_portal_radius",
-            0, 32, 1,
-            "setting.world_map.portal_skip_portal_radius.tooltip",
-            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setPortalRadius(b),
-            15,
-            SettingLocation.CHUNK_HIGHLIGHTS);
+        "PortalSkip Portal Radius",
+        "setting.world_map.portal_skip_portal_radius",
+        "setting.world_map.portal_skip_portal_radius.tooltip",
+        0, 32, 1,
+        15,
+        (b) -> ModuleManager.getModule(PortalSkipDetection.class).setPortalRadius(b),
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusFloatSetting portalSkipDetectionSearchDelayTicksSetting = XaeroPlusFloatSetting.create(
-            "PortalSkip Search Delay",
-            "setting.world_map.portal_skip_search_delay",
-            0, 100, 1,
-            "setting.world_map.portal_skip_search_delay.tooltip",
-            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setSearchDelayTicks(b),
-            10,
-            SettingLocation.CHUNK_HIGHLIGHTS);
+        "PortalSkip Search Delay",
+        "setting.world_map.portal_skip_search_delay",
+        "setting.world_map.portal_skip_search_delay.tooltip",
+        0, 100, 1,
+        10,
+        (b) -> ModuleManager.getModule(PortalSkipDetection.class).setSearchDelayTicks(b),
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting portalSkipNewChunksSetting = XaeroPlusBooleanSetting.create(
-            "PortalSkip NewChunks",
-            "setting.world_map.portal_skip_new_chunks",
-            "setting.world_map.portal_skip_new_chunks.tooltip",
-            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setNewChunks(b),
-            true,
-            SettingLocation.CHUNK_HIGHLIGHTS);
+        "PortalSkip NewChunks",
+        "setting.world_map.portal_skip_new_chunks",
+        "setting.world_map.portal_skip_new_chunks.tooltip",
+        true,
+        (b) -> ModuleManager.getModule(PortalSkipDetection.class).setNewChunks(b),
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting portalSkipOldChunkInverseSetting = XaeroPlusBooleanSetting.create(
-            "PortalSkip OldChunks Inverse",
-            "setting.world_map.portal_skip_old_chunks_inverse",
-            "setting.world_map.portal_skip_old_chunks_inverse.tooltip",
-            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setOldChunksInverse(b),
-            true,
-            SettingLocation.CHUNK_HIGHLIGHTS);
+        "PortalSkip OldChunks Inverse",
+        "setting.world_map.portal_skip_old_chunks_inverse",
+        "setting.world_map.portal_skip_old_chunks_inverse.tooltip",
+        true,
+        (b) -> ModuleManager.getModule(PortalSkipDetection.class).setOldChunksInverse(b),
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting highwayHighlightsSetting = XaeroPlusBooleanSetting.create(
         "2b2t Highways",
         "setting.world_map.2b2t_highways_enabled",
         "setting.world_map.2b2t_highways_enabled.tooltip",
-        (b) -> ModuleManager.getModule(Highways.class).setEnabled(b),
         false,
+        (b) -> ModuleManager.getModule(Highways.class).setEnabled(b),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> highwaysColorSetting = XaeroPlusEnumSetting.create(
         "2b2t Highways Color",
         "setting.world_map.2b2t_highways_color",
         "setting.world_map.2b2t_highways_color.tooltip",
-        (b) -> ModuleManager.getModule(Highways.class).setRgbColor(b.getColor()),
         ColorHelper.HighlightColor.values(),
         ColorHelper.HighlightColor.BLUE,
+        (b) -> ModuleManager.getModule(Highways.class).setRgbColor(b.getColor()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusFloatSetting highwaysColorAlphaSetting = XaeroPlusFloatSetting.create(
         "2b2t Highways Opacity",
         "setting.world_map.2b2t_highways_opacity",
-        0f, 255f, 10f,
         "setting.world_map.2b2t_highways_opacity.tooltip",
-        (b) -> ModuleManager.getModule(Highways.class).setAlpha(b),
+        0f, 255f, 10f,
         100,
+        (b) -> ModuleManager.getModule(Highways.class).setAlpha(b),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting owAutoWaypointDimension = XaeroPlusBooleanSetting.create(
-            "Prefer Overworld Waypoints",
-            "setting.world_map.ow_auto_waypoint_dimension",
-            "setting.world_map.ow_auto_waypoint_dimension.tooltip",
-            false,
-            SettingLocation.WORLD_MAP_MAIN);
+        "Prefer Overworld Waypoints",
+        "setting.world_map.ow_auto_waypoint_dimension",
+        "setting.world_map.ow_auto_waypoint_dimension.tooltip",
+        false,
+        SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting showWaypointDistances = XaeroPlusBooleanSetting.create(
-            "Show Waypoint Distances",
-            "setting.world_map.show_waypoint_distances",
-            "setting.world_map.show_waypoint_distances.tooltip",
-            true,
-            SettingLocation.WORLD_MAP_MAIN);
+        "Show Waypoint Distances",
+        "setting.world_map.show_waypoint_distances",
+        "setting.world_map.show_waypoint_distances.tooltip",
+        true,
+        SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting showRenderDistanceSetting = XaeroPlusBooleanSetting.create(
-            "Show Render Distance",
-            "setting.world_map.show_render_distance",
-            "setting.world_map.show_render_distance.tooltip",
-            false,
-            SettingLocation.MINIMAP_OVERLAYS);
+        "Show Render Distance",
+        "setting.world_map.show_render_distance",
+        "setting.world_map.show_render_distance.tooltip",
+        false,
+        SettingLocation.MINIMAP_OVERLAYS);
     public static final XaeroPlusBooleanSetting showRenderDistanceWorldMapSetting = XaeroPlusBooleanSetting.create(
-            "Show Render Distance WorldMap",
-            "setting.world_map.show_render_distance_world_map",
-            "setting.world_map.show_render_distance_world_map.tooltip",
-            false,
-            SettingLocation.MINIMAP_OVERLAYS);
+        "Show Render Distance WorldMap",
+        "setting.world_map.show_render_distance_world_map",
+        "setting.world_map.show_render_distance_world_map.tooltip",
+        false,
+        SettingLocation.MINIMAP_OVERLAYS);
     public static final XaeroPlusBooleanSetting nullOverworldDimensionFolder = XaeroPlusBooleanSetting.create(
-            "null OW Dim Dir",
-            "setting.world_map.null_overworld_dimension_folder",
-            "setting.world_map.null_overworld_dimension_folder.tooltip",
-            true,
-            SettingLocation.WORLD_MAP_MAIN);
+        "null OW Dim Dir",
+        "setting.world_map.null_overworld_dimension_folder",
+        "setting.world_map.null_overworld_dimension_folder.tooltip",
+        true,
+        SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusEnumSetting<DataFolderResolutionMode> dataFolderResolutionMode = XaeroPlusEnumSetting.create(
-            "Data Dir Mode",
-            "setting.world_map.data_folder_resolution_mode",
-            "setting.world_map.data_folder_resolution_mode.tooltip",
-            DataFolderResolutionMode.values(),
-            DataFolderResolutionMode.IP,
-            SettingLocation.WORLD_MAP_MAIN);
+        "Data Dir Mode",
+        "setting.world_map.data_folder_resolution_mode",
+        "setting.world_map.data_folder_resolution_mode.tooltip",
+        DataFolderResolutionMode.values(),
+        DataFolderResolutionMode.IP,
+        SettingLocation.WORLD_MAP_MAIN);
+
     public enum DataFolderResolutionMode implements TranslatableSettingEnum {
         IP("setting.world_map.data_folder_resolution_mode.ip"),
         SERVER_NAME("setting.world_map.data_folder_resolution_mode.server_name"),
         BASE_DOMAIN("setting.world_map.data_folder_resolution_mode.base_domain");
 
         private final String translationKey;
+
         DataFolderResolutionMode(final String translationKey) {
             this.translationKey = translationKey;
         }
@@ -493,42 +488,42 @@ public final class XaeroPlusSettingRegistry {
             return translationKey;
         }
     }
+
     public static final XaeroPlusBooleanSetting transparentMinimapBackground = XaeroPlusBooleanSetting.create(
-            "Transparent Background",
-            "setting.minimap.transparent_background",
-            "setting.minimap.transparent_background.tooltip",
-            false,
-            SettingLocation.MINIMAP);
+        "Transparent Background",
+        "setting.minimap.transparent_background",
+        "setting.minimap.transparent_background.tooltip",
+        false,
+        SettingLocation.MINIMAP_VIEW);
     public static final XaeroPlusFloatSetting minimapScaling = XaeroPlusFloatSetting.create(
-            "Minimap Scaling Factor",
-            // todo: increase max but we need to improve rendering or start using different texture levels
-            "setting.minimap.minimap_scaling",
-            1f, 2f, 1f,
-            "setting.minimap.minimap_scaling.tooltip",
-            (b) -> Globals.shouldResetFBO = true,
-            2f,
-            SettingLocation.MINIMAP);
+        "Minimap Scaling Factor",
+        "setting.minimap.minimap_scaling",
+        "setting.minimap.minimap_scaling.tooltip",
+        1f, 5f, 1f,
+        1f,
+        (b) -> Globals.shouldResetFBO = true,
+        SettingLocation.MINIMAP_VIEW);
     public static final XaeroPlusBooleanSetting switchToNetherSetting = XaeroPlusBooleanSetting.create(
-            "Switch to Nether",
-            "setting.keybinds.switch_to_nether",
-            "setting.keybinds.switch_to_nether.tooltip",
-            (b) -> Globals.switchToDimension(NETHER),
-            false,
-            SettingLocation.KEYBINDS);
+        "Switch to Nether",
+        "setting.keybinds.switch_to_nether",
+        "setting.keybinds.switch_to_nether.tooltip",
+        false,
+        (b) -> Globals.switchToDimension(NETHER),
+        SettingLocation.KEYBINDS);
     public static final XaeroPlusBooleanSetting switchToOverworldSetting = XaeroPlusBooleanSetting.create(
-            "Switch to Overworld",
-            "setting.keybinds.switch_to_overworld",
-            "setting.keybinds.switch_to_overworld.tooltip",
-            (b) -> Globals.switchToDimension(OVERWORLD),
-            false,
-            SettingLocation.KEYBINDS);
+        "Switch to Overworld",
+        "setting.keybinds.switch_to_overworld",
+        "setting.keybinds.switch_to_overworld.tooltip",
+        false,
+        (b) -> Globals.switchToDimension(OVERWORLD),
+        SettingLocation.KEYBINDS);
     public static final XaeroPlusBooleanSetting switchToEndSetting = XaeroPlusBooleanSetting.create(
-            "Switch to End",
-            "setting.keybinds.switch_to_end",
-            "setting.keybinds.switch_to_end.tooltip",
-            (b) -> Globals.switchToDimension(END),
-            false,
-            SettingLocation.KEYBINDS);
+        "Switch to End",
+        "setting.keybinds.switch_to_end",
+        "setting.keybinds.switch_to_end.tooltip",
+        false,
+        (b) -> Globals.switchToDimension(END),
+        SettingLocation.KEYBINDS);
     public static final XaeroPlusBooleanSetting worldMapBaritoneGoalHereKeybindSetting = XaeroPlusBooleanSetting.create(
         "WorldMap Baritone Goal Here",
         "setting.keybinds.world_map_baritone_goal_here",
@@ -548,49 +543,49 @@ public final class XaeroPlusSettingRegistry {
         false,
         SettingLocation.KEYBINDS);
     public static final XaeroPlusBooleanSetting netherCaveFix = XaeroPlusBooleanSetting.create(
-            "Nether Cave Fix",
-            "setting.world_map.nether_cave_fix",
-            "setting.world_map.nether_cave_fix.tooltip",
-            true,
-            SettingLocation.WORLD_MAP_MAIN);
+        "Nether Cave Fix",
+        "setting.world_map.nether_cave_fix",
+        "setting.world_map.nether_cave_fix.tooltip",
+        true,
+        SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting alwaysRenderPlayerWithNameOnRadar = XaeroPlusBooleanSetting.create(
-            "Always Render Player Name",
-            "setting.minimap.always_render_player_name",
-            "setting.minimap.always_render_player_name.tooltip",
-            true,
-            SettingLocation.MINIMAP_ENTITY_RADAR);
+        "Always Render Player Name",
+        "setting.minimap.always_render_player_name",
+        "setting.minimap.always_render_player_name.tooltip",
+        true,
+        SettingLocation.MINIMAP_ENTITY_RADAR);
     public static final XaeroPlusBooleanSetting alwaysRenderPlayerIconOnRadar = XaeroPlusBooleanSetting.create(
-            "Always Render Player Icon",
-            "setting.minimap.always_render_player_icon",
-            "setting.minimap.always_render_player_icon.tooltip",
-            true,
-            SettingLocation.MINIMAP_ENTITY_RADAR);
+        "Always Render Player Icon",
+        "setting.minimap.always_render_player_icon",
+        "setting.minimap.always_render_player_icon.tooltip",
+        true,
+        SettingLocation.MINIMAP_ENTITY_RADAR);
     public static final XaeroPlusBooleanSetting fixMainEntityDot = XaeroPlusBooleanSetting.create(
-            "Fix Main Entity Dot",
-            "setting.minimap.fix_main_entity_dot",
-            "setting.minimap.fix_main_entity_dot.tooltip",
-            true,
-            SettingLocation.MINIMAP_ENTITY_RADAR);
+        "Fix Main Entity Dot",
+        "setting.minimap.fix_main_entity_dot",
+        "setting.minimap.fix_main_entity_dot.tooltip",
+        true,
+        SettingLocation.MINIMAP_ENTITY_RADAR);
     public static final XaeroPlusBooleanSetting waypointBeacons = XaeroPlusBooleanSetting.create(
-            "Waypoint Beacons",
-            "setting.waypoints.waypoint_beacons",
-            "setting.waypoints.waypoint_beacons.tooltip",
-            false,
-            SettingLocation.WAYPOINTS);
+        "Waypoint Beacons",
+        "setting.waypoints.waypoint_beacons",
+        "setting.waypoints.waypoint_beacons.tooltip",
+        false,
+        SettingLocation.MINIMAP_WAYPOINTS);
     public static final XaeroPlusFloatSetting waypointBeaconScaleMin = XaeroPlusFloatSetting.create(
-            "Waypoint Beacon Scale Min",
-            "setting.waypoints.waypoint_beacon_scale_min",
-            0f, 30f, 1f,
-            "setting.waypoints.waypoint_beacon_scale_min.tooltip",
-            0f,
-            SettingLocation.WAYPOINTS);
+        "Waypoint Beacon Scale Min",
+        "setting.waypoints.waypoint_beacon_scale_min",
+        "setting.waypoints.waypoint_beacon_scale_min.tooltip",
+        0f, 30f, 1f,
+        0f,
+        SettingLocation.MINIMAP_WAYPOINTS);
     public static final XaeroPlusFloatSetting waypointBeaconDistanceMin = XaeroPlusFloatSetting.create(
-            "Waypoint Beacon Distance Min",
-            "setting.waypoints.waypoint_beacon_distance_min",
-            0f, 512f, 8f,
-            "setting.waypoints.waypoint_beacon_distance_min.tooltip",
-            0f,
-            SettingLocation.WAYPOINTS);
+        "Waypoint Beacon Distance Min",
+        "setting.waypoints.waypoint_beacon_distance_min",
+        "setting.waypoints.waypoint_beacon_distance_min.tooltip",
+        0f, 512f, 8f,
+        0f,
+        SettingLocation.MINIMAP_WAYPOINTS);
     public static final XaeroPlusBooleanSetting disableXaeroInternetAccess = XaeroPlusBooleanSetting.create(
         "Disable Xaero Internet Access",
         "setting.world_map.disable_internet",
@@ -608,6 +603,5 @@ public final class XaeroPlusSettingRegistry {
         "setting.world_map.highlight_regions_without_textures",
         "setting.world_map.highlight_regions_without_textures.tooltip",
         false,
-        SettingLocation.CHUNK_HIGHLIGHTS
-    );
+        SettingLocation.CHUNK_HIGHLIGHTS);
 }

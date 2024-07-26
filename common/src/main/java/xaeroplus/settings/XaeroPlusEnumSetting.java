@@ -19,10 +19,10 @@ public class XaeroPlusEnumSetting<T extends Enum<T>> extends XaeroPlusSetting {
                                  final String settingNameTranslationKey,
                                  final String tooltipTranslationKey,
                                  final KeyMapping keyBinding,
-                                 final Supplier<Boolean> visibilitySupplier,
-                                 final Consumer<T> settingChangeConsumer,
                                  final T[] enumValues,
-                                 final T defaultValue) {
+                                 final T defaultValue,
+                                 final Consumer<T> settingChangeConsumer,
+                                 final Supplier<Boolean> visibilitySupplier) {
         super(settingName, settingNameTranslationKey, tooltipTranslationKey, keyBinding, visibilitySupplier);
         this.enumValues = enumValues;
         this.value = defaultValue;
@@ -39,10 +39,8 @@ public class XaeroPlusEnumSetting<T extends Enum<T>> extends XaeroPlusSetting {
                                                                            settingNameTranslationKey,
                                                                            tooltipTranslationKey,
                                                                            null,
-                                                                           null,
-                                                                           null,
-                                                                           values,
-                                                                           defaultValue);
+                                                                           values, defaultValue, null, null
+        );
         settingLocation.getSettingsList().add(setting);
         return setting;
     }
@@ -50,18 +48,19 @@ public class XaeroPlusEnumSetting<T extends Enum<T>> extends XaeroPlusSetting {
     public static <E extends Enum<E>> XaeroPlusEnumSetting<E> create(String settingName,
                                                                      String settingNameTranslationKey,
                                                                      String tooltipTranslationKey,
-                                                                     Consumer<E> settingChangeConsumer,
                                                                      E[] values,
                                                                      E defaultValue,
+                                                                     Consumer<E> settingChangeConsumer,
                                                                      final SettingLocation settingLocation) {
         final XaeroPlusEnumSetting<E> setting = new XaeroPlusEnumSetting<>(SETTING_PREFIX + settingName,
                                                                            settingNameTranslationKey,
                                                                            tooltipTranslationKey,
                                                                            null,
-                                                                           null,
-                                                                           settingChangeConsumer,
                                                                            values,
-                                                                           defaultValue);
+                                                                           defaultValue,
+                                                                           settingChangeConsumer,
+                                                                           null
+        );
         settingLocation.getSettingsList().add(setting);
         return setting;
     }
@@ -69,19 +68,20 @@ public class XaeroPlusEnumSetting<T extends Enum<T>> extends XaeroPlusSetting {
     public static <E extends Enum<E>> XaeroPlusEnumSetting<E> create(String settingName,
                                                                      String settingNameTranslationKey,
                                                                      String tooltipTranslationKey,
+                                                                     E[] values,
+                                                                     E defaultValue,
+                                                                     Consumer<E> settingChangeConsumer,
                                                                      Supplier<Boolean> visibilitySupplier,
-                                                                     Consumer<E> settingChangeConsumer,
-                                                                     E[] values,
-                                                                     E defaultValue,
                                                                      final SettingLocation settingLocation) {
         final XaeroPlusEnumSetting<E> setting = new XaeroPlusEnumSetting<>(SETTING_PREFIX + settingName,
                                                                            settingNameTranslationKey,
                                                                            tooltipTranslationKey,
                                                                            null,
-                                                                           visibilitySupplier,
-                                                                           settingChangeConsumer,
                                                                            values,
-                                                                           defaultValue);
+                                                                           defaultValue,
+                                                                           settingChangeConsumer,
+                                                                           visibilitySupplier
+        );
         settingLocation.getSettingsList().add(setting);
         return setting;
     }

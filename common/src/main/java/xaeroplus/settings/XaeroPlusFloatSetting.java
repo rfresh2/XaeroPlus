@@ -21,12 +21,12 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
                                   final String settingNameTranslationKey,
                                   final String tooltipTranslationKey,
                                   final KeyMapping keyBinding,
-                                  final Supplier<Boolean> visibilitySupplier,
                                   final float valueMin,
-                                  final float valueStep,
                                   final float valueMax,
+                                  final float valueStep,
+                                  final float defaultValue,
                                   final Consumer<Float> settingChangeConsumer,
-                                  final float defaultValue) {
+                                  final Supplier<Boolean> visibilitySupplier) {
         super(settingName, settingNameTranslationKey, tooltipTranslationKey, keyBinding, visibilitySupplier);
         this.valueMin = valueMin;
         this.valueMax = valueMax;
@@ -37,23 +37,18 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
 
     public static XaeroPlusFloatSetting create(String settingName,
                                                String settingNameTranslationKey,
+                                               String tooltipTranslationKey,
                                                float valueMin,
                                                float valueMax,
                                                float valueStep,
-                                               String tooltipTranslationKey,
                                                float defaultValue,
                                                SettingLocation settingLocation) {
         final XaeroPlusFloatSetting setting = new XaeroPlusFloatSetting(
-                SETTING_PREFIX + settingName,
-                settingNameTranslationKey,
-                tooltipTranslationKey,
-                null,
-                null,
-                valueMin,
-                valueStep,
-                valueMax,
-                null,
-                defaultValue
+            SETTING_PREFIX + settingName,
+            settingNameTranslationKey,
+            tooltipTranslationKey,
+            null,
+            valueMin, valueMax, valueStep, defaultValue, null, null
         );
         settingLocation.getSettingsList().add(setting);
         return setting;
@@ -61,24 +56,19 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
 
     public static XaeroPlusFloatSetting create(String settingName,
                                                String settingNameTranslationKey,
+                                               String tooltipTranslationKey,
                                                float valueMin,
                                                float valueMax,
                                                float valueStep,
-                                               String tooltipTranslationKey,
+                                               float defaultValue,
                                                Consumer<Float> changeConsumer,
-                                               float defaultValue,
                                                SettingLocation settingLocation) {
         final XaeroPlusFloatSetting setting = new XaeroPlusFloatSetting(
-                SETTING_PREFIX + settingName,
-                settingNameTranslationKey,
-                tooltipTranslationKey,
-                null,
-                null,
-                valueMin,
-                valueStep,
-                valueMax,
-                changeConsumer,
-                defaultValue
+            SETTING_PREFIX + settingName,
+            settingNameTranslationKey,
+            tooltipTranslationKey,
+            null,
+            valueMin, valueMax, valueStep, defaultValue, changeConsumer, null
         );
         settingLocation.getSettingsList().add(setting);
         return setting;
@@ -86,25 +76,20 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
 
     public static XaeroPlusFloatSetting create(String settingName,
                                                String settingNameTranslationKey,
+                                               String tooltipTranslationKey,
                                                float valueMin,
                                                float valueMax,
                                                float valueStep,
-                                               String tooltipTranslationKey,
+                                               float defaultValue,
+                                               Consumer<Float> changeConsumer,
                                                Supplier<Boolean> visibilitySupplier,
-                                               Consumer<Float> changeConsumer,
-                                               float defaultValue,
                                                SettingLocation settingLocation) {
         final XaeroPlusFloatSetting setting = new XaeroPlusFloatSetting(
-                SETTING_PREFIX + settingName,
-                settingNameTranslationKey,
-                tooltipTranslationKey,
-                null,
-                visibilitySupplier,
-                valueMin,
-                valueStep,
-                valueMax,
-                changeConsumer,
-                defaultValue
+            SETTING_PREFIX + settingName,
+            settingNameTranslationKey,
+            tooltipTranslationKey,
+            null,
+            valueMin, valueMax, valueStep, defaultValue, changeConsumer, visibilitySupplier
         );
         settingLocation.getSettingsList().add(setting);
         return setting;

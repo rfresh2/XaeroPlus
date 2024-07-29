@@ -270,31 +270,34 @@ public abstract class MixinMapWriter {
             : original.call(mapWorld);
     }
 
-    @WrapOperation(method = "writeChunk", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/map/MapProcessor;getLeafMapRegion(IIIZ)Lxaero/map/region/MapRegion;"
-    ))
-    public MapRegion getActualMapRegionInWriteChunk(final MapProcessor mapProcessor, int caveLayer, int regX, int regZ, boolean create, final Operation<MapRegion> original) {
-        if (XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue()) {
-            ((CustomMapProcessor) mapProcessor).xaeroPlus$getLeafRegionActualDimSignal().set(true);
-        }
-        return original.call(
-            mapProcessor,
-            caveLayer,
-            regX,
-            regZ,
-            create);
+    /**
+     * Redirects or WrapMethods inside writeChunk can cause delayed ARM JVM crashes due to a bug in the C2 compiler
+     *
+     * We are using terrible threadlocal hacks to signal to methods we are interested in to change their behavior themselves
+     *
+     * if writeChunk or a method down the stack throws an exception it is possible for the signal not to be reset, although signals won't cross thread barriers
+     */
+
+    @Inject(method = "writeChunk", at = @At("HEAD"))
+    public void getActualMapRegionDimSignalHead(final Level world, final Registry<Block> blockRegistry, final int distance, final boolean onlyLoad, final Registry<Biome> biomeRegistry, final OverlayManager overlayManager, final boolean loadChunks, final boolean updateChunks, final boolean ignoreHeightmaps, final boolean flowers, final boolean detailedDebug, final BlockPos.MutableBlockPos mutableBlockPos3, final BlockTintProvider blockTintProvider, final int caveDepth, final int caveStart, final int layerToWrite, final int tileChunkX, final int tileChunkZ, final int tileChunkLocalX, final int tileChunkLocalZ, final int chunkX, final int chunkZ, final CallbackInfoReturnable<Boolean> cir) {
+        ((CustomMapProcessor) mapProcessor).xaeroPlus$getLeafRegionActualDimSignal().set(XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue());
     }
 
-    @WrapOperation(method = "writeChunk", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/map/MapProcessor;getCurrentDimension()Ljava/lang/String;"
-    ))
-    public String getActualDimensionInWriteChunk(final MapProcessor mapProcessor, final Operation<String> original) {
-        var world = mapProcessor.getWorld();
-        return XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue() && world != null
-            ? mapProcessor.getDimensionName(world.dimension())
-            : original.call(mapProcessor);
+    @Inject(method = "writeChunk", at = @At("RETURN"))
+    public void getActualMapRegionDimSignalTail(final Level world, final Registry<Block> blockRegistry, final int distance, final boolean onlyLoad, final Registry<Biome> biomeRegistry, final OverlayManager overlayManager, final boolean loadChunks, final boolean updateChunks, final boolean ignoreHeightmaps, final boolean flowers, final boolean detailedDebug, final BlockPos.MutableBlockPos mutableBlockPos3, final BlockTintProvider blockTintProvider, final int caveDepth, final int caveStart, final int layerToWrite, final int tileChunkX, final int tileChunkZ, final int tileChunkLocalX, final int tileChunkLocalZ, final int chunkX, final int chunkZ, final CallbackInfoReturnable<Boolean> cir) {
+        ((CustomMapProcessor) mapProcessor).xaeroPlus$getLeafRegionActualDimSignal().set(false);
+    }
+
+    @Inject(method = "writeChunk", at = @At("HEAD"))
+    public void setGetCurrentDimActualDimSignalHead(final Level world, final Registry<Block> blockRegistry, final int distance, final boolean onlyLoad, final Registry<Biome> biomeRegistry, final OverlayManager overlayManager, final boolean loadChunks, final boolean updateChunks, final boolean ignoreHeightmaps, final boolean flowers, final boolean detailedDebug, final BlockPos.MutableBlockPos mutableBlockPos3, final BlockTintProvider blockTintProvider, final int caveDepth, final int caveStart, final int layerToWrite, final int tileChunkX, final int tileChunkZ, final int tileChunkLocalX, final int tileChunkLocalZ, final int chunkX, final int chunkZ, final CallbackInfoReturnable<Boolean> cir) {
+        var mapWorld = mapProcessor.getWorld();
+        var setSignal = XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue() && mapWorld != null;
+        ((CustomMapProcessor) mapProcessor).xaeroPlus$getCurrentDimensionActualDimSignal().set(setSignal);
+    }
+
+    @Inject(method = "writeChunk", at = @At("RETURN"))
+    public void setGetCurrentDimActualDimSignalTail(final Level world, final Registry<Block> blockRegistry, final int distance, final boolean onlyLoad, final Registry<Biome> biomeRegistry, final OverlayManager overlayManager, final boolean loadChunks, final boolean updateChunks, final boolean ignoreHeightmaps, final boolean flowers, final boolean detailedDebug, final BlockPos.MutableBlockPos mutableBlockPos3, final BlockTintProvider blockTintProvider, final int caveDepth, final int caveStart, final int layerToWrite, final int tileChunkX, final int tileChunkZ, final int tileChunkLocalX, final int tileChunkLocalZ, final int chunkX, final int chunkZ, final CallbackInfoReturnable<Boolean> cir) {
+        ((CustomMapProcessor) mapProcessor).xaeroPlus$getCurrentDimensionActualDimSignal().set(false);
     }
 
     @WrapOperation(method = "onRender", at = @At(

@@ -2,8 +2,6 @@ package xaeroplus.mixin.client;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.llamalad7.mixinextras.sugar.Share;
-import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.core.Registry;
@@ -28,6 +26,7 @@ import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.feature.extensions.CustomMapProcessor;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.DataFolderResolveUtil;
 
 import java.nio.file.Path;
@@ -47,8 +46,14 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
 
     @Unique
     private static final ThreadLocal<Boolean> xaeroPlus$getLeafRegionActualDimSignal = ThreadLocal.withInitial(() -> false);
+    @Unique
+    private static final ThreadLocal<Boolean> xaeroPlus$getCurrentDimensionActualDimSignal = ThreadLocal.withInitial(() -> false);
     @Override
     public ThreadLocal<Boolean> xaeroPlus$getLeafRegionActualDimSignal() {
+        return xaeroPlus$getLeafRegionActualDimSignal;
+    }
+    @Override
+    public ThreadLocal<Boolean> xaeroPlus$getCurrentDimensionActualDimSignal() {
         return xaeroPlus$getLeafRegionActualDimSignal;
     }
 
@@ -93,11 +98,11 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
         XaeroPlus.EVENT_BUS.call(new XaeroWorldChangeEvent(this.currentWorldId, this.currentDimId, this.currentMWId));
     }
 
-    @Inject(method = "getLeafMapRegion", at = @At("HEAD"))
-    public void signalToLocalShare(final int caveLayer, final int regX, final int regZ, final boolean create, final CallbackInfoReturnable<MapRegion> cir,
-                                   @Share("signal") LocalBooleanRef signal) {
-        signal.set(xaeroPlus$getLeafRegionActualDimSignal().get());
-        xaeroPlus$getLeafRegionActualDimSignal().set(false); // reset
+    @Inject(method = "getCurrentDimension", at = @At("HEAD"), cancellable = true)
+    public void getActualDimIfSignalSet(final CallbackInfoReturnable<String> cir) {
+        if (xaeroPlus$getCurrentDimensionActualDimSignal.get()) {
+            cir.setReturnValue(getDimensionName(ChunkUtils.getActualDimension()));
+        }
     }
 
     @WrapOperation(method = "getLeafMapRegion", at = @At(
@@ -105,10 +110,9 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
         target = "Lxaero/map/world/MapWorld;getCurrentDimension()Lxaero/map/world/MapDimension;",
         ordinal = 0
     ))
-    public MapDimension getLeafMapRegionActualDimensionIfSignalled(final MapWorld instance, final Operation<MapDimension> original,
-                                                                   @Share("signal") LocalBooleanRef signal) {
+    public MapDimension getLeafMapRegionActualDimensionIfSignalled(final MapWorld instance, final Operation<MapDimension> original) {
         var world = this.world;
-        if (signal.get() && world != null && xaeroPlus$prevDimId != null && xaeroPlus$prevDimId.equals(getDimensionName(world.dimension()))) {
+        if (xaeroPlus$getLeafRegionActualDimSignal().get() && world != null && xaeroPlus$prevDimId != null && xaeroPlus$prevDimId.equals(getDimensionName(world.dimension()))) {
             return instance.getDimension(world.dimension());
         } else return original.call(instance);
     }
@@ -117,10 +121,9 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
         value = "NEW",
         target = "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lxaero/map/world/MapDimension;IIIIZLnet/minecraft/core/Registry;)Lxaero/map/region/MapRegion;"
     ), remap = true) // $REMAP
-    public MapRegion createMapRegionInActualDimensionIfSignalled(String worldId, String dimId, String mwId, final MapDimension dim, final int x, final int z, final int caveLayer, final int initialVersion, final boolean normalMapData, final Registry biomeRegistry,
-                                                                 @Share("signal") LocalBooleanRef signal) {
+    public MapRegion createMapRegionInActualDimensionIfSignalled(String worldId, String dimId, String mwId, final MapDimension dim, final int x, final int z, final int caveLayer, final int initialVersion, final boolean normalMapData, final Registry biomeRegistry) {
         var world = this.world;
-        if (signal.get() && world != null && xaeroPlus$prevDimId != null && xaeroPlus$prevDimId.equals(getDimensionName(world.dimension()))) {
+        if (xaeroPlus$getLeafRegionActualDimSignal().get() && world != null && xaeroPlus$prevDimId != null && xaeroPlus$prevDimId.equals(getDimensionName(world.dimension()))) {
             worldId = xaeroPlus$prevWorldId;
             dimId = xaeroPlus$prevDimId;
             mwId = xaeroPlus$prevMWId;

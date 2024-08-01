@@ -14,8 +14,12 @@ import java.util.Optional;
 public class XaeroPlusModSettingsHooks {
     private static int loadCount = 0;
 
-    public static void saveSettings() throws IOException {
-        saveXPSettings();
+    public static void saveSettings() {
+        try {
+            saveXPSettings();
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Failed saving settings", e);
+        }
     }
 
     public static synchronized void saveXPSettings() throws IOException {

@@ -99,7 +99,8 @@ public class BufferedComponent {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, textureid);
         modelViewMatrix.load(RenderSystem.getModelViewMatrix());
-        float scalar = 1.0f / minecraft.options.guiScale().get();
+        var guiScale = (float) Math.max(1.0, Minecraft.getInstance().getWindow().getGuiScale());
+        float scalar = 1.0f / guiScale;
         Matrix4f scaleMatrix = Matrix4f.createScaleMatrix(scalar, scalar, scalar);
         modelViewMatrix.multiply(scaleMatrix);
         model.draw(modelViewMatrix);

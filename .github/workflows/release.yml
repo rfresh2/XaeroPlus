@@ -181,19 +181,19 @@ jobs:
             worldtools(optional){modrinth:FlFKBOIX}{curseforge:909868}
             waystones(optional){modrinth:LOpKHB2A}{curseforge:245755}
 
-#      - name: Github Release
-#        if: ${{ inputs.fabric }} || ${{ inputs.forge }}
-#        uses: ncipollo/release-action@v1
-#        with:
-#          tag: "${{ needs.build.outputs.xp_version }}"
-#          commit: 1.20.1
-#          artifacts: "artifacts/*.jar"
-#          allowUpdates: true
-#          makeLatest: true
-#          body: |
-#            For WorldMap and Minimap Versions:
-#            * Fabric: WM${{ needs.build.outputs.worldmap_version_fabric }} MM${{ needs.build.outputs.minimap_version_fabric }}
-#            * Forge: WM${{ needs.build.outputs.worldmap_version_forge }} MM${{ needs.build.outputs.minimap_version_forge }}
-#
-#            ${{ needs.build.outputs.changelog }}
-#          omitBodyDuringUpdate: true
+      - name: Github Release
+        if: ${{ inputs.fabric }} || ${{ inputs.forge }}
+        uses: ncipollo/release-action@v1
+        with:
+          tag: "${{ needs.build.outputs.xp_version }}"
+          commit: 1.20.1
+          artifacts: "artifacts/*.jar"
+          allowUpdates: true
+          makeLatest: true
+          body: |
+            For WorldMap and Minimap Versions:
+            * Fabric: WM${{ needs.build.outputs.worldmap_version_fabric }} MM${{ needs.build.outputs.minimap_version_fabric }}
+            * Forge: WM${{ needs.build.outputs.worldmap_version_forge }} MM${{ needs.build.outputs.minimap_version_forge }}
+            
+            ${{ needs.build.outputs.changelog }}
+          omitBodyDuringUpdate: true

@@ -24,7 +24,6 @@ public class BufferedComponent {
     private final RenderTarget renderTarget = new TextureTarget(100, 100, true, false);
     // for timing when the original render should be invoked
     private long fpsTimer = System.currentTimeMillis();
-    private int guiScale = 0;
     private boolean isRendering = false;
     private final Supplier<Integer> fpsLimitSupplier;
     private final Matrix4f modelViewMatrix = new Matrix4f(RenderSystem.getModelViewMatrix());
@@ -98,7 +97,8 @@ public class BufferedComponent {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, textureid);
         modelViewMatrix.set(RenderSystem.getModelViewMatrix());
-        modelViewMatrix.scale(1.0f / minecraft.options.guiScale().get());
+        var guiScale = (float) Math.max(1.0, Minecraft.getInstance().getWindow().getGuiScale());
+        modelViewMatrix.scale(1.0f / guiScale);
         model.draw(modelViewMatrix);
         RenderSystem.depthMask(true);
         RenderSystem.enableDepthTest();

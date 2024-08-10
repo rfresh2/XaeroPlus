@@ -116,7 +116,8 @@ public class PaletteNewChunks extends Module {
      *
      * So we are simply checking if the first entry of the lowest section's block palette is air
      * The lowest section should always have bedrock as the first entry at the bottom section after compacting
-     * Credits to etianl (https://github.com/etianl/Trouser-Streak) for original idea to examine the first entry
+     * Credits to etianl (https://github.com/etianl/Trouser-Streak) for first idea and public implementation for examining palette entries
+     * and crosby (https://github.com/RacoonDog) for idea to check if air is the first palette entry
      *
      * However, there is a chance for false negatives if the chunk's palette generates with more than 16 different blockstates
      * The palette gets resized to a HashMapPalette which does not retain the original entry ordering

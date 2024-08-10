@@ -2,6 +2,7 @@ package xaeroplus.module.impl;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
 import net.lenni0451.lambdaevents.EventHandler;
@@ -69,7 +70,7 @@ public class Portals extends Module {
         Globals.drawManager.registerChunkHighlightProvider(
             this.getClass(),
             new ChunkHighlightProvider(
-                this::isPortalChunk,
+                this::getHighlights,
                 this::getPortalsColor
             ));
         portalsCache.onEnable();
@@ -207,5 +208,9 @@ public class Portals extends Module {
 
     public boolean isPortalChunk(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> dimensionId) {
         return portalsCache.isHighlighted(chunkPosX, chunkPosZ, dimensionId);
+    }
+
+    public LongSet getHighlights(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
+        return portalsCache.getWindowedHighlightsSnapshot(windowRegionX, windowRegionZ, windowRegionSize, dimension);
     }
 }

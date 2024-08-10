@@ -164,8 +164,6 @@
   "setting.world_map.disable_internet.tooltip": "Отключает модам WorldMap и Minimap использование Интернета для проверки обновлений и подписок на Patreon при запуске.\n Моды Xaero обычно не отображают этот параметр в графическом интерфейсе.\n XaeroPlus не использует Интернет независимо от этой настройки.",
   "setting.world_map.expanded_settings": "Расширенные настройки",
   "setting.world_map.expanded_settings.tooltip": "Увеличивает количество настроек, отображаемых на странице на больших экранах.",
-  "setting.world_map.highlight_regions_without_textures": "Выделять Регионы Без Текстур",
-  "setting.world_map.highlight_regions_without_textures.tooltip": "Отображать ли выделение участков в регионах без текстур. Может снизить FPS, если вы сильно увеличены на Карте Мира",
   "gui.world_map.toggle_follow_mode": "Переключить Режим Следования",
   "gui.xaeroplus.on": "Вкл",
   "gui.xaeroplus.off": "Выкл",

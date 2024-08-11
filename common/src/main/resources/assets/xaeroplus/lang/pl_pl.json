@@ -164,8 +164,6 @@
   "setting.world_map.disable_internet.tooltip": "Wyłącza modom WorldMap i Minimap korzystanie z Internetu w celu sprawdzania dostępności aktualizacji i subskrypcji Patreona przy uruchomieniu.\n Mody Xaero normalnie nie udostępniają tego ustawienia w GUI.\n XaeroPlus nie korzysta z Internetu niezależnie od tego ustawienia.",
   "setting.world_map.expanded_settings": "Rozszerzone ustawienia",
   "setting.world_map.expanded_settings.tooltip": "Zwiększa liczbę ustawień wyświetlanych na stronie na większych ekranach",
-  "setting.world_map.highlight_regions_without_textures": "Podświetl w Regionach Bez Tekstur",
-  "setting.world_map.highlight_regions_without_textures.tooltip": "Czy renderować podświetlenia fragmentów w regionach bez tekstur. Może to zmniejszyć FPS, jeśli jesteś bardzo oddalony na Mapie Świata",
   "gui.world_map.toggle_follow_mode": "Przełącz Tryb Podążąnia",
   "gui.xaeroplus.on": "Włączony",
   "gui.xaeroplus.off": "Wyłączony",

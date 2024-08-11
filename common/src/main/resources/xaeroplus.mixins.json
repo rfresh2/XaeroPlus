@@ -15,6 +15,7 @@
     "MixinCommonInternet",
     "MixinControlsHandler",
     "MixinCrashHandler",
+    "MixinDimensionHighlighterHandler",
     "MixinGuiAddWaypoint",
     "MixinGuiEntityRadarSettings",
     "MixinGuiMap",

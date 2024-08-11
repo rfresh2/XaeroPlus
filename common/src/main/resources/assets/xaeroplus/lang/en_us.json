@@ -164,8 +164,6 @@
   "setting.world_map.disable_internet.tooltip": "Disables WorldMap and Minimap mods from using the internet to check for updates and patreon subscriptions at launch.\n Xaero mods do not expose this setting in the GUI normally.\n XaeroPlus does not use the internet regardless of this setting.",
   "setting.world_map.expanded_settings": "Expanded Settings",
   "setting.world_map.expanded_settings.tooltip": "Increases the number of settings shown per page on larger screens",
-  "setting.world_map.highlight_regions_without_textures": "Highlights In Regions Without Textures",
-  "setting.world_map.highlight_regions_without_textures.tooltip": "Whether to render chunk highlights in regions without textures. Can reduce FPS if you are very zoomed out on the WorldMap",
   "gui.world_map.toggle_follow_mode": "Toggle Follow Mode",
   "gui.xaeroplus.on": "On",
   "gui.xaeroplus.off": "Off",

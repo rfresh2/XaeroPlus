@@ -164,8 +164,6 @@
   "setting.world_map.disable_internet.tooltip": "停用世界地圖和小地圖模組在啟動時使用網際網路檢查更新和 Patreon 訂閱。\n Xaero 模組通常不會在介面中公開此設定。\n 無論此設定如何，XaeroPlus 都不会使用網際網路。",
   "setting.world_map.expanded_settings": "擴展設定",
   "setting.world_map.expanded_settings.tooltip": "在較大的螢幕上增加每頁顯示的設定數量",
-  "setting.world_map.highlight_regions_without_textures": "在沒有紋理的區域中高亮顯示",
-  "setting.world_map.highlight_regions_without_textures.tooltip": "是否在沒有紋理的區域中渲染區塊高亮。如果您在世界地圖上縮放得很遠，則可能會降低 FPS",
   "gui.world_map.toggle_follow_mode": "切換追蹤模式",
   "gui.xaeroplus.on": "開啟",
   "gui.xaeroplus.off": "關閉",

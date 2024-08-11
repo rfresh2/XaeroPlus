@@ -164,8 +164,6 @@
   "setting.world_map.disable_internet.tooltip": "Empêche les mods WorldMap et Minimap d'utiliser Internet pour vérifier les mises à jour et les abonnements Patreon au lancement.\n Les mods Xaero n'exposent pas normalement ce paramètre dans l'interface graphique.\n XaeroPlus n'utilise pas Internet quel que soit ce paramètre.",
   "setting.world_map.expanded_settings": "Paramètres étendus",
   "setting.world_map.expanded_settings.tooltip": "Augmente le nombre de paramètres affichés par page sur des écrans plus grands",
-  "setting.world_map.highlight_regions_without_textures": "Surligner Dans Les Régions Sans Textures",
-  "setting.world_map.highlight_regions_without_textures.tooltip": "Détermine si les surlignages de chunks sont rendus dans les régions sans textures. Peut réduire les FPS si vous êtes très éloigné sur la Carte du Monde",
   "gui.world_map.toggle_follow_mode": "Basculer le mode suivi",
   "gui.xaeroplus.on": "On",
   "gui.xaeroplus.off": "Off",

@@ -2,6 +2,8 @@ package xaeroplus.feature.render.highlights;
 
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaeroplus.XaeroPlus;
@@ -52,6 +54,24 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
     @Override
     public boolean isHighlighted(final int x, final int z, ResourceKey<Level> dimensionId) {
         return isHighlighted(chunkPosToLong(x, z));
+    }
+
+    @Override
+    public LongSet getWindowedHighlightsSnapshot(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
+        try {
+            if (lock.readLock().tryLock(1, TimeUnit.SECONDS)) {
+                // ignoring window as its probably faster than iterating over all currently loaded highlights lol
+                // also when we use the saving cache we already resize the cache's window, so only could have mem reduction on local caches
+
+                // copy is memory inefficient but we need a thread safe iterator for rendering
+                var set = new LongOpenHashSet(chunks.keySet());
+                lock.readLock().unlock();
+                return set;
+            }
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Error getting windowed highlights: {}, {}, {}", windowRegionX, windowRegionZ, windowRegionSize, e);
+        }
+        return LongSet.of();
     }
 
     public boolean isHighlighted(final long chunkPos) {

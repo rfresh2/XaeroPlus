@@ -3,6 +3,8 @@ package xaeroplus.module.impl;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
 import net.lenni0451.lambdaevents.EventHandler;
@@ -200,7 +202,7 @@ public class LiquidNewChunks extends Module {
         Globals.drawManager.registerChunkHighlightProvider(
             this.getClass(),
             new ChunkHighlightProvider(
-                this::isNewChunk,
+                this::getNewChunkHighlights,
                 this::getNewChunksColor
             ));
         if (renderInverse) {
@@ -215,7 +217,7 @@ public class LiquidNewChunks extends Module {
         Globals.drawManager.registerChunkHighlightProvider(
             InverseRenderHolderClass.class,
             new ChunkHighlightProvider(
-                this::isInverseNewChunk,
+                this::getInverseNewChunkHighlights,
                 this::getInverseColor
             )
         );
@@ -248,6 +250,16 @@ public class LiquidNewChunks extends Module {
     public void setAlpha(final float a) {
         newChunksColor = ColorHelper.getColorWithAlpha(newChunksColor, (int) (a));
         inverseColor = ColorHelper.getColorWithAlpha(inverseColor, (int) (a));
+    }
+
+    public LongSet getNewChunkHighlights(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
+        return newChunksCache.getWindowedHighlightsSnapshot(windowRegionX, windowRegionZ, windowRegionSize, dimension);
+    }
+
+    public LongSet getInverseNewChunkHighlights(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
+        return new LongOpenHashSet(
+            inverseNewChunksCache.getWindowedHighlightsSnapshot(windowRegionX, windowRegionZ, windowRegionSize, dimension)
+        );
     }
 
     public boolean isNewChunk(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> dimensionId) {

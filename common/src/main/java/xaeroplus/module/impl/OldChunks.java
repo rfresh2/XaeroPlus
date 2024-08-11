@@ -2,6 +2,7 @@ package xaeroplus.module.impl;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
 import net.lenni0451.lambdaevents.EventHandler;
@@ -177,7 +178,7 @@ public class OldChunks extends Module {
         Globals.drawManager.registerChunkHighlightProvider(
             this.getClass(),
             new ChunkHighlightProvider(
-                this::isHighlighted,
+                this::getHighlights,
                 this::getOldChunksColor
             ));
         oldChunksCache.onEnable();
@@ -225,6 +226,12 @@ public class OldChunks extends Module {
             return isOldChunkInverse(chunkPosX, chunkPosZ, dimensionId);
         else
             return isOldChunk(chunkPosX, chunkPosZ, dimensionId);
+    }
+
+    public LongSet getHighlights(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
+        return inverse
+            ? modernChunksCache.getWindowedHighlightsSnapshot(windowRegionX, windowRegionZ, windowRegionSize, dimension)
+            : oldChunksCache.getWindowedHighlightsSnapshot(windowRegionX, windowRegionZ, windowRegionSize, dimension);
     }
 
     public boolean isOldChunk(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> dimensionId) {

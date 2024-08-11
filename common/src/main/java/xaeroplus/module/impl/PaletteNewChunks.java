@@ -3,6 +3,7 @@ package xaeroplus.module.impl;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
@@ -198,7 +199,7 @@ public class PaletteNewChunks extends Module {
         Globals.drawManager.registerChunkHighlightProvider(
             this.getClass(),
             new ChunkHighlightProvider(
-                this::isHighlighted,
+                this::getWindowedHighlights,
                 this::getNewChunksColor
             ));
         newChunksCache.onEnable();
@@ -232,6 +233,12 @@ public class PaletteNewChunks extends Module {
         return renderInverse
             ? isInverseNewChunk(chunkPosX, chunkPosZ, dimensionId)
             : isNewChunk(chunkPosX, chunkPosZ, dimensionId);
+    }
+
+    public LongSet getWindowedHighlights(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
+        return renderInverse
+            ? newChunksInverseCache.getWindowedHighlightsSnapshot(windowRegionX, windowRegionZ, windowRegionSize, dimension)
+            : newChunksCache.getWindowedHighlightsSnapshot(windowRegionX, windowRegionZ, windowRegionSize, dimension);
     }
 
     public boolean isNewChunk(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> dimensionId) {

@@ -1,10 +1,8 @@
 package xaeroplus.feature.render;
 
-import java.util.function.Supplier;
+import java.util.function.IntSupplier;
 
 public record ChunkHighlightProvider(
-    ChunkHighlightPredicate chunkHighlightPredicate,
-    Supplier<Integer> colorSupplier
-) {
-}
-
+    ChunkHighlightSupplier chunkHighlightSupplier,
+    IntSupplier colorSupplier
+) {}

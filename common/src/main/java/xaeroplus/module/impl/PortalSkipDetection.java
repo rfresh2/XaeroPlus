@@ -3,6 +3,7 @@ package xaeroplus.module.impl;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
@@ -88,7 +89,7 @@ public class PortalSkipDetection extends Module {
         Globals.drawManager.registerChunkHighlightProvider(
             this.getClass(),
             new ChunkHighlightProvider(
-                this::isPortalSkipChunk,
+                this::getHighlights,
                 this::getPortalSkipChunksColor
             ));
         reset();
@@ -240,6 +241,10 @@ public class PortalSkipDetection extends Module {
 
     public boolean isPortalSkipChunk(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> dimension) {
         return isPortalSkipChunk(chunkPosToLong(chunkPosX, chunkPosZ));
+    }
+
+    public LongSet getHighlights(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
+        return cache.getWindowedHighlightsSnapshot(windowRegionX, windowRegionZ, windowRegionSize, dimension);
     }
 
     public boolean isPortalSkipChunk(final long chunkPos) {

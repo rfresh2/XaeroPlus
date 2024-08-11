@@ -2,6 +2,8 @@ package xaeroplus.module.impl;
 
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaeroplus.Globals;
@@ -73,7 +75,7 @@ public class Highways extends Module {
         Globals.drawManager.registerChunkHighlightProvider(
             this.getClass(),
             new ChunkHighlightProvider(
-                this::isHighwayChunk,
+                this::getHighlights,
                 this::getHighwayColor
             ));
     }
@@ -107,6 +109,22 @@ public class Highways extends Module {
             }
         }
         return false;
+    }
+
+    public LongSet getHighlights(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
+        int minChunkX = ChunkUtils.regionCoordToChunkCoord(windowRegionX - windowRegionSize);
+        int maxChunkX = ChunkUtils.regionCoordToChunkCoord(windowRegionX + windowRegionSize);
+        int minChunkZ = ChunkUtils.regionCoordToChunkCoord(windowRegionZ - windowRegionSize);
+        int maxChunkZ = ChunkUtils.regionCoordToChunkCoord(windowRegionZ + windowRegionSize);
+        LongSet chunks = new LongOpenHashSet();
+        for (int x = minChunkX; x <= maxChunkX; x++) {
+            for (int z = minChunkZ; z <= maxChunkZ; z++) {
+                if (isHighwayChunk(x, z, dimension)) {
+                    chunks.add(ChunkUtils.chunkPosToLong(x, z));
+                }
+            }
+        }
+        return chunks;
     }
 
     public int getHighwayColor() {

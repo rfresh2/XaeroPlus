@@ -90,7 +90,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
 
     public ListenableFuture<?> writeAllHighlightsToDatabase() {
         return executorService.submit(() -> {
-            final List<ChunkHighlightData> chunksToWrite = new ArrayList<>();
+            final List<ChunkHighlightData> chunksToWrite = new ArrayList<>(chunks.size());
             try {
                 if (lock.readLock().tryLock(1, TimeUnit.SECONDS)) {
                     chunks.long2LongEntrySet().forEach(entry -> {

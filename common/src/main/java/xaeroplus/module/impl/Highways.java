@@ -2,18 +2,17 @@ package xaeroplus.module.impl;
 
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
-import it.unimi.dsi.fastutil.longs.LongSet;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.longs.LongList;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaeroplus.Globals;
-import xaeroplus.feature.render.ChunkHighlightProvider;
-import xaeroplus.feature.render.ColorHelper;
 import xaeroplus.module.Module;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ChunkUtils;
+import xaeroplus.util.ColorHelper;
 
-import static xaeroplus.feature.render.ColorHelper.getColor;
+import static xaeroplus.util.ColorHelper.getColor;
 
 public class Highways extends Module {
     private int highwaysColor = getColor(0, 0, 255, 100);
@@ -74,15 +73,13 @@ public class Highways extends Module {
     public void onEnable() {
         Globals.drawManager.registerChunkHighlightProvider(
             this.getClass(),
-            new ChunkHighlightProvider(
-                this::getHighlights,
-                this::getHighwayColor
-            ));
+            this::getWindowedHighlightsSnapshot,
+            this::getHighwayColor);
     }
 
     @Override
     public void onDisable() {
-        Globals.drawManager.unregister(this.getClass());
+        Globals.drawManager.unregisterChunkHighlightProvider(this.getClass());
     }
 
     public boolean isHighwayChunk(int x, int z, ResourceKey<Level> dimension) {
@@ -111,12 +108,12 @@ public class Highways extends Module {
         return false;
     }
 
-    public LongSet getHighlights(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
+    public LongList getWindowedHighlightsSnapshot(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
         int minChunkX = ChunkUtils.regionCoordToChunkCoord(windowRegionX - windowRegionSize);
         int maxChunkX = ChunkUtils.regionCoordToChunkCoord(windowRegionX + windowRegionSize);
         int minChunkZ = ChunkUtils.regionCoordToChunkCoord(windowRegionZ - windowRegionSize);
         int maxChunkZ = ChunkUtils.regionCoordToChunkCoord(windowRegionZ + windowRegionSize);
-        LongSet chunks = new LongOpenHashSet();
+        LongList chunks = new LongArrayList(8);
         for (int x = minChunkX; x <= maxChunkX; x++) {
             for (int z = minChunkZ; z <= maxChunkZ; z++) {
                 if (isHighwayChunk(x, z, dimension)) {

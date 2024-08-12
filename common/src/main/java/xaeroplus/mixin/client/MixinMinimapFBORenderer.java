@@ -32,9 +32,9 @@ import xaero.common.misc.OptimizedMath;
 import xaero.hud.minimap.MinimapLogs;
 import xaeroplus.Globals;
 import xaeroplus.feature.extensions.CustomMinimapFBORenderer;
-import xaeroplus.feature.render.ColorHelper;
 import xaeroplus.mixin.client.mc.AccessorGameOptions;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.ColorHelper;
 
 @Mixin(value = MinimapFBORenderer.class, remap = false)
 public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements CustomMinimapFBORenderer {
@@ -274,10 +274,10 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
                                             @Local(name = "zFloored") int zFloored,
                                             @Local(name = "overlayBufferBuilder") VertexConsumer overlayBufferBuilder,
                                             @Local(name = "matrixStack") PoseStack matrixStack,
-                                            @Local(name = "minX") LocalIntRef minXRef,
-                                            @Local(name = "maxX") LocalIntRef maxXRef,
-                                            @Local(name = "minZ") LocalIntRef minZRef,
-                                            @Local(name = "maxZ") LocalIntRef maxZRef
+                                            @Local(name = "minX") int minXRef,
+                                            @Local(name = "maxX") int maxXRef,
+                                            @Local(name = "minZ") int minZRef,
+                                            @Local(name = "maxZ") int maxZRef
                                             ) {
         int mapX = xFloored >> 4;
         int mapZ = zFloored >> 4;
@@ -288,10 +288,10 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         int insideX = xFloored & 15;
         int insideZ = zFloored & 15;
         Globals.drawManager.drawMinimapFeatures(
-            minXRef.get(),
-            maxXRef.get(),
-            minZRef.get(),
-            maxZRef.get(),
+            minXRef,
+            maxXRef,
+            minZRef,
+            maxZRef,
             chunkX,
             chunkZ,
             tileX,

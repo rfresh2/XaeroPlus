@@ -1,10 +1,11 @@
 package xaeroplus.module;
 
+import net.minecraft.client.Minecraft;
 import xaeroplus.XaeroPlus;
 
 public abstract class Module {
-
     private boolean enabled = false;
+    public final Minecraft mc = Minecraft.getInstance();
 
     protected void onEnable() {
 

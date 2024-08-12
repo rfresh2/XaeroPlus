@@ -29,9 +29,9 @@ import xaero.common.minimap.waypoints.render.WaypointFilterParams;
 import xaero.common.minimap.waypoints.render.WaypointsIngameRenderer;
 import xaero.common.settings.ModSettings;
 import xaeroplus.feature.extensions.CustomWaypointsIngameRenderer;
-import xaeroplus.feature.render.ColorHelper;
 import xaeroplus.mixin.client.mc.AccessorWorldRenderer;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.ColorHelper;
 
 import java.util.ArrayList;
 import java.util.Iterator;

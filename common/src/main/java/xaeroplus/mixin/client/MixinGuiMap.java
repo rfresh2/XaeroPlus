@@ -116,7 +116,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Shadow private int mouseBlockPosZ;
 
-    @ModifyConstant(method = "changeZoom", constant = @Constant(doubleValue = 0.0625))
+    @ModifyExpressionValue(method = "changeZoom",
+        at = @At(
+            value = "CONSTANT",
+            args = "doubleValue=0.0625"))
     public double customMinZoom(final double original) {
         return XaeroPlusSettingRegistry.worldMapMinZoomSetting.getValue() / 10.0f;
     }

@@ -3,7 +3,7 @@ package xaeroplus.settings;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.resources.language.I18n;
 
-import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
 
 public abstract class XaeroPlusSetting {
     public static final String SETTING_PREFIX = "[XP] ";
@@ -13,14 +13,14 @@ public abstract class XaeroPlusSetting {
     private static boolean ingameOnly = false;
     private static boolean requiresMinimap = false;
     private KeyMapping keyBinding;
-    private Supplier<Boolean> visibilitySupplier;
+    private BooleanSupplier visibilitySupplier;
 
 
     public XaeroPlusSetting(String settingName,
                             String settingNameTranslationKey,
                             String tooltipTranslationKey, // nullable
                             KeyMapping keyBinding, // nullable
-                            Supplier<Boolean> visibilitySupplier // nullable
+                            BooleanSupplier visibilitySupplier // nullable
     ) {
         this.settingName = settingName;
         this.settingNameTranslationKey = settingNameTranslationKey;
@@ -63,7 +63,7 @@ public abstract class XaeroPlusSetting {
     }
     public boolean isVisible() {
         if (visibilitySupplier != null) {
-            return visibilitySupplier.get();
+            return visibilitySupplier.getAsBoolean();
         } else {
             return true;
         }

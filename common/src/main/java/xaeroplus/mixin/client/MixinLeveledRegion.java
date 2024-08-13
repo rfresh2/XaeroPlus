@@ -1,7 +1,6 @@
 package xaeroplus.mixin.client;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -32,11 +31,11 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
         target = "Ljava/util/zip/ZipOutputStream;closeEntry()V"
     ))
     public void writeSaveCacheTexturesZipOutputStream(final File tempFile, final int extraAttempts, final CallbackInfoReturnable<Boolean> cir,
-                                     @Local(name = "zipOutput") LocalRef<ZipOutputStream> zipOutputRef
+                                     @Local(name = "zipOutput") ZipOutputStream zipOutputRef
     ) {
         if (!XaeroPlusSettingRegistry.fastZipWrite.getValue()) return;
         try {
-            Globals.zipFastByteBuffer.writeTo(zipOutputRef.get());
+            Globals.zipFastByteBuffer.writeTo(zipOutputRef);
             Globals.zipFastByteBuffer.reset();
         } catch (final IOException e) {
             throw new UncheckedIOException(e);

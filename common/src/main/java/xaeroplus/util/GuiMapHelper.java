@@ -4,7 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import xaero.map.gui.GuiMap;
 import xaero.map.gui.GuiSettings;
-import xaeroplus.mixin.client.MixinGuiMapAccessor;
+import xaeroplus.mixin.client.AccessorGuiMap;
 
 import java.util.Optional;
 
@@ -23,13 +23,13 @@ public class GuiMapHelper {
         return Optional.empty();
     }
     public static double getCameraX(final GuiMap guiMap) {
-        return ((MixinGuiMapAccessor) guiMap).getCameraX();
+        return ((AccessorGuiMap) guiMap).getCameraX();
     }
     public static double getCameraZ(final GuiMap guiMap) {
-        return ((MixinGuiMapAccessor)guiMap).getCameraZ();
+        return ((AccessorGuiMap)guiMap).getCameraZ();
     }
     public static double getDestScale(final GuiMap guiMap) {
-        return ((MixinGuiMapAccessor) guiMap).getDestScale();
+        return AccessorGuiMap.getDestScale();
     }
 
     public static int getGuiMapRegionSize(final GuiMap guiMap) {

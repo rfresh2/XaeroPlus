@@ -17,7 +17,7 @@ public class MixinWidgetLoadingHandler {
      */
     @Overwrite
     public void loadWidget(String serialized) {
-        ((MixinWidgetScreenHandlerAccessor) handler).getWidgets().clear();
+        ((AccessorWidgetScreenHandler) handler).getWidgets().clear();
         final TextWidgetBuilder builder = new TextWidgetBuilder();
         builder.setText("§7§kaa§r §l§bXaero§aPlus§r §7§kaa§r");
         builder.setAlignment(Alignment.CENTER);
@@ -32,6 +32,6 @@ public class MixinWidgetLoadingHandler {
         builder.setNoGuiScale(false);
         builder.setLocation(GuiSettings.class);
         Widget widget = builder.build();
-        ((MixinWidgetScreenHandlerAccessor) handler).invokeAddWidget(widget);
+        ((AccessorWidgetScreenHandler) handler).invokeAddWidget(widget);
     }
 }

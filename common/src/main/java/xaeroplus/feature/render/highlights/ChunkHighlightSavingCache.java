@@ -2,7 +2,7 @@ package xaeroplus.feature.render.highlights;
 
 import com.google.common.util.concurrent.*;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
-import it.unimi.dsi.fastutil.longs.LongSet;
+import it.unimi.dsi.fastutil.longs.LongList;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
@@ -84,11 +84,11 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
     }
 
     @Override
-    public LongSet getWindowedHighlightsSnapshot(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimensionId) {
-        if (dimensionId == null) return LongSet.of();
+    public LongList getHighlightsSnapshot(final ResourceKey<Level> dimensionId) {
+        if (dimensionId == null) return LongList.of();
         ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimensionId, false);
-        if (cacheForDimension == null) return LongSet.of();
-        return cacheForDimension.getWindowedHighlightsSnapshot(windowRegionX, windowRegionZ, windowRegionSize, dimensionId);
+        if (cacheForDimension == null) return LongList.of();
+        return cacheForDimension.getHighlightsSnapshot(dimensionId);
     }
 
     @Override

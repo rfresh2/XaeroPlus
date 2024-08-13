@@ -25,7 +25,7 @@ public abstract class MixinGuiSettingsWorldMap extends ScreenBase {
     @Inject(method = "render", at = @At("RETURN"), remap = true)
     public void drawScreen(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float delta, final CallbackInfo ci) {
         WidgetScreenHandler widgetScreenHandler = XaeroMinimapCore.modMain.getWidgetScreenHandler();
-        ((MixinWidgetScreenHandlerAccessor) widgetScreenHandler).getWidgets().forEach(widget -> {
+        ((AccessorWidgetScreenHandler) widgetScreenHandler).getWidgets().forEach(widget -> {
             WidgetRenderer widgetRenderer = widget.getType().widgetRenderer;
             if (nonNull(widgetRenderer)) {
                 widgetRenderer.render(guiGraphics, width, height, mouseX, mouseY, delta, widget);

@@ -1,4 +1,4 @@
-package xaeroplus.feature.render;
+package xaeroplus.util;
 
 import xaeroplus.settings.TranslatableSettingEnum;
 
@@ -13,14 +13,26 @@ public class ColorHelper {
 
     public static float[] getColorRGBA(final int colorInt) {
         return new float[] {
-                ((colorInt >> 16) & 255) / 255.0f,
-                ((colorInt >> 8) & 255) / 255.0f,
-                (colorInt & 255) / 255.0f,
-                ((colorInt >> 24) & 255) / 255.0f };
+                getR(colorInt),
+                getB(colorInt),
+                getG(colorInt),
+                getA(colorInt) };
     }
 
-    public static int getColorAlpha(final int colorInt) {
-        return (colorInt >> 24) & 255;
+    public static float getR(final int color) {
+        return ((color >> 16) & 255) / 255.0f;
+    }
+
+    public static float getG(final int color) {
+        return ((color >> 8) & 255) / 255.0f;
+    }
+
+    public static float getB(final int color) {
+        return (color & 255) / 255.0f;
+    }
+
+    public static float getA(final int color) {
+        return ((color >> 24) & 255) / 255.0f;
     }
 
     public enum HighlightColor implements TranslatableSettingEnum {

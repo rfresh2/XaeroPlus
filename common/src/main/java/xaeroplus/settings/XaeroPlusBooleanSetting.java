@@ -1,11 +1,12 @@
 package xaeroplus.settings;
 
+import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.client.KeyMapping;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax.SettingLocation;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import static java.util.Objects.nonNull;
 
@@ -19,8 +20,8 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
                                     final String tooltipTranslationKey,
                                     final KeyMapping keyBinding,
                                     final boolean value,
-                                    final Consumer<Boolean> settingChangeConsumer,
-                                    final Supplier<Boolean> visibilitySupplier) {
+                                    final BooleanConsumer settingChangeConsumer,
+                                    final BooleanSupplier visibilitySupplier) {
         super(settingName, settingNameTranslationKey, tooltipTranslationKey, keyBinding, visibilitySupplier);
         this.value = value;
         this.settingChangeConsumer = settingChangeConsumer;
@@ -45,7 +46,7 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
                                                  String settingNameTranslationKey,
                                                  String tooltipTranslationKey,
                                                  boolean defaultValue,
-                                                 Consumer<Boolean> settingChangeConsumer,
+                                                 BooleanConsumer settingChangeConsumer,
                                                  final SettingLocation settingLocation) {
         final XaeroPlusBooleanSetting setting = new XaeroPlusBooleanSetting(
             SETTING_PREFIX + settingName,
@@ -61,7 +62,7 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
                                                  String settingNameTranslationKey,
                                                  String tooltipTranslationKey,
                                                  boolean defaultValue,
-                                                 Supplier<Boolean> visibilitySupplier,
+                                                 BooleanSupplier visibilitySupplier,
                                                  final SettingLocation settingLocation) {
         final XaeroPlusBooleanSetting setting = new XaeroPlusBooleanSetting(
             SETTING_PREFIX + settingName,
@@ -77,8 +78,8 @@ public class XaeroPlusBooleanSetting extends XaeroPlusSetting {
                                                  String settingNameTranslationKey,
                                                  String tooltipTranslationKey,
                                                  boolean defaultValue,
-                                                 Consumer<Boolean> settingChangeConsumer,
-                                                 Supplier<Boolean> visibilitySupplier,
+                                                 BooleanConsumer settingChangeConsumer,
+                                                 BooleanSupplier visibilitySupplier,
                                                  final SettingLocation settingLocation) {
         final XaeroPlusBooleanSetting setting = new XaeroPlusBooleanSetting(
             SETTING_PREFIX + settingName,

@@ -1,11 +1,12 @@
 package xaeroplus.settings;
 
+import it.unimi.dsi.fastutil.floats.FloatConsumer;
 import net.minecraft.client.KeyMapping;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax.SettingLocation;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import static java.util.Objects.nonNull;
 
@@ -15,7 +16,7 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
     private final float valueStep;
 
     private float value;
-    private Consumer<Float> settingChangeConsumer;
+    private FloatConsumer settingChangeConsumer;
 
     private XaeroPlusFloatSetting(final String settingName,
                                   final String settingNameTranslationKey,
@@ -25,8 +26,8 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
                                   final float valueMax,
                                   final float valueStep,
                                   final float defaultValue,
-                                  final Consumer<Float> settingChangeConsumer,
-                                  final Supplier<Boolean> visibilitySupplier) {
+                                  final FloatConsumer settingChangeConsumer,
+                                  final BooleanSupplier visibilitySupplier) {
         super(settingName, settingNameTranslationKey, tooltipTranslationKey, keyBinding, visibilitySupplier);
         this.valueMin = valueMin;
         this.valueMax = valueMax;
@@ -61,7 +62,7 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
                                                float valueMax,
                                                float valueStep,
                                                float defaultValue,
-                                               Consumer<Float> changeConsumer,
+                                               FloatConsumer changeConsumer,
                                                SettingLocation settingLocation) {
         final XaeroPlusFloatSetting setting = new XaeroPlusFloatSetting(
             SETTING_PREFIX + settingName,
@@ -81,8 +82,8 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
                                                float valueMax,
                                                float valueStep,
                                                float defaultValue,
-                                               Consumer<Float> changeConsumer,
-                                               Supplier<Boolean> visibilitySupplier,
+                                               FloatConsumer changeConsumer,
+                                               BooleanSupplier visibilitySupplier,
                                                SettingLocation settingLocation) {
         final XaeroPlusFloatSetting setting = new XaeroPlusFloatSetting(
             SETTING_PREFIX + settingName,
@@ -126,7 +127,7 @@ public class XaeroPlusFloatSetting extends XaeroPlusSetting {
         return settingChangeConsumer;
     }
 
-    public void setSettingChangeConsumer(final Consumer<Float> settingChangeConsumer) {
+    public void setSettingChangeConsumer(final FloatConsumer settingChangeConsumer) {
         this.settingChangeConsumer = settingChangeConsumer;
     }
     public void init() {

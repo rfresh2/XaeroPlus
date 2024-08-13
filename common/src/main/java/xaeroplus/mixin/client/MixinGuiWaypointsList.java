@@ -35,7 +35,7 @@ public abstract class MixinGuiWaypointsList {
     @Inject(method = "getWaypointCount", at = @At("HEAD"), cancellable = true)
     public void getWaypointCount(final CallbackInfoReturnable<Integer> cir) {
         try {
-            int size = ((MixinGuiWaypointsAccessor) thisGuiWaypoints).getWaypointsSorted().size();
+            int size = ((AccessorGuiWaypoints) thisGuiWaypoints).getWaypointsSorted().size();
             cir.setReturnValue(size);
         } catch (final NullPointerException e) {
             // fall through
@@ -47,7 +47,7 @@ public abstract class MixinGuiWaypointsList {
         target = "Lxaero/common/minimap/waypoints/WaypointSet;getList()Ljava/util/ArrayList;"
     ))
     public ArrayList<Waypoint> getWaypointList(final xaero.common.minimap.waypoints.WaypointSet waypointSet) {
-        return ((MixinGuiWaypointsAccessor) thisGuiWaypoints).getWaypointsSorted();
+        return ((AccessorGuiWaypoints) thisGuiWaypoints).getWaypointsSorted();
     }
 
     @Inject(method = "drawWaypointSlot", at = @At(

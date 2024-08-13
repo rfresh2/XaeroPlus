@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import xaero.map.gui.GuiMap;
 
 @Mixin(value = GuiMap.class, remap = false)
-public interface MixinGuiMapAccessor {
+public interface AccessorGuiMap {
     @Accessor(value = "cameraX")
     double getCameraX();
 
@@ -13,5 +13,7 @@ public interface MixinGuiMapAccessor {
     double getCameraZ();
 
     @Accessor(value = "destScale")
-    double getDestScale();
+    static double getDestScale() {
+        throw new AssertionError();
+    }
 }

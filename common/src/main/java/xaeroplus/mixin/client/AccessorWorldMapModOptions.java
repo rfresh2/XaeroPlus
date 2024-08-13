@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 import xaero.map.gui.CursorBox;
 
 @Mixin(value = xaero.map.settings.ModOptions.class, remap = false)
-public interface MixinWorldMapModOptionsAccessor {
+public interface AccessorWorldMapModOptions {
 
     @Invoker(value = "<init>")
     static xaero.map.settings.ModOptions createBooleanSetting(String settingName,

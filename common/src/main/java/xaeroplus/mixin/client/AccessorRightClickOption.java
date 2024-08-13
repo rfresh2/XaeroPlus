@@ -6,7 +6,6 @@ import xaero.map.gui.dropdown.rightclick.RightClickOption;
 
 @Mixin(value = RightClickOption.class, remap = false)
 public interface AccessorRightClickOption {
-
     @Accessor
     String getName();
 }

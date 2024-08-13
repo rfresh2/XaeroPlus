@@ -2,8 +2,8 @@ package xaeroplus.module.impl;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongList;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
-import it.unimi.dsi.fastutil.longs.LongSet;
 import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
@@ -19,13 +19,12 @@ import xaeroplus.XaeroPlus;
 import xaeroplus.event.ClientTickEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.feature.extensions.SeenChunksTrackingMapTileChunk;
-import xaeroplus.feature.render.ChunkHighlightProvider;
-import xaeroplus.feature.render.ColorHelper;
 import xaeroplus.feature.render.highlights.ChunkHighlightLocalCache;
 import xaeroplus.module.Module;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ChunkUtils;
+import xaeroplus.util.ColorHelper;
 
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
@@ -88,10 +87,8 @@ public class PortalSkipDetection extends Module {
     public void onEnable() {
         Globals.drawManager.registerChunkHighlightProvider(
             this.getClass(),
-            new ChunkHighlightProvider(
-                this::getHighlights,
-                this::getPortalSkipChunksColor
-            ));
+            this::getHighlightsSnapshot,
+            this::getPortalSkipChunksColor);
         reset();
         initializeWorld();
         this.newChunksModule = ModuleManager.getModule(PaletteNewChunks.class);
@@ -101,7 +98,7 @@ public class PortalSkipDetection extends Module {
     @Override
     public void onDisable() {
         reset();
-        Globals.drawManager.unregister(this.getClass());
+        Globals.drawManager.unregisterChunkHighlightProvider(this.getClass());
     }
 
     private void initializeWorld() {
@@ -243,8 +240,8 @@ public class PortalSkipDetection extends Module {
         return isPortalSkipChunk(chunkPosToLong(chunkPosX, chunkPosZ));
     }
 
-    public LongSet getHighlights(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
-        return cache.getWindowedHighlightsSnapshot(windowRegionX, windowRegionZ, windowRegionSize, dimension);
+    public LongList getHighlightsSnapshot(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
+        return cache.getHighlightsSnapshot(dimension);
     }
 
     public boolean isPortalSkipChunk(final long chunkPos) {

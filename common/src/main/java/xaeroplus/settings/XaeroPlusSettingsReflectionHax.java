@@ -6,8 +6,8 @@ import net.minecraft.client.Minecraft;
 import xaero.map.WorldMapSession;
 import xaero.map.gui.CursorBox;
 import xaero.map.settings.ModOptions;
-import xaeroplus.mixin.client.MixinMinimapModOptionsAccessor;
-import xaeroplus.mixin.client.MixinWorldMapModOptionsAccessor;
+import xaeroplus.mixin.client.AccessorMinimapModOptions;
+import xaeroplus.mixin.client.AccessorWorldMapModOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -168,14 +168,14 @@ public class XaeroPlusSettingsReflectionHax {
     private static xaero.map.settings.ModOptions buildWorldMapModOptions(final XaeroPlusSetting xaeroPlusSetting) {
         try {
             if (xaeroPlusSetting instanceof XaeroPlusBooleanSetting) {
-                return MixinWorldMapModOptionsAccessor.createBooleanSetting(
+                return AccessorWorldMapModOptions.createBooleanSetting(
                         xaeroPlusSetting.getSettingName(),
                         new CursorBox(xaeroPlusSetting.getTooltipTranslationKey()),
                         xaeroPlusSetting.isIngameOnly(),
                         xaeroPlusSetting.isRequiresMinimap(),
                         false);
             } else if (xaeroPlusSetting instanceof XaeroPlusFloatSetting) {
-                return MixinWorldMapModOptionsAccessor.createDoubleSetting(
+                return AccessorWorldMapModOptions.createDoubleSetting(
                         xaeroPlusSetting.getSettingName(),
                         ((XaeroPlusFloatSetting) xaeroPlusSetting).getValueMin(),
                         ((XaeroPlusFloatSetting) xaeroPlusSetting).getValueMax(),
@@ -186,7 +186,7 @@ public class XaeroPlusSettingsReflectionHax {
                         false
                 );
             } else if (xaeroPlusSetting instanceof XaeroPlusEnumSetting) {
-                return MixinWorldMapModOptionsAccessor.createEnumSetting(
+                return AccessorWorldMapModOptions.createEnumSetting(
                         xaeroPlusSetting.getSettingName(),
                         ((XaeroPlusEnumSetting<?>) xaeroPlusSetting).getIndexMax() + 1,
                         new CursorBox(xaeroPlusSetting.getTooltipTranslationKey()),
@@ -204,12 +204,12 @@ public class XaeroPlusSettingsReflectionHax {
     private static xaero.common.settings.ModOptions buildMinimapModOptions(final XaeroPlusSetting xaeroPlusSetting) {
         try {
             if (xaeroPlusSetting instanceof XaeroPlusBooleanSetting) {
-                return MixinMinimapModOptionsAccessor.createBooleanSetting(
+                return AccessorMinimapModOptions.createBooleanSetting(
                         xaeroPlusSetting.getSettingName(),
                         new xaero.common.graphics.CursorBox(xaeroPlusSetting.getTooltipTranslationKey()),
                         xaeroPlusSetting.isIngameOnly());
             } else if (xaeroPlusSetting instanceof XaeroPlusFloatSetting) {
-                return MixinMinimapModOptionsAccessor.createDoubleSetting(
+                return AccessorMinimapModOptions.createDoubleSetting(
                         xaeroPlusSetting.getSettingName(),
                         ((XaeroPlusFloatSetting) xaeroPlusSetting).getValueMin(),
                         ((XaeroPlusFloatSetting) xaeroPlusSetting).getValueMax(),
@@ -218,7 +218,7 @@ public class XaeroPlusSettingsReflectionHax {
                         xaeroPlusSetting.isIngameOnly()
                 );
             } else if (xaeroPlusSetting instanceof XaeroPlusEnumSetting) {
-                return MixinMinimapModOptionsAccessor.createEnumSetting(
+                return AccessorMinimapModOptions.createEnumSetting(
                         xaeroPlusSetting.getSettingName(),
                         0,
                         ((XaeroPlusEnumSetting<?>) xaeroPlusSetting).getIndexMax(),

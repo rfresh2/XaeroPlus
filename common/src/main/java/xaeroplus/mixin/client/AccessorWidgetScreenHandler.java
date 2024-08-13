@@ -9,7 +9,7 @@ import xaero.common.gui.widget.WidgetScreenHandler;
 import java.util.List;
 
 @Mixin(value = WidgetScreenHandler.class, remap = false)
-public interface MixinWidgetScreenHandlerAccessor {
+public interface AccessorWidgetScreenHandler {
 
     @Invoker(value = "addWidget")
     void invokeAddWidget(Widget widget);

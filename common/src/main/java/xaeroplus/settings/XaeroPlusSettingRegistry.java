@@ -1,12 +1,12 @@
 package xaeroplus.settings;
 
 import xaeroplus.Globals;
-import xaeroplus.feature.render.ColorHelper;
-import xaeroplus.feature.render.ColorHelper.WaystoneColor;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.*;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax.SettingLocation;
 import xaeroplus.util.BaritoneHelper;
+import xaeroplus.util.ColorHelper;
+import xaeroplus.util.ColorHelper.WaystoneColor;
 import xaeroplus.util.WaystonesHelper;
 import xaeroplus.util.WorldToolsHelper;
 
@@ -198,7 +198,7 @@ public final class XaeroPlusSettingRegistry {
         "setting.world_map.palette_new_chunks_save_load_to_disk",
         "setting.world_map.palette_new_chunks_save_load_to_disk.tooltip",
         true,
-        (b) -> ModuleManager.getModule(PaletteNewChunks.class).setNewChunksCache(b),
+        (b) -> ModuleManager.getModule(PaletteNewChunks.class).setDiskCache(b),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusFloatSetting paletteNewChunksAlphaSetting = XaeroPlusFloatSetting.create(
         "Palette NewChunks Opacity",
@@ -235,7 +235,7 @@ public final class XaeroPlusSettingRegistry {
         "setting.world_map.new_chunks_save_load_to_disk",
         "setting.world_map.new_chunks_save_load_to_disk.tooltip",
         true,
-        (b) -> ModuleManager.getModule(LiquidNewChunks.class).setNewChunksCache(b),
+        (b) -> ModuleManager.getModule(LiquidNewChunks.class).setDiskCache(b),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusFloatSetting liquidNewChunksAlphaSetting = XaeroPlusFloatSetting.create(
         "New Chunks Opacity",
@@ -287,7 +287,7 @@ public final class XaeroPlusSettingRegistry {
         "setting.world_map.old_chunks_save_load_to_disk",
         "setting.world_map.old_chunks_save_load_to_disk.tooltip",
         true,
-        (b) -> ModuleManager.getModule(OldChunks.class).setOldChunksCache(b),
+        (b) -> ModuleManager.getModule(OldChunks.class).setDiskCache(b),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusFloatSetting oldChunksAlphaSetting = XaeroPlusFloatSetting.create(
         "Old Chunks Opacity",
@@ -317,7 +317,7 @@ public final class XaeroPlusSettingRegistry {
         "setting.world_map.portals_save_load_to_disk",
         "setting.world_map.portals_save_load_to_disk.tooltip",
         true,
-        (b) -> ModuleManager.getModule(Portals.class).setPortalsCache(b),
+        (b) -> ModuleManager.getModule(Portals.class).setDiskCache(b),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusFloatSetting portalsAlphaSetting = XaeroPlusFloatSetting.create(
         "Portal Highlights Opacity",

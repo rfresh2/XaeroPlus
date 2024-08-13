@@ -5,8 +5,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax.SettingLocation;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import static java.util.Objects.nonNull;
 
@@ -22,7 +22,7 @@ public class XaeroPlusEnumSetting<T extends Enum<T>> extends XaeroPlusSetting {
                                  final T[] enumValues,
                                  final T defaultValue,
                                  final Consumer<T> settingChangeConsumer,
-                                 final Supplier<Boolean> visibilitySupplier) {
+                                 final BooleanSupplier visibilitySupplier) {
         super(settingName, settingNameTranslationKey, tooltipTranslationKey, keyBinding, visibilitySupplier);
         this.enumValues = enumValues;
         this.value = defaultValue;
@@ -45,42 +45,46 @@ public class XaeroPlusEnumSetting<T extends Enum<T>> extends XaeroPlusSetting {
         return setting;
     }
 
-    public static <E extends Enum<E>> XaeroPlusEnumSetting<E> create(String settingName,
-                                                                     String settingNameTranslationKey,
-                                                                     String tooltipTranslationKey,
-                                                                     E[] values,
-                                                                     E defaultValue,
-                                                                     Consumer<E> settingChangeConsumer,
-                                                                     final SettingLocation settingLocation) {
-        final XaeroPlusEnumSetting<E> setting = new XaeroPlusEnumSetting<>(SETTING_PREFIX + settingName,
-                                                                           settingNameTranslationKey,
-                                                                           tooltipTranslationKey,
-                                                                           null,
-                                                                           values,
-                                                                           defaultValue,
-                                                                           settingChangeConsumer,
-                                                                           null
+    public static <E extends Enum<E>> XaeroPlusEnumSetting<E> create(
+        String settingName,
+         String settingNameTranslationKey,
+         String tooltipTranslationKey,
+         E[] values,
+         E defaultValue,
+         Consumer<E> settingChangeConsumer,
+         final SettingLocation settingLocation) {
+        final XaeroPlusEnumSetting<E> setting = new XaeroPlusEnumSetting<>(
+            SETTING_PREFIX + settingName,
+                       settingNameTranslationKey,
+                       tooltipTranslationKey,
+                       null,
+                       values,
+                       defaultValue,
+                       settingChangeConsumer,
+                       null
         );
         settingLocation.getSettingsList().add(setting);
         return setting;
     }
 
-    public static <E extends Enum<E>> XaeroPlusEnumSetting<E> create(String settingName,
-                                                                     String settingNameTranslationKey,
-                                                                     String tooltipTranslationKey,
-                                                                     E[] values,
-                                                                     E defaultValue,
-                                                                     Consumer<E> settingChangeConsumer,
-                                                                     Supplier<Boolean> visibilitySupplier,
-                                                                     final SettingLocation settingLocation) {
-        final XaeroPlusEnumSetting<E> setting = new XaeroPlusEnumSetting<>(SETTING_PREFIX + settingName,
-                                                                           settingNameTranslationKey,
-                                                                           tooltipTranslationKey,
-                                                                           null,
-                                                                           values,
-                                                                           defaultValue,
-                                                                           settingChangeConsumer,
-                                                                           visibilitySupplier
+    public static <E extends Enum<E>> XaeroPlusEnumSetting<E> create(
+        String settingName,
+        String settingNameTranslationKey,
+        String tooltipTranslationKey,
+        E[] values,
+        E defaultValue,
+        Consumer<E> settingChangeConsumer,
+        BooleanSupplier visibilitySupplier,
+        final SettingLocation settingLocation) {
+        final XaeroPlusEnumSetting<E> setting = new XaeroPlusEnumSetting<>(
+            SETTING_PREFIX + settingName,
+            settingNameTranslationKey,
+            tooltipTranslationKey,
+            null,
+            values,
+            defaultValue,
+            settingChangeConsumer,
+            visibilitySupplier
         );
         settingLocation.getSettingsList().add(setting);
         return setting;

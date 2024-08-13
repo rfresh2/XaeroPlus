@@ -8,7 +8,7 @@ import xaero.common.minimap.waypoints.Waypoint;
 import java.util.ArrayList;
 
 @Mixin(value = GuiWaypoints.class, remap = false)
-public interface MixinGuiWaypointsAccessor {
+public interface AccessorGuiWaypoints {
     @Accessor(value = "waypointsSorted")
     ArrayList<Waypoint> getWaypointsSorted();
 }

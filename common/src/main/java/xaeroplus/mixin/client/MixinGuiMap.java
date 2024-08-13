@@ -47,7 +47,6 @@ import xaero.map.mods.SupportMods;
 import xaero.map.world.MapDimension;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
-import xaeroplus.mixin.client.mc.AccessorGameOptions;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.BaritoneExecutor;
 import xaeroplus.util.BaritoneHelper;
@@ -379,7 +378,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         Minecraft mc = Minecraft.getInstance();
         if (XaeroPlusSettingRegistry.showRenderDistanceWorldMapSetting.getValue() && !mc.options.hideGui) {
             if (mc.level.dimension() == Globals.getCurrentDimensionId()) {
-                final int viewDistance = ((AccessorGameOptions) mc.options).getServerRenderDistance();
+                final int viewDistance = mc.options.serverRenderDistance;
                 int width = viewDistance * 2 + 1;
                 double playerX = getPlayerX();
                 double playerZ = getPlayerZ();

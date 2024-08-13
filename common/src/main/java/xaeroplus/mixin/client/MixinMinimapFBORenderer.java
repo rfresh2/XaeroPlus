@@ -32,7 +32,6 @@ import xaero.common.misc.OptimizedMath;
 import xaero.hud.minimap.MinimapLogs;
 import xaeroplus.Globals;
 import xaeroplus.feature.extensions.CustomMinimapFBORenderer;
-import xaeroplus.mixin.client.mc.AccessorGameOptions;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ColorHelper;
 
@@ -154,7 +153,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             double actualPlayerZ = minimap.getEntityRadar().getEntityZ(mc.player, partial);
             int actualXFloored = OptimizedMath.myFloor(actualPlayerX);
             int actualZFloored = OptimizedMath.myFloor(actualPlayerZ);
-            final int viewDistance = ((AccessorGameOptions) mc.options).getServerRenderDistance();
+            final int viewDistance = mc.options.serverRenderDistance;
             int width = viewDistance * 2 + 1;
             // origin of the chunk we are standing in
             final int middleChunkX = -(actualXFloored & 15);

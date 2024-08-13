@@ -19,7 +19,6 @@ import xaeroplus.event.ChunkBlocksUpdateEvent;
 import xaeroplus.event.ChunkDataEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.feature.render.highlights.SavableHighlightCacheInstance;
-import xaeroplus.mixin.client.mc.AccessorWorldRenderer;
 import xaeroplus.module.Module;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ChunkScanner;
@@ -64,7 +63,7 @@ public class LiquidNewChunks extends Module {
     @EventHandler
     public void onMultiBlockUpdate(final ChunkBlocksUpdateEvent event) {
         var level = mc.level;
-        if (level == null || ((AccessorWorldRenderer) mc.levelRenderer).getChunks() == null) return;
+        if (level == null || mc.levelRenderer.viewArea == null) return;
         event.packet().runUpdates((pos, state) -> {
             handleBlockUpdate(level, pos, state);
         });
@@ -73,7 +72,7 @@ public class LiquidNewChunks extends Module {
     @EventHandler
     public void onBlockUpdate(final ChunkBlockUpdateEvent event) {
         var level = mc.level;
-        if (level == null || ((AccessorWorldRenderer) mc.levelRenderer).getChunks() == null) return;
+        if (level == null || mc.levelRenderer.viewArea == null) return;
         handleBlockUpdate(level, event.packet().getPos(), event.packet().getBlockState());
     }
 
@@ -101,7 +100,7 @@ public class LiquidNewChunks extends Module {
     @EventHandler
     public void onChunkData(final ChunkDataEvent event) {
         var level = mc.level;
-        if (level == null || ((AccessorWorldRenderer) mc.levelRenderer).getChunks() == null) return;
+        if (level == null || mc.levelRenderer.viewArea == null) return;
         var chunk = event.chunk();
         var chunkPos = chunk.getPos();
         long chunkLong = ChunkUtils.chunkPosToLong(chunkPos);

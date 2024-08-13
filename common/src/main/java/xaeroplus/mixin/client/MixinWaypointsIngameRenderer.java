@@ -29,7 +29,6 @@ import xaero.common.minimap.waypoints.render.WaypointFilterParams;
 import xaero.common.minimap.waypoints.render.WaypointsIngameRenderer;
 import xaero.common.settings.ModSettings;
 import xaeroplus.feature.extensions.CustomWaypointsIngameRenderer;
-import xaeroplus.mixin.client.mc.AccessorWorldRenderer;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ColorHelper;
 
@@ -105,7 +104,7 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
         }
         final EntityRenderDispatcher entityRenderDispatcher = mc.getEntityRenderDispatcher();
         final Camera camera = entityRenderDispatcher.camera;
-        final Frustum frustum = ((AccessorWorldRenderer) mc.levelRenderer).getFrustum();
+        final Frustum frustum = mc.levelRenderer.cullingFrustum;
         if (camera == null || frustum == null) return;
         final double viewX = camera.getPosition().x();
         final double viewZ = camera.getPosition().z();

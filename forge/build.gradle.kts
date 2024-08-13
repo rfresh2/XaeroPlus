@@ -37,20 +37,24 @@ sourceSets.main.get().resources.srcDir(common.layout.buildDirectory.get().asFile
 
 dependencies {
     forge(libs.forge)
-    implementation(annotationProcessor(libs.mixinextras.common.get())!!)
+    compileOnly(annotationProcessor(libs.mixinextras.common.get())!!)
     implementation(include(libs.mixinextras.forge.get())!!)
-    implementation(libs.worldmap.forge)
-    implementation(libs.minimap.forge)
-    compileOnly(files("libs/baritone-unoptimized-forge-1.10.2.jar"))
-    compileOnly(libs.waystones.forge)
-    compileOnly(libs.balm.forge)
-    compileOnly(libs.worldtools)
-    compileOnly(libs.fabric.waystones)
-    compileOnly(libs.embeddium)
+    modImplementation(libs.worldmap.forge)
+    modImplementation(libs.minimap.forge)
+    modCompileOnly(files("libs/baritone-unoptimized-forge-1.10.2.jar"))
+    modCompileOnly(libs.waystones.forge)
+    modCompileOnly(libs.balm.forge)
+    modCompileOnly(libs.worldtools)
+    modCompileOnly(libs.fabric.waystones)
+    modCompileOnly(libs.embeddium)
     shadow(libs.sqlite)
     forgeRuntimeLibrary(implementation(include(libs.caffeine.get())!!)!!)
     forgeRuntimeLibrary(implementation(include(libs.lambdaEvents.get())!!)!!)
     compileOnly(project(":common"))
+}
+
+configurations.all {
+    resolutionStrategy.force("net.sf.jopt-simple:jopt-simple:5.0.4")
 }
 
 tasks {

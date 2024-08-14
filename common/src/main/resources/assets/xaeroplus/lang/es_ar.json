@@ -160,6 +160,8 @@
   "setting.waypoints.waypoint_beacon_scale_min.tooltip": "Establece la escala mínima del Beacon (faro) del waypoint cuando está lejos. \n Este valor es el número de chunks del jugador donde se representa el faro. \n 0 = coincide automáticamente con la distancia de renderizado del jugador.",
   "setting.waypoints.waypoint_beacon_distance_min": "Distancia Mínima Beacon Waypoint",
   "setting.waypoints.waypoint_beacon_distance_min.tooltip": "Establece la distancia xz mínima desde el jugador donde el waypoint debe estar para mostrar un Beacon (faro).",
+  "setting.waypoints.waypoint_eta": "Distancia del Punto de Referencia ETA",
+  "setting.waypoints.waypoint_eta.tooltip": "Muestra el tiempo estimado de llegada en el texto de distancia del punto de referencia. El ETA se basa en la velocidad y dirección de movimiento actuales del jugador",
   "setting.world_map.disable_internet": "Deshabilitar el acceso a Internet de Xaero",
   "setting.world_map.disable_internet.tooltip": "Desactiva el uso de Internet de las modificaciones de WorldMap y Minimap para buscar actualizaciones y suscripciones a Patreon en el momento del lanzamiento.\n Los mods de Xaero normalmente no exponen esta configuración en la GUI.\n XaeroPlus no utiliza Internet independientemente de esta configuración.",
   "setting.world_map.expanded_settings": "Configuración ampliada",

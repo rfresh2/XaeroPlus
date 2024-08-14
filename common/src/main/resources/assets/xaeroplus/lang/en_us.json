@@ -160,6 +160,8 @@
   "setting.waypoints.waypoint_beacon_scale_min.tooltip": "Sets the minimum scale of the waypoint beacon when it is far away. \n This value is the number of chunks away from the player the beacon is rendered at. \n 0 = auto-match the player's render distance.",
   "setting.waypoints.waypoint_beacon_distance_min": "Waypoint Beacon Distance Min",
   "setting.waypoints.waypoint_beacon_distance_min.tooltip": "Sets the minimum xz distance from the player the waypoint must be to render a beacon.",
+  "setting.waypoints.waypoint_eta": "Waypoint Distance ETA",
+  "setting.waypoints.waypoint_eta.tooltip": "Renders the estimated time of arrival on waypoint distance text. The ETA is based on the player's current speed and movement direction",
   "setting.world_map.disable_internet": "Disable Xaero Internet Access",
   "setting.world_map.disable_internet.tooltip": "Disables WorldMap and Minimap mods from using the internet to check for updates and patreon subscriptions at launch.\n Xaero mods do not expose this setting in the GUI normally.\n XaeroPlus does not use the internet regardless of this setting.",
   "setting.world_map.expanded_settings": "Expanded Settings",

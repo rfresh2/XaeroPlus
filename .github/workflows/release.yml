@@ -35,7 +35,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Gradle Wrapper Verification
-        uses: gradle/wrapper-validation-action@v3
+        uses: gradle/actions/wrapper-validation@v4
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -46,10 +46,11 @@ jobs:
       - name: Elevate wrapper permissions
         run: chmod +x ./gradlew
 
-      - name: Build
-        uses: gradle/gradle-build-action@v3
-        with:
-          arguments: build
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build Mods
+        run: ./gradlew build
 
       - name: Get WorldMap Version Fabric
         run: |

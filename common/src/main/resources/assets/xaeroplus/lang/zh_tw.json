@@ -17,6 +17,8 @@
   "setting.world_map.baritone_waypoint.tooltip": "將 Baritone 目標同步為臨時定位點。",
   "setting.world_map.disable_waypoint_sharing": "停用定位點共享",
   "setting.world_map.disable_waypoint_sharing.tooltip": "停用與其他玩家共享定位點。",
+  "setting.world_map.plain_waypoint_sharing": "簡單的航點共享",
+  "setting.world_map.plain_waypoint_sharing.tooltip": "以人類可讀的文本形式共享航點",
   "setting.world_map.disable_receiving_waypoints": "停用接收定位點",
   "setting.world_map.disable_receiving_waypoints.tooltip": "停用從其他玩家接收定位點。",
   "setting.world_map.waypoint_receive_no_chat_reports_fix": "定位點接收無聊天回報修復",

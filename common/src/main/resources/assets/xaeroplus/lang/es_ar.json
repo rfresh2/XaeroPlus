@@ -17,6 +17,8 @@
   "setting.world_map.baritone_waypoint.tooltip": "Sincroniza los waypoint (puntos de recorrido) de Baritone como waypoints temporarios.",
   "setting.world_map.disable_waypoint_sharing": "Desactivar Compartir waypoint",
   "setting.world_map.disable_waypoint_sharing.tooltip": "Desactiva el compartido de waypoints (puntos de recorrido) con otros jugadores.",
+  "setting.world_map.plain_waypoint_sharing": "Compartir Punto de Referencia Simple",
+  "setting.world_map.plain_waypoint_sharing.tooltip": "Comparte puntos de referencia como texto legible por humanos",
   "setting.world_map.disable_receiving_waypoints": "Desactivar Recepción Waypoints",
   "setting.world_map.disable_receiving_waypoints.tooltip": "Desactiva la recepción de waypoints (puntos de recorrido) de otros jugadores.",
   "setting.world_map.waypoint_receive_no_chat_reports_fix": "Waypoint No Recibe Reportes De Chat",

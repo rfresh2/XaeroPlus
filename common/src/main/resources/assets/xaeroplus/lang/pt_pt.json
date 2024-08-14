@@ -160,6 +160,8 @@
   "setting.waypoints.waypoint_beacon_scale_min.tooltip": "Define a escala mínima do sinalizador de localização quando está afastado. \n Este valor é o número de partes do mapa entre o jogador e o sinalizador. \n 0 = igualar ao valor do alcance visual do jogador.",
   "setting.waypoints.waypoint_beacon_distance_min": "Distância Min dos Sinalizadores",
   "setting.waypoints.waypoint_beacon_distance_min.tooltip": "Define a distância xz mínima entre o jogador e a localização para renderizar o sinalizador.",
+  "setting.waypoints.waypoint_eta": "ETA da Distância do Ponto de Referência",
+  "setting.waypoints.waypoint_eta.tooltip": "Exibe o tempo estimado de chegada no texto de distância do ponto de referência. O ETA é baseado na velocidade e direção de movimento atuais do jogador",
   "setting.world_map.disable_internet": "Desati. Acesso à Internet ao Xaero",
   "setting.world_map.disable_internet.tooltip": "Desativa o acesso à Internet para verificação de atualizações ou subscrição do Patreon dos mods do mapa-mundo e mini-mapa. \n Normalmente os mods Xaero não mostram esta configuração no GUI. \n O XaeroPlus não usa a Internet independentemente desta definição.",
   "setting.world_map.expanded_settings": "Configurações expandidas",

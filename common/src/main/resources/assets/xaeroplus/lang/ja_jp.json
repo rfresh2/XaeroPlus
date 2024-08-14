@@ -158,6 +158,8 @@
     "setting.waypoints.waypoint_beacon_scale_min.tooltip": "ウェイポイントビーコンが遠くにあるときの最小スケールを設定します。\nこの値は、ビーコンがプレイヤーからレンダリングされるチャンク数です。\n0 = プレイヤーのレンダリング距離に自動一致します。",
     "setting.waypoints.waypoint_beacon_distance_min": "Waypoint Beacon Distance Min",
     "setting.waypoints.waypoint_beacon_distance_min.tooltip": "ビーコンをレンダリングするために、ウェイポイントがプレイヤーからxzの最小距離を設定します。",
+    "setting.waypoints.waypoint_eta": "ウェイポイント距離のETA",
+    "setting.waypoints.waypoint_eta.tooltip": "プレイヤーの現在の速度と移動方向に基づいて、ウェイポイントの距離に推定到着時刻を表示します",
     "setting.world_map.disable_internet": "Xaeroのインターネットアクセスを無効にする",
     "setting.world_map.disable_internet.tooltip": "WorldMapとMinimapのMODが起動時にインターネットを使用してアップデートとパトロン購読をチェックするのを無効にします。\nXaeroのMODは通常GUIでこの設定を公開しません。\nXaeroPlusはこの設定に関係なくインターネットを使用しません。",
     "setting.world_map.expanded_settings": "拡張設定",

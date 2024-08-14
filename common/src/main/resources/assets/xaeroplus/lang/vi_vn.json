@@ -160,6 +160,8 @@
     "setting.waypoints.waypoint_beacon_scale_min.tooltip": "Thiết lập tỷ lệ tối thiểu của đèn hiệu điểm đến khi nó xa. \n Giá trị này là số chunk xa người chơi đèn hiệu được hiển thị. \n 0 = tự động khớp với khoảng cách hiển thị của người chơi",
     "setting.waypoints.waypoint_beacon_distance_min": "Khoảng Cách Đèn Hiệu Điểm Đến Tối Thiểu",
     "setting.waypoints.waypoint_beacon_distance_min.tooltip": "Thiết lập khoảng cách xz tối thiểu từ người chơi mà điểm đến phải có để hiển thị đèn hiệu.",
+    "setting.waypoints.waypoint_eta": "Khoảng cách đến Điểm Đường ETA",
+    "setting.waypoints.waypoint_eta.tooltip": "Hiển thị thời gian đến ước tính trên văn bản khoảng cách đến điểm đường. ETA dựa trên tốc độ và hướng di chuyển hiện tại của người chơi",
     "setting.world_map.disable_internet": "Vô Hiệu Hóa Truy Cập Internet Xaero",
     "setting.world_map.disable_internet.tooltip": "Vô hiệu hóa các mod WorldMap và Minimap từ việc sử dụng internet để kiểm tra cập nhật và đăng ký patreon khi khởi động.\n Các mod Xaero không hiển thị cài đặt này trong giao diện người dùng bình thường.\n XaeroPlus không sử dụng internet bất kể cài đặt này.",
     "setting.world_map.expanded_settings": "Cài đặt mở rộng",

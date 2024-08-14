@@ -160,6 +160,8 @@
   "setting.waypoints.waypoint_beacon_scale_min.tooltip": "Устанавливает минимальный масштаб маяка путевой точки, когда он находится далеко. \n Это значение равно количеству фрагментов, удаленных от игрока, на котором отображается маяк. \n 0 = автоматическое соответствие расстоянию рендеринга игрока",
   "setting.waypoints.waypoint_beacon_distance_min": "Минимальное расстояние до маяка путевой точки",
   "setting.waypoints.waypoint_beacon_distance_min.tooltip": "Задает минимальное расстояние xz от игрока, на котором должна находиться путевая точка для отображения маяка.",
+  "setting.waypoints.waypoint_eta": "ETA расстояния до точки",
+  "setting.waypoints.waypoint_eta.tooltip": "Отображает расчетное время прибытия на тексте расстояния до точки. ETA основано на текущей скорости и направлении движения игрока",
   "setting.world_map.disable_internet": "Отключить доступ Xaero в Интернет",
   "setting.world_map.disable_internet.tooltip": "Отключает модам WorldMap и Minimap использование Интернета для проверки обновлений и подписок на Patreon при запуске.\n Моды Xaero обычно не отображают этот параметр в графическом интерфейсе.\n XaeroPlus не использует Интернет независимо от этой настройки.",
   "setting.world_map.expanded_settings": "Расширенные настройки",

@@ -81,18 +81,6 @@ public final class XaeroPlusSettingRegistry {
         },
         BaritoneHelper::isBaritonePresent,
         SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusBooleanSetting disableWaypointSharing = XaeroPlusBooleanSetting.create(
-        "Disable Waypoint Sharing",
-        "setting.world_map.disable_waypoint_sharing",
-        "setting.world_map.disable_waypoint_sharing.tooltip",
-        false,
-        SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusBooleanSetting disableReceivingWaypoints = XaeroPlusBooleanSetting.create(
-        "Disable Receiving Waypoints",
-        "setting.world_map.disable_receiving_waypoints",
-        "setting.world_map.disable_receiving_waypoints.tooltip",
-        false,
-        SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting waystonesWaypointSyncSetting = XaeroPlusBooleanSetting.create(
         "Waystones Sync",
         "setting.world_map.waystones_sync",
@@ -180,7 +168,7 @@ public final class XaeroPlusSettingRegistry {
         0, 0.625f, 0.01f,
         0.1f,
         SettingLocation.WORLD_MAP_MAIN);
-    public static XaeroPlusBooleanSetting crossDimensionCursorCoordinates = XaeroPlusBooleanSetting.create(
+    public static final XaeroPlusBooleanSetting crossDimensionCursorCoordinates = XaeroPlusBooleanSetting.create(
         "Cross Dim Cursor Coords",
         "setting.world_map.cross_dimension_cursor_coordinates",
         "setting.world_map.cross_dimension_cursor_coordinates.tooltip",
@@ -601,6 +589,24 @@ public final class XaeroPlusSettingRegistry {
         "Waypoint ETA",
         "setting.waypoints.waypoint_eta",
         "setting.waypoints.waypoint_eta.tooltip",
+        false,
+        SettingLocation.MINIMAP_WAYPOINTS);
+    public static final XaeroPlusBooleanSetting disableWaypointSharing = XaeroPlusBooleanSetting.create(
+        "Disable Waypoint Sharing",
+        "setting.world_map.disable_waypoint_sharing",
+        "setting.world_map.disable_waypoint_sharing.tooltip",
+        false,
+        SettingLocation.MINIMAP_WAYPOINTS);
+    public static final XaeroPlusBooleanSetting plainWaypointSharing = XaeroPlusBooleanSetting.create(
+        "Plain Waypoint Sharing",
+        "setting.world_map.plain_waypoint_sharing",
+        "setting.world_map.plain_waypoint_sharing.tooltip",
+        false,
+        SettingLocation.MINIMAP_WAYPOINTS);
+    public static final XaeroPlusBooleanSetting disableReceivingWaypoints = XaeroPlusBooleanSetting.create(
+        "Disable Receiving Waypoints",
+        "setting.world_map.disable_receiving_waypoints",
+        "setting.world_map.disable_receiving_waypoints.tooltip",
         false,
         SettingLocation.MINIMAP_WAYPOINTS);
     public static final XaeroPlusBooleanSetting disableXaeroInternetAccess = XaeroPlusBooleanSetting.create(

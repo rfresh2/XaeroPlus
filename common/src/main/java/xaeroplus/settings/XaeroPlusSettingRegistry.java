@@ -597,6 +597,12 @@ public final class XaeroPlusSettingRegistry {
         0f, 512f, 8f,
         0f,
         SettingLocation.MINIMAP_WAYPOINTS);
+    public static final XaeroPlusBooleanSetting waypointEta = XaeroPlusBooleanSetting.create(
+        "Waypoint ETA",
+        "setting.waypoints.waypoint_eta",
+        "setting.waypoints.waypoint_eta.tooltip",
+        false,
+        SettingLocation.MINIMAP_WAYPOINTS);
     public static final XaeroPlusBooleanSetting disableXaeroInternetAccess = XaeroPlusBooleanSetting.create(
         "Disable Xaero Internet Access",
         "setting.world_map.disable_internet",

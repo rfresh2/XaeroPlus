@@ -1,9 +1,11 @@
 package xaeroplus.mixin.client;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import it.unimi.dsi.fastutil.doubles.DoubleArrayFIFOQueue;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -18,8 +20,10 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.render.MinimapRendererHelper;
@@ -120,5 +124,100 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
         BeaconRenderer.renderBeaconBeam(matrixStack, entityVertexConsumers, BEAM_LOCATION, tickDelta, 1.0f, time, 0, 355,
                                              ColorHelper.getColorRGBA(color), 0.2f, 0.25f);
         matrixStack.popPose();
+    }
+
+    /**
+     * todo: separate out rendering so it is independent of when distance text is rendered
+     *  and put it on its own line
+     */
+    @ModifyArg(method = "renderWaypointIngame", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/common/minimap/waypoints/render/WaypointsIngameRenderer;drawAsOverlay(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/PoseStack;Lxaero/common/minimap/render/MinimapRendererHelper;Lxaero/common/minimap/waypoints/Waypoint;Lxaero/common/settings/ModSettings;Lcom/mojang/blaze3d/vertex/BufferBuilder;Lcom/mojang/blaze3d/vertex/Tesselator;Lnet/minecraft/client/gui/Font;Ljava/lang/String;Ljava/lang/String;FZLnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lcom/mojang/blaze3d/vertex/VertexConsumer;Lorg/joml/Matrix4f;IIDDZLjava/lang/String;)V"),
+    index = 9,
+    remap = true) // $REMAP
+    public String modifyDistanceText(final String text, @Local(argsOnly = true) Waypoint waypoint) {
+        if (!XaeroPlusSettingRegistry.waypointEta.getValue()) return text;
+        if (text.isBlank()) return text;
+        var eta = getEtaSecondsToReachWaypoint(waypoint);
+        if (eta <= 0) return text;
+        String etaText = " - ";
+        if (eta > 86400) {
+            int days = (int) (eta / 86400);
+            int hours = (int) ((eta % 86400) / 3600);
+            etaText += days + "d";
+            if (hours > 0) etaText += " " + hours + "h";
+        } else if (eta > 3600) {
+            int hours = (int) (eta / 3600);
+            int minutes = (int) ((eta % 3600) / 60);
+            etaText += hours + "h";
+            if (minutes > 0) etaText += " " + minutes + "m";
+        } else if (eta > 60) {
+            int minutes = (int) (eta / 60);
+            int seconds = (int) (eta % 60);
+            etaText += minutes + "m";
+            if (seconds > 0) etaText += " " + seconds + "s";
+        } else {
+            etaText += eta + "s";
+        }
+        return text + etaText;
+    }
+
+    // average out and smoothen speed updates so they aren't tied directly to fps
+    @Unique long xaeroPlus$lastSpeedUpdate = 0;
+    @Unique public final DoubleArrayFIFOQueue xaeroPlus$speedQueue = new DoubleArrayFIFOQueue(15);
+
+    @Unique
+    public long getEtaSecondsToReachWaypoint(Waypoint waypoint) {
+        final Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null || mc.player == null) return 0;
+        try {
+            final Vec3 playerVec = mc.player.position();
+            final WaypointsManager waypointsManager = XaeroMinimapSession.getCurrentSession().getWaypointsManager();
+            double dimDiv = waypointsManager.getDimensionDivision(waypointsManager.getCurrentWorld());
+            int wpX = waypoint.getX(dimDiv);
+            int wpZ = waypoint.getZ(dimDiv);
+            double directionX = wpX - playerVec.x;
+            double directionZ = wpZ - playerVec.z;
+            double movementX = playerVec.x - mc.player.xOld;
+            double movementZ = playerVec.z - mc.player.zOld;
+            double dot = directionX * movementX + directionZ * movementZ;
+            double distance = Math.sqrt(directionX * directionX + directionZ * directionZ);
+            double speed = xaeroPlus$speedQueue.isEmpty() ? 0.0 : xaeroPlus$avgSpeed(xaeroPlus$speedQueue);
+            double cos = dot / (distance * speed);
+            double time = distance / speed;
+            double etaTicks = time / cos;
+            double etaSeconds = etaTicks / 20.0;
+
+            // update avg speed measurements
+            var updateDeltaMs = System.currentTimeMillis() - xaeroPlus$lastSpeedUpdate;
+            if (updateDeltaMs > 50) {
+                xaeroPlus$lastSpeedUpdate = System.currentTimeMillis();
+                double s = Math.sqrt(movementX * movementX + movementZ * movementZ);
+                if (s > 0 || mc.player.tickCount % 4 == 0) {
+                    xaeroPlus$speedQueue.enqueue(s);
+                } else if (!xaeroPlus$speedQueue.isEmpty()) {
+                    xaeroPlus$speedQueue.dequeueDouble();
+                }
+                while (xaeroPlus$speedQueue.size() > 10) xaeroPlus$speedQueue.dequeueDouble();
+            }
+            if (etaSeconds == Double.POSITIVE_INFINITY || etaSeconds == Double.NEGATIVE_INFINITY || Double.isNaN(etaSeconds)) return 0;
+            return (long) etaSeconds;
+        } catch (final Exception e) {
+            // fall through
+        }
+        return 0;
+    }
+
+    @Unique
+    private double xaeroPlus$avgSpeed(final DoubleArrayFIFOQueue speedQueue) {
+        double sum = 0;
+        for (int i = 0; i < speedQueue.size(); i++) {
+            var v = speedQueue.dequeueDouble();
+            speedQueue.enqueue(v);
+            sum += v;
+        }
+        var s = sum / speedQueue.size();
+        if (s < 0.05) return 0.0; // floor very low speeds
+        return s;
     }
 }

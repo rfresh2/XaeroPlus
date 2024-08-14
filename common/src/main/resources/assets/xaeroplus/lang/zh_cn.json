@@ -160,6 +160,8 @@
   "setting.waypoints.waypoint_beacon_scale_min.tooltip": "设置距离较远时，路径点信标的最小尺寸。\n 该值是玩家距离所渲染路径点信标的区块数。\n 0 = 自动匹配玩家的渲染距离",
   "setting.waypoints.waypoint_beacon_distance_min": "路径点信标距离最小值",
   "setting.waypoints.waypoint_beacon_distance_min.tooltip": "设置将路径点渲染为信标所需的最短水平距离。",
+  "setting.waypoints.waypoint_eta": "航点距离 ETA",
+  "setting.waypoints.waypoint_eta.tooltip": "在航点距离文本上显示预计到达时间。ETA 基于玩家当前的速度和移动方向",
   "setting.world_map.disable_internet": "禁用 Xaero 互联网访问",
   "setting.world_map.disable_internet.tooltip": "禁止 WorldMap 和 Minimap mods 在启动时使用互联网检查更新和 patreon 订阅。\n Xaero mods 通常不会在 GUI 中公开此设置。\n 无论此设置如何，XaeroPlus 都不会使用互联网。",
   "setting.world_map.expanded_settings": "扩展设置",

@@ -17,6 +17,8 @@
   "setting.world_map.baritone_waypoint.tooltip": "Синхронизирует цели Baritone в качестве временных путевых точек.",
   "setting.world_map.disable_waypoint_sharing": "Отключить обмен маршрутными точками",
   "setting.world_map.disable_waypoint_sharing.tooltip": "Отключает обмен маршрутными точками с другими игроками.",
+  "setting.world_map.plain_waypoint_sharing": "Простое Обмен Местоположениями",
+  "setting.world_map.plain_waypoint_sharing.tooltip": "Делится местоположениями в виде читаемого текста",
   "setting.world_map.disable_receiving_waypoints": "Отключить получение путевых точек",
   "setting.world_map.disable_receiving_waypoints.tooltip": "Отключает получение путевых точек от других игроков.",
   "setting.world_map.waypoint_receive_no_chat_reports_fix": "Путевые точки не получают отчеты о чате. Исправление",

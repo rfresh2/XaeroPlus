@@ -17,6 +17,8 @@
     "setting.world_map.baritone_waypoint.tooltip": "バリトンのゴールを一時的なウェイポイントとして表示させる。",
     "setting.world_map.disable_waypoint_sharing": "Disable Waypoint Sharing",
     "setting.world_map.disable_waypoint_sharing.tooltip": "他のプレーヤーとのウェイポイントの共有を無効にする。",
+    "setting.world_map.plain_waypoint_sharing": "簡易ウェイポイント共有",
+    "setting.world_map.plain_waypoint_sharing.tooltip": "ウェイポイントを人間が読みやすいテキストとして共有します",
     "setting.world_map.disable_receiving_waypoints": "Disable Receiving Waypoints",
     "setting.world_map.disable_receiving_waypoints.tooltip": "他のプレイヤーからのウェイポイント受信を無効にする。",
     "setting.world_map.waypoint_receive_no_chat_reports_fix": "Waypoint Receive No Chat Reports Fix",

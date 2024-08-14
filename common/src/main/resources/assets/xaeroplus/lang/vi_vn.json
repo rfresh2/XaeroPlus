@@ -17,6 +17,8 @@
     "setting.world_map.baritone_waypoint.tooltip": "Đồng bộ hóa mục tiêu Baritone như các điểm đến tạm thời.",
     "setting.world_map.disable_waypoint_sharing": "Vô Hiệu Hóa Chia Sẻ Điểm Đến",
     "setting.world_map.disable_waypoint_sharing.tooltip": "Vô hiệu hóa chia sẻ điểm đến với người chơi khác.",
+    "setting.world_map.plain_waypoint_sharing": "Chia Sẻ Điểm Dẫn Đường Đơn Giản",
+    "setting.world_map.plain_waypoint_sharing.tooltip": "Chia sẻ điểm dẫn đường dưới dạng văn bản có thể đọc được",
     "setting.world_map.disable_receiving_waypoints": "Vô Hiệu Hóa Nhận Điểm Đến",
     "setting.world_map.disable_receiving_waypoints.tooltip": "Vô hiệu hóa việc nhận điểm đến từ người chơi khác.",
     "setting.world_map.waypoint_receive_no_chat_reports_fix": "Sửa Lỗi Nhận Điểm Đến Không Báo Cáo Chat",

@@ -17,6 +17,8 @@
   "setting.world_map.baritone_waypoint.tooltip": "Syncs Baritone goals as temporary waypoints.",
   "setting.world_map.disable_waypoint_sharing": "Disable Waypoint Sharing",
   "setting.world_map.disable_waypoint_sharing.tooltip": "Disables waypoint sharing with other players.",
+  "setting.world_map.plain_waypoint_sharing": "Plain Waypoint Sharing",
+  "setting.world_map.plain_waypoint_sharing.tooltip": "Shares waypoints as human readable text",
   "setting.world_map.disable_receiving_waypoints": "Disable Receiving Waypoints",
   "setting.world_map.disable_receiving_waypoints.tooltip": "Disables receiving waypoints from other players.",
   "setting.world_map.waypoint_receive_no_chat_reports_fix": "Waypoint Receive No Chat Reports Fix",

@@ -1,5 +1,6 @@
 package xaeroplus.mixin.client;
 
+import com.google.common.collect.Lists;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -67,45 +68,31 @@ import static xaeroplus.util.ChunkUtils.getPlayerZ;
 @Mixin(value = GuiMap.class, remap = false)
 public abstract class MixinGuiMap extends ScreenBase implements IRightClickableElement {
 
-    Button coordinateGotoButton;
-    EditBox xTextEntryField;
-    EditBox zTextEntryField;
-    Button followButton;
-    Button switchToNetherButton;
-    Button switchToOverworldButton;
-    Button switchToEndButton;
-    @Shadow
-    private double cameraX = 0.0;
-    @Shadow
-    private double cameraZ = 0.0;
-    @Shadow
-    private int[] cameraDestination = null;
-    @Shadow
-    private SlowingAnimation cameraDestinationAnimX = null;
-    @Shadow
-    private SlowingAnimation cameraDestinationAnimZ = null;
-    @Shadow
-    private double scale;
-    @Shadow
-    private double prevPlayerDimDiv;
-    @Shadow
-    private MapProcessor mapProcessor;
-    @Shadow
-    private Button exportButton;
-    @Shadow
-    private Button claimsButton;
-    @Shadow
-    private Button zoomInButton;
-    @Shadow
-    private Button zoomOutButton;
-    @Shadow
-    private Button keybindingsButton;
-    @Shadow
-    private Button dimensionToggleButton;
-    @Shadow
-    private int rightClickX;
-    @Shadow
-    private int rightClickZ;
+    @Unique Button coordinateGotoButton;
+    @Unique EditBox xTextEntryField;
+    @Unique EditBox zTextEntryField;
+    @Unique Button followButton;
+    @Unique Button switchToNetherButton;
+    @Unique Button switchToOverworldButton;
+    @Unique Button switchToEndButton;
+    @Unique List<Button> guiMapButtonTempList = Lists.<Button>newArrayList();
+    @Unique ResourceLocation xpGuiTextures = ResourceLocation.fromNamespaceAndPath("xaeroplus", "gui/xpgui.png");
+    @Shadow private double cameraX = 0.0;
+    @Shadow private double cameraZ = 0.0;
+    @Shadow private int[] cameraDestination = null;
+    @Shadow private SlowingAnimation cameraDestinationAnimX = null;
+    @Shadow private SlowingAnimation cameraDestinationAnimZ = null;
+    @Shadow private double scale;
+    @Shadow private double prevPlayerDimDiv;
+    @Shadow private MapProcessor mapProcessor;
+    @Shadow private Button exportButton;
+    @Shadow private Button claimsButton;
+    @Shadow private Button zoomInButton;
+    @Shadow private Button zoomOutButton;
+    @Shadow private Button keybindingsButton;
+    @Shadow private Button dimensionToggleButton;
+    @Shadow private int rightClickX;
+    @Shadow private int rightClickZ;
 
     protected MixinGuiMap(final Screen parent, final Screen escape, final Component titleIn) {
         super(parent, escape, titleIn);
@@ -160,15 +147,15 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             this.zoomInButton.setY(this.zoomOutButton.getY() - 20);
         }
         switchToEndButton = new GuiTexturedButton(this.width - 20, zoomInButton.getY() - 20, 20, 20, 31, 0, 16, 16,
-                                                  Globals.xpGuiTextures,
+                                                  this.xpGuiTextures,
                                                   (button -> onSwitchDimensionButton(END)),
                                                   () -> new CursorBox(Component.translatable("setting.keybinds.switch_to_end")));
         switchToOverworldButton = new GuiTexturedButton(this.width - 20, this.switchToEndButton.getY() - 20, 20, 20, 16, 0, 16, 16,
-                                                        Globals.xpGuiTextures,
+                                                        this.xpGuiTextures,
                                                         (button -> onSwitchDimensionButton(OVERWORLD)),
                                                         () -> new CursorBox(Component.translatable("setting.keybinds.switch_to_overworld")));
         switchToNetherButton = new GuiTexturedButton(this.width - 20, this.switchToOverworldButton.getY() - 20, 20, 20, 0, 0, 16, 16,
-                                                     Globals.xpGuiTextures,
+                                                     this.xpGuiTextures,
                                                      (button -> onSwitchDimensionButton(NETHER)),
                                                      () -> new CursorBox(Component.translatable("setting.keybinds.switch_to_nether")));
         addButton(switchToEndButton);
@@ -484,17 +471,17 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if (Minecraft.getInstance().options.hideGui) {
             List<Button> buttonList = getButtonList();
             if (!buttonList.isEmpty()) {
-                Globals.guiMapButtonTempList.clear();
-                Globals.guiMapButtonTempList.addAll(buttonList);
+                this.guiMapButtonTempList.clear();
+                this.guiMapButtonTempList.addAll(buttonList);
                 xTextEntryField.setVisible(false);
                 zTextEntryField.setVisible(false);
                 clearButtons();
             }
         } else {
-            if (!Globals.guiMapButtonTempList.isEmpty()) {
+            if (!this.guiMapButtonTempList.isEmpty()) {
                 clearButtons();
-                Globals.guiMapButtonTempList.forEach(this::addButton);
-                Globals.guiMapButtonTempList.clear();
+                this.guiMapButtonTempList.forEach(this::addButton);
+                this.guiMapButtonTempList.clear();
             }
         }
     }

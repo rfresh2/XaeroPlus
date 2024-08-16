@@ -11,6 +11,7 @@ import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -25,7 +26,6 @@ import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.minimap.waypoints.WaypointsSort;
 import xaero.common.misc.KeySortableByOther;
-import xaeroplus.Globals;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 import java.util.ArrayList;
@@ -35,15 +35,16 @@ import java.util.List;
 @Mixin(value = GuiWaypoints.class, remap = false)
 public abstract class MixinGuiWaypoints extends ScreenBase {
 
-    private final int TOGGLE_ALL_ID = 69;
     @Shadow
     private WaypointWorld displayedWorld;
     @Shadow
     private ArrayList<Waypoint> waypointsSorted;
     @Shadow
     private WaypointsManager waypointsManager;
-    private EditBox searchField;
-    private MySmallButton toggleAllButton;
+    @Unique private EditBox searchField;
+    @Unique private final int TOGGLE_ALL_ID = 69;
+    @Unique private MySmallButton toggleAllButton;
+    @Unique private String waypointsSearchFilter = "";
 
     protected MixinGuiWaypoints(final IXaeroMinimap modMain, final Screen parent, final Screen escape, final Component titleIn) {
         super(modMain, parent, escape, titleIn);
@@ -65,7 +66,7 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         this.addWidget(searchField);
         this.setFocused(this.searchField);
 
-        Globals.waypointsSearchFilter = "";
+        this.waypointsSearchFilter = "";
         // todo: this button is a bit larger than i want but cba to figure out exact size rn
         this.addRenderableWidget(
                 this.toggleAllButton = new MySmallButton(
@@ -118,7 +119,7 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         }
         this.searchField.render(guiGraphics, mouseX, mouseY, partial);
         if (!this.searchField.isFocused()) {
-            xaero.map.misc.Misc.setFieldText(this.searchField, Globals.waypointsSearchFilter);
+            xaero.map.misc.Misc.setFieldText(this.searchField, this.waypointsSearchFilter);
         }
     }
 
@@ -136,8 +137,8 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
     private void updateSearch() {
         if (this.searchField.isFocused()) {
             String newValue = this.searchField.getValue();
-            if (!Objects.equal(Globals.waypointsSearchFilter, newValue)) {
-                Globals.waypointsSearchFilter = this.searchField.getValue();
+            if (!Objects.equal(this.waypointsSearchFilter, newValue)) {
+                this.waypointsSearchFilter = this.searchField.getValue();
                 updateSortedList();
             }
         }
@@ -162,9 +163,9 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
              else
                  enabledWaypoints.add(w);
         }
-        if (!Globals.waypointsSearchFilter.isEmpty()) {
-            enabledWaypoints.removeIf(waypoint -> !waypoint.getName().toLowerCase().contains(Globals.waypointsSearchFilter.toLowerCase()));
-            disabledWaypoints.removeIf(waypoint -> !waypoint.getName().toLowerCase().contains(Globals.waypointsSearchFilter.toLowerCase()));
+        if (!this.waypointsSearchFilter.isEmpty()) {
+            enabledWaypoints.removeIf(waypoint -> !waypoint.getName().toLowerCase().contains(this.waypointsSearchFilter.toLowerCase()));
+            disabledWaypoints.removeIf(waypoint -> !waypoint.getName().toLowerCase().contains(this.waypointsSearchFilter.toLowerCase()));
         }
         this.waypointsSorted = new ArrayList<>();
 

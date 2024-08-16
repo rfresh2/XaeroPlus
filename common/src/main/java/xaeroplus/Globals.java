@@ -1,29 +1,23 @@
 package xaeroplus;
 
 import com.google.common.base.Suppliers;
-import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
+import xaero.hud.HudSession;
 import xaero.map.core.XaeroWorldMapCore;
+import xaeroplus.event.ClientPlaySessionFinalizedEvent;
 import xaeroplus.feature.render.DrawManager;
 import xaeroplus.settings.XaeroPlusSetting;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Supplier;
-import java.util.zip.ZipInputStream;
 
 import static net.minecraft.world.level.Level.OVERWORLD;
 
@@ -31,7 +25,7 @@ import static net.minecraft.world.level.Level.OVERWORLD;
  * static variables and functions to share or persist across mixins
  */
 public class Globals {
-
+    public static DrawManager drawManager = new DrawManager();
     // Map gui follow mode
     public static boolean FOLLOW = false;
     // cache and only update this on new world loads
@@ -52,8 +46,6 @@ public class Globals {
             return OVERWORLD;
         }
     }
-    public static String waypointsSearchFilter = "";
-    public static List<Button> guiMapButtonTempList = Lists.<Button>newArrayList();
     // This can only be shared under the assumption region and texture cache writes are non-concurrent
     // sharing the underlying byte array reduces GC spam
     // at cost of a few MB higher idle RAM usage
@@ -66,16 +58,16 @@ public class Globals {
                 .setDaemon(true)
                 .build()));
 
-    public static final ResourceLocation xpGuiTextures = new ResourceLocation("xaeroplus", "gui/xpgui.png");
-
-    public static DrawManager drawManager = new DrawManager();
-
     public static void onAllSettingsLoaded() {
         XaeroPlusSettingsReflectionHax.ALL_SETTINGS.get().forEach(XaeroPlusSetting::init);
         nullOverworldDimensionFolder = XaeroPlusSettingRegistry.nullOverworldDimensionFolder.getValue();
         dataFolderResolutionMode = XaeroPlusSettingRegistry.dataFolderResolutionMode.getValue();
         minimapScaleMultiplier = (int) XaeroPlusSettingRegistry.minimapScaleMultiplierSetting.getValue();
         minimapSizeMultiplier = (int) XaeroPlusSettingRegistry.minimapSizeMultiplierSetting.getValue();
+        XaeroPlus.EVENT_BUS.registerConsumer((e) -> {
+            nullOverworldDimensionFolder = XaeroPlusSettingRegistry.nullOverworldDimensionFolder.getValue();
+            dataFolderResolutionMode = XaeroPlusSettingRegistry.dataFolderResolutionMode.getValue();
+        }, ClientPlaySessionFinalizedEvent.class);
     }
 
     public static void switchToDimension(final ResourceKey<Level> newDimId) {
@@ -94,16 +86,25 @@ public class Globals {
         }
     }
 
-    public static byte[] decompressZipToBytes(final Path input) {
-        // overall performance improvement here is not that large
-        // writing has bigger impact doing it all bytes at once
-        try (final var in = new ZipInputStream(Files.newInputStream(input))) {
-            if (in.getNextEntry() != null) { // all xaero zip files (currently) only have 1 entry
-                return in.readAllBytes();
-            }
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
+    public static void setNullOverworldDimFolderIfAble(final boolean b) {
+        try {
+            var currentWMSession = XaeroWorldMapCore.currentSession;
+            var currentMMSession = HudSession.getCurrentSession();
+            if (currentWMSession != null || currentMMSession != null) return;
+            Globals.nullOverworldDimensionFolder = b;
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Failed setting nullOverworldDimensionFolder", e);
         }
-        return new byte[0];
+    }
+
+    public static void setDataFolderResolutionModeIfAble(XaeroPlusSettingRegistry.DataFolderResolutionMode mode) {
+        try {
+            var currentWMSession = XaeroWorldMapCore.currentSession;
+            var currentMMSession = HudSession.getCurrentSession();
+            if (currentWMSession != null || currentMMSession != null) return;
+            Globals.dataFolderResolutionMode = mode;
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Failed setting data folder resolution mode", e);
+        }
     }
 }

@@ -454,6 +454,7 @@ public final class XaeroPlusSettingRegistry {
         "setting.world_map.null_overworld_dimension_folder",
         "setting.world_map.null_overworld_dimension_folder.tooltip",
         true,
+        Globals::setNullOverworldDimFolderIfAble,
         SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusEnumSetting<DataFolderResolutionMode> dataFolderResolutionMode = XaeroPlusEnumSetting.create(
         "Data Dir Mode",
@@ -461,6 +462,7 @@ public final class XaeroPlusSettingRegistry {
         "setting.world_map.data_folder_resolution_mode.tooltip",
         DataFolderResolutionMode.values(),
         DataFolderResolutionMode.IP,
+        Globals::setDataFolderResolutionModeIfAble,
         SettingLocation.WORLD_MAP_MAIN);
 
     public enum DataFolderResolutionMode implements TranslatableSettingEnum {

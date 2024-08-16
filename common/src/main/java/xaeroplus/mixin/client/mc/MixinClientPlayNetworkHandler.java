@@ -17,6 +17,7 @@ import xaeroplus.XaeroPlus;
 import xaeroplus.event.ChunkBlockUpdateEvent;
 import xaeroplus.event.ChunkBlocksUpdateEvent;
 import xaeroplus.event.ChunkDataEvent;
+import xaeroplus.event.ClientPlaySessionFinalizedEvent;
 
 @Mixin(ClientPacketListener.class)
 public class MixinClientPlayNetworkHandler {
@@ -55,5 +56,12 @@ public class MixinClientPlayNetworkHandler {
     ))
     public void onBlockUpdate(final ClientboundBlockUpdatePacket packet, final CallbackInfo ci) {
         XaeroPlus.EVENT_BUS.call(new ChunkBlockUpdateEvent(packet));
+    }
+
+    @Inject(method = "close", at = @At(
+        "RETURN" // after session is closed, including xaero session closes and mc level ref unset
+    ))
+    public void onClientSessionClose(final CallbackInfo ci) {
+        XaeroPlus.EVENT_BUS.call(ClientPlaySessionFinalizedEvent.INSTANCE);
     }
 }

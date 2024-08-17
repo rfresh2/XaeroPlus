@@ -20,9 +20,9 @@ gradle.extra.apply {
 	set("worldmap_version_fabric", "1.38.8")
 	set("minimap_version_fabric", "24.3.0")
     set("worldmap_version_forge", "1.38.8")
-    set("minimap_version_forge", "24.2.0")
+	set("minimap_version_forge", "24.3.0")
 	set("worldmap_version_neo", "1.38.8")
-	set("minimap_version_neo", "24.2.0")
+	set("minimap_version_neo", "24.3.0")
 }
 
 dependencyResolutionManagement {

@@ -8,7 +8,7 @@ pluginManagement {
 	}
 }
 gradle.extra.apply {
-	set("mod_version", "2.22")
+	set("mod_version", "2.22.1")
 	set("maven_group", "xaeroplus")
 	set("archives_base_name", "XaeroPlus")
 	set("minecraft_version", "1.20.1")
@@ -17,7 +17,7 @@ gradle.extra.apply {
 	set("fabric_api_version", "0.92.2+1.20.1")
 	set("forge_loader_version", "47.3.5")
 	set("worldmap_version_fabric", "1.38.8")
-	set("minimap_version_fabric", "24.2.0")
+	set("minimap_version_fabric", "24.3.0")
 	set("worldmap_version_forge", "1.38.8")
 	set("minimap_version_forge", "24.2.0")
 }

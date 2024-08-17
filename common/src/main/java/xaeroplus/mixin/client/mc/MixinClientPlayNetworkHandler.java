@@ -58,7 +58,7 @@ public class MixinClientPlayNetworkHandler {
         XaeroPlus.EVENT_BUS.call(new ChunkBlockUpdateEvent(packet));
     }
 
-    @Inject(method = "close", at = @At(
+    @Inject(method = "cleanup", at = @At(
         "RETURN" // after session is closed, including xaero session closes and mc level ref unset
     ))
     public void onClientSessionClose(final CallbackInfo ci) {

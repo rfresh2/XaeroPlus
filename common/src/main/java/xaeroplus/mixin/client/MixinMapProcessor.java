@@ -31,8 +31,7 @@ import xaeroplus.util.DataFolderResolveUtil;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import static xaeroplus.Globals.LOCK_ID;
+import java.util.UUID;
 
 @Mixin(value = MapProcessor.class, remap = false)
 public abstract class MixinMapProcessor implements CustomMapProcessor {
@@ -42,6 +41,7 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
     @Unique private String xaeroPlus$prevWorldId;
     @Unique private String xaeroPlus$prevDimId;
     @Unique private String xaeroPlus$prevMWId;
+    @Unique private final static String LOCK_ID = UUID.randomUUID().toString();
     @Shadow private ClientLevel world;
 
     @Unique

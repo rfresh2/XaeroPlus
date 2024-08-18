@@ -1,6 +1,5 @@
 package xaeroplus.mixin.client;
 
-import com.google.common.collect.Lists;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -58,14 +57,13 @@ import java.util.stream.Collectors;
 import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
 import static net.minecraft.world.level.Level.*;
-import static xaeroplus.Globals.FOLLOW;
 import static xaeroplus.Globals.getCurrentDimensionId;
 import static xaeroplus.util.ChunkUtils.getPlayerX;
 import static xaeroplus.util.ChunkUtils.getPlayerZ;
 
 @Mixin(value = GuiMap.class, remap = false)
 public abstract class MixinGuiMap extends ScreenBase implements IRightClickableElement {
-
+    @Unique private static boolean follow = false;
     @Unique Button coordinateGotoButton;
     @Unique EditBox xTextEntryField;
     @Unique EditBox zTextEntryField;
@@ -73,7 +71,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Unique Button switchToNetherButton;
     @Unique Button switchToOverworldButton;
     @Unique Button switchToEndButton;
-    @Unique List<Button> guiMapButtonTempList = Lists.<Button>newArrayList();
+    @Unique List<Button> guiMapButtonTempList = new ArrayList<>();
     @Unique ResourceLocation xpGuiTextures = new ResourceLocation("xaeroplus", "gui/xpgui.png");
     @Shadow private double cameraX = 0.0;
     @Shadow private double cameraZ = 0.0;
@@ -115,11 +113,11 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Inject(method = "init", at = @At(value = "RETURN"), remap = true)
     public void customInitGui(CallbackInfo ci) {
         // left side
-        followButton = new GuiTexturedButton(0, this.dimensionToggleButton.y - 20, 20, 20, FOLLOW ? 133 : 149, 16, 16, 16,
+        followButton = new GuiTexturedButton(0, this.dimensionToggleButton.y - 20, 20, 20, this.follow ? 133 : 149, 16, 16, 16,
                                              WorldMap.guiTextures,
                                              this::onFollowButton,
                                              () -> new CursorBox(Component.translatable("gui.world_map.toggle_follow_mode")
-                                                                         .append(" " + I18n.get(FOLLOW ? "gui.xaeroplus.off" : "gui.xaeroplus.on"))));
+                                                                         .append(" " + I18n.get(this.follow ? "gui.xaeroplus.off" : "gui.xaeroplus.on"))));
         addButton(followButton);
         coordinateGotoButton = new GuiTexturedButton(0, followButton.y - 20 , 20, 20, 229, 16, 16, 16,
                                                      WorldMap.guiTextures,
@@ -203,7 +201,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "render", at = @At(value = "FIELD", target = "Lxaero/map/gui/GuiMap;lastStartTime:J", opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER), remap = true)
     public void injectFollowMode(final PoseStack guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci) {
-        if (FOLLOW && isNull(this.cameraDestination) && isNull(this.cameraDestinationAnimX) && isNull(this.cameraDestinationAnimZ)) {
+        if (this.follow && isNull(this.cameraDestination) && isNull(this.cameraDestinationAnimX) && isNull(this.cameraDestinationAnimZ)) {
             this.cameraDestination = new int[]{(int) getPlayerX(), (int) getPlayerZ()};
         }
     }
@@ -594,7 +592,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     }
 
     public void onFollowButton(final Button b) {
-        FOLLOW = !FOLLOW;
+        this.follow = !this.follow;
         this.init(Minecraft.getInstance(), width, height);
     }
 
@@ -605,7 +603,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 int z = Integer.parseInt(zTextEntryField.getValue());
                 cameraX = x;
                 cameraZ = z;
-                FOLLOW = false;
+                this.follow = false;
                 this.init(Minecraft.getInstance(), width, height);
             } catch (final NumberFormatException e) {
                 xTextEntryField.setValue("");

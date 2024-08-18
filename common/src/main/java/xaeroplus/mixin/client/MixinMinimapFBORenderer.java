@@ -97,12 +97,6 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             s -= minimapScaledSizeDiff * f;
         }
         scaledSize.set(s);
-        Globals.minimapDrawContext = guiGraphics; // storing this for later use in SupportXaeroWorldMap rendering
-    }
-
-    @Inject(method = "renderChunksToFBO", at = @At("RETURN"), remap = false)
-    public void removeDrawContextRef(final XaeroMinimapSession minimapSession, final GuiGraphics guiGraphics, final MinimapProcessor minimap, final Player player, final Entity renderEntity, final double playerX, final double playerZ, final double playerDimDiv, final double mapDimensionScale, final int bufferSize, final int viewW, final float sizeFix, final float partial, final int level, final boolean retryIfError, final boolean useWorldMap, final boolean lockedNorth, final int shape, final double ps, final double pc, final boolean cave, final boolean circle, final CustomVertexConsumers cvc, final CallbackInfo ci) {
-        Globals.minimapDrawContext = null;
     }
 
     @Redirect(method = "renderChunksToFBO", at = @At(

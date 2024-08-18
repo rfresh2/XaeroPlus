@@ -33,7 +33,7 @@ public class XaeroPlusFabric implements ClientModInitializer {
 				return;
 			}
             ModuleManager.init();
-            boolean a = Globals.FOLLOW; // force static instances to init
+            boolean a = Globals.shouldResetFBO; // force static instances to init
             XaeroPlusSettingRegistry.fastMapSetting.getValue(); // force static instances to init
             List<KeyMapping> keybinds = XaeroPlusSettingsReflectionHax.keybindsSupplier.get();
             keybinds.forEach(KeyBindingHelper::registerKeyBinding);

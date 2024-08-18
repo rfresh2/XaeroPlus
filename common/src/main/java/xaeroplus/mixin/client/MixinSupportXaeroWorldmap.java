@@ -73,7 +73,7 @@ public abstract class MixinSupportXaeroWorldmap {
             // need these calc'd before they're init lol
             var drawX = ((chunk.getX() - chunkX) << 6) - (tileX << 4) - insideX;
             var drawZ = ((chunk.getZ() - chunkZ) << 6) - (tileZ << 4) - insideZ;
-            MinimapBackgroundDrawHelper.addMMBackgroundToBuffer(Globals.minimapDrawContext.pose().last().pose(),
+            MinimapBackgroundDrawHelper.addMMBackgroundToBuffer(matrixStack.last().pose(),
                                                                 bgBufferBuilderRef.get(),
                                                                 drawX,
                                                                 drawZ,

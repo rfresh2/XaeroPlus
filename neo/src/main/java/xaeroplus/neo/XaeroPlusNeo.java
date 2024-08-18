@@ -48,7 +48,7 @@ public class XaeroPlusNeo {
     public void onRegisterKeyMappingsEvent(final RegisterKeyMappingsEvent event) {
         if (XaeroPlus.initialized.compareAndSet(false, true)) {
             ModuleManager.init();
-            boolean a = Globals.FOLLOW; // force static instances to init
+            boolean a = Globals.shouldResetFBO; // force static instances to init
             XaeroPlusSettingRegistry.fastMapSetting.getValue(); // force static instances to init
             List<KeyMapping> keybinds = XaeroPlusSettingsReflectionHax.keybindsSupplier.get();
             keybinds.forEach(event::register);

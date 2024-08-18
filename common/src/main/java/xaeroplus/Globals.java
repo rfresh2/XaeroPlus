@@ -2,7 +2,6 @@ package xaeroplus;
 
 import com.google.common.base.Suppliers;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaero.hud.HudSession;
@@ -14,7 +13,6 @@ import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
 
 import java.io.ByteArrayOutputStream;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Supplier;
@@ -25,17 +23,13 @@ import static net.minecraft.world.level.Level.OVERWORLD;
  * static variables and functions to share or persist across mixins
  */
 public class Globals {
-    public static DrawManager drawManager = new DrawManager();
-    // Map gui follow mode
-    public static boolean FOLLOW = false;
+    public static final DrawManager drawManager = new DrawManager();
     // cache and only update this on new world loads
     public static boolean nullOverworldDimensionFolder = false;
     public static XaeroPlusSettingRegistry.DataFolderResolutionMode dataFolderResolutionMode = XaeroPlusSettingRegistry.DataFolderResolutionMode.IP;
     public static int minimapScaleMultiplier = 1;
     public static int minimapSizeMultiplier = 1;
     public static boolean shouldResetFBO = false;
-    public static String LOCK_ID = UUID.randomUUID().toString();
-    public static GuiGraphics minimapDrawContext = null;
     public static ResourceKey<Level> getCurrentDimensionId() {
         try {
             var dim = XaeroWorldMapCore.currentSession.getMapProcessor().getMapWorld().getCurrentDimensionId();
@@ -50,7 +44,7 @@ public class Globals {
     // sharing the underlying byte array reduces GC spam
     // at cost of a few MB higher idle RAM usage
     public static ByteArrayOutputStream zipFastByteBuffer = new ByteArrayOutputStream();
-    public static Supplier<ExecutorService> cacheRefreshExecutorService = Suppliers.memoize(() -> Executors.newFixedThreadPool(
+    public static final Supplier<ExecutorService> cacheRefreshExecutorService = Suppliers.memoize(() -> Executors.newFixedThreadPool(
             // limited benefits by refreshing on more threads as it will consume the entire CPU and start lagging the game
             Math.max(1, Math.min(Runtime.getRuntime().availableProcessors() / 2, 4)),
             new ThreadFactoryBuilder()

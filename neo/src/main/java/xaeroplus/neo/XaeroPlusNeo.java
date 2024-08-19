@@ -3,6 +3,7 @@ package xaeroplus.neo;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModLoadingContext;
@@ -21,6 +22,7 @@ import xaeroplus.module.ModuleManager;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
 import xaeroplus.util.DataFolderResolveUtil;
+import xaeroplus.util.XaeroPlusGameTest;
 
 import java.util.List;
 
@@ -52,6 +54,8 @@ public class XaeroPlusNeo {
             XaeroPlusSettingRegistry.fastMapSetting.getValue(); // force static instances to init
             List<KeyMapping> keybinds = XaeroPlusSettingsReflectionHax.keybindsSupplier.get();
             keybinds.forEach(event::register);
+            if (System.getenv("XP_CI_TEST") != null)
+                Minecraft.getInstance().execute(XaeroPlusGameTest::applyMixinsTest);
         }
     }
 

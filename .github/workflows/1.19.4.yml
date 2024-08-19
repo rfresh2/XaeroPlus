@@ -35,32 +35,25 @@ jobs:
       run: ./gradlew build
 
     - name: Get WorldMap Version Fabric
-      run: |
-        echo "WORLDMAP_VERSION_FABRIC=$(./gradlew -q printWorldMapVersionFabric)" >> $GITHUB_ENV
+      run: echo "WORLDMAP_VERSION_FABRIC=$(./gradlew -q printWorldMapVersionFabric)" >> $GITHUB_ENV
 
     - name: Get Minimap Version Fabric
-      run: |
-        echo "MINIMAP_VERSION_FABRIC=$(./gradlew -q printMinimapVersionFabric)" >> $GITHUB_ENV
+      run: echo "MINIMAP_VERSION_FABRIC=$(./gradlew -q printMinimapVersionFabric)" >> $GITHUB_ENV
 
     - name: Get WorldMap Version Forge
-      run: |
-        echo "WORLDMAP_VERSION_FORGE=$(./gradlew -q printWorldMapVersionForge)" >> $GITHUB_ENV
+      run: echo "WORLDMAP_VERSION_FORGE=$(./gradlew -q printWorldMapVersionForge)" >> $GITHUB_ENV
 
     - name: Get Minimap Version Forge
-      run: |
-        echo "MINIMAP_VERSION_FORGE=$(./gradlew -q printMinimapVersionForge)" >> $GITHUB_ENV
+      run: echo "MINIMAP_VERSION_FORGE=$(./gradlew -q printMinimapVersionForge)" >> $GITHUB_ENV
 
     - name: Get XaeroPlus Version
-      run: |
-        echo "XP_VERSION=$(./gradlew -q printXaeroPlusVersion)" >> $GITHUB_ENV
+      run: echo "XP_VERSION=$(./gradlew -q printXaeroPlusVersion)" >> $GITHUB_ENV
 
     - name: Get Fabric Jar Filename
-      run: |
-        echo "XP_FABRIC=XaeroPlus-${{ env.XP_VERSION}}+fabric-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FABRIC }}-MM${{ env.MINIMAP_VERSION_FABRIC }}" >> $GITHUB_ENV
+      run: echo "XP_FABRIC=XaeroPlus-${{ env.XP_VERSION}}+fabric-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FABRIC }}-MM${{ env.MINIMAP_VERSION_FABRIC }}" >> $GITHUB_ENV
 
     - name: Get Forge Jar Filename
-      run: |
-        echo "XP_FORGE=XaeroPlus-${{ env.XP_VERSION}}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
+      run: echo "XP_FORGE=XaeroPlus-${{ env.XP_VERSION}}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
 
     - name: Upload Fabric Artifact
       uses: actions/upload-artifact@v4
@@ -75,3 +68,44 @@ jobs:
         name: ${{ env.XP_FORGE }}
         path: forge/build/libs/${{ env.XP_FORGE }}.jar
         if-no-files-found: error
+
+    - name: Set CI Test Env Var
+      run: echo "XP_CI_TEST=true" >> $GITHUB_ENV
+
+    - name: Setup Fabric Test Mods
+      run: |
+        mkdir -p run/mods && cp fabric/build/libs/${{ env.XP_FABRIC }}.jar run/mods \
+        && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ env.MINIMAP_VERSION_FABRIC }}_Fabric_${{ env.MINECRAFT_VERSION }}/xaeros-minimap-${{ env.MINIMAP_VERSION_FABRIC }}_Fabric_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/ \
+        && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ env.WORLDMAP_VERSION_FABRIC }}_Fabric_${{ env.MINECRAFT_VERSION }}/xaeros-world-map-${{ env.WORLDMAP_VERSION_FABRIC }}_Fabric_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/
+
+    - name: Fabric Test
+      uses: 3arthqu4ke/mc-runtime-test@2.3.1
+      with:
+        mc: ${{ env.MINECRAFT_VERSION }}
+        modloader: fabric
+        regex: .*fabric.*
+        mc-runtime-test: fabric
+        fabric-api: 0.87.2
+        java: 17
+        xvfb: false
+        headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
+
+    - name: Cleanup Test
+      run: rm -rf run/ && rm -rf HeadlessMC/ && rm headlessmc-launcher.jar && rm -rf ~/.minecraft
+
+    - name: Setup Forge Test
+      run: |
+        mkdir -p run/mods && cp forge/build/libs/${{ env.XP_FORGE }}.jar run/mods \
+        && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ env.MINIMAP_VERSION_FORGE }}_Forge_${{ env.MINECRAFT_VERSION }}/xaeros-minimap-${{ env.MINIMAP_VERSION_FORGE }}_Forge_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/ \
+        && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ env.WORLDMAP_VERSION_FORGE }}_Forge_${{ env.MINECRAFT_VERSION }}/xaeros-world-map-${{ env.WORLDMAP_VERSION_FORGE }}_Forge_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/
+
+    - name: Forge Test
+      uses: 3arthqu4ke/mc-runtime-test@2.3.1
+      with:
+        mc: ${{ env.MINECRAFT_VERSION }}
+        modloader: forge
+        regex: .*forge.*
+        mc-runtime-test: lexforge
+        java: 17
+        xvfb: false
+        headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true

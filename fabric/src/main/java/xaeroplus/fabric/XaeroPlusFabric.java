@@ -17,6 +17,7 @@ import xaeroplus.module.ModuleManager;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
 import xaeroplus.util.DataFolderResolveUtil;
+import xaeroplus.util.XaeroPlusGameTest;
 
 import java.util.List;
 
@@ -38,6 +39,8 @@ public class XaeroPlusFabric implements ClientModInitializer {
             List<KeyMapping> keybinds = XaeroPlusSettingsReflectionHax.keybindsSupplier.get();
             keybinds.forEach(KeyBindingHelper::registerKeyBinding);
             FabricWaystonesHelperInit.doInit();
+			if (System.getenv("XP_CI_TEST") != null)
+				Minecraft.getInstance().execute(XaeroPlusGameTest::applyMixinsTest);
         }
 	}
 

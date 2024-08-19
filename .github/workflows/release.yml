@@ -53,20 +53,16 @@ jobs:
         run: ./gradlew build
 
       - name: Get WorldMap Version Fabric
-        run: |
-          echo "WORLDMAP_VERSION_FABRIC=$(./gradlew -q printWorldMapVersionFabric)" >> $GITHUB_ENV
+        run: echo "WORLDMAP_VERSION_FABRIC=$(./gradlew -q printWorldMapVersionFabric)" >> $GITHUB_ENV
 
       - name: Get Minimap Version Fabric
-        run: |
-          echo "MINIMAP_VERSION_FABRIC=$(./gradlew -q printMinimapVersionFabric)" >> $GITHUB_ENV
+        run: echo "MINIMAP_VERSION_FABRIC=$(./gradlew -q printMinimapVersionFabric)" >> $GITHUB_ENV
 
       - name: Get WorldMap Version Forge
-        run: |
-          echo "WORLDMAP_VERSION_FORGE=$(./gradlew -q printWorldMapVersionForge)" >> $GITHUB_ENV
+        run: echo "WORLDMAP_VERSION_FORGE=$(./gradlew -q printWorldMapVersionForge)" >> $GITHUB_ENV
 
       - name: Get Minimap Version Forge
-        run: |
-          echo "MINIMAP_VERSION_FORGE=$(./gradlew -q printMinimapVersionForge)" >> $GITHUB_ENV
+        run: echo "MINIMAP_VERSION_FORGE=$(./gradlew -q printMinimapVersionForge)" >> $GITHUB_ENV
 
       - name: Get WorldMap Version NeoForge
         run: |
@@ -78,16 +74,13 @@ jobs:
 
 
       - name: Get XaeroPlus Version
-        run: |
-          echo "XP_VERSION=$(./gradlew -q printXaeroPlusVersion)" >> $GITHUB_ENV
+        run: echo "XP_VERSION=$(./gradlew -q printXaeroPlusVersion)" >> $GITHUB_ENV
 
       - name: Get Fabric Jar Filename
-        run: |
-          echo "XP_FABRIC=XaeroPlus-${{ env.XP_VERSION}}+fabric-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FABRIC }}-MM${{ env.MINIMAP_VERSION_FABRIC }}" >> $GITHUB_ENV
+        run: echo "XP_FABRIC=XaeroPlus-${{ env.XP_VERSION}}+fabric-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FABRIC }}-MM${{ env.MINIMAP_VERSION_FABRIC }}" >> $GITHUB_ENV
 
       - name: Get Forge Jar Filename
-        run: |
-          echo "XP_FORGE=XaeroPlus-${{ env.XP_VERSION}}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
+        run: echo "XP_FORGE=XaeroPlus-${{ env.XP_VERSION}}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
 
       - name: Get Neo Jar Filename
         run: |

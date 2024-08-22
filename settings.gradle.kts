@@ -9,7 +9,7 @@ pluginManagement {
 	}
 }
 gradle.extra.apply {
-	set("mod_version", "2.22.1")
+	set("mod_version", "2.22.2")
 	set("maven_group", "xaeroplus")
 	set("archives_base_name", "XaeroPlus")
 	set("minecraft_version", "1.20.6")
@@ -53,7 +53,7 @@ dependencyResolutionManagement {
 			library("balm-neoforge", "maven.modrinth:balm:10.3.2+neoforge-1.20.6")
 			library("fabric-waystones", "maven.modrinth:fwaystones:3.3.2+mc1.20.4")
 			library("worldtools", "maven.modrinth:worldtools:1.2.4+1.20.4")
-            library("sqlite", "com.github.rfresh2:sqlite-jdbc:2ba0c66439") // relocated xerial sqlite to avoid conflicts with other mods
+            library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.46.1.0") // relocated xerial sqlite to avoid conflicts with other mods
 			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.2.18+1.20.6-fabric")
 			library("immediatelyfast-neo", "maven.modrinth:immediatelyfast:1.2.18+1.20.6-neoforge")
 			library("modmenu", "maven.modrinth:modmenu:10.0.0-beta.1")

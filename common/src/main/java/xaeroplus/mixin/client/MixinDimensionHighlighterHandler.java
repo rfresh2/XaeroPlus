@@ -27,7 +27,7 @@ public class MixinDimensionHighlighterHandler {
         try {
             for (int i = 0; i < highlighters.size(); i++) {
                 AbstractHighlighter hl = highlighters.get(i);
-                if (hl.isCoveringOutsideDiscovered() && discovered) continue;
+                if (!discovered && !hl.isCoveringOutsideDiscovered()) continue;
                 if (hl.regionHasHighlights(dimension, regionX, regionZ)) return true;
             }
         } catch (final Exception e) {

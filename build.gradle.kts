@@ -4,7 +4,7 @@ import net.fabricmc.loom.api.LoomGradleExtensionAPI
 plugins {
     id("architectury-plugin") version "3.4-SNAPSHOT"
     id("dev.architectury.loom") version "1.7-SNAPSHOT" apply false
-    id("com.github.johnrengelman.shadow") version "8.1.1" apply false
+    id("com.gradleup.shadow") version "8.3.0" apply false
     idea
 }
 
@@ -18,7 +18,7 @@ architectury {
 
 subprojects {
     apply(plugin = "dev.architectury.loom")
-    apply(plugin = "com.github.johnrengelman.shadow")
+    apply(plugin = "com.gradleup.shadow")
 
     configure<LoomGradleExtensionAPI> {
         silentMojangMappingsLicense()
@@ -52,6 +52,7 @@ subprojects {
             exclude("org/rfresh/sqlite/native/Linux/x86/**")
             exclude("org/rfresh/sqlite/native/Linux/armv7/**")
             exclude("org/rfresh/sqlite/native/Linux/ppc64/**")
+            exclude("org/rfresh/sqlite/native/Linux/riscv64/**")
             exclude("org/rfresh/sqlite/native/Windows/armv7/**")
             exclude("org/rfresh/sqlite/native/Windows/aarch64/**")
             exclude("org/rfresh/sqlite/native/Windows/armv7/**")
@@ -79,8 +80,8 @@ allprojects {
         maven("https://api.modrinth.com/maven") {
             name = "Modrinth"
         }
-        maven("https://jitpack.io") {
-            name = "jitpack.io"
+        maven("https://maven.2b2t.vc/releases") {
+            name = "maven.2b2t.vc"
         }
         maven("https://maven.parchmentmc.org") {
             name = "ParchmentMC"

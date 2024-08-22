@@ -52,6 +52,8 @@ dependencies {
 	modRuntimeOnly(libs.cloth.config.fabric) {
 		exclude(group = "net.fabricmc.fabric-api")
 	}
+	modRuntimeOnly(libs.opac.fabric)
+	modRuntimeOnly(libs.forge.config.api.port)
 	implementation(include(libs.caffeine.get())!!)
 	implementation(include(libs.lambdaEvents.get())!!)
 	common(project(path = ":common", configuration = "namedElements")) { isTransitive = false }

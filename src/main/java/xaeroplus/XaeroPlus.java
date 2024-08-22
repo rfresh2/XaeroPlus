@@ -12,6 +12,7 @@ import xaeroplus.event.ForgeEventHandler;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.Globals;
+import xaeroplus.util.XaeroPlusGameTest;
 
 @Mod(
         modid = XaeroPlus.MODID,
@@ -41,6 +42,9 @@ public class XaeroPlus {
     public void init(FMLInitializationEvent event) {
         EVENT_BUS.register(forgeEventHandler);
         LOGGER.info("XaeroPlus initialized");
+        if (System.getenv("XP_CI_TEST") != null) {
+            XaeroPlusGameTest.applyMixinsTest();
+        }
     }
 
     @Mod.EventHandler

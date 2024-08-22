@@ -1,9 +1,8 @@
 name: Mainline Build And Release
 
 on:
-  push:
-    branches:
-      - "mainline"
+  workflow_dispatch:
+
 env:
   WORLDMAP_VERSION: "1.38.8"
   MINIMAP_VERSION: "24.3.0"

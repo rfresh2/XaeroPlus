@@ -264,7 +264,7 @@ public abstract class MixinMapWriter {
         remap = true) // $REMAP
     public ResourceKey<Level> removeCustomDimSwitchWriterPrevention(final MapWorld mapWorld, final Operation<ResourceKey<Level>> original) {
         var world = mapProcessor.getWorld();
-        return XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue() && world != null
+        return XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue() && world != null && mapWorld.isMultiplayer()
             ? world.dimension() // makes if condition in injected code always true
             : original.call(mapWorld);
     }
@@ -279,7 +279,7 @@ public abstract class MixinMapWriter {
 
     @Inject(method = "writeChunk", at = @At("HEAD"))
     public void getActualMapRegionDimSignalHead(final Level world, final int distance, final boolean onlyLoad, final Registry<Biome> biomeRegistry, final OverlayManager overlayManager, final boolean loadChunks, final boolean updateChunks, final boolean ignoreHeightmaps, final boolean flowers, final boolean detailedDebug, final BlockPos.MutableBlockPos mutableBlockPos3, final BlockTintProvider blockTintProvider, final int caveDepth, final int caveStart, final int layerToWrite, final int tileChunkX, final int tileChunkZ, final int tileChunkLocalX, final int tileChunkLocalZ, final int chunkX, final int chunkZ, final CallbackInfoReturnable<Boolean> cir) {
-        ((CustomMapProcessor) mapProcessor).xaeroPlus$getLeafRegionActualDimSignal().set(XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue());
+        ((CustomMapProcessor) mapProcessor).xaeroPlus$getLeafRegionActualDimSignal().set(XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue() && mapProcessor.getMapWorld().isMultiplayer());
     }
 
     @Inject(method = "writeChunk", at = @At("RETURN"))
@@ -290,7 +290,7 @@ public abstract class MixinMapWriter {
     @Inject(method = "writeChunk", at = @At("HEAD"))
     public void setGetCurrentDimActualDimSignalHead(final Level world, final int distance, final boolean onlyLoad, final Registry<Biome> biomeRegistry, final OverlayManager overlayManager, final boolean loadChunks, final boolean updateChunks, final boolean ignoreHeightmaps, final boolean flowers, final boolean detailedDebug, final BlockPos.MutableBlockPos mutableBlockPos3, final BlockTintProvider blockTintProvider, final int caveDepth, final int caveStart, final int layerToWrite, final int tileChunkX, final int tileChunkZ, final int tileChunkLocalX, final int tileChunkLocalZ, final int chunkX, final int chunkZ, final CallbackInfoReturnable<Boolean> cir) {
         var mapWorld = mapProcessor.getWorld();
-        var setSignal = XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue() && mapWorld != null;
+        var setSignal = XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue() && mapWorld != null && mapProcessor.getMapWorld().isMultiplayer();
         ((CustomMapProcessor) mapProcessor).xaeroPlus$getCurrentDimensionActualDimSignal().set(setSignal);
     }
 
@@ -304,7 +304,7 @@ public abstract class MixinMapWriter {
         target = "Lxaero/map/MapProcessor;getLeafMapRegion(IIIZ)Lxaero/map/region/MapRegion;"
     ))
     public MapRegion getActualMapRegionInOnRender(final MapProcessor mapProcessor, int caveLayer, int regX, int regZ, boolean create, final Operation<MapRegion> original) {
-        if (XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue()) {
+        if (XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue() && mapProcessor.getMapWorld().isMultiplayer()) {
             ((CustomMapProcessor) mapProcessor).xaeroPlus$getLeafRegionActualDimSignal().set(true);
         }
         try {

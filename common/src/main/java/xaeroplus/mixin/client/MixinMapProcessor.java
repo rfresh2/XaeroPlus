@@ -157,7 +157,7 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
     ))
     public MapDimension updateWorldSyncedGetActualDimension(final MapWorld mapWorld, final Operation<MapDimension> original) {
         var world = this.world;
-        return XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue() && world != null
+        return XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue() && world != null && mapWorld.isMultiplayer()
             ? mapWorld.getDimension(world.dimension())
             : original.call(mapWorld);
     }

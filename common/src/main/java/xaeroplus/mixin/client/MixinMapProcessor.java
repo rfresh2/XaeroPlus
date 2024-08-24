@@ -59,8 +59,10 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
 
     @Shadow public abstract String getDimensionName(final ResourceKey<Level> id);
 
-    @Inject(method = "getMainId", at = @At("HEAD"), cancellable = true, remap = false)
-    private void getMainId(final boolean rootFolderFormat, boolean preIP6Fix, final ClientPacketListener connection, final CallbackInfoReturnable<String> cir) {
+    @Inject(method = "getMainId(ILnet/minecraft/client/multiplayer/ClientPacketListener;)Ljava/lang/String;", at = @At("HEAD"),
+        cancellable = true,
+        remap = true) // $REMAP
+    private void getMainId(final int version, final ClientPacketListener connection, final CallbackInfoReturnable<String> cir) {
         DataFolderResolveUtil.resolveDataFolder(connection, cir);
     }
 

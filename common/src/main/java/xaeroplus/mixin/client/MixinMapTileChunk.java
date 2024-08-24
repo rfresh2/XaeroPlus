@@ -62,7 +62,7 @@ public abstract class MixinMapTileChunk implements SeenChunksTrackingMapTileChun
         target = "Lxaero/map/world/MapWorld;getCurrentDimension()Lxaero/map/world/MapDimension;"
     ))
     public MapDimension useRegionDimensionInsteadOfMapWorld(final MapWorld mapWorld, final Operation<MapDimension> original) {
-        if (XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue()) {
+        if (XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue() && mapWorld.isMultiplayer()) {
             return getInRegion().getDim();
         } else {
             return original.call(mapWorld);

@@ -284,7 +284,7 @@ public abstract class MixinMapWriter {
     }
 
     @Inject(method = "writeChunk", at = @At("RETURN"))
-    public void getActualMapRegionDimSignalTail(final Level world, final Registry<Block> blockRegistry, final int distance, final boolean onlyLoad, final Registry<Biome> biomeRegistry, final OverlayManager overlayManager, final boolean loadChunks, final boolean updateChunks, final boolean ignoreHeightmaps, final boolean flowers, final boolean detailedDebug, final BlockPos.MutableBlockPos mutableBlockPos3, final BlockTintProvider blockTintProvider, final int caveDepth, final int caveStart, final int layerToWrite, final int tileChunkX, final int tileChunkZ, final int tileChunkLocalX, final int tileChunkLocalZ, final int chunkX, final int chunkZ, final CallbackInfoReturnable<Boolean> cir) {
+    public void getActualMapRegionDimSignalReturn(final Level world, final Registry<Block> blockRegistry, final int distance, final boolean onlyLoad, final Registry<Biome> biomeRegistry, final OverlayManager overlayManager, final boolean loadChunks, final boolean updateChunks, final boolean ignoreHeightmaps, final boolean flowers, final boolean detailedDebug, final BlockPos.MutableBlockPos mutableBlockPos3, final BlockTintProvider blockTintProvider, final int caveDepth, final int caveStart, final int layerToWrite, final int tileChunkX, final int tileChunkZ, final int tileChunkLocalX, final int tileChunkLocalZ, final int chunkX, final int chunkZ, final CallbackInfoReturnable<Boolean> cir) {
         ((CustomMapProcessor) mapProcessor).xaeroPlus$getLeafRegionActualDimSignal().set(false);
     }
 
@@ -308,11 +308,15 @@ public abstract class MixinMapWriter {
         if (XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue()) {
             ((CustomMapProcessor) mapProcessor).xaeroPlus$getLeafRegionActualDimSignal().set(true);
         }
-        return original.call(
-            mapProcessor,
-            caveLayer,
-            regX,
-            regZ,
-            create);
+        try {
+            return original.call(
+                mapProcessor,
+                caveLayer,
+                regX,
+                regZ,
+                create);
+        } finally {
+            ((CustomMapProcessor) mapProcessor).xaeroPlus$getLeafRegionActualDimSignal().set(false);
+        }
     }
 }

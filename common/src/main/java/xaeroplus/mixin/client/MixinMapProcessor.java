@@ -3,7 +3,6 @@ package xaeroplus.mixin.client;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -59,8 +58,10 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
 
     @Shadow public abstract String getDimensionName(final ResourceKey<Level> id);
 
-    @Inject(method = "getMainId", at = @At("HEAD"), cancellable = true, remap = false)
-    private void getMainId(final boolean rootFolderFormat, boolean preIP6Fix, final CallbackInfoReturnable<String> cir) {
+    @Inject(method = "getMainId(I)Ljava/lang/String;", at = @At("HEAD"),
+        cancellable = true,
+        remap = true) // $REMAP
+    private void getMainId(final int version, final CallbackInfoReturnable<String> cir) {
         DataFolderResolveUtil.resolveDataFolder(cir);
     }
 

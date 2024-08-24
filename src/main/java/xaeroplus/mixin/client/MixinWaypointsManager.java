@@ -75,7 +75,7 @@ public abstract class MixinWaypointsManager {
         return !crossDimTeleport;
     }
 
-    @Inject(method = "getMainContainer", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getMainContainer(I)Ljava/lang/String;", at = @At("HEAD"), cancellable = true)
     private void getMainContainer(CallbackInfoReturnable<String> cir) {
         DataFolderResolveUtil.resolveDataFolder(cir);
     }

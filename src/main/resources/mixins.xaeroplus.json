@@ -41,7 +41,6 @@
     "MixinPixelBuffers",
     "MixinRadarRenderContext",
     "MixinRadarRenderProvider",
-    "MixinRegionTexture",
     "MixinSupportXaeroMinimap",
     "MixinSupportXaeroWorldmap",
     "MixinWaypoint",

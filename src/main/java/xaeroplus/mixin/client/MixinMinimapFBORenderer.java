@@ -32,6 +32,7 @@ import xaero.common.minimap.waypoints.render.WaypointsGuiRenderer;
 import xaero.common.misc.Misc;
 import xaero.common.misc.OptimizedMath;
 import xaero.common.settings.ModSettings;
+import xaero.hud.compat.mods.ImmediatelyFastHelper;
 import xaero.hud.minimap.Minimap;
 import xaero.hud.minimap.MinimapLogs;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
@@ -147,6 +148,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         int offsetX = xFloored & 63;
         int offsetZ = zFloored & 63;
         boolean zooming = (double)((int)this.zoom) != this.zoom;
+        ImmediatelyFastHelper.triggerBatchingBuffersFlush();
         this.scalingFramebuffer.bindFramebuffer(true);
         GL11.glClear(16640);
         GlStateManager.enableTexture2D();
@@ -357,6 +359,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
                         halfWView
                 );
         GlStateManager.popMatrix();
+        ImmediatelyFastHelper.triggerBatchingBuffersFlush();
         this.rotationFramebuffer.unbindFramebuffer();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.disableBlend();

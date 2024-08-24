@@ -168,8 +168,8 @@ public abstract class MixinMapProcessor {
 
     @Shadow private OverlayManager overlayManager;
 
-    @Inject(method = "getMainId", at = @At("HEAD"), cancellable = true)
-    private void getMainId(boolean rootFolderFormat, boolean preIP6Fix, CallbackInfoReturnable<String> cir) {
+    @Inject(method = "getMainId(I)Ljava/lang/String;", at = @At("HEAD"), cancellable = true)
+    private void getMainId(final int version, final CallbackInfoReturnable<String> cir) {
         DataFolderResolveUtil.resolveDataFolder(cir);
     }
 

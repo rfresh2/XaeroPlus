@@ -60,7 +60,7 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
 
     @Inject(method = "getMainId(I)Ljava/lang/String;", at = @At("HEAD"),
         cancellable = true,
-        remap = true) // $REMAP
+        remap = false)
     private void getMainId(final int version, final CallbackInfoReturnable<String> cir) {
         DataFolderResolveUtil.resolveDataFolder(cir);
     }

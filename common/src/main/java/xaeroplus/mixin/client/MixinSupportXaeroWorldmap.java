@@ -63,16 +63,15 @@ public abstract class MixinSupportXaeroWorldmap {
 
     @Inject(method = "renderChunks", at = @At(
         value = "INVOKE",
-        target = "Lorg/lwjgl/opengl/GL11;glTexParameterf(IIF)V"
+        target = "Lxaero/common/mods/SupportXaeroWorldmap;prepareMapTexturedRect(Lorg/joml/Matrix4f;FFIIFFLxaero/map/region/MapTileChunk;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRenderer;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRenderer;Lxaero/common/minimap/render/MinimapRendererHelper;)V"
     ), remap = false)
     public void renderTransparentMMBg(final PoseStack matrixStack, final int minX, final int maxX, final int minZ, final int maxZ, final int minViewX, final int maxViewX, final int minViewZ, final int maxViewZ, final MapProcessor mapProcessor, final int renderedCaveLayer, final boolean shouldRequestLoading, final boolean reloadEverything, final int globalReloadVersion, final int globalRegionCacheHashCode, final int globalCaveStart, final int globalCaveDepth, final boolean playerIsMoving, final boolean noCaveMaps, final boolean slimeChunks, final int chunkX, final int chunkZ, final int tileX, final int tileZ, final int insideX, final int insideZ, final Long seed, final MultiTextureRenderTypeRenderer mapWithLightRenderer, final MultiTextureRenderTypeRenderer mapNoLightRenderer, final MinimapRendererHelper helper, final VertexConsumer overlayBufferBuilder, final CallbackInfo ci,
                                       @Share("bgBufferBuilder") LocalRef<BufferBuilder> bgBufferBuilderRef,
+                                      @Local(name = "drawX") int drawX,
+                                      @Local(name = "drawZ") int drawZ,
                                       @Local(name = "chunk") MapTileChunk chunk
     ) {
         if (XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) {
-            // need these calc'd before they're init lol
-            var drawX = ((chunk.getX() - chunkX) << 6) - (tileX << 4) - insideX;
-            var drawZ = ((chunk.getZ() - chunkZ) << 6) - (tileZ << 4) - insideZ;
             MinimapBackgroundDrawHelper.addMMBackgroundToBuffer(matrixStack.last().pose(),
                                                                 bgBufferBuilderRef.get(),
                                                                 drawX,

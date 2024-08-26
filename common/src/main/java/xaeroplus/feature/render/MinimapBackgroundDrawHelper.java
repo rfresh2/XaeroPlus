@@ -8,7 +8,7 @@ import xaeroplus.feature.extensions.SeenChunksTrackingMapTileChunk;
 public class MinimapBackgroundDrawHelper {
 
     public static void addMMBackgroundToBuffer(Matrix4f matrix, VertexConsumer bufferBuilder, final int drawX, final int drawZ, final MapTileChunk chunk) {
-        boolean[][] seenTiles = ((SeenChunksTrackingMapTileChunk) (Object) chunk).getSeenTiles();
+        boolean[][] seenTiles = ((SeenChunksTrackingMapTileChunk) chunk).getSeenTiles();
         int combinedLeft = 0;
         int combinedTop = 0;
         int combinedRight = 0;
@@ -20,8 +20,8 @@ public class MinimapBackgroundDrawHelper {
                 if (seenTiles[o][p]) {
                     int left = drawX + (o << 4);
                     int top = drawZ + (p << 4);
-                    int right = drawX + ((o + 1) << 4);
-                    int bottom = drawZ + ((p + 1) << 4);
+                    int right = left + 16;
+                    int bottom = top + 16;
                     if (!rowStarted) {
                         // Start a new row
                         combinedLeft = left;

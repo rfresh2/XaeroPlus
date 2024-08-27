@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -66,6 +67,9 @@ import static xaeroplus.util.ChunkUtils.getPlayerZ;
 @Mixin(value = GuiMap.class, remap = false)
 public abstract class MixinGuiMap extends ScreenBase implements IRightClickableElement {
     @Unique private static boolean follow = false;
+    @Unique boolean pan;
+    @Unique double panMouseStartX;
+    @Unique double panMouseStartY;
     @Unique Button coordinateGotoButton;
     @Unique EditBox xTextEntryField;
     @Unique EditBox zTextEntryField;
@@ -91,18 +95,16 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Shadow private Button dimensionToggleButton;
     @Shadow private int rightClickX;
     @Shadow private int rightClickZ;
+    @Shadow private int mouseBlockPosX;
+    @Shadow private int mouseBlockPosZ;
+    @Shadow private static double destScale;
 
     protected MixinGuiMap(final Screen parent, final Screen escape, final Component titleIn) {
         super(parent, escape, titleIn);
     }
 
     @Shadow public abstract <T extends GuiEventListener & Renderable & NarratableEntry> T addButton(final T guiEventListener);
-
     @Shadow public abstract <T extends GuiEventListener & NarratableEntry> T addWidget(final T guiEventListener);
-
-    @Shadow private int mouseBlockPosX;
-
-    @Shadow private int mouseBlockPosZ;
 
     @ModifyExpressionValue(method = "changeZoom",
         at = @At(
@@ -159,6 +161,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         addButton(switchToEndButton);
         addButton(switchToOverworldButton);
         addButton(switchToNetherButton);
+        pan = false;
     }
 
     @Override
@@ -521,6 +524,46 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     }
 
     // todo: mixin on mouseClicked to close coord entry fields when clicking on something else
+
+    @Inject(method = "onInputPress", at = @At("HEAD"))
+    public void panMouseButtonClick(final InputConstants.Type type, final int code, final CallbackInfoReturnable<Boolean> cir) {
+        if (type != InputConstants.Type.MOUSE) return;
+        if (code != 2) return;
+        pan = true;
+        var mc = Minecraft.getInstance();
+        panMouseStartX = Misc.getMouseX(mc, true);
+        panMouseStartY = Misc.getMouseY(mc, true);
+    }
+
+    @Inject(method = "onInputRelease", at = @At("HEAD"))
+    public void panMouseButtonRelease(final InputConstants.Type type, final int code, final CallbackInfoReturnable<Boolean> cir) {
+        if (type != InputConstants.Type.MOUSE) return;
+        if (code != 2) return;
+        pan = false;
+    }
+
+    @Inject(method = "render", at = @At("HEAD"))
+    public void panMapOnRender(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci) {
+        if (!pan) return;
+        Minecraft mc = Minecraft.getInstance();
+        double mouseX = Misc.getMouseX(mc, true);
+        double mouseY = Misc.getMouseY(mc, true);
+        double fps = mc.getFps();
+
+        double mouseDeltaX = mouseX - panMouseStartX;
+        double mouseDeltaY = mouseY - panMouseStartY;
+        double distance = Math.sqrt(Math.pow(mouseDeltaX, 2) + Math.pow(mouseDeltaY, 2));
+        double accelFactor = (distance / 30.0);
+        double xVec = mouseDeltaX * accelFactor; // scale vec roughly exponentially
+        double yVec = mouseDeltaY * accelFactor;
+
+        // normalize across fps and map zoom levels
+        double panDeltaX = (1.0 / (fps / xVec)) / destScale;
+        double panDeltaZ = (1.0 / (fps / yVec)) / destScale;
+
+        cameraX += panDeltaX;
+        cameraZ += panDeltaZ;
+    }
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true, remap = true)
     public void onInputPress(final int code, final int scanCode, final int modifiers, final CallbackInfoReturnable<Boolean> cir) {

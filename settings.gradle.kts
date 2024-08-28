@@ -51,7 +51,7 @@ dependencyResolutionManagement {
 			library("balm-fabric", "maven.modrinth:balm:21.0.12+fabric-1.21")
 			library("balm-forge", "maven.modrinth:balm:21.0.12+forge-1.21")
 			library("balm-neoforge", "maven.modrinth:balm:21.0.12+neoforge-1.21")
-			library("fabric-waystones", "maven.modrinth:fwaystones:3.3.2+mc1.20.4")
+			library("fabric-waystones", "maven.modrinth:fwaystones:3.3.3+mc1.21")
 			library("worldtools", "maven.modrinth:worldtools:1.2.4+1.20.4")
             library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.46.1.0") // relocated xerial sqlite to avoid conflicts with other mods
 			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.2.18+1.21-fabric")

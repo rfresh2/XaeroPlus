@@ -25,10 +25,11 @@ import static xaero.common.settings.ModSettings.COLORS;
 
 public class WaystoneSync extends Module {
     private boolean subscribed = false;
-    private BlayWaystonesHelper blayWaystonesHelper = new BlayWaystonesHelper();
+    private final BlayWaystonesHelper blayWaystonesHelper = new BlayWaystonesHelper();
     int fwaystonesTickC = 0;
     private WaystoneColor color = WaystoneColor.RANDOM;
     private boolean separateWaypointSet = false;
+    private int visibilityType = 0;
 
     @Override
     public void onEnable() {
@@ -124,6 +125,7 @@ public class WaystoneSync extends Module {
             0,
             true
         );
+        waystoneWp.setVisibilityType(visibilityType);
         ((IWaypointDimension) waystoneWp).setDimension(waystone.dimension());
         waypointsList.add(waystoneWp);
     }
@@ -187,6 +189,11 @@ public class WaystoneSync extends Module {
 
     public void setWaypointSet(final boolean waypointSet) {
         this.separateWaypointSet = waypointSet;
+        reloadStandardWaystones();
+    }
+
+    public void setVisibilityType(final int visibilityType) {
+        this.visibilityType = visibilityType;
         reloadStandardWaystones();
     }
 

@@ -190,5 +190,11 @@
   "setting.world_map.waystone_color": "Couleur du point de cheminement de la pierre de cheminement",
   "setting.world_map.waystone_color.tooltip": "Utilise une couleur prédéfinie facultative pour tous les waypoints waystone ou une couleur aléatoire.",
   "setting.world_map.waystone_waypoint_set": "Ensemble de points de cheminement Waystone",
-  "setting.world_map.waystone_waypoint_set.tooltip": "Crée un ensemble de waypoints distinct pour les waypoints waystone au lieu de les ajouter à l'ensemble par défaut."
+  "setting.world_map.waystone_waypoint_set.tooltip": "Crée un ensemble de waypoints distinct pour les waypoints waystone au lieu de les ajouter à l'ensemble par défaut.",
+  "setting.world_map.waystone_visibility_type": "Visibilité de Waystone WP",
+  "setting.world_map.waystone_visibility_type.tooltip": "Type de visibilité dans le jeu/minicarte \n \n Local: visible uniquement lorsqu'il est à la distance de rendu maximale du point de passage \n Global: toujours visible \n Loc. Carte du Monde: non visible mais considéré comme local \n Glo. Carte du Monde: non visible mais considéré comme global",
+  "gui.xaeroplus.waystone_visibility_type.local": "Local",
+  "gui.xaeroplus.waystone_visibility_type.global": "Global",
+  "gui.xaeroplus.waystone_visibility_type.world_map_local": "Carte Mondiale Loc.",
+  "gui.xaeroplus.waystone_visibility_type.world_map_global": "Carte Mondiale Glob."
 }

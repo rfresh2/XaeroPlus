@@ -509,9 +509,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Inject(method = "onDimensionToggleButton", at = @At(value = "RETURN"))
     public void onDimensionToggleAfter(final Button b, final CallbackInfo ci) {
         if (!XaeroPlusSettingRegistry.radarWhileDimensionSwitchedSetting.getValue()) {
-            if (mapProcessor.getMapWorld().getFutureDimensionId() != ChunkUtils.getActualDimension())
-                WorldMap.settings.minimapRadar = false;
-            else WorldMap.settings.minimapRadar = true;
+            WorldMap.settings.minimapRadar = mapProcessor.getMapWorld().getFutureDimensionId() == ChunkUtils.getActualDimension();
         }
     }
 

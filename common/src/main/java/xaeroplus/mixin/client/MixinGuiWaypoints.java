@@ -178,28 +178,14 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         for (Waypoint w : waypointsList) {
             Comparable sortVal = 0;
             switch (sortType) {
-                case NONE:
-                    break;
-                case ANGLE:
-                    sortVal = -w.getComparisonAngleCos(camera, GuiWaypoints.distanceDivided);
-                    break;
-                case COLOR:
-                    sortVal = w.getColor();
-                    break;
-                case NAME:
-                    sortVal = w.getComparisonName();
-                    break;
-                case SYMBOL:
-                    sortVal = w.getSymbol();
-                    break;
-                case DISTANCE:
-                    sortVal = w.getComparisonDistance(camera, GuiWaypoints.distanceDivided);
-                    break;
+                case NONE -> {}
+                case ANGLE -> sortVal = -w.getComparisonAngleCos(camera, GuiWaypoints.distanceDivided);
+                case COLOR -> sortVal = w.getColor();
+                case NAME -> sortVal = w.getComparisonName();
+                case SYMBOL -> sortVal = w.getSymbol();
+                case DISTANCE -> sortVal = w.getComparisonDistance(camera, GuiWaypoints.distanceDivided);
             }
-            sortableKeys.add(
-                    new KeySortableByOther<>(
-                            w,
-                            sortVal));
+            sortableKeys.add(new KeySortableByOther<>(w, sortVal));
         }
         Collections.sort(sortableKeys);
         for (KeySortableByOther<Waypoint> k : sortableKeys) {

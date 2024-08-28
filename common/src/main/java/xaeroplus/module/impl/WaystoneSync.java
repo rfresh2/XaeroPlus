@@ -24,9 +24,7 @@ import java.util.stream.Collectors;
 import static xaero.common.settings.ModSettings.COLORS;
 
 public class WaystoneSync extends Module {
-    private boolean subscribed = false;
     private final BlayWaystonesHelper blayWaystonesHelper = new BlayWaystonesHelper();
-    int fwaystonesTickC = 0;
     private WaystoneColor color = WaystoneColor.RANDOM;
     private boolean separateWaypointSet = false;
     private int visibilityType = 0;
@@ -34,22 +32,23 @@ public class WaystoneSync extends Module {
     @Override
     public void onEnable() {
         if (WaystonesHelper.isWaystonesPresent()) {
-            if (!subscribed) {
-                subscribed = true;
-                blayWaystonesHelper.subscribeWaystonesEvent();
-            }
+            blayWaystonesHelper.subscribeWaystonesEvent();
         }
+        if (WaystonesHelper.isFabricWaystonesPresent()) {
+            FabricWaystonesHelper.subcribeWaystonesEventsRunnable.run();
+        }
+        reloadWaystones();
     }
 
     @Override
     public void onDisable() {
-        blayWaystonesHelper.toSyncWaystones = new ArrayList<>();
+        blayWaystonesHelper.toSyncWaystones = Collections.emptyList();
     }
 
     @EventHandler
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
         if (event.worldId() == null) {
-            blayWaystonesHelper.toSyncWaystones = new ArrayList<>();
+            blayWaystonesHelper.toSyncWaystones = Collections.emptyList();
         }
     }
 
@@ -57,23 +56,24 @@ public class WaystoneSync extends Module {
     public void onClientTickEvent(final ClientTickEvent.Post event) {
         if (WaystonesHelper.isWaystonesPresent()) {
             if (blayWaystonesHelper.shouldSync) {
-                if (syncMainWaystones()) {
+                if (syncBlayWaystones()) {
                     blayWaystonesHelper.shouldSync = false;
-                    blayWaystonesHelper.toSyncWaystones = new ArrayList<>();
+                    blayWaystonesHelper.toSyncWaystones = Collections.emptyList();
                 }
             }
         } else if (WaystonesHelper.isFabricWaystonesPresent()) {
-            syncFabricWaystones();
+            if (FabricWaystonesHelper.shouldSync) {
+                syncFabricWaystones();
+                FabricWaystonesHelper.shouldSync = false;
+            }
         }
     }
 
     public void syncFabricWaystones() {
-        if (fwaystonesTickC++ % 20 != 0) return;
-        if (fwaystonesTickC > 100) fwaystonesTickC = 0;
         commonWaystoneSync(FabricWaystonesHelper.getWaystones());
     }
 
-    public boolean syncMainWaystones() {
+    public boolean syncBlayWaystones() {
         return commonWaystoneSync(blayWaystonesHelper.getToSyncWaystones());
     }
 
@@ -101,7 +101,7 @@ public class WaystoneSync extends Module {
                 try {
                     waypointsListSync(entry.getKey(), entry.getValue());
                 } catch (final Exception e) {
-                    XaeroPlus.LOGGER.error("Error syncing waystone: " + entry.getKey().name(), e);
+                    XaeroPlus.LOGGER.error("Error syncing waystone: {}", entry.getKey().name(), e);
                 }
             }
             SupportMods.xaeroMinimap.requestWaypointsRefresh();
@@ -184,22 +184,22 @@ public class WaystoneSync extends Module {
 
     public void setColor(final WaystoneColor color) {
         this.color = color;
-        reloadStandardWaystones();
+        reloadWaystones();
     }
 
     public void setWaypointSet(final boolean waypointSet) {
         this.separateWaypointSet = waypointSet;
-        reloadStandardWaystones();
+        reloadWaystones();
     }
 
     public void setVisibilityType(final int visibilityType) {
         this.visibilityType = visibilityType;
-        reloadStandardWaystones();
+        reloadWaystones();
     }
 
-    public void reloadStandardWaystones() {
-        blayWaystonesHelper.toSyncWaystones = blayWaystonesHelper.currentWaystones;
+    public void reloadWaystones() {
         blayWaystonesHelper.shouldSync = true;
+        FabricWaystonesHelper.shouldSync = true;
     }
 
     public record Waystone(String name, ResourceKey<Level> dimension, int x, int y, int z) { }

@@ -39,6 +39,7 @@ import xaero.map.WorldMap;
 import xaero.map.animation.SlowingAnimation;
 import xaero.map.element.HoveredMapElementHolder;
 import xaero.map.element.MapElementRenderHandler;
+import xaero.map.graphics.MapRenderHelper;
 import xaero.map.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
 import xaero.map.gui.*;
 import xaero.map.gui.dropdown.rightclick.RightClickOption;
@@ -98,6 +99,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Shadow private int mouseBlockPosX;
     @Shadow private int mouseBlockPosZ;
     @Shadow private static double destScale;
+    @Shadow private MapTileSelection mapTileSelection;
 
     protected MixinGuiMap(final Screen parent, final Screen escape, final Component titleIn) {
         super(parent, escape, titleIn);
@@ -190,9 +192,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     ), remap = true)
     public void toggleRadarWhileDimensionSwitched(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci, @Local(name = "currentFutureDim") MapDimension currentFutureDim) {
         if (!XaeroPlusSettingRegistry.radarWhileDimensionSwitchedSetting.getValue()) {
-            if (currentFutureDim.getDimId() != ChunkUtils.getActualDimension())
-                WorldMap.settings.minimapRadar = false;
-            else WorldMap.settings.minimapRadar = true;
+            WorldMap.settings.minimapRadar = currentFutureDim.getDimId() == ChunkUtils.getActualDimension();
         }
     }
 
@@ -242,7 +242,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         at = @At(
             value = "INVOKE",
             target = "Lxaero/map/graphics/MapRenderHelper;renderDynamicHighlight(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;IIIIIIFFFFFFFF)V",
-            shift = At.Shift.BEFORE,
             ordinal = 0
         ),
         remap = true)
@@ -359,7 +358,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         value = "FIELD",
         target = "Lxaero/map/settings/ModSettings;renderArrow:Z",
         opcode = Opcodes.GETFIELD,
-        shift = At.Shift.BEFORE
+        ordinal = 0
     ), remap = true)
     public void showRenderDistanceWorldMap(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci,
                                            @Local(name = "flooredCameraX") int flooredCameraX,
@@ -489,8 +488,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "render", at = @At(
         value = "INVOKE",
-        target = "Lxaero/map/graphics/MapRenderHelper;restoreDefaultShaderBlendState()V",
-        shift = At.Shift.BEFORE
+        target = "Lxaero/map/graphics/MapRenderHelper;restoreDefaultShaderBlendState()V"
     ), remap = true)
     public void renderCoordinatesGotoTextEntryFields(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci) {
         Minecraft mc = Minecraft.getInstance();
@@ -563,6 +561,29 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
         cameraX += panDeltaX;
         cameraZ += panDeltaZ;
+    }
+
+    @Inject(method = "render", at = @At(
+        value = "FIELD",
+        target = "Lxaero/map/settings/ModSettings;coordinates:Z",
+        opcode = Opcodes.GETFIELD,
+        ordinal = 0
+    ), remap = true)
+    public void renderTileSelectionSize(
+        final GuiGraphics guiGraphics,
+        final int scaledMouseX,
+        final int scaledMouseY,
+        final float partialTicks,
+        final CallbackInfo ci,
+        @Local(name = "backgroundVertexBuffer") VertexConsumer backgroundVertexBuffer
+    ) {
+        MapTileSelection selection = this.mapTileSelection;
+        if (selection == null) return;
+        var sideLen = Math.abs(Math.abs(selection.getRight()) - Math.abs(selection.getLeft()))+1;
+        var heightLen = Math.abs(Math.abs(selection.getBottom()) - Math.abs(selection.getTop()))+1;
+        // todo: it'd be better if we could render this directly on the highlight
+        //  but we need a function for map -> screen coordinates translation
+        MapRenderHelper.drawCenteredStringWithBackground(guiGraphics, font, sideLen + " x " + heightLen, scaledMouseX, scaledMouseY - font.lineHeight, -1, 0.0f, 0.0f, 0.0f, 0.4f, backgroundVertexBuffer);
     }
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true, remap = true)

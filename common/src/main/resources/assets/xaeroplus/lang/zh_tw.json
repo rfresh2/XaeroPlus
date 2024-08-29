@@ -190,5 +190,11 @@
   "setting.world_map.waystone_color": "傳送石碑定位點顏色",
   "setting.world_map.waystone_color.tooltip": "為所有傳送石碑定位點使用可選的預設顏色或隨機顏色。",
   "setting.world_map.waystone_waypoint_set": "傳送石碑定位點集",
-  "setting.world_map.waystone_waypoint_set.tooltip": "為傳送石碑定位點建立一個單獨的定位點集，而不是將它們新增到預設集。"
+  "setting.world_map.waystone_waypoint_set.tooltip": "為傳送石碑定位點建立一個單獨的定位點集，而不是將它們新增到預設集。",
+  "setting.world_map.waystone_visibility_type": "Waystone WP 可見性",
+  "setting.world_map.waystone_visibility_type.tooltip": "遊戲內/小地圖的可見性類型 \n \n 本地 - 只有在達到最大路徑點渲染距離時可見 \n 全局 - 始終可見 \n 世界地圖本地 - 不可見但視為本地 \n 世界地圖全局 - 不可見但視為全局",
+  "gui.xaeroplus.waystone_visibility_type.local": "本地",
+  "gui.xaeroplus.waystone_visibility_type.global": "全局",
+  "gui.xaeroplus.waystone_visibility_type.world_map_local": "世界地圖本地",
+  "gui.xaeroplus.waystone_visibility_type.world_map_global": "世界地圖全局"
 }

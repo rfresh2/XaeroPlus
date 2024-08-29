@@ -190,5 +190,11 @@
   "setting.world_map.waystone_color": "Waystone Waypoint Color",
   "setting.world_map.waystone_color.tooltip": "Uses an optional preset color for all waystone waypoints or a random color.",
   "setting.world_map.waystone_waypoint_set": "Waystone Waypoint Set",
-  "setting.world_map.waystone_waypoint_set.tooltip": "Creates a separate waypoint set for waystone waypoints instead of adding them to the default set."
+  "setting.world_map.waystone_waypoint_set.tooltip": "Creates a separate waypoint set for waystone waypoints instead of adding them to the default set.",
+  "setting.world_map.waystone_visibility_type" : "Waystone WP Visibility",
+  "setting.world_map.waystone_visibility_type.tooltip" : "In-Game/Minimap Visibility Type \n \n Local - only visible when in the maximum waypoint render distance \n Global - always visible \n World Map Loc. - not visible but is considered local \n World Map Glo. - not visible but is considered global",
+  "gui.xaeroplus.waystone_visibility_type.local": "Local",
+  "gui.xaeroplus.waystone_visibility_type.global": "Global",
+  "gui.xaeroplus.waystone_visibility_type.world_map_local": "World Map Loc.",
+  "gui.xaeroplus.waystone_visibility_type.world_map_global": "World Map Glo."
 }

@@ -1,0 +1,15 @@
+# For 1.12.2 branch,
+# the workflow needs to be present on the default branch for some reason in order for workflow_dispatch to work
+# https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/manually-running-a-workflow#running-a-workflow-on-github
+name: Mainline Build And Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v4

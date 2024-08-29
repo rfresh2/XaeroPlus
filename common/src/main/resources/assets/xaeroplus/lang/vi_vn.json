@@ -190,5 +190,11 @@
     "setting.world_map.waystone_color": "Màu Điểm Đến Waystone",
     "setting.world_map.waystone_color.tooltip": "Sử dụng một màu cài đặt trước tùy chọn cho tất cả điểm đến waystone hoặc một màu ngẫu nhiên.",
     "setting.world_map.waystone_waypoint_set": "Bộ Điểm Đến Waystone",
-    "setting.world_map.waystone_waypoint_set.tooltip": "Tạo một bộ điểm đến riêng biệt cho điểm đến waystone thay vì thêm chúng vào bộ mặc định."
-  }
+    "setting.world_map.waystone_waypoint_set.tooltip": "Tạo một bộ điểm đến riêng biệt cho điểm đến waystone thay vì thêm chúng vào bộ mặc định.",
+    "setting.world_map.waystone_visibility_type": "Khả năng hiển thị Waystone WP",
+    "setting.world_map.waystone_visibility_type.tooltip": "Loại khả năng hiển thị trong trò chơi/bản đồ nhỏ \n \n Cục bộ - chỉ hiển thị khi trong khoảng cách hiển thị tối đa của điểm dừng \n Toàn cầu - luôn hiển thị \n Vị trí Bản đồ Thế giới Cục bộ - không hiển thị nhưng được coi là cục bộ \n Vị trí Bản đồ Thế giới Toàn cầu - không hiển thị nhưng được coi là toàn cầu",
+    "gui.xaeroplus.waystone_visibility_type.local": "Cục bộ",
+    "gui.xaeroplus.waystone_visibility_type.global": "Toàn cầu",
+    "gui.xaeroplus.waystone_visibility_type.world_map_local": "Bản Đồ Thế Giới Cục Bộ",
+    "gui.xaeroplus.waystone_visibility_type.world_map_global": "Bản Đồ Thế Giới Toàn Cầu"
+}

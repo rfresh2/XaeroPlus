@@ -112,6 +112,32 @@ public final class XaeroPlusSettingRegistry {
         },
         WaystonesHelper::isAnyWaystonesPresent,
         SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusEnumSetting<WaystoneWpVisibilityType> waystoneWaypointVisibilityModeSetting = XaeroPlusEnumSetting.create(
+        "Waystone WP Visibility Type",
+        "setting.world_map.waystone_visibility_type",
+        "setting.world_map.waystone_visibility_type.tooltip",
+        WaystoneWpVisibilityType.values(),
+        WaystoneWpVisibilityType.LOCAL,
+        (mode) -> {
+            if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setVisibilityType(mode.ordinal());
+        },
+        WaystonesHelper::isAnyWaystonesPresent,
+        SettingLocation.WORLD_MAP_MAIN);
+    public enum WaystoneWpVisibilityType implements TranslatableSettingEnum {
+        // order here must mirror xaero's visibility enum
+        LOCAL("gui.xaeroplus.waystone_visibility_type.local"),
+        GLOBAL("gui.xaeroplus.waystone_visibility_type.global"),
+        WORLD_MAP_LOCAL("gui.xaeroplus.waystone_visibility_type.world_map_local"),
+        WORLD_MAP_GLOBAL("gui.xaeroplus.waystone_visibility_type.world_map_global");
+        private final String translationKey;
+        WaystoneWpVisibilityType(final String translationKey) {
+            this.translationKey = translationKey;
+        }
+        @Override
+        public String getTranslationKey() {
+            return translationKey;
+        }
+    }
     public static final XaeroPlusBooleanSetting persistMapDimensionSwitchSetting = XaeroPlusBooleanSetting.create(
         "Persist Dim Switch",
         "setting.world_map.persist_dimension_switch",

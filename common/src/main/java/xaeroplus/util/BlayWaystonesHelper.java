@@ -14,12 +14,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public class BlayWaystonesHelper {
     public Map<ResourceLocation, ArrayList<IWaystone>> currentWaystoneTypeMap = new ConcurrentHashMap<>();
     public boolean shouldSync = false;
+    private boolean subscribed = false;
     public final Object lock = new Object();
 
     public void subscribeWaystonesEvent() {
+        if (subscribed) return;
         Balm.getEvents().onEvent(WaystonesListReceivedEvent.class, this::onWaystonesListReceivedEvent);
         Balm.getEvents().onEvent(WaystoneUpdateReceivedEvent.class, this::onWaystoneUpdateReceived);
         Balm.getEvents().onEvent(WaystoneRemoveReceivedEvent.class, this::onWaystoneRemoveReceived);
+        subscribed = true;
     }
 
     private void onWaystoneRemoveReceived(WaystoneRemoveReceivedEvent event) {

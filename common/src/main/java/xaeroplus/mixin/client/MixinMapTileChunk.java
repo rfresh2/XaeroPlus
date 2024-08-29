@@ -52,7 +52,8 @@ public abstract class MixinMapTileChunk implements SeenChunksTrackingMapTileChun
     ) {
         for(int i = 0; i < 4; ++i) {
             for (int j = 0; j < 4; ++j) {
-                seenTiles[i][j] = leafTexture.getHeight(i << 4, j << 4) != -1;
+                var height = leafTexture.getHeight(i << 4, j << 4);
+                seenTiles[i][j] = height != -1 && height != 32767;
             }
         }
     }

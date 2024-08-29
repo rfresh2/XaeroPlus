@@ -190,5 +190,11 @@
   "setting.world_map.waystone_color": "Цвет путевой точки",
   "setting.world_map.waystone_color.tooltip": "Использует дополнительный предустановленный цвет для всех путевых точек путевого камня или случайный цвет.",
   "setting.world_map.waystone_waypoint_set": "Набор путевых точек Waystone",
-  "setting.world_map.waystone_waypoint_set.tooltip": "Создает отдельный набор путевых точек для путевых точек вместо добавления их в набор по умолчанию."
+  "setting.world_map.waystone_waypoint_set.tooltip": "Создает отдельный набор путевых точек для путевых точек вместо добавления их в набор по умолчанию.",
+  "setting.world_map.waystone_visibility_type": "Видимость Waystone WP",
+  "setting.world_map.waystone_visibility_type.tooltip": "Тип видимости в игре/на миникарте \n \n Локальная - видна только на максимальном расстоянии рендеринга точки \n Глобальная - всегда видна \n Мировая карта Лок. - не видна, но считается локальной \n Мировая карта Глоб. - не видна, но считается глобальной",
+  "gui.xaeroplus.waystone_visibility_type.local": "Локальный",
+  "gui.xaeroplus.waystone_visibility_type.global": "Глобальный",
+  "gui.xaeroplus.waystone_visibility_type.world_map_local": "Карта Мира Лок.",
+  "gui.xaeroplus.waystone_visibility_type.world_map_global": "Карта Мира Глоб."
 }

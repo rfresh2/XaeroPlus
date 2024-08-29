@@ -190,5 +190,11 @@
   "setting.world_map.waystone_color": "Cor de Localização Waystone",
   "setting.world_map.waystone_color.tooltip": "Usa uma cor predefinida para todas as localizações Waystone ou uma cor aleatória.",
   "setting.world_map.waystone_waypoint_set": "Conjunto de Local. Waystone",
-  "setting.world_map.waystone_waypoint_set.tooltip": "Cria um conjunto próprio para as localizações Waystone em vez de adicionar ao conjunto por defeito."
+  "setting.world_map.waystone_waypoint_set.tooltip": "Cria um conjunto próprio para as localizações Waystone em vez de adicionar ao conjunto por defeito.",
+  "setting.world_map.waystone_visibility_type": "Visibilidade do Waystone WP",
+  "setting.world_map.waystone_visibility_type.tooltip": "Tipo de Visibilidade no Jogo/Minimapa \n \n Local - visível apenas quando dentro da distância máxima de renderização do ponto de referência \n Global - sempre visível \n Loc. Mapa-Mundi - não visível, mas considerado local \n Glo. Mapa-Mundi - não visível, mas considerado global",
+  "gui.xaeroplus.waystone_visibility_type.local": "Local",
+  "gui.xaeroplus.waystone_visibility_type.global": "Global",
+  "gui.xaeroplus.waystone_visibility_type.world_map_local": "Mapa Mundial Loc.",
+  "gui.xaeroplus.waystone_visibility_type.world_map_global": "Mapa Mundial Glob."
 }

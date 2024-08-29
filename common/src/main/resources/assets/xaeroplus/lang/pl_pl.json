@@ -190,5 +190,11 @@
   "setting.world_map.waystone_color": "Kolor punktu orientacyjnego Waystone",
   "setting.world_map.waystone_color.tooltip": "Używa opcjonalnego, wstępnie ustawionego koloru dla wszystkich punktów orientacyjnych lub koloru losowego.",
   "setting.world_map.waystone_waypoint_set": "Zestaw punktów orientacyjnych Waystone",
-  "setting.world_map.waystone_waypoint_set.tooltip": "Tworzy oddzielny zestaw punktów orientacyjnych dla punktów orientacyjnych zamiast dodawać je do zestawu domyślnego."
+  "setting.world_map.waystone_waypoint_set.tooltip": "Tworzy oddzielny zestaw punktów orientacyjnych dla punktów orientacyjnych zamiast dodawać je do zestawu domyślnego.",
+  "setting.world_map.waystone_visibility_type": "Widoczność Waystone WP",
+  "setting.world_map.waystone_visibility_type.tooltip": "Typ widoczności w grze/na minimapie \n \n Lokalnie - widoczne tylko w maksymalnej odległości renderowania punktu orientacyjnego \n Globalnie - zawsze widoczne \n Lokalizacja na mapie świata - niewidoczne, ale uznawane za lokalne \n Globalna na mapie świata - niewidoczne, ale uznawane za globalne",
+  "gui.xaeroplus.waystone_visibility_type.local": "Lokalny",
+  "gui.xaeroplus.waystone_visibility_type.global": "Globalny",
+  "gui.xaeroplus.waystone_visibility_type.world_map_local": "Mapa Świata Lok.",
+  "gui.xaeroplus.waystone_visibility_type.world_map_global": "Mapa Świata Glob."
 }

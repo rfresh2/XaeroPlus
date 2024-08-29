@@ -188,5 +188,11 @@
     "setting.world_map.waystone_color": "Waystone Waypoint Color",
     "setting.world_map.waystone_color.tooltip": "すべてのウェイストーンのウェイポイントに、オプションのプリセットカラーまたはランダムカラーを使用します。",
     "setting.world_map.waystone_waypoint_set": "Waystone Waypoint Set",
-    "setting.world_map.waystone_waypoint_set.tooltip": "ウェイストーンのウェイポイントをデフォルトのウェイポイントセットに追加する代わりに、別のウェイポイントセットを作成します。"
-  }
+    "setting.world_map.waystone_waypoint_set.tooltip": "ウェイストーンのウェイポイントをデフォルトのウェイポイントセットに追加する代わりに、別のウェイポイントセットを作成します。",
+    "setting.world_map.waystone_visibility_type": "ウェイストーンWPの可視性",
+    "setting.world_map.waystone_visibility_type.tooltip": "ゲーム内/ミニマップの可視性タイプ \n \n ローカル - 最大ウェイポイント描画距離内でのみ表示 \n グローバル - 常に表示 \n ワールドマップ ローカル - 表示されないがローカルと見なされる \n ワールドマップ グローバル - 表示されないがグローバルと見なされる",
+    "gui.xaeroplus.waystone_visibility_type.local": "ローカル",
+    "gui.xaeroplus.waystone_visibility_type.global": "グローバル",
+    "gui.xaeroplus.waystone_visibility_type.world_map_local": "ワールドマップ ローカル",
+    "gui.xaeroplus.waystone_visibility_type.world_map_global": "ワールドマップ グローバル"
+}

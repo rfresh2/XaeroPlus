@@ -79,7 +79,7 @@ jobs:
         && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ env.WORLDMAP_VERSION_FABRIC }}_Fabric_1.19.1/xaeros-world-map-${{ env.WORLDMAP_VERSION_FABRIC }}_Fabric_1.19.1.jar -P run/mods/
 
     - name: Fabric Test
-      uses: 3arthqu4ke/mc-runtime-test@2.3.1
+      uses: 3arthqu4ke/mc-runtime-test@2.4.0
       with:
         mc: ${{ env.MINECRAFT_VERSION }}
         modloader: fabric
@@ -100,7 +100,7 @@ jobs:
         && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ env.WORLDMAP_VERSION_FORGE }}_Forge_1.19.1/xaeros-world-map-${{ env.WORLDMAP_VERSION_FORGE }}_Forge_1.19.1.jar -P run/mods/
 
     - name: Forge Test
-      uses: 3arthqu4ke/mc-runtime-test@2.3.1
+      uses: 3arthqu4ke/mc-runtime-test@2.4.0
       with:
         mc: ${{ env.MINECRAFT_VERSION }}
         modloader: forge

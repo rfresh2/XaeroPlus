@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import wraith.fwaystones.FabricWaystones;
 import wraith.fwaystones.access.WaystoneValue;
+import wraith.fwaystones.integration.event.WaystoneEvents;
 import xaeroplus.module.impl.WaystoneSync;
 import xaeroplus.util.FabricWaystonesHelper;
 
@@ -13,8 +14,19 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class FabricWaystonesHelperInit {
+
     public static void doInit() {
-        FabricWaystonesHelper.waystoneProvider = () -> getWaystones();
+        FabricWaystonesHelper.waystoneProvider = FabricWaystonesHelperInit::getWaystones;
+        FabricWaystonesHelper.subcribeWaystonesEventsRunnable = FabricWaystonesHelperInit::subscribeWaystonesEvents;
+    }
+
+    public static void subscribeWaystonesEvents() {
+        if (FabricWaystonesHelper.subscribed) return;
+        WaystoneEvents.FORGET_ALL_WAYSTONES_EVENT.register((p) -> FabricWaystonesHelper.onWaystoneUpdate(null));
+        WaystoneEvents.DISCOVER_WAYSTONE_EVENT.register(FabricWaystonesHelper::onWaystoneUpdate);
+        WaystoneEvents.REMOVE_WAYSTONE_EVENT.register(FabricWaystonesHelper::onWaystoneUpdate);
+        WaystoneEvents.RENAME_WAYSTONE_EVENT.register(FabricWaystonesHelper::onWaystoneUpdate);
+        FabricWaystonesHelper.subscribed = true;
     }
 
     public static List<WaystoneSync.Waystone> getWaystones() {
@@ -23,11 +35,12 @@ public class FabricWaystonesHelperInit {
         ConcurrentHashMap<String, WaystoneValue> waystones = waystoneStorage.WAYSTONES;
         if (waystones == null) return Collections.emptyList();
         return waystones.values().stream()
-            .map(waystone -> new WaystoneSync.Waystone(waystone.getWaystoneName(),
-                                                       ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(waystone.getWorldName())),
-                                                       waystone.way_getPos().getX(),
-                                                       waystone.way_getPos().getY() + 1,// avoid teleporting directly into the waystone
-                                                       waystone.way_getPos().getZ()))
+            .map(waystone -> new WaystoneSync.Waystone(
+                waystone.getWaystoneName(),
+                ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(waystone.getWorldName())),
+                waystone.way_getPos().getX(),
+                waystone.way_getPos().getY() + 1,// avoid teleporting directly into the waystone
+                waystone.way_getPos().getZ()))
             .toList();
     }
 }

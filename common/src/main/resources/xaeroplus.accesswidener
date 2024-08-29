@@ -6,3 +6,4 @@ accessible class com/mojang/blaze3d/platform/GlStateManager$BlendState
 accessible field net/minecraft/client/Options serverRenderDistance I
 accessible field net/minecraft/client/renderer/LevelRenderer cullingFrustum Lnet/minecraft/client/renderer/culling/Frustum;
 accessible field net/minecraft/client/renderer/LevelRenderer viewArea Lnet/minecraft/client/renderer/ViewArea;
+accessible field net/minecraft/client/Minecraft fps I

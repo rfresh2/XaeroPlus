@@ -14,14 +14,13 @@ public class FpsLimiter extends Module {
     // todo: Buffer and mutate the rotation framebuffer separately to not cause visual
     //  impact while minimap north is not locked
     // this must be initialized AFTER MC's screen is initialized
-    private final Supplier<BufferedComponent> minimapComponentSupplier = Suppliers.memoize(
+    private final Supplier<BufferedComponent> minimapRenderInstanceSupplier = Suppliers.memoize(
         () -> new BufferedComponent(() -> (int) XaeroPlusSettingRegistry.minimapFpsLimit.getValue()));
-
     public static RenderTarget renderTargetOverwrite = null;
 
     @EventHandler
     public void onMinimapRenderEvent(final MinimapRenderEvent event) {
-        event.cancelled = minimapComponentSupplier.get().render();
-        event.postRenderCallback = minimapComponentSupplier.get()::postRender;
+        event.cancelled = minimapRenderInstanceSupplier.get().render();
+        event.postRenderCallback = minimapRenderInstanceSupplier.get()::postRender;
     }
 }

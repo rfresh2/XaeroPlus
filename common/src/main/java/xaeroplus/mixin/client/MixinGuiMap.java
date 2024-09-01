@@ -549,6 +549,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if (selection == null) return;
         var sideLen = Math.abs(Math.abs(selection.getRight()) - Math.abs(selection.getLeft()))+1;
         var heightLen = Math.abs(Math.abs(selection.getBottom()) - Math.abs(selection.getTop()))+1;
+        if (sideLen <= 1 && heightLen <= 1) return;
         // todo: it'd be better if we could render this directly on the highlight
         //  but we need a function for map -> screen coordinates translation
         MapRenderHelper.drawCenteredStringWithBackground(guiGraphics, font, sideLen + " x " + heightLen, scaledMouseX, scaledMouseY - font.lineHeight, -1, 0.0f, 0.0f, 0.0f, 0.4f, backgroundVertexBuffer);

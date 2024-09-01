@@ -71,4 +71,5 @@ jobs:
           fabric-api: 0.92.2
           java: 17
           xvfb: false
+          fabric-gametest-api: 1.2.13+1802ada577
           headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true

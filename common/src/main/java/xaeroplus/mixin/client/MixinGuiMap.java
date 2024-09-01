@@ -360,8 +360,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         ordinal = 0
     ), remap = true)
     public void showRenderDistanceWorldMap(final PoseStack guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci,
-                                           @Local(name = "flooredCameraX") int flooredCameraX,
-                                           @Local(name = "flooredCameraZ") int flooredCameraZ,
                                            @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers,
                                            @Local(name = "matrixStack") PoseStack matrixStack) {
         Minecraft mc = Minecraft.getInstance();
@@ -377,15 +375,15 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 int chunkRightX = (xFloored >> 4) + 1 + (width / 2) << 4;
                 int chunkTopZ = (zFloored >> 4) - (width / 2) << 4;
                 int chunkBottomZ = (zFloored >> 4) + 1 + (width / 2) << 4;
-                final int x0 = chunkLeftX - flooredCameraX;
-                final int x1 = chunkRightX - flooredCameraX;
-                final int z0 = chunkTopZ - flooredCameraZ;
-                final int z1 = chunkBottomZ - flooredCameraZ;
+                float camX = (float) cameraX;
+                float camZ = (float) cameraZ;
+                final float x0 = chunkLeftX - camX;
+                final float x1 = chunkRightX - camX;
+                final float z0 = chunkTopZ - camZ;
+                final float z1 = chunkBottomZ - camZ;
                 VertexConsumer lineBufferBuilder = renderTypeBuffers.getBuffer(xaero.common.graphics.CustomRenderTypes.MAP_LINES);
                 PoseStack.Pose matrices = matrixStack.last();
-                MinimapShaders.FRAMEBUFFER_LINES.setFrameSize(mc.getWindow().getWidth(),
-                                                              mc.getWindow().getHeight());
-
+                MinimapShaders.FRAMEBUFFER_LINES.setFrameSize(mc.getWindow().getWidth(), mc.getWindow().getHeight());
                 float settingWidth = (float) XaeroMinimapSession.getCurrentSession()
                     .getModMain()
                     .getSettings().chunkGridLineWidth;
@@ -395,52 +393,24 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 // todo: horizontal lines seem to have a smaller width here for some reason
                 //  also there's some jittering to the position noticeable when you zoom in
                 addColoredLineToExistingBuffer(
-                    matrices,
-                    lineBufferBuilder,
-                    x0,
-                    z0,
-                    x1,
-                    z0,
-                    1.0f,
-                    1.0f,
-                    0.0f,
-                    0.8f
+                    matrices, lineBufferBuilder,
+                    x0, z0, x1, z0,
+                    1.0f, 1.0f, 0.0f, 0.8f
                 );
                 addColoredLineToExistingBuffer(
-                    matrices,
-                    lineBufferBuilder,
-                    x1,
-                    z0,
-                    x1,
-                    z1,
-                    1.0f,
-                    1.0f,
-                    0.0f,
-                    0.8f
+                    matrices, lineBufferBuilder,
+                    x1, z0, x1, z1,
+                    1.0f, 1.0f, 0.0f, 0.8f
                 );
                 addColoredLineToExistingBuffer(
-                    matrices,
-                    lineBufferBuilder,
-                    x1,
-                    z1,
-                    x0,
-                    z1,
-                    1.0f,
-                    1.0f,
-                    0.0f,
-                    0.8f
+                    matrices, lineBufferBuilder,
+                    x1, z1, x0, z1,
+                    1.0f, 1.0f, 0.0f, 0.8f
                 );
                 addColoredLineToExistingBuffer(
-                    matrices,
-                    lineBufferBuilder,
-                    x0,
-                    z0,
-                    x0,
-                    z1,
-                    1.0f,
-                    1.0f,
-                    0.0f,
-                    0.8f
+                    matrices, lineBufferBuilder,
+                    x0, z0, x0, z1,
+                    1.0f, 1.0f, 0.0f, 0.8f
                 );
             }
         }
@@ -578,6 +548,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if (selection == null) return;
         var sideLen = Math.abs(Math.abs(selection.getRight()) - Math.abs(selection.getLeft()))+1;
         var heightLen = Math.abs(Math.abs(selection.getBottom()) - Math.abs(selection.getTop()))+1;
+        if (sideLen <= 1 && heightLen <= 1) return;
         // todo: it'd be better if we could render this directly on the highlight
         //  but we need a function for map -> screen coordinates translation
         MapRenderHelper.drawCenteredStringWithBackground(guiGraphics, font, sideLen + " x " + heightLen, scaledMouseX, scaledMouseY - font.lineHeight, -1, 0.0f, 0.0f, 0.0f, 0.4f, backgroundVertexBuffer);

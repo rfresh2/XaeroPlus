@@ -20,6 +20,9 @@
     ],
     "modmenu": [
       "xaeroplus.fabric.XaeroPlusModMenu"
+    ],
+    "fabric-gametest": [
+      "xaeroplus.fabric.XaeroPlusFabricGameTest"
     ]
   },
   "mixins": [

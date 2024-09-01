@@ -28,7 +28,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.map.MapProcessor;
 import xaero.map.MapWriter;
 import xaero.map.biome.BiomeColorCalculator;
@@ -204,45 +203,52 @@ public abstract class MixinMapWriter {
         return original;
     }
 
-    @Inject(method = "writeChunk", at = @At(value = "HEAD"), cancellable = true, remap = false)
-    public void writeChunk(
-        final Level world,
-        final int distance,
-        final boolean onlyLoad,
-        final Registry<Biome> biomeRegistry,
-        final OverlayManager overlayManager,
-        final boolean loadChunks,
-        final boolean updateChunks,
-        final boolean ignoreHeightmaps,
-        final boolean flowers,
-        final boolean detailedDebug,
-        final BlockPos.MutableBlockPos mutableBlockPos3,
-        final BlockTintProvider blockTintProvider,
-        final int caveDepth,
-        final int caveStart,
-        final int layerToWrite,
-        final int tileChunkX,
-        final int tileChunkZ,
-        final int tileChunkLocalX,
-        final int tileChunkLocalZ,
-        final int chunkX,
-        final int chunkZ,
-        final CallbackInfoReturnable<Boolean> cir) {
-        if (!XaeroPlusSettingRegistry.fastMapSetting.getValue()) return;
-        if (this.mapProcessor.getCurrentCaveLayer() != Integer.MAX_VALUE) return;
-
-        final Long cacheable = ChunkUtils.chunkPosToLong(chunkX, chunkZ);
-        final Long cacheValue = tileUpdateCache.getIfPresent(cacheable);
-        if (nonNull(cacheValue)) {
-            if (cacheValue < System.currentTimeMillis() - (long) XaeroPlusSettingRegistry.fastMapWriterDelaySetting.getValue()) {
-                tileUpdateCache.put(cacheable, System.currentTimeMillis());
-            } else {
-                cir.setReturnValue(false);
-                cir.cancel();
+    @WrapOperation(method = "writeMap", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/map/MapWriter;writeChunk(Lnet/minecraft/world/level/Level;IZLnet/minecraft/core/Registry;Lxaero/map/region/OverlayManager;ZZZZZLnet/minecraft/core/BlockPos$MutableBlockPos;Lxaero/map/biome/BlockTintProvider;IIIIIIIII)Z"
+    ), remap = true) // $REMAP
+    public boolean fastMap(final MapWriter instance,
+                           Level world,
+                           int distance,
+                           boolean onlyLoad,
+                           Registry<Biome> biomeRegistry,
+                           OverlayManager overlayManager,
+                           boolean loadChunks,
+                           boolean updateChunks,
+                           boolean ignoreHeightmaps,
+                           boolean flowers,
+                           boolean detailedDebug,
+                           BlockPos.MutableBlockPos mutableBlockPos3,
+                           BlockTintProvider blockTintProvider,
+                           int caveDepth,
+                           int caveStart,
+                           int layerToWrite,
+                           int tileChunkX,
+                           int tileChunkZ,
+                           int tileChunkLocalX,
+                           int tileChunkLocalZ,
+                           int chunkX,
+                           int chunkZ,
+                           final Operation<Boolean> original) {
+        if (XaeroPlusSettingRegistry.fastMapSetting.getValue()) {
+            if (this.mapProcessor.getCurrentCaveLayer() == Integer.MAX_VALUE) {
+                final Long cacheable = ChunkUtils.chunkPosToLong(chunkX, chunkZ);
+                final Long cacheValue = tileUpdateCache.getIfPresent(cacheable);
+                if (nonNull(cacheValue)) {
+                    if (cacheValue < System.currentTimeMillis() - (long) XaeroPlusSettingRegistry.fastMapWriterDelaySetting.getValue()) {
+                        tileUpdateCache.put(cacheable, System.currentTimeMillis());
+                    } else {
+                        return false;
+                    }
+                } else {
+                    tileUpdateCache.put(cacheable, System.currentTimeMillis());
+                }
             }
-        } else {
-            tileUpdateCache.put(cacheable, System.currentTimeMillis());
         }
+        return original.call(instance, world, distance, onlyLoad, biomeRegistry,
+                             overlayManager, loadChunks, updateChunks, ignoreHeightmaps, flowers, detailedDebug,
+                             mutableBlockPos3, blockTintProvider, caveDepth, caveStart, layerToWrite, tileChunkX,
+                             tileChunkZ, tileChunkLocalX, tileChunkLocalZ, chunkX, chunkZ);
     }
 
     @Inject(method = "loadPixel", at = @At("HEAD"), remap = false)
@@ -277,25 +283,18 @@ public abstract class MixinMapWriter {
      * if writeChunk or a method down the stack throws an exception it is possible for the signal not to be reset, although signals won't cross thread barriers
      */
 
-    @Inject(method = "writeChunk", at = @At("HEAD"))
-    public void getActualMapRegionDimSignalHead(final Level world, final int distance, final boolean onlyLoad, final Registry<Biome> biomeRegistry, final OverlayManager overlayManager, final boolean loadChunks, final boolean updateChunks, final boolean ignoreHeightmaps, final boolean flowers, final boolean detailedDebug, final BlockPos.MutableBlockPos mutableBlockPos3, final BlockTintProvider blockTintProvider, final int caveDepth, final int caveStart, final int layerToWrite, final int tileChunkX, final int tileChunkZ, final int tileChunkLocalX, final int tileChunkLocalZ, final int chunkX, final int chunkZ, final CallbackInfoReturnable<Boolean> cir) {
-        ((CustomMapProcessor) mapProcessor).xaeroPlus$getLeafRegionActualDimSignal().set(XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue() && mapProcessor.getMapWorld().isMultiplayer());
+    @Inject(method = "onRender", at = @At("HEAD"))
+    public void setCrossDimWriteSignals(final BiomeColorCalculator biomeColorCalculator, final OverlayManager overlayManager, final CallbackInfo ci) {
+        boolean signal = XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue()
+            && mapProcessor.getWorld() != null
+            && mapProcessor.getMapWorld().isMultiplayer();
+        ((CustomMapProcessor) mapProcessor).xaeroPlus$getLeafRegionActualDimSignal().set(signal);
+        ((CustomMapProcessor) mapProcessor).xaeroPlus$getCurrentDimensionActualDimSignal().set(signal);
     }
 
-    @Inject(method = "writeChunk", at = @At("RETURN"))
-    public void getActualMapRegionDimSignalReturn(final Level world, final int distance, final boolean onlyLoad, final Registry<Biome> biomeRegistry, final OverlayManager overlayManager, final boolean loadChunks, final boolean updateChunks, final boolean ignoreHeightmaps, final boolean flowers, final boolean detailedDebug, final BlockPos.MutableBlockPos mutableBlockPos3, final BlockTintProvider blockTintProvider, final int caveDepth, final int caveStart, final int layerToWrite, final int tileChunkX, final int tileChunkZ, final int tileChunkLocalX, final int tileChunkLocalZ, final int chunkX, final int chunkZ, final CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "onRender", at = @At("RETURN"))
+    public void resetSignals(final BiomeColorCalculator biomeColorCalculator, final OverlayManager overlayManager, final CallbackInfo ci) {
         ((CustomMapProcessor) mapProcessor).xaeroPlus$getLeafRegionActualDimSignal().set(false);
-    }
-
-    @Inject(method = "writeChunk", at = @At("HEAD"))
-    public void setGetCurrentDimActualDimSignalHead(final Level world, final int distance, final boolean onlyLoad, final Registry<Biome> biomeRegistry, final OverlayManager overlayManager, final boolean loadChunks, final boolean updateChunks, final boolean ignoreHeightmaps, final boolean flowers, final boolean detailedDebug, final BlockPos.MutableBlockPos mutableBlockPos3, final BlockTintProvider blockTintProvider, final int caveDepth, final int caveStart, final int layerToWrite, final int tileChunkX, final int tileChunkZ, final int tileChunkLocalX, final int tileChunkLocalZ, final int chunkX, final int chunkZ, final CallbackInfoReturnable<Boolean> cir) {
-        var mapWorld = mapProcessor.getWorld();
-        var setSignal = XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue() && mapWorld != null && mapProcessor.getMapWorld().isMultiplayer();
-        ((CustomMapProcessor) mapProcessor).xaeroPlus$getCurrentDimensionActualDimSignal().set(setSignal);
-    }
-
-    @Inject(method = "writeChunk", at = @At("RETURN"))
-    public void setGetCurrentDimActualDimSignalTail(final Level world, final int distance, final boolean onlyLoad, final Registry<Biome> biomeRegistry, final OverlayManager overlayManager, final boolean loadChunks, final boolean updateChunks, final boolean ignoreHeightmaps, final boolean flowers, final boolean detailedDebug, final BlockPos.MutableBlockPos mutableBlockPos3, final BlockTintProvider blockTintProvider, final int caveDepth, final int caveStart, final int layerToWrite, final int tileChunkX, final int tileChunkZ, final int tileChunkLocalX, final int tileChunkLocalZ, final int chunkX, final int chunkZ, final CallbackInfoReturnable<Boolean> cir) {
         ((CustomMapProcessor) mapProcessor).xaeroPlus$getCurrentDimensionActualDimSignal().set(false);
     }
 

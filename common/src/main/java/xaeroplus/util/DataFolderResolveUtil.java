@@ -1,7 +1,9 @@
 package xaeroplus.util;
 
 import com.google.common.net.InternetDomainName;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.map.MapProcessor;
@@ -70,7 +72,12 @@ public class DataFolderResolveUtil {
             MapProcessor mapProcessor = currentSession.getMapProcessor();
             String mainId = mapProcessor.getMapWorld().getMainId();
             Path rootFolder = MapSaveLoad.getRootFolder(mainId);
-            return (Component.literal(rootFolder.toString()));
+            return Component.literal(rootFolder.toString())
+                .append(Component.literal(" (")
+                            .append(Component.literal("Click To Open").withStyle(style -> style
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, rootFolder.toString()))
+                                .withColor(ChatFormatting.GOLD)))
+                            .append(Component.literal(")")));
         } catch (final Throwable e) {
             XaeroPlus.LOGGER.error("Failed to get data directory", e);
             return Component.literal("Failed to get data directory");

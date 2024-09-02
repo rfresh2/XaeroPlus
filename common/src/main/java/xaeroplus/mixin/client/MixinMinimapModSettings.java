@@ -1,5 +1,6 @@
 package xaeroplus.mixin.client;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.KeyMapping;
 import org.spongepowered.asm.mixin.Mixin;
@@ -8,22 +9,19 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import xaero.common.HudMod;
 import xaero.common.IXaeroMinimap;
-import xaero.common.XaeroMinimapSession;
-import xaero.common.minimap.waypoints.Waypoint;
-import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.settings.ModOptions;
 import xaero.common.settings.ModSettings;
-import xaero.hud.HudSession;
+import xaero.hud.minimap.Minimap;
 import xaeroplus.Globals;
-import xaeroplus.XaeroPlus;
-import xaeroplus.feature.extensions.IWaypointDimension;
 import xaeroplus.settings.XaeroPlusModSettingsHooks;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import static xaeroplus.settings.XaeroPlusSettingsReflectionHax.ALL_MINIMAP_SETTINGS;
 
@@ -47,29 +45,14 @@ public class MixinMinimapModSettings {
         caveMaps = 0;
     }
 
-    @Inject(method = "getLockNorth", at = @At("HEAD"), cancellable = true)
-    public void getLockNorth(int mapSize, int shape, CallbackInfoReturnable<Boolean> cir) {
-        if (!XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) return;
-        // prevent lock north from being forced to true when minimap is square and greater than 180 size
-        XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
-        if (minimapSession == null) {
-            cir.setReturnValue(this.lockNorth);
-        } else {
-            cir.setReturnValue(this.lockNorth || !this.keepUnlockedWhenEnlarged && minimapSession.getMinimapProcessor().isEnlargedMap());
-        }
-    }
-
-    @Inject(
-        method = "checkWaypointsLine",
-        at = @At(
-            value = "INVOKE",
-            target = "Ljava/util/ArrayList;add(Ljava/lang/Object;)Z"))
-    public void createWaypointInject(final String[] args, final WaypointWorld wpw, final CallbackInfoReturnable<Boolean> cir, @Local Waypoint waypoint) {
-        try {
-            ((IWaypointDimension) waypoint).setDimension(wpw.getDimId());
-        } catch (final Throwable e) {
-            XaeroPlus.LOGGER.error("Failed setting waypoint dimension: {}", waypoint, e);
-        }
+    @ModifyExpressionValue(method = "getLockNorth", at = @At(
+        value = "CONSTANT",
+        args = "intValue=180"))
+    public int allowNoNorthLockWithTransparentMM(final int original) {
+        if (XaeroPlusSettingRegistry.transparentMinimapBackground.getValue())
+            // will make the if expression always return false
+            return Integer.MAX_VALUE;
+        else return original;
     }
 
     @Inject(method = "getMinimapSize", at = @At(
@@ -77,9 +60,11 @@ public class MixinMinimapModSettings {
     ), cancellable = true)
     public void modifyMinimapSize(final CallbackInfoReturnable<Integer> cir) {
         try {
-            var session = HudSession.getCurrentSession();
-            if (session == null) return;
-            if (session.getHudMod().getInterfaces().getMinimapInterface().usingFBO()) {
+            var hudMod = HudMod.INSTANCE;
+            if (hudMod == null) return;
+            Minimap minimap = hudMod.getMinimap();
+            if (minimap == null) return;
+            if (minimap.usingFBO()) {
                 cir.setReturnValue(cir.getReturnValue() * Globals.minimapSizeMultiplier);
             }
         } catch (final Exception e) {
@@ -89,13 +74,13 @@ public class MixinMinimapModSettings {
 
 
     @Inject(method = "saveSettings", at = @At("RETURN"))
-    public void saveSettings(final CallbackInfo ci) throws IOException {
+    public void saveSettings(final CallbackInfo ci) {
         XaeroPlusModSettingsHooks.saveSettings();
     }
 
     @Inject(method = "loadSettings", at = @At(value = "INVOKE", target = "Lxaero/common/settings/ModSettings;saveSettings()V"))
-    public void loadSettings(final CallbackInfo ci, @Local File mainConfigFile) throws IOException {
-        if (!mainConfigFile.exists()) {
+    public void loadSettings(final CallbackInfo ci, @Local(name = "mainConfigFile") Path mainConfigFile) throws IOException {
+        if (!mainConfigFile.toFile().exists()) {
             XaeroPlusModSettingsHooks.loadSettings(null, ALL_MINIMAP_SETTINGS.get());
         }
     }

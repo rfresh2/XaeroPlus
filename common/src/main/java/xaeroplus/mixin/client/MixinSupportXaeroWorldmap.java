@@ -30,7 +30,7 @@ import xaeroplus.settings.XaeroPlusSettingRegistry;
 public abstract class MixinSupportXaeroWorldmap {
     @Inject(method = "drawMinimap", at = @At(
         value = "INVOKE",
-        target = "Lxaero/common/settings/ModSettings;getSlimeChunks(Lxaero/common/minimap/waypoints/WaypointsManager;)Z"
+        target = "Lxaero/common/settings/ModSettings;getSlimeChunks(Lxaero/hud/minimap/module/MinimapSession;)Z"
     ), remap = false)
     public void overrideRegionRange(final MinimapSession minimapSession, final PoseStack matrixStack, final MinimapRendererHelper helper, final int xFloored, final int zFloored, final int minViewX, final int minViewZ, final int maxViewX, final int maxViewZ, final boolean zooming, final double zoom, final double mapDimensionScale, final VertexConsumer overlayBufferBuilder, final MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers, final CallbackInfo ci,
                                     @Local(name = "mapX") int mapX,

@@ -5,7 +5,6 @@ import baritone.api.pathing.goals.GoalXZ;
 import baritone.api.utils.interfaces.IGoalRenderPos;
 import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.misc.OptimizedMath;
 import xaero.hud.minimap.BuiltInHudModules;
@@ -18,7 +17,6 @@ import xaeroplus.util.BaritoneGoalHelper;
 import xaeroplus.util.BaritoneHelper;
 
 public class BaritoneGoalSync extends Module {
-    final ResourceLocation XP = new ResourceLocation("xaeroplus");
 
     @EventHandler
     public void onClientTickEvent(final ClientTickEvent.Post event) {
@@ -47,7 +45,7 @@ public class BaritoneGoalSync extends Module {
             return;
         }
 
-        // todo: this no longer has no idea about the baritone goal's dimension
+        // todo: this no longer has any idea about the baritone goal's dimension
         //      so the dim div will be completely off if the player has a wp set of nether open in the ow and visa versa
         final int x = OptimizedMath.myFloor(baritoneGoalBlockPos.getX());
         final int z = OptimizedMath.myFloor(baritoneGoalBlockPos.getZ());

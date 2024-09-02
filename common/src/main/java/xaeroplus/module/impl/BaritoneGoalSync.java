@@ -17,6 +17,7 @@ import xaeroplus.util.BaritoneGoalHelper;
 import xaeroplus.util.BaritoneHelper;
 
 public class BaritoneGoalSync extends Module {
+
     @EventHandler
     public void onClientTickEvent(final ClientTickEvent.Post event) {
         if (!BaritoneHelper.isBaritonePresent()) return;
@@ -44,7 +45,7 @@ public class BaritoneGoalSync extends Module {
             return;
         }
 
-        // todo: this no longer has no idea about the baritone goal's dimension
+        // todo: this no longer has any idea about the baritone goal's dimension
         //      so the dim div will be completely off if the player has a wp set of nether open in the ow and visa versa
         final int x = OptimizedMath.myFloor(baritoneGoalBlockPos.getX());
         final int z = OptimizedMath.myFloor(baritoneGoalBlockPos.getZ());

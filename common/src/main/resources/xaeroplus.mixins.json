@@ -15,6 +15,7 @@
     "AccessorWidgetScreenHandler",
     "AccessorWorldMapModOptions",
     "AccessorWorldMapScreenSwitchSettingEntry",
+    "MixinBuiltInInfoDisplays",
     "MixinClientEvents",
     "MixinCommonGuiSettings",
     "MixinCommonInternet",

@@ -50,6 +50,7 @@ import java.util.stream.Collectors;
 
 import static net.minecraft.client.renderer.blockentity.BeaconRenderer.BEAM_LOCATION;
 import static net.minecraft.world.level.Level.NETHER;
+import static net.minecraft.world.level.Level.OVERWORLD;
 
 @Mixin(value = WaypointsIngameRenderer.class, remap = false)
 public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRenderer {
@@ -95,7 +96,8 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
         if (!XaeroPlusSettingRegistry.owAutoWaypointDimension.getValue()) return;
         if (subWorldNameRef.get() == null) return;
         ResourceKey<Level> actualDimension = ChunkUtils.getActualDimension();
-        if (actualDimension == NETHER) {
+        ResourceKey<Level> currentWpWorldDim = session.getWorldManager().getCurrentWorld().getDimId();
+        if (actualDimension == NETHER && currentWpWorldDim == OVERWORLD) {
             subWorldNameRef.set(null);
         }
     }

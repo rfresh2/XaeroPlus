@@ -1,6 +1,7 @@
 package xaeroplus.mixin.client;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -12,7 +13,9 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BeaconRenderer;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
@@ -25,14 +28,17 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.XaeroMinimapSession;
+import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.minimap.waypoints.render.WaypointFilterParams;
 import xaero.common.minimap.waypoints.render.WaypointsIngameRenderer;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.module.MinimapSession;
 import xaeroplus.feature.extensions.CustomWaypointsIngameRenderer;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.ChunkUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -41,6 +47,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static net.minecraft.client.renderer.blockentity.BeaconRenderer.BEAM_LOCATION;
+import static net.minecraft.world.level.Level.NETHER;
+import static net.minecraft.world.level.Level.OVERWORLD;
 
 @Mixin(value = WaypointsIngameRenderer.class, remap = false)
 public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRenderer {
@@ -77,8 +85,23 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
         }
     };
 
+    @Inject(method = "render", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/common/minimap/waypoints/render/WaypointDeleter;begin()V"
+    ))
+    public void preferOwWaypointsRemoveSubworldText(final MinimapSession session, final float partial, final MinimapProcessor minimap, final Matrix4f waypointsProjection, final Matrix4f worldModelView, final CallbackInfo ci,
+                                                    @Local(name = "subworldName") LocalRef<String> subWorldNameRef) {
+        if (!XaeroPlusSettingRegistry.owAutoWaypointDimension.getValue()) return;
+        if (subWorldNameRef.get() == null) return;
+        ResourceKey<Level> actualDimension = ChunkUtils.getActualDimension();
+        ResourceKey<Level> currentWpWorldDim = session.getWorldManager().getCurrentWorld().getDimId();
+        if (actualDimension == NETHER && currentWpWorldDim == OVERWORLD) {
+            subWorldNameRef.set(null);
+        }
+    }
+
     @Inject(method = "renderWaypointsIterator", at = @At("HEAD"))
-    public void injectRenderWaypoints(final PoseStack matrixStack, final PoseStack matrixStackOverlay, final MinimapRendererHelper helper, final Iterator<Waypoint> iter, final double d3, final double d4, final double d5, final Entity entity, final Tesselator tessellator, final double dimDiv, final double actualEntityX, final double actualEntityY, final double actualEntityZ, final double smoothEntityY, final double fov, final int screenHeight, final float cameraAngleYaw, final float cameraAnglePitch, final Vector3f lookVector, final double clampDepth, final MultiBufferSource.BufferSource renderTypeBuffer, final VertexConsumer waypointBackgroundConsumer, final Font fontrenderer, final Matrix4f waypointsProjection, final int screenWidth, final boolean detailedDisplayAllowed, final double minDistance, final String subworldName, final CallbackInfo ci) {
+    public void collectBeaconWaypointsList(final PoseStack matrixStack, final PoseStack matrixStackOverlay, final MinimapRendererHelper helper, final Iterator<Waypoint> iter, final double d3, final double d4, final double d5, final Entity entity, final Tesselator tessellator, final double dimDiv, final double actualEntityX, final double actualEntityY, final double actualEntityZ, final double smoothEntityY, final double fov, final int screenHeight, final float cameraAngleYaw, final float cameraAnglePitch, final Vector3f lookVector, final double clampDepth, final MultiBufferSource.BufferSource renderTypeBuffer, final VertexConsumer waypointBackgroundConsumer, final Font fontrenderer, final Matrix4f waypointsProjection, final int screenWidth, final boolean detailedDisplayAllowed, final double minDistance, final String subworldName, final CallbackInfo ci) {
         beaconWaypoints = sortingList.stream().filter(beaconViewFilter).sorted().collect(Collectors.toList());
     }
 
@@ -91,6 +114,7 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
         beaconWaypoints.clear();
     }
 
+    @Unique
     public void renderWaypointBeacon(final Waypoint waypoint, final double dimDiv, float tickDelta, PoseStack matrixStack) {
         final Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null) return;
@@ -120,17 +144,9 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
         matrixStack.pushPose();
         matrixStack.translate(x, y, z);
         BeaconRenderer.renderBeaconBeam(
-            matrixStack,
-            entityVertexConsumers,
-            BEAM_LOCATION,
-            tickDelta,
-            1.0f,
-            time,
-            0,
-            355,
-            color,
-            0.2f,
-            0.25f);
+            matrixStack, entityVertexConsumers, BEAM_LOCATION, tickDelta,
+            1.0f, time, 0, 355,
+            color, 0.2f, 0.25f);
         matrixStack.popPose();
     }
 

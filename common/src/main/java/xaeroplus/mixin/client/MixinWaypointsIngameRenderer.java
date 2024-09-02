@@ -28,14 +28,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.minimap.waypoints.Waypoint;
-import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.minimap.waypoints.render.WaypointFilterParams;
 import xaero.common.minimap.waypoints.render.WaypointsIngameRenderer;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.module.MinimapSession;
 import xaeroplus.feature.extensions.CustomWaypointsIngameRenderer;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
@@ -56,34 +55,31 @@ import static net.minecraft.world.level.Level.OVERWORLD;
 public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRenderer {
     @Shadow private List<Waypoint> sortingList;
     @Shadow private WaypointFilterParams filterParams;
-    List<Waypoint> beaconWaypoints = new ArrayList<>();
-    final Predicate<Waypoint> beaconViewFilter = new Predicate<Waypoint>() {
-        @Override
-        public boolean test(final Waypoint w) {
-            boolean deathpoints = filterParams.deathpoints;
-            if (!w.isDisabled()
-                    && w.getVisibilityType() != 2
-                    && w.getVisibilityType() != 3
-                    && (w.getWaypointType() != 1 && w.getWaypointType() != 2 || deathpoints)) {
-                double offX = (double)w.getX(filterParams.dimDiv) - filterParams.cameraX + 0.5;
-                double offZ = (double)w.getZ(filterParams.dimDiv) - filterParams.cameraZ + 0.5;
-                double distanceScale = filterParams.dimensionScaleDistance ? Minecraft.getInstance().level.dimensionType().coordinateScale() : 1.0;
-                double unscaledDistance2D = Math.sqrt(offX * offX + offZ * offZ);
-                double distance2D = unscaledDistance2D * distanceScale;
-                double waypointsDistance = filterParams.waypointsDistance;
-                double waypointsDistanceMin = filterParams.waypointsDistanceMin;
-                return w.isOneoffDestination()
-                        || (
-                        w.getWaypointType() == 1
-                                || w.isGlobal()
-                                || w.isTemporary() && filterParams.temporaryWaypointsGlobal
-                                || waypointsDistance == 0.0
-                                || !(distance2D > waypointsDistance)
-                )
-                    && (waypointsDistanceMin == 0.0 || !(unscaledDistance2D < waypointsDistanceMin));
-            } else {
-                return false;
-            }
+    @Unique List<Waypoint> beaconWaypoints = new ArrayList<>();
+    @Unique final Predicate<Waypoint> beaconViewFilter = (w) -> {
+        boolean deathpoints = filterParams.deathpoints;
+        if (!w.isDisabled()
+            && w.getVisibilityType() != 2
+            && w.getVisibilityType() != 3
+            && (w.getWaypointType() != 1 && w.getWaypointType() != 2 || deathpoints)) {
+            double offX = (double)w.getX(filterParams.dimDiv) - filterParams.cameraX + 0.5;
+            double offZ = (double)w.getZ(filterParams.dimDiv) - filterParams.cameraZ + 0.5;
+            double distanceScale = filterParams.dimensionScaleDistance ? Minecraft.getInstance().level.dimensionType().coordinateScale() : 1.0;
+            double unscaledDistance2D = Math.sqrt(offX * offX + offZ * offZ);
+            double distance2D = unscaledDistance2D * distanceScale;
+            double waypointsDistance = filterParams.waypointsDistance;
+            double waypointsDistanceMin = filterParams.waypointsDistanceMin;
+            return w.isOneoffDestination()
+                || (
+                w.getWaypointType() == 1
+                    || w.isGlobal()
+                    || w.isTemporary() && filterParams.temporaryWaypointsGlobal
+                    || waypointsDistance == 0.0
+                    || !(distance2D > waypointsDistance)
+            )
+                && (waypointsDistanceMin == 0.0 || !(unscaledDistance2D < waypointsDistanceMin));
+        } else {
+            return false;
         }
     };
 
@@ -108,10 +104,8 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
     }
 
     @Override
-    public void renderWaypointBeacons(final XaeroMinimapSession minimapSession, final PoseStack matrixStack, final float tickDelta) {
-        if (!XaeroPlusSettingRegistry.waypointBeacons.getValue()) return;
-        final WaypointsManager waypointsManager = minimapSession.getWaypointsManager();
-        double dimDiv = waypointsManager.getDimensionDivision(waypointsManager.getCurrentContainerID());
+    public void renderWaypointBeacons(final MinimapSession minimapSession, final PoseStack matrixStack, final float tickDelta) {
+        double dimDiv = minimapSession.getDimensionHelper().getDimensionDivision(minimapSession.getWorldManager().getCurrentWorld());
         beaconWaypoints.forEach(w -> renderWaypointBeacon(w, dimDiv, tickDelta, matrixStack));
         beaconWaypoints.clear();
     }
@@ -196,9 +190,9 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
         if (mc.level == null || mc.player == null) return 0;
         try {
             final Vec3 playerVec = mc.player.position();
-            final WaypointsManager waypointsManager = XaeroMinimapSession.getCurrentSession().getWaypointsManager();
-            double dimDiv = waypointsManager.getDimensionDivision(waypointsManager.getCurrentContainerID());
-            int wpX = waypoint.getX(dimDiv);
+            MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
+            if (minimapSession == null) return 0;
+            double dimDiv = minimapSession.getDimensionHelper().getDimensionDivision(minimapSession.getWorldManager().getCurrentWorld());            int wpX = waypoint.getX(dimDiv);
             int wpZ = waypoint.getZ(dimDiv);
             double directionX = wpX - playerVec.x;
             double directionZ = wpZ - playerVec.z;

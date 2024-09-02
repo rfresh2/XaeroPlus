@@ -16,12 +16,10 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.IXaeroMinimap;
-import xaero.common.XaeroMinimapSession;
 import xaero.common.graphics.CustomRenderTypes;
 import xaero.common.graphics.CustomVertexConsumers;
 import xaero.common.graphics.ImprovedFramebuffer;
 import xaero.common.graphics.shader.MinimapShaders;
-import xaero.common.minimap.MinimapInterface;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.render.MinimapFBORenderer;
 import xaero.common.minimap.render.MinimapRenderer;
@@ -29,6 +27,8 @@ import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.minimap.waypoints.render.CompassRenderer;
 import xaero.common.minimap.waypoints.render.WaypointsGuiRenderer;
 import xaero.common.misc.OptimizedMath;
+import xaero.hud.minimap.BuiltInHudModules;
+import xaero.hud.minimap.Minimap;
 import xaero.hud.minimap.MinimapLogs;
 import xaero.hud.minimap.module.MinimapSession;
 import xaeroplus.Globals;
@@ -46,8 +46,8 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
     @Shadow
     private boolean loadedFBO;
 
-    public MixinMinimapFBORenderer(final IXaeroMinimap modMain, final Minecraft mc, final WaypointsGuiRenderer waypointsGuiRenderer, final MinimapInterface minimapInterface, final CompassRenderer compassRenderer) {
-        super(modMain, mc, waypointsGuiRenderer, minimapInterface, compassRenderer);
+    public MixinMinimapFBORenderer(final IXaeroMinimap modMain, final Minecraft mc, final WaypointsGuiRenderer waypointsGuiRenderer, final Minimap minimap, final CompassRenderer compassRenderer) {
+        super(modMain, mc, waypointsGuiRenderer, minimap, compassRenderer);
     }
 
     @ModifyConstant(method = "loadFrameBuffer", constant = @Constant(intValue = 512))
@@ -57,7 +57,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
 
     @Override
     public void reloadMapFrameBuffers() {
-        if (!XaeroMinimapSession.getCurrentSession().getMinimapProcessor().canUseFrameBuffer()) {
+        if (!BuiltInHudModules.MINIMAP.getCurrentSession().getProcessor().canUseFrameBuffer()) {
             MinimapLogs.LOGGER.info("FBO mode not supported! Using minimap safe mode.");
         } else {
             if (this.scalingFramebuffer != null)

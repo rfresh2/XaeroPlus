@@ -9,12 +9,12 @@ import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.element.render.MinimapElementRenderer;
 import xaero.common.minimap.element.render.over.MinimapElementOverMapRendererHandler;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.minimap.render.radar.element.RadarRenderContext;
 import xaero.common.minimap.render.radar.element.RadarRenderer;
+import xaero.hud.HudSession;
 import xaeroplus.Globals;
 
 @Mixin(value = MinimapElementOverMapRendererHandler.class, remap = false)
@@ -47,7 +47,7 @@ public class MixinMinimapElementOverMapRendererHandler {
                                          final boolean cave,
                                          final float partialTicks) {
         if (instance instanceof RadarRenderer) {
-            ((RadarRenderContext) instance.getContext()).nameScale = XaeroMinimapSession.getCurrentSession().getModMain().getSettings().getDotNameScale();
+            ((RadarRenderContext) instance.getContext()).nameScale = HudSession.getCurrentSession().getHudMod().getSettings().getDotNameScale();
             return instance.renderElement(location, highlit, outOfBounds, drawContext, immediate, fontRenderer,
                     framebuffer, minimapRendererHelper, renderEntity, entityPlayer, renderX, renderY, renderZ,
                     elementIndex, optionalDepth,

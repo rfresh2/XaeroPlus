@@ -21,29 +21,29 @@ import xaero.common.gui.GuiWaypoints;
 import xaero.common.gui.MySmallButton;
 import xaero.common.gui.ScreenBase;
 import xaero.common.minimap.waypoints.Waypoint;
-import xaero.common.minimap.waypoints.WaypointWorld;
-import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.minimap.waypoints.WaypointsSort;
 import xaero.common.misc.KeySortableByOther;
+import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.world.MinimapWorld;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 @Mixin(value = GuiWaypoints.class, remap = false)
 public abstract class MixinGuiWaypoints extends ScreenBase {
-
-    @Shadow
-    private WaypointWorld displayedWorld;
-    @Shadow
-    private ArrayList<Waypoint> waypointsSorted;
-    @Shadow
-    private WaypointsManager waypointsManager;
     @Unique private EditBox searchField;
     @Unique private final int TOGGLE_ALL_ID = 69;
     @Unique private MySmallButton toggleAllButton;
     @Unique private String waypointsSearchFilter = "";
+
+    @Shadow private MinimapWorld displayedWorld;
+    @Shadow private ArrayList<Waypoint> waypointsSorted;
+    @Shadow protected abstract boolean isOneSelected();
+    @Shadow private MinimapSession session;
+    @Shadow private ConcurrentSkipListSet<Integer> selectedListSet;
 
     protected MixinGuiWaypoints(final IXaeroMinimap modMain, final Screen parent, final Screen escape, final Component titleIn) {
         super(modMain, parent, escape, titleIn);
@@ -122,9 +122,6 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         }
     }
 
-    @Shadow
-    protected abstract boolean isOneSelected();
-
     @Redirect(method = "updateButtons", at = @At(value = "INVOKE", target = "Lxaero/common/gui/GuiWaypoints;isOneSelected()Z"))
     public boolean shareButtonRedirect(final GuiWaypoints instance) {
         if (XaeroPlusSettingRegistry.disableWaypointSharing.getValue()) {
@@ -133,11 +130,13 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         return isOneSelected();
     }
 
+    @Unique
     private void updateSearch() {
         if (this.searchField.isFocused()) {
             String newValue = this.searchField.getValue();
             if (!Objects.equal(this.waypointsSearchFilter, newValue)) {
                 this.waypointsSearchFilter = this.searchField.getValue();
+                selectedListSet.clear();
                 updateSortedList();
             }
         }
@@ -149,9 +148,9 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
      */
     @Overwrite
     private void updateSortedList() {
-        WaypointsSort sortType = this.displayedWorld.getContainer().getRootContainer().getSortType();
-        ArrayList<Waypoint> waypointsList = this.displayedWorld.getCurrentSet().getList();
-        GuiWaypoints.distanceDivided = this.waypointsManager.getDimensionDivision(this.displayedWorld);
+        WaypointsSort sortType = this.displayedWorld.getContainer().getRoot().getSortType();
+        Iterable<Waypoint> waypointsList = this.displayedWorld.getCurrentWaypointSet().getWaypoints();
+        GuiWaypoints.distanceDivided = this.session.getDimensionHelper().getDimensionDivision(this.displayedWorld);
         Camera camera = this.minecraft.gameRenderer.getMainCamera();
 
         final List<Waypoint> disabledWaypoints = new ArrayList<>();
@@ -167,11 +166,11 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
             disabledWaypoints.removeIf(waypoint -> !waypoint.getName().toLowerCase().contains(this.waypointsSearchFilter.toLowerCase()));
         }
         this.waypointsSorted = new ArrayList<>();
-
         this.waypointsSorted.addAll(sortWaypoints(enabledWaypoints, sortType, camera));
         this.waypointsSorted.addAll(sortWaypoints(disabledWaypoints, sortType, camera));
     }
 
+    @Unique
     private List<Waypoint> sortWaypoints(final List<Waypoint> waypointsList, WaypointsSort sortType, final Camera camera) {
         final ArrayList<Waypoint> waypointsSorted = new ArrayList<>();
         final ArrayList<KeySortableByOther<Waypoint>> sortableKeys = new ArrayList<>();
@@ -191,7 +190,7 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         for (KeySortableByOther<Waypoint> k : sortableKeys) {
             waypointsSorted.add(k.getKey());
         }
-        if (this.displayedWorld.getContainer().getRootContainer().isSortReversed()) {
+        if (this.displayedWorld.getContainer().getRoot().isSortReversed()) {
             Collections.reverse(waypointsSorted);
         }
         return waypointsSorted;

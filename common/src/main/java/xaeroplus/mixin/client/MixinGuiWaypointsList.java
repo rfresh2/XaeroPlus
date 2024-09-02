@@ -14,10 +14,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.common.gui.GuiWaypoints;
 import xaero.common.minimap.waypoints.Waypoint;
+import xaero.hud.minimap.waypoint.set.WaypointSet;
+import xaero.hud.minimap.world.MinimapWorld;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
 
 @Mixin(targets = "xaero.common.gui.GuiWaypoints$List", remap = false)
 public abstract class MixinGuiWaypointsList {
@@ -44,10 +45,14 @@ public abstract class MixinGuiWaypointsList {
 
     @Redirect(method = "getWaypoint", at = @At(
         value = "INVOKE",
-        target = "Lxaero/common/minimap/waypoints/WaypointSet;getList()Ljava/util/ArrayList;"
+        target = "Lxaero/hud/minimap/world/MinimapWorld;getCurrentWaypointSet()Lxaero/hud/minimap/waypoint/set/WaypointSet;"
     ))
-    public ArrayList<Waypoint> getWaypointList(final xaero.common.minimap.waypoints.WaypointSet waypointSet) {
-        return ((AccessorGuiWaypoints) thisGuiWaypoints).getWaypointsSorted();
+    public WaypointSet getWaypointList(final MinimapWorld instance) {
+        // todo: could be optimized to reduce unnecessary list allocs
+        WaypointSet currentWaypointSet = instance.getCurrentWaypointSet();
+        var wpSet = WaypointSet.Builder.begin().setName(currentWaypointSet.getName()).build();
+        wpSet.addAll(((AccessorGuiWaypoints) thisGuiWaypoints).getWaypointsSorted());
+        return wpSet;
     }
 
     @Inject(method = "drawWaypointSlot", at = @At(

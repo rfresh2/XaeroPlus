@@ -25,7 +25,7 @@ public class DataFolderResolveUtil {
         if (dataFolderResolutionMode == XaeroPlusSettingRegistry.DataFolderResolutionMode.SERVER_NAME) {
             if (nonNull(Minecraft.getInstance().getCurrentServer())) {
                 String serverName = Minecraft.getInstance().getCurrentServer().name;
-                if (serverName.length() > 0) {
+                if (!serverName.isEmpty()) {
                     // use common directories based on server list name instead of IP
                     // good for proxies
                     cir.setReturnValue(sanitizeDataFolderName("Multiplayer_" + serverName));

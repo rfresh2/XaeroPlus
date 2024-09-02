@@ -11,7 +11,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.IXaeroMinimap;
-import xaero.common.XaeroMinimapSession;
 import xaero.common.graphics.CustomVertexConsumers;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
 import xaero.common.minimap.MinimapProcessor;
@@ -22,6 +21,7 @@ import xaero.common.minimap.render.MinimapRenderer;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.settings.ModSettings;
 import xaero.hud.minimap.Minimap;
+import xaero.hud.minimap.module.MinimapSession;
 import xaeroplus.Globals;
 import xaeroplus.feature.extensions.CustomMinimapFBORenderer;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
@@ -35,18 +35,18 @@ public class MixinMinimapRenderer {
 
     @Inject(method = "renderMinimap", at = @At("HEAD"))
     public void renderMinimap(
-            final XaeroMinimapSession minimapSession,
-            final PoseStack guiGraphics,
-            final MinimapProcessor minimap,
-            final int x,
-            final int y,
-            final int width,
-            final int height,
-            final double scale,
-            final int size,
-            final float partial,
-            final CustomVertexConsumers cvc,
-            final CallbackInfo ci
+        final MinimapSession minimapSession,
+        final PoseStack matrixStack,
+        final MinimapProcessor minimap,
+        final int x,
+        final int y,
+        final int width,
+        final int height,
+        final double scale,
+        final int size,
+        final float partial,
+        final CustomVertexConsumers cvc,
+        final CallbackInfo ci
     ) {
         if (this.minimap.usingFBO() && Globals.shouldResetFBO) {
             Globals.minimapScaleMultiplier = (int) XaeroPlusSettingRegistry.minimapScaleMultiplierSetting.getValue();
@@ -65,7 +65,7 @@ public class MixinMinimapRenderer {
         slice = @Slice(
             from = @At(
                 value = "INVOKE",
-                target = "Lxaero/common/minimap/render/MinimapRenderer;renderChunks(Lxaero/common/XaeroMinimapSession;Lcom/mojang/blaze3d/vertex/PoseStack;Lxaero/common/minimap/MinimapProcessor;DDDDIIFFIZZIDDZZLxaero/common/settings/ModSettings;Lxaero/common/graphics/CustomVertexConsumers;)V"
+                target = "Lxaero/common/minimap/render/MinimapRenderer;renderChunks(Lxaero/hud/minimap/module/MinimapSession;Lcom/mojang/blaze3d/vertex/PoseStack;Lxaero/common/minimap/MinimapProcessor;DDDDIIFFIZZIDDZZLxaero/common/settings/ModSettings;Lxaero/common/graphics/CustomVertexConsumers;)V"
             )
         )
     )
@@ -86,7 +86,7 @@ public class MixinMinimapRenderer {
         slice = @Slice(
             from = @At(
                 value = "INVOKE",
-                target = "Lxaero/common/minimap/render/MinimapRenderer;renderChunks(Lxaero/common/XaeroMinimapSession;Lcom/mojang/blaze3d/vertex/PoseStack;Lxaero/common/minimap/MinimapProcessor;DDDDIIFFIZZIDDZZLxaero/common/settings/ModSettings;Lxaero/common/graphics/CustomVertexConsumers;)V"
+                target = "Lxaero/common/minimap/render/MinimapRenderer;renderChunks(Lxaero/hud/minimap/module/MinimapSession;Lcom/mojang/blaze3d/vertex/PoseStack;Lxaero/common/minimap/MinimapProcessor;DDDDIIFFIZZIDDZZLxaero/common/settings/ModSettings;Lxaero/common/graphics/CustomVertexConsumers;)V"
             )
         )
     )
@@ -107,7 +107,7 @@ public class MixinMinimapRenderer {
         slice = @Slice(
             from = @At(
                 value = "INVOKE",
-                target = "Lxaero/common/minimap/render/MinimapRenderer;renderChunks(Lxaero/common/XaeroMinimapSession;Lcom/mojang/blaze3d/vertex/PoseStack;Lxaero/common/minimap/MinimapProcessor;DDDDIIFFIZZIDDZZLxaero/common/settings/ModSettings;Lxaero/common/graphics/CustomVertexConsumers;)V"
+                target = "Lxaero/common/minimap/render/MinimapRenderer;renderChunks(Lxaero/hud/minimap/module/MinimapSession;Lcom/mojang/blaze3d/vertex/PoseStack;Lxaero/common/minimap/MinimapProcessor;DDDDIIFFIZZIDDZZLxaero/common/settings/ModSettings;Lxaero/common/graphics/CustomVertexConsumers;)V"
             )
         )
     )

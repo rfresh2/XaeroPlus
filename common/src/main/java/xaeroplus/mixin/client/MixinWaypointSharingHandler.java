@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.minimap.waypoints.WaypointSharingHandler;
-import xaero.common.minimap.waypoints.WaypointWorld;
+import xaero.hud.minimap.world.MinimapWorld;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 @Mixin(value = WaypointSharingHandler.class, remap = false)
@@ -19,8 +19,11 @@ public class MixinWaypointSharingHandler {
 
     @Shadow private Waypoint w;
 
-    @Inject(method = "shareWaypoint", at = @At("HEAD"), cancellable = true)
-    public void shareWaypoint(final Screen parent, final Waypoint w, final WaypointWorld wWorld, final CallbackInfo ci) {
+    @Inject(method = "shareWaypoint(Lnet/minecraft/client/gui/screens/Screen;Lxaero/common/minimap/waypoints/Waypoint;Lxaero/hud/minimap/world/MinimapWorld;)V",
+        at = @At("HEAD"),
+        cancellable = true,
+        remap = true) // $REMAP
+    public void shareWaypoint(final Screen parent, final Waypoint w, final MinimapWorld wWorld, final CallbackInfo ci) {
         if (XaeroPlusSettingRegistry.disableWaypointSharing.getValue()) {
             ci.cancel();
         }

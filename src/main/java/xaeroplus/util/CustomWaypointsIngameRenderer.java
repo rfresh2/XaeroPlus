@@ -1,8 +1,8 @@
 package xaeroplus.util;
 
 import net.minecraft.client.renderer.RenderGlobal;
-import xaero.common.XaeroMinimapSession;
+import xaero.hud.minimap.module.MinimapSession;
 
 public interface CustomWaypointsIngameRenderer {
-    void renderWaypointBeacons(final XaeroMinimapSession minimapSession, final RenderGlobal renderGlobal, final float partialTicks);
+    void renderWaypointBeacons(final MinimapSession minimapSession, final RenderGlobal renderGlobal, final float partialTicks);
 }

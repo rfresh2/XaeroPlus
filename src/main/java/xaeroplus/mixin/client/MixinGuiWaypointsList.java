@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.IXaeroMinimap;
 import xaero.common.gui.GuiWaypoints;
 import xaero.common.minimap.waypoints.Waypoint;
-import xaero.common.minimap.waypoints.WaypointsManager;
+import xaero.hud.minimap.world.MinimapWorld;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.Globals;
@@ -47,11 +47,11 @@ public abstract class MixinGuiWaypointsList {
                     filteredWaypoints.add(w);
                 }
             }
-            final Field waypointsManagerField = thisGuiWaypoints.getClass().getDeclaredField("waypointsManager");
-            waypointsManagerField.setAccessible(true);
-            final WaypointsManager waypointsManagerValue = (WaypointsManager) waypointsManagerField.get(thisGuiWaypoints);
-            if (waypointsManagerValue.getServerWaypoints() != null) {
-                for(Waypoint w : waypointsManagerValue.getServerWaypoints()) {
+            final Field displayedWorldField = thisGuiWaypoints.getClass().getDeclaredField("displayedWorld");
+            displayedWorldField.setAccessible(true);
+            final MinimapWorld minimapWorld = (MinimapWorld) displayedWorldField.get(thisGuiWaypoints);
+            if (minimapWorld.getContainer().getServerWaypointManager() != null) {
+                for(Waypoint w : minimapWorld.getContainer().getServerWaypointManager().getWaypoints()) {
                     if (w.getName().toLowerCase().contains(Globals.waypointsSearchFilter.toLowerCase())) {
                         filteredWaypoints.add(w);
                     }

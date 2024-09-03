@@ -16,7 +16,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import xaero.common.IXaeroMinimap;
-import xaero.common.XaeroMinimapSession;
 import xaero.common.effect.Effects;
 import xaero.common.graphics.ImprovedFramebuffer;
 import xaero.common.minimap.MinimapProcessor;
@@ -33,8 +32,10 @@ import xaero.common.misc.Misc;
 import xaero.common.misc.OptimizedMath;
 import xaero.common.settings.ModSettings;
 import xaero.hud.compat.mods.ImmediatelyFastHelper;
+import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.Minimap;
 import xaero.hud.minimap.MinimapLogs;
+import xaero.hud.minimap.module.MinimapSession;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ColorHelper;
 import xaeroplus.util.CustomMinimapFBORenderer;
@@ -91,7 +92,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
 
     @Override
     public void reloadMapFrameBuffers() {
-        if (!XaeroMinimapSession.getCurrentSession().getMinimapProcessor().canUseFrameBuffer()) {
+        if (!BuiltInHudModules.MINIMAP.getCurrentSession().getProcessor().canUseFrameBuffer()) {
             MinimapLogs.LOGGER.info("FBO mode not supported! Using minimap safe mode.");
         } else {
             if (this.scalingFramebuffer != null)
@@ -113,7 +114,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
      */
     @Overwrite
     public void renderChunksToFBO(
-            XaeroMinimapSession minimapSession,
+            MinimapSession minimapSession,
             MinimapProcessor minimap,
             EntityPlayer player,
             Entity renderEntity,
@@ -200,7 +201,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
                 int loadedMapChunkX = minimap.getMinimapWriter().getLoadedMapChunkX();
                 int loadedMapChunkZ = minimap.getMinimapWriter().getLoadedMapChunkZ();
                 int loadedWidth = minimap.getMinimapWriter().getLoadedBlocks().length;
-                boolean slimeChunks = this.modMain.getSettings().getSlimeChunks(minimapSession.getWaypointsManager());
+                boolean slimeChunks = this.modMain.getSettings().getSlimeChunks(minimapSession);
                 minX = Math.max(minX, loadedMapChunkX);
                 minZ = Math.max(minZ, loadedMapChunkZ);
                 maxX = Math.min(maxX, loadedMapChunkX + loadedWidth - 1);

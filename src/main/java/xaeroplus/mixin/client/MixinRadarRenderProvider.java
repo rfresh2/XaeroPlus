@@ -8,11 +8,11 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.radar.MinimapRadarList;
 import xaero.common.minimap.radar.category.setting.EntityRadarCategorySettings;
 import xaero.common.minimap.render.radar.element.RadarRenderContext;
 import xaero.common.minimap.render.radar.element.RadarRenderProvider;
+import xaero.hud.HudSession;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.Globals;
 import xaeroplus.util.IScreenRadarRenderContext;
@@ -41,7 +41,7 @@ public class MixinRadarRenderProvider {
         }
 
         if (!((IScreenRadarRenderContext) (Object) context).isWorldMap()) {
-            context.nameScale = XaeroMinimapSession.getCurrentSession().getModMain().getSettings().getDotNameScale() * Globals.minimapScalingFactor;
+            context.nameScale = HudSession.getCurrentSession().getHudMod().getSettings().getDotNameScale() * Globals.minimapScalingFactor;
             context.iconScale = this.currentList.getCategory().getSettingValue(EntityRadarCategorySettings.ICON_SCALE) * Globals.minimapScalingFactor;
         }
     }

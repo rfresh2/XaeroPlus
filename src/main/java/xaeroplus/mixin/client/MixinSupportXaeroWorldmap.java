@@ -13,12 +13,12 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import xaero.common.IXaeroMinimap;
-import xaero.common.XaeroMinimapSession;
 import xaero.common.effect.Effects;
 import xaero.common.minimap.region.MinimapTile;
 import xaero.common.minimap.render.MinimapRendererHelper;
-import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.mods.SupportXaeroWorldmap;
+import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.world.MinimapWorld;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMap;
 import xaero.map.WorldMapSession;
@@ -76,7 +76,7 @@ public abstract class MixinSupportXaeroWorldmap {
      * @reason Render NewChunks on minimap
      */
     @Overwrite
-    public void drawMinimap(XaeroMinimapSession minimapSession, MinimapRendererHelper helper, int xFloored, int zFloored, int minViewX, int minViewZ, int maxViewX, int maxViewZ, boolean zooming, double zoom, double mapDimensionScale) {
+    public void drawMinimap(MinimapSession minimapSession, MinimapRendererHelper helper, int xFloored, int zFloored, int minViewX, int minViewZ, int maxViewX, int maxViewZ, boolean zooming, double zoom, double mapDimensionScale) {
         WorldMapSession worldmapSession = WorldMapSession.getCurrentSession();
         if (worldmapSession != null) {
             final boolean isDimensionSwitched = Globals.getCurrentDimensionId() != Minecraft.getMinecraft().player.dimension;
@@ -114,7 +114,7 @@ public abstract class MixinSupportXaeroWorldmap {
                     int globalRegionCacheHashCode = wmUsesHashcodes ? WorldMap.settings.getRegionCacheHashCode() : 0;
                     boolean reloadEverything = wmUsesHashcodes ? WorldMap.settings.reloadEverything : false;
                     int globalReloadVersion = wmUsesHashcodes ? WorldMap.settings.reloadVersion : 0;
-                    boolean slimeChunks = this.modMain.getSettings().getSlimeChunks(minimapSession.getWaypointsManager());
+                    boolean slimeChunks = this.modMain.getSettings().getSlimeChunks(minimapSession);
                     boolean wmHasDimensionSwitch = this.hasDimensionSwitching();
                     if (wmHasDimensionSwitch) {
                         mapProcessor.initMinimapRender(xFloored, zFloored);
@@ -180,8 +180,8 @@ public abstract class MixinSupportXaeroWorldmap {
                         GuiMap.setupTextureMatricesAndTextures(brightness);
                     }
 
-                    WaypointWorld world = minimapSession.getWaypointsManager().getAutoWorld();
-                    Long seed = slimeChunks && world != null ? this.modMain.getSettings().getSlimeChunksSeed(world.getFullId()) : null;
+                    MinimapWorld world = minimapSession.getWorldManager().getAutoWorld();
+                    Long seed = slimeChunks && world != null ? this.modMain.getSettings().getSlimeChunksSeed(world.getFullPath()) : null;
                     this.renderChunks(
                         minX,
                         maxX,

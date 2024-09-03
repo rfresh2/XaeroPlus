@@ -19,12 +19,11 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.waypoints.Waypoint;
-import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.minimap.waypoints.render.WaypointFilterParams;
 import xaero.common.minimap.waypoints.render.WaypointsIngameRenderer;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.module.MinimapSession;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ColorHelper;
 import xaeroplus.util.CustomWaypointsIngameRenderer;
@@ -82,10 +81,8 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
     }
 
     @Override
-    public void renderWaypointBeacons(final XaeroMinimapSession minimapSession, final RenderGlobal renderGlobal, final float partialTicks) {
-        if (!XaeroPlusSettingRegistry.waypointBeacons.getValue()) return;
-        final WaypointsManager waypointsManager = minimapSession.getWaypointsManager();
-        double dimDiv = waypointsManager.getDimensionDivision(waypointsManager.getCurrentWorld());
+    public void renderWaypointBeacons(final MinimapSession minimapSession, final RenderGlobal renderGlobal, final float partialTicks) {
+        double dimDiv = minimapSession.getDimensionHelper().getDimensionDivision(minimapSession.getWorldManager().getCurrentWorld());
         beaconWaypoints.forEach(w -> renderWaypointBeacon(w, dimDiv, partialTicks));
         GlStateManager.disableLighting(); // baritone goal rendering fix lol, learn 2 set up GL state
         beaconWaypoints.clear();

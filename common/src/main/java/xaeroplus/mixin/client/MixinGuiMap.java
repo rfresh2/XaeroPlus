@@ -390,9 +390,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     .getSettings().chunkGridLineWidth;
                 float lineScale = (float) Math.max(1.0, Math.min(settingWidth * scale, settingWidth));
                 RenderSystem.lineWidth(lineScale);
-
-                // todo: horizontal lines seem to have a smaller width here for some reason
-                //  also there's some jittering to the position noticeable when you zoom in
                 addColoredLineToExistingBuffer(
                     matrices, lineBufferBuilder,
                     x0, z0, x1, z0,
@@ -514,19 +511,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         Minecraft mc = Minecraft.getInstance();
         double mouseX = Misc.getMouseX(mc, true);
         double mouseY = Misc.getMouseY(mc, true);
-        double fps = mc.getFps();
-
         double mouseDeltaX = mouseX - panMouseStartX;
         double mouseDeltaY = mouseY - panMouseStartY;
-        double distance = Math.sqrt(Math.pow(mouseDeltaX, 2) + Math.pow(mouseDeltaY, 2));
-        double accelFactor = (distance / 30.0);
-        double xVec = mouseDeltaX * accelFactor; // scale vec roughly exponentially
-        double yVec = mouseDeltaY * accelFactor;
-
-        // normalize across fps and map zoom levels
-        double panDeltaX = (1.0 / (fps / xVec)) / destScale;
-        double panDeltaZ = (1.0 / (fps / yVec)) / destScale;
-
+        double panDeltaX = (partialTicks * mouseDeltaX) / destScale;
+        double panDeltaZ = (partialTicks * mouseDeltaY) / destScale;
         cameraX += panDeltaX;
         cameraZ += panDeltaZ;
     }

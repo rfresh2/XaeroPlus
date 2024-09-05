@@ -1,6 +1,5 @@
 package xaeroplus.mixin.client;
 
-import com.google.common.base.Objects;
 import net.minecraft.client.Camera;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
@@ -124,9 +123,7 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
 
     @Redirect(method = "updateButtons", at = @At(value = "INVOKE", target = "Lxaero/common/gui/GuiWaypoints;isOneSelected()Z"))
     public boolean shareButtonRedirect(final GuiWaypoints instance) {
-        if (XaeroPlusSettingRegistry.disableWaypointSharing.getValue()) {
-            return false;
-        }
+        if (XaeroPlusSettingRegistry.disableWaypointSharing.getValue()) return false;
         return isOneSelected();
     }
 
@@ -134,7 +131,7 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
     private void updateSearch() {
         if (this.searchField.isFocused()) {
             String newValue = this.searchField.getValue();
-            if (!Objects.equal(this.waypointsSearchFilter, newValue)) {
+            if (!this.waypointsSearchFilter.equals(newValue)) {
                 this.waypointsSearchFilter = this.searchField.getValue();
                 selectedListSet.clear();
                 updateSortedList();

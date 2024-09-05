@@ -32,8 +32,8 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import xaero.common.XaeroMinimapSession;
 import xaero.common.graphics.shader.MinimapShaders;
+import xaero.hud.HudSession;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMap;
 import xaero.map.animation.SlowingAnimation;
@@ -61,6 +61,7 @@ import java.util.stream.Collectors;
 import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
 import static net.minecraft.world.level.Level.*;
+import static org.lwjgl.glfw.GLFW.*;
 import static xaeroplus.Globals.getCurrentDimensionId;
 import static xaeroplus.util.ChunkUtils.getPlayerX;
 import static xaeroplus.util.ChunkUtils.getPlayerZ;
@@ -208,7 +209,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "render", at = @At(value = "FIELD", target = "Lxaero/map/gui/GuiMap;lastStartTime:J", opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER), remap = true)
     public void injectFollowMode(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci) {
-        if (this.follow && isNull(this.cameraDestination) && isNull(this.cameraDestinationAnimX) && isNull(this.cameraDestinationAnimZ)) {
+        if (follow && isNull(this.cameraDestination) && isNull(this.cameraDestinationAnimX) && isNull(this.cameraDestinationAnimZ)) {
             this.cameraDestination = new int[]{(int) getPlayerX(), (int) getPlayerZ()};
         }
     }
@@ -221,15 +222,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     public boolean hideDebugRenderingOnF1(boolean original) {
         return original && !Minecraft.getInstance().options.hideGui;
     }
-
-    // todo: re-benchmark region load perf impact
-//    @ModifyArg(method = "render", at = @At(
-//        value = "INVOKE",
-//        target = "Lxaero/map/misc/Misc;addToListOfSmallest(ILjava/util/List;Ljava/lang/Comparable;)V"),
-//        index = 0, remap = true)
-//    public int increaseRegionBuffer(final int i, final List list, final Comparable element) {
-//        return 100;
-//    }
 
     @Inject(method = "render",
         slice = @Slice(
@@ -271,25 +263,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             matrixStack,
             overlayBuffer);
     }
-
-//    @ModifyConstant(method = "render", constant = @Constant(intValue = 16, ordinal = 0))
-//    public int increaseRequestedRegionsLimit(final int original) {
-//        return 64;
-//    }
-//
-    // todo: re-benchmark region load perf impact
-//    @Inject(method = "render", at = @At(
-//        value = "FIELD",
-//        target = "Lxaero/map/settings/ModSettings;pauseRequests:Z",
-//        opcode = Opcodes.GETFIELD,
-//        shift = At.Shift.BY,
-//        by = 4,
-//        ordinal = 0
-//    ))
-//    public void increaseRequestedRegions(final DrawContext guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci,
-//                                         @Local(name = "toRequest") LocalIntRef toRequest) {
-//        toRequest.set(8);
-//    }
 
     @WrapWithCondition(method = "render", at = @At(
         value = "INVOKE",
@@ -385,9 +358,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 VertexConsumer lineBufferBuilder = renderTypeBuffers.getBuffer(xaero.common.graphics.CustomRenderTypes.MAP_LINES);
                 PoseStack.Pose matrices = matrixStack.last();
                 MinimapShaders.FRAMEBUFFER_LINES.setFrameSize(mc.getWindow().getWidth(), mc.getWindow().getHeight());
-                float settingWidth = (float) XaeroMinimapSession.getCurrentSession()
-                    .getModMain()
-                    .getSettings().chunkGridLineWidth;
+                float settingWidth = (float) HudSession.getCurrentSession().getHudMod().getSettings().chunkGridLineWidth;
                 float lineScale = (float) Math.max(1.0, Math.min(settingWidth * scale, settingWidth));
                 RenderSystem.lineWidth(lineScale);
                 addColoredLineToExistingBuffer(
@@ -491,7 +462,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Inject(method = "onInputPress", at = @At("HEAD"))
     public void panMouseButtonClick(final InputConstants.Type type, final int code, final CallbackInfoReturnable<Boolean> cir) {
         if (type != InputConstants.Type.MOUSE) return;
-        if (code != 2) return;
+        if (code != GLFW_MOUSE_BUTTON_MIDDLE) return;
         pan = true;
         var mc = Minecraft.getInstance();
         panMouseStartX = Misc.getMouseX(mc, true);
@@ -501,7 +472,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Inject(method = "onInputRelease", at = @At("HEAD"))
     public void panMouseButtonRelease(final InputConstants.Type type, final int code, final CallbackInfoReturnable<Boolean> cir) {
         if (type != InputConstants.Type.MOUSE) return;
-        if (code != 2) return;
+        if (code != GLFW_MOUSE_BUTTON_MIDDLE) return;
         pan = false;
     }
 
@@ -545,13 +516,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true, remap = true)
     public void onInputPress(final int code, final int scanCode, final int modifiers, final CallbackInfoReturnable<Boolean> cir) {
-        if (code == 290) {
+        if (code == GLFW_KEY_F1) {
             Minecraft.getInstance().options.hideGui = !Minecraft.getInstance().options.hideGui;
             cir.setReturnValue(true);
             return;
         }
         if ((xTextEntryField.isVisible() && zTextEntryField.isVisible()) && (xTextEntryField.isFocused() || zTextEntryField.isFocused())) {
-            if (code == 257) {
+            if (code == GLFW_KEY_ENTER) {
                 onGotoCoordinatesButton(null);
                 cir.setReturnValue(true);
                 return;
@@ -616,8 +587,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         vertexBuffer.vertex(matrices.pose(), x2, y2, 0.0F).color(r, g, b, a).normal(matrices.normal(), x2 - x1, y2 - y1, 0.0F).endVertex();
     }
 
+    @Unique
     public void onFollowButton(final Button b) {
-        this.follow = !this.follow;
+        follow = !follow;
         this.init(Minecraft.getInstance(), width, height);
     }
 
@@ -628,7 +600,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 int z = Integer.parseInt(zTextEntryField.getValue());
                 cameraX = x;
                 cameraZ = z;
-                this.follow = false;
+                follow = false;
                 this.init(Minecraft.getInstance(), width, height);
             } catch (final NumberFormatException e) {
                 xTextEntryField.setValue("");
@@ -645,6 +617,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         }
     }
 
+    @Unique
     private void onSwitchDimensionButton(final ResourceKey<Level> newDimId) {
         Globals.switchToDimension(newDimId);
     }

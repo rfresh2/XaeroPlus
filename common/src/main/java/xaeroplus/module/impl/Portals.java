@@ -41,6 +41,12 @@ public class Portals extends Module {
         new ThreadFactoryBuilder()
             .setNameFormat("XaeroPlus-Portals-Search-%d")
             .build());
+    private static final ReferenceSet<Block> PORTAL_BLOCKS = ReferenceOpenHashSet.of(
+        Blocks.END_PORTAL,
+        Blocks.END_GATEWAY,
+        Blocks.NETHER_PORTAL,
+        Blocks.END_PORTAL_FRAME
+    );
 
     public void setDiskCache(final boolean disk) {
         portalsCache.setDiskCache(disk, isEnabled());
@@ -96,14 +102,6 @@ public class Portals extends Module {
                 XaeroPlus.LOGGER.error("Error searching for portal in chunk: {}, {}", chunk.getPos().x, chunk.getPos().z, e);
             }
         });
-    }
-
-    private static final ReferenceSet<Block> PORTAL_BLOCKS = new ReferenceOpenHashSet<>();
-    static {
-        PORTAL_BLOCKS.add(Blocks.END_PORTAL);
-        PORTAL_BLOCKS.add(Blocks.END_GATEWAY);
-        PORTAL_BLOCKS.add(Blocks.NETHER_PORTAL);
-        PORTAL_BLOCKS.add(Blocks.END_PORTAL_FRAME);
     }
 
     private boolean findPortalInChunk(final ChunkAccess chunk) {

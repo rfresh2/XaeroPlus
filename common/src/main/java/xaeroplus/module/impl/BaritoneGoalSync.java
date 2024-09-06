@@ -5,18 +5,33 @@ import baritone.api.pathing.goals.GoalXZ;
 import baritone.api.utils.interfaces.IGoalRenderPos;
 import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.misc.OptimizedMath;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.waypoint.set.WaypointSet;
 import xaero.hud.minimap.world.MinimapWorld;
+import xaero.map.mods.SupportMods;
+import xaeroplus.XaeroPlus;
 import xaeroplus.event.ClientTickEvent;
 import xaeroplus.module.Module;
 import xaeroplus.util.BaritoneGoalHelper;
 import xaeroplus.util.BaritoneHelper;
+import xaeroplus.util.ChunkUtils;
+
+import java.lang.ref.WeakReference;
+
+import static net.minecraft.world.level.Level.NETHER;
+import static net.minecraft.world.level.Level.OVERWORLD;
 
 public class BaritoneGoalSync extends Module {
+    private static final WeakReference nullRef = new WeakReference<>(null);
+    private WeakReference<Waypoint> baritoneWpRef = nullRef;
+    private WeakReference<WaypointSet> baritoneWpSetRef = nullRef;
+    private WeakReference<MinimapWorld> baritoneWpMinimapWorldRef = nullRef;
+    private ResourceKey<Level> baritoneWpDimension = OVERWORLD;
 
     @EventHandler
     public void onClientTickEvent(final ClientTickEvent.Post event) {
@@ -25,46 +40,89 @@ public class BaritoneGoalSync extends Module {
         if (minimapSession == null) return;
         MinimapWorld currentWorld = minimapSession.getWorldManager().getCurrentWorld();
         if (currentWorld == null) return;
-        WaypointSet currentWaypointSet = currentWorld.getCurrentWaypointSet();
-        Waypoint currentBaritoneWp = null;
-        for (var wp : currentWaypointSet.getWaypoints()) {
-            if (wp.getName().equals("Baritone Goal")) {
-                currentBaritoneWp = wp;
-                break;
+        try {
+            final Goal goal = BaritoneGoalHelper.getBaritoneGoal();
+            if (goal == null) {
+                clearBaritoneWpAndState();
+                return;
+            }
+            final BlockPos baritoneGoalBlockPos = getBaritoneGoalBlockPos(goal);
+            if (baritoneGoalBlockPos == null) {
+                clearBaritoneWpAndState();
+                return;
+            }
+
+            if (baritoneWpRef.get() == null) {
+                baritoneWpDimension = ChunkUtils.getActualDimension();
+            }
+
+            if (baritoneWpMinimapWorldRef.get() == null) {
+                initBaritoneWpWorld(currentWorld);
+            }
+
+            if (currentWorld != baritoneWpMinimapWorldRef.get()) {
+                Waypoint baritoneWp = this.baritoneWpRef.get();
+                WaypointSet waypointSet = baritoneWpSetRef.get();
+                if (waypointSet != null && baritoneWp != null) waypointSet.remove(baritoneWp);
+                this.baritoneWpRef = nullRef;
+                initBaritoneWpWorld(currentWorld);
+            }
+
+            double customDimDiv = getBaritoneWpDimDiv();
+            final int x = (int) (OptimizedMath.myFloor(baritoneGoalBlockPos.getX()) * customDimDiv);
+            final int z = (int) (OptimizedMath.myFloor(baritoneGoalBlockPos.getZ()) * customDimDiv);
+            Waypoint baritoneWp = baritoneWpRef.get();
+            if (baritoneWp != null) {
+                if (baritoneWp.getX() != x || baritoneWp.getZ() != z) {
+                    baritoneWp.setX(x);
+                    baritoneWp.setY(baritoneGoalBlockPos.getY());
+                    baritoneWp.setZ(z);
+                    SupportMods.xaeroMinimap.requestWaypointsRefresh();
+                }
+            } else {
+                baritoneWp = new Waypoint(
+                    x,
+                    baritoneGoalBlockPos.getY(),
+                    z,
+                    "Baritone Goal",
+                    "B",
+                    10, // green
+                    0,
+                    true);
+                baritoneWpRef = new WeakReference<>(baritoneWp);
+                baritoneWpSetRef.get().add(baritoneWp);
+                SupportMods.xaeroMinimap.requestWaypointsRefresh();
+            }
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Error in Baritone goal sync", e);
+        }
+    }
+
+    private double getBaritoneWpDimDiv() {
+        if (baritoneWpMinimapWorldRef.get() == null) return 1.0;
+        ResourceKey<Level> baritoneWpMinimapWorldDimId = baritoneWpMinimapWorldRef.get().getDimId();
+        double customDimDiv = 1.0;
+        if (baritoneWpMinimapWorldDimId != baritoneWpDimension) {
+            if (baritoneWpMinimapWorldDimId == NETHER && baritoneWpDimension == OVERWORLD) {
+                customDimDiv = 0.125;
+            } else if (baritoneWpMinimapWorldDimId == OVERWORLD && baritoneWpDimension == NETHER) {
+                customDimDiv = 8.0;
             }
         }
-        boolean baritoneWpExists = currentBaritoneWp != null;
-        final Goal goal = BaritoneGoalHelper.getBaritoneGoal();
-        if (goal == null) {
-            if (baritoneWpExists) currentWaypointSet.remove(currentBaritoneWp);
-            return;
-        }
-        final BlockPos baritoneGoalBlockPos = getBaritoneGoalBlockPos(goal);
-        if (baritoneGoalBlockPos == null) {
-            if (baritoneWpExists) currentWaypointSet.remove(currentBaritoneWp);
-            return;
-        }
+        return customDimDiv;
+    }
 
-        // todo: this no longer has any idea about the baritone goal's dimension
-        //      so the dim div will be completely off if the player has a wp set of nether open in the ow and visa versa
-        final int x = OptimizedMath.myFloor(baritoneGoalBlockPos.getX());
-        final int z = OptimizedMath.myFloor(baritoneGoalBlockPos.getZ());
-        if (baritoneWpExists) {
-            currentBaritoneWp.setX(x);
-            currentBaritoneWp.setY(baritoneGoalBlockPos.getY());
-            currentBaritoneWp.setZ(z);
-        } else {
-            final Waypoint waypoint = new Waypoint(
-                x,
-                baritoneGoalBlockPos.getY(),
-                z,
-                "Baritone Goal",
-                "B",
-                10, // green
-                0,
-                true);
-            currentWaypointSet.add(waypoint);
-        }
+    private void initBaritoneWpWorld(final MinimapWorld currentWorld) {
+        baritoneWpMinimapWorldRef = new WeakReference<>(currentWorld);
+        WaypointSet waypointSet = baritoneWpMinimapWorldRef.get().getWaypointSet("gui.xaero_default");
+        baritoneWpSetRef = new WeakReference<>(waypointSet);
+    }
+
+    private void clearBaritoneWpAndState() {
+        if (baritoneWpRef.get() != null) baritoneWpSetRef.get().remove(this.baritoneWpRef.get());
+        baritoneWpRef = nullRef;
+        baritoneWpSetRef = nullRef;
+        baritoneWpMinimapWorldRef = nullRef;
     }
 
     private BlockPos getBaritoneGoalBlockPos(Goal goal) {

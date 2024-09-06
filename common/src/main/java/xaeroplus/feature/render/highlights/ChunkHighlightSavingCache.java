@@ -173,7 +173,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
             this.executorService = MoreExecutors.listeningDecorator(
                 Executors.newSingleThreadExecutor(
                     new ThreadFactoryBuilder()
-                        .setNameFormat("XaeroPlus-" + databaseName + "-DiskCache-" + worldId)
+                        .setNameFormat(databaseName + "-DiskCache")
                         .setUncaughtExceptionHandler((t, e) -> {
                             XaeroPlus.LOGGER.error("Uncaught exception handler in {}", t.getName(), e);
                         })

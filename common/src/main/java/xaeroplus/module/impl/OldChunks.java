@@ -28,7 +28,6 @@ import xaeroplus.util.ColorHelper;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static java.util.Arrays.asList;
 import static net.minecraft.world.level.Level.*;
 import static xaeroplus.util.ColorHelper.getColor;
 
@@ -43,34 +42,33 @@ public class OldChunks extends Module {
             .build());
 
     private boolean inverse = false;
-    private static final ReferenceSet<Block> OVERWORLD_BLOCKS = new ReferenceOpenHashSet<>();
-    private static final ReferenceSet<Block> NETHER_BLOCKS = new ReferenceOpenHashSet<>();
-    static {
-        OVERWORLD_BLOCKS.addAll(asList(Blocks.COPPER_ORE,
-                                       Blocks.DEEPSLATE_COPPER_ORE,
-                                       Blocks.AMETHYST_BLOCK,
-                                       Blocks.SMOOTH_BASALT,
-                                       Blocks.TUFF,
-                                       Blocks.KELP,
-                                       Blocks.KELP_PLANT,
-                                       Blocks.POINTED_DRIPSTONE,
-                                       Blocks.DRIPSTONE_BLOCK,
-                                       Blocks.DEEPSLATE,
-                                       Blocks.AZALEA,
-                                       Blocks.BIG_DRIPLEAF,
-                                       Blocks.BIG_DRIPLEAF_STEM,
-                                       Blocks.SMALL_DRIPLEAF,
-                                       Blocks.MOSS_BLOCK,
-                                       Blocks.CAVE_VINES,
-                                       Blocks.CAVE_VINES_PLANT));
-        NETHER_BLOCKS.addAll(asList(Blocks.ANCIENT_DEBRIS,
-                                    Blocks.BLACKSTONE,
-                                    Blocks.BASALT,
-                                    Blocks.CRIMSON_NYLIUM,
-                                    Blocks.WARPED_NYLIUM,
-                                    Blocks.NETHER_GOLD_ORE,
-                                    Blocks.CHAIN));
-    }
+    private static final ReferenceSet<Block> OVERWORLD_BLOCKS = ReferenceOpenHashSet.of(
+        Blocks.COPPER_ORE,
+        Blocks.DEEPSLATE_COPPER_ORE,
+        Blocks.AMETHYST_BLOCK,
+        Blocks.SMOOTH_BASALT,
+        Blocks.TUFF,
+        Blocks.KELP,
+        Blocks.KELP_PLANT,
+        Blocks.POINTED_DRIPSTONE,
+        Blocks.DRIPSTONE_BLOCK,
+        Blocks.DEEPSLATE,
+        Blocks.AZALEA,
+        Blocks.BIG_DRIPLEAF,
+        Blocks.BIG_DRIPLEAF_STEM,
+        Blocks.SMALL_DRIPLEAF,
+        Blocks.MOSS_BLOCK,
+        Blocks.CAVE_VINES,
+        Blocks.CAVE_VINES_PLANT);
+    private static final ReferenceSet<Block> NETHER_BLOCKS = ReferenceOpenHashSet.of(
+        Blocks.ANCIENT_DEBRIS,
+        Blocks.BLACKSTONE,
+        Blocks.BASALT,
+        Blocks.CRIMSON_NYLIUM,
+        Blocks.WARPED_NYLIUM,
+        Blocks.NETHER_GOLD_ORE,
+        Blocks.CHAIN
+    );
 
     public void setDiskCache(boolean disk) {
         oldChunksCache.setDiskCache(disk, isEnabled());
@@ -109,11 +107,10 @@ public class OldChunks extends Module {
                 ? modernChunksCache.get().addHighlight(x, z)
                 : oldChunksCache.get().addHighlight(x, z);
         } else if (actualDimension == END) {
-            Holder<Biome> biome = mc.level.getBiome(new BlockPos(ChunkUtils.chunkCoordToCoord(x) + 8, 64, ChunkUtils.chunkCoordToCoord(z) + 8));
-            var biomeKey = biome.unwrapKey().get();
-            return biomeKey == Biomes.THE_END
-                ? oldChunksCache.get().addHighlight(x, z)
-                : modernChunksCache.get().addHighlight(x, z);
+            Holder<Biome> biomeHolder = mc.level.getBiome(new BlockPos(ChunkUtils.chunkCoordToCoord(x) + 8, 64, ChunkUtils.chunkCoordToCoord(z) + 8));
+            return biomeHolder.unwrapKey().filter(biome -> biome.equals(Biomes.THE_END)).isEmpty()
+                ? modernChunksCache.get().addHighlight(x, z)
+                : oldChunksCache.get().addHighlight(x, z);
         }
         return true;
     }

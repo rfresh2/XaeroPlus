@@ -21,11 +21,8 @@ import xaeroplus.util.ColorHelper.WaystoneColor;
 import xaeroplus.util.FabricWaystonesHelper;
 import xaeroplus.util.WaystonesHelper;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static xaero.common.settings.ModSettings.COLORS;
 
@@ -92,22 +89,12 @@ public class WaystoneSync extends Module {
             if (worldManager == null) return false;
             MinimapWorld currentWorld = worldManager.getCurrentWorld();
             if (currentWorld == null) return false;
-            Map<Waystone, WaypointSet> waystoneToWaypointSet = waystones.stream()
-                .collect(Collectors.toMap((k1) -> k1,
-                                          (v1) -> getWaypointsList(v1, minimapSession),
-                                          (v1, v2) -> v1));
-
-            // iterate over ALL waypoint sets and lists and remove waystones
-            // todo: this doesn't iterate over dims/set permutations where we have no waystones at all
-            for (var waypointSet : new HashSet<>(waystoneToWaypointSet.values())) {
-                List<Waypoint> list = ((AccessorWaypointSet) waypointSet).getList();
-                list.removeIf(waypoint -> waypoint.isTemporary() && waypoint.getName().endsWith(" [Waystone]"));
-            }
-            for (var entry : waystoneToWaypointSet.entrySet()) {
+            clearWaystoneWaypoints(minimapSession);
+            for (Waystone waystone : waystones) {
                 try {
-                    waypointsListSync(entry.getKey(), entry.getValue());
+                    waypointsListSync(waystone, getWaypointSet(waystone, minimapSession));
                 } catch (final Exception e) {
-                    XaeroPlus.LOGGER.error("Error syncing waystone: {}", entry.getKey().name(), e);
+                    XaeroPlus.LOGGER.error("Error syncing waystone: {}", waystone.name(), e);
                 }
             }
             return true;
@@ -115,6 +102,28 @@ public class WaystoneSync extends Module {
             XaeroPlus.LOGGER.error("Error syncing waystones", e);
             return true; // stops immediate retry. we'll still spam logs on the next iteration though
         }
+    }
+
+    // iterate over ALL waypoint sets and lists and remove waystones
+    private void clearWaystoneWaypoints(final MinimapSession minimapSession) {
+        var rootContainer = minimapSession.getWorldManager().getCurrentRootContainer();
+        var rootWorlds = rootContainer.getWorlds();
+        for (var world : rootWorlds) {
+            for (WaypointSet set : world.getIterableWaypointSets()) {
+                ((AccessorWaypointSet) set).getList().removeIf(WaystoneSync::isWaystoneWaypoint);
+            }
+        }
+        for (var subContainer : rootContainer.getSubContainers()) {
+            for (var world : subContainer.getWorlds()) {
+                for (WaypointSet set : world.getIterableWaypointSets()) {
+                    ((AccessorWaypointSet) set).getList().removeIf(WaystoneSync::isWaystoneWaypoint);
+                }
+            }
+        }
+    }
+
+    private static boolean isWaystoneWaypoint(Waypoint waypoint) {
+        return waypoint.isTemporary() && waypoint.getName().endsWith(" [Waystone]");
     }
 
     private void waypointsListSync(final Waystone waystone, final WaypointSet waypointsList) {
@@ -134,7 +143,7 @@ public class WaystoneSync extends Module {
         waypointsList.add(waystoneWp);
     }
 
-    private WaypointSet getWaypointsList(final Waystone waystone, final MinimapSession minimapSession) {
+    private WaypointSet getWaypointSet(final Waystone waystone, final MinimapSession minimapSession) {
         final String waypointSetName = this.separateWaypointSet ? "Waystones" : "gui.xaero_default";
         final MinimapWorld waypointWorld = getWaypointWorldForWaystone(waystone, minimapSession);
         WaypointSet waypointSet = waypointWorld.getWaypointSet(waypointSetName);

@@ -12,10 +12,14 @@ import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.function.IntSupplier;
 
 public class DrawManager {
     private final Object2ObjectMap<String, DrawFeature> chunkHighlightDrawFeatures = new Object2ObjectOpenHashMap<>();
+    private final List<String> sortedKeySet = new ArrayList<>();
 
     public DrawManager() {
         XaeroPlus.EVENT_BUS.register(this);
@@ -23,9 +27,13 @@ public class DrawManager {
 
     public synchronized void registerChunkHighlightProvider(String id, ChunkHighlightSupplier chunkHighlightSupplier, IntSupplier colorSupplier) {
         chunkHighlightDrawFeatures.put(id, new DrawFeature(new ChunkHighlightProvider(chunkHighlightSupplier, colorSupplier)));
+        sortedKeySet.add(id);
+        // arbitrary order, just needs to be consistent so colors blend consistently
+        sortedKeySet.sort(Comparator.naturalOrder());
     }
 
     public synchronized void unregisterChunkHighlightProvider(String id) {
+        sortedKeySet.remove(id);
         chunkHighlightDrawFeatures.remove(id);
     }
 
@@ -62,8 +70,9 @@ public class DrawManager {
         final VertexConsumer overlayBufferBuilder,
         MinimapRendererHelper helper
     ) {
-        if (chunkHighlightDrawFeatures.isEmpty()) return;
-        for (DrawFeature feature : chunkHighlightDrawFeatures.values()) {
+        for (int i = 0; i < sortedKeySet.size(); i++) {
+            var k = sortedKeySet.get(i);
+            var feature = chunkHighlightDrawFeatures.get(k);
             int color = feature.colorInt();
             var a = ColorHelper.getA(color);
             if (a == 0.0f) return;
@@ -71,8 +80,8 @@ public class DrawManager {
             var g = ColorHelper.getG(color);
             var b = ColorHelper.getB(color);
             var highlights = feature.getChunkHighlights();
-            for (int i = 0; i < highlights.size(); i++) {
-                long highlight = highlights.getLong(i);
+            for (int j = 0; j < highlights.size(); j++) {
+                long highlight = highlights.getLong(j);
                 var chunkPosX = ChunkUtils.longToChunkX(highlight);
                 var chunkPosZ = ChunkUtils.longToChunkZ(highlight);
                 var mapTileChunkX = ChunkUtils.chunkCoordToMapTileChunkCoord(chunkPosX);
@@ -97,16 +106,18 @@ public class DrawManager {
     }
 
     public synchronized void drawWorldMapFeatures(
-        final int minMapRegionX,
-        final int maxMapRegionX,
-        final int minMapRegionZ,
-        final int maxMapRegionZ,
+        final double minBlockX,
+        final double maxBlockX,
+        final double minBlockZ,
+        final double maxBlockZ,
         final int flooredCameraX,
         final int flooredCameraZ,
         final PoseStack matrixStack,
         final VertexConsumer overlayBuffer
     ) {
-        for (DrawFeature feature : chunkHighlightDrawFeatures.values()) {
+        for (int i = 0; i < sortedKeySet.size(); i++) {
+            var k = sortedKeySet.get(i);
+            var feature = chunkHighlightDrawFeatures.get(k);
             int color = feature.colorInt();
             var a = ColorHelper.getA(color);
             if (a == 0.0f) return;
@@ -114,14 +125,14 @@ public class DrawManager {
             var g = ColorHelper.getG(color);
             var b = ColorHelper.getB(color);
             var highlights = feature.getChunkHighlights();
-            for (int i = 0; i < highlights.size(); i++) {
-                long highlight = highlights.getLong(i);
+            for (int j = 0; j < highlights.size(); j++) {
+                long highlight = highlights.getLong(j);
                 var chunkPosX = ChunkUtils.longToChunkX(highlight);
                 var chunkPosZ = ChunkUtils.longToChunkZ(highlight);
-                var regionX = ChunkUtils.chunkCoordToMapRegionCoord(chunkPosX);
-                var regionZ = ChunkUtils.chunkCoordToMapRegionCoord(chunkPosZ);
-                if (regionX < minMapRegionX || regionX > maxMapRegionX) continue;
-                if (regionZ < minMapRegionZ || regionZ > maxMapRegionZ) continue;
+                var blockX = ChunkUtils.chunkCoordToCoord(chunkPosX);
+                var blockZ = ChunkUtils.chunkCoordToCoord(chunkPosZ);
+                if (blockX < minBlockX || blockX > maxBlockX) continue;
+                if (blockZ < minBlockZ || blockZ > maxBlockZ) continue;
                 final float left = (float) (ChunkUtils.chunkCoordToCoord(chunkPosX) - flooredCameraX);
                 final float top = (float) (ChunkUtils.chunkCoordToCoord(chunkPosZ) - flooredCameraZ);
                 final float right = left + 16;

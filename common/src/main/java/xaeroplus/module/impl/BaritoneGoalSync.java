@@ -41,6 +41,8 @@ public class BaritoneGoalSync extends Module {
         if (minimapSession == null) return;
         MinimapWorld currentWorld = minimapSession.getWorldManager().getCurrentWorld();
         if (currentWorld == null) return;
+        WaypointSet currentWpSet = currentWorld.getCurrentWaypointSet();
+        if (currentWpSet == null) return;
         try {
             final Goal goal = BaritoneGoalHelper.getBaritoneGoal();
             if (goal == null) {
@@ -62,10 +64,11 @@ public class BaritoneGoalSync extends Module {
                 baritoneGoalPos = new WeakReference<>(baritoneGoalBlockPos);
             }
 
-            if (baritoneWpMinimapWorldRef.get() == null || currentWorld != baritoneWpMinimapWorldRef.get()) {
-                Waypoint baritoneWp = this.baritoneWpRef.get();
-                WaypointSet waypointSet = baritoneWpSetRef.get();
-                if (waypointSet != null && baritoneWp != null) waypointSet.remove(baritoneWp);
+            if (baritoneWpMinimapWorldRef.get() == null || currentWorld != baritoneWpMinimapWorldRef.get()
+                || baritoneWpSetRef.get() == null || baritoneWpSetRef.get() != currentWpSet) {
+                if (baritoneWpSetRef.get() != null && baritoneWpRef.get() != null) {
+                    baritoneWpSetRef.get().remove(baritoneWpRef.get());
+                }
                 baritoneWpRef = nullRef;
                 initBaritoneWpWorld(currentWorld);
             }
@@ -116,7 +119,7 @@ public class BaritoneGoalSync extends Module {
 
     private void initBaritoneWpWorld(final MinimapWorld currentWorld) {
         baritoneWpMinimapWorldRef = new WeakReference<>(currentWorld);
-        WaypointSet waypointSet = baritoneWpMinimapWorldRef.get().getWaypointSet("gui.xaero_default");
+        WaypointSet waypointSet = baritoneWpMinimapWorldRef.get().getCurrentWaypointSet();
         baritoneWpSetRef = new WeakReference<>(waypointSet);
     }
 

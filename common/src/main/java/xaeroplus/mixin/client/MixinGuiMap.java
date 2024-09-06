@@ -238,26 +238,20 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         ),
         remap = true)
     public void drawWorldMapFeatures(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci,
-                                     @Local(name = "minRegX") int minRegX,
-                                     @Local(name = "maxRegX") int maxRegX,
-                                     @Local(name = "minRegZ") int minRegZ,
-                                     @Local(name = "maxRegZ") int maxRegZ,
-                                     @Local(name = "textureLevel") int textureLevel,
+                                     @Local(name = "leftBorder") double leftBorder,
+                                     @Local(name = "rightBorder") double rightBorder,
+                                     @Local(name = "topBorder") double topBorder,
+                                     @Local(name = "bottomBorder") double bottomBorder,
                                      @Local(name = "flooredCameraX") int flooredCameraX,
                                      @Local(name = "flooredCameraZ") int flooredCameraZ,
                                      @Local(name = "matrixStack") PoseStack matrixStack,
                                      @Local(name = "overlayBuffer") VertexConsumer overlayBuffer) {
         if (Minecraft.getInstance().options.hideGui) return;
-        final int leveledSideInRegions = 1 << textureLevel;
-        final int minX = minRegX * leveledSideInRegions;
-        final int maxX = (maxRegX + 1) * leveledSideInRegions;
-        final int minZ = minRegZ * leveledSideInRegions;
-        final int maxZ = (maxRegZ + 1) * leveledSideInRegions;
         Globals.drawManager.drawWorldMapFeatures(
-            minX - 1,
-            maxX + 1,
-            minZ - 1,
-            maxZ + 1,
+            leftBorder,
+            rightBorder,
+            topBorder,
+            bottomBorder,
             flooredCameraX,
             flooredCameraZ,
             matrixStack,

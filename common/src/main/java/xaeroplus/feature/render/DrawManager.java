@@ -106,10 +106,10 @@ public class DrawManager {
     }
 
     public synchronized void drawWorldMapFeatures(
-        final int minMapRegionX,
-        final int maxMapRegionX,
-        final int minMapRegionZ,
-        final int maxMapRegionZ,
+        final double minBlockX,
+        final double maxBlockX,
+        final double minBlockZ,
+        final double maxBlockZ,
         final int flooredCameraX,
         final int flooredCameraZ,
         final PoseStack matrixStack,
@@ -129,10 +129,10 @@ public class DrawManager {
                 long highlight = highlights.getLong(j);
                 var chunkPosX = ChunkUtils.longToChunkX(highlight);
                 var chunkPosZ = ChunkUtils.longToChunkZ(highlight);
-                var regionX = ChunkUtils.chunkCoordToMapRegionCoord(chunkPosX);
-                var regionZ = ChunkUtils.chunkCoordToMapRegionCoord(chunkPosZ);
-                if (regionX < minMapRegionX || regionX > maxMapRegionX) continue;
-                if (regionZ < minMapRegionZ || regionZ > maxMapRegionZ) continue;
+                var blockX = ChunkUtils.chunkCoordToCoord(chunkPosX);
+                var blockZ = ChunkUtils.chunkCoordToCoord(chunkPosZ);
+                if (blockX < minBlockX || blockX > maxBlockX) continue;
+                if (blockZ < minBlockZ || blockZ > maxBlockZ) continue;
                 final float left = (float) (ChunkUtils.chunkCoordToCoord(chunkPosX) - flooredCameraX);
                 final float top = (float) (ChunkUtils.chunkCoordToCoord(chunkPosZ) - flooredCameraZ);
                 final float right = left + 16;

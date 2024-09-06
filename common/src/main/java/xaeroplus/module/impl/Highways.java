@@ -67,7 +67,6 @@ public class Highways extends Module {
     );
 
     private static final int fiftyK = ChunkUtils.posToChunkPos(50000);
-    private static final int fiveK = ChunkUtils.posToChunkPos(5000);
 
     @Override
     public void onEnable() {
@@ -101,8 +100,8 @@ public class Highways extends Module {
 
             // grid
             if (xAbs < fiftyK && zAbs < fiftyK) {
-                if (xAbs % fiveK == 0) return true;
-                if (zAbs % fiveK == 0) return true;
+                if ((xAbs * 16) % 5000 == 0) return true;
+                if ((zAbs * 16) % 5000 == 0) return true;
             }
         }
         return false;

@@ -31,6 +31,7 @@ public class BaritoneGoalSync extends Module {
     private WeakReference<Waypoint> baritoneWpRef = nullRef;
     private WeakReference<WaypointSet> baritoneWpSetRef = nullRef;
     private WeakReference<MinimapWorld> baritoneWpMinimapWorldRef = nullRef;
+    private WeakReference<BlockPos> baritoneGoalPos = nullRef;
     private ResourceKey<Level> baritoneWpDimension = OVERWORLD;
 
     @EventHandler
@@ -52,19 +53,20 @@ public class BaritoneGoalSync extends Module {
                 return;
             }
 
-            if (baritoneWpRef.get() == null) {
-                baritoneWpDimension = ChunkUtils.getActualDimension();
+            if (baritoneGoalPos.get() == null) {
+                baritoneGoalPos = new WeakReference<>(baritoneGoalBlockPos);
             }
 
-            if (baritoneWpMinimapWorldRef.get() == null) {
-                initBaritoneWpWorld(currentWorld);
+            if (baritoneGoalPos.get() != null && !baritoneGoalPos.get().equals(baritoneGoalBlockPos)) {
+                clearBaritoneWpAndState();
+                baritoneGoalPos = new WeakReference<>(baritoneGoalBlockPos);
             }
 
-            if (currentWorld != baritoneWpMinimapWorldRef.get()) {
+            if (baritoneWpMinimapWorldRef.get() == null || currentWorld != baritoneWpMinimapWorldRef.get()) {
                 Waypoint baritoneWp = this.baritoneWpRef.get();
                 WaypointSet waypointSet = baritoneWpSetRef.get();
                 if (waypointSet != null && baritoneWp != null) waypointSet.remove(baritoneWp);
-                this.baritoneWpRef = nullRef;
+                baritoneWpRef = nullRef;
                 initBaritoneWpWorld(currentWorld);
             }
 
@@ -123,6 +125,8 @@ public class BaritoneGoalSync extends Module {
         baritoneWpRef = nullRef;
         baritoneWpSetRef = nullRef;
         baritoneWpMinimapWorldRef = nullRef;
+        baritoneGoalPos = nullRef;
+        baritoneWpDimension = ChunkUtils.getActualDimension();
     }
 
     private BlockPos getBaritoneGoalBlockPos(Goal goal) {

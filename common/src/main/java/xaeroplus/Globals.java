@@ -46,7 +46,7 @@ public class Globals {
     public static ByteArrayOutputStream zipFastByteBuffer = new ByteArrayOutputStream();
     public static final Supplier<ExecutorService> cacheRefreshExecutorService = Suppliers.memoize(() -> Executors.newFixedThreadPool(
             // limited benefits by refreshing on more threads as it will consume the entire CPU and start lagging the game
-            Math.max(1, Math.min(Runtime.getRuntime().availableProcessors() / 2, 4)),
+            Math.max(1, Math.min(Runtime.getRuntime().availableProcessors() / 2, 2)),
             new ThreadFactoryBuilder()
                 .setNameFormat("XaeroPlus-Cache-Refresh-%d")
                 .setDaemon(true)

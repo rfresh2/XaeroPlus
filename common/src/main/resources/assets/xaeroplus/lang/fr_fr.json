@@ -63,6 +63,8 @@
   "setting.world_map.new_chunks_inverse_enabled.tooltip": "Met en surbrillance les chunks qui ont déjà été chargés en vérifiant s'il y a un liquide en mouvement présent.\n\nGardez à l'esprit qu'il y aura des faux positifs. Plusieurs biomes et structures comme les bastions et les deltas de basalte peuvent se générer avec un liquide en mouvement.",
   "setting.world_map.new_chunks_inverse_color": "Couleur Inverse de Liquéfié NewChunks",
   "setting.world_map.new_chunks_inverse_color.tooltip": "Change la couleur des surbrillances inverses de Liquéfié NewChunks",
+  "setting.world_map.new_chunks_only_above_y0": "NouveauxMorceaux Liquides Y>0",
+  "setting.world_map.new_chunks_only_above_y0.tooltip": "Limite la recherche de NouveauxMorceaux Liquides aux niveaux Y supérieurs à 0",
   "setting.world_map.old_chunks_highlighting": "Mise en évidence d'OldChunks",
   "setting.world_map.old_chunks_highlighting.tooltip": "Met en évidence OldChunks sur la mini-carte et la carte du monde. Un OldChunk est un morceau généré dans la version 1.12.2 ou inférieure en fonction des blocs présents dans le morceau. Destiné à être utilisé sur 2b2t.",
   "setting.world_map.old_chunks_inverse": "OldChunks inversé",

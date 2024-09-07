@@ -63,6 +63,8 @@
   "setting.world_map.new_chunks_inverse_enabled.tooltip": "Highlights chunks that have already been loaded by checking if any flowing liquid is present.\n\nKeep in mind there will be false positives. Multiple biomes and structures like bastions and basalt deltas can generate with flowing liquid.",
   "setting.world_map.new_chunks_inverse_color": "Liquid NewChunks Inverse Color",
   "setting.world_map.new_chunks_inverse_color.tooltip": "Changes the color of Liquid NewChunks inverse highlights",
+  "setting.world_map.new_chunks_only_above_y0": "Liquid NewChunks Only Y > 0",
+  "setting.world_map.new_chunks_only_above_y0.tooltip": "Limits Liquid NewChunks search to Y levels greater than 0",
   "setting.world_map.old_chunks_highlighting": "OldChunks",
   "setting.world_map.old_chunks_highlighting.tooltip": "Highlights OldChunks on the Minimap and WorldMap. An OldChunk is a chunk that was generated in 1.12.2 or lower based on the blocks present in the chunk. Intended for use on 2b2t.",
   "setting.world_map.old_chunks_inverse": "OldChunks Inverse",

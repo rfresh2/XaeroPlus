@@ -63,6 +63,8 @@
   "setting.world_map.new_chunks_inverse_enabled.tooltip": "透過檢查是否存在任何流動的液體來高亮顯示已載入的區塊。\n\n請記住，會出現誤報。多個生態域和堡壘和玄武岩三角洲等結構可以在生成時帶有流動的液體。",
   "setting.world_map.new_chunks_inverse_color": "液體新區塊反轉顏色",
   "setting.world_map.new_chunks_inverse_color.tooltip": "更改液體新區塊反轉高亮的顏色",
+  "setting.world_map.new_chunks_only_above_y0": "液體新區塊 Y>0",
+  "setting.world_map.new_chunks_only_above_y0.tooltip": "將液體新區塊的搜索限制為 Y 大於 0 的級別",
   "setting.world_map.old_chunks_highlighting": "舊區塊高亮",
   "setting.world_map.old_chunks_highlighting.tooltip": "在小地圖和世界地圖上高亮顯示舊區塊。舊區塊是根據區塊中存在的方塊在 1.12.2 或更低版本中生成的區塊。旨在用於 2b2t。",
   "setting.world_map.old_chunks_inverse": "舊區塊反轉",

@@ -61,6 +61,8 @@
     "setting.world_map.new_chunks_color.tooltip": "液体 NewChunksの色を変更します。",
     "setting.world_map.new_chunks_inverse_enabled": "液体 NewChunksの逆レンダリング",
     "setting.world_map.new_chunks_inverse_enabled.tooltip": "流れている液体が存在するかどうかを確認して、すでにロードされているチャンクをハイライトします。\n\n誤検知があることに注意してください。複数のバイオームやバスチオンやバサルトデルタのような構造は流れている液体と共に生成されることがあります。",
+    "setting.world_map.new_chunks_only_above_y0": "液体の新しいチャンク Y>0",
+    "setting.world_map.new_chunks_only_above_y0.tooltip": "液体の新しいチャンクの検索をYが0より大きいレベルに制限します",
     "setting.world_map.old_chunks_highlighting": "OldChunksをハイライトする",
     "setting.world_map.old_chunks_highlighting.tooltip": "ミニマップとワールドマップのOldChunkをハイライトします。OldChunkとは、1.12.2以前のチャンクで、チャンク内に存在するブロックに基づいて生成されたチャンクのことです。2b2tでの使用を意図しています。",
     "setting.world_map.old_chunks_inverse": "[古いチャンク]の逆",

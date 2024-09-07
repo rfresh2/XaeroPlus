@@ -63,6 +63,8 @@
   "setting.world_map.new_chunks_inverse_enabled.tooltip": "Выделяет чанки, которые уже были загружены, проверяя наличие текущей жидкости.\n\nИмейте в виду, что могут быть ложные срабатывания. Несколько биомов и структур, таких как бастионы и дельты базальта, могут генерироваться с текущей жидкостью.",
   "setting.world_map.new_chunks_inverse_color": "Цвет Обратной Жидкости NewChunks",
   "setting.world_map.new_chunks_inverse_color.tooltip": "Изменяет цвет обратных выделений Жидкости NewChunks",
+  "setting.world_map.new_chunks_only_above_y0": "НовыеЖидкиеЧанки Y>0",
+  "setting.world_map.new_chunks_only_above_y0.tooltip": "Ограничивает поиск НовыхЖидкихЧанков уровнями Y больше 0",
   "setting.world_map.old_chunks_highlighting": "Выделение старых фрагментов",
   "setting.world_map.old_chunks_highlighting.tooltip": "Выделяет OldChunks на мини-карте и карте мира. OldChunk — это чанк, созданный в версии 1.12.2 или ниже на основе блоков, присутствующих в чанк. Предназначен для использования на 2b2t.",
   "setting.world_map.old_chunks_inverse": "OldChunks Инверсия",

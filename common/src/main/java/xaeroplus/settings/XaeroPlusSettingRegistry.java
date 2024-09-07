@@ -282,6 +282,12 @@ public final class XaeroPlusSettingRegistry {
         ColorHelper.HighlightColor.GREEN,
         (b) -> ModuleManager.getModule(LiquidNewChunks.class).setInverseRgbColor(b.getColor()),
         SettingLocation.CHUNK_HIGHLIGHTS);
+    public static final XaeroPlusBooleanSetting liquidNewChunksOnlyAboveY0Setting = XaeroPlusBooleanSetting.create(
+        "Liquid NewChunks Only Y > 0",
+        "setting.world_map.new_chunks_only_above_y0",
+        "setting.world_map.new_chunks_only_above_y0.tooltip",
+        false,
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting oldChunksEnabledSetting = XaeroPlusBooleanSetting.create(
         "OldChunks Highlighting",
         "setting.world_map.old_chunks_highlighting",

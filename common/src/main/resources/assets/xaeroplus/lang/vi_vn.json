@@ -63,6 +63,8 @@
     "setting.world_map.new_chunks_inverse_enabled.tooltip": "Làm nổi bật các chunk đã được tải bằng cách kiểm tra sự hiện diện của chất lỏng chảy.\n\nLưu ý rằng sẽ có những trường hợp dương tính giả. Nhiều quần xã sinh vật và cấu trúc như bastion và delta bazan có thể sinh ra với chất lỏng chảy.",
     "setting.world_map.new_chunks_inverse_color": "Màu Ngược Chất lỏng NewChunks",
     "setting.world_map.new_chunks_inverse_color.tooltip": "Thay đổi màu của các điểm nổi bật ngược Chất lỏng NewChunks",
+    "setting.world_map.new_chunks_only_above_y0": "MảnhMới Lỏng Y>0",
+    "setting.world_map.new_chunks_only_above_y0.tooltip": "Giới hạn tìm kiếm MảnhMới Lỏng cho các mức Y lớn hơn 0",
     "setting.world_map.old_chunks_highlighting": "Nổi Bật OldChunks",
     "setting.world_map.old_chunks_highlighting.tooltip": "Nổi bật OldChunks trên Minimap và WorldMap. Một OldChunk là chunk được tạo ra trong 1.12.2 hoặc thấp hơn dựa trên các khối có mặt trong chunk. Dành cho 2b2t",
     "setting.world_map.old_chunks_inverse": "Đảo Ngược OldChunks",

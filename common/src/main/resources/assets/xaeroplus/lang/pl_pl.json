@@ -63,6 +63,8 @@
   "setting.world_map.new_chunks_inverse_enabled.tooltip": "Podświetla chunki, które zostały już załadowane, sprawdzając obecność przepływającej cieczy.\n\nPamiętaj, że mogą występować fałszywe pozytywy. Wiele biomów i struktur, takich jak bastiony i delty bazaltowe, może generować się z przepływającą cieczą.",
   "setting.world_map.new_chunks_inverse_color": "Kolor Odwrotny Ciecz NewChunks",
   "setting.world_map.new_chunks_inverse_color.tooltip": "Zmienia kolor odwrotnych podświetleń Ciecz NewChunks",
+  "setting.world_map.new_chunks_only_above_y0": "Płynne NoweFragmenty Y>0",
+  "setting.world_map.new_chunks_only_above_y0.tooltip": "Ogranicza wyszukiwanie Płynnych NowychFragmentów do poziomów Y większych niż 0",
   "setting.world_map.old_chunks_highlighting": "Podświetlanie OldChunks",
   "setting.world_map.old_chunks_highlighting.tooltip": "Podświetla OldChunks na minimapie i mapie świata. OldChunk to fragment wygenerowany w wersji 1.12.2 lub starszej na podstawie bloków znajdujących się w fragmencie. Przeznaczony do użytku na 2b2t",
   "setting.world_map.old_chunks_inverse": "Odwrotność OldChunks",

@@ -35,6 +35,7 @@ public class MixinSodium6OptionsGUI {
         value = "RETURN"
     ))
     public void injectXPSettings(final Screen prevScreen, final CallbackInfo ci) {
+        if (!XaeroPlusSettingRegistry.sodiumSettingIntegration.getValue()) return;
         pages.add(new OptionPage(Component.literal("XaeroPlus"), ImmutableList.<OptionGroup>of(
             OptionGroup.createBuilder()
                 .add(OptionImpl.createBuilder(Boolean.TYPE, XaeroPlusSodium6OptionStorage.INSTANCE)

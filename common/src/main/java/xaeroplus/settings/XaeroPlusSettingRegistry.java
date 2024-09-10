@@ -655,4 +655,10 @@ public final class XaeroPlusSettingRegistry {
         "setting.world_map.expanded_settings.tooltip",
         false,
         SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting sodiumSettingIntegration = XaeroPlusBooleanSetting.create(
+        "Sodium/Embeddium Setting Integration",
+        "setting.xaeroplus.sodium_embeddium_integration",
+        "setting.xaeroplus.sodium_embeddium_integration.tooltip",
+        true,
+        SettingLocation.WORLD_MAP_MAIN);
 }

@@ -170,6 +170,8 @@
   "setting.world_map.disable_internet.tooltip": "禁止 WorldMap 和 Minimap mods 在启动时使用互联网检查更新和 patreon 订阅。\n Xaero mods 通常不会在 GUI 中公开此设置。\n 无论此设置如何，XaeroPlus 都不会使用互联网。",
   "setting.world_map.expanded_settings": "扩展设置",
   "setting.world_map.expanded_settings.tooltip": "增加大屏幕上每页显示的设置数量",
+  "setting.xaeroplus.sodium_embeddium_integration": "Sodium/Embeddium 设置集成",
+  "setting.xaeroplus.sodium_embeddium_integration.tooltip": "启用 Sodium/Embeddium 中的 XaeroPlus 设置页面",
   "gui.world_map.toggle_follow_mode": "切换跟随模式",
   "gui.xaeroplus.on": "开启",
   "gui.xaeroplus.off": "关闭",

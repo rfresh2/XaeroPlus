@@ -170,6 +170,8 @@
     "setting.world_map.disable_internet.tooltip": "Vô hiệu hóa các mod WorldMap và Minimap từ việc sử dụng internet để kiểm tra cập nhật và đăng ký patreon khi khởi động.\n Các mod Xaero không hiển thị cài đặt này trong giao diện người dùng bình thường.\n XaeroPlus không sử dụng internet bất kể cài đặt này.",
     "setting.world_map.expanded_settings": "Cài đặt mở rộng",
     "setting.world_map.expanded_settings.tooltip": "Tăng số lượng cài đặt hiển thị trên mỗi trang trên màn hình lớn hơn",
+    "setting.xaeroplus.sodium_embeddium_integration": "Tích hợp Cài đặt Sodium/Embeddium",
+    "setting.xaeroplus.sodium_embeddium_integration.tooltip": "Kích hoạt trang cài đặt XaeroPlus trong Sodium/Embeddium",
     "gui.world_map.toggle_follow_mode": "Chuyển Chế Độ Theo Dõi",
     "gui.xaeroplus.on": "Bật",
     "gui.xaeroplus.off": "Tắt",

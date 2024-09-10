@@ -170,6 +170,8 @@
   "setting.world_map.disable_internet.tooltip": "Desactiva el uso de Internet de las modificaciones de WorldMap y Minimap para buscar actualizaciones y suscripciones a Patreon en el momento del lanzamiento.\n Los mods de Xaero normalmente no exponen esta configuración en la GUI.\n XaeroPlus no utiliza Internet independientemente de esta configuración.",
   "setting.world_map.expanded_settings": "Configuración ampliada",
   "setting.world_map.expanded_settings.tooltip": "Aumenta la cantidad de configuraciones que se muestran por página en pantallas más grandes",
+  "setting.xaeroplus.sodium_embeddium_integration": "Integración de Configuración de Sodium/Embeddium",
+  "setting.xaeroplus.sodium_embeddium_integration.tooltip": "Habilita la página de configuración de XaeroPlus en Sodium/Embeddium",
   "gui.world_map.toggle_follow_mode": "Alternar Modo Seguimiento",
   "gui.xaeroplus.on": "Encendido",
   "gui.xaeroplus.off": "Apagado",

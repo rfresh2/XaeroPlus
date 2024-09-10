@@ -47,7 +47,7 @@ dependencies {
 	modCompileOnly(libs.fabric.waystones)
 	modRuntimeOnly(libs.immediatelyfast)
 	modImplementation(libs.modmenu)
-	modCompileOnly(libs.sodium)
+	modImplementation(libs.sodium)
 	modRuntimeOnly(libs.fpsdisplay)
 	modRuntimeOnly(libs.cloth.config.fabric) {
 		exclude(group = "net.fabricmc.fabric-api")

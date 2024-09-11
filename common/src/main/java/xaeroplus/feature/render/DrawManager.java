@@ -70,6 +70,7 @@ public class DrawManager {
         final VertexConsumer overlayBufferBuilder,
         MinimapRendererHelper helper
     ) {
+        var matrix = matrixStack.last().pose();
         for (int i = 0; i < sortedKeySet.size(); i++) {
             var k = sortedKeySet.get(i);
             var feature = chunkHighlightDrawFeatures.get(k);
@@ -97,7 +98,7 @@ public class DrawManager {
                 var left = drawX + 16 * (chunkPosX - cx * 4);
                 var top = drawZ + 16 * (chunkPosZ - cz * 4);
                 helper.addColoredRectToExistingBuffer(
-                    matrixStack.last().pose(), overlayBufferBuilder,
+                    matrix, overlayBufferBuilder,
                     left, top, 16, 16,
                     r, g, b, a
                 );
@@ -115,6 +116,7 @@ public class DrawManager {
         final PoseStack matrixStack,
         final VertexConsumer overlayBuffer
     ) {
+        var matrix = matrixStack.last().pose();
         for (int i = 0; i < sortedKeySet.size(); i++) {
             var k = sortedKeySet.get(i);
             var feature = chunkHighlightDrawFeatures.get(k);
@@ -138,7 +140,7 @@ public class DrawManager {
                 final float right = left + 16;
                 final float bottom = top + 16;
                 MinimapBackgroundDrawHelper.fillIntoExistingBuffer(
-                    matrixStack.last().pose(), overlayBuffer,
+                    matrix, overlayBuffer,
                     left, top, right, bottom,
                     r, g, b, a
                 );

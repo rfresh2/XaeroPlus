@@ -16,6 +16,7 @@ import xaeroplus.settings.XaeroPlusSettingRegistry;
 
 public class XaeroPlusEmbeddiumOptionsInit {
     public static void onEmbeddiumOptionGUIConstructionEvent(OptionGUIConstructionEvent event) {
+        if (!XaeroPlusSettingRegistry.sodiumSettingIntegration.getValue()) return;
         event.addPage(new OptionPage(OptionIdentifier.create("xaeroplus", "options"), Component.literal("XaeroPlus"), ImmutableList.<OptionGroup>of(
             OptionGroup.createBuilder()
                 .setId(ResourceLocation.tryBuild("xaeroplus", "option-group"))

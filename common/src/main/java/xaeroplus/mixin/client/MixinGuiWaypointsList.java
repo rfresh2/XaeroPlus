@@ -8,6 +8,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -23,7 +24,8 @@ import java.text.NumberFormat;
 
 @Mixin(targets = "xaero.common.gui.GuiWaypoints$List", remap = false)
 public abstract class MixinGuiWaypointsList {
-    private GuiWaypoints thisGuiWaypoints;
+    @Unique private final WaypointSet waypointsSortedSet = WaypointSet.Builder.begin().setName("xp-wp-sorted").build();
+    @Unique private GuiWaypoints thisGuiWaypoints;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     public void init(final GuiWaypoints this$0, final CallbackInfo ci) throws NoSuchFieldException, IllegalAccessException {
@@ -49,11 +51,10 @@ public abstract class MixinGuiWaypointsList {
         target = "Lxaero/hud/minimap/world/MinimapWorld;getCurrentWaypointSet()Lxaero/hud/minimap/waypoint/set/WaypointSet;"
     ))
     public WaypointSet getWaypointList(final MinimapWorld instance) {
-        // todo: could be optimized to reduce unnecessary list allocs
-        WaypointSet currentWaypointSet = instance.getCurrentWaypointSet();
-        var wpSet = WaypointSet.Builder.begin().setName(currentWaypointSet.getName()).build();
-        wpSet.addAll(((AccessorGuiWaypoints) thisGuiWaypoints).getWaypointsSorted());
-        return wpSet;
+        // reusing waypoint set to avoid allocating an arraylist every call to this method
+        waypointsSortedSet.clear();
+        waypointsSortedSet.addAll(((AccessorGuiWaypoints) thisGuiWaypoints).getWaypointsSorted());
+        return waypointsSortedSet;
     }
 
     @Inject(method = "drawWaypointSlot", at = @At(

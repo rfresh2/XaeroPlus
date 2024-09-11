@@ -1,5 +1,5 @@
 package xaeroplus.event;
 
 public record ClientPlaySessionFinalizedEvent() {
-    public static ClientPlaySessionFinalizedEvent INSTANCE = new ClientPlaySessionFinalizedEvent();
+    public static final ClientPlaySessionFinalizedEvent INSTANCE = new ClientPlaySessionFinalizedEvent();
 }

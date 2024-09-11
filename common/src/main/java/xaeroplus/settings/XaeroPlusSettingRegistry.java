@@ -237,51 +237,6 @@ public final class XaeroPlusSettingRegistry {
         false,
         (b) -> ModuleManager.getModule(PaletteNewChunks.class).setInverse(b),
         SettingLocation.CHUNK_HIGHLIGHTS);
-    public static final XaeroPlusBooleanSetting liquidNewChunksEnabledSetting = XaeroPlusBooleanSetting.create(
-        "NewChunks Highlighting",
-        "setting.world_map.new_chunks_highlighting",
-        "setting.world_map.new_chunks_highlighting.tooltip",
-        false,
-        (b) -> ModuleManager.getModule(LiquidNewChunks.class).setEnabled(b),
-        SettingLocation.CHUNK_HIGHLIGHTS);
-    public static final XaeroPlusBooleanSetting liquidNewChunksSaveLoadToDisk = XaeroPlusBooleanSetting.create(
-        "Save/Load NewChunks to Disk",
-        "setting.world_map.new_chunks_save_load_to_disk",
-        "setting.world_map.new_chunks_save_load_to_disk.tooltip",
-        true,
-        (b) -> ModuleManager.getModule(LiquidNewChunks.class).setDiskCache(b),
-        SettingLocation.CHUNK_HIGHLIGHTS);
-    public static final XaeroPlusFloatSetting liquidNewChunksAlphaSetting = XaeroPlusFloatSetting.create(
-        "New Chunks Opacity",
-        "setting.world_map.new_chunks_opacity",
-        "setting.world_map.new_chunks_opacity.tooltip",
-        0f, 255f, 10f,
-        100,
-        (b) -> ModuleManager.getModule(LiquidNewChunks.class).setAlpha(b),
-        SettingLocation.CHUNK_HIGHLIGHTS);
-    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> liquidNewChunksColorSetting = XaeroPlusEnumSetting.create(
-        "New Chunks Color",
-        "setting.world_map.new_chunks_color",
-        "setting.world_map.new_chunks_color.tooltip",
-        ColorHelper.HighlightColor.values(),
-        ColorHelper.HighlightColor.RED,
-        (b) -> ModuleManager.getModule(LiquidNewChunks.class).setRgbColor(b.getColor()),
-        SettingLocation.CHUNK_HIGHLIGHTS);
-    public static final XaeroPlusBooleanSetting liquidNewChunksInverseHighlightsSetting = XaeroPlusBooleanSetting.create(
-        "New Chunks Render Inverse",
-        "setting.world_map.new_chunks_inverse_enabled",
-        "setting.world_map.new_chunks_inverse_enabled.tooltip",
-        false,
-        (b) -> ModuleManager.getModule(LiquidNewChunks.class).setInverseRenderEnabled(b),
-        SettingLocation.CHUNK_HIGHLIGHTS);
-    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> liquidNewChunksInverseColorSetting = XaeroPlusEnumSetting.create(
-        "New Chunks Inverse Color",
-        "setting.world_map.new_chunks_inverse_color",
-        "setting.world_map.new_chunks_inverse_color.tooltip",
-        ColorHelper.HighlightColor.values(),
-        ColorHelper.HighlightColor.GREEN,
-        (b) -> ModuleManager.getModule(LiquidNewChunks.class).setInverseRgbColor(b.getColor()),
-        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting oldChunksEnabledSetting = XaeroPlusBooleanSetting.create(
         "OldChunks Highlighting",
         "setting.world_map.old_chunks_highlighting",
@@ -348,6 +303,57 @@ public final class XaeroPlusSettingRegistry {
         ColorHelper.HighlightColor.values(),
         ColorHelper.HighlightColor.MAGENTA,
         (b) -> ModuleManager.getModule(Portals.class).setRgbColor(b.getColor()),
+        SettingLocation.CHUNK_HIGHLIGHTS);
+    public static final XaeroPlusBooleanSetting liquidNewChunksEnabledSetting = XaeroPlusBooleanSetting.create(
+        "NewChunks Highlighting",
+        "setting.world_map.new_chunks_highlighting",
+        "setting.world_map.new_chunks_highlighting.tooltip",
+        false,
+        (b) -> ModuleManager.getModule(LiquidNewChunks.class).setEnabled(b),
+        SettingLocation.CHUNK_HIGHLIGHTS);
+    public static final XaeroPlusBooleanSetting liquidNewChunksSaveLoadToDisk = XaeroPlusBooleanSetting.create(
+        "Save/Load NewChunks to Disk",
+        "setting.world_map.new_chunks_save_load_to_disk",
+        "setting.world_map.new_chunks_save_load_to_disk.tooltip",
+        true,
+        (b) -> ModuleManager.getModule(LiquidNewChunks.class).setDiskCache(b),
+        SettingLocation.CHUNK_HIGHLIGHTS);
+    public static final XaeroPlusFloatSetting liquidNewChunksAlphaSetting = XaeroPlusFloatSetting.create(
+        "New Chunks Opacity",
+        "setting.world_map.new_chunks_opacity",
+        "setting.world_map.new_chunks_opacity.tooltip",
+        0f, 255f, 10f,
+        100,
+        (b) -> ModuleManager.getModule(LiquidNewChunks.class).setAlpha(b),
+        SettingLocation.CHUNK_HIGHLIGHTS);
+    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> liquidNewChunksColorSetting = XaeroPlusEnumSetting.create(
+        "New Chunks Color",
+        "setting.world_map.new_chunks_color",
+        "setting.world_map.new_chunks_color.tooltip",
+        ColorHelper.HighlightColor.values(),
+        ColorHelper.HighlightColor.RED,
+        (b) -> ModuleManager.getModule(LiquidNewChunks.class).setRgbColor(b.getColor()),
+        SettingLocation.CHUNK_HIGHLIGHTS);
+    public static final XaeroPlusBooleanSetting liquidNewChunksInverseHighlightsSetting = XaeroPlusBooleanSetting.create(
+        "New Chunks Render Inverse",
+        "setting.world_map.new_chunks_inverse_enabled",
+        "setting.world_map.new_chunks_inverse_enabled.tooltip",
+        false,
+        (b) -> ModuleManager.getModule(LiquidNewChunks.class).setInverseRenderEnabled(b),
+        SettingLocation.CHUNK_HIGHLIGHTS);
+    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> liquidNewChunksInverseColorSetting = XaeroPlusEnumSetting.create(
+        "New Chunks Inverse Color",
+        "setting.world_map.new_chunks_inverse_color",
+        "setting.world_map.new_chunks_inverse_color.tooltip",
+        ColorHelper.HighlightColor.values(),
+        ColorHelper.HighlightColor.GREEN,
+        (b) -> ModuleManager.getModule(LiquidNewChunks.class).setInverseRgbColor(b.getColor()),
+        SettingLocation.CHUNK_HIGHLIGHTS);
+    public static final XaeroPlusBooleanSetting liquidNewChunksOnlyAboveY0Setting = XaeroPlusBooleanSetting.create(
+        "Liquid NewChunks Only Y > 0",
+        "setting.world_map.new_chunks_only_above_y0",
+        "setting.world_map.new_chunks_only_above_y0.tooltip",
+        false,
         SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting worldToolsEnabledSetting = XaeroPlusBooleanSetting.create(
         "WorldTools Highlights",
@@ -648,5 +654,11 @@ public final class XaeroPlusSettingRegistry {
         "setting.world_map.expanded_settings",
         "setting.world_map.expanded_settings.tooltip",
         false,
+        SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting sodiumSettingIntegration = XaeroPlusBooleanSetting.create(
+        "Sodium/Embeddium Setting Integration",
+        "setting.xaeroplus.sodium_embeddium_integration",
+        "setting.xaeroplus.sodium_embeddium_integration.tooltip",
+        true,
         SettingLocation.WORLD_MAP_MAIN);
 }

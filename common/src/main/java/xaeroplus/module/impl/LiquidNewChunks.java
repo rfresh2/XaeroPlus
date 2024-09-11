@@ -7,6 +7,7 @@ import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
 import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -24,11 +25,9 @@ import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ChunkScanner;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
-import xaeroplus.util.MutableBlockPos;
 
 import java.time.Duration;
 
-import static java.util.Arrays.asList;
 import static xaeroplus.util.ChunkUtils.getActualDimension;
 import static xaeroplus.util.ColorHelper.getColor;
 
@@ -46,14 +45,11 @@ public class LiquidNewChunks extends Module {
     private int newChunksColor = getColor(255, 0, 0, 100);
     private int inverseColor = getColor(0, 255, 0, 100);
     private static final Direction[] searchDirs = new Direction[] { Direction.EAST, Direction.NORTH, Direction.WEST, Direction.SOUTH, Direction.UP };
-    private static final ReferenceSet<Block> liquidBlockTypeFilter = new ReferenceOpenHashSet<>(2);
+    private static final ReferenceSet<Block> liquidBlockTypeFilter = ReferenceOpenHashSet.of(
+        Blocks.WATER,
+        Blocks.LAVA
+    );
     private static final String inverseDrawFeatureId = "LiquidNewChunksInverse";
-    static {
-        liquidBlockTypeFilter.addAll(asList(
-            Blocks.WATER,
-            Blocks.LAVA
-        ));
-    }
 
     public void setDiskCache(boolean disk) {
         newChunksCache.setDiskCache(disk, isEnabled());
@@ -84,11 +80,12 @@ public class LiquidNewChunks extends Module {
             if (newChunksCache.get().isHighlighted(chunkX, chunkZ, getActualDimension())) return;
             final int srcX = pos.getX();
             final int srcY = pos.getY();
+            if (XaeroPlusSettingRegistry.liquidNewChunksOnlyAboveY0Setting.getValue() && srcY <= 0) return;
             final int srcZ = pos.getZ();
             MutableBlockPos bp = new MutableBlockPos(srcX, srcY, srcZ);
             for (int i = 0; i < searchDirs.length; i++) {
                 final Direction dir = searchDirs[i];
-                bp.setPos(srcX + dir.getStepX(), srcY + dir.getStepY(), srcZ + dir.getStepZ());
+                bp.set(srcX + dir.getStepX(), srcY + dir.getStepY(), srcZ + dir.getStepZ());
                 if (level.getBlockState(bp).getFluidState().isSource()) {
                     newChunksCache.get().addHighlight(chunkX, chunkZ);
                     return;
@@ -137,7 +134,9 @@ public class LiquidNewChunks extends Module {
                 }
             }
             return false;
-        }, level.getMinBuildHeight());
+        }, XaeroPlusSettingRegistry.liquidNewChunksOnlyAboveY0Setting.getValue()
+            ? Math.max(1, level.getMinBuildHeight())
+            : level.getMinBuildHeight());
     }
 
     @EventHandler

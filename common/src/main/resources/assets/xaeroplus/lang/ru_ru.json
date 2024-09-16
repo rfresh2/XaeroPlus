@@ -200,5 +200,7 @@
   "gui.xaeroplus.waystone_visibility_type.local": "Локальный",
   "gui.xaeroplus.waystone_visibility_type.global": "Глобальный",
   "gui.xaeroplus.waystone_visibility_type.world_map_local": "Карта Мира Лок.",
-  "gui.xaeroplus.waystone_visibility_type.world_map_global": "Карта Мира Глоб."
+  "gui.xaeroplus.waystone_visibility_type.world_map_global": "Карта Мира Глоб.",
+  "setting.world_map.highlight_shader": "Шейдер Подсветки",
+  "setting.world_map.highlight_shader.tooltip": "Использует шейдер для отрисовки подсветки. Уменьшает использование памяти и передает больше работы на GPU."
 }

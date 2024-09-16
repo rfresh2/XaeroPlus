@@ -200,5 +200,7 @@
   "gui.xaeroplus.waystone_visibility_type.local": "Local",
   "gui.xaeroplus.waystone_visibility_type.global": "Global",
   "gui.xaeroplus.waystone_visibility_type.world_map_local": "Carte Mondiale Loc.",
-  "gui.xaeroplus.waystone_visibility_type.world_map_global": "Carte Mondiale Glob."
+  "gui.xaeroplus.waystone_visibility_type.world_map_global": "Carte Mondiale Glob.",
+  "setting.world_map.highlight_shader": "Shader de Surlignage",
+  "setting.world_map.highlight_shader.tooltip": "Utilise un shader pour rendre les surlignages. Réduit l'utilisation de la mémoire et décharge plus de travail sur le GPU."
 }

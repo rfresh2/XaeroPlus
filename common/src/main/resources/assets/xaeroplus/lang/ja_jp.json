@@ -198,5 +198,7 @@
     "gui.xaeroplus.waystone_visibility_type.local": "ローカル",
     "gui.xaeroplus.waystone_visibility_type.global": "グローバル",
     "gui.xaeroplus.waystone_visibility_type.world_map_local": "ワールドマップ ローカル",
-    "gui.xaeroplus.waystone_visibility_type.world_map_global": "ワールドマップ グローバル"
+    "gui.xaeroplus.waystone_visibility_type.world_map_global": "ワールドマップ グローバル",
+    "setting.world_map.highlight_shader": "ハイライトシェーダー",
+    "setting.world_map.highlight_shader.tooltip": "ハイライトをレンダリングするためにシェーダーを使用します。メモリ使用量を減らし、より多くの作業をGPUにオフロードします。"
 }

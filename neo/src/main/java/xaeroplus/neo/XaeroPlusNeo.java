@@ -12,6 +12,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
+import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
@@ -32,6 +33,7 @@ public class XaeroPlusNeo {
         if (FMLEnvironment.dist.isClient()) {
             modEventBus.addListener(this::onInitialize);
             modEventBus.addListener(this::onRegisterKeyMappingsEvent);
+            modEventBus.addListener(this::onRegisterClientResourceReloadListeners);
             FORGE_EVENT_BUS.addListener(this::onRegisterClientCommandsEvent);
 //			FORGE_EVENT_BUS.register(modEventBus);
             if (EmbeddiumHelper.isEmbeddiumPresent())
@@ -65,5 +67,9 @@ public class XaeroPlusNeo {
             c.getSource().sendSuccess(DataFolderResolveUtil::getCurrentDataDirPath, false);
             return 1;
         }));
+    }
+
+    public void onRegisterClientResourceReloadListeners(RegisterClientReloadListenersEvent event) {
+        event.registerReloadListener(new XaeroPlusNeoResourceReloadListener());
     }
 }

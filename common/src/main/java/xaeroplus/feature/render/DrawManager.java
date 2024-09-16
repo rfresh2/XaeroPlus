@@ -30,6 +30,7 @@ public class DrawManager {
     }
 
     public synchronized void registerChunkHighlightProvider(String id, ChunkHighlightSupplier chunkHighlightSupplier, IntSupplier colorSupplier) {
+        unregisterChunkHighlightProvider(id); // just in case
         chunkHighlightDrawFeatures.put(id, new DrawFeature(new ChunkHighlightProvider(chunkHighlightSupplier, colorSupplier)));
         sortedKeySet.add(id);
         // arbitrary order, just needs to be consistent so colors blend consistently
@@ -80,7 +81,9 @@ public class DrawManager {
         var matrix = matrixStack.last().pose();
         for (int i = 0; i < sortedKeySet.size(); i++) {
             var k = sortedKeySet.get(i);
+            if (k == null) continue;
             var feature = chunkHighlightDrawFeatures.get(k);
+            if (feature == null) continue;
             int color = feature.colorInt();
             var a = ColorHelper.getA(color);
             if (a == 0.0f) return;
@@ -150,7 +153,9 @@ public class DrawManager {
         );
         for (int i = 0; i < sortedKeySet.size(); i++) {
             var k = sortedKeySet.get(i);
+            if (k == null) continue;
             var feature = chunkHighlightDrawFeatures.get(k);
+            if (feature == null) continue;
             int color = feature.colorInt();
             var a = ColorHelper.getA(color);
             if (a == 0.0f) return;
@@ -181,7 +186,9 @@ public class DrawManager {
         var matrix = matrixStack.last().pose();
         for (int i = 0; i < sortedKeySet.size(); i++) {
             var k = sortedKeySet.get(i);
+            if (k == null) continue;
             var feature = chunkHighlightDrawFeatures.get(k);
+            if (feature == null) continue;
             feature.getHighlightDrawBuffer().close();
             int color = feature.colorInt();
             var a = ColorHelper.getA(color);

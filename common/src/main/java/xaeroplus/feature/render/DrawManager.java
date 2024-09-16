@@ -7,6 +7,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.lenni0451.lambdaevents.EventHandler;
+import net.minecraft.client.Minecraft;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.DimensionSwitchEvent;
@@ -37,7 +38,10 @@ public class DrawManager {
 
     public synchronized void unregisterChunkHighlightProvider(String id) {
         sortedKeySet.remove(id);
-        chunkHighlightDrawFeatures.remove(id);
+        DrawFeature feature = chunkHighlightDrawFeatures.remove(id);
+        if (feature != null) {
+            Minecraft.getInstance().execute(() -> feature.getHighlightDrawBuffer().close());
+        }
     }
 
     public synchronized void registerChunkHighlightProvider(Class<?> clazz, ChunkHighlightSupplier chunkHighlightSupplier, IntSupplier colorSupplier) {

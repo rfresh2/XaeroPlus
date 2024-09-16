@@ -200,5 +200,7 @@
   "gui.xaeroplus.waystone_visibility_type.local": "Local",
   "gui.xaeroplus.waystone_visibility_type.global": "Global",
   "gui.xaeroplus.waystone_visibility_type.world_map_local": "Mapa Mundial Loc.",
-  "gui.xaeroplus.waystone_visibility_type.world_map_global": "Mapa Mundial Glob."
+  "gui.xaeroplus.waystone_visibility_type.world_map_global": "Mapa Mundial Glob.",
+  "setting.world_map.highlight_shader": "Sombreado de Resaltado",
+  "setting.world_map.highlight_shader.tooltip": "Usa un sombreador para renderizar resaltados. Reduce el uso de memoria y descarga más trabajo a la GPU."
 }

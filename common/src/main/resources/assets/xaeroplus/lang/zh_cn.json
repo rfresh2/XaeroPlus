@@ -200,5 +200,7 @@
   "gui.xaeroplus.waystone_visibility_type.local": "本地",
   "gui.xaeroplus.waystone_visibility_type.global": "全局",
   "gui.xaeroplus.waystone_visibility_type.world_map_local": "世界地图本地",
-  "gui.xaeroplus.waystone_visibility_type.world_map_global": "世界地图全局"
+  "gui.xaeroplus.waystone_visibility_type.world_map_global": "世界地图全局",
+  "setting.world_map.highlight_shader": "高亮着色器",
+  "setting.world_map.highlight_shader.tooltip": "使用着色器来渲染高亮。减少内存使用，并将更多工作分配给GPU。"
 }

@@ -8,6 +8,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
+import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -39,6 +40,7 @@ public class XaeroPlusForge {
             return () -> {
                 modEventBus.addListener(this::onInitialize);
                 modEventBus.addListener(this::onRegisterKeyMappingsEvent);
+                modEventBus.addListener(this::onRegisterClientResourceReloadListeners);
                 FORGE_EVENT_BUS.addListener(this::onRegisterClientCommandsEvent);
                 FORGE_EVENT_BUS.register(modEventBus);
                 RemovalCause explicit = RemovalCause.EXPLICIT; // force class load to stop forge shitting itself at runtime??
@@ -71,5 +73,9 @@ public class XaeroPlusForge {
             c.getSource().sendSuccess(DataFolderResolveUtil.getCurrentDataDirPath(), false);
             return 1;
         }));
+    }
+
+    public void onRegisterClientResourceReloadListeners(RegisterClientReloadListenersEvent event) {
+        event.registerReloadListener(new XaeroPlusForgeResourceReloadListener());
     }
 }

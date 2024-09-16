@@ -661,4 +661,10 @@ public final class XaeroPlusSettingRegistry {
         "setting.xaeroplus.sodium_embeddium_integration.tooltip",
         true,
         SettingLocation.WORLD_MAP_MAIN);
+    public static final XaeroPlusBooleanSetting highlightShader = XaeroPlusBooleanSetting.create(
+        "Highlight Shader",
+        "setting.world_map.highlight_shader",
+        "setting.world_map.highlight_shader.tooltip",
+        true,
+        SettingLocation.CHUNK_HIGHLIGHTS);
 }

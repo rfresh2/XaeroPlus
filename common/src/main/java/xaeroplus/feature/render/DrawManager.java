@@ -1,5 +1,7 @@
 package xaeroplus.feature.render;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
@@ -9,6 +11,7 @@ import xaero.common.minimap.render.MinimapRendererHelper;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.DimensionSwitchEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
+import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
 
@@ -116,10 +119,66 @@ public class DrawManager {
         final PoseStack matrixStack,
         final VertexConsumer overlayBuffer
     ) {
+        if (XaeroPlusSettingRegistry.highlightShader.getValue())
+            drawWorldMapFeaturesShader(flooredCameraX, flooredCameraZ, matrixStack);
+        else
+            drawWorldMapFeaturesImmediate(minBlockX, maxBlockX, minBlockZ, maxBlockZ, flooredCameraX, flooredCameraZ, matrixStack, overlayBuffer);
+    }
+
+    public synchronized void drawWorldMapFeaturesShader(
+        final int flooredCameraX,
+        final int flooredCameraZ,
+        final PoseStack matrixStack
+    ) {
+        XaeroPlusShaders.ensureShaders();
+        var shader = XaeroPlusShaders.HIGHLIGHT_SHADER;
+        if (shader == null) return;
+        matrixStack.pushPose();
+        matrixStack.translate(-flooredCameraX, -flooredCameraZ, 1.0f);
+        shader.setWorldMapViewMatrix(matrixStack.last().pose());
+        matrixStack.popPose();
+        RenderSystem.enableBlend();
+        RenderSystem.blendFuncSeparate(
+            GlStateManager.SourceFactor.SRC_ALPHA,
+            GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
+            GlStateManager.SourceFactor.ONE,
+            GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA
+        );
+        for (int i = 0; i < sortedKeySet.size(); i++) {
+            var k = sortedKeySet.get(i);
+            var feature = chunkHighlightDrawFeatures.get(k);
+            int color = feature.colorInt();
+            var a = ColorHelper.getA(color);
+            if (a == 0.0f) return;
+            var r = ColorHelper.getR(color);
+            var g = ColorHelper.getG(color);
+            var b = ColorHelper.getB(color);
+            shader.setHighlightColor(r, g, b, a);
+            var highlights = feature.getChunkHighlights();
+            if (feature.getHighlightDrawBuffer().needsRefresh()) {
+                feature.getHighlightDrawBuffer().refresh(highlights);
+            }
+            feature.getHighlightDrawBuffer().render();
+        }
+        RenderSystem.disableBlend();
+        RenderSystem.defaultBlendFunc();
+    }
+
+    public synchronized void drawWorldMapFeaturesImmediate(
+        final double minBlockX,
+        final double maxBlockX,
+        final double minBlockZ,
+        final double maxBlockZ,
+        final int flooredCameraX,
+        final int flooredCameraZ,
+        final PoseStack matrixStack,
+        final VertexConsumer overlayBuffer
+    ) {
         var matrix = matrixStack.last().pose();
         for (int i = 0; i < sortedKeySet.size(); i++) {
             var k = sortedKeySet.get(i);
             var feature = chunkHighlightDrawFeatures.get(k);
+            feature.getHighlightDrawBuffer().close();
             int color = feature.colorInt();
             var a = ColorHelper.getA(color);
             if (a == 0.0f) return;
@@ -133,8 +192,8 @@ public class DrawManager {
                 var chunkPosZ = ChunkUtils.longToChunkZ(highlight);
                 var blockX = ChunkUtils.chunkCoordToCoord(chunkPosX);
                 var blockZ = ChunkUtils.chunkCoordToCoord(chunkPosZ);
-                if (blockX < minBlockX || blockX > maxBlockX) continue;
-                if (blockZ < minBlockZ || blockZ > maxBlockZ) continue;
+                if (blockX < minBlockX - 32 || blockX > maxBlockX) continue;
+                if (blockZ < minBlockZ - 32 || blockZ > maxBlockZ) continue;
                 final float left = (float) (ChunkUtils.chunkCoordToCoord(chunkPosX) - flooredCameraX);
                 final float top = (float) (ChunkUtils.chunkCoordToCoord(chunkPosZ) - flooredCameraZ);
                 final float right = left + 16;

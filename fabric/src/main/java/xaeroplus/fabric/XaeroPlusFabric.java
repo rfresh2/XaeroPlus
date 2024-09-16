@@ -5,12 +5,15 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.Version;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.server.packs.PackType;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.fabric.util.FabricWaystonesHelperInit;
+import xaeroplus.fabric.util.XPShaderResourceReloadListener;
 import xaeroplus.fabric.util.compat.IncompatibleMinimapWarningScreen;
 import xaeroplus.fabric.util.compat.XaeroPlusMinimapCompatibilityChecker;
 import xaeroplus.module.ModuleManager;
@@ -61,5 +64,6 @@ public class XaeroPlusFabric implements ClientModInitializer {
 				return 1;
 			}));
 		});
+		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new XPShaderResourceReloadListener());
 	}
 }

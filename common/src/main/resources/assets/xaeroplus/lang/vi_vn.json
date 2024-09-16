@@ -200,5 +200,7 @@
     "gui.xaeroplus.waystone_visibility_type.local": "Cục bộ",
     "gui.xaeroplus.waystone_visibility_type.global": "Toàn cầu",
     "gui.xaeroplus.waystone_visibility_type.world_map_local": "Bản Đồ Thế Giới Cục Bộ",
-    "gui.xaeroplus.waystone_visibility_type.world_map_global": "Bản Đồ Thế Giới Toàn Cầu"
+    "gui.xaeroplus.waystone_visibility_type.world_map_global": "Bản Đồ Thế Giới Toàn Cầu",
+    "setting.world_map.highlight_shader": "Shader Làm Nổi Bật",
+    "setting.world_map.highlight_shader.tooltip": "Sử dụng shader để kết xuất điểm nổi bật. Giảm sử dụng bộ nhớ và chuyển nhiều công việc hơn cho GPU."
 }

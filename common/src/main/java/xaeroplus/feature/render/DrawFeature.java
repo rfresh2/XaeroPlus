@@ -13,6 +13,7 @@ import static xaeroplus.util.GuiMapHelper.*;
 public class DrawFeature {
     private final AsyncLoadingCache<Long, LongList> chunkRenderCache;
     private final ChunkHighlightProvider chunkHighlightProvider;
+    private final HighlightDrawBuffer highlightDrawBuffer = new HighlightDrawBuffer();
 
     public DrawFeature(ChunkHighlightProvider chunkHighlightProvider) {
         this.chunkHighlightProvider = chunkHighlightProvider;
@@ -24,6 +25,7 @@ public class DrawFeature {
             .expireAfterWrite(10, TimeUnit.SECONDS)
             .refreshAfterWrite(500, TimeUnit.MILLISECONDS)
             .executor(Globals.cacheRefreshExecutorService.get())
+            .removalListener((k, v, cause) -> getHighlightDrawBuffer().markStale())
             // only one key
             .buildAsync(k -> loadFeatureHighlightsInWindow(chunkHighlightProvider));
     }
@@ -54,5 +56,9 @@ public class DrawFeature {
 
     public LongList getChunkHighlights() {
         return chunkRenderCache.get(0L).getNow(LongList.of());
+    }
+
+    public HighlightDrawBuffer getHighlightDrawBuffer() {
+        return this.highlightDrawBuffer;
     }
 }

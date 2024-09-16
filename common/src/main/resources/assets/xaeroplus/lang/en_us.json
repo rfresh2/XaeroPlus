@@ -200,5 +200,7 @@
   "gui.xaeroplus.waystone_visibility_type.local": "Local",
   "gui.xaeroplus.waystone_visibility_type.global": "Global",
   "gui.xaeroplus.waystone_visibility_type.world_map_local": "World Map Loc.",
-  "gui.xaeroplus.waystone_visibility_type.world_map_global": "World Map Glo."
+  "gui.xaeroplus.waystone_visibility_type.world_map_global": "World Map Glo.",
+  "setting.world_map.highlight_shader": "Highlight Shader",
+  "setting.world_map.highlight_shader.tooltip": "Uses a shader to render highlights. Reduces memory usage and offloads more work to the GPU."
 }

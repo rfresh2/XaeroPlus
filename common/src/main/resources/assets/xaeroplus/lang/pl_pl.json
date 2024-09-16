@@ -200,5 +200,7 @@
   "gui.xaeroplus.waystone_visibility_type.local": "Lokalny",
   "gui.xaeroplus.waystone_visibility_type.global": "Globalny",
   "gui.xaeroplus.waystone_visibility_type.world_map_local": "Mapa Świata Lok.",
-  "gui.xaeroplus.waystone_visibility_type.world_map_global": "Mapa Świata Glob."
+  "gui.xaeroplus.waystone_visibility_type.world_map_global": "Mapa Świata Glob.",
+  "setting.world_map.highlight_shader": "Shader Podświetlenia",
+  "setting.world_map.highlight_shader.tooltip": "Używa shaderu do renderowania podświetleń. Zmniejsza zużycie pamięci i przenosi więcej pracy na GPU."
 }

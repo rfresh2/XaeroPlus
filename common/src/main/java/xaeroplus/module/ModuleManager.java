@@ -16,6 +16,7 @@ public class ModuleManager {
                 new Highways(),
                 new LiquidNewChunks(),
                 new OldChunks(),
+                new OldBiomes(),
                 new PaletteNewChunks(),
                 new Portals(),
                 new PortalSkipDetection(),

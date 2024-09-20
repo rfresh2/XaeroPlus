@@ -83,6 +83,24 @@ public class DrawManager {
             -(chunkZ * 64) - (tileZ * 16) - insideZ,
             0);
         matrixStack.scale(16f, 16f, 1f);
+        if (XaeroPlusSettingRegistry.highlightShader.getValue()) {
+            drawMinimapFeaturesShader(matrixStack);
+        } else {
+            drawMinimapFeaturesImmediate(minViewMapTileChunkCoordX, maxViewMapTileChunkCoordX, minViewMapTileChunkCoordZ, maxViewMapTileChunkCoordZ,
+                                         matrixStack, overlayBufferBuilder, helper);
+        }
+        matrixStack.popPose();
+    }
+
+    public synchronized void drawMinimapFeaturesImmediate(
+        int minViewMapTileChunkCoordX,
+        int maxViewMapTileChunkCoordX,
+        int minViewMapTileChunkCoordZ,
+        int maxViewMapTileChunkCoordZ,
+        final PoseStack matrixStack,
+        final VertexConsumer overlayBufferBuilder,
+        MinimapRendererHelper helper
+    ) {
         var matrix = matrixStack.last().pose();
         for (int i = 0; i < sortedKeySet.size(); i++) {
             var k = sortedKeySet.get(i);
@@ -111,7 +129,36 @@ public class DrawManager {
                 );
             }
         }
-        matrixStack.popPose();
+    }
+
+    public synchronized void drawMinimapFeaturesShader(
+        final PoseStack matrixStack
+    ) {
+        XaeroPlusShaders.ensureShaders();
+        var shader = XaeroPlusShaders.HIGHLIGHT_SHADER;
+        if (shader == null) return;
+        shader.setWorldMapViewMatrix(matrixStack.last().pose());
+        RenderSystem.enableBlend();
+        for (int i = 0; i < sortedKeySet.size(); i++) {
+            var k = sortedKeySet.get(i);
+            if (k == null) continue;
+            var feature = chunkHighlightDrawFeatures.get(k);
+            if (feature == null) continue;
+            int color = feature.colorInt();
+            var a = ColorHelper.getA(color);
+            if (a == 0.0f) return;
+            var r = ColorHelper.getR(color);
+            var g = ColorHelper.getG(color);
+            var b = ColorHelper.getB(color);
+            shader.setHighlightColor(r, g, b, a);
+            var highlights = feature.getChunkHighlights();
+            var drawBuffer = feature.getHighlightDrawBuffer();
+            if (drawBuffer.needsRefresh()) {
+                drawBuffer.refresh(highlights);
+            }
+            drawBuffer.render();
+        }
+        RenderSystem.disableBlend();
     }
 
     public synchronized void drawWorldMapFeatures(
@@ -140,6 +187,8 @@ public class DrawManager {
         if (shader == null) return;
         matrixStack.pushPose();
         matrixStack.translate(-flooredCameraX, -flooredCameraZ, 1.0f);
+        matrixStack.scale(16f, -16f, 1f);
+        matrixStack.translate(0, -1, 0);
         shader.setWorldMapViewMatrix(matrixStack.last().pose());
         matrixStack.popPose();
         RenderSystem.enableBlend();

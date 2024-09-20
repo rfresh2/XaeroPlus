@@ -30,17 +30,14 @@ public class HighlightDrawBuffer {
             long highlight = highlights.getLong(j);
             var chunkPosX = ChunkUtils.longToChunkX(highlight);
             var chunkPosZ = ChunkUtils.longToChunkZ(highlight);
-            var blockPosX = ChunkUtils.chunkCoordToCoord(chunkPosX);
-            var blockPosZ = ChunkUtils.chunkCoordToCoord(chunkPosZ);
-            var chunkSize = 16;
-            float x1 = blockPosX;
-            float x2 = blockPosX + chunkSize;
-            float y1 = blockPosZ;
-            float y2 = blockPosZ + chunkSize;
-            bufferBuilder.vertex(x1, y1, 0.0F).endVertex();
-            bufferBuilder.vertex(x2, y1, 0.0F).endVertex();
-            bufferBuilder.vertex(x2, y2, 0.0F).endVertex();
-            bufferBuilder.vertex(x1, y2, 0.0F).endVertex();
+            float x1 = chunkPosX;
+            float x2 = chunkPosX + 1;
+            float y1 = chunkPosZ;
+            float y2 = chunkPosZ + 1;
+            bufferBuilder.vertex(x1, y2, 0F).endVertex();
+            bufferBuilder.vertex(x2, y2, 0F).endVertex();
+            bufferBuilder.vertex(x2, y1, 0F).endVertex();
+            bufferBuilder.vertex(x1, y1, 0F).endVertex();
         }
         if (vertexBuffer == null || vertexBuffer.isInvalid()) {
             close();

@@ -1,5 +1,7 @@
 package xaeroplus.mixin.client;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
@@ -19,6 +21,8 @@ import xaero.common.IXaeroMinimap;
 import xaero.common.graphics.CustomRenderTypes;
 import xaero.common.graphics.CustomVertexConsumers;
 import xaero.common.graphics.ImprovedFramebuffer;
+import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRenderer;
+import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
 import xaero.common.graphics.shader.MinimapShaders;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.render.MinimapFBORenderer;
@@ -231,11 +235,11 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         this.helper.drawMyTexturedModalRect(matrixStack, -scaledSize.get(), -scaledSize.get(), 0, 0, scaledSizeM, scaledSizeM, scaledSizeM, scaledSizeM);
     }
 
-    @Inject(method = "renderChunksToFBO", at = @At(
+    @WrapOperation(method = "renderChunksToFBO", at = @At(
         value = "INVOKE",
         target = "Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;draw(Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRenderer;)V"
     ))
-    public void drawMinimapFeaturesCaveMode(final MinimapSession minimapSession, final GuiGraphics guiGraphics, final MinimapProcessor minimap, final Player player, final Entity renderEntity, final double playerX, final double playerZ, final double playerDimDiv, final double mapDimensionScale, final int bufferSize, final int viewW, final float sizeFix, final float partial, final int level, final boolean retryIfError, final boolean useWorldMap, final boolean lockedNorth, final int shape, final double ps, final double pc, final boolean cave, final boolean circle, final CustomVertexConsumers cvc, final CallbackInfo ci,
+    public void drawMinimapFeaturesCaveMode(final MultiTextureRenderTypeRendererProvider instance, final MultiTextureRenderTypeRenderer renderer, final Operation<Void> original,
                                             @Local(name = "xFloored") int xFloored,
                                             @Local(name = "zFloored") int zFloored,
                                             @Local(name = "overlayBufferBuilder") VertexConsumer overlayBufferBuilder,
@@ -245,6 +249,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
                                             @Local(name = "minZ") int minZRef,
                                             @Local(name = "maxZ") int maxZRef
     ) {
+        original.call(instance, renderer);
         int mapX = xFloored >> 4;
         int mapZ = zFloored >> 4;
         int chunkX = mapX >> 2;

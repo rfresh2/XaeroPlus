@@ -304,6 +304,36 @@ public final class XaeroPlusSettingRegistry {
         ColorHelper.HighlightColor.MAGENTA,
         (b) -> ModuleManager.getModule(Portals.class).setRgbColor(b.getColor()),
         SettingLocation.CHUNK_HIGHLIGHTS);
+    public static final XaeroPlusBooleanSetting oldBiomesSetting = XaeroPlusBooleanSetting.create(
+        "Old Biomes",
+        "setting.world_map.old_biomes_enabled",
+        "setting.world_map.old_biomes_enabled.tooltip",
+        false,
+        (b) -> ModuleManager.getModule(OldBiomes.class).setEnabled(b),
+        SettingLocation.CHUNK_HIGHLIGHTS);
+    public static final XaeroPlusBooleanSetting oldBiomesSaveToDiskSetting = XaeroPlusBooleanSetting.create(
+        "Save/Load OldBiomes To Disk",
+        "setting.world_map.old_biomes_save_load_to_disk",
+        "setting.world_map.old_biomes_save_load_to_disk.tooltip",
+        true,
+        (b) -> ModuleManager.getModule(OldBiomes.class).setDiskCache(b),
+        SettingLocation.CHUNK_HIGHLIGHTS);
+    public static final XaeroPlusFloatSetting oldBiomesAlphaSetting = XaeroPlusFloatSetting.create(
+        "OldBiomes Opacity",
+        "setting.world_map.old_biomes_opacity",
+        "setting.world_map.old_biomes_opacity.tooltip",
+        0f, 255f, 10f,
+        100,
+        (b) -> ModuleManager.getModule(OldBiomes.class).setAlpha(b),
+        SettingLocation.CHUNK_HIGHLIGHTS);
+    public static final XaeroPlusEnumSetting<ColorHelper.HighlightColor> oldBiomesColorSetting = XaeroPlusEnumSetting.create(
+        "OldBiomes Color",
+        "setting.world_map.old_biomes_color",
+        "setting.world_map.old_biomes_color.tooltip",
+        ColorHelper.HighlightColor.values(),
+        ColorHelper.HighlightColor.GREEN,
+        (b) -> ModuleManager.getModule(OldBiomes.class).setRgbColor(b.getColor()),
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public static final XaeroPlusBooleanSetting liquidNewChunksEnabledSetting = XaeroPlusBooleanSetting.create(
         "NewChunks Highlighting",
         "setting.world_map.new_chunks_highlighting",

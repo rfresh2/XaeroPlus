@@ -47,6 +47,7 @@ dependencies {
     shadow(libs.sqlite)
     forgeRuntimeLibrary(implementation(include(libs.caffeine.get())!!)!!)
     forgeRuntimeLibrary(implementation(include(libs.lambdaEvents.get())!!)!!)
+    implementation(include(libs.oldbiomes.get())!!)
     compileOnly(project(":common"))
 }
 

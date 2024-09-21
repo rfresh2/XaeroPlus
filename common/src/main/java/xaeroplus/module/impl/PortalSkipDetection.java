@@ -1,6 +1,5 @@
 package xaeroplus.module.impl;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongList;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
@@ -27,19 +26,12 @@ import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
 
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import static xaeroplus.util.ChunkUtils.*;
 import static xaeroplus.util.GuiMapHelper.*;
 
 public class PortalSkipDetection extends Module {
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor(
-        new ThreadFactoryBuilder()
-            .setNameFormat("XaeroPlus-PortalSkipDetection-Search")
-            .setDaemon(true)
-            .build());
     private Future<?> portalSkipDetectionSearchFuture = null;
     private int portalSkipChunksColor = ColorHelper.getColor(255, 255, 255, 100);
     private final ChunkHighlightLocalCache cache = new ChunkHighlightLocalCache();
@@ -124,7 +116,7 @@ public class PortalSkipDetection extends Module {
         windowRegionZ = regionZ;
         windowRegionSize = regionSize;
         if (Minecraft.getInstance().level == null) return;
-        portalSkipDetectionSearchFuture = executorService.submit(this::searchForPortalSkipChunks);
+        portalSkipDetectionSearchFuture = Globals.moduleExecutorService.get().submit(this::searchForPortalSkipChunks);
     }
 
     private final LongOpenHashSet portalDetectionSearchChunksBuf = new LongOpenHashSet();

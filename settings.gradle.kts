@@ -8,7 +8,7 @@ pluginManagement {
 	}
 }
 gradle.extra.apply {
-	set("mod_version", "2.23.3")
+	set("mod_version", "2.23")
 	set("maven_group", "xaeroplus")
 	set("archives_base_name", "XaeroPlus")
 	set("minecraft_version", "1.20.2")
@@ -59,7 +59,8 @@ dependencyResolutionManagement {
             library("embeddium", "maven.modrinth:embeddium:0.2.12+mc1.20.2")
             library("fpsdisplay", "maven.modrinth:fpsdisplay:3.1.0+1.20.x")
 			library("cloth-config-fabric", "me.shedaniel.cloth:cloth-config-fabric:12.0.111")
-		}
+            library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0")
+        }
 	}
 }
 

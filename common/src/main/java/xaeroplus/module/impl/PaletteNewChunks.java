@@ -99,7 +99,7 @@ public class PaletteNewChunks extends Module {
         } else { // HashMapPalette
             // we could iterate through more sections but this is good enough in most cases
             // checking every blockstate is relatively expensive
-            for (int i = 0; i < Math.min(sections.length, 3); i++) {
+            for (int i = 0; i < Math.min(sections.length, 10); i++) {
                 var section = sections[i];
                 var paletteContainerData = section.getStates().data;
                 var palette = paletteContainerData.palette();

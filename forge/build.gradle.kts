@@ -47,6 +47,7 @@ dependencies {
     modCompileOnly(libs.worldtools)
     modCompileOnly(libs.fabric.waystones)
     shadow(libs.sqlite)
+    implementation(include(libs.oldbiomes.get())!!)
     forgeRuntimeLibrary(implementation(include(libs.caffeine.get())!!)!!)
     forgeRuntimeLibrary(implementation(include(libs.lambdaEvents.get())!!)!!)
     compileOnly(project(":common"))

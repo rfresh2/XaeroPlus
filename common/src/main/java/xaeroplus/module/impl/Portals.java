@@ -1,6 +1,5 @@
 package xaeroplus.module.impl;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import it.unimi.dsi.fastutil.longs.LongList;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
@@ -28,19 +27,11 @@ import xaeroplus.util.ChunkScanner;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import static xaeroplus.util.ColorHelper.getColor;
 
 public class Portals extends Module {
     private final SavableHighlightCacheInstance portalsCache = new SavableHighlightCacheInstance("XaeroPlusPortals");
     private int portalsColor = getColor(0, 255, 0, 100);
-    private final ExecutorService searchExecutor = Executors.newFixedThreadPool(
-        1,
-        new ThreadFactoryBuilder()
-            .setNameFormat("XaeroPlus-Portals-Search-%d")
-            .build());
     private static final ReferenceSet<Block> PORTAL_BLOCKS = ReferenceOpenHashSet.of(
         Blocks.END_PORTAL,
         Blocks.END_GATEWAY,
@@ -89,7 +80,7 @@ public class Portals extends Module {
 
     private void findPortalInChunkAsync(final ChunkAccess chunk, final int waitMs) {
         if (chunk == null) return;
-        searchExecutor.execute(() -> {
+        Globals.moduleExecutorService.get().execute(() -> {
             try {
                 Thread.sleep(waitMs);
                 int iterations = 0;

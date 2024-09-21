@@ -8,7 +8,7 @@ pluginManagement {
 	}
 }
 gradle.extra.apply {
-	set("mod_version", "2.23.3")
+	set("mod_version", "2.23")
 	set("maven_group", "xaeroplus")
 	set("archives_base_name", "XaeroPlus")
 	set("minecraft_version", "1.19.4")
@@ -47,6 +47,7 @@ dependencyResolutionManagement {
             library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.46.1.0") // relocated xerial sqlite to avoid conflicts with other mods
 			library("sodium", "maven.modrinth:sodium:mc1.19.4-0.4.10")
             library("modmenu", "maven.modrinth:modmenu:6.3.1")
+            library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0")
         }
 	}
 }

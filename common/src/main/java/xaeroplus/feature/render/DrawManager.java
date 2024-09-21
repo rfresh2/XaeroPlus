@@ -77,6 +77,12 @@ public class DrawManager {
         final VertexConsumer overlayBufferBuilder,
         MinimapRendererHelper helper
     ) {
+        matrixStack.pushPose();
+        matrixStack.translate(
+            -(chunkX * 64) - (tileX * 16) - insideX,
+            -(chunkZ * 64) - (tileZ * 16) - insideZ,
+            0);
+        matrixStack.scale(16f, 16f, 1f);
         var matrix = matrixStack.last().pose();
         for (int i = 0; i < sortedKeySet.size(); i++) {
             var k = sortedKeySet.get(i);
@@ -98,21 +104,14 @@ public class DrawManager {
                 var mapTileChunkZ = ChunkUtils.chunkCoordToMapTileChunkCoord(chunkPosZ);
                 if (mapTileChunkX < minViewMapTileChunkCoordX || mapTileChunkX > maxViewMapTileChunkCoordX) continue;
                 if (mapTileChunkZ < minViewMapTileChunkCoordZ || mapTileChunkZ > maxViewMapTileChunkCoordZ) continue;
-                var regionX = ChunkUtils.chunkCoordToRegionCoord(chunkPosX);
-                var regionZ = ChunkUtils.chunkCoordToRegionCoord(chunkPosZ);
-                var cx = regionX & 7;
-                var cz = regionZ & 7;
-                var drawX = ((cx - chunkX) << 6) - (tileX << 4) - insideX;
-                var drawZ = ((cz - chunkZ) << 6) - (tileZ << 4) - insideZ;
-                var left = drawX + 16 * (chunkPosX - cx * 4);
-                var top = drawZ + 16 * (chunkPosZ - cz * 4);
                 helper.addColoredRectToExistingBuffer(
                     matrix, overlayBufferBuilder,
-                    left, top, 16, 16,
+                    chunkPosX, chunkPosZ, 1, 1,
                     r, g, b, a
                 );
             }
         }
+        matrixStack.popPose();
     }
 
     public synchronized void drawWorldMapFeatures(
@@ -175,6 +174,8 @@ public class DrawManager {
         final PoseStack matrixStack,
         final VertexConsumer overlayBuffer
     ) {
+        matrixStack.pushPose();
+        matrixStack.translate(-flooredCameraX, -flooredCameraZ, 0);
         var matrix = matrixStack.last().pose();
         for (int i = 0; i < sortedKeySet.size(); i++) {
             var k = sortedKeySet.get(i);
@@ -197,8 +198,8 @@ public class DrawManager {
                 var blockZ = ChunkUtils.chunkCoordToCoord(chunkPosZ);
                 if (blockX < minBlockX - 32 || blockX > maxBlockX) continue;
                 if (blockZ < minBlockZ - 32 || blockZ > maxBlockZ) continue;
-                final float left = (float) (ChunkUtils.chunkCoordToCoord(chunkPosX) - flooredCameraX);
-                final float top = (float) (ChunkUtils.chunkCoordToCoord(chunkPosZ) - flooredCameraZ);
+                final float left = (float) ChunkUtils.chunkCoordToCoord(chunkPosX);
+                final float top = (float) ChunkUtils.chunkCoordToCoord(chunkPosZ);
                 final float right = left + 16;
                 final float bottom = top + 16;
                 MinimapBackgroundDrawHelper.fillIntoExistingBuffer(
@@ -208,5 +209,6 @@ public class DrawManager {
                 );
             }
         }
+        matrixStack.popPose();
     }
 }

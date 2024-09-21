@@ -42,7 +42,10 @@ public class HighlightDrawBuffer {
             bufferBuilder.vertex(x2, y2, 0.0F).endVertex();
             bufferBuilder.vertex(x1, y2, 0.0F).endVertex();
         }
-        vertexBuffer = new VertexBuffer();
+        if (vertexBuffer == null || vertexBuffer.isInvalid()) {
+            close();
+            vertexBuffer = new VertexBuffer();
+        }
         var meshData = bufferBuilder.end();
         vertexBuffer.bind();
         vertexBuffer.upload(meshData);

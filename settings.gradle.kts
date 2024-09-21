@@ -8,7 +8,7 @@ pluginManagement {
 	}
 }
 gradle.extra.apply {
-	set("mod_version", "2.23.3")
+	set("mod_version", "2.23")
 	set("maven_group", "xaeroplus")
 	set("archives_base_name", "XaeroPlus")
 	set("minecraft_version", "1.19.2")
@@ -48,6 +48,7 @@ dependencyResolutionManagement {
 			library("sodium", "maven.modrinth:sodium:mc1.19.2-0.4.4")
 			library("embeddium", "maven.modrinth:embeddium:0.3.18+mc1.19.2")
             library("modmenu", "maven.modrinth:modmenu:4.2.0-beta.2")
+            library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0")
         }
 	}
 }

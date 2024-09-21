@@ -1,6 +1,5 @@
 package xaeroplus.module.impl;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import it.unimi.dsi.fastutil.longs.LongList;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
@@ -25,9 +24,6 @@ import xaeroplus.util.ChunkScanner;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import static net.minecraft.world.level.Level.*;
 import static xaeroplus.util.ColorHelper.getColor;
 
@@ -35,11 +31,6 @@ public class OldChunks extends Module {
     private final SavableHighlightCacheInstance oldChunksCache = new SavableHighlightCacheInstance("XaeroPlusOldChunks");
     private final SavableHighlightCacheInstance modernChunksCache = new SavableHighlightCacheInstance("XaeroPlusModernChunks");
     private int oldChunksColor = getColor(0, 0, 255, 100);
-    private final ExecutorService searchExecutor = Executors.newFixedThreadPool(
-        1,
-        new ThreadFactoryBuilder()
-            .setNameFormat("XaeroPlus-OldChunks-Search-%d")
-            .build());
 
     private boolean inverse = false;
     private static final ReferenceSet<Block> OVERWORLD_BLOCKS = ReferenceOpenHashSet.of(
@@ -82,7 +73,7 @@ public class OldChunks extends Module {
     }
 
     private void searchChunkAsync(final ChunkAccess chunk) {
-        searchExecutor.submit(() -> {
+        Globals.moduleExecutorService.get().submit(() -> {
             try {
                 int iterations = 0;
                 while (iterations++ < 3) {

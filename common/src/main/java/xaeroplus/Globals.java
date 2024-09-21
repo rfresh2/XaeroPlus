@@ -49,8 +49,16 @@ public class Globals {
             Math.max(1, Math.min(Runtime.getRuntime().availableProcessors() / 2, 2)),
             new ThreadFactoryBuilder()
                 .setNameFormat("XaeroPlus-Cache-Refresh-%d")
+                .setUncaughtExceptionHandler((t, e) -> XaeroPlus.LOGGER.error("Caught unhandled exception in cache refresh executor", e))
                 .setDaemon(true)
                 .build()));
+    public static final Supplier<ExecutorService> moduleExecutorService = Suppliers.memoize(() -> Executors.newFixedThreadPool(
+        Math.max(1, Math.min(Runtime.getRuntime().availableProcessors() / 2, 2)),
+        new ThreadFactoryBuilder()
+            .setNameFormat("XaeroPlus-Module-%d")
+            .setUncaughtExceptionHandler((t, e) -> XaeroPlus.LOGGER.error("Caught unhandled exception in module executor", e))
+            .setDaemon(true)
+            .build()));
 
     public static void onAllSettingsLoaded() {
         XaeroPlusSettingsReflectionHax.ALL_SETTINGS.get().forEach(XaeroPlusSetting::init);

@@ -17,6 +17,7 @@ dependencies {
     modCompileOnly(libs.balm.fabric)
     modCompileOnly(libs.fabric.waystones)
     modCompileOnly(libs.worldtools)
+    implementation(libs.oldbiomes)
 }
 
 tasks {

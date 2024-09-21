@@ -13,10 +13,11 @@ public class ColorHelper {
 
     public static float[] getColorRGBA(final int colorInt) {
         return new float[] {
-                getR(colorInt),
-                getB(colorInt),
-                getG(colorInt),
-                getA(colorInt) };
+            getR(colorInt),
+            getG(colorInt),
+            getB(colorInt),
+            getA(colorInt)
+        };
     }
 
     public static float getR(final int color) {

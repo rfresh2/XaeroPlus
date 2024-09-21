@@ -12,6 +12,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class XaeroPlus {
 	public static final Logger LOGGER = LoggerFactory.getLogger("XaeroPlus");
 	public static final LambdaManager EVENT_BUS = LambdaManager.basic(new LambdaMetaFactoryGenerator());
-	public static AtomicBoolean initialized = new AtomicBoolean(false);
+	public static final AtomicBoolean initialized = new AtomicBoolean(false);
 	public static final File configFile = Services.PLATFORM.getConfigDir().resolve("xaeroplus.txt").toFile();
 }

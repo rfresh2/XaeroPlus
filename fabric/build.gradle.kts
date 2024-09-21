@@ -54,6 +54,8 @@ dependencies {
 	}
 	implementation(include(libs.caffeine.get())!!)
 	implementation(include(libs.lambdaEvents.get())!!)
+	implementation(include(libs.oldbiomes.get())!!)
+
 	common(project(path = ":common", configuration = "namedElements")) { isTransitive = false }
     shadowCommon(project(path = ":common", configuration = "transformProductionFabric")) { isTransitive = false }
 }

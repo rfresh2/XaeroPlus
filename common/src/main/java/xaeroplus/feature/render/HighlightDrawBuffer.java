@@ -39,7 +39,10 @@ public class HighlightDrawBuffer {
             bufferBuilder.addVertex(x2, y2, 0.0F);
             bufferBuilder.addVertex(x1, y2, 0.0F);
         }
-        vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
+        if (vertexBuffer == null || vertexBuffer.isInvalid()) {
+            close();
+            vertexBuffer = new VertexBuffer(VertexBuffer.Usage.DYNAMIC);
+        }
         var meshData = bufferBuilder.buildOrThrow();
         vertexBuffer.bind();
         vertexBuffer.upload(meshData);

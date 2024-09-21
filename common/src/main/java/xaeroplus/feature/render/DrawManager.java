@@ -1,6 +1,5 @@
 package xaeroplus.feature.render;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -30,6 +29,7 @@ public class DrawManager {
     }
 
     public synchronized void registerChunkHighlightProvider(String id, ChunkHighlightSupplier chunkHighlightSupplier, IntSupplier colorSupplier) {
+        unregisterChunkHighlightProvider(id); // just in case
         chunkHighlightDrawFeatures.put(id, new DrawFeature(new ChunkHighlightProvider(chunkHighlightSupplier, colorSupplier)));
         sortedKeySet.add(id);
         // arbitrary order, just needs to be consistent so colors blend consistently
@@ -80,7 +80,9 @@ public class DrawManager {
         var matrix = matrixStack.last().pose();
         for (int i = 0; i < sortedKeySet.size(); i++) {
             var k = sortedKeySet.get(i);
+            if (k == null) continue;
             var feature = chunkHighlightDrawFeatures.get(k);
+            if (feature == null) continue;
             int color = feature.colorInt();
             var a = ColorHelper.getA(color);
             if (a == 0.0f) return;
@@ -142,15 +144,11 @@ public class DrawManager {
         shader.setWorldMapViewMatrix(matrixStack.last().pose());
         matrixStack.popPose();
         RenderSystem.enableBlend();
-        RenderSystem.blendFuncSeparate(
-            GlStateManager.SourceFactor.SRC_ALPHA,
-            GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
-            GlStateManager.SourceFactor.ONE,
-            GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA
-        );
         for (int i = 0; i < sortedKeySet.size(); i++) {
             var k = sortedKeySet.get(i);
+            if (k == null) continue;
             var feature = chunkHighlightDrawFeatures.get(k);
+            if (feature == null) continue;
             int color = feature.colorInt();
             var a = ColorHelper.getA(color);
             if (a == 0.0f) return;
@@ -165,7 +163,6 @@ public class DrawManager {
             feature.getHighlightDrawBuffer().render();
         }
         RenderSystem.disableBlend();
-        RenderSystem.defaultBlendFunc();
     }
 
     public synchronized void drawWorldMapFeaturesImmediate(
@@ -181,7 +178,9 @@ public class DrawManager {
         var matrix = matrixStack.last().pose();
         for (int i = 0; i < sortedKeySet.size(); i++) {
             var k = sortedKeySet.get(i);
+            if (k == null) continue;
             var feature = chunkHighlightDrawFeatures.get(k);
+            if (feature == null) continue;
             feature.getHighlightDrawBuffer().close();
             int color = feature.colorInt();
             var a = ColorHelper.getA(color);

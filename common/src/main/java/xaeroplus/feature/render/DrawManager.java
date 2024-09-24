@@ -138,7 +138,7 @@ public class DrawManager {
         XaeroPlusShaders.ensureShaders();
         var shader = XaeroPlusShaders.HIGHLIGHT_SHADER;
         if (shader == null) return;
-        shader.setWorldMapViewMatrix(matrixStack.last().pose());
+        shader.setMapViewMatrix(matrixStack.last().pose());
         RenderSystem.enableBlend();
         for (int i = 0; i < sortedKeySet.size(); i++) {
             var k = sortedKeySet.get(i);
@@ -153,9 +153,9 @@ public class DrawManager {
             var b = ColorHelper.getB(color);
             shader.setHighlightColor(r, g, b, a);
             var highlights = feature.getChunkHighlights();
-            var drawBuffer = feature.getMinimapDrawBuffer();
-            if (drawBuffer.needsRefresh()) {
-                drawBuffer.refresh(highlights);
+            var drawBuffer = feature.getDrawBuffer();
+            if (drawBuffer.needsRefresh(false)) {
+                drawBuffer.refresh(highlights, false);
             }
             drawBuffer.render();
         }
@@ -172,25 +172,24 @@ public class DrawManager {
         final PoseStack matrixStack,
         final VertexConsumer overlayBuffer
     ) {
+        matrixStack.pushPose();
+        matrixStack.translate(-flooredCameraX, -flooredCameraZ, 1.0f);
+        matrixStack.scale(16f, 16f, 1f);
         if (XaeroPlusSettingRegistry.highlightShader.getValue())
-            drawWorldMapFeaturesShader(flooredCameraX, flooredCameraZ, matrixStack);
+            drawWorldMapFeaturesShader(matrixStack);
         else
-            drawWorldMapFeaturesImmediate(minBlockX, maxBlockX, minBlockZ, maxBlockZ, flooredCameraX, flooredCameraZ, matrixStack, overlayBuffer);
+            drawWorldMapFeaturesImmediate(minBlockX, maxBlockX, minBlockZ, maxBlockZ,
+                                          matrixStack, overlayBuffer);
+        matrixStack.popPose();
     }
 
     public synchronized void drawWorldMapFeaturesShader(
-        final int flooredCameraX,
-        final int flooredCameraZ,
         final PoseStack matrixStack
     ) {
         XaeroPlusShaders.ensureShaders();
         var shader = XaeroPlusShaders.HIGHLIGHT_SHADER;
         if (shader == null) return;
-        matrixStack.pushPose();
-        matrixStack.translate(-flooredCameraX, -flooredCameraZ, 1.0f);
-        matrixStack.scale(16f, 16f, 1f);
-        shader.setWorldMapViewMatrix(matrixStack.last().pose());
-        matrixStack.popPose();
+        shader.setMapViewMatrix(matrixStack.last().pose());
         RenderSystem.enableBlend();
         for (int i = 0; i < sortedKeySet.size(); i++) {
             var k = sortedKeySet.get(i);
@@ -205,9 +204,9 @@ public class DrawManager {
             var b = ColorHelper.getB(color);
             shader.setHighlightColor(r, g, b, a);
             var highlights = feature.getChunkHighlights();
-            var drawBuffer = feature.getWorldMapDrawBuffer();
-            if (drawBuffer.needsRefresh()) {
-                drawBuffer.refresh(highlights);
+            var drawBuffer = feature.getDrawBuffer();
+            if (drawBuffer.needsRefresh(true)) {
+                drawBuffer.refresh(highlights, true);
             }
             drawBuffer.render();
         }
@@ -219,13 +218,9 @@ public class DrawManager {
         final double maxBlockX,
         final double minBlockZ,
         final double maxBlockZ,
-        final int flooredCameraX,
-        final int flooredCameraZ,
         final PoseStack matrixStack,
         final VertexConsumer overlayBuffer
     ) {
-        matrixStack.pushPose();
-        matrixStack.translate(-flooredCameraX, -flooredCameraZ, 0);
         var matrix = matrixStack.last().pose();
         for (int i = 0; i < sortedKeySet.size(); i++) {
             var k = sortedKeySet.get(i);
@@ -248,10 +243,10 @@ public class DrawManager {
                 var blockZ = ChunkUtils.chunkCoordToCoord(chunkPosZ);
                 if (blockX < minBlockX - 32 || blockX > maxBlockX) continue;
                 if (blockZ < minBlockZ - 32 || blockZ > maxBlockZ) continue;
-                final float left = (float) ChunkUtils.chunkCoordToCoord(chunkPosX);
-                final float top = (float) ChunkUtils.chunkCoordToCoord(chunkPosZ);
-                final float right = left + 16;
-                final float bottom = top + 16;
+                final float left = chunkPosX;
+                final float top = chunkPosZ;
+                final float right = left + 1;
+                final float bottom = top + 1;
                 MinimapBackgroundDrawHelper.fillIntoExistingBuffer(
                     matrix, overlayBuffer,
                     left, top, right, bottom,
@@ -259,6 +254,5 @@ public class DrawManager {
                 );
             }
         }
-        matrixStack.popPose();
     }
 }

@@ -13,8 +13,7 @@ import static xaeroplus.util.GuiMapHelper.*;
 public class DrawFeature {
     private final AsyncLoadingCache<Long, LongList> chunkRenderCache;
     private final ChunkHighlightProvider chunkHighlightProvider;
-    private final HighlightDrawBuffer worldMapDrawBuffer = new HighlightDrawBuffer(true);
-    private final HighlightDrawBuffer minimapDrawBuffer = new HighlightDrawBuffer(false);
+    private final HighlightDrawBuffer drawBuffer = new HighlightDrawBuffer();
 
     public DrawFeature(ChunkHighlightProvider chunkHighlightProvider) {
         this.chunkHighlightProvider = chunkHighlightProvider;
@@ -59,21 +58,15 @@ public class DrawFeature {
         return chunkRenderCache.get(0L).getNow(LongList.of());
     }
 
-    public HighlightDrawBuffer getWorldMapDrawBuffer() {
-        return this.worldMapDrawBuffer;
-    }
-
-    public HighlightDrawBuffer getMinimapDrawBuffer() {
-        return this.minimapDrawBuffer;
+    public HighlightDrawBuffer getDrawBuffer() {
+        return this.drawBuffer;
     }
 
     public void markDrawBuffersStale() {
-        worldMapDrawBuffer.markStale();
-        minimapDrawBuffer.markStale();
+        drawBuffer.markStale();
     }
 
     public void closeDrawBuffers() {
-        worldMapDrawBuffer.close();
-        minimapDrawBuffer.close();
+        drawBuffer.close();
     }
 }

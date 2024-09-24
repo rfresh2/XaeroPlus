@@ -40,7 +40,7 @@ public class DrawManager {
         sortedKeySet.remove(id);
         DrawFeature feature = chunkHighlightDrawFeatures.remove(id);
         if (feature != null) {
-            Minecraft.getInstance().execute(() -> feature.getHighlightDrawBuffer().close());
+            Minecraft.getInstance().execute(feature::closeDrawBuffers);
         }
     }
 
@@ -107,6 +107,7 @@ public class DrawManager {
             if (k == null) continue;
             var feature = chunkHighlightDrawFeatures.get(k);
             if (feature == null) continue;
+            feature.closeDrawBuffers();
             int color = feature.colorInt();
             var a = ColorHelper.getA(color);
             if (a == 0.0f) return;
@@ -152,7 +153,7 @@ public class DrawManager {
             var b = ColorHelper.getB(color);
             shader.setHighlightColor(r, g, b, a);
             var highlights = feature.getChunkHighlights();
-            var drawBuffer = feature.getHighlightDrawBuffer();
+            var drawBuffer = feature.getMinimapDrawBuffer();
             if (drawBuffer.needsRefresh()) {
                 drawBuffer.refresh(highlights);
             }
@@ -187,8 +188,7 @@ public class DrawManager {
         if (shader == null) return;
         matrixStack.pushPose();
         matrixStack.translate(-flooredCameraX, -flooredCameraZ, 1.0f);
-        matrixStack.scale(16f, -16f, 1f);
-        matrixStack.translate(0, -1, 0);
+        matrixStack.scale(16f, 16f, 1f);
         shader.setWorldMapViewMatrix(matrixStack.last().pose());
         matrixStack.popPose();
         RenderSystem.enableBlend();
@@ -205,10 +205,11 @@ public class DrawManager {
             var b = ColorHelper.getB(color);
             shader.setHighlightColor(r, g, b, a);
             var highlights = feature.getChunkHighlights();
-            if (feature.getHighlightDrawBuffer().needsRefresh()) {
-                feature.getHighlightDrawBuffer().refresh(highlights);
+            var drawBuffer = feature.getWorldMapDrawBuffer();
+            if (drawBuffer.needsRefresh()) {
+                drawBuffer.refresh(highlights);
             }
-            feature.getHighlightDrawBuffer().render();
+            drawBuffer.render();
         }
         RenderSystem.disableBlend();
     }
@@ -231,7 +232,7 @@ public class DrawManager {
             if (k == null) continue;
             var feature = chunkHighlightDrawFeatures.get(k);
             if (feature == null) continue;
-            feature.getHighlightDrawBuffer().close();
+            feature.closeDrawBuffers();
             int color = feature.colorInt();
             var a = ColorHelper.getA(color);
             if (a == 0.0f) return;

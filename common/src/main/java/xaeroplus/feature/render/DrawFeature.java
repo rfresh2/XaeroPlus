@@ -13,7 +13,8 @@ import static xaeroplus.util.GuiMapHelper.*;
 public class DrawFeature {
     private final AsyncLoadingCache<Long, LongList> chunkRenderCache;
     private final ChunkHighlightProvider chunkHighlightProvider;
-    private final HighlightDrawBuffer highlightDrawBuffer = new HighlightDrawBuffer();
+    private final HighlightDrawBuffer worldMapDrawBuffer = new HighlightDrawBuffer(true);
+    private final HighlightDrawBuffer minimapDrawBuffer = new HighlightDrawBuffer(false);
 
     public DrawFeature(ChunkHighlightProvider chunkHighlightProvider) {
         this.chunkHighlightProvider = chunkHighlightProvider;
@@ -25,7 +26,7 @@ public class DrawFeature {
             .expireAfterWrite(10, TimeUnit.SECONDS)
             .refreshAfterWrite(500, TimeUnit.MILLISECONDS)
             .executor(Globals.cacheRefreshExecutorService.get())
-            .removalListener((k, v, cause) -> getHighlightDrawBuffer().markStale())
+            .removalListener((k, v, cause) -> markDrawBuffersStale())
             // only one key
             .buildAsync(k -> loadFeatureHighlightsInWindow(chunkHighlightProvider));
     }
@@ -58,7 +59,21 @@ public class DrawFeature {
         return chunkRenderCache.get(0L).getNow(LongList.of());
     }
 
-    public HighlightDrawBuffer getHighlightDrawBuffer() {
-        return this.highlightDrawBuffer;
+    public HighlightDrawBuffer getWorldMapDrawBuffer() {
+        return this.worldMapDrawBuffer;
+    }
+
+    public HighlightDrawBuffer getMinimapDrawBuffer() {
+        return this.minimapDrawBuffer;
+    }
+
+    public void markDrawBuffersStale() {
+        worldMapDrawBuffer.markStale();
+        minimapDrawBuffer.markStale();
+    }
+
+    public void closeDrawBuffers() {
+        worldMapDrawBuffer.close();
+        minimapDrawBuffer.close();
     }
 }

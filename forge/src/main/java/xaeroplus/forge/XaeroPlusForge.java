@@ -2,7 +2,6 @@ package xaeroplus.forge;
 
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraftforge.api.distmarker.Dist;
@@ -17,16 +16,11 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import xaero.map.gui.GuiWorldMapSettings;
-import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.extensions.GuiXaeroPlusWorldMapSettings;
-import xaeroplus.module.ModuleManager;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.DataFolderResolveUtil;
 import xaeroplus.util.XaeroPlusGameTest;
-
-import java.util.List;
 
 import static net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get;
 
@@ -36,19 +30,17 @@ public class XaeroPlusForge {
 
     public XaeroPlusForge() {
         IEventBus modEventBus = get().getModEventBus();
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> {
-            return () -> {
-                modEventBus.addListener(this::onInitialize);
-                modEventBus.addListener(this::onRegisterKeyMappingsEvent);
-                modEventBus.addListener(this::onRegisterClientResourceReloadListeners);
-                FORGE_EVENT_BUS.addListener(this::onRegisterClientCommandsEvent);
-                FORGE_EVENT_BUS.register(modEventBus);
-                RemovalCause explicit = RemovalCause.EXPLICIT; // force class load to stop forge shitting itself at runtime??
-                ModLoadingContext.get().registerExtensionPoint(
-                    ConfigScreenHandler.ConfigScreenFactory.class,
-                    () -> new ConfigScreenHandler.ConfigScreenFactory((mc, screen) -> new GuiXaeroPlusWorldMapSettings(new GuiWorldMapSettings(screen), screen))
-                );
-            };
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+            modEventBus.addListener(this::onInitialize);
+            modEventBus.addListener(this::onRegisterKeyMappingsEvent);
+            modEventBus.addListener(this::onRegisterClientResourceReloadListeners);
+            FORGE_EVENT_BUS.addListener(this::onRegisterClientCommandsEvent);
+            FORGE_EVENT_BUS.register(modEventBus);
+            RemovalCause explicit = RemovalCause.EXPLICIT; // force class load to stop forge shitting itself at runtime??
+            ModLoadingContext.get().registerExtensionPoint(
+                ConfigScreenHandler.ConfigScreenFactory.class,
+                () -> new ConfigScreenHandler.ConfigScreenFactory((mc, screen) -> new GuiXaeroPlusWorldMapSettings(new GuiWorldMapSettings(screen), screen))
+            );
         });
     }
 
@@ -58,11 +50,8 @@ public class XaeroPlusForge {
 
     public void onRegisterKeyMappingsEvent(final RegisterKeyMappingsEvent event) {
         if (XaeroPlus.initialized.compareAndSet(false, true)) {
-            ModuleManager.init();
-            boolean a = Globals.shouldResetFBO; // force static instances to init
-            XaeroPlusSettingRegistry.fastMapSetting.getValue(); // force static instances to init
-            List<KeyMapping> keybinds = XaeroPlusSettingsReflectionHax.keybindsSupplier.get();
-            keybinds.forEach(event::register);
+            XaeroPlus.initializeSettings();
+            Settings.REGISTRY.getKeybindings().forEach(event::register);
             if (System.getenv("XP_CI_TEST") != null)
                 Minecraft.getInstance().execute(XaeroPlusGameTest::applyMixinsTest);
         }

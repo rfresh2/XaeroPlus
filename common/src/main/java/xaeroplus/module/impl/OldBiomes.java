@@ -19,7 +19,7 @@ import xaeroplus.XaeroPlus;
 import xaeroplus.event.ChunkDataEvent;
 import xaeroplus.feature.render.highlights.SavableHighlightCacheInstance;
 import xaeroplus.module.Module;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
 
@@ -151,11 +151,11 @@ public class OldBiomes extends Module {
         oldBiomesCache.setDiskCache(b, isEnabled());
     }
 
-    public void setAlpha(final float b) {
+    public void setAlpha(final double b) {
         oldBiomesColor = ColorHelper.getColorWithAlpha(oldBiomesColor, (int) b);
     }
 
     public void setRgbColor(final int color) {
-        oldBiomesColor = ColorHelper.getColorWithAlpha(color, (int) XaeroPlusSettingRegistry.oldBiomesAlphaSetting.getValue());
+        oldBiomesColor = ColorHelper.getColorWithAlpha(color, Settings.REGISTRY.oldBiomesAlphaSetting.getAsInt());
     }
 }

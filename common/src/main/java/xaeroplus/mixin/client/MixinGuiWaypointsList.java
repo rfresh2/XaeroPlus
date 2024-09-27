@@ -17,7 +17,7 @@ import xaero.common.gui.GuiWaypoints;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.hud.minimap.waypoint.set.WaypointSet;
 import xaero.hud.minimap.world.MinimapWorld;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 
 import java.text.NumberFormat;
 
@@ -70,7 +70,7 @@ public abstract class MixinGuiWaypointsList {
         target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endBatch()V"
     ), remap = true)
     public void drawWaypointDistances(final GuiGraphics guiGraphics, final Waypoint w, final int x, final int y, final CallbackInfo ci) {
-        if (XaeroPlusSettingRegistry.showWaypointDistances.getValue()) {
+        if (Settings.REGISTRY.showWaypointDistances.get()) {
             Entity renderViewEntity = Minecraft.getInstance().getCameraEntity();
             final double playerX = renderViewEntity.getX();
             final double playerZ = renderViewEntity.getZ();

@@ -34,7 +34,7 @@ public abstract class MixinGuiWorldMapSettings extends GuiSettings {
             var entry = entries[i];
             if (entry instanceof ScreenSwitchSettingEntry screenSwitchEntry) {
                 var name = ((AccessorWorldMapScreenSwitchSettingEntry) screenSwitchEntry).getName();
-                if (name.equals("gui.xaero_wm_minimap_settings")) {
+                if (name.equals("xaeroplus.gui.xaero_wm_minimap_settings")) {
                     minimapSettingEntryIndex = i;
                     break;
                 }

@@ -27,7 +27,7 @@ public abstract class MixinGuiUpdateAll extends ConfirmScreen {
             this.height / 6 + 168,
             200,
             20,
-            Component.translatable("gui.xaeroplus.check_github_button"), (button -> {
+            Component.translatable("xaeroplus.gui.check_github_button"), (button -> {
             try {
                  Util.getPlatform().openUri(new URI("https://github.com/rfresh2/XaeroPlus"));
             } catch (Exception e) {

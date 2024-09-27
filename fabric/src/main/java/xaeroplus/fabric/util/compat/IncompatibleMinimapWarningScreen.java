@@ -19,12 +19,12 @@ public class IncompatibleMinimapWarningScreen extends WarningScreen {
         currentVersion.ifPresent(cv -> {
             msg
                 .withStyle(ChatFormatting.RESET)
-                .append(Component.translatable("gui.xaeroplus.minimap_incompatible.currently_installed_version"))
+                .append(Component.translatable("xaeroplus.gui.minimap_incompatible.currently_installed_version"))
                 .append(Component.literal(cv.getFriendlyString()).withStyle(ChatFormatting.RED))
                 .append(Component.literal("\n"));
         });
         msg.append(
-            Component.translatable("gui.xaeroplus.minimap_incompatible.required_version")
+            Component.translatable("xaeroplus.gui.minimap_incompatible.required_version")
                 .withStyle(ChatFormatting.RESET)
                 .append(Component.literal(compatibleMinimapVersion.getFriendlyString()).withStyle(ChatFormatting.AQUA))
         );
@@ -32,7 +32,7 @@ public class IncompatibleMinimapWarningScreen extends WarningScreen {
     }
     public IncompatibleMinimapWarningScreen(Optional<Version> currentVersion, final Version compatibleMinimapVersion) {
         super(
-            Component.translatable("gui.xaeroplus.minimap_incompatible.title").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD),
+            Component.translatable("xaeroplus.gui.minimap_incompatible.title").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD),
             getMessage(currentVersion, compatibleMinimapVersion),
             getMessage(currentVersion, compatibleMinimapVersion)
         );
@@ -46,7 +46,7 @@ public class IncompatibleMinimapWarningScreen extends WarningScreen {
                 100 + yOffset,
                 150,
                 20,
-                Component.translatable("gui.xaeroplus.minimap_incompatible.download_minimap"), button -> {
+                Component.translatable("xaeroplus.gui.minimap_incompatible.download_minimap"), button -> {
                     Util.getPlatform().openUri("https://modrinth.com/mod/xaeros-minimap/versions");
                     Minecraft.getInstance().close();
             })
@@ -57,7 +57,7 @@ public class IncompatibleMinimapWarningScreen extends WarningScreen {
                 100 + yOffset,
                 150,
                 20,
-                Component.translatable("gui.xaeroplus.minimap_incompatible.exit"), button -> {
+                Component.translatable("xaeroplus.gui.minimap_incompatible.exit"), button -> {
                 Minecraft.getInstance().close();
             })
         );

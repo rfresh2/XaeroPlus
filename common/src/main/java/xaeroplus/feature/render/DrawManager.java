@@ -11,7 +11,7 @@ import xaero.common.minimap.render.MinimapRendererHelper;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.DimensionSwitchEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
 
@@ -40,7 +40,7 @@ public class DrawManager {
         sortedKeySet.remove(id);
         DrawFeature feature = chunkHighlightDrawFeatures.remove(id);
         if (feature != null) {
-            Minecraft.getInstance().execute(() -> feature.getHighlightDrawBuffer().close());
+            Minecraft.getInstance().execute(feature::closeDrawBuffers);
         }
     }
 
@@ -83,12 +83,31 @@ public class DrawManager {
             -(chunkZ * 64) - (tileZ * 16) - insideZ,
             0);
         matrixStack.scale(16f, 16f, 1f);
+        if (Settings.REGISTRY.highlightShader.get()) {
+            drawMinimapFeaturesShader(matrixStack);
+        } else {
+            drawMinimapFeaturesImmediate(minViewMapTileChunkCoordX, maxViewMapTileChunkCoordX, minViewMapTileChunkCoordZ, maxViewMapTileChunkCoordZ,
+                                         matrixStack, overlayBufferBuilder, helper);
+        }
+        matrixStack.popPose();
+    }
+
+    public synchronized void drawMinimapFeaturesImmediate(
+        int minViewMapTileChunkCoordX,
+        int maxViewMapTileChunkCoordX,
+        int minViewMapTileChunkCoordZ,
+        int maxViewMapTileChunkCoordZ,
+        final PoseStack matrixStack,
+        final VertexConsumer overlayBufferBuilder,
+        MinimapRendererHelper helper
+    ) {
         var matrix = matrixStack.last().pose();
         for (int i = 0; i < sortedKeySet.size(); i++) {
             var k = sortedKeySet.get(i);
             if (k == null) continue;
             var feature = chunkHighlightDrawFeatures.get(k);
             if (feature == null) continue;
+            feature.closeDrawBuffers();
             int color = feature.colorInt();
             var a = ColorHelper.getA(color);
             if (a == 0.0f) return;
@@ -111,37 +130,15 @@ public class DrawManager {
                 );
             }
         }
-        matrixStack.popPose();
     }
 
-    public synchronized void drawWorldMapFeatures(
-        final double minBlockX,
-        final double maxBlockX,
-        final double minBlockZ,
-        final double maxBlockZ,
-        final int flooredCameraX,
-        final int flooredCameraZ,
-        final PoseStack matrixStack,
-        final VertexConsumer overlayBuffer
-    ) {
-        if (XaeroPlusSettingRegistry.highlightShader.getValue())
-            drawWorldMapFeaturesShader(flooredCameraX, flooredCameraZ, matrixStack);
-        else
-            drawWorldMapFeaturesImmediate(minBlockX, maxBlockX, minBlockZ, maxBlockZ, flooredCameraX, flooredCameraZ, matrixStack, overlayBuffer);
-    }
-
-    public synchronized void drawWorldMapFeaturesShader(
-        final int flooredCameraX,
-        final int flooredCameraZ,
+    public synchronized void drawMinimapFeaturesShader(
         final PoseStack matrixStack
     ) {
         XaeroPlusShaders.ensureShaders();
         var shader = XaeroPlusShaders.HIGHLIGHT_SHADER;
         if (shader == null) return;
-        matrixStack.pushPose();
-        matrixStack.translate(-flooredCameraX, -flooredCameraZ, 1.0f);
-        shader.setWorldMapViewMatrix(matrixStack.last().pose());
-        matrixStack.popPose();
+        shader.setMapViewMatrix(matrixStack.last().pose());
         RenderSystem.enableBlend();
         for (int i = 0; i < sortedKeySet.size(); i++) {
             var k = sortedKeySet.get(i);
@@ -156,15 +153,16 @@ public class DrawManager {
             var b = ColorHelper.getB(color);
             shader.setHighlightColor(r, g, b, a);
             var highlights = feature.getChunkHighlights();
-            if (feature.getHighlightDrawBuffer().needsRefresh()) {
-                feature.getHighlightDrawBuffer().refresh(highlights);
+            var drawBuffer = feature.getDrawBuffer();
+            if (drawBuffer.needsRefresh(false)) {
+                drawBuffer.refresh(highlights, false);
             }
-            feature.getHighlightDrawBuffer().render();
+            drawBuffer.render();
         }
         RenderSystem.disableBlend();
     }
 
-    public synchronized void drawWorldMapFeaturesImmediate(
+    public synchronized void drawWorldMapFeatures(
         final double minBlockX,
         final double maxBlockX,
         final double minBlockZ,
@@ -175,14 +173,61 @@ public class DrawManager {
         final VertexConsumer overlayBuffer
     ) {
         matrixStack.pushPose();
-        matrixStack.translate(-flooredCameraX, -flooredCameraZ, 0);
+        matrixStack.translate(-flooredCameraX, -flooredCameraZ, 1.0f);
+        matrixStack.scale(16f, 16f, 1f);
+        if (Settings.REGISTRY.highlightShader.get())
+            drawWorldMapFeaturesShader(matrixStack);
+        else
+            drawWorldMapFeaturesImmediate(minBlockX, maxBlockX, minBlockZ, maxBlockZ,
+                                          matrixStack, overlayBuffer);
+        matrixStack.popPose();
+    }
+
+    public synchronized void drawWorldMapFeaturesShader(
+        final PoseStack matrixStack
+    ) {
+        XaeroPlusShaders.ensureShaders();
+        var shader = XaeroPlusShaders.HIGHLIGHT_SHADER;
+        if (shader == null) return;
+        shader.setMapViewMatrix(matrixStack.last().pose());
+        RenderSystem.enableBlend();
+        for (int i = 0; i < sortedKeySet.size(); i++) {
+            var k = sortedKeySet.get(i);
+            if (k == null) continue;
+            var feature = chunkHighlightDrawFeatures.get(k);
+            if (feature == null) continue;
+            int color = feature.colorInt();
+            var a = ColorHelper.getA(color);
+            if (a == 0.0f) return;
+            var r = ColorHelper.getR(color);
+            var g = ColorHelper.getG(color);
+            var b = ColorHelper.getB(color);
+            shader.setHighlightColor(r, g, b, a);
+            var highlights = feature.getChunkHighlights();
+            var drawBuffer = feature.getDrawBuffer();
+            if (drawBuffer.needsRefresh(true)) {
+                drawBuffer.refresh(highlights, true);
+            }
+            drawBuffer.render();
+        }
+        RenderSystem.disableBlend();
+    }
+
+    public synchronized void drawWorldMapFeaturesImmediate(
+        final double minBlockX,
+        final double maxBlockX,
+        final double minBlockZ,
+        final double maxBlockZ,
+        final PoseStack matrixStack,
+        final VertexConsumer overlayBuffer
+    ) {
         var matrix = matrixStack.last().pose();
         for (int i = 0; i < sortedKeySet.size(); i++) {
             var k = sortedKeySet.get(i);
             if (k == null) continue;
             var feature = chunkHighlightDrawFeatures.get(k);
             if (feature == null) continue;
-            feature.getHighlightDrawBuffer().close();
+            feature.closeDrawBuffers();
             int color = feature.colorInt();
             var a = ColorHelper.getA(color);
             if (a == 0.0f) return;
@@ -198,10 +243,10 @@ public class DrawManager {
                 var blockZ = ChunkUtils.chunkCoordToCoord(chunkPosZ);
                 if (blockX < minBlockX - 32 || blockX > maxBlockX) continue;
                 if (blockZ < minBlockZ - 32 || blockZ > maxBlockZ) continue;
-                final float left = (float) ChunkUtils.chunkCoordToCoord(chunkPosX);
-                final float top = (float) ChunkUtils.chunkCoordToCoord(chunkPosZ);
-                final float right = left + 16;
-                final float bottom = top + 16;
+                final float left = chunkPosX;
+                final float top = chunkPosZ;
+                final float right = left + 1;
+                final float bottom = top + 1;
                 MinimapBackgroundDrawHelper.fillIntoExistingBuffer(
                     matrix, overlayBuffer,
                     left, top, right, bottom,
@@ -209,6 +254,5 @@ public class DrawManager {
                 );
             }
         }
-        matrixStack.popPose();
     }
 }

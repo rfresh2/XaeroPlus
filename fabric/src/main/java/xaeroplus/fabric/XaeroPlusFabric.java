@@ -7,22 +7,16 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.Version;
-import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.PackType;
-import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.fabric.util.FabricWaystonesHelperInit;
 import xaeroplus.fabric.util.XPShaderResourceReloadListener;
 import xaeroplus.fabric.util.compat.IncompatibleMinimapWarningScreen;
 import xaeroplus.fabric.util.compat.XaeroPlusMinimapCompatibilityChecker;
-import xaeroplus.module.ModuleManager;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.DataFolderResolveUtil;
 import xaeroplus.util.XaeroPlusGameTest;
-
-import java.util.List;
 
 import static xaeroplus.fabric.util.compat.XaeroPlusMinimapCompatibilityChecker.versionCheckResult;
 
@@ -36,11 +30,8 @@ public class XaeroPlusFabric implements ClientModInitializer {
 									   versionCheckResult.anyPresentMinimapVersion().map(Version::getFriendlyString).orElse("None!"));
 				return;
 			}
-            ModuleManager.init();
-            boolean a = Globals.shouldResetFBO; // force static instances to init
-            XaeroPlusSettingRegistry.fastMapSetting.getValue(); // force static instances to init
-            List<KeyMapping> keybinds = XaeroPlusSettingsReflectionHax.keybindsSupplier.get();
-            keybinds.forEach(KeyBindingHelper::registerKeyBinding);
+			XaeroPlus.initializeSettings();
+			Settings.REGISTRY.getKeybindings().forEach(KeyBindingHelper::registerKeyBinding);
             FabricWaystonesHelperInit.doInit();
 			if (System.getenv("XP_CI_TEST") != null)
 				Minecraft.getInstance().execute(XaeroPlusGameTest::applyMixinsTest);

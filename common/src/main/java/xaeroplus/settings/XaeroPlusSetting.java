@@ -29,9 +29,16 @@ public abstract class XaeroPlusSetting {
         this.visibilitySupplier = visibilitySupplier;
     }
 
-    protected static String defaultValueStr(final String settingName, final Object defaultVal) {
-        return settingName + " \n    Default: " + defaultVal + " \n ";
-    }
+    // Called after setting is loaded from file for the first time
+    public abstract void init();
+
+    public abstract String getSerializedValue();
+
+    public abstract void deserializeValue(String value);
+
+    public abstract xaero.common.settings.ModOptions toMinimapModOptions();
+
+    public abstract xaero.map.settings.ModOptions toWorldMapModOptions();
 
     public String getSettingName() {
         return settingName;
@@ -49,18 +56,26 @@ public abstract class XaeroPlusSetting {
         return tooltipTranslationKey;
     }
 
+    public static String buildTooltipTranslationKey(String baseKey) {
+        return baseKey + ".tooltip";
+    }
+
     public boolean isIngameOnly() {
         return ingameOnly;
     }
+
     public boolean isRequiresMinimap() {
         return requiresMinimap;
     }
+
     public KeyMapping getKeyBinding() {
         return keyBinding;
     }
+
     public void setKeyBinding(KeyMapping keyBinding) {
         this.keyBinding = keyBinding;
     }
+
     public boolean isVisible() {
         if (visibilitySupplier != null) {
             return visibilitySupplier.getAsBoolean();
@@ -68,5 +83,12 @@ public abstract class XaeroPlusSetting {
             return true;
         }
     }
-    public abstract void init();
+
+    public xaero.common.gui.ConfigSettingEntry toMinimapConfigSettingEntry() {
+        return new xaero.common.gui.ConfigSettingEntry(toMinimapModOptions());
+    }
+
+    public xaero.map.gui.ConfigSettingEntry toWorldmapConfigSettingEntry() {
+        return new xaero.map.gui.ConfigSettingEntry(toWorldMapModOptions());
+    }
 }

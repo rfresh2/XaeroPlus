@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.map.settings.ModOptions;
 import xaero.map.settings.Option;
-import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
+import xaeroplus.settings.Settings;
 
 import static xaeroplus.settings.XaeroPlusSetting.SETTING_PREFIX;
 
@@ -25,10 +25,10 @@ public class MixinWorldMapOption {
     @Inject(method = "<init>", at = @At("RETURN"))
     public void constructorInject(final ModOptions option, final CallbackInfo ci) {
         if (option.getEnumString().startsWith(SETTING_PREFIX)) {
-            XaeroPlusSettingsReflectionHax.ALL_WORLD_MAP_SETTINGS.get().stream()
-                    .filter(s -> s.getSettingName().equals(option.getEnumString()))
-                    .findFirst()
-                    .ifPresent(s -> caption = MutableComponent.create(new LiteralContents(SETTING_PREFIX)).append(Component.translatable(s.getSettingNameTranslationKey())));
+            var xpSetting = Settings.REGISTRY.getSettingByName(option.getEnumString());
+            if (xpSetting != null) {
+                caption = MutableComponent.create(new LiteralContents(SETTING_PREFIX)).append(Component.translatable(xpSetting.getSettingNameTranslationKey()));
+            }
         }
     }
 }

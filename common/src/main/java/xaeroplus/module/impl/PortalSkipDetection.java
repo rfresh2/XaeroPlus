@@ -21,7 +21,7 @@ import xaeroplus.feature.extensions.SeenChunksTrackingMapTileChunk;
 import xaeroplus.feature.render.highlights.ChunkHighlightLocalCache;
 import xaeroplus.module.Module;
 import xaeroplus.module.ModuleManager;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
 
@@ -184,14 +184,14 @@ public class PortalSkipDetection extends Module {
     }
 
     private boolean isNewChunk(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> currentlyViewedDimension) {
-        if (XaeroPlusSettingRegistry.paletteNewChunksSaveLoadToDisk.getValue() && newChunksModule != null)
+        if (Settings.REGISTRY.paletteNewChunksSaveLoadToDisk.get() && newChunksModule != null)
             return newChunksModule.isNewChunk(chunkPosX, chunkPosZ, currentlyViewedDimension);
         else
             return false;
     }
 
     private boolean isOldChunksInverse(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> currentlyViewedDimension) {
-        if (XaeroPlusSettingRegistry.oldChunksEnabledSetting.getValue() && oldChunksModule != null)
+        if (Settings.REGISTRY.oldChunksEnabledSetting.get() && oldChunksModule != null)
             return oldChunksModule.isOldChunkInverse(chunkPosX, chunkPosZ, currentlyViewedDimension);
         else
             return false;
@@ -221,10 +221,10 @@ public class PortalSkipDetection extends Module {
     }
 
     public void setRgbColor(final int color) {
-        portalSkipChunksColor = ColorHelper.getColorWithAlpha(color, (int) XaeroPlusSettingRegistry.portalSkipDetectionAlphaSetting.getValue());
+        portalSkipChunksColor = ColorHelper.getColorWithAlpha(color, Settings.REGISTRY.portalSkipDetectionAlphaSetting.getAsInt());
     }
 
-    public void setAlpha(final float a) {
+    public void setAlpha(final double a) {
         portalSkipChunksColor = ColorHelper.getColorWithAlpha(portalSkipChunksColor, (int) a);
     }
 
@@ -240,19 +240,19 @@ public class PortalSkipDetection extends Module {
         return cache.isHighlighted(chunkPos);
     }
 
-    public void setSearchDelayTicks(final float delay) {
+    public void setSearchDelayTicks(final double delay) {
         searchDelayTicks = (int) delay;
     }
 
-    public void setOldChunksInverse(final Boolean b) {
+    public void setOldChunksInverse(final boolean b) {
         this.oldChunksInverse = b;
     }
 
-    public void setNewChunks(final Boolean b) {
+    public void setNewChunks(final boolean b) {
         this.newChunks = b;
     }
 
-    public void setPortalRadius(final Float b) {
-        this.portalRadius = b.intValue();
+    public void setPortalRadius(final double b) {
+        this.portalRadius = (int) b;
     }
 }

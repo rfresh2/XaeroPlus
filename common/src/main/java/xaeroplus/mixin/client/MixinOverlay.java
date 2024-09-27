@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.map.region.Overlay;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 
 @Mixin(value = Overlay.class, remap = false)
 public class MixinOverlay {
@@ -14,7 +14,7 @@ public class MixinOverlay {
 
     @Inject(method = "increaseOpacity", at = @At("HEAD"), cancellable = true)
     public void increaseOpacity(final int toAdd, final CallbackInfo ci) {
-        if (XaeroPlusSettingRegistry.overlayOpacityFix.getValue()) {
+        if (Settings.REGISTRY.overlayOpacityFix.get()) {
             ci.cancel();
 
             // fix byte overflow

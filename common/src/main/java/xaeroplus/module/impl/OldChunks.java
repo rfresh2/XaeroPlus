@@ -19,7 +19,7 @@ import xaeroplus.XaeroPlus;
 import xaeroplus.event.ChunkDataEvent;
 import xaeroplus.feature.render.highlights.SavableHighlightCacheInstance;
 import xaeroplus.module.Module;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkScanner;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
@@ -150,10 +150,10 @@ public class OldChunks extends Module {
     }
 
     public void setRgbColor(final int color) {
-        oldChunksColor = ColorHelper.getColorWithAlpha(color, (int) XaeroPlusSettingRegistry.oldChunksAlphaSetting.getValue());
+        oldChunksColor = ColorHelper.getColorWithAlpha(color, Settings.REGISTRY.oldChunksAlphaSetting.getAsInt());
     }
 
-    public void setAlpha(final float a) {
+    public void setAlpha(final double a) {
         oldChunksColor = ColorHelper.getColorWithAlpha(oldChunksColor, (int) (a));
     }
 

@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.minimap.waypoints.WaypointSharingHandler;
 import xaero.hud.minimap.world.MinimapWorld;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 
 @Mixin(value = WaypointSharingHandler.class, remap = false)
 public class MixinWaypointSharingHandler {
@@ -24,7 +24,7 @@ public class MixinWaypointSharingHandler {
         cancellable = true,
         remap = true) // $REMAP
     public void shareWaypoint(final Screen parent, final Waypoint w, final MinimapWorld wWorld, final CallbackInfo ci) {
-        if (XaeroPlusSettingRegistry.disableWaypointSharing.getValue()) {
+        if (Settings.REGISTRY.disableWaypointSharing.get()) {
             ci.cancel();
         }
     }
@@ -43,7 +43,7 @@ public class MixinWaypointSharingHandler {
         remap = true)
     public void mutateWaypointSharingText(final boolean confirm, final CallbackInfo ci,
                                           @Local(name = "message") LocalRef<String> containerIdRef) {
-        if (XaeroPlusSettingRegistry.plainWaypointSharing.getValue()) {
+        if (Settings.REGISTRY.plainWaypointSharing.get()) {
             containerIdRef.set(w.getName() + " [" + w.getX() + ", " + (w.isYIncluded() ? (w.getY() + ", ") : "") + w.getZ() + "]");
         }
     }

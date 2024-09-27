@@ -10,7 +10,7 @@ import xaeroplus.settings.Settings;
 
 public class GuiXaeroPlusChunkHighlightSettings extends GuiSettings {
     public GuiXaeroPlusChunkHighlightSettings(Screen parent, Screen escapeScreen) {
-        super(Component.translatable("gui.xaeroplus.chunk_highlight_settings"), parent, escapeScreen);
+        super(Component.translatable("xaeroplus.gui.chunk_highlight_settings"), parent, escapeScreen);
         this.entries = Settings.REGISTRY.getWorldmapConfigSettingEntries(SettingLocation.CHUNK_HIGHLIGHTS);
     }
 
@@ -22,7 +22,7 @@ public class GuiXaeroPlusChunkHighlightSettings extends GuiSettings {
 
     public static ScreenSwitchSettingEntry getScreenSwitchSettingEntry(Screen parent) {
         return new ScreenSwitchSettingEntry(
-            "gui.xaeroplus.chunk_highlight_settings",
+            "xaeroplus.gui.chunk_highlight_settings",
             GuiXaeroPlusChunkHighlightSettings::new,
             null,
             true

@@ -11,7 +11,7 @@ import xaero.common.minimap.render.MinimapRendererHelper;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.DimensionSwitchEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
 
@@ -83,7 +83,7 @@ public class DrawManager {
             -(chunkZ * 64) - (tileZ * 16) - insideZ,
             0);
         matrixStack.scale(16f, 16f, 1f);
-        if (XaeroPlusSettingRegistry.highlightShader.getValue()) {
+        if (Settings.REGISTRY.highlightShader.get()) {
             drawMinimapFeaturesShader(matrixStack);
         } else {
             drawMinimapFeaturesImmediate(minViewMapTileChunkCoordX, maxViewMapTileChunkCoordX, minViewMapTileChunkCoordZ, maxViewMapTileChunkCoordZ,
@@ -175,7 +175,7 @@ public class DrawManager {
         matrixStack.pushPose();
         matrixStack.translate(-flooredCameraX, -flooredCameraZ, 1.0f);
         matrixStack.scale(16f, 16f, 1f);
-        if (XaeroPlusSettingRegistry.highlightShader.getValue())
+        if (Settings.REGISTRY.highlightShader.get())
             drawWorldMapFeaturesShader(matrixStack);
         else
             drawWorldMapFeaturesImmediate(minBlockX, maxBlockX, minBlockZ, maxBlockZ,

@@ -10,7 +10,7 @@ import xaero.map.gui.dropdown.rightclick.RightClickOption;
 import xaero.map.misc.Misc;
 import xaero.map.mods.gui.Waypoint;
 import xaero.map.mods.gui.WaypointReader;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.BaritoneExecutor;
 import xaeroplus.util.BaritoneHelper;
 
@@ -34,13 +34,13 @@ public class MixinWaypointReader {
                     public void onAction(Screen screen) {
                         BaritoneExecutor.goal(goalX, goalZ);
                     }
-                }.setNameFormatArgs(Misc.getKeyName(XaeroPlusSettingRegistry.worldMapBaritoneGoalHereKeybindSetting.getKeyBinding())),
+                }.setNameFormatArgs(Misc.getKeyName(Settings.REGISTRY.worldMapBaritoneGoalHereKeybindSetting.getKeyBinding())),
                 new RightClickOption("gui.world_map.baritone_path_here", options.size(), target) {
                     @Override
                     public void onAction(Screen screen) {
                         BaritoneExecutor.path(goalX, goalZ);
                     }
-                }.setNameFormatArgs(Misc.getKeyName(XaeroPlusSettingRegistry.worldMapBaritonePathHereKeybindSetting.getKeyBinding()))
+                }.setNameFormatArgs(Misc.getKeyName(Settings.REGISTRY.worldMapBaritonePathHereKeybindSetting.getKeyBinding()))
             ));
             if (BaritoneHelper.isBaritoneElytraPresent()) {
                 options.addAll(5, asList(
@@ -49,12 +49,12 @@ public class MixinWaypointReader {
                         public void onAction(Screen screen) {
                             BaritoneExecutor.elytra(goalX, goalZ);
                         }
-                    }.setNameFormatArgs(Misc.getKeyName(XaeroPlusSettingRegistry.worldMapBaritoneElytraHereKeybindSetting.getKeyBinding()))
+                    }.setNameFormatArgs(Misc.getKeyName(Settings.REGISTRY.worldMapBaritoneElytraHereKeybindSetting.getKeyBinding()))
                 ));
             }
         }
 
-        if (XaeroPlusSettingRegistry.disableWaypointSharing.getValue()) {
+        if (Settings.REGISTRY.disableWaypointSharing.get()) {
             cir.getReturnValue().removeIf(option -> ((AccessorRightClickOption) option).getName().equals("gui.xaero_right_click_waypoint_share"));
         }
     }

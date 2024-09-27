@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import xaero.map.file.worldsave.WorldDataReader;
 import xaero.map.region.MapTile;
 import xaero.map.region.MapTileChunk;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 
 import static net.minecraft.world.level.Level.NETHER;
 
@@ -69,7 +69,7 @@ public abstract class MixinWorldDataReader {
                                      boolean flowers,
                                      int worldBottomY,
                                      int worldTopY) {
-        if (XaeroPlusSettingRegistry.netherCaveFix.getValue()) {
+        if (Settings.REGISTRY.netherCaveFix.get()) {
             boolean cave = caveStart != Integer.MAX_VALUE;
             boolean nether = tileChunk.getInRegion().getDim().getDimId() == NETHER;
             int customCaveStart = caveStart;

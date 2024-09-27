@@ -22,13 +22,10 @@ import xaero.common.gui.*;
 import xaero.common.misc.KeySortableByOther;
 import xaero.common.settings.ModOptions;
 import xaeroplus.XaeroPlus;
-import xaeroplus.settings.XaeroPlusSetting;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
+import xaeroplus.settings.Settings;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Optional;
 
 @Mixin(value = GuiSettings.class, remap = false)
 public abstract class MixinCommonGuiSettings extends ScreenBase {
@@ -50,7 +47,7 @@ public abstract class MixinCommonGuiSettings extends ScreenBase {
     public void adjustEntriesPerPage(final CallbackInfo ci) {
         this.xaeroPlus$settingEntryWidth = 200; // default width
         this.entriesPerPage = 12; // fills height = 240
-        if (XaeroPlusSettingRegistry.expandSettingEntries.getValue()) {
+        if (Settings.REGISTRY.expandSettingEntries.get()) {
             if (this.height > 350) {
                 int extraRows = Math.min((height - 240) / 50, 6);
                 this.entriesPerPage = 12 + (2 * extraRows);
@@ -65,7 +62,7 @@ public abstract class MixinCommonGuiSettings extends ScreenBase {
         value = "RETURN"
     ))
     public void adjustForwardBackButtonPositionsForExtraRows(final CallbackInfo ci) {
-        if (!XaeroPlusSettingRegistry.expandSettingEntries.getValue()) return;
+        if (!Settings.REGISTRY.expandSettingEntries.get()) return;
         int extraRows = (this.entriesPerPage - 12) / 2;
         int yAdjust = (extraRows * 24);
         this.nextButton.setY(this.nextButton.getY() + yAdjust);
@@ -89,11 +86,9 @@ public abstract class MixinCommonGuiSettings extends ScreenBase {
                 option.setAccessible(true);
                 ModOptions modOptions = (ModOptions) option.get(settingEntry);
                 String settingName = modOptions.getEnumString();
-                Optional<XaeroPlusSetting> foundSetting = XaeroPlusSettingsReflectionHax.ALL_MINIMAP_SETTINGS.get().stream()
-                        .filter(s -> s.getSettingName().equals(settingName))
-                        .findFirst();
-                if (foundSetting.isPresent()) {
-                    if (!foundSetting.get().isVisible()) {
+                var xpSetting = Settings.REGISTRY.getSettingByName(settingName);
+                if (xpSetting != null) {
+                    if (!xpSetting.isVisible()) {
                         // skip adding setting
                         return false;
                     }
@@ -123,7 +118,7 @@ public abstract class MixinCommonGuiSettings extends ScreenBase {
     )
     public AbstractWidget adjustSettingEntryWidth(final ISettingEntry instance, final int x, final int y, final int w, final boolean canEditIngameSettings, final Operation<AbstractWidget> original,
                                                   @Local(name = "i") int i) {
-        if (!XaeroPlusSettingRegistry.expandSettingEntries.getValue()) return original.call(instance, x, y, w, canEditIngameSettings);
+        if (!Settings.REGISTRY.expandSettingEntries.get()) return original.call(instance, x, y, w, canEditIngameSettings);
         int xOffset = ((i % 2 == 0) ? -1 : 1) * ((xaeroPlus$settingEntryWidth - 200) / 2);
         return original.call(instance, x + xOffset, y, xaeroPlus$settingEntryWidth, canEditIngameSettings);
     }

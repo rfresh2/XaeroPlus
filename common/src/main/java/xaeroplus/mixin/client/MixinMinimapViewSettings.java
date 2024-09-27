@@ -11,7 +11,8 @@ import xaero.common.gui.ConfigSettingEntry;
 import xaero.common.gui.GuiMinimapViewSettings;
 import xaero.common.gui.GuiSettings;
 import xaero.common.gui.ISettingEntry;
-import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
+import xaeroplus.settings.SettingLocation;
+import xaeroplus.settings.Settings;
 
 @Mixin(value = GuiMinimapViewSettings.class, remap = false)
 public abstract class MixinMinimapViewSettings extends GuiSettings {
@@ -22,8 +23,7 @@ public abstract class MixinMinimapViewSettings extends GuiSettings {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     public void init(final IXaeroMinimap modMain, final Screen backScreen, final Screen escScreen, final CallbackInfo ci) {
-        final ConfigSettingEntry[] configSettingEntries = XaeroPlusSettingsReflectionHax.getMinimapViewConfigSettingEntries()
-            .toArray(new ConfigSettingEntry[0]);
+        final ConfigSettingEntry[] configSettingEntries = Settings.REGISTRY.getMinimapConfigSettingEntries(SettingLocation.MINIMAP_VIEW);
         final int oldLen = this.entries.length;
         final int newLen = configSettingEntries.length;
         final int totalNewLen = oldLen + configSettingEntries.length;

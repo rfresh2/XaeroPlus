@@ -14,7 +14,7 @@ import xaero.map.region.LeveledRegion;
 import xaero.map.region.MapRegion;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -43,7 +43,7 @@ public abstract class MixinMapSaveLoad {
     public DataOutputStream replaceSaveRegionZipOutputStream(final OutputStream out,
                                                              @Local(name = "zipOut") final ZipOutputStream zipOut,
                                                              @Share("zipOutShare") final LocalRef<ZipOutputStream> zipOutShare) {
-        if (!XaeroPlusSettingRegistry.fastZipWrite.getValue()) return new DataOutputStream(out);
+        if (!Settings.REGISTRY.fastZipWrite.get()) return new DataOutputStream(out);
         Globals.zipFastByteBuffer.reset();
         zipOutShare.set(zipOut);
         return new DataOutputStream(Globals.zipFastByteBuffer);
@@ -55,7 +55,7 @@ public abstract class MixinMapSaveLoad {
     ))
     public void saveRegionWriteZipOutputStream(final MapRegion region, final int extraAttempts, final CallbackInfoReturnable<Boolean> cir,
                                                @Local(name = "zipOut") final ZipOutputStream zipOut) throws IOException {
-        if (!XaeroPlusSettingRegistry.fastZipWrite.getValue()) return;
+        if (!Settings.REGISTRY.fastZipWrite.get()) return;
         Globals.zipFastByteBuffer.writeTo(zipOut);
         Globals.zipFastByteBuffer.reset();
     }
@@ -67,7 +67,7 @@ public abstract class MixinMapSaveLoad {
     public void closeZipOutputStream(final MapRegion region, final int extraAttempts, final CallbackInfoReturnable<Boolean> cir,
                                      @Share("zipOutShare") final LocalRef<ZipOutputStream> zipOutShare
     ) throws IOException {
-        if (!XaeroPlusSettingRegistry.fastZipWrite.getValue()) return;
+        if (!Settings.REGISTRY.fastZipWrite.get()) return;
         zipOutShare.get().close();
     }
 

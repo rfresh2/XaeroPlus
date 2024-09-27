@@ -37,7 +37,7 @@ import xaero.hud.minimap.MinimapLogs;
 import xaero.hud.minimap.module.MinimapSession;
 import xaeroplus.Globals;
 import xaeroplus.feature.extensions.CustomMinimapFBORenderer;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.ColorHelper;
 
 @Mixin(value = MinimapFBORenderer.class, remap = false)
@@ -121,7 +121,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
     ), remap = true)
     public void modifyMMBackgroundFill(final GuiGraphics guiGraphics, final int x1, final int y1, final int x2, final int y2, final int color,
                                        @Share("scaledSize") LocalIntRef scaledSize) {
-        if (!XaeroPlusSettingRegistry.transparentMinimapBackground.getValue())
+        if (!Settings.REGISTRY.transparentMinimapBackground.get())
             guiGraphics.fill(-scaledSize.get(), -scaledSize.get(), scaledSize.get(), scaledSize.get(), ColorHelper.getColor(0, 0, 0, 255));
         else
             guiGraphics.fill(-scaledSize.get(), -scaledSize.get(), scaledSize.get(), scaledSize.get(), ColorHelper.getColor(0, 0, 0, 0));
@@ -147,7 +147,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
                                          @Local(name = "matrixStack") PoseStack matrixStack
     ) {
         final boolean isDimensionSwitched = Globals.getCurrentDimensionId() != Minecraft.getInstance().level.dimension();
-        if (XaeroPlusSettingRegistry.showRenderDistanceSetting.getValue() && !isDimensionSwitched) {
+        if (Settings.REGISTRY.showRenderDistanceSetting.get() && !isDimensionSwitched) {
             double actualPlayerX = minimap.getEntityRadar().getEntityX(mc.player, partial);
             double actualPlayerZ = minimap.getEntityRadar().getEntityZ(mc.player, partial);
             int actualXFloored = OptimizedMath.myFloor(actualPlayerX);

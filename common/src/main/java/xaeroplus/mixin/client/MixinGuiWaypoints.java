@@ -24,7 +24,7 @@ import xaero.common.minimap.waypoints.WaypointsSort;
 import xaero.common.misc.KeySortableByOther;
 import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.world.MinimapWorld;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -123,7 +123,7 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
 
     @Redirect(method = "updateButtons", at = @At(value = "INVOKE", target = "Lxaero/common/gui/GuiWaypoints;isOneSelected()Z"))
     public boolean shareButtonRedirect(final GuiWaypoints instance) {
-        if (XaeroPlusSettingRegistry.disableWaypointSharing.getValue()) return false;
+        if (Settings.REGISTRY.disableWaypointSharing.get()) return false;
         return isOneSelected();
     }
 

@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.ClientTickEvent;
 import xaeroplus.module.impl.FpsLimiter;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 
 @Mixin(value = Minecraft.class)
 public class MixinMinecraftClient {
@@ -26,7 +26,7 @@ public class MixinMinecraftClient {
 
     @Inject(method = "getMainRenderTarget", at = @At("HEAD"), cancellable = true)
     public void getMainRenderTarget(CallbackInfoReturnable<RenderTarget> ci) {
-        if (!XaeroPlusSettingRegistry.minimapFpsLimiter.getValue()) return;
+        if (!Settings.REGISTRY.minimapFpsLimiter.get()) return;
         var renderTargetOverwrite = FpsLimiter.renderTargetOverwrite;
         if (renderTargetOverwrite != null) ci.setReturnValue(renderTargetOverwrite);
     }

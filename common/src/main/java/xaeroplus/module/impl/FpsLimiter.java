@@ -6,7 +6,7 @@ import net.lenni0451.lambdaevents.EventHandler;
 import xaeroplus.event.MinimapRenderEvent;
 import xaeroplus.feature.render.buffered.BufferedComponent;
 import xaeroplus.module.Module;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 
 import java.util.function.Supplier;
 
@@ -15,7 +15,7 @@ public class FpsLimiter extends Module {
     //  impact while minimap north is not locked
     // this must be initialized AFTER MC's screen is initialized
     private final Supplier<BufferedComponent> minimapRenderInstanceSupplier = Suppliers.memoize(
-        () -> new BufferedComponent(() -> (int) XaeroPlusSettingRegistry.minimapFpsLimit.getValue()));
+        () -> new BufferedComponent(Settings.REGISTRY.minimapFpsLimit::getAsInt));
     public static RenderTarget renderTargetOverwrite = null;
 
     @EventHandler

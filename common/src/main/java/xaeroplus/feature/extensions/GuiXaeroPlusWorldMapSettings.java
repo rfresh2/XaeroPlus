@@ -6,18 +6,19 @@ import net.minecraft.network.chat.Component;
 import xaero.map.gui.GuiSettings;
 import xaero.map.gui.ISettingEntry;
 import xaero.map.gui.ScreenSwitchSettingEntry;
-import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
+import xaeroplus.settings.SettingLocation;
+import xaeroplus.settings.Settings;
 
 public class GuiXaeroPlusWorldMapSettings extends GuiSettings {
 
     public GuiXaeroPlusWorldMapSettings(Screen parent, Screen escapeScreen) {
         super(Component.translatable("gui.xaeroplus.world_map_settings"), parent, escapeScreen);
-        var mainSettingsEntries = XaeroPlusSettingsReflectionHax.getWorldMapConfigSettingEntries();
+        var mainSettingsEntries = Settings.REGISTRY.getWorldmapConfigSettingEntries(SettingLocation.WORLD_MAP_MAIN);
         var chunkHighlightSettingSwitchEntry = GuiXaeroPlusChunkHighlightSettings.getScreenSwitchSettingEntry(parent);
-        this.entries = new ISettingEntry[mainSettingsEntries.size() + 1];
+        this.entries = new ISettingEntry[mainSettingsEntries.length + 1];
         this.entries[0] = chunkHighlightSettingSwitchEntry;
-        for (int i = 0; i < mainSettingsEntries.size(); i++) {
-            this.entries[i + 1] = mainSettingsEntries.get(i);
+        for (int i = 0; i < mainSettingsEntries.length; i++) {
+            this.entries[i + 1] = mainSettingsEntries[i];
         }
     }
 

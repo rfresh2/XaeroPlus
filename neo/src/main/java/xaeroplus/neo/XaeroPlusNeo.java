@@ -2,7 +2,6 @@ package xaeroplus.neo;
 
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.neoforged.api.distmarker.Dist;
@@ -16,11 +15,10 @@ import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
-import xaeroplus.Globals;
+import xaero.map.gui.GuiWorldMapSettings;
 import xaeroplus.XaeroPlus;
-import xaeroplus.module.ModuleManager;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
+import xaeroplus.feature.extensions.GuiXaeroPlusWorldMapSettings;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.DataFolderResolveUtil;
 import xaeroplus.util.XaeroPlusGameTest;
 
@@ -51,11 +49,8 @@ public class XaeroPlusNeo {
 
     public void onRegisterKeyMappingsEvent(final RegisterKeyMappingsEvent event) {
         if (XaeroPlus.initialized.compareAndSet(false, true)) {
-            ModuleManager.init();
-            boolean a = Globals.shouldResetFBO; // force static instances to init
-            XaeroPlusSettingRegistry.fastMapSetting.getValue(); // force static instances to init
-            List<KeyMapping> keybinds = XaeroPlusSettingsReflectionHax.keybindsSupplier.get();
-            keybinds.forEach(event::register);
+            XaeroPlus.initializeSettings();
+            Settings.REGISTRY.getKeybindings().forEach(event::register);
             if (System.getenv("XP_CI_TEST") != null)
                 Minecraft.getInstance().execute(XaeroPlusGameTest::applyMixinsTest);
         }

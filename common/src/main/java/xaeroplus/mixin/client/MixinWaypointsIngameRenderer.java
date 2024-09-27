@@ -36,7 +36,7 @@ import xaero.common.settings.ModSettings;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.module.MinimapSession;
 import xaeroplus.feature.extensions.CustomWaypointsIngameRenderer;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
 
 import java.util.ArrayList;
@@ -87,7 +87,7 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
     ))
     public void preferOwWaypointsRemoveSubworldText(final MinimapSession session, final float partial, final MinimapProcessor minimap, final Matrix4f waypointsProjection, final Matrix4f worldModelView, final CallbackInfo ci,
                                                     @Local(name = "subworldName") LocalRef<String> subWorldNameRef) {
-        if (!XaeroPlusSettingRegistry.owAutoWaypointDimension.getValue()) return;
+        if (!Settings.REGISTRY.owAutoWaypointDimension.get()) return;
         if (subWorldNameRef.get() == null) return;
         ResourceKey<Level> actualDimension = ChunkUtils.getActualDimension();
         ResourceKey<Level> currentWpWorldDim = session.getWorldManager().getCurrentWorld().getDimId();
@@ -115,8 +115,8 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
         final Vec3 playerVec = mc.player.position();
         Vec3 waypointVec = new Vec3(waypoint.getX(dimDiv), playerVec.y, waypoint.getZ(dimDiv));
         final double xzDistance = playerVec.distanceTo(waypointVec);
-        if (xzDistance < (int) XaeroPlusSettingRegistry.waypointBeaconDistanceMin.getValue()) return;
-        final int farScale = (int) XaeroPlusSettingRegistry.waypointBeaconScaleMin.getValue();
+        if (xzDistance < Settings.REGISTRY.waypointBeaconDistanceMin.getAsInt()) return;
+        final int farScale = Settings.REGISTRY.waypointBeaconScaleMin.getAsInt();
         final double maxRenderDistance = Math.min(mc.options.renderDistance().get() << 4, farScale == 0 ? Integer.MAX_VALUE : farScale << 4);
         if (xzDistance > maxRenderDistance) {
             final Vec3 delta = waypointVec.subtract(playerVec).normalize();
@@ -154,7 +154,7 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
     index = 8,
     remap = true) // $REMAP
     public String modifyDistanceText(final String text, @Local(argsOnly = true) Waypoint waypoint) {
-        if (!XaeroPlusSettingRegistry.waypointEta.getValue()) return text;
+        if (!Settings.REGISTRY.waypointEta.get()) return text;
         if (text.isBlank()) return text;
         var eta = getEtaSecondsToReachWaypoint(waypoint);
         if (eta <= 0) return text;

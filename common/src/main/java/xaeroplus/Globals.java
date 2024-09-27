@@ -8,9 +8,7 @@ import xaero.hud.HudSession;
 import xaero.map.core.XaeroWorldMapCore;
 import xaeroplus.event.ClientPlaySessionFinalizedEvent;
 import xaeroplus.feature.render.DrawManager;
-import xaeroplus.settings.XaeroPlusSetting;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
+import xaeroplus.settings.Settings;
 
 import java.io.ByteArrayOutputStream;
 import java.util.concurrent.ExecutorService;
@@ -26,7 +24,7 @@ public class Globals {
     public static final DrawManager drawManager = new DrawManager();
     // cache and only update this on new world loads
     public static boolean nullOverworldDimensionFolder = false;
-    public static XaeroPlusSettingRegistry.DataFolderResolutionMode dataFolderResolutionMode = XaeroPlusSettingRegistry.DataFolderResolutionMode.IP;
+    public static Settings.DataFolderResolutionMode dataFolderResolutionMode = Settings.DataFolderResolutionMode.IP;
     public static int minimapScaleMultiplier = 1;
     public static int minimapSizeMultiplier = 1;
     public static boolean shouldResetFBO = false;
@@ -60,15 +58,14 @@ public class Globals {
             .setDaemon(true)
             .build()));
 
-    public static void onAllSettingsLoaded() {
-        XaeroPlusSettingsReflectionHax.ALL_SETTINGS.get().forEach(XaeroPlusSetting::init);
-        nullOverworldDimensionFolder = XaeroPlusSettingRegistry.nullOverworldDimensionFolder.getValue();
-        dataFolderResolutionMode = XaeroPlusSettingRegistry.dataFolderResolutionMode.getValue();
-        minimapScaleMultiplier = (int) XaeroPlusSettingRegistry.minimapScaleMultiplierSetting.getValue();
-        minimapSizeMultiplier = (int) XaeroPlusSettingRegistry.minimapSizeMultiplierSetting.getValue();
+    public static void initStickySettings() {
+        nullOverworldDimensionFolder = Settings.REGISTRY.nullOverworldDimensionFolder.get();
+        dataFolderResolutionMode = Settings.REGISTRY.dataFolderResolutionMode.get();
+        minimapScaleMultiplier = Settings.REGISTRY.minimapScaleMultiplierSetting.getAsInt();
+        minimapSizeMultiplier = Settings.REGISTRY.minimapSizeMultiplierSetting.getAsInt();
         XaeroPlus.EVENT_BUS.registerConsumer((e) -> {
-            nullOverworldDimensionFolder = XaeroPlusSettingRegistry.nullOverworldDimensionFolder.getValue();
-            dataFolderResolutionMode = XaeroPlusSettingRegistry.dataFolderResolutionMode.getValue();
+            nullOverworldDimensionFolder = Settings.REGISTRY.nullOverworldDimensionFolder.get();
+            dataFolderResolutionMode = Settings.REGISTRY.dataFolderResolutionMode.get();
         }, ClientPlaySessionFinalizedEvent.class);
     }
 
@@ -99,7 +96,7 @@ public class Globals {
         }
     }
 
-    public static void setDataFolderResolutionModeIfAble(XaeroPlusSettingRegistry.DataFolderResolutionMode mode) {
+    public static void setDataFolderResolutionModeIfAble(Settings.DataFolderResolutionMode mode) {
         try {
             var currentWMSession = XaeroWorldMapCore.currentSession;
             var currentMMSession = HudSession.getCurrentSession();

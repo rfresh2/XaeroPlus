@@ -8,7 +8,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaeroplus.Globals;
 import xaeroplus.module.Module;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
 
@@ -128,10 +128,10 @@ public class Highways extends Module {
     }
 
     public void setRgbColor(final int color) {
-        highwaysColor = ColorHelper.getColorWithAlpha(color, (int) XaeroPlusSettingRegistry.highwaysColorAlphaSetting.getValue());
+        highwaysColor = ColorHelper.getColorWithAlpha(color, Settings.REGISTRY.highwaysColorAlphaSetting.getAsInt());
     }
 
-    public void setAlpha(final float a) {
+    public void setAlpha(final double a) {
         highwaysColor = ColorHelper.getColorWithAlpha(highwaysColor, (int) a);
     }
 

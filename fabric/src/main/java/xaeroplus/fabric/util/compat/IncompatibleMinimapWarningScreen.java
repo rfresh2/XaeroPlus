@@ -19,12 +19,12 @@ public class IncompatibleMinimapWarningScreen extends Screen {
         currentVersion.ifPresent(cv -> {
             msg
                 .withStyle(ChatFormatting.RESET)
-                .append(Component.translatable("gui.xaeroplus.minimap_incompatible.currently_installed_version"))
+                .append(Component.translatable("xaeroplus.gui.minimap_incompatible.currently_installed_version"))
                 .append(Component.literal(cv.getFriendlyString()).withStyle(ChatFormatting.RED))
                 .append(Component.literal("\n"));
         });
         msg.append(
-            Component.translatable("gui.xaeroplus.minimap_incompatible.required_version")
+            Component.translatable("xaeroplus.gui.minimap_incompatible.required_version")
                 .withStyle(ChatFormatting.RESET)
                 .append(Component.literal(compatibleMinimapVersion.getFriendlyString()).withStyle(ChatFormatting.AQUA))
         );
@@ -38,7 +38,7 @@ public class IncompatibleMinimapWarningScreen extends Screen {
 
     public IncompatibleMinimapWarningScreen(Optional<Version> currentVersion, final Version compatibleMinimapVersion) {
         super(Component.literal("XaeroPlus"));
-        titleComponent = Component.translatable("gui.xaeroplus.minimap_incompatible.title").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD);
+        titleComponent = Component.translatable("xaeroplus.gui.minimap_incompatible.title").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD);
         messageComponent = getMessage(currentVersion, compatibleMinimapVersion);
     }
 
@@ -46,7 +46,7 @@ public class IncompatibleMinimapWarningScreen extends Screen {
     public void init() {
         this.message = MultiLineLabel.create(this.font, this.messageComponent, this.width - 100);
         addRenderableWidget(
-            Button.builder(Component.translatable("gui.xaeroplus.minimap_incompatible.download_minimap"), button -> {
+            Button.builder(Component.translatable("xaeroplus.gui.minimap_incompatible.download_minimap"), button -> {
                     Util.getPlatform().openUri("https://modrinth.com/mod/xaeros-minimap/versions");
                     Minecraft.getInstance().close();
             })
@@ -55,7 +55,7 @@ public class IncompatibleMinimapWarningScreen extends Screen {
         );
 
         addRenderableWidget(
-            Button.builder(Component.translatable("gui.xaeroplus.minimap_incompatible.exit"), button -> {
+            Button.builder(Component.translatable("xaeroplus.gui.minimap_incompatible.exit"), button -> {
                     Minecraft.getInstance().close();
                 })
                 .bounds(width / 2 + 100 - 75, 150, 150, 20)

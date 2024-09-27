@@ -123,13 +123,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         followButton = new GuiTexturedButton(0, this.dimensionToggleButton.getY() - 20, 20, 20, this.follow ? 133 : 149, 16, 16, 16,
                                              WorldMap.guiTextures,
                                              this::onFollowButton,
-                                             () -> new CursorBox(Component.translatable("gui.world_map.toggle_follow_mode")
-                                                                         .append(" " + I18n.get(this.follow ? "gui.xaeroplus.off" : "gui.xaeroplus.on"))));
+                                             () -> new CursorBox(Component.translatable("xaeroplus.gui.world_map.toggle_follow_mode")
+                                                                         .append(" " + I18n.get(this.follow ? "xaeroplus.gui.off" : "xaeroplus.gui.on"))));
         addButton(followButton);
         coordinateGotoButton = new GuiTexturedButton(0, followButton.getY() - 20 , 20, 20, 229, 16, 16, 16,
                                                      WorldMap.guiTextures,
                                                      this::onGotoCoordinatesButton,
-                                                     () -> new CursorBox(Component.translatable("gui.world_map.go_to_coordinates")));
+                                                     () -> new CursorBox(Component.translatable("xaeroplus.gui.world_map.go_to_coordinates")));
         addButton(coordinateGotoButton);
         xTextEntryField = new EditBox(Minecraft.getInstance().font, 20, coordinateGotoButton.getY() - 10, 50, 20, Component.nullToEmpty("X:"));
         xTextEntryField.setVisible(false);
@@ -152,15 +152,15 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         switchToEndButton = new GuiTexturedButton(this.width - 20, zoomInButton.getY() - 20, 20, 20, 31, 0, 16, 16,
                                                   this.xpGuiTextures,
                                                   (button -> onSwitchDimensionButton(END)),
-                                                  () -> new CursorBox(Component.translatable("setting.keybinds.switch_to_end")));
+                                                  () -> new CursorBox(Component.translatable("xaeroplus.keybind.switch_to_end")));
         switchToOverworldButton = new GuiTexturedButton(this.width - 20, this.switchToEndButton.getY() - 20, 20, 20, 16, 0, 16, 16,
                                                         this.xpGuiTextures,
                                                         (button -> onSwitchDimensionButton(OVERWORLD)),
-                                                        () -> new CursorBox(Component.translatable("setting.keybinds.switch_to_overworld")));
+                                                        () -> new CursorBox(Component.translatable("xaeroplus.keybind.switch_to_overworld")));
         switchToNetherButton = new GuiTexturedButton(this.width - 20, this.switchToOverworldButton.getY() - 20, 20, 20, 0, 0, 16, 16,
                                                      this.xpGuiTextures,
                                                      (button -> onSwitchDimensionButton(NETHER)),
-                                                     () -> new CursorBox(Component.translatable("setting.keybinds.switch_to_nether")));
+                                                     () -> new CursorBox(Component.translatable("xaeroplus.keybind.switch_to_nether")));
         addButton(switchToEndButton);
         addButton(switchToOverworldButton);
         addButton(switchToNetherButton);
@@ -543,13 +543,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             int goalX = rightClickX;
             int goalZ = rightClickZ;
             options.addAll(3, asList(
-                    new RightClickOption("gui.world_map.baritone_goal_here", options.size(), this) {
+                    new RightClickOption("xaeroplus.gui.world_map.baritone_goal_here", options.size(), this) {
                         @Override
                         public void onAction(Screen screen) {
                             BaritoneExecutor.goal(goalX, goalZ);
                         }
                     }.setNameFormatArgs(Misc.getKeyName(Settings.REGISTRY.worldMapBaritoneGoalHereKeybindSetting.getKeyBinding())),
-                    new RightClickOption("gui.world_map.baritone_path_here", options.size(), this) {
+                    new RightClickOption("xaeroplus.gui.world_map.baritone_path_here", options.size(), this) {
                         @Override
                         public void onAction(Screen screen) {
                             BaritoneExecutor.path(goalX, goalZ);
@@ -558,7 +558,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             ));
             if (BaritoneHelper.isBaritoneElytraPresent()) {
                 options.addAll(5, asList(
-                    new RightClickOption("gui.world_map.baritone_elytra_here", options.size(), this) {
+                    new RightClickOption("xaeroplus.gui.world_map.baritone_elytra_here", options.size(), this) {
                         @Override
                         public void onAction(Screen screen) {
                             BaritoneExecutor.elytra(goalX, goalZ);
@@ -569,7 +569,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         }
 
         if (Settings.REGISTRY.disableWaypointSharing.get()) {
-            cir.getReturnValue().removeIf(option -> ((AccessorRightClickOption) option).getName().equals("gui.xaero_right_click_map_share_location"));
+            cir.getReturnValue().removeIf(option -> ((AccessorRightClickOption) option).getName().equals("xaeroplus.gui.xaero_right_click_map_share_location"));
         }
     }
 

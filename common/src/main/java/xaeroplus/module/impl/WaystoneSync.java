@@ -144,7 +144,7 @@ public class WaystoneSync extends Module {
     }
 
     private WaypointSet getWaypointSet(final Waystone waystone, final MinimapSession minimapSession) {
-        final String waypointSetName = this.separateWaypointSet ? "Waystones" : "gui.xaero_default";
+        final String waypointSetName = this.separateWaypointSet ? "Waystones" : "xaeroplus.gui.xaero_default";
         final MinimapWorld waypointWorld = getWaypointWorldForWaystone(waystone, minimapSession);
         WaypointSet waypointSet = waypointWorld.getWaypointSet(waypointSetName);
         if (waypointSet == null) {

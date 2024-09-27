@@ -11,11 +11,11 @@ import me.jellysquid.mods.sodium.client.gui.options.control.TickBoxControl;
 import net.minecraft.network.chat.Component;
 import org.embeddedt.embeddium.api.OptionGUIConstructionEvent;
 import org.embeddedt.embeddium.client.gui.options.OptionIdentifier;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 
 public class XaeroPlusEmbeddiumOptionsInit {
     public static void onEmbeddiumOptionGUIConstructionEvent(OptionGUIConstructionEvent event) {
-        if (!XaeroPlusSettingRegistry.sodiumSettingIntegration.getValue()) return;
+        if (!Settings.REGISTRY.sodiumSettingIntegration.get()) return;
         event.addPage(new OptionPage(OptionIdentifier.create("xaeroplus", "options"), Component.literal("XaeroPlus"), ImmutableList.<OptionGroup>of(
             OptionGroup.createBuilder()
                 .add(OptionImpl.createBuilder(Boolean.TYPE, XaeroPlusEmbeddiumOptionStorage.INSTANCE)
@@ -23,8 +23,8 @@ public class XaeroPlusEmbeddiumOptionsInit {
                          .setTooltip(Component.translatable("setting.minimap.fps_limiter.tooltip"))
                          .setControl(TickBoxControl::new)
                          .setBinding(new GenericBinding<>(
-                             (config, value) -> XaeroPlusSettingRegistry.minimapFpsLimiter.setValue(value),
-                             config -> XaeroPlusSettingRegistry.minimapFpsLimiter.getValue()
+                             (config, value) -> Settings.REGISTRY.minimapFpsLimiter.setValue(value),
+                             config -> Settings.REGISTRY.minimapFpsLimiter.get()
                          ))
                          .build())
                 .add(OptionImpl.createBuilder(int.class, XaeroPlusEmbeddiumOptionStorage.INSTANCE)
@@ -32,13 +32,13 @@ public class XaeroPlusEmbeddiumOptionsInit {
                          .setTooltip(Component.translatable("setting.minimap.fps_limiter_limit.tooltip"))
                          .setControl(option -> new SliderControl(
                              option,
-                             (int) XaeroPlusSettingRegistry.minimapFpsLimit.getValueMin(),
-                             (int) XaeroPlusSettingRegistry.minimapFpsLimit.getValueMax(),
-                             (int) XaeroPlusSettingRegistry.minimapFpsLimit.getValueStep(),
+                             (int) Settings.REGISTRY.minimapFpsLimit.getValueMin(),
+                             (int) Settings.REGISTRY.minimapFpsLimit.getValueMax(),
+                             (int) Settings.REGISTRY.minimapFpsLimit.getValueStep(),
                              ControlValueFormatter.number()))
                          .setBinding(new GenericBinding<>(
-                             (config, value) -> XaeroPlusSettingRegistry.minimapFpsLimit.setValue((float) value),
-                             config -> (int) XaeroPlusSettingRegistry.minimapFpsLimit.getValue()
+                             (config, value) -> Settings.REGISTRY.minimapFpsLimit.setValue(value),
+                             config -> Settings.REGISTRY.minimapFpsLimit.getAsInt()
                          ))
                          .build())
                 .add(OptionImpl.createBuilder(int.class, XaeroPlusEmbeddiumOptionStorage.INSTANCE)
@@ -46,13 +46,13 @@ public class XaeroPlusEmbeddiumOptionsInit {
                          .setTooltip(Component.translatable("setting.minimap.minimap_scaling.tooltip"))
                          .setControl(option -> new SliderControl(
                              option,
-                             (int) XaeroPlusSettingRegistry.minimapScaleMultiplierSetting.getValueMin(),
-                             (int) XaeroPlusSettingRegistry.minimapScaleMultiplierSetting.getValueMax(),
-                             (int) XaeroPlusSettingRegistry.minimapScaleMultiplierSetting.getValueStep(),
+                             (int) Settings.REGISTRY.minimapScaleMultiplierSetting.getValueMin(),
+                             (int) Settings.REGISTRY.minimapScaleMultiplierSetting.getValueMax(),
+                             (int) Settings.REGISTRY.minimapScaleMultiplierSetting.getValueStep(),
                              ControlValueFormatter.number()))
                          .setBinding(new GenericBinding<>(
-                             (config, value) -> XaeroPlusSettingRegistry.minimapScaleMultiplierSetting.setValue((float) value),
-                             config -> (int) XaeroPlusSettingRegistry.minimapScaleMultiplierSetting.getValue()
+                             (config, value) -> Settings.REGISTRY.minimapScaleMultiplierSetting.setValue(value),
+                             config -> Settings.REGISTRY.minimapScaleMultiplierSetting.getAsInt()
                          ))
                          .build())
                 .build()

@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.map.mods.SupportXaeroMinimap;
 import xaero.map.mods.gui.Waypoint;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 
 import java.util.ArrayList;
 
@@ -34,7 +34,7 @@ public class MixinSupportXaeroMinimap {
 
     @Inject(method = "getSubWorldNameToRender", at = @At("HEAD"), cancellable = true)
     public void getSubworldNameToRenderInject(final CallbackInfoReturnable<String> cir) {
-        if (XaeroPlusSettingRegistry.owAutoWaypointDimension.getValue()) {
+        if (Settings.REGISTRY.owAutoWaypointDimension.get()) {
             // remove annoying string rendered in the middle of the worldmap
             cir.setReturnValue(null);
         }

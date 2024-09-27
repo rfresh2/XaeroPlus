@@ -18,7 +18,7 @@ import xaero.hud.minimap.Minimap;
 import xaero.hud.minimap.module.MinimapSession;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.extensions.CustomWaypointsIngameRenderer;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 
 @Mixin(value = LevelRenderer.class)
 public class MixinWorldRenderer {
@@ -27,7 +27,7 @@ public class MixinWorldRenderer {
     @Inject(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LevelRenderer;checkPoseStack(Lcom/mojang/blaze3d/vertex/PoseStack;)V", ordinal = 1, shift = At.Shift.AFTER))
     public void renderBlockEntitiesInject(final float tickDelta, final long l, final boolean bl, final Camera camera, final GameRenderer gameRenderer, final LightTexture lightTexture, final Matrix4f matrix4f, final Matrix4f matrix4f2, final CallbackInfo ci,
                                           @Local PoseStack poseStack) {
-        if (!XaeroPlusSettingRegistry.waypointBeacons.getValue()) return;
+        if (!Settings.REGISTRY.waypointBeacons.get()) return;
         HudMod hudMod = HudMod.INSTANCE;
         if (hudMod == null) return;
         Minimap minimap = hudMod.getMinimap();

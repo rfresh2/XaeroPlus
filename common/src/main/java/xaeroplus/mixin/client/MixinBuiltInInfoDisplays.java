@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import xaero.common.minimap.info.BuiltInInfoDisplays;
 import xaero.common.minimap.info.render.compile.InfoDisplayCompiler;
 import xaero.hud.minimap.world.MinimapWorld;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
 
 @Mixin(value = BuiltInInfoDisplays.class, remap = false)
@@ -21,7 +21,7 @@ public class MixinBuiltInInfoDisplays {
         target = "Lxaero/common/minimap/info/render/compile/InfoDisplayCompiler;addWords(ILjava/lang/String;)V"))
     private static void hideAutoSubworldInfoWhenOwAutoWaypointsEnabled(final InfoDisplayCompiler instance, final int lineWidth, final String text, final Operation<Void> original,
                                                                        @Local(name = "currentWorld") MinimapWorld currentWorld) {
-        if (XaeroPlusSettingRegistry.owAutoWaypointDimension.getValue()) {
+        if (Settings.REGISTRY.owAutoWaypointDimension.get()) {
             ResourceKey<Level> actualDimension = ChunkUtils.getActualDimension();
             if (actualDimension == Level.NETHER && currentWorld.getDimId() == Level.OVERWORLD) return;
         }

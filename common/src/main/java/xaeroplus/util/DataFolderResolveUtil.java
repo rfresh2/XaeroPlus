@@ -13,7 +13,7 @@ import xaero.map.core.XaeroWorldMapCore;
 import xaero.map.file.MapSaveLoad;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 
 import java.nio.file.Path;
 
@@ -22,8 +22,8 @@ import static java.util.Objects.nonNull;
 public class DataFolderResolveUtil {
 
     public static void resolveDataFolder(final ClientPacketListener connection, final CallbackInfoReturnable<String> cir) {
-        final XaeroPlusSettingRegistry.DataFolderResolutionMode dataFolderResolutionMode = Globals.dataFolderResolutionMode;
-        if (dataFolderResolutionMode == XaeroPlusSettingRegistry.DataFolderResolutionMode.SERVER_NAME) {
+        final Settings.DataFolderResolutionMode dataFolderResolutionMode = Globals.dataFolderResolutionMode;
+        if (dataFolderResolutionMode == Settings.DataFolderResolutionMode.SERVER_NAME) {
             if (nonNull(connection.getServerData())) {
                 String serverName = connection.getServerData().name;
                 if (!serverName.isEmpty()) {
@@ -38,7 +38,7 @@ public class DataFolderResolveUtil {
             if (!Minecraft.getInstance().hasSingleplayerServer()) {
                 XaeroPlus.LOGGER.error("Unable to resolve valid MC Server Name. Falling back to default Xaero data folder resolution");
             }
-        } else if (dataFolderResolutionMode == XaeroPlusSettingRegistry.DataFolderResolutionMode.BASE_DOMAIN) {
+        } else if (dataFolderResolutionMode == Settings.DataFolderResolutionMode.BASE_DOMAIN) {
             if (nonNull(connection.getServerData())) {
                 // use the base domain name, e.g connect.2b2t.org -> 2b2t.org
                 String id;

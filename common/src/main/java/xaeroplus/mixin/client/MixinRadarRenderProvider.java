@@ -15,7 +15,7 @@ import xaero.common.minimap.render.radar.element.RadarRenderProvider;
 import xaero.hud.HudSession;
 import xaeroplus.Globals;
 import xaeroplus.feature.extensions.IScreenRadarRenderContext;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 
 import java.util.Objects;
 
@@ -32,10 +32,10 @@ public class MixinRadarRenderProvider {
         final Entity e = cir.getReturnValue();
         if (e instanceof Player) {
             if (!Objects.equals(e, Minecraft.getInstance().player)) {
-                if (XaeroPlusSettingRegistry.alwaysRenderPlayerIconOnRadar.getValue()) {
+                if (Settings.REGISTRY.alwaysRenderPlayerIconOnRadar.get()) {
                     context.icon = true;
                 }
-                if (XaeroPlusSettingRegistry.alwaysRenderPlayerWithNameOnRadar.getValue()) {
+                if (Settings.REGISTRY.alwaysRenderPlayerWithNameOnRadar.get()) {
                     context.name = true;
                 }
             }

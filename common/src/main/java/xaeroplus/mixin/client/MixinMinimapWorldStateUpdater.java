@@ -15,7 +15,7 @@ import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.world.state.MinimapWorldState;
 import xaero.hud.minimap.world.state.MinimapWorldStateUpdater;
 import xaero.hud.path.XaeroPath;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.DataFolderResolveUtil;
 
@@ -36,7 +36,7 @@ public abstract class MixinMinimapWorldStateUpdater {
                                    @Local(name = "oldAutoWorldPath") XaeroPath oldAutoWorldPath,
                                    @Local(name = "potentialAutoWorldNode") String potentialAutoWorldNode) {
         original.call(instance, autoWorldPath);
-        if (XaeroPlusSettingRegistry.owAutoWaypointDimension.getValue()) {
+        if (Settings.REGISTRY.owAutoWaypointDimension.get()) {
             ResourceKey<Level> actualDimension = ChunkUtils.getActualDimension();
             if (actualDimension == NETHER && currentDim != actualDimension) {
                 XaeroPath overworldWpXaeroPath = session.getWorldState().getAutoRootContainerPath()

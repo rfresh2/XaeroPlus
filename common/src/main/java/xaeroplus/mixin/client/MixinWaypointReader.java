@@ -29,13 +29,13 @@ public class MixinWaypointReader {
             int goalX = element.getX();
             int goalZ = element.getZ();
             options.addAll(3, asList(
-                new RightClickOption("gui.world_map.baritone_goal_here", options.size(), target) {
+                new RightClickOption("xaeroplus.gui.world_map.baritone_goal_here", options.size(), target) {
                     @Override
                     public void onAction(Screen screen) {
                         BaritoneExecutor.goal(goalX, goalZ);
                     }
                 }.setNameFormatArgs(Misc.getKeyName(Settings.REGISTRY.worldMapBaritoneGoalHereKeybindSetting.getKeyBinding())),
-                new RightClickOption("gui.world_map.baritone_path_here", options.size(), target) {
+                new RightClickOption("xaeroplus.gui.world_map.baritone_path_here", options.size(), target) {
                     @Override
                     public void onAction(Screen screen) {
                         BaritoneExecutor.path(goalX, goalZ);
@@ -44,7 +44,7 @@ public class MixinWaypointReader {
             ));
             if (BaritoneHelper.isBaritoneElytraPresent()) {
                 options.addAll(5, asList(
-                    new RightClickOption("gui.world_map.baritone_elytra_here", options.size(), target) {
+                    new RightClickOption("xaeroplus.gui.world_map.baritone_elytra_here", options.size(), target) {
                         @Override
                         public void onAction(Screen screen) {
                             BaritoneExecutor.elytra(goalX, goalZ);
@@ -55,7 +55,7 @@ public class MixinWaypointReader {
         }
 
         if (Settings.REGISTRY.disableWaypointSharing.get()) {
-            cir.getReturnValue().removeIf(option -> ((AccessorRightClickOption) option).getName().equals("gui.xaero_right_click_waypoint_share"));
+            cir.getReturnValue().removeIf(option -> ((AccessorRightClickOption) option).getName().equals("xaeroplus.gui.xaero_right_click_waypoint_share"));
         }
     }
 }

@@ -81,7 +81,7 @@ public class ColorHelper {
         LIGHT_PURPLE(13, "gui.xaero_purple"),
         YELLOW(14, "gui.xaero_yellow"),
         WHITE(15, "gui.xaero_white"),
-        RANDOM(16, "gui.xaeroplus.random");
+        RANDOM(16, "xaeroplus.gui.random");
 
         private final int colorIndex;
         private final String translationKey;

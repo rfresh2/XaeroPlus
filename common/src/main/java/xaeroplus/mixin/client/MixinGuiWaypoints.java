@@ -72,7 +72,7 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
                         TOGGLE_ALL_ID,
                         this.width / 2 + 213,
                         this.height - 53,
-                        Component.translatable("gui.waypoints.toggle_enable_all"),
+                        Component.translatable("xaeroplus.gui.waypoints.toggle_enable_all"),
                         b -> {
                             waypointsSorted.stream().findFirst().ifPresent(firstWaypoint -> {
                                 boolean firstIsEnabled = firstWaypoint.isDisabled();
@@ -113,7 +113,7 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lxaero/common/gui/ScreenBase;render(Lcom/mojang/blaze3d/vertex/PoseStack;IIF)V", shift = At.Shift.AFTER), remap = true)
     public void drawScreenInject(final PoseStack guiGraphics, final int mouseX, final int mouseY, final float partial, final CallbackInfo ci) {
         if (!this.searchField.isFocused() && this.searchField.getValue().isEmpty()) {
-            xaero.map.misc.Misc.setFieldText(this.searchField, I18n.get("gui.xaero_settings_search_placeholder", new Object[0]), -11184811);
+            xaero.map.misc.Misc.setFieldText(this.searchField, I18n.get("xaeroplus.gui.xaero_settings_search_placeholder", new Object[0]), -11184811);
             this.searchField.moveCursorToStart();
         }
         this.searchField.render(guiGraphics, mouseX, mouseY, partial);

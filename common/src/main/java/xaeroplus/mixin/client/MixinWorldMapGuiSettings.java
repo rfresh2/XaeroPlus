@@ -70,7 +70,7 @@ public abstract class MixinWorldMapGuiSettings extends ScreenBase {
             .filter(child -> child instanceof Button)
             .map(child -> (Button) child)
             .filter(button -> button.getMessage().getContents() instanceof TranslatableContents)
-            .filter(button -> ((TranslatableContents) button.getMessage().getContents()).getKey().equals("xaeroplus.gui.xaero_back"))
+            .filter(button -> ((TranslatableContents) button.getMessage().getContents()).getKey().equals("gui.xaero_back"))
             .findFirst()
             .ifPresent(button -> button.setY(button.getY() + yAdjust));
     }

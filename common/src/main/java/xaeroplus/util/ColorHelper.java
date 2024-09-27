@@ -37,14 +37,14 @@ public class ColorHelper {
     }
 
     public enum HighlightColor implements TranslatableSettingEnum {
-        RED(ColorHelper.getColor(255, 0, 0, 100), "xaeroplus.gui.xaero_red"),
-        GREEN(ColorHelper.getColor(0, 255, 0, 100), "xaeroplus.gui.xaero_green"),
-        BLUE(ColorHelper.getColor(0, 0, 255, 100), "xaeroplus.gui.xaero_blue"),
-        YELLOW(ColorHelper.getColor(255, 255, 0, 100), "xaeroplus.gui.xaero_yellow"),
-        CYAN(ColorHelper.getColor(0, 255, 255, 100), "xaeroplus.gui.xaero_aqua"),
-        MAGENTA(ColorHelper.getColor(255, 0, 255, 100), "xaeroplus.gui.xaero_purple"),
-        WHITE(ColorHelper.getColor(255, 255, 255, 100), "xaeroplus.gui.xaero_white"),
-        BLACK(ColorHelper.getColor(0, 0, 0, 100), "xaeroplus.gui.xaero_black");
+        RED(ColorHelper.getColor(255, 0, 0, 100), "gui.xaero_red"),
+        GREEN(ColorHelper.getColor(0, 255, 0, 100), "gui.xaero_green"),
+        BLUE(ColorHelper.getColor(0, 0, 255, 100), "gui.xaero_blue"),
+        YELLOW(ColorHelper.getColor(255, 255, 0, 100), "gui.xaero_yellow"),
+        CYAN(ColorHelper.getColor(0, 255, 255, 100), "gui.xaero_aqua"),
+        MAGENTA(ColorHelper.getColor(255, 0, 255, 100), "gui.xaero_purple"),
+        WHITE(ColorHelper.getColor(255, 255, 255, 100), "gui.xaero_white"),
+        BLACK(ColorHelper.getColor(0, 0, 0, 100), "gui.xaero_black");
 
         private final int color;
         private final String translationKey;
@@ -65,22 +65,22 @@ public class ColorHelper {
 
     public enum WaystoneColor implements TranslatableSettingEnum {
 
-        BLACK(0, "xaeroplus.gui.xaero_black"),
-        DARK_BLUE(1, "xaeroplus.gui.xaero_dark_blue"),
-        DARK_GREEN(2, "xaeroplus.gui.xaero_dark_green"),
-        DARK_AQUA(3, "xaeroplus.gui.xaero_dark_aqua"),
-        DARK_RED(4, "xaeroplus.gui.xaero_dark_red"),
-        DARK_PURPLE(5, "xaeroplus.gui.xaero_dark_purple"),
-        GOLD(6, "xaeroplus.gui.xaero_gold"),
-        GRAY(7, "xaeroplus.gui.xaero_gray"),
-        DARK_GRAY(8, "xaeroplus.gui.xaero_dark_gray"),
-        BLUE(9, "xaeroplus.gui.xaero_blue"),
-        GREEN(10, "xaeroplus.gui.xaero_green"),
-        AQUA(11, "xaeroplus.gui.xaero_aqua"),
-        RED(12, "xaeroplus.gui.xaero_red"),
-        LIGHT_PURPLE(13, "xaeroplus.gui.xaero_purple"),
-        YELLOW(14, "xaeroplus.gui.xaero_yellow"),
-        WHITE(15, "xaeroplus.gui.xaero_white"),
+        BLACK(0, "gui.xaero_black"),
+        DARK_BLUE(1, "gui.xaero_dark_blue"),
+        DARK_GREEN(2, "gui.xaero_dark_green"),
+        DARK_AQUA(3, "gui.xaero_dark_aqua"),
+        DARK_RED(4, "gui.xaero_dark_red"),
+        DARK_PURPLE(5, "gui.xaero_dark_purple"),
+        GOLD(6, "gui.xaero_gold"),
+        GRAY(7, "gui.xaero_gray"),
+        DARK_GRAY(8, "gui.xaero_dark_gray"),
+        BLUE(9, "gui.xaero_blue"),
+        GREEN(10, "gui.xaero_green"),
+        AQUA(11, "gui.xaero_aqua"),
+        RED(12, "gui.xaero_red"),
+        LIGHT_PURPLE(13, "gui.xaero_purple"),
+        YELLOW(14, "gui.xaero_yellow"),
+        WHITE(15, "gui.xaero_white"),
         RANDOM(16, "xaeroplus.gui.random");
 
         private final int colorIndex;

@@ -14,7 +14,9 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.*;
 import xaeroplus.Globals;
+import xaeroplus.XaeroPlus;
 import xaeroplus.event.ChunkDataEvent;
+import xaeroplus.feature.render.highlights.ChunkHighlightLocalCache;
 import xaeroplus.feature.render.highlights.SavableHighlightCacheInstance;
 import xaeroplus.module.Module;
 import xaeroplus.settings.Settings;
@@ -39,28 +41,32 @@ public class PaletteNewChunks extends Module {
     @EventHandler
     public void onChunkData(ChunkDataEvent event) {
         if (event.seenChunk()) return; // never will be newchunk if we've already cached it
-        var currentDim = ChunkUtils.getActualDimension();
-        var x = event.chunk().getPos().x;
-        var z = event.chunk().getPos().z;
+        var dim = ChunkUtils.getActualDimension();
+        var chunk = event.chunk();
+        var x = chunk.getPos().x;
+        var z = chunk.getPos().z;
         try {
-            if (newChunksCache.get().isHighlighted(x, z, currentDim)) return;
-            if (newChunksInverseCache.get().isHighlighted(x, z, currentDim)) return;
-            if (currentDim == OVERWORLD || currentDim == NETHER) {
-                if (checkNewChunkOverworldOrNether(event.chunk())) {
-                    newChunksCache.get().addHighlight(x, z);
-                } else {
-                    newChunksInverseCache.get().addHighlight(x, z);
-                }
-            } else if (currentDim == END) {
-                if (checkNewChunkEnd(event.chunk())) {
-                    newChunksCache.get().addHighlight(x, z);
-                } else {
-                    newChunksInverseCache.get().addHighlight(x, z);
-                }
-            }
+            if (newChunksCache.get().isHighlighted(x, z, dim)) return;
+            if (newChunksInverseCache.get().isHighlighted(x, z, dim)) return;
+            if (checkNewChunk(dim, chunk)) newChunksCache.get().addHighlight(x, z);
+            else newChunksInverseCache.get().addHighlight(x, z);
         } catch (final Exception e) {
-            // fall through
+            XaeroPlus.LOGGER.error("Error checking palette NewChunk at [{} {}]", x, z, e);
         }
+    }
+
+    private boolean checkNewChunk(final ResourceKey<Level> dim, final LevelChunk chunk) {
+        if (dim == OVERWORLD) {
+            return checkNewChunkBiomePalette(chunk, true)
+                // it's possible for the overworld to have a plains biome
+                // so we need to check the blockstate palette as well
+                || checkNewChunkBlockStatePalette(chunk);
+        } else if (dim == NETHER) {
+            return checkNewChunkBiomePalette(chunk, false);
+        } else if (dim == END) {
+            return checkNewChunkBiomePalette(chunk, false);
+        }
+        return false;
     }
 
     /**
@@ -75,7 +81,7 @@ public class PaletteNewChunks extends Module {
      * the key is that this compaction occurs _after_ newly generated chunk data is sent to players
      *
      * compacting has 2 effects:
-     * 1. palette entries without blockstates present in the chunk are removed
+     * 1. palette entries without values present in the chunk are removed
      * 2. the order of ids in the palette can change as it is rebuilt in order of the actual blockstates present in the chunk
      *
      * So we are simply checking if the first entry of the lowest section's block palette is air
@@ -86,9 +92,12 @@ public class PaletteNewChunks extends Module {
      * However, there is a chance for false negatives if the chunk's palette generates with more than 16 different blockstates
      * The palette gets resized to a HashMapPalette which does not retain the original entry ordering
      * Usually this happens when features like mineshafts or the deep dark generates
-     * To catch these we fall back to checking if the palette has more entries than what is actually present in the chunk data
+     *
+     * The second check that can be applied is verifying every palette entry is actually present in the data.
+     * But this can still fail if air is still present in the section. Or if the chunk is modified by a
+     * different online player right before we enter it.
      */
-    private boolean checkNewChunkOverworldOrNether(LevelChunk chunk) {
+    private boolean checkNewChunkBlockStatePalette(LevelChunk chunk) {
         var sections = chunk.getSections();
         if (sections.length == 0) return false;
         var firstSection = sections[0];
@@ -99,7 +108,7 @@ public class PaletteNewChunks extends Module {
         } else { // HashMapPalette
             // we could iterate through more sections but this is good enough in most cases
             // checking every blockstate is relatively expensive
-            for (int i = 0; i < Math.min(sections.length, 10); i++) {
+            for (int i = 0; i < Math.min(sections.length, 5); i++) {
                 var section = sections[i];
                 var paletteContainerData = section.getStates().data;
                 var palette = paletteContainerData.palette();
@@ -111,26 +120,45 @@ public class PaletteNewChunks extends Module {
     }
 
     /**
-     * Similar to Overworld/Nether but we check the biome palette instead
+     * Same logic as BlockState palette but we check the biomes palette.
+     * MC initializes palettes with the Plains biome.
      *
-     * New chunks generated in the end will set the first biome palette entry to plains before compaction
+     * This check is very reliable in all dimensions - even the overworld as long as plains is not a real biome present.
+     *
+     * This should generally be preferred over blockstate palette checks as its faster and more reliable.
+     * For example, this solves the issue of player activity modifying the chunk, and therefore possibly causing palette ID's
+     * without matching data present, at the same time as we load them.
      */
-    private boolean checkNewChunkEnd(LevelChunk chunk) {
+    private boolean checkNewChunkBiomePalette(LevelChunk chunk, boolean checkPlainsPresent) {
         var sections = chunk.getSections();
         if (sections.length == 0) return false;
         var firstSection = sections[0];
         var biomes = firstSection.getBiomes();
         if (biomes instanceof PalettedContainer<Holder<Biome>> biomesPaletteContainer) {
-            Palette<Holder<Biome>> firstPalette = biomesPaletteContainer.data.palette();
-            // chunks already generated in the end will not have more than 1 biome present (stored in SingleValuePalette)
-            // so just checking the palette size is sufficient
-            // but we also check if the first entry is plains to be extra sure
-            if (firstPalette.getSize() > 1) {
-                Holder<Biome> firstBiome = firstPalette.valueFor(0);
-                return firstBiome.unwrapKey().filter(k -> k.equals(Biomes.PLAINS)).isPresent();
-            }
+            var firstPalette = biomesPaletteContainer.data.palette();
+            // Alternatively we could check the first palette entry for plains in the nether/end
+            // but checking data entries allows this to also work in the overworld
+            // and plains is not set to the first entry in certain cases in the nether
+            var plainsInPalette = firstPalette.maybeHas(holder -> holder.unwrapKey().get().equals(Biomes.PLAINS));
+            // only needed in overworld
+            return checkPlainsPresent
+                ? plainsInPalette && plainsNotPresentInData(biomesPaletteContainer)
+                : plainsInPalette;
         }
         return false;
+    }
+
+    private boolean plainsNotPresentInData(PalettedContainer<Holder<Biome>> biomesPaletteContainer) {
+        var palette = biomesPaletteContainer.data.palette();
+        var storage = biomesPaletteContainer.data.storage();
+        presentStateIdsBuf.clear(); // reusing to reduce gc pressure
+        storage.getAll(presentStateIdsBuf::add);
+        for (int id : presentStateIdsBuf) {
+            if (palette.valueFor(id).unwrapKey().get().equals(Biomes.PLAINS)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private boolean isNotLinearOrHashMapPalette(Palette palette) {
@@ -159,6 +187,12 @@ public class PaletteNewChunks extends Module {
     public void onDisable() {
         newChunksCache.onDisable();
         newChunksInverseCache.onDisable();
+        if (newChunksCache.get() instanceof ChunkHighlightLocalCache localCache) {
+            localCache.reset();
+        }
+        if (newChunksInverseCache.get() instanceof ChunkHighlightLocalCache localCache) {
+            localCache.reset();
+        }
         Globals.drawManager.unregisterChunkHighlightProvider(this.getClass());
     }
 

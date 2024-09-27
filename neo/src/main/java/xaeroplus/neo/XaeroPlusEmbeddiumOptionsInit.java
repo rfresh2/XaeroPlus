@@ -22,8 +22,8 @@ public class XaeroPlusEmbeddiumOptionsInit {
                 .setId(ResourceLocation.tryBuild("xaeroplus", "option-group"))
                 .add(OptionImpl.createBuilder(Boolean.TYPE, XaeroPlusEmbeddiumOptionStorage.INSTANCE)
                          .setId(ResourceLocation.tryBuild("xaeroplus", "minimap-fps-limiter-enabled"))
-                         .setName(Component.translatable("setting.minimap.fps_limiter"))
-                         .setTooltip(Component.translatable("setting.minimap.fps_limiter.tooltip"))
+                         .setName(Component.translatable("xaeroplus.setting.fps_limiter"))
+                         .setTooltip(Component.translatable("xaeroplus.setting.fps_limiter.tooltip"))
                          .setControl(TickBoxControl::new)
                          .setBinding(new GenericBinding<>(
                              (config, value) -> Settings.REGISTRY.minimapFpsLimiter.setValue(value),
@@ -32,8 +32,8 @@ public class XaeroPlusEmbeddiumOptionsInit {
                          .build())
                 .add(OptionImpl.createBuilder(int.class, XaeroPlusEmbeddiumOptionStorage.INSTANCE)
                          .setId(ResourceLocation.tryBuild("xaeroplus", "minimap-fps-limit"))
-                         .setName(Component.translatable("setting.minimap.fps_limiter_limit"))
-                         .setTooltip(Component.translatable("setting.minimap.fps_limiter_limit.tooltip"))
+                         .setName(Component.translatable("xaeroplus.setting.fps_limiter_limit"))
+                         .setTooltip(Component.translatable("xaeroplus.setting.fps_limiter_limit.tooltip"))
                          .setControl(option -> new SliderControl(
                              option,
                              (int) Settings.REGISTRY.minimapFpsLimit.getValueMin(),
@@ -47,8 +47,8 @@ public class XaeroPlusEmbeddiumOptionsInit {
                          .build())
                 .add(OptionImpl.createBuilder(int.class, XaeroPlusEmbeddiumOptionStorage.INSTANCE)
                          .setId(ResourceLocation.tryBuild("xaeroplus", "minimap-scaling-factor"))
-                         .setName(Component.translatable("setting.minimap.minimap_scaling"))
-                         .setTooltip(Component.translatable("setting.minimap.minimap_scaling.tooltip"))
+                         .setName(Component.translatable("xaeroplus.setting.fps_limiter_limit"))
+                         .setTooltip(Component.translatable("xaeroplus.setting.fps_limiter_limit.tooltip"))
                          .setControl(option -> new SliderControl(
                              option,
                              (int) Settings.REGISTRY.minimapScaleMultiplierSetting.getValueMin(),

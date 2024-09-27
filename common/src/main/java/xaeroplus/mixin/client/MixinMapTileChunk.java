@@ -16,7 +16,7 @@ import xaero.map.region.texture.LeafRegionTexture;
 import xaero.map.world.MapDimension;
 import xaero.map.world.MapWorld;
 import xaeroplus.feature.extensions.SeenChunksTrackingMapTileChunk;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 
 import java.io.DataInputStream;
 
@@ -63,7 +63,7 @@ public abstract class MixinMapTileChunk implements SeenChunksTrackingMapTileChun
         target = "Lxaero/map/world/MapWorld;getCurrentDimension()Lxaero/map/world/MapDimension;"
     ))
     public MapDimension useRegionDimensionInsteadOfMapWorld(final MapWorld mapWorld, final Operation<MapDimension> original) {
-        if (XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue() && mapWorld.isMultiplayer()) {
+        if (Settings.REGISTRY.writesWhileDimSwitched.get() && mapWorld.isMultiplayer()) {
             return getInRegion().getDim();
         } else {
             return original.call(mapWorld);

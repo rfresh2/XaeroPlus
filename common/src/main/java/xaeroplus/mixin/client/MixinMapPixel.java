@@ -19,7 +19,7 @@ import xaero.map.biome.BlockTintProvider;
 import xaero.map.cache.BlockStateShortShapeCache;
 import xaero.map.region.*;
 import xaero.map.world.MapDimension;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 
 import java.util.ArrayList;
 @Mixin(value = MapPixel.class, remap = false)
@@ -60,11 +60,11 @@ public abstract class MixinMapPixel {
             final BlockStateShortShapeCache blockStateShortShapeCache,
             final CallbackInfo ci
     ) {
-        if (XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()) {
+        if (Settings.REGISTRY.transparentObsidianRoofSetting.get()) {
             if (state.getBlock() == Blocks.OBSIDIAN || state.getBlock() == Blocks.CRYING_OBSIDIAN) {
-                result_dest[3] = (int) XaeroPlusSettingRegistry.transparentObsidianRoofDarkeningSetting.getValue();
+                result_dest[3] = Settings.REGISTRY.transparentObsidianRoofDarkeningSetting.getAsInt();
             } else if (state.getBlock() == Blocks.SNOW) {
-                result_dest[3] = (int) XaeroPlusSettingRegistry.transparentObsidianRoofSnowOpacitySetting.getValue();
+                result_dest[3] = Settings.REGISTRY.transparentObsidianRoofSnowOpacitySetting.getAsInt();
             }
         }
     }

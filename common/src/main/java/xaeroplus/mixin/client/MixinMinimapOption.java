@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.settings.ModOptions;
 import xaero.common.settings.Option;
-import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
+import xaeroplus.settings.Settings;
 
 import static xaeroplus.settings.XaeroPlusSetting.SETTING_PREFIX;
 
@@ -25,10 +25,10 @@ public class MixinMinimapOption {
     @Inject(method = "<init>", at = @At("RETURN"))
     public void constructorInject(final ModOptions option, final CallbackInfo ci) {
         if (option.getEnumString().startsWith(SETTING_PREFIX)) {
-            XaeroPlusSettingsReflectionHax.ALL_MINIMAP_SETTINGS.get().stream()
-                    .filter(s -> s.getSettingName().equals(option.getEnumString()))
-                    .findFirst()
-                    .ifPresent(s -> caption = MutableComponent.create(new PlainTextContents.LiteralContents(SETTING_PREFIX)).append(Component.translatable(s.getSettingNameTranslationKey())));
+            var xpSetting = Settings.REGISTRY.getSettingByName(option.getEnumString());
+            if (xpSetting != null) {
+                caption = MutableComponent.create(new PlainTextContents.LiteralContents(SETTING_PREFIX)).append(Component.translatable(xpSetting.getSettingNameTranslationKey()));
+            }
         }
     }
 }

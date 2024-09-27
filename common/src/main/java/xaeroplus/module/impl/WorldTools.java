@@ -7,7 +7,7 @@ import net.minecraft.world.level.Level;
 import org.waste.of.time.storage.cache.HotCache;
 import xaeroplus.Globals;
 import xaeroplus.module.Module;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
 import xaeroplus.util.WorldToolsHelper;
@@ -58,10 +58,10 @@ public class WorldTools extends Module {
     }
 
     public void setRgbColor(final int color) {
-        worldToolsColor = ColorHelper.getColorWithAlpha(color, (int) XaeroPlusSettingRegistry.worldToolsAlphaSetting.getValue());
+        worldToolsColor = ColorHelper.getColorWithAlpha(color, Settings.REGISTRY.worldToolsAlphaSetting.getAsInt());
     }
 
-    public void setAlpha(final float alpha) {
+    public void setAlpha(final double alpha) {
         worldToolsColor = ColorHelper.getColorWithAlpha(worldToolsColor, (int) alpha);
     }
 }

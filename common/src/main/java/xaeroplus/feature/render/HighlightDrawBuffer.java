@@ -12,13 +12,15 @@ import xaeroplus.util.ChunkUtils;
 public class HighlightDrawBuffer {
     private boolean stale = true;
     @Nullable private VertexBuffer vertexBuffer = null;
+    private boolean flipped = false;
 
-    public boolean needsRefresh() {
-        return vertexBuffer == null || vertexBuffer.isInvalid() || stale;
+    public boolean needsRefresh(boolean needsFlip) {
+        return vertexBuffer == null || vertexBuffer.isInvalid() || stale || flipped != needsFlip;
     }
 
-    public void refresh(LongList highlights) {
+    public void refresh(LongList highlights, boolean needsFlip) {
         stale = false;
+        flipped = needsFlip;
         if (highlights.isEmpty()) {
             close();
             return;
@@ -30,17 +32,14 @@ public class HighlightDrawBuffer {
             long highlight = highlights.getLong(j);
             var chunkPosX = ChunkUtils.longToChunkX(highlight);
             var chunkPosZ = ChunkUtils.longToChunkZ(highlight);
-            var blockPosX = ChunkUtils.chunkCoordToCoord(chunkPosX);
-            var blockPosZ = ChunkUtils.chunkCoordToCoord(chunkPosZ);
-            var chunkSize = 16;
-            float x1 = blockPosX;
-            float x2 = blockPosX + chunkSize;
-            float y1 = blockPosZ;
-            float y2 = blockPosZ + chunkSize;
-            bufferBuilder.vertex(x1, y1, 0.0F).endVertex();
-            bufferBuilder.vertex(x2, y1, 0.0F).endVertex();
-            bufferBuilder.vertex(x2, y2, 0.0F).endVertex();
-            bufferBuilder.vertex(x1, y2, 0.0F).endVertex();
+            float x1 = chunkPosX;
+            float x2 = chunkPosX + 1;
+            float y1 = needsFlip ? chunkPosZ + 1 : chunkPosZ;
+            float y2 = needsFlip ? chunkPosZ : chunkPosZ + 1;
+            bufferBuilder.vertex(x1, y2, 0F).endVertex();
+            bufferBuilder.vertex(x2, y2, 0F).endVertex();
+            bufferBuilder.vertex(x2, y1, 0F).endVertex();
+            bufferBuilder.vertex(x1, y1, 0F).endVertex();
         }
         if (vertexBuffer == null || vertexBuffer.isInvalid()) {
             close();

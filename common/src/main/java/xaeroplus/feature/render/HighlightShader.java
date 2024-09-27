@@ -12,7 +12,7 @@ import java.io.IOException;
 
 public class HighlightShader extends ShaderInstance {
     public final Uniform highlightColor = getUniform("HighlightColor");
-    public final Uniform worldMapViewMatrix = getUniform("WorldMapViewMatrix");
+    public final Uniform mapViewMatrix = getUniform("MapViewMatrix");
 
     public HighlightShader(final ResourceProvider resourceProvider) throws IOException {
         super(resourceProvider, "xaeroplus/highlights", DefaultVertexFormat.POSITION);
@@ -26,11 +26,11 @@ public class HighlightShader extends ShaderInstance {
         highlightColor.set(new Vector4f(r, g, b, a));
     }
 
-    public void setWorldMapViewMatrix(Matrix4f transform) {
-        if (worldMapViewMatrix == null) {
-            XaeroPlus.LOGGER.error("worldmapTransform is null");
+    public void setMapViewMatrix(Matrix4f transform) {
+        if (mapViewMatrix == null) {
+            XaeroPlus.LOGGER.error("mapViewMatrix is null");
             return;
         }
-        worldMapViewMatrix.set(transform);
+        mapViewMatrix.set(transform);
     }
 }

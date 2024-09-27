@@ -9,23 +9,23 @@ import static java.util.Arrays.asList;
 public class ModuleManager {
     private static final Reference2ObjectMap<Class<? extends Module>, Module> modulesClassMap = new Reference2ObjectOpenHashMap<>();
 
-    public static void init() {
+    static {
         asList(
-                new BaritoneGoalSync(),
-                new FpsLimiter(),
-                new Highways(),
-                new LiquidNewChunks(),
-                new OldChunks(),
-                new OldBiomes(),
-                new PaletteNewChunks(),
-                new Portals(),
-                new PortalSkipDetection(),
-                new WaystoneSync(),
-                new WorldTools()
+            new BaritoneGoalSync(),
+            new FpsLimiter(),
+            new Highways(),
+            new LiquidNewChunks(),
+            new OldChunks(),
+            new OldBiomes(),
+            new PaletteNewChunks(),
+            new Portals(),
+            new PortalSkipDetection(),
+            new WaystoneSync(),
+            new WorldTools()
         ).forEach(ModuleManager::addModule);
     }
 
-    private static void addModule(Module module) {
+    public static void addModule(Module module) {
         modulesClassMap.put(module.getClass(), module);
     }
 

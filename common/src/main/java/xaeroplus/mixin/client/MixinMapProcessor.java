@@ -24,7 +24,7 @@ import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.feature.extensions.CustomMapProcessor;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.DataFolderResolveUtil;
 
@@ -156,7 +156,7 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
     ))
     public MapDimension updateWorldSyncedGetActualDimension(final MapWorld mapWorld, final Operation<MapDimension> original) {
         var world = this.world;
-        return XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue() && world != null && mapWorld.isMultiplayer()
+        return Settings.REGISTRY.writesWhileDimSwitched.get() && world != null && mapWorld.isMultiplayer()
             ? mapWorld.getDimension(world.dimension())
             : original.call(mapWorld);
     }

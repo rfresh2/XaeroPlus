@@ -47,7 +47,7 @@ import xaero.map.mods.SupportMods;
 import xaero.map.world.MapDimension;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.BaritoneExecutor;
 import xaeroplus.util.BaritoneHelper;
 import xaeroplus.util.ChunkUtils;
@@ -112,7 +112,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             value = "CONSTANT",
             args = "doubleValue=0.0625"))
     public double customMinZoom(final double original) {
-        return XaeroPlusSettingRegistry.worldMapMinZoomSetting.getValue() / 10.0f;
+        return Settings.REGISTRY.worldMapMinZoomSetting.get() / 10.0f;
     }
 
     @Inject(method = "init", at = @At(value = "RETURN"), remap = true)
@@ -165,12 +165,12 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Override
     protected void onExit(Screen screen) {
-        if (!XaeroPlusSettingRegistry.persistMapDimensionSwitchSetting.getValue()) {
+        if (!Settings.REGISTRY.persistMapDimensionSwitchSetting.get()) {
             try {
                 var actualDimension = ChunkUtils.getActualDimension();
                 if (Globals.getCurrentDimensionId() != actualDimension) {
                     Globals.switchToDimension(actualDimension);
-                    if (!XaeroPlusSettingRegistry.radarWhileDimensionSwitchedSetting.getValue()) {
+                    if (!Settings.REGISTRY.radarWhileDimensionSwitchedSetting.get()) {
                         WorldMap.settings.minimapRadar = true;
                     }
                 }
@@ -188,7 +188,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         shift = At.Shift.AFTER
     ), remap = true)
     public void toggleRadarWhileDimensionSwitched(final PoseStack guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci, @Local(name = "currentFutureDim") MapDimension currentFutureDim) {
-        if (!XaeroPlusSettingRegistry.radarWhileDimensionSwitchedSetting.getValue()) {
+        if (!Settings.REGISTRY.radarWhileDimensionSwitchedSetting.get()) {
             WorldMap.settings.minimapRadar = currentFutureDim.getDimId() == ChunkUtils.getActualDimension();
         }
     }
@@ -306,7 +306,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             ordinal = 0
     ), index = 2)
     public String renderCrossDimensionCursorCoordinates(final String original) {
-        if (!XaeroPlusSettingRegistry.crossDimensionCursorCoordinates.getValue()) return original;
+        if (!Settings.REGISTRY.crossDimensionCursorCoordinates.get()) return original;
         ResourceKey<Level> dim = getCurrentDimensionId();
         if (!(dim == OVERWORLD || dim == NETHER)) return original;
         double dimDiv = dim == NETHER
@@ -327,7 +327,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                            @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers,
                                            @Local(name = "matrixStack") PoseStack matrixStack) {
         Minecraft mc = Minecraft.getInstance();
-        if (XaeroPlusSettingRegistry.showRenderDistanceWorldMapSetting.getValue() && !mc.options.hideGui) {
+        if (Settings.REGISTRY.showRenderDistanceWorldMapSetting.get() && !mc.options.hideGui) {
             if (mc.level.dimension() == Globals.getCurrentDimensionId()) {
                 final int viewDistance = mc.options.serverRenderDistance;
                 int width = viewDistance * 2 + 1;
@@ -436,7 +436,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "onDimensionToggleButton", at = @At(value = "RETURN"))
     public void onDimensionToggleAfter(final Button b, final CallbackInfo ci) {
-        if (!XaeroPlusSettingRegistry.radarWhileDimensionSwitchedSetting.getValue()) {
+        if (!Settings.REGISTRY.radarWhileDimensionSwitchedSetting.get()) {
             WorldMap.settings.minimapRadar = mapProcessor.getMapWorld().getFutureDimensionId() == ChunkUtils.getActualDimension();
         }
     }
@@ -519,13 +519,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             }
         }
         if (BaritoneHelper.isBaritonePresent()) {
-            if (XaeroPlusSettingRegistry.worldMapBaritoneGoalHereKeybindSetting.getKeyBinding().matches(code, scanCode)) {
+            if (Settings.REGISTRY.worldMapBaritoneGoalHereKeybindSetting.getKeyBinding().matches(code, scanCode)) {
                 BaritoneExecutor.goal(mouseBlockPosX, mouseBlockPosZ);
                 cir.setReturnValue(true);
-            } else if (XaeroPlusSettingRegistry.worldMapBaritonePathHereKeybindSetting.getKeyBinding().matches(code, scanCode)) {
+            } else if (Settings.REGISTRY.worldMapBaritonePathHereKeybindSetting.getKeyBinding().matches(code, scanCode)) {
                 BaritoneExecutor.path(mouseBlockPosX, mouseBlockPosZ);
                 cir.setReturnValue(true);
-            } else if (BaritoneHelper.isBaritoneElytraPresent() && XaeroPlusSettingRegistry.worldMapBaritoneElytraHereKeybindSetting.getKeyBinding().matches(code, scanCode)) {
+            } else if (BaritoneHelper.isBaritoneElytraPresent() && Settings.REGISTRY.worldMapBaritoneElytraHereKeybindSetting.getKeyBinding().matches(code, scanCode)) {
                 BaritoneExecutor.elytra(mouseBlockPosX, mouseBlockPosZ);
                 cir.setReturnValue(true);
             }
@@ -544,13 +544,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                         public void onAction(Screen screen) {
                             BaritoneExecutor.goal(goalX, goalZ);
                         }
-                    }.setNameFormatArgs(Misc.getKeyName(XaeroPlusSettingRegistry.worldMapBaritoneGoalHereKeybindSetting.getKeyBinding())),
+                    }.setNameFormatArgs(Misc.getKeyName(Settings.REGISTRY.worldMapBaritoneGoalHereKeybindSetting.getKeyBinding())),
                     new RightClickOption("gui.world_map.baritone_path_here", options.size(), this) {
                         @Override
                         public void onAction(Screen screen) {
                             BaritoneExecutor.path(goalX, goalZ);
                         }
-                    }.setNameFormatArgs(Misc.getKeyName(XaeroPlusSettingRegistry.worldMapBaritonePathHereKeybindSetting.getKeyBinding()))
+                    }.setNameFormatArgs(Misc.getKeyName(Settings.REGISTRY.worldMapBaritonePathHereKeybindSetting.getKeyBinding()))
             ));
             if (BaritoneHelper.isBaritoneElytraPresent()) {
                 options.addAll(5, asList(
@@ -559,12 +559,12 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                         public void onAction(Screen screen) {
                             BaritoneExecutor.elytra(goalX, goalZ);
                         }
-                    }.setNameFormatArgs(Misc.getKeyName(XaeroPlusSettingRegistry.worldMapBaritoneElytraHereKeybindSetting.getKeyBinding()))
+                    }.setNameFormatArgs(Misc.getKeyName(Settings.REGISTRY.worldMapBaritoneElytraHereKeybindSetting.getKeyBinding()))
                 ));
             }
         }
 
-        if (XaeroPlusSettingRegistry.disableWaypointSharing.getValue()) {
+        if (Settings.REGISTRY.disableWaypointSharing.get()) {
             cir.getReturnValue().removeIf(option -> ((AccessorRightClickOption) option).getName().equals("gui.xaero_right_click_map_share_location"));
         }
     }

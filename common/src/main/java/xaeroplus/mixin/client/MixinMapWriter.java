@@ -38,7 +38,7 @@ import xaero.map.region.OverlayBuilder;
 import xaero.map.region.OverlayManager;
 import xaero.map.world.MapWorld;
 import xaeroplus.feature.extensions.CustomMapProcessor;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
 
 import java.util.concurrent.TimeUnit;
@@ -73,7 +73,7 @@ public abstract class MixinMapWriter {
     @Inject(method = "loadPixel", at = @At("HEAD"), remap = false)
     public void setObsidianColumnLocalVar(final Level world, final MapBlock pixel, final MapBlock currentPixel, final LevelChunk bchunk, final int insideX, final int insideZ, final int highY, final int lowY, final boolean cave, final boolean fullCave, final int mappedHeight, final boolean canReuseBiomeColours, final boolean ignoreHeightmaps, final Registry<Biome> biomeRegistry, final boolean flowers, final int worldBottomY, final BlockPos.MutableBlockPos mutableBlockPos3, final CallbackInfo ci,
                                           @Share("columnRoofObsidian") LocalBooleanRef columnRoofObsidianRef) {
-        if (!XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()) return;
+        if (!Settings.REGISTRY.transparentObsidianRoofSetting.get()) return;
         columnRoofObsidianRef.set(false);
     }
 
@@ -88,9 +88,9 @@ public abstract class MixinMapWriter {
                                        @Local(name = "transparentSkipY") LocalIntRef transparentSkipYRef,
                                        @Share("columnRoofObsidian") LocalBooleanRef columnRoofObsidianRef
     ) {
-        if (!XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()) return;
+        if (!Settings.REGISTRY.transparentObsidianRoofSetting.get()) return;
         final Block b = stateRef.get().getBlock();
-        final boolean blockHeightAboveYLimit = hRef.get() >= XaeroPlusSettingRegistry.transparentObsidianRoofYSetting.getValue();
+        final boolean blockHeightAboveYLimit = hRef.get() >= Settings.REGISTRY.transparentObsidianRoofYSetting.get();
 
         if (blockHeightAboveYLimit) {
             boolean shouldMakeTransparent = (b == Blocks.OBSIDIAN || b == Blocks.CRYING_OBSIDIAN);
@@ -101,7 +101,7 @@ public abstract class MixinMapWriter {
                 shouldMakeTransparent = belowState.getBlock() == Blocks.OBSIDIAN || belowState.getBlock() == Blocks.CRYING_OBSIDIAN;
             }
             if (shouldMakeTransparent) {
-                if (XaeroPlusSettingRegistry.transparentObsidianRoofDarkeningSetting.getValue() == 0) {
+                if (Settings.REGISTRY.transparentObsidianRoofDarkeningSetting.get() == 0) {
                     stateRef.set(Blocks.AIR.defaultBlockState());
                     transparentSkipYRef.set(transparentSkipYRef.get() - 1);
                 }
@@ -119,7 +119,7 @@ public abstract class MixinMapWriter {
     ), remap = false)
     public boolean checkObsidianRoofColumn(final OverlayBuilder instance, final Operation<Boolean> original,
                                            @Share("columnRoofObsidian") final LocalBooleanRef columnRoofObsidianRef) {
-        if (!XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()) return original.call(instance);
+        if (!Settings.REGISTRY.transparentObsidianRoofSetting.get()) return original.call(instance);
         return original.call(instance) || columnRoofObsidianRef.get();
     }
 
@@ -133,8 +133,8 @@ public abstract class MixinMapWriter {
                                           @Local(name = "b") Block b,
                                           @Local(name = "h") int h
     ) {
-        if (XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()
-            && h > XaeroPlusSettingRegistry.transparentObsidianRoofYSetting.getValue()) {
+        if (Settings.REGISTRY.transparentObsidianRoofSetting.get()
+            && h > Settings.REGISTRY.transparentObsidianRoofYSetting.get()) {
             if (b == Blocks.OBSIDIAN || b == Blocks.CRYING_OBSIDIAN) {
                 return true;
             } else if (b == Blocks.SNOW) {
@@ -154,8 +154,8 @@ public abstract class MixinMapWriter {
     ), remap = true)
     public int getOpacityForObsidianRoof(BlockState instance, BlockGetter world, BlockPos pos, Operation<Integer> original,
                                          @Local(name = "h") int h) {
-        if (XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()
-            && h > XaeroPlusSettingRegistry.transparentObsidianRoofYSetting.getValue()) {
+        if (Settings.REGISTRY.transparentObsidianRoofSetting.get()
+            && h > Settings.REGISTRY.transparentObsidianRoofYSetting.get()) {
             boolean shouldMakeTransparent = instance.getBlock() == Blocks.OBSIDIAN || instance.getBlock() == Blocks.CRYING_OBSIDIAN;
             if (instance.getBlock() == Blocks.SNOW) {
                 this.mutableLocalPos.setY(h - 1);
@@ -180,11 +180,11 @@ public abstract class MixinMapWriter {
     public void fastMapMaxTilesPerCycleSetting(final BiomeColorCalculator biomeColorCalculator, final OverlayManager overlayManager, final CallbackInfo ci,
                                         @Local(name = "tilesToUpdate") LocalLongRef tilesToUpdateRef,
                                         @Local(name = "sizeTiles") int sizeTiles) {
-        if (XaeroPlusSettingRegistry.fastMapSetting.getValue()) {
+        if (Settings.REGISTRY.fastMapSetting.get()) {
             this.writeFreeSinceLastWrite = Math.max(1L, this.writeFreeSinceLastWrite);
             if (this.mapProcessor.getCurrentCaveLayer() == Integer.MAX_VALUE) {
                 tilesToUpdateRef.set((long) Math.min(sizeTiles,
-                                                     XaeroPlusSettingRegistry.fastMapMaxTilesPerCycle.getValue()));
+                                                     Settings.REGISTRY.fastMapMaxTilesPerCycle.get()));
             }
         }
     }
@@ -195,7 +195,7 @@ public abstract class MixinMapWriter {
         ordinal = 2
     ))
     public long removeWriteTimeLimiterPerFrame(long original) {
-        if (XaeroPlusSettingRegistry.fastMapSetting.getValue()) {
+        if (Settings.REGISTRY.fastMapSetting.get()) {
             if (this.mapProcessor.getCurrentCaveLayer() == Integer.MAX_VALUE) {
                 return 0;
             }
@@ -230,12 +230,12 @@ public abstract class MixinMapWriter {
                            int chunkX,
                            int chunkZ,
                            final Operation<Boolean> original) {
-        if (XaeroPlusSettingRegistry.fastMapSetting.getValue()) {
+        if (Settings.REGISTRY.fastMapSetting.get()) {
             if (this.mapProcessor.getCurrentCaveLayer() == Integer.MAX_VALUE) {
                 final Long cacheable = ChunkUtils.chunkPosToLong(chunkX, chunkZ);
                 final Long cacheValue = tileUpdateCache.getIfPresent(cacheable);
                 if (nonNull(cacheValue)) {
-                    if (cacheValue < System.currentTimeMillis() - (long) XaeroPlusSettingRegistry.fastMapWriterDelaySetting.getValue()) {
+                    if (cacheValue < System.currentTimeMillis() - (long) Settings.REGISTRY.fastMapWriterDelaySetting.get()) {
                         tileUpdateCache.put(cacheable, System.currentTimeMillis());
                     } else {
                         return false;
@@ -256,7 +256,7 @@ public abstract class MixinMapWriter {
                                     @Local(index = 9, argsOnly = true) LocalBooleanRef caveRef,
                                     @Local(index = 10, argsOnly = true) LocalBooleanRef fullCaveRef
                                     ) {
-        if (XaeroPlusSettingRegistry.netherCaveFix.getValue()) {
+        if (Settings.REGISTRY.netherCaveFix.get()) {
             var nether = world.dimension() == NETHER;
             var shouldForceFullInNether = !cave && nether;
             caveRef.set(shouldForceFullInNether || cave);
@@ -270,7 +270,7 @@ public abstract class MixinMapWriter {
         remap = true) // $REMAP
     public ResourceKey<Level> removeCustomDimSwitchWriterPrevention(final MapWorld mapWorld, final Operation<ResourceKey<Level>> original) {
         var world = mapProcessor.getWorld();
-        return XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue() && world != null && mapWorld.isMultiplayer()
+        return Settings.REGISTRY.writesWhileDimSwitched.get() && world != null && mapWorld.isMultiplayer()
             ? world.dimension() // makes if condition in injected code always true
             : original.call(mapWorld);
     }
@@ -285,7 +285,7 @@ public abstract class MixinMapWriter {
 
     @Inject(method = "onRender", at = @At("HEAD"))
     public void setCrossDimWriteSignals(final BiomeColorCalculator biomeColorCalculator, final OverlayManager overlayManager, final CallbackInfo ci) {
-        boolean signal = XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue()
+        boolean signal = Settings.REGISTRY.writesWhileDimSwitched.get()
             && mapProcessor.getWorld() != null
             && mapProcessor.getMapWorld().isMultiplayer();
         ((CustomMapProcessor) mapProcessor).xaeroPlus$getLeafRegionActualDimSignal().set(signal);
@@ -303,7 +303,7 @@ public abstract class MixinMapWriter {
         target = "Lxaero/map/MapProcessor;getLeafMapRegion(IIIZ)Lxaero/map/region/MapRegion;"
     ))
     public MapRegion getActualMapRegionInOnRender(final MapProcessor mapProcessor, int caveLayer, int regX, int regZ, boolean create, final Operation<MapRegion> original) {
-        if (XaeroPlusSettingRegistry.writesWhileDimSwitched.getValue() && mapProcessor.getMapWorld().isMultiplayer()) {
+        if (Settings.REGISTRY.writesWhileDimSwitched.get() && mapProcessor.getMapWorld().isMultiplayer()) {
             ((CustomMapProcessor) mapProcessor).xaeroPlus$getLeafRegionActualDimSignal().set(true);
         }
         try {

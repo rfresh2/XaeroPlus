@@ -21,7 +21,7 @@ import xaeroplus.event.ChunkDataEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.feature.render.highlights.SavableHighlightCacheInstance;
 import xaeroplus.module.Module;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkScanner;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
@@ -80,7 +80,7 @@ public class LiquidNewChunks extends Module {
             if (newChunksCache.get().isHighlighted(chunkX, chunkZ, getActualDimension())) return;
             final int srcX = pos.getX();
             final int srcY = pos.getY();
-            if (XaeroPlusSettingRegistry.liquidNewChunksOnlyAboveY0Setting.getValue() && srcY <= 0) return;
+            if (Settings.REGISTRY.liquidNewChunksOnlyAboveY0Setting.get() && srcY <= 0) return;
             final int srcZ = pos.getZ();
             MutableBlockPos bp = new MutableBlockPos(srcX, srcY, srcZ);
             for (int i = 0; i < searchDirs.length; i++) {
@@ -134,7 +134,7 @@ public class LiquidNewChunks extends Module {
                 }
             }
             return false;
-        }, XaeroPlusSettingRegistry.liquidNewChunksOnlyAboveY0Setting.getValue()
+        }, Settings.REGISTRY.liquidNewChunksOnlyAboveY0Setting.get()
             ? Math.max(1, level.getMinBuildHeight())
             : level.getMinBuildHeight());
     }
@@ -190,14 +190,14 @@ public class LiquidNewChunks extends Module {
     }
 
     public void setRgbColor(final int color) {
-        newChunksColor = ColorHelper.getColorWithAlpha(color, (int) XaeroPlusSettingRegistry.liquidNewChunksAlphaSetting.getValue());
+        newChunksColor = ColorHelper.getColorWithAlpha(color, Settings.REGISTRY.liquidNewChunksAlphaSetting.getAsInt());
     }
 
     public void setInverseRgbColor(final int color) {
-        inverseColor = ColorHelper.getColorWithAlpha(color, (int) XaeroPlusSettingRegistry.liquidNewChunksAlphaSetting.getValue());
+        inverseColor = ColorHelper.getColorWithAlpha(color, Settings.REGISTRY.liquidNewChunksAlphaSetting.getAsInt());
     }
 
-    public void setAlpha(final float a) {
+    public void setAlpha(final double a) {
         newChunksColor = ColorHelper.getColorWithAlpha(newChunksColor, (int) (a));
         inverseColor = ColorHelper.getColorWithAlpha(inverseColor, (int) (a));
     }

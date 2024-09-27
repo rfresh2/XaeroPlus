@@ -24,7 +24,7 @@ import xaero.hud.minimap.Minimap;
 import xaero.hud.minimap.module.MinimapSession;
 import xaeroplus.Globals;
 import xaeroplus.feature.extensions.CustomMinimapFBORenderer;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 
 @Mixin(value = MinimapRenderer.class, remap = false)
 public class MixinMinimapRenderer {
@@ -49,8 +49,8 @@ public class MixinMinimapRenderer {
         final CallbackInfo ci
     ) {
         if (this.minimap.usingFBO() && Globals.shouldResetFBO) {
-            Globals.minimapScaleMultiplier = (int) XaeroPlusSettingRegistry.minimapScaleMultiplierSetting.getValue();
-            Globals.minimapSizeMultiplier = (int) XaeroPlusSettingRegistry.minimapSizeMultiplierSetting.getValue();
+            Globals.minimapScaleMultiplier = Settings.REGISTRY.minimapScaleMultiplierSetting.getAsInt();
+            Globals.minimapSizeMultiplier = Settings.REGISTRY.minimapSizeMultiplierSetting.getAsInt();
             ((CustomMinimapFBORenderer) this.minimap.getMinimapFBORenderer()).reloadMapFrameBuffers();
             Globals.shouldResetFBO = false;
             minimap.setToResetImage(true);
@@ -209,7 +209,7 @@ public class MixinMinimapRenderer {
                                             final ModSettings settings,
                                             final MultiBufferSource.BufferSource renderTypeBuffers,
                                             final float minimapScale) {
-        if (XaeroPlusSettingRegistry.fixMainEntityDot.getValue()) {
+        if (Settings.REGISTRY.fixMainEntityDot.get()) {
             if (!(modMain.getSettings().mainEntityAs != 2 && !lockedNorth)) {
                 return;
             }
@@ -239,6 +239,6 @@ public class MixinMinimapRenderer {
 
     @ModifyVariable(method = "drawArrow", name = "offsetY", ordinal = 0, at = @At(value = "STORE"))
     public int modifyArrowOffsetY(final int offsetY) {
-        return XaeroPlusSettingRegistry.fixMainEntityDot.getValue() ? -10 : offsetY;
+        return Settings.REGISTRY.fixMainEntityDot.get() ? -10 : offsetY;
     }
 }

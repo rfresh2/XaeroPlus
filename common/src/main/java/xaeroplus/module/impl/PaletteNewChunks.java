@@ -16,7 +16,6 @@ import net.minecraft.world.level.chunk.*;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.ChunkDataEvent;
-import xaeroplus.feature.render.highlights.ChunkHighlightLocalCache;
 import xaeroplus.feature.render.highlights.SavableHighlightCacheInstance;
 import xaeroplus.module.Module;
 import xaeroplus.settings.Settings;
@@ -187,12 +186,6 @@ public class PaletteNewChunks extends Module {
     public void onDisable() {
         newChunksCache.onDisable();
         newChunksInverseCache.onDisable();
-        if (newChunksCache.get() instanceof ChunkHighlightLocalCache localCache) {
-            localCache.reset();
-        }
-        if (newChunksInverseCache.get() instanceof ChunkHighlightLocalCache localCache) {
-            localCache.reset();
-        }
         Globals.drawManager.unregisterChunkHighlightProvider(this.getClass());
     }
 

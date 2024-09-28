@@ -47,23 +47,22 @@ public class PaletteNewChunks extends Module {
         try {
             if (newChunksCache.get().isHighlighted(x, z, dim)) return;
             if (newChunksInverseCache.get().isHighlighted(x, z, dim)) return;
-            if (checkNewChunk(dim, chunk)) newChunksCache.get().addHighlight(x, z);
+            if (isNewChunk(dim, chunk)) newChunksCache.get().addHighlight(x, z);
             else newChunksInverseCache.get().addHighlight(x, z);
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error checking palette NewChunk at [{} {}]", x, z, e);
         }
     }
 
-    private boolean checkNewChunk(final ResourceKey<Level> dim, final LevelChunk chunk) {
+    private boolean isNewChunk(final ResourceKey<Level> dim, final LevelChunk chunk) {
         if (dim == OVERWORLD) {
-            return checkNewChunkBiomePalette(chunk, true)
-                // it's possible for the overworld to have a plains biome
-                // so we need to check the blockstate palette as well
-                || checkNewChunkBlockStatePalette(chunk);
+            return plainsBiomePresent(chunk)
+                ? checkNewChunkBlockStatePalette(chunk)
+                : checkNewChunkBiomePalette(chunk);
         } else if (dim == NETHER) {
-            return checkNewChunkBiomePalette(chunk, false);
+            return checkNewChunkBiomePalette(chunk);
         } else if (dim == END) {
-            return checkNewChunkBiomePalette(chunk, false);
+            return checkNewChunkBiomePalette(chunk);
         }
         return false;
     }
@@ -103,7 +102,7 @@ public class PaletteNewChunks extends Module {
         Palette<BlockState> firstPalette = firstSection.getStates().data.palette();
         if (isNotLinearOrHashMapPalette(firstPalette)) return false;
         if (firstPalette instanceof LinearPalette<BlockState>) {
-            return firstPalette.valueFor(0).getBlock() == Blocks.AIR;
+            return firstPalette.valueFor(0).is(Blocks.AIR);
         } else { // HashMapPalette
             // we could iterate through more sections but this is good enough in most cases
             // checking every blockstate is relatively expensive
@@ -128,36 +127,37 @@ public class PaletteNewChunks extends Module {
      * For example, this solves the issue of player activity modifying the chunk, and therefore possibly causing palette ID's
      * without matching data present, at the same time as we load them.
      */
-    private boolean checkNewChunkBiomePalette(LevelChunk chunk, boolean checkPlainsPresent) {
+    private boolean checkNewChunkBiomePalette(LevelChunk chunk) {
         var sections = chunk.getSections();
         if (sections.length == 0) return false;
         var firstSection = sections[0];
         var biomes = firstSection.getBiomes();
         if (biomes instanceof PalettedContainer<Holder<Biome>> biomesPaletteContainer) {
             var firstPalette = biomesPaletteContainer.data.palette();
-            // Alternatively we could check the first palette entry for plains in the nether/end
-            // but checking data entries allows this to also work in the overworld
-            // and plains is not set to the first entry in certain cases in the nether
-            var plainsInPalette = firstPalette.maybeHas(holder -> holder.unwrapKey().get().equals(Biomes.PLAINS));
-            // only needed in overworld
-            return checkPlainsPresent
-                ? plainsInPalette && plainsNotPresentInData(biomesPaletteContainer)
-                : plainsInPalette;
+            // assumes that plains is not a real biome present in this chunk
+            return firstPalette.maybeHas(PaletteNewChunks::isPlainsBiome);
         }
         return false;
     }
 
-    private boolean plainsNotPresentInData(PalettedContainer<Holder<Biome>> biomesPaletteContainer) {
-        var palette = biomesPaletteContainer.data.palette();
-        var storage = biomesPaletteContainer.data.storage();
-        presentStateIdsBuf.clear(); // reusing to reduce gc pressure
-        storage.getAll(presentStateIdsBuf::add);
-        for (int id : presentStateIdsBuf) {
-            if (palette.valueFor(id).unwrapKey().get().equals(Biomes.PLAINS)) {
-                return false;
+    private boolean plainsBiomePresent(LevelChunk chunk) {
+        var sections = chunk.getSections();
+        if (sections.length == 0) return false;
+        var firstSection = sections[0];
+        var biomes = firstSection.getBiomes();
+        if (biomes instanceof PalettedContainer<Holder<Biome>> biomesPaletteContainer) {
+            var palette = biomesPaletteContainer.data.palette();
+            if (!palette.maybeHas(PaletteNewChunks::isPlainsBiome)) return false;
+            var storage = biomesPaletteContainer.data.storage();
+            presentStateIdsBuf.clear(); // reusing to reduce gc pressure
+            storage.getAll(presentStateIdsBuf::add);
+            for (int id : presentStateIdsBuf) {
+                if (isPlainsBiome(palette.valueFor(id))) {
+                    return true;
+                }
             }
         }
-        return true;
+        return false;
     }
 
     private boolean isNotLinearOrHashMapPalette(Palette palette) {
@@ -170,6 +170,10 @@ public class PaletteNewChunks extends Module {
         BitStorage storage = paletteContainer.storage();
         storage.getAll(presentStateIdsBuf::add);
         return palette.getSize() > presentStateIdsBuf.size();
+    }
+
+    private static boolean isPlainsBiome(Holder<Biome> holder) {
+        return holder.is(Biomes.PLAINS);
     }
 
     @Override

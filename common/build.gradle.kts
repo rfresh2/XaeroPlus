@@ -18,6 +18,7 @@ dependencies {
     modCompileOnly(libs.fabric.waystones)
     modCompileOnly(libs.worldtools)
     implementation(libs.oldbiomes)
+    implementation(libs.sqlite)
 }
 
 tasks {

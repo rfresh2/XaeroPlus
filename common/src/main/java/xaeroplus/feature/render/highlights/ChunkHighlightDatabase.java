@@ -3,6 +3,7 @@ package xaeroplus.feature.render.highlights;
 import com.google.common.collect.Lists;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import org.rfresh.sqlite.JDBC;
 import xaero.map.WorldMap;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.render.highlights.db.DatabaseMigrator;
@@ -28,6 +29,10 @@ public class ChunkHighlightDatabase implements Closeable {
     public ChunkHighlightDatabase(String worldId, String databaseName) {
         this.databaseName = databaseName;
         try {
+            // workaround for other mods that might have forced the JDBC drivers to be init
+            // before we are on the classpath
+            var jdbcClass = JDBC.class;
+
             final Path dbPath = WorldMap.saveFolder.toPath().resolve(worldId).resolve(databaseName + ".db");
             boolean shouldRunMigrations = dbPath.toFile().exists();
             connection = DriverManager.getConnection("jdbc:rfresh_sqlite:" + dbPath);

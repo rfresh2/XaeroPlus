@@ -90,7 +90,7 @@ public class Portals extends Module {
                     Thread.sleep(500);
                 }
             } catch (final Throwable e) {
-                XaeroPlus.LOGGER.error("Error searching for portal in chunk: {}, {}", chunk.getPos().x, chunk.getPos().z, e);
+                XaeroPlus.LOGGER.debug("Error searching for portal in chunk: {}, {}", chunk.getPos().x, chunk.getPos().z, e);
             }
         });
     }

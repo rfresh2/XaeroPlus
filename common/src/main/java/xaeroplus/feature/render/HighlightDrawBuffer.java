@@ -1,8 +1,8 @@
 package xaeroplus.feature.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexBuffer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import it.unimi.dsi.fastutil.longs.LongList;
@@ -25,7 +25,7 @@ public class HighlightDrawBuffer {
             close();
             return;
         }
-        var bufferBuilder = new BufferBuilder(128);
+        var bufferBuilder = Tesselator.getInstance().getBuilder();
         bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
 
         for (int j = 0; j < highlights.size(); j++) {

@@ -81,10 +81,10 @@ public class OldChunks extends Module {
                     Thread.sleep(500);
                 }
                 if (iterations == 3) {
-                    XaeroPlus.LOGGER.info("[{}, {}] Too many search iterations", chunk.getPos().x, chunk.getPos().z);
+                    XaeroPlus.LOGGER.debug("[{}, {}] Too many search iterations", chunk.getPos().x, chunk.getPos().z);
                 }
             } catch (final Throwable e) {
-                XaeroPlus.LOGGER.error("Error searching for OldChunk in chunk: {}, {}", chunk.getPos().x, chunk.getPos().z, e);
+                XaeroPlus.LOGGER.debug("Error searching for OldChunk in chunk: {}, {}", chunk.getPos().x, chunk.getPos().z, e);
             }
         });
     }

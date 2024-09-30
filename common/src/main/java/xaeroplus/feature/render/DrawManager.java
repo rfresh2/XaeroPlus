@@ -8,6 +8,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.client.Minecraft;
+import xaero.common.HudMod;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.DimensionSwitchEvent;
@@ -78,6 +79,7 @@ public class DrawManager {
         final VertexConsumer overlayBufferBuilder,
         MinimapRendererHelper helper
     ) {
+        if (HudMod.INSTANCE.isFairPlay()) return;
         matrixStack.pushPose();
         matrixStack.translate(
             -(chunkX * 64) - (tileX * 16) - insideX,
@@ -180,6 +182,7 @@ public class DrawManager {
         final PoseStack matrixStack,
         final VertexConsumer overlayBuffer
     ) {
+        if (HudMod.INSTANCE.isFairPlay()) return;
         matrixStack.pushPose();
         matrixStack.translate(-flooredCameraX, -flooredCameraZ, 1.0f);
         matrixStack.scale(16f, 16f, 1f);

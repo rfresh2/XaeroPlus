@@ -1,8 +1,8 @@
 package xaeroplus.feature.render.buffered;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexBuffer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import org.joml.Matrix4f;
@@ -16,7 +16,7 @@ public class Model {
     private final VertexBuffer vertexBuffer;
 
     public Model(final Vector3f[] posMatrix, final Vector2f[] texUvMatrix) {
-        var bufferbuilder = new BufferBuilder(posMatrix.length);
+        var bufferbuilder = Tesselator.getInstance().getBuilder();
         bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
         for (int i = 0; i < posMatrix.length; i++) {
             var pos = posMatrix[i];

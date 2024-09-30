@@ -23,6 +23,7 @@ import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
 
 import static net.minecraft.world.level.Level.*;
+import static xaeroplus.module.impl.PaletteNewChunks.BiomeCheckResult.*;
 import static xaeroplus.util.ColorHelper.getColor;
 
 public class PaletteNewChunks extends Module {
@@ -56,13 +57,15 @@ public class PaletteNewChunks extends Module {
 
     private boolean isNewChunk(final ResourceKey<Level> dim, final LevelChunk chunk) {
         if (dim == OVERWORLD) {
-            return plainsBiomePresent(chunk)
-                ? checkNewChunkBlockStatePalette(chunk)
-                : checkNewChunkBiomePalette(chunk);
+            return switch (checkNewChunkBiomePalette(chunk, true)) {
+                case NO_PLAINS -> false;
+                case PLAINS_IN_PALETTE -> true;
+                case PLAINS_PRESENT -> checkNewChunkBlockStatePalette(chunk);
+            };
         } else if (dim == NETHER) {
-            return checkNewChunkBiomePalette(chunk);
+            return checkNewChunkBiomePalette(chunk, false) == PLAINS_IN_PALETTE;
         } else if (dim == END) {
-            return checkNewChunkBiomePalette(chunk);
+            return checkNewChunkBiomePalette(chunk, false) == PLAINS_IN_PALETTE;
         }
         return false;
     }
@@ -127,37 +130,33 @@ public class PaletteNewChunks extends Module {
      * For example, this solves the issue of player activity modifying the chunk, and therefore possibly causing palette ID's
      * without matching data present, at the same time as we load them.
      */
-    private boolean checkNewChunkBiomePalette(LevelChunk chunk) {
+    private BiomeCheckResult checkNewChunkBiomePalette(LevelChunk chunk, boolean checkData) {
         var sections = chunk.getSections();
-        if (sections.length == 0) return false;
-        var firstSection = sections[0];
-        var biomes = firstSection.getBiomes();
-        if (biomes instanceof PalettedContainer<Holder<Biome>> biomesPaletteContainer) {
-            var firstPalette = biomesPaletteContainer.data.palette();
-            // assumes that plains is not a real biome present in this chunk
-            return firstPalette.maybeHas(PaletteNewChunks::isPlainsBiome);
-        }
-        return false;
-    }
-
-    private boolean plainsBiomePresent(LevelChunk chunk) {
-        var sections = chunk.getSections();
-        if (sections.length == 0) return false;
+        if (sections.length == 0) return NO_PLAINS;
         var firstSection = sections[0];
         var biomes = firstSection.getBiomes();
         if (biomes instanceof PalettedContainer<Holder<Biome>> biomesPaletteContainer) {
             var palette = biomesPaletteContainer.data.palette();
-            if (!palette.maybeHas(PaletteNewChunks::isPlainsBiome)) return false;
-            var storage = biomesPaletteContainer.data.storage();
-            presentStateIdsBuf.clear(); // reusing to reduce gc pressure
-            storage.getAll(presentStateIdsBuf::add);
-            for (int id : presentStateIdsBuf) {
-                if (isPlainsBiome(palette.valueFor(id))) {
-                    return true;
+            boolean paletteContainsPlains = palette.maybeHas(PaletteNewChunks::isPlainsBiome);
+            if (paletteContainsPlains && checkData) {
+                var storage = biomesPaletteContainer.data.storage();
+                presentStateIdsBuf.clear();
+                storage.getAll(presentStateIdsBuf::add);
+                for (int id : presentStateIdsBuf) {
+                    if (isPlainsBiome(palette.valueFor(id))) {
+                        return PLAINS_PRESENT;
+                    }
                 }
             }
+            if (paletteContainsPlains) return PLAINS_IN_PALETTE;
         }
-        return false;
+        return NO_PLAINS;
+    }
+
+    enum BiomeCheckResult {
+        NO_PLAINS,
+        PLAINS_IN_PALETTE,
+        PLAINS_PRESENT
     }
 
     private boolean isNotLinearOrHashMapPalette(Palette palette) {

@@ -146,7 +146,7 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
      */
     @Overwrite
     private void updateSortedList() {
-        WaypointsSort sortType = this.displayedWorld.getContainer().getRoot().getSortType();
+        WaypointsSort sortType = this.displayedWorld.getRootConfig().getSortType();
         Iterable<Waypoint> waypointsList = this.displayedWorld.getCurrentWaypointSet().getWaypoints();
         GuiWaypoints.distanceDivided = this.session.getDimensionHelper().getDimensionDivision(this.displayedWorld);
         Camera camera = this.minecraft.gameRenderer.getMainCamera();
@@ -177,9 +177,9 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
             switch (sortType) {
                 case NONE -> {}
                 case ANGLE -> sortVal = -w.getComparisonAngleCos(camera, GuiWaypoints.distanceDivided);
-                case COLOR -> sortVal = w.getColor();
+                case COLOR -> sortVal = w.getWaypointColor();
                 case NAME -> sortVal = w.getComparisonName();
-                case SYMBOL -> sortVal = w.getSymbol();
+                case SYMBOL -> sortVal = w.getInitials();
                 case DISTANCE -> sortVal = w.getComparisonDistance(camera, GuiWaypoints.distanceDivided);
             }
             sortableKeys.add(new KeySortableByOther<>(w, sortVal));
@@ -188,7 +188,7 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         for (KeySortableByOther<Waypoint> k : sortableKeys) {
             waypointsSorted.add(k.getKey());
         }
-        if (this.displayedWorld.getContainer().getRoot().isSortReversed()) {
+        if (this.displayedWorld.getContainer().getRootConfig().isSortReversed()) {
             Collections.reverse(waypointsSorted);
         }
         return waypointsSorted;

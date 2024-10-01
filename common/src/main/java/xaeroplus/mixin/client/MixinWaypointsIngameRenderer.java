@@ -31,11 +31,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.minimap.waypoints.Waypoint;
-import xaero.common.minimap.waypoints.render.WaypointFilterParams;
+import xaero.common.minimap.waypoints.WaypointVisibilityType;
 import xaero.common.minimap.waypoints.render.WaypointsIngameRenderer;
-import xaero.common.settings.ModSettings;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.waypoint.render.WaypointFilterParams;
 import xaeroplus.feature.extensions.CustomWaypointsIngameRenderer;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
@@ -59,19 +59,19 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
     @Unique final Predicate<Waypoint> beaconViewFilter = (w) -> {
         boolean deathpoints = filterParams.deathpoints;
         if (!w.isDisabled()
-            && w.getVisibilityType() != 2
-            && w.getVisibilityType() != 3
-            && (w.getWaypointType() != 1 && w.getWaypointType() != 2 || deathpoints)) {
-            double offX = (double)w.getX(filterParams.dimDiv) - filterParams.cameraX + 0.5;
-            double offZ = (double)w.getZ(filterParams.dimDiv) - filterParams.cameraZ + 0.5;
+            && w.getVisibility() != WaypointVisibilityType.WORLD_MAP_LOCAL
+            && w.getVisibility() != WaypointVisibilityType.WORLD_MAP_GLOBAL
+            && (!w.getPurpose().isDeath() || deathpoints)) {
+            double offX = (double)w.getX(filterParams.dimDiv) - filterParams.cameraPos.x + 0.5;
+            double offZ = (double)w.getZ(filterParams.dimDiv) - filterParams.cameraPos.z + 0.5;
             double distanceScale = filterParams.dimensionScaleDistance ? Minecraft.getInstance().level.dimensionType().coordinateScale() : 1.0;
             double unscaledDistance2D = Math.sqrt(offX * offX + offZ * offZ);
             double distance2D = unscaledDistance2D * distanceScale;
             double waypointsDistance = filterParams.waypointsDistance;
             double waypointsDistanceMin = filterParams.waypointsDistanceMin;
-            return w.isOneoffDestination()
+            return w.isDestination()
                 || (
-                w.getWaypointType() == 1
+                w.getPurpose().isDeath()
                     || w.isGlobal()
                     || w.isTemporary() && filterParams.temporaryWaypointsGlobal
                     || waypointsDistance == 0.0
@@ -85,7 +85,7 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
 
     @Inject(method = "render", at = @At(
         value = "INVOKE",
-        target = "Lxaero/common/minimap/waypoints/render/WaypointDeleter;begin()V"
+        target = "Lxaero/hud/minimap/waypoint/render/WaypointDeleter;begin()V"
     ))
     public void preferOwWaypointsRemoveSubworldText(final MinimapSession session, final float partial, final MinimapProcessor minimap, final Matrix4f waypointsProjection, final Matrix4f worldModelView, final CallbackInfo ci,
                                                     @Local(name = "subworldName") LocalRef<String> subWorldNameRef) {
@@ -134,7 +134,7 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
         final double z = waypointVec.z - viewZ;
         final double y = -100;
         if (!frustum.isVisible(new AABB(waypointVec.x-1, -100, waypointVec.z-1, waypointVec.x+1, 500, waypointVec.z+1))) return;
-        final int color = ModSettings.COLORS[waypoint.getColor()];
+        final int color = waypoint.getWaypointColor().getHex();
         final MultiBufferSource.BufferSource entityVertexConsumers = mc.renderBuffers().bufferSource();
         final long time = mc.level.getGameTime();
         matrixStack.pushPose();
@@ -192,7 +192,8 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
             final Vec3 playerVec = mc.player.position();
             MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
             if (minimapSession == null) return 0;
-            double dimDiv = minimapSession.getDimensionHelper().getDimensionDivision(minimapSession.getWorldManager().getCurrentWorld());            int wpX = waypoint.getX(dimDiv);
+            double dimDiv = minimapSession.getDimensionHelper().getDimensionDivision(minimapSession.getWorldManager().getCurrentWorld());
+            int wpX = waypoint.getX(dimDiv);
             int wpZ = waypoint.getZ(dimDiv);
             double directionX = wpX - playerVec.x;
             double directionZ = wpZ - playerVec.z;

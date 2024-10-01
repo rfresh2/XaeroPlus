@@ -6,7 +6,9 @@ import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -25,14 +27,15 @@ import static net.minecraft.world.level.Level.OVERWORLD;
 @Mixin(value = MinimapWorldStateUpdater.class, remap = false)
 public abstract class MixinMinimapWorldStateUpdater {
 
+    @Final @Shadow private MinimapSession session;
+    @Final @Shadow private ClientPacketListener connection;
     @Unique private ResourceKey<Level> currentDim = OVERWORLD;
 
-    @WrapOperation(method = "update", at = @At(
+    @WrapOperation(method = "update()V", at = @At(
         value = "INVOKE",
         target = "Lxaero/hud/minimap/world/state/MinimapWorldState;setAutoWorldPath(Lxaero/hud/path/XaeroPath;)V"
     ))
     public void preferOverworldWpSetCustomPathOnDimUpdate(final MinimapWorldState instance, final XaeroPath autoWorldPath, final Operation<Void> original,
-                                   @Local(argsOnly = true) MinimapSession session,
                                    @Local(name = "oldAutoWorldPath") XaeroPath oldAutoWorldPath,
                                    @Local(name = "potentialAutoWorldNode") String potentialAutoWorldNode) {
         original.call(instance, autoWorldPath);
@@ -48,8 +51,8 @@ public abstract class MixinMinimapWorldStateUpdater {
         currentDim = ChunkUtils.getActualDimension();
     }
 
-    @Inject(method = "getAutoRootContainerPath", at = @At("HEAD"), cancellable = true)
-    public void customDataFolderResolve(final int version, final ClientPacketListener connection, final MinimapSession session, final CallbackInfoReturnable<XaeroPath> cir) {
+    @Inject(method = "getAutoRootContainerPath(I)Lxaero/hud/path/XaeroPath;", at = @At("HEAD"), cancellable = true)
+    public void customDataFolderResolve(final int version, final CallbackInfoReturnable<XaeroPath> cir) {
         var customCir = new CallbackInfoReturnable<String>("a", true);
         DataFolderResolveUtil.resolveDataFolder(customCir);
         if (customCir.isCancelled()) {

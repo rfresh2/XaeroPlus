@@ -44,7 +44,7 @@
     "MixinMapWorld",
     "MixinMapWriter",
     "MixinMinimap",
-    "MixinMinimapElementOverMapRendererHandler",
+    "MixinMinimapElementMapRendererHandler",
     "MixinMinimapElementRendererHandler",
     "MixinMinimapFBORenderer",
     "MixinMinimapModSettings",

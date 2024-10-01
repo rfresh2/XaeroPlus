@@ -19,7 +19,7 @@ public class MixinMinimapElementRendererHandler {
     @WrapOperation(method = "renderForRenderer", at = @At(
         value = "INVOKE",
         target = "Lxaero/hud/minimap/element/render/MinimapElementRenderer;preRender(Lxaero/hud/minimap/element/render/MinimapElementRenderInfo;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;)V"
-    ))
+    ), remap = true) // $REMAP
     public void captureRenderContext(final MinimapElementRenderer instance, final MinimapElementRenderInfo minimapElementRenderInfo, final MultiBufferSource.BufferSource bufferSource, final MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRendererProvider, final Operation<Void> original,
                                      @Local(name = "context") LocalRef<Object> contextRef) {
         if (contextRef.get() instanceof RadarRenderContext) {

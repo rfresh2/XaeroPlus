@@ -139,6 +139,7 @@ public class PaletteNewChunks extends Module {
             var palette = biomesPaletteContainer.data.palette();
             boolean paletteContainsPlains = palette.maybeHas(PaletteNewChunks::isPlainsBiome);
             if (paletteContainsPlains && checkData) {
+                if (palette.getSize() == 1) return PLAINS_PRESENT;
                 var storage = biomesPaletteContainer.data.storage();
                 presentStateIdsBuf.clear();
                 storage.getAll(presentStateIdsBuf::add);

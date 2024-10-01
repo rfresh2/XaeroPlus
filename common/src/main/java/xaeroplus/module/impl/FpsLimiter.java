@@ -20,7 +20,6 @@ public class FpsLimiter extends Module {
 
     @EventHandler
     public void onMinimapRenderEvent(final MinimapRenderEvent event) {
-        if (true) return;
         event.cancelled = minimapRenderInstanceSupplier.get().render();
         event.postRenderCallback = minimapRenderInstanceSupplier.get()::postRender;
     }

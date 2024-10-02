@@ -1,6 +1,10 @@
 package xaeroplus.mixin.client;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.Entity;
@@ -215,5 +219,25 @@ public class MixinMinimapRenderer {
     @ModifyVariable(method = "drawArrow", name = "offsetY", ordinal = 0, at = @At(value = "STORE"))
     public int modifyArrowOffsetY(final int offsetY) {
         return Settings.REGISTRY.fixMainEntityDot.get() ? -10 : offsetY;
+    }
+
+    @WrapOperation(method = "renderMinimap", at = @At(
+        value = "INVOKE",
+        target = "Lcom/mojang/blaze3d/systems/RenderSystem;blendFuncSeparate(Lcom/mojang/blaze3d/platform/GlStateManager$SourceFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DestFactor;Lcom/mojang/blaze3d/platform/GlStateManager$SourceFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DestFactor;)V"
+    ), remap = true) // $REMAP
+    public void correctBlendingForFpsLimiter(final GlStateManager.SourceFactor sourceFactor, final GlStateManager.DestFactor destFactor, final GlStateManager.SourceFactor sourceFactor2, final GlStateManager.DestFactor destFactor2, final Operation<Void> original) {
+        if (Settings.REGISTRY.minimapFpsLimiter.get()) {
+            // todo: when minimap opacity is not set to 100 this is slightly different than without fps limiter
+            //  the minimap will appear more opaque and dim than it should be
+            //  when we are rendering to our buffering render target the blending isn't exactly the same as our BG opacity is 0
+            RenderSystem.blendFuncSeparate(
+                GlStateManager.SourceFactor.SRC_ALPHA,
+                GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
+                GlStateManager.SourceFactor.SRC_COLOR,
+                GlStateManager.DestFactor.ZERO
+            );
+        } else {
+            original.call(sourceFactor, destFactor, sourceFactor2, destFactor2);
+        }
     }
 }

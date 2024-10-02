@@ -224,7 +224,7 @@ public class MixinMinimapRenderer {
     @WrapOperation(method = "renderMinimap", at = @At(
         value = "INVOKE",
         target = "Lcom/mojang/blaze3d/systems/RenderSystem;blendFuncSeparate(Lcom/mojang/blaze3d/platform/GlStateManager$SourceFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DestFactor;Lcom/mojang/blaze3d/platform/GlStateManager$SourceFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DestFactor;)V"
-    ), remap = true)
+    ), remap = true) // $REMAP
     public void correctBlendingForFpsLimiter(final GlStateManager.SourceFactor sourceFactor, final GlStateManager.DestFactor destFactor, final GlStateManager.SourceFactor sourceFactor2, final GlStateManager.DestFactor destFactor2, final Operation<Void> original) {
         if (Settings.REGISTRY.minimapFpsLimiter.get()) {
             // todo: when minimap opacity is not set to 100 this is slightly different than without fps limiter

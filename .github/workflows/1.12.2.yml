@@ -53,7 +53,7 @@ jobs:
         run: |
           mkdir -p run/mods && cp XaeroPlus-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar run/mods \
           && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ env.MINIMAP_VERSION }}_Forge_1.12/xaeros-minimap-${{ env.MINIMAP_VERSION }}_Forge_1.12.jar -P run/mods/ \
-          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ env.WORLDMAP_VERSION }}_Forge_1.12/xaeros-world-map-${{ env.WORLDMAP_VERSION }}_Forge_1.12.jar -P run/mods/
+          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ env.WORLDMAP_VERSION }}_Forge_1.12/xaeros-world-map-${{ env.WORLDMAP_VERSION }}_Forge_1.12.jar -P run/mods/ \
           && wget https://api.modrinth.com/maven/maven/modrinth/mixinbooter/9.4/!mixinbooter-9.4.jar -P run/mods/
 
       - name: Forge Test

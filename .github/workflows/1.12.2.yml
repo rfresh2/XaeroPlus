@@ -20,13 +20,13 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Gradle Wrapper Verification
-        uses: gradle/wrapper-validation-action@v1
+        uses: gradle/actions/wrapper-validation@v4
 
       - name: Set up JDK 8
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '8'
           distribution: 'temurin'
@@ -41,7 +41,7 @@ jobs:
         run: mv build/libs/xaeroplus-${{ env.MINECRAFT_VERSION }}.jar XaeroPlus-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}
           path: XaeroPlus-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar
@@ -54,9 +54,10 @@ jobs:
           mkdir -p run/mods && cp XaeroPlus-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar run/mods \
           && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ env.MINIMAP_VERSION }}_Forge_1.12/xaeros-minimap-${{ env.MINIMAP_VERSION }}_Forge_1.12.jar -P run/mods/ \
           && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ env.WORLDMAP_VERSION }}_Forge_1.12/xaeros-world-map-${{ env.WORLDMAP_VERSION }}_Forge_1.12.jar -P run/mods/
+          && wget https://api.modrinth.com/maven/maven/modrinth/mixinbooter/9.4/!mixinbooter-9.4.jar -P run/mods/
 
       - name: Forge Test
-        uses: 3arthqu4ke/mc-runtime-test@2.3.1
+        uses: 3arthqu4ke/mc-runtime-test@2.4.0
         with:
           mc: ${{ env.MINECRAFT_VERSION }}
           modloader: forge

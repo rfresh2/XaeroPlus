@@ -386,7 +386,7 @@ public abstract class MixinMapWriter {
                 final Long cacheable = ChunkUtils.chunkPosToLong(chunkX, chunkZ);
                 final Long cacheValue = tileUpdateCache.getIfPresent(cacheable);
                 if (nonNull(cacheValue)) {
-                    if (cacheValue < System.currentTimeMillis() - 250L) {
+                    if (cacheValue < System.currentTimeMillis() - 50L) {
                         tileUpdateCache.put(cacheable, System.currentTimeMillis());
                     } else {
                         return false;

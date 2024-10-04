@@ -199,12 +199,6 @@ public final class XaeroPlusSettingRegistry {
             ColorHelper.HighlightColor.values(),
             ColorHelper.HighlightColor.GREEN,
             SettingLocation.WORLD_MAP_MAIN);
-    public static final XaeroPlusBooleanSetting owAutoWaypointDimension = XaeroPlusBooleanSetting.create(
-            "Prefer Overworld Waypoints",
-            "setting.world_map.ow_auto_waypoint_dimension",
-            "setting.world_map.ow_auto_waypoint_dimension.tooltip",
-            true,
-            SettingLocation.WORLD_MAP_MAIN);
     public static final XaeroPlusBooleanSetting showWaypointDistances = XaeroPlusBooleanSetting.create(
             "Show Waypoint Distances",
             "setting.world_map.show_waypoint_distances",

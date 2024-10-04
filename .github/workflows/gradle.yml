@@ -49,13 +49,6 @@ jobs:
     - name: Download Xaero Minimap
       run: wget https://chocolateminecraft.com/mods2/minimap/Xaeros_Minimap_${{ env.MINIMAP_VERSION }}_${{ env.MOD_LOADER }}_${{ env.MINECRAFT_VERSION_SHORT }}.jar --no-check-certificate
 
-    - name: Create modpack zip
-      run: >
-        tar -czvf
-        XaeroPlus-modpack-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}.zip
-        XaeroPlus-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar
-        XaerosWorldMap_${{ env.WORLDMAP_VERSION }}_${{ env.MOD_LOADER }}_${{ env.MINECRAFT_VERSION_SHORT }}.jar
-        Xaeros_Minimap_${{ env.MINIMAP_VERSION }}_${{ env.MOD_LOADER }}_${{ env.MINECRAFT_VERSION_SHORT }}.jar
 
     # todo: for future auto-update check feature
 #    - name: Create version identifier file
@@ -87,7 +80,6 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         github-files: |
           XaeroPlus-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar
-          XaeroPlus-modpack-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}.zip
         github-tag: ${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}
         github-commitish: mainline
 

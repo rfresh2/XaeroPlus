@@ -1,5 +1,6 @@
 package xaeroplus.mixin.client;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.shader.Framebuffer;
@@ -9,10 +10,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import xaero.common.IXaeroMinimap;
-import xaero.common.minimap.element.render.MinimapElementReader;
-import xaero.common.minimap.element.render.MinimapElementRenderProvider;
 import xaero.common.minimap.element.render.MinimapElementRenderer;
 import xaero.common.minimap.element.render.MinimapElementRendererHandler;
 import xaero.common.minimap.render.MinimapRendererHelper;
@@ -27,7 +25,7 @@ public class MixinMinimapElementRendererHandler {
         at = @At(
             value = "INVOKE",
             target = "Lxaero/common/minimap/element/render/MinimapElementRenderer;preRender(ILnet/minecraft/entity/Entity;Lnet/minecraft/entity/player/EntityPlayer;DDDLnet/minecraft/client/gui/ScaledResolution;Lxaero/common/IXaeroMinimap;)V"
-        ), locals = LocalCapture.CAPTURE_FAILHARD)
+        ))
     public void renderForRendererInject(MinimapElementRenderer renderer,
                                         Entity renderEntity,
                                         EntityPlayer player,
@@ -48,10 +46,7 @@ public class MixinMinimapElementRendererHandler {
                                         ScaledResolution scaledRes,
                                         int indexLimit,
                                         CallbackInfoReturnable<Integer> cir,
-                                        MinimapElementReader elementReader,
-                                        MinimapElementRenderProvider provider,
-                                        Object context,
-                                        int location) {
+                                        @Local(name = "context") Object context) {
         if (context instanceof RadarRenderContext) {
             ((IScreenRadarRenderContext) context).setIsWorldMap(false);
         }

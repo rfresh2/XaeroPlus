@@ -1,17 +1,17 @@
 package xaeroplus.mixin;
 
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
-import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import org.spongepowered.asm.launch.MixinBootstrap;
 import org.spongepowered.asm.mixin.MixinEnvironment;
 import org.spongepowered.asm.mixin.Mixins;
+import zone.rong.mixinbooter.IEarlyMixinLoader;
+import zone.rong.mixinbooter.MixinLoader;
 
-import javax.annotation.Nullable;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
-@IFMLLoadingPlugin.Name("XaeroPlusMixinLoader")
-@IFMLLoadingPlugin.MCVersion("1.12.2")
-public class MixinLoaderForge implements IFMLLoadingPlugin {
+@MixinLoader
+public class MixinLoaderForge implements IEarlyMixinLoader {
 
     public MixinLoaderForge() {
         MixinBootstrap.init();
@@ -23,27 +23,12 @@ public class MixinLoaderForge implements IFMLLoadingPlugin {
     }
 
     @Override
-    public String[] getASMTransformerClass() {
-        return new String[0];
-    }
-
-    @Override
-    public String getModContainerClass() {
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public String getSetupClass() {
-        return null;
-    }
-
-    @Override
-    public void injectData(Map<String, Object> data) {
-    }
-
-    @Override
-    public String getAccessTransformerClass() {
-        return null;
+    public List<String> getMixinConfigs() {
+        ArrayList<String> list = new ArrayList<>();
+        list.add("mixins.xaeroplus.json");
+        if (FMLLaunchHandler.isDeobfuscatedEnvironment()) {
+            list.add("mixins.baritone.json");
+        }
+        return list;
     }
 }

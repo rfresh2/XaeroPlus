@@ -1,11 +1,13 @@
 package xaeroplus.mixin.client;
 
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -36,6 +38,7 @@ public abstract class MixinGuiWaypointsList {
         this.modMain = (IXaeroMinimap) modMainField.get(this$0);
     }
 
+    @Unique
     public ArrayList<Waypoint> getSearchFilteredWaypointList() {
         ArrayList<Waypoint> filteredWaypoints = new ArrayList<>();
         try {
@@ -87,56 +90,33 @@ public abstract class MixinGuiWaypointsList {
         }
     }
 
-    /**
-     * @author rfresh2
-     * @reason Add waypoint distance to right side, and move waypoint initials icon farther left to handle long waypoint names
-     */
-    @Overwrite
-    public void drawWaypointSlot(Waypoint w, int x, int y) {
-            if (w != null) {
-                final FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
-                thisGuiWaypoints.drawCenteredString(
-                        fontRenderer,
-                        w.getLocalizedName()
-                                + (
-                                w.isDisabled()
-                                        ? " §4" + I18n.format("gui.xaero_disabled")
-                                        : (w.isTemporary() ? " §4" + I18n.format("gui.xaero_temporary") : "")
-                        ),
-                        x + 110,
-                        y + 1,
-                        16777215
-                );
-                int rectX = x - 30;
-                int rectY = y + 6;
-                if (w.isGlobal()) {
-                    thisGuiWaypoints.drawCenteredString(fontRenderer, "*", rectX - 25, rectY - 3, 16777215);
-                }
+    @Inject(method = "drawWaypointSlot", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/common/minimap/waypoints/Waypoint;isGlobal()Z"
+    ), remap = false)
+    public void shiftIconsLeft(Waypoint w, int x, int y, final CallbackInfo ci,
+                               @Local(name = "rectX") LocalIntRef rectX) {
+        rectX.set(rectX.get() - 30);
+    }
 
-                this.modMain
-                        .getInterfaces()
-                        .getMinimapInterface()
-                        .getWaypointsGuiRenderer()
-                        .drawIconOnGUI(
-                                this.modMain.getInterfaces().getMinimapInterface().getMinimapFBORenderer().getHelper(),
-                                w,
-                                this.modMain.getSettings(),
-                                rectX,
-                                rectY
-                        );
-                if (XaeroPlusSettingRegistry.showWaypointDistances.getValue()) {
-                    Entity renderViewEntity = Minecraft.getMinecraft().getRenderViewEntity();
-                    final double playerX = renderViewEntity.posX;
-                    final double playerZ = renderViewEntity.posZ;
-                    final double playerY = renderViewEntity.posY;
-                    final double dimensionDivision = GuiWaypoints.distanceDivided;
-                    final int wpX = w.getX(dimensionDivision);
-                    final int wpY = w.getY();
-                    final int wpZ = w.getZ(dimensionDivision);
-                    final double distance = Math.sqrt(Math.pow(playerX - wpX, 2) + Math.pow(playerY - wpY, 2) + Math.pow(playerZ - wpZ, 2));
-                    final String text = NumberFormat.getIntegerInstance().format(distance) + "m";
-                    thisGuiWaypoints.drawString(fontRenderer, text, x + 250, y + 1, 0xFFFFFF);
-                }
-            }
+    @Inject(method = "drawWaypointSlot", at = @At(
+        value = "INVOKE",
+        target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endBatch()V"
+    ))
+    public void drawWaypointDistances(Waypoint w, int x, int y, final CallbackInfo ci) {
+        if (XaeroPlusSettingRegistry.showWaypointDistances.getValue()) {
+            Entity renderViewEntity = Minecraft.getMinecraft().getRenderViewEntity();
+            final double playerX = renderViewEntity.posX;
+            final double playerZ = renderViewEntity.posZ;
+            final double playerY = renderViewEntity.posY;
+            final double dimensionDivision = GuiWaypoints.distanceDivided;
+            final int wpX = w.getX(dimensionDivision);
+            final int wpY = w.getY();
+            final int wpZ = w.getZ(dimensionDivision);
+            final double distance = Math.sqrt(Math.pow(playerX - wpX, 2) + Math.pow(playerY - wpY, 2) + Math.pow(playerZ - wpZ, 2));
+            final String text = NumberFormat.getIntegerInstance().format(distance) + "m";
+            final FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
+            thisGuiWaypoints.drawString(fontRenderer, text, x + 250, y + 1, 0xFFFFFF);
+        }
     }
 }

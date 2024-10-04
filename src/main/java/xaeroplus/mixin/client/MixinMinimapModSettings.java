@@ -1,5 +1,6 @@
 package xaeroplus.mixin.client;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -8,7 +9,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import xaero.common.IXaeroMinimap;
 import xaero.common.settings.ModOptions;
 import xaero.common.settings.ModSettings;
@@ -50,9 +50,8 @@ public class MixinMinimapModSettings {
     @Inject(
         method = "loadSettings", at = @At(
         value = "INVOKE",
-        target = "Lxaero/common/settings/ModSettings;saveSettings()V"),
-        locals = LocalCapture.CAPTURE_FAILHARD)
-    public void loadSettings(final CallbackInfo ci, Path mainConfigFile, Path configFolderPath) throws IOException {
+        target = "Lxaero/common/settings/ModSettings;saveSettings()V"))
+    public void loadSettings(final CallbackInfo ci, @Local(name = "mainConfigFile") Path mainConfigFile) throws IOException {
         if (!mainConfigFile.toFile().exists()) {
             XaeroPlusModSettingsHooks.loadSettings(null, ALL_MINIMAP_SETTINGS.get());
         }

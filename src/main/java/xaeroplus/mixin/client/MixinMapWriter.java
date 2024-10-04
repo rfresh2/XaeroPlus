@@ -1,5 +1,12 @@
 package xaeroplus.mixin.client;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.ref.LocalLongRef;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockGlass;
@@ -13,9 +20,9 @@ import net.minecraft.world.DimensionType;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -24,16 +31,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.map.MapProcessor;
 import xaero.map.MapWriter;
-import xaero.map.WorldMap;
 import xaero.map.biome.BiomeColorCalculator;
 import xaero.map.biome.WriterBiomeInfoSupplier;
 import xaero.map.cache.BlockStateColorTypeCache;
-import xaero.map.core.XaeroWorldMapCore;
 import xaero.map.misc.Misc;
-import xaero.map.region.*;
+import xaero.map.region.MapBlock;
+import xaero.map.region.MapRegion;
+import xaero.map.region.OverlayBuilder;
+import xaero.map.region.OverlayManager;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.ChunkUtils;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
+
+import static java.util.Objects.nonNull;
 
 @Mixin(value = MapWriter.class, remap = false)
 public abstract class MixinMapWriter {
@@ -125,6 +137,8 @@ public abstract class MixinMapWriter {
 
     @Shadow
     protected abstract IBlockState unpackFramedBlocks(IBlockState original, World world, BlockPos globalPos);
+
+    // todo: rewrite obsidian roof mixins without overwrites
 
     /**
      * @author Entropy5
@@ -297,202 +311,94 @@ public abstract class MixinMapWriter {
         pixel.write(stateId, h, this.topH, this.biomeBuffer, light, glowing, cave);
     }
 
-    /**
-     * @author rfresh2
-     * @reason remove limiters on map write frequency
-     */
-    @Overwrite
-    public void onRender(BiomeColorCalculator biomeColorCalculator, OverlayManager overlayManager) {
-        long before = System.nanoTime();
-
-        try {
-            if (WorldMap.crashHandler.getCrashedBy() == null) {
-                if (!this.mapProcessor.isWritingPaused()
-                        && !this.mapProcessor.isWaitingForWorldUpdate()
-                        && this.mapProcessor.getMapSaveLoad().isRegionDetectionComplete()
-                        && this.mapProcessor.isCurrentMultiworldWritable()) {
-                    if (this.mapProcessor.getWorld() == null || this.mapProcessor.isCurrentMapLocked() || this.mapProcessor.getMapWorld().isCacheOnlyMode()) {
-                        return;
-                    }
-
-                    if (this.mapProcessor.getCurrentWorldId() != null
-                            && !this.mapProcessor.ignoreWorld(this.mapProcessor.getWorld())
-                        && (
-                        WorldMap.settings.updateChunks
-                            || WorldMap.settings.loadChunks
-                            || this.mapProcessor.getMapWorld().getCurrentDimension().isUsingWorldSave()
-                    )) {
-                        double playerX;
-                        double playerY;
-                        double playerZ;
-                        synchronized(this.mapProcessor.mainStuffSync) {
-                            if (this.mapProcessor.mainWorld != this.mapProcessor.getWorld()) {
-                                return;
-                            }
-                            if (this.mapProcessor.getMapWorld().getCurrentDimensionId() == null
-                                || this.mapProcessor.getWorld().provider.getDimension() != this.mapProcessor.getMapWorld().getCurrentDimensionId()) {
-                                return;
-                            }
-                            playerX = this.mapProcessor.mainPlayerX;
-                            playerY = this.mapProcessor.mainPlayerY;
-                            playerZ = this.mapProcessor.mainPlayerZ;
-                        }
-
-                        XaeroWorldMapCore.ensureField();
-                        int lengthX = this.endTileChunkX - this.startTileChunkX + 1;
-                        int lengthZ = this.endTileChunkZ - this.startTileChunkZ + 1;
-                        if (this.lastWriteTry == -1L) {
-                            lengthX = 3;
-                            lengthZ = 3;
-                        }
-
-                        int sizeTileChunks = lengthX * lengthZ;
-                        int sizeTiles = sizeTileChunks * 4 * 4;
-                        int sizeBasedTargetTime = sizeTiles * 1000 / 1500;
-                        int fullUpdateTargetTime = Math.max(100, sizeBasedTargetTime);
-                        long time = System.currentTimeMillis();
-                        long passed = this.lastWrite == -1L ? 0L : time - this.lastWrite;
-                        if (this.lastWriteTry == -1L
-                                || this.writeFreeSizeTiles != sizeTiles
-                                || this.writeFreeFullUpdateTargetTime != fullUpdateTargetTime
-                                || this.workingFrameCount > 30) {
-                            this.framesFreedTime = time;
-                            this.writeFreeSizeTiles = sizeTiles;
-                            this.writeFreeFullUpdateTargetTime = fullUpdateTargetTime;
-                            this.workingFrameCount = 0;
-                        }
-                        long sinceLastWrite;
-                        if (this.framesFreedTime != -1L) {
-                            sinceLastWrite = time - this.framesFreedTime;
-                        } else {
-                            sinceLastWrite = Math.min(passed, this.writeFreeSinceLastWrite);
-                        }
-                        sinceLastWrite = Math.max(1L, sinceLastWrite);
-
-                        long tilesToUpdate = XaeroPlusSettingRegistry.fastMapSetting.getValue()
-                                ? (long) Math.min(sizeTiles, XaeroPlusSettingRegistry.fastMapMaxTilesPerCycle.getValue())
-                                : Math.min(sinceLastWrite * (long)sizeTiles / (long)fullUpdateTargetTime, 100L); // default
-
-                        if (this.lastWrite == -1L || tilesToUpdate != 0L) {
-                            this.lastWrite = time;
-                        }
-
-                        if (tilesToUpdate != 0L) {
-                            if (this.framesFreedTime != -1L) {
-                                this.writeFreeSinceLastWrite = sinceLastWrite;
-                                this.framesFreedTime = -1L;
-                            } else {
-                                int timeLimit = (int)(Math.min(sinceLastWrite, 50L) * 86960L);
-                                long writeStartNano = System.nanoTime();
-                                boolean loadChunks = WorldMap.settings.loadChunks || this.mapProcessor.getMapWorld().getCurrentDimension().isUsingWorldSave();
-                                boolean updateChunks = WorldMap.settings.updateChunks || this.mapProcessor.getMapWorld().getCurrentDimension().isUsingWorldSave();
-                                boolean ignoreHeightmaps = this.mapProcessor.getMapWorld().isIgnoreHeightmaps();
-                                boolean flowers = WorldMap.settings.flowers;
-                                boolean detailedDebug = WorldMap.settings.detailed_debug;
-                                int caveDepth = WorldMap.settings.caveModeDepth;
-                                BlockPos.MutableBlockPos mutableBlockPos3 = this.mutableBlockPos3;
-
-                                for(int i = 0; (long)i < tilesToUpdate; ++i) {
-                                    if (this.writeMap(
-                                            this.mapProcessor.getWorld(),
-                                            playerX,
-                                            playerY,
-                                            playerZ,
-                                            biomeColorCalculator,
-                                            overlayManager,
-                                            loadChunks,
-                                            updateChunks,
-                                            ignoreHeightmaps,
-                                            flowers,
-                                            detailedDebug,
-                                            mutableBlockPos3,
-                                            caveDepth
-                                    )) {
-                                        --i;
-                                    }
-
-                                    /** removing time limit **/
-                                    if (!XaeroPlusSettingRegistry.fastMapSetting.getValue()) {
-                                        if (System.nanoTime() - writeStartNano >= (long)timeLimit) {
-                                            break;
-                                        }
-                                    }
-                                }
-                                ++this.workingFrameCount;
-                            }
-                        }
-
-                        this.lastWriteTry = time;
-                        int startRegionX = this.startTileChunkX >> 3;
-                        int startRegionZ = this.startTileChunkZ >> 3;
-                        int endRegionX = this.endTileChunkX >> 3;
-                        int endRegionZ = this.endTileChunkZ >> 3;
-                        boolean shouldRequestLoading = false;
-                        LeveledRegion<?> nextToLoad = this.mapProcessor.getMapSaveLoad().getNextToLoadByViewing();
-                        if (nextToLoad != null) {
-                            synchronized(nextToLoad) {
-                                if (!nextToLoad.reloadHasBeenRequested()
-                                        && !nextToLoad.hasRemovableSourceData()
-                                        && (!(nextToLoad instanceof MapRegion) || !((MapRegion)nextToLoad).isRefreshing())) {
-                                    shouldRequestLoading = true;
-                                }
-                            }
-                        } else {
-                            shouldRequestLoading = true;
-                        }
-
-                        this.regionBuffer.clear();
-                        int comparisonChunkX = this.playerChunkX - 16;
-                        int comparisonChunkZ = this.playerChunkZ - 16;
-                        LeveledRegion.setComparison(comparisonChunkX, comparisonChunkZ, 0, comparisonChunkX, comparisonChunkZ);
-
-                        for(int visitRegionX = startRegionX; visitRegionX <= endRegionX; ++visitRegionX) {
-                            for(int visitRegionZ = startRegionZ; visitRegionZ <= endRegionZ; ++visitRegionZ) {
-                                MapRegion visitRegion = this.mapProcessor.getLeafMapRegion(this.writingLayer, visitRegionX, visitRegionZ, true);
-                                if (visitRegion != null && visitRegion.getLoadState() == 2) {
-                                    visitRegion.registerVisit();
-                                }
-                                synchronized(visitRegion) {
-                                    if (visitRegion.isResting()
-                                        && shouldRequestLoading
-                                        && visitRegion.canRequestReload_unsynced()
-                                        && visitRegion.getLoadState() != 2) {
-                                        visitRegion.calculateSortingChunkDistance();
-                                        Misc.addToListOfSmallest(10, this.regionBuffer, visitRegion);
-                                    }
-                                }
-                            }
-                        }
-
-                        int toRequest = 1;
-                        int counter = 0;
-
-                        for(int i = 0; i < this.regionBuffer.size() && counter < toRequest; ++i) {
-                            MapRegion region = this.regionBuffer.get(i);
-                            if (region != nextToLoad || this.regionBuffer.size() <= 1) {
-                                synchronized(region) {
-                                    if (region.canRequestReload_unsynced() && region.getLoadState() != 2) {
-                                        region.setBeingWritten(true);
-                                        this.mapProcessor.getMapSaveLoad().requestLoad(region, "writing");
-                                        if (counter == 0) {
-                                            this.mapProcessor.getMapSaveLoad().setNextToLoadByViewing((LeveledRegion<?>)region);
-                                        }
-
-                                        ++counter;
-                                        if (region.getLoadState() == 4) {
-                                            return;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                return;
+    @Inject(method = "onRender", at = @At(
+        value = "FIELD",
+        target = "Lxaero/map/MapWriter;lastWrite:J",
+        opcode = Opcodes.GETFIELD,
+        ordinal = 2
+    ))
+    public void fastMapMaxTilesPerCycleSetting(final BiomeColorCalculator biomeColorCalculator, final OverlayManager overlayManager, final CallbackInfo ci,
+                                               @Local(name = "tilesToUpdate") LocalLongRef tilesToUpdateRef,
+                                               @Local(name = "sizeTiles") int sizeTiles) {
+        if (XaeroPlusSettingRegistry.fastMapSetting.getValue()) {
+            this.writeFreeSinceLastWrite = Math.max(1L, this.writeFreeSinceLastWrite);
+            if (this.mapProcessor.getCurrentCaveLayer() == Integer.MAX_VALUE) {
+                tilesToUpdateRef.set((long) Math.min(sizeTiles, XaeroPlusSettingRegistry.fastMapMaxTilesPerCycle.getValue()));
             }
-        } catch (Throwable var39) {
-            WorldMap.crashHandler.setCrashedBy(var39);
         }
+    }
+
+    @ModifyExpressionValue(method = "onRender", at = @At(
+        value = "INVOKE",
+        target = "Ljava/lang/System;nanoTime()J",
+        ordinal = 2
+    ))
+    public long removeWriteTimeLimiterPerFrame(long original) {
+        if (XaeroPlusSettingRegistry.fastMapSetting.getValue()) {
+            if (this.mapProcessor.getCurrentCaveLayer() == Integer.MAX_VALUE) {
+                return 0;
+            }
+        }
+        return original;
+    }
+
+    // insert our own limiter on new tiles being written but this one's keyed on the actual chunk
+    // tile "writes" also include a lot of extra operations and lookups before any writing is actually done
+    // when we remove existing limiters those extra operations add up to a lot of unnecessary cpu time
+    private final Cache<Long, Long> tileUpdateCache = Caffeine.newBuilder()
+        // I would usually expect even second long expiration here to be fine
+        // but there are some operations that make repeat invocations actually required
+        // perhaps another time ill rewrite those. Or make the cache lock more aware of when we don't have any new updates to write/load
+        // there's still alot of performance and efficiency on the table to regain
+        // but i think this is a good middle ground for now
+        .maximumSize(10000)
+        .expireAfterWrite(5L, TimeUnit.SECONDS)
+        .<Long, Long>build();
+
+    @WrapOperation(method = "writeMap", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/map/MapWriter;writeChunk(Lnet/minecraft/world/World;IZLxaero/map/biome/BiomeColorCalculator;Lxaero/map/region/OverlayManager;ZZZZZLnet/minecraft/util/math/BlockPos$MutableBlockPos;IIIIIIIII)Z"
+    ))
+    public boolean fastMap(final MapWriter instance,
+                           World world,
+                           int distance,
+                           boolean onlyLoad,
+                           BiomeColorCalculator biomeColorCalculator,
+                           OverlayManager overlayManager,
+                           boolean loadChunks,
+                           boolean updateChunks,
+                           boolean ignoreHeightmaps,
+                           boolean flowers,
+                           boolean detailedDebug,
+                           BlockPos.MutableBlockPos mutableBlockPos3,
+                           int caveDepth,
+                           int caveStart,
+                           int layerToWrite,
+                           int tileChunkX,
+                           int tileChunkZ,
+                           int tileChunkLocalX,
+                           int tileChunkLocalZ,
+                           int chunkX,
+                           int chunkZ,
+                           final Operation<Boolean> original) {
+        if (XaeroPlusSettingRegistry.fastMapSetting.getValue()) {
+            if (this.mapProcessor.getCurrentCaveLayer() == Integer.MAX_VALUE) {
+                final Long cacheable = ChunkUtils.chunkPosToLong(chunkX, chunkZ);
+                final Long cacheValue = tileUpdateCache.getIfPresent(cacheable);
+                if (nonNull(cacheValue)) {
+                    if (cacheValue < System.currentTimeMillis() - 250L) {
+                        tileUpdateCache.put(cacheable, System.currentTimeMillis());
+                    } else {
+                        return false;
+                    }
+                } else {
+                    tileUpdateCache.put(cacheable, System.currentTimeMillis());
+                }
+            }
+        }
+        return original.call(instance, world, distance, onlyLoad, biomeColorCalculator, overlayManager, loadChunks, updateChunks,
+                             ignoreHeightmaps, flowers, detailedDebug, mutableBlockPos3, caveDepth, caveStart, layerToWrite, tileChunkX,
+                             tileChunkZ, tileChunkLocalX, tileChunkLocalZ, chunkX, chunkZ);
     }
 
     @Redirect(method = "writeChunk", at = @At(value = "INVOKE", target = "Lxaero/map/MapWriter;loadPixel(Lnet/minecraft/world/World;Lxaero/map/region/MapBlock;Lxaero/map/region/MapBlock;Lnet/minecraft/world/chunk/Chunk;IIIIZZIZZZLnet/minecraft/util/math/BlockPos$MutableBlockPos;)V"))

@@ -20,10 +20,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.minimap.waypoints.Waypoint;
-import xaero.common.minimap.waypoints.render.WaypointFilterParams;
+import xaero.common.minimap.waypoints.WaypointVisibilityType;
 import xaero.common.minimap.waypoints.render.WaypointsIngameRenderer;
-import xaero.common.settings.ModSettings;
 import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.waypoint.render.WaypointFilterParams;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.ColorHelper;
 import xaeroplus.util.CustomWaypointsIngameRenderer;
@@ -46,13 +46,13 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
         public boolean test(final Waypoint w) {
             boolean deathpoints = filterParams.deathpoints;
             if (!w.isDisabled()
-                    && w.getVisibilityType() != 2
-                    && w.getVisibilityType() != 3
-                    && (w.getWaypointType() != 1 && w.getWaypointType() != 2 || deathpoints)) {
+                && w.getVisibility() != WaypointVisibilityType.WORLD_MAP_LOCAL
+                && w.getVisibility() != WaypointVisibilityType.WORLD_MAP_GLOBAL
+                && (!w.getPurpose().isDeath() || deathpoints)) {
                 double wpRenderX = (double)w.getX(filterParams.dimDiv) + 0.5 - filterParams.actualEntityX;
                 double wpRenderZ = (double)w.getZ(filterParams.dimDiv) + 0.5 - filterParams.actualEntityZ;
-                double offX = wpRenderX - filterParams.cameraX;
-                double offZ = wpRenderZ - filterParams.cameraZ;
+                double offX = wpRenderX - filterParams.cameraPos.x;
+                double offZ = wpRenderZ - filterParams.cameraPos.z;
                 double distanceScale = filterParams.dimensionScaleDistance
                     && Minecraft.getMinecraft().world.provider.getDimensionType() == DimensionType.NETHER
                     ? 8.0
@@ -61,9 +61,9 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
                 double distance2D = unscaledDistance2D * distanceScale;
                 double waypointsDistance = filterParams.waypointsDistance;
                 double waypointsDistanceMin = filterParams.waypointsDistanceMin;
-                return w.isOneoffDestination()
+                return w.isDestination()
                         || (
-                        w.getWaypointType() == 1
+                            w.getPurpose().isDeath()
                                 || w.isGlobal()
                                 || w.isTemporary() && filterParams.temporaryWaypointsGlobal
                                 || waypointsDistance == 0.0
@@ -106,7 +106,7 @@ public class MixinWaypointsIngameRenderer implements CustomWaypointsIngameRender
         final double x = waypointVec.x - renderManager.viewerPosX;
         final double z = waypointVec.z - renderManager.viewerPosZ;
         final double y = -renderManager.viewerPosY;
-        final int color = ModSettings.COLORS[waypoint.getColor()];
+        final int color = waypoint.getWaypointColor().getHex();
         if (!this.clippingHelper.isBoxInFrustum(x, y, z, x, y+256, z)) return;
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1f);
         mc.renderEngine.bindTexture(BEACON_BEAM_TEXTURE);

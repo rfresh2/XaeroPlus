@@ -18,7 +18,7 @@ import xaeroplus.util.XaeroPlusGameTest;
         modid = XaeroPlus.MODID,
         name = XaeroPlus.NAME,
         version = XaeroPlus.VERSION,
-        dependencies = "required:mixinbooter;after:xaerominimap;after:xaerobetterpvp;required-after:xaeroworldmap@[1.39.0];"
+        dependencies = "required:mixinbooter@[9.4,);after:xaerominimap@[24.5.0];required-after:xaeroworldmap@[1.39.0];"
 )
 public class XaeroPlus {
     public static final String MODID = "xaeroplus";

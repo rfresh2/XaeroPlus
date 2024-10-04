@@ -11,7 +11,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xaero.common.IXaeroMinimap;
 import xaero.common.gui.GuiWaypoints;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.hud.minimap.world.MinimapWorld;
@@ -25,17 +24,12 @@ import java.util.ArrayList;
 
 @Mixin(targets = "xaero.common.gui.GuiWaypoints$List", remap = false)
 public abstract class MixinGuiWaypointsList {
-
-    private IXaeroMinimap modMain;
     private GuiWaypoints thisGuiWaypoints;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     public void init(GuiWaypoints this$0, CallbackInfo ci) throws NoSuchFieldException, IllegalAccessException {
         // god why make this an inner static class i hate these hacks
         thisGuiWaypoints = this$0;
-        final Field modMainField = this$0.getClass().getSuperclass().getDeclaredField("modMain");
-        modMainField.setAccessible(true);
-        this.modMain = (IXaeroMinimap) modMainField.get(this$0);
     }
 
     @Unique
@@ -101,7 +95,7 @@ public abstract class MixinGuiWaypointsList {
 
     @Inject(method = "drawWaypointSlot", at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endBatch()V"
+        target = "Lxaero/common/minimap/waypoints/render/WaypointsGuiRenderer;drawIconOnGUI(Lxaero/common/minimap/render/MinimapRendererHelper;Lxaero/common/minimap/waypoints/Waypoint;Lxaero/common/settings/ModSettings;II)V"
     ))
     public void drawWaypointDistances(Waypoint w, int x, int y, final CallbackInfo ci) {
         if (XaeroPlusSettingRegistry.showWaypointDistances.getValue()) {

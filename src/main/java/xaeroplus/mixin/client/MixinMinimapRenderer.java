@@ -1,10 +1,10 @@
 package xaeroplus.mixin.client;
 
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,13 +14,12 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.IXaeroMinimap;
 import xaero.common.minimap.MinimapProcessor;
-import xaero.common.minimap.element.render.over.MinimapElementOverMapRendererHandler;
 import xaero.common.minimap.radar.MinimapRadar;
 import xaero.common.minimap.render.MinimapFBORenderer;
 import xaero.common.minimap.render.MinimapRenderer;
-import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.settings.ModSettings;
 import xaero.hud.minimap.Minimap;
+import xaero.hud.minimap.element.render.over.MinimapElementOverMapRendererHandler;
 import xaero.hud.minimap.module.MinimapSession;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.CustomMinimapFBORenderer;
@@ -45,32 +44,35 @@ public class MixinMinimapRenderer {
         }
     }
 
-    @Redirect(method = "renderMinimap", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/element/render/over/MinimapElementOverMapRendererHandler;render(Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/player/EntityPlayer;DDDDDDDZFLnet/minecraft/client/shader/Framebuffer;Lxaero/common/IXaeroMinimap;Lxaero/common/minimap/render/MinimapRendererHelper;Lnet/minecraft/client/gui/FontRenderer;Lnet/minecraft/client/gui/ScaledResolution;IIIIZF)D"))
-    public double editOvermapRender(final MinimapElementOverMapRendererHandler instance, final Entity renderEntity, final EntityPlayer player, final double renderX, final double renderY, final double renderZ, final double playerDimDiv, final double ps, final double pc, final double zoom, final boolean cave, final float partialTicks, final Framebuffer framebuffer, final IXaeroMinimap modMain, final MinimapRendererHelper helper, final FontRenderer font, final ScaledResolution scaledRes, final int specW, final int specH, final int halfViewW, final int halfViewH, final boolean circle, final float minimapScale) {
+    @Redirect(method = "renderMinimap", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/hud/minimap/element/render/over/MinimapElementOverMapRendererHandler;render(Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/math/Vec3d;DDDDZFLnet/minecraft/client/shader/Framebuffer;Lnet/minecraft/client/gui/ScaledResolution;)D"
+    ))
+    public double editOvermapRender(final MinimapElementOverMapRendererHandler instance,
+                                    Entity renderEntity,
+                                    EntityPlayer player,
+                                    Vec3d renderPos,
+                                    double playerDimDiv,
+                                    double ps,
+                                    double pc,
+                                    double zoom,
+                                    boolean cave,
+                                    float partialTicks,
+                                    Framebuffer framebuffer,
+                                    ScaledResolution scaledRes) {
         double customZoom = zoom / Globals.minimapScalingFactor;
         return instance.render(
                 renderEntity,
                 player,
-                renderX,
-                renderY,
-                renderZ,
+                renderPos,
                 playerDimDiv,
                 ps,
                 pc,
                 customZoom,
                 cave,
                 partialTicks,
-                null,
-                modMain,
-                helper,
-                font,
-                scaledRes,
-                specW,
-                specW,
-                halfViewW,
-                halfViewH,
-                circle,
-                minimapScale
+                framebuffer,
+                scaledRes
         );
     }
 

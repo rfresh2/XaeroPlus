@@ -131,7 +131,7 @@ public class MixinGuiWaypoints extends ScreenBase {
      */
     @Overwrite
     private void updateSortedList() {
-        WaypointsSort sortType = this.displayedWorld.getContainer().getRoot().getSortType();
+        WaypointsSort sortType = this.displayedWorld.getRootConfig().getSortType();
         Iterable<Waypoint> waypointsList = this.displayedWorld.getCurrentWaypointSet().getWaypoints();
         GuiWaypoints.distanceDivided = this.session.getDimensionHelper().getDimensionDivision(this.displayedWorld);
         Entity renderViewEntity = Minecraft.getMinecraft().getRenderViewEntity();
@@ -173,13 +173,13 @@ public class MixinGuiWaypoints extends ScreenBase {
                      sortVal = -w.getComparisonAngleCos(cameraPos, lookVector, GuiWaypoints.distanceDivided);
                      break;
                 case COLOR:
-                    sortVal = w.getColor();
+                    sortVal = w.getWaypointColor();
                     break;
                 case NAME:
                     sortVal = w.getComparisonName();
                     break;
                 case SYMBOL:
-                    sortVal = w.getSymbol();
+                    sortVal = w.getInitials();
                     break;
                 case DISTANCE:
                     sortVal = w.getComparisonDistance(cameraPos, GuiWaypoints.distanceDivided);
@@ -194,7 +194,7 @@ public class MixinGuiWaypoints extends ScreenBase {
         for(KeySortableByOther<Waypoint> k : sortableKeys) {
             waypointsSorted.add(k.getKey());
         }
-        if (this.displayedWorld.getContainer().getRoot().isSortReversed()) {
+        if (this.displayedWorld.getRootConfig().isSortReversed()) {
             Collections.reverse(waypointsSorted);
         }
         return waypointsSorted;

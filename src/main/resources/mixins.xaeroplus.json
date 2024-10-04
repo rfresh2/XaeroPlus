@@ -28,7 +28,7 @@
     "MixinMapTileChunk",
     "MixinMapWorld",
     "MixinMapWriter",
-    "MixinMinimapElementOverMapRendererHandler",
+    "MixinMinimapElementMapRendererHandler",
     "MixinMinimapElementRendererHandler",
     "MixinMinimapFBORenderer",
     "MixinMinimapModSettings",

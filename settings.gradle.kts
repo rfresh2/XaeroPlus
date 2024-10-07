@@ -33,7 +33,7 @@ dependencyResolutionManagement {
 			library("minimap-fabric", "maven.modrinth:xaeros-minimap:${gradle.extra.get("minimap_version_fabric")}_Fabric_1.20")
 			library("minimap-forge", "maven.modrinth:xaeros-minimap:${gradle.extra.get("minimap_version_forge")}_Forge_1.20")
 			library("mixinextras-common", "io.github.llamalad7:mixinextras-common:0.4.0")
-			library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.4.0")
+			library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.4.1")
 			library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.1.8")
 			library("lambdaEvents", "net.lenni0451:LambdaEvents:2.4.2")
 			library("waystones-fabric", "maven.modrinth:waystones:14.1.4+fabric-1.20")

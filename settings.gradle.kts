@@ -8,14 +8,9 @@ pluginManagement {
 	}
 }
 gradle.extra.apply {
-	set("mod_version", "2.24.3")
-	set("maven_group", "xaeroplus")
-	set("archives_base_name", "XaeroPlus")
+	set("mod_version", "2.24.4")
 	set("minecraft_version", "1.20.1")
 	set("parchment_version", "2023.09.03")
-	set("fabric_loader_version", "0.15.11")
-	set("fabric_api_version", "0.92.2+1.20.1")
-	set("forge_loader_version", "47.3.5")
 	set("worldmap_version_fabric", "1.39.0")
 	set("minimap_version_fabric", "24.5.0")
 	set("worldmap_version_forge", "1.39.0")
@@ -25,15 +20,15 @@ gradle.extra.apply {
 dependencyResolutionManagement {
 	versionCatalogs {
 		create("libs") {
-			library("fabric-loader", "net.fabricmc:fabric-loader:${gradle.extra.get("fabric_loader_version")}")
-			library("forge", "net.minecraftforge:forge:${gradle.extra.get("minecraft_version")}-${gradle.extra.get("forge_loader_version")}")
-			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:${gradle.extra.get("fabric_api_version")}")
+			library("fabric-loader", "net.fabricmc:fabric-loader:0.15.11")
+			library("forge", "net.minecraftforge:forge:${gradle.extra.get("minecraft_version")}-47.3.5")
+			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.92.2+${gradle.extra.get("minecraft_version")}")
 			library("worldmap-fabric", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version_fabric")}_Fabric_1.20")
 			library("worldmap-forge", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version_forge")}_Forge_1.20")
 			library("minimap-fabric", "maven.modrinth:xaeros-minimap:${gradle.extra.get("minimap_version_fabric")}_Fabric_1.20")
 			library("minimap-forge", "maven.modrinth:xaeros-minimap:${gradle.extra.get("minimap_version_forge")}_Forge_1.20")
-			library("mixinextras-common", "io.github.llamalad7:mixinextras-common:0.4.0")
-			library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.4.0")
+			library("mixinextras-common", "io.github.llamalad7:mixinextras-common:0.4.1")
+			library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.4.1")
 			library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.1.8")
 			library("lambdaEvents", "net.lenni0451:LambdaEvents:2.4.2")
 			library("waystones-fabric", "maven.modrinth:waystones:14.1.4+fabric-1.20")

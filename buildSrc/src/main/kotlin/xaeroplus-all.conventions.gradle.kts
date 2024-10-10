@@ -9,7 +9,7 @@ configure<BasePluginExtension> {
 }
 
 version = gradle.extra.get("mod_version").toString()
-group = gradle.extra.get("maven_group").toString()
+group = "xaeroplus"
 
 repositories {
     maven("https://api.modrinth.com/maven") {

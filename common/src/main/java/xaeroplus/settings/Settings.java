@@ -521,6 +521,18 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.show_render_distance_world_map",
             false),
         SettingLocation.MINIMAP_OVERLAYS);
+    public final BooleanSetting showWorldBorderSetting = register(
+        BooleanSetting.create(
+            "Show World Border",
+            "xaeroplus.setting.show_world_border",
+            false),
+        SettingLocation.MINIMAP_OVERLAYS);
+    public final BooleanSetting showWorldBorderWorldMapSetting = register(
+        BooleanSetting.create(
+            "Show World Border WorldMap",
+            "xaeroplus.setting.show_world_border_world_map",
+            false),
+        SettingLocation.MINIMAP_OVERLAYS);
     public final BooleanSetting nullOverworldDimensionFolder = register(
         BooleanSetting.create(
             "null OW Dim Dir",

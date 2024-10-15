@@ -145,50 +145,105 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
                                          @Local(name = "zFloored") int zFloored,
                                          @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers) {
         final boolean isDimensionSwitched = Globals.getCurrentDimensionId() != Minecraft.getInstance().level.dimension();
-        if (Settings.REGISTRY.showRenderDistanceSetting.get() && !isDimensionSwitched) {
-            double actualPlayerX = minimap.getEntityRadar().getEntityX(mc.player, partial);
-            double actualPlayerZ = minimap.getEntityRadar().getEntityZ(mc.player, partial);
-            int actualXFloored = OptimizedMath.myFloor(actualPlayerX);
-            int actualZFloored = OptimizedMath.myFloor(actualPlayerZ);
-            final int viewDistance = mc.options.serverRenderDistance;
-            int width = viewDistance * 2 + 1;
-            // origin of the chunk we are standing in
-            final int middleChunkX = -(actualXFloored & 15);
-            final int middleChunkZ = -(actualZFloored & 15);
-            int distanceFlooredX = actualXFloored - xFloored;
-            int distanceFlooredZ = actualZFloored - zFloored;
+        if (!Settings.REGISTRY.showRenderDistanceSetting.get() || isDimensionSwitched) return;
+        double actualPlayerX = minimap.getEntityRadar().getEntityX(mc.player, partial);
+        double actualPlayerZ = minimap.getEntityRadar().getEntityZ(mc.player, partial);
+        int actualXFloored = OptimizedMath.myFloor(actualPlayerX);
+        int actualZFloored = OptimizedMath.myFloor(actualPlayerZ);
+        final int viewDistance = mc.options.serverRenderDistance;
+        int width = viewDistance * 2 + 1;
+        // origin of the chunk we are standing in
+        final int middleChunkX = -(actualXFloored & 15);
+        final int middleChunkZ = -(actualZFloored & 15);
+        int distanceFlooredX = actualXFloored - xFloored;
+        int distanceFlooredZ = actualZFloored - zFloored;
 
-            final int x0 = distanceFlooredX + middleChunkX - (width / 2) * 16;
-            final int z0 = distanceFlooredZ + middleChunkZ - (width / 2) * 16;
-            final int x1 = x0 + width * 16;
-            final int z1 = z0 + width * 16;
-            VertexConsumer lineBufferBuilder = renderTypeBuffers.getBuffer(CustomRenderTypes.MAP_LINES);
-            MinimapShaders.FRAMEBUFFER_LINES.setFrameSize((float) scalingFramebuffer.viewWidth, (float) scalingFramebuffer.viewHeight);
-            float lineWidth = Math.max(1.0f, modMain.getSettings().chunkGridLineWidth * Globals.minimapScaleMultiplier / (float) Globals.minimapSizeMultiplier);
-            RenderSystem.lineWidth(lineWidth);
-            PoseStack.Pose matrices = matrixStack.last();
+        final int x0 = distanceFlooredX + middleChunkX - (width / 2) * 16;
+        final int z0 = distanceFlooredZ + middleChunkZ - (width / 2) * 16;
+        final int x1 = x0 + width * 16;
+        final int z1 = z0 + width * 16;
+        VertexConsumer lineBufferBuilder = renderTypeBuffers.getBuffer(CustomRenderTypes.MAP_LINES);
+        MinimapShaders.FRAMEBUFFER_LINES.setFrameSize((float) scalingFramebuffer.viewWidth, (float) scalingFramebuffer.viewHeight);
+        float lineWidth = Math.max(1.0f, modMain.getSettings().chunkGridLineWidth * Globals.minimapScaleMultiplier / (float) Globals.minimapSizeMultiplier);
+        RenderSystem.lineWidth(lineWidth);
+        float r = 1.0f;
+        float g = 1.0f;
+        float b = 0.0f;
+        float a = 0.8f;
+        PoseStack.Pose matrices = matrixStack.last();
 
-            helper.addColoredLineToExistingBuffer(
-                matrices, lineBufferBuilder,
-                x0, z0, x1, z0,
-                1.0f, 1.0f, 0.0f, 0.8f
-            );
-            helper.addColoredLineToExistingBuffer(
-                matrices, lineBufferBuilder,
-                x1, z0, x1, z1,
-                1.0f, 1.0f, 0.0f, 0.8f
-            );
-            helper.addColoredLineToExistingBuffer(
-                matrices, lineBufferBuilder,
-                x1, z1, x0, z1,
-                1.0f, 1.0f, 0.0f, 0.8f
-            );
-            helper.addColoredLineToExistingBuffer(
-                matrices, lineBufferBuilder,
-                x0, z0, x0, z1,
-                1.0f, 1.0f, 0.0f, 0.8f
-            );
-        }
+        helper.addColoredLineToExistingBuffer(
+            matrices, lineBufferBuilder,
+            x0, z0, x1, z0,
+            r, g, b, a
+        );
+        helper.addColoredLineToExistingBuffer(
+            matrices, lineBufferBuilder,
+            x1, z0, x1, z1,
+            r, g, b, a
+        );
+        helper.addColoredLineToExistingBuffer(
+            matrices, lineBufferBuilder,
+            x1, z1, x0, z1,
+            r, g, b, a
+        );
+        helper.addColoredLineToExistingBuffer(
+            matrices, lineBufferBuilder,
+            x0, z0, x0, z1,
+            r, g, b, a
+        );
+    }
+
+    @Inject(method = "renderChunksToFBO", at = @At(
+        value = "INVOKE",
+        target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endBatch()V",
+        ordinal = 0
+    ), remap = true)
+    public void drawWorldBorderSquare(final MinimapSession minimapSession, final PoseStack matrixStack, final MinimapProcessor minimap, final Player player, final Entity renderEntity, final Vec3 renderPos, final double playerDimDiv, final double mapDimensionScale, final int bufferSize, final int viewW, final float sizeFix, final float partial, final int level, final boolean retryIfError, final boolean useWorldMap, final boolean lockedNorth, final int shape, final double ps, final double pc, final boolean cave, final boolean circle, final CustomVertexConsumers cvc, final CallbackInfo ci,
+                                      @Local(name = "xFloored") int xFloored,
+                                      @Local(name = "zFloored") int zFloored,
+                                      @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers) {
+        final boolean isDimensionSwitched = Globals.getCurrentDimensionId() != Minecraft.getInstance().level.dimension();
+        if (!Settings.REGISTRY.showWorldBorderSetting.get() || isDimensionSwitched) return;
+        var worldBorder = mc.level.getWorldBorder();
+        float wbMinX = (float) worldBorder.getMinX();
+        float wbMinZ = (float) worldBorder.getMinZ();
+        float wbMaxX = (float) worldBorder.getMaxX();
+        float wbMaxZ = (float) worldBorder.getMaxZ();
+        float x0 = wbMinX - xFloored;
+        float z0 = wbMinZ - zFloored;
+        float x1 = wbMaxX - xFloored;
+        float z1 = wbMaxZ - zFloored;
+
+        VertexConsumer lineBufferBuilder = renderTypeBuffers.getBuffer(CustomRenderTypes.MAP_LINES);
+        MinimapShaders.FRAMEBUFFER_LINES.setFrameSize((float) scalingFramebuffer.viewWidth, (float) scalingFramebuffer.viewHeight);
+        float lineWidth = Math.max(1.0f, modMain.getSettings().chunkGridLineWidth * Globals.minimapScaleMultiplier / (float) Globals.minimapSizeMultiplier);
+        RenderSystem.lineWidth(lineWidth);
+        var matrix = matrixStack.last();
+        float r = 0.0f;
+        float g = 1.0f;
+        float b = 1.0f;
+        float a = 0.8f;
+        helper.addColoredLineToExistingBuffer(
+            matrix, lineBufferBuilder,
+            x0, z0, x1, z0,
+            r, g, b, a
+        );
+        helper.addColoredLineToExistingBuffer(
+            matrix, lineBufferBuilder,
+            x0, z1, x1, z1,
+            r, g, b, a
+        );
+        helper.addColoredLineToExistingBuffer(
+            matrix, lineBufferBuilder,
+            x1, z0, x1, z1,
+            r, g, b, a
+        );
+        helper.addColoredLineToExistingBuffer(
+            matrix, lineBufferBuilder,
+            x0, z0, x0, z1,
+            r, g, b, a
+        );
     }
 
     @Redirect(method = "renderChunksToFBO", at = @At(

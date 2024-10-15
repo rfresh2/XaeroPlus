@@ -3,6 +3,11 @@ import dev.architectury.transformer.transformers.TransformNeoForgeAnnotations
 import dev.architectury.transformer.transformers.TransformNeoForgeEnvironment
 import dev.architectury.transformer.transformers.TransformPlatformOnly
 
+plugins {
+    id("xaeroplus-all.conventions")
+    id("xaeroplus-platform.conventions")
+}
+
 architectury {
     platformSetupLoomIde()
     neoForge()
@@ -25,9 +30,6 @@ loom {
 val worldmap_version_neo: String by gradle.extra
 val minimap_version_neo: String by gradle.extra
 val minecraft_version: String by gradle.extra
-val parchment_version: String by gradle.extra
-val loader_version: String by gradle.extra
-val neoforge_version: String by gradle.extra
 val destArchiveVersion = "${project.version}+${loom.platform.get().id()}-${minecraft_version}"
 val destArchiveClassifier = "WM${worldmap_version_neo}-MM${minimap_version_neo}"
 
@@ -83,5 +85,9 @@ tasks {
         archiveVersion = destArchiveVersion
         archiveClassifier = destArchiveClassifier
         atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
+    }
+
+    compileJava {
+        dependsOn(common.tasks.getByName("remapForge"))
     }
 }

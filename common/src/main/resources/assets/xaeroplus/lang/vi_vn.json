@@ -191,6 +191,7 @@
     "xaeroplus.gui.minimap_incompatible.required_version": "Phiên Bản Yêu Cầu: ",
     "xaeroplus.gui.minimap_incompatible.download_minimap": "Tải Xuống Xaero's Minimap",
     "xaeroplus.gui.minimap_incompatible.exit": "Thoát",
+    "xaeroplus.gui.world_map.copy_coordinates": "Sao chép tọa độ",
     "xaeroplus.gui.world_map.go_to_coordinates": "Đi Đến Tọa Độ",
     "xaeroplus.gui.world_map.baritone_goal_here": "§2%s§r Mục Tiêu Baritone Tại Đây",
     "xaeroplus.gui.world_map.baritone_path_here": "§2%s§r Đường Đi Baritone Tại Đây",

@@ -1,3 +1,10 @@
+import kotlin.streams.asStream
+
+plugins {
+    id("xaeroplus-all.conventions")
+    id("xaeroplus-platform.conventions")
+}
+
 architectury {
     common(rootProject.properties["enabled_platforms"].toString().split(","))
 }
@@ -22,14 +29,14 @@ dependencies {
 }
 
 tasks {
-    val remapForgeTask = register("remapForge") {
+    register("remapForge") {
         group = "build"
         description = "Remap the source files, replacing fabric-specific strings with forge-specific strings."
+        val remapDir = project.layout.buildDirectory.dir("remappedSources/forge").get().asFile
         doLast {
-            val remapDir = file("build/remappedSources/forge")
             // clear directory if it exists
             if (remapDir.exists()) {
-                remapDir.delete()
+                remapDir.deleteRecursively()
             }
             remapDir.mkdirs()
             // create sourceset directory structure
@@ -62,7 +69,7 @@ tasks {
             }
 
             // exec remap on every source file
-            remapDir.walk().forEach { file ->
+            remapDir.walk().asStream().parallel().forEach { file ->
                 if (file.isFile && (file.extension == "java" || file.extension == "json")) {
                     var text = file.readText()
                     remap.forEach { (fabric, forge) ->
@@ -73,6 +80,5 @@ tasks {
             }
         }
     }
-    compileJava.get().dependsOn(remapForgeTask)
 }
 

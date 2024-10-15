@@ -191,6 +191,7 @@
   "xaeroplus.gui.minimap_incompatible.required_version": "Versão Necessária: ",
   "xaeroplus.gui.minimap_incompatible.download_minimap": "Transferir Xaero's Minimap",
   "xaeroplus.gui.minimap_incompatible.exit": "Sair",
+  "xaeroplus.gui.world_map.copy_coordinates": "Copiar coordenadas",
   "xaeroplus.gui.world_map.go_to_coordinates": "Ir para Coordenadas",
   "xaeroplus.gui.world_map.baritone_goal_here": "§2%s§r Destino Baritone Aqui",
   "xaeroplus.gui.world_map.baritone_path_here": "§2%s§r Caminho Baritone Aqui",

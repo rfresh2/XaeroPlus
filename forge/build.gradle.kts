@@ -4,6 +4,11 @@ import dev.architectury.transformer.transformers.FixForgeMixin
 import dev.architectury.transformer.transformers.TransformForgeAnnotations
 import dev.architectury.transformer.transformers.TransformForgeEnvironment
 
+plugins {
+    id("xaeroplus-all.conventions")
+    id("xaeroplus-platform.conventions")
+}
+
 architectury {
     platformSetupLoomIde()
     forge()
@@ -61,6 +66,7 @@ configurations.all {
 
 tasks {
     processResources {
+        dependsOn(common.tasks.getByName("remapForge"))
         filesMatching("META-INF/mods.toml") {
             expand(mapOf(
                 "version" to project.version,
@@ -92,5 +98,9 @@ tasks {
         inputFile.set(shadowJar.get().archiveFile.get())
         archiveVersion = destArchiveVersion
         archiveClassifier = destArchiveClassifier
+    }
+
+    compileJava {
+        dependsOn(common.tasks.getByName("remapForge"))
     }
 }

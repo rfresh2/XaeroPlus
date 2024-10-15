@@ -68,7 +68,15 @@ public abstract class MixinMapSaveLoad {
                                      @Share("zipOutShare") final LocalRef<ZipOutputStream> zipOutShare
     ) throws IOException {
         if (!Settings.REGISTRY.fastZipWrite.get()) return;
-        zipOutShare.get().close();
+        try {
+            zipOutShare.get().close();
+        } catch (final IOException e) {
+            throw e;
+        } catch (final Exception e) {
+            // Deflator ensureOpen can throw a NPE in certain cases
+            // and the saveRegion method only catches IOExceptions
+            throw new IOException(e);
+        }
     }
 
     @Redirect(method = "run", at = @At(value = "INVOKE", target = "Lxaero/map/region/LeveledRegion;isAllCachePrepared()Z", ordinal = 0))

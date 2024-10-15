@@ -58,7 +58,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
 import static net.minecraft.world.level.Level.*;
 import static org.lwjgl.glfw.GLFW.*;
@@ -96,6 +95,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Shadow private Button keybindingsButton;
     @Shadow private Button dimensionToggleButton;
     @Shadow private int rightClickX;
+    @Shadow private int rightClickY;
     @Shadow private int rightClickZ;
     @Shadow private int mouseBlockPosX;
     @Shadow private int mouseBlockPosZ;
@@ -532,38 +532,41 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "getRightClickOptions", at = @At(value = "RETURN"), remap = false)
     public void getRightClickOptionsInject(final CallbackInfoReturnable<ArrayList<RightClickOption>> cir) {
+        final ArrayList<RightClickOption> options = cir.getReturnValue();
+        int index = 3;
+        options.add(index++, new RightClickOption("xaeroplus.gui.world_map.copy_coordinates", options.size(), this) {
+            @Override
+            public void onAction(final Screen screen) {
+                Minecraft.getInstance().keyboardHandler.setClipboard(rightClickX + " " + rightClickY + " " + rightClickZ);
+            }
+        });
         if (BaritoneHelper.isBaritonePresent()) {
-            final ArrayList<RightClickOption> options = cir.getReturnValue();
             int goalX = rightClickX;
             int goalZ = rightClickZ;
-            options.addAll(3, asList(
-                    new RightClickOption("xaeroplus.gui.world_map.baritone_goal_here", options.size(), this) {
+            options.add(index++, new RightClickOption("xaeroplus.gui.world_map.baritone_goal_here", options.size(), this) {
                         @Override
                         public void onAction(Screen screen) {
                             BaritoneExecutor.goal(goalX, goalZ);
                         }
-                    }.setNameFormatArgs(Misc.getKeyName(Settings.REGISTRY.worldMapBaritoneGoalHereKeybindSetting.getKeyBinding())),
-                    new RightClickOption("xaeroplus.gui.world_map.baritone_path_here", options.size(), this) {
+                    }.setNameFormatArgs(Misc.getKeyName(Settings.REGISTRY.worldMapBaritoneGoalHereKeybindSetting.getKeyBinding())));
+            options.add(index++, new RightClickOption("xaeroplus.gui.world_map.baritone_path_here", options.size(), this) {
                         @Override
                         public void onAction(Screen screen) {
                             BaritoneExecutor.path(goalX, goalZ);
                         }
-                    }.setNameFormatArgs(Misc.getKeyName(Settings.REGISTRY.worldMapBaritonePathHereKeybindSetting.getKeyBinding()))
-            ));
+                    }.setNameFormatArgs(Misc.getKeyName(Settings.REGISTRY.worldMapBaritonePathHereKeybindSetting.getKeyBinding())));
             if (BaritoneHelper.isBaritoneElytraPresent()) {
-                options.addAll(5, asList(
-                    new RightClickOption("xaeroplus.gui.world_map.baritone_elytra_here", options.size(), this) {
+                options.add(index++, new RightClickOption("xaeroplus.gui.world_map.baritone_elytra_here", options.size(), this) {
                         @Override
                         public void onAction(Screen screen) {
                             BaritoneExecutor.elytra(goalX, goalZ);
                         }
-                    }.setNameFormatArgs(Misc.getKeyName(Settings.REGISTRY.worldMapBaritoneElytraHereKeybindSetting.getKeyBinding()))
-                ));
+                    }.setNameFormatArgs(Misc.getKeyName(Settings.REGISTRY.worldMapBaritoneElytraHereKeybindSetting.getKeyBinding())));
             }
         }
 
         if (Settings.REGISTRY.disableWaypointSharing.get()) {
-            cir.getReturnValue().removeIf(option -> ((AccessorRightClickOption) option).getName().equals("gui.xaero_right_click_map_share_location"));
+            options.removeIf(option -> ((AccessorRightClickOption) option).getName().equals("gui.xaero_right_click_map_share_location"));
         }
     }
 

@@ -191,6 +191,7 @@
   "xaeroplus.gui.minimap_incompatible.required_version": "Version requise: ",
   "xaeroplus.gui.minimap_incompatible.download_minimap": "Téléchargez la mini-carte de Xaero",
   "xaeroplus.gui.minimap_incompatible.exit": "Sortie",
+  "xaeroplus.gui.world_map.copy_coordinates": "Copier les coordonnées",
   "xaeroplus.gui.world_map.go_to_coordinates": "Aller aux coordonnées",
   "xaeroplus.gui.world_map.baritone_goal_here": "§2%s§r Baryton Ciblez ici",
   "xaeroplus.gui.world_map.baritone_path_here": "§2%s§r Chemin du baryton ici",

@@ -1,3 +1,8 @@
+plugins {
+	id("xaeroplus-all.conventions")
+	id("xaeroplus-platform.conventions")
+}
+
 architectury {
 	platformSetupLoomIde()
 	fabric()

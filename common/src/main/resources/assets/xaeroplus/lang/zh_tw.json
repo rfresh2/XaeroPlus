@@ -191,6 +191,7 @@
   "xaeroplus.gui.minimap_incompatible.required_version": "需要的版本：",
   "xaeroplus.gui.minimap_incompatible.download_minimap": "下載 Xaero 的小地圖",
   "xaeroplus.gui.minimap_incompatible.exit": "退出",
+  "xaeroplus.gui.world_map.copy_coordinates": "複製座標",
   "xaeroplus.gui.world_map.go_to_coordinates": "前往座標",
   "xaeroplus.gui.world_map.baritone_goal_here": "§2%s§r Baritone 行動目標到此處",
   "xaeroplus.gui.world_map.baritone_path_here": "§2%s§r Baritone 尋路到此處",

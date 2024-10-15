@@ -191,6 +191,7 @@
   "xaeroplus.gui.minimap_incompatible.required_version": "Требуемая версия: ",
   "xaeroplus.gui.minimap_incompatible.download_minimap": "Скачать миникарту Xaero",
   "xaeroplus.gui.minimap_incompatible.exit": "Выход",
+  "xaeroplus.gui.world_map.copy_coordinates": "Копировать координаты",
   "xaeroplus.gui.world_map.go_to_coordinates": "Идти на координаты",
   "xaeroplus.gui.world_map.baritone_goal_here": "§2%s§r Baritone Цель тут",
   "xaeroplus.gui.world_map.baritone_path_here": "§2%s§r Baritone Путь тут",

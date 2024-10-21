@@ -56,6 +56,9 @@ versionRange = "[1.2.0,)"
 ordering = "BEFORE"
 side = "CLIENT"
 
+[mods."lithium:options"]
+"mixin.chunk.palette" = false
+
 [[mixins]]
 config = "xaeroplus.mixins.json"
 

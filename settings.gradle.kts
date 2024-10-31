@@ -13,11 +13,11 @@ gradle.extra.apply {
 	set("minecraft_version", "1.21")
 	set("parchment_version", "2024.07.28")
     set("worldmap_version_fabric", "1.39.0")
-	set("minimap_version_fabric", "24.5.0")
+	set("minimap_version_fabric", "24.6.1")
 	set("worldmap_version_forge", "1.39.0")
-	set("minimap_version_forge", "24.5.0")
+	set("minimap_version_forge", "24.6.1")
 	set("worldmap_version_neo", "1.39.0")
-	set("minimap_version_neo", "24.5.0")
+	set("minimap_version_neo", "24.6.1")
 }
 
 dependencyResolutionManagement {

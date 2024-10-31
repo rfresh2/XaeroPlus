@@ -192,7 +192,7 @@
     "xaeroplus.gui.minimap_incompatible.currently_installed_version": "現在のバージョン: ",
     "xaeroplus.gui.minimap_incompatible.required_version": "必要なバージョン: ",
     "xaeroplus.gui.minimap_incompatible.download_minimap": "Xaero's Minimapをダウンロード",
-    "xaeroplus.gui.minimap_incompatible.exit": "出口",
+    "xaeroplus.gui.minimap_incompatible.exit": "終了",
     "xaeroplus.gui.world_map.copy_coordinates": " [XP] 座標をコピー",
     "xaeroplus.gui.world_map.go_to_coordinates": "この座標に行く",
     "xaeroplus.gui.world_map.baritone_goal_here": "§2%s§r [XP] Baritoneのゴール",

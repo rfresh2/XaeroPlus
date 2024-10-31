@@ -2,21 +2,18 @@ package xaeroplus.mixin.client;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.IXaeroMinimap;
 import xaero.common.graphics.CustomVertexConsumers;
-import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.radar.MinimapRadar;
 import xaero.common.minimap.render.MinimapFBORenderer;
@@ -68,7 +65,7 @@ public class MixinMinimapRenderer {
         slice = @Slice(
             from = @At(
                 value = "INVOKE",
-                target = "Lxaero/common/minimap/render/MinimapRenderer;renderChunks(Lxaero/hud/minimap/module/MinimapSession;Lnet/minecraft/client/gui/GuiGraphics;Lxaero/common/minimap/MinimapProcessor;Lnet/minecraft/world/phys/Vec3;DDIIFFIZZIDDZZLxaero/common/settings/ModSettings;Lxaero/common/graphics/CustomVertexConsumers;)V"
+                target = "Lxaero/common/minimap/render/MinimapRenderer;renderChunks(Lxaero/hud/minimap/module/MinimapSession;Lnet/minecraft/client/gui/GuiGraphics;Lxaero/common/minimap/MinimapProcessor;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/resources/ResourceKey;DIIFFIZZIDDZZLxaero/common/settings/ModSettings;Lxaero/common/graphics/CustomVertexConsumers;)V"
             )
         )
     )
@@ -89,7 +86,7 @@ public class MixinMinimapRenderer {
         slice = @Slice(
             from = @At(
                 value = "INVOKE",
-                target = "Lxaero/common/minimap/render/MinimapRenderer;renderChunks(Lxaero/hud/minimap/module/MinimapSession;Lnet/minecraft/client/gui/GuiGraphics;Lxaero/common/minimap/MinimapProcessor;Lnet/minecraft/world/phys/Vec3;DDIIFFIZZIDDZZLxaero/common/settings/ModSettings;Lxaero/common/graphics/CustomVertexConsumers;)V"
+                target = "Lxaero/common/minimap/render/MinimapRenderer;renderChunks(Lxaero/hud/minimap/module/MinimapSession;Lnet/minecraft/client/gui/GuiGraphics;Lxaero/common/minimap/MinimapProcessor;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/resources/ResourceKey;DIIFFIZZIDDZZLxaero/common/settings/ModSettings;Lxaero/common/graphics/CustomVertexConsumers;)V"
             )
         )
     )
@@ -110,7 +107,7 @@ public class MixinMinimapRenderer {
         slice = @Slice(
             from = @At(
                 value = "INVOKE",
-                target = "Lxaero/common/minimap/render/MinimapRenderer;renderChunks(Lxaero/hud/minimap/module/MinimapSession;Lnet/minecraft/client/gui/GuiGraphics;Lxaero/common/minimap/MinimapProcessor;Lnet/minecraft/world/phys/Vec3;DDIIFFIZZIDDZZLxaero/common/settings/ModSettings;Lxaero/common/graphics/CustomVertexConsumers;)V"
+                target = "Lxaero/common/minimap/render/MinimapRenderer;renderChunks(Lxaero/hud/minimap/module/MinimapSession;Lnet/minecraft/client/gui/GuiGraphics;Lxaero/common/minimap/MinimapProcessor;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/resources/ResourceKey;DIIFFIZZIDDZZLxaero/common/settings/ModSettings;Lxaero/common/graphics/CustomVertexConsumers;)V"
             )
         )
     )
@@ -124,38 +121,33 @@ public class MixinMinimapRenderer {
 
     @Redirect(method = "renderMinimap", at = @At(
         value = "INVOKE",
-        target = "Lxaero/hud/minimap/element/render/over/MinimapElementOverMapRendererHandler;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/phys/Vec3;DDDDZFLcom/mojang/blaze3d/pipeline/RenderTarget;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;)V"),
+        target = "Lxaero/hud/minimap/element/render/over/MinimapElementOverMapRendererHandler;prepareRender(DDDIIIIZF)V"),
         remap = true) // $REMAP
-    public void editOvermapRender(final MinimapElementOverMapRendererHandler instance,
-                                  final GuiGraphics guiGraphics,
-                                  final Entity entity,
-                                  final Player player,
-                                  final Vec3 renderPos,
-                                  final double playerDimDiv,
-                                  final double ps,
-                                  final double pc,
-                                  double zoom,
-                                  final boolean cave,
-                                  final float partialTicks,
-                                  final RenderTarget framebuffer,
-                                  final MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers
+    public void editOvermapRender(
+        final MinimapElementOverMapRendererHandler instance,
+        final double ps,
+        final double pc,
+        double zoom,
+        final int specW,
+        final int specH,
+        final int halfViewW,
+        final int halfViewH,
+        final boolean circle,
+        final float minimapScale
     ) {
         if (this.minimap.usingFBO()) {
             zoom = (zoom / Globals.minimapScaleMultiplier) * Globals.minimapSizeMultiplier;
         }
-        instance.render(
-               guiGraphics,
-               entity,
-               player,
-               renderPos,
-               playerDimDiv,
+        instance.prepareRender(
                ps,
                pc,
                zoom,
-               cave,
-               partialTicks,
-               framebuffer,
-               multiTextureRenderTypeRenderers
+               specW,
+               specH,
+               halfViewW,
+               halfViewH,
+               circle,
+               minimapScale
         );
     }
 

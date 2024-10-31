@@ -11,12 +11,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.HudMod;
-import xaero.common.minimap.waypoints.render.WaypointsIngameRenderer;
 import xaero.hud.minimap.BuiltInHudModules;
-import xaero.hud.minimap.Minimap;
 import xaero.hud.minimap.module.MinimapSession;
 import xaeroplus.XaeroPlus;
-import xaeroplus.feature.extensions.CustomWaypointsIngameRenderer;
+import xaeroplus.feature.render.WaypointBeaconRenderer;
 import xaeroplus.settings.Settings;
 
 @Mixin(value = LevelRenderer.class)
@@ -26,16 +24,16 @@ public class MixinWorldRenderer {
     @Inject(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LevelRenderer;checkPoseStack(Lcom/mojang/blaze3d/vertex/PoseStack;)V", ordinal = 1, shift = At.Shift.AFTER))
     public void renderBlockEntitiesInject(final PoseStack matrixStack, final float tickDelta, final long limitTime, final boolean renderBlockOutline, final Camera camera, final GameRenderer gameRenderer, final LightTexture lightmapTextureManager, final Matrix4f positionMatrix, final CallbackInfo ci) {
         if (!Settings.REGISTRY.waypointBeacons.get()) return;
-        HudMod hudMod = HudMod.INSTANCE;
+        var hudMod = HudMod.INSTANCE;
         if (hudMod == null) return;
-        Minimap minimap = hudMod.getMinimap();
+        var minimap = hudMod.getMinimap();
         if (minimap == null) return;
-        WaypointsIngameRenderer waypointsIngameRenderer = minimap.getWaypointsIngameRenderer();
+        var waypointsIngameRenderer = minimap.getWaypointWorldRenderer();
         if (waypointsIngameRenderer == null) return;
         MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
         if (minimapSession == null) return;
         try {
-            ((CustomWaypointsIngameRenderer) waypointsIngameRenderer).renderWaypointBeacons(minimapSession, matrixStack, tickDelta);
+            WaypointBeaconRenderer.INSTANCE.renderWaypointBeacons(tickDelta, matrixStack);
         } catch (final Exception e) {
             if (errorCount++ < 2) XaeroPlus.LOGGER.error("Error rendering waypoints", e);
         }

@@ -11,8 +11,8 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -79,9 +79,9 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
 
     @ModifyArg(method = "renderChunks", at = @At(
         value = "INVOKE",
-        target = "Lxaero/common/minimap/render/MinimapFBORenderer;renderChunksToFBO(Lxaero/hud/minimap/module/MinimapSession;Lnet/minecraft/client/gui/GuiGraphics;Lxaero/common/minimap/MinimapProcessor;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/Vec3;DDIIFFIZZZIDDZZLxaero/common/graphics/CustomVertexConsumers;)V"
+        target = "Lxaero/common/minimap/render/MinimapFBORenderer;renderChunksToFBO(Lxaero/hud/minimap/module/MinimapSession;Lnet/minecraft/client/gui/GuiGraphics;Lxaero/common/minimap/MinimapProcessor;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/resources/ResourceKey;DIFIZZIDDZLxaero/common/graphics/CustomVertexConsumers;)V"
     ),
-        index = 9,
+        index = 6,
         remap = true) // $REMAP
     public int modifyViewW(final int viewW) {
         return viewW * Globals.minimapScaleMultiplier;
@@ -91,7 +91,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         value = "INVOKE",
         target = "Lnet/minecraft/client/gui/GuiGraphics;pose()Lcom/mojang/blaze3d/vertex/PoseStack;"
     ), remap = true)
-    public void modifyScaledSize(final MinimapSession minimapSession, final GuiGraphics guiGraphics, final MinimapProcessor minimap, final Player player, final Entity renderEntity, final Vec3 renderPos, final double playerDimDiv, final double mapDimensionScale, final int bufferSize, final int viewW, final float sizeFix, final float partial, final int level, final boolean retryIfError, final boolean useWorldMap, final boolean lockedNorth, final int shape, final double ps, final double pc, final boolean cave, final boolean circle, final CustomVertexConsumers cvc, final CallbackInfo ci,
+    public void modifyScaledSize(final MinimapSession minimapSession, final GuiGraphics guiGraphics, final MinimapProcessor minimap, final Vec3 renderPos, final ResourceKey<Level> mapDimension, final double mapDimensionScale, final int viewW, final float partial, final int level, final boolean useWorldMap, final boolean lockedNorth, final int shape, final double ps, final double pc, final boolean cave, final CustomVertexConsumers cvc, final CallbackInfo ci,
                                  @Share("scaledSize") LocalIntRef scaledSize) {
         int s = 256 * Globals.minimapScaleMultiplier * Globals.minimapSizeMultiplier;
         if (Globals.minimapSizeMultiplier > 1) {
@@ -141,7 +141,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endBatch()V",
         ordinal = 0
     ), remap = true)
-    public void drawRenderDistanceSquare(final MinimapSession minimapSession, final GuiGraphics guiGraphics, final MinimapProcessor minimap, final Player player, final Entity renderEntity, final Vec3 renderPos, final double playerDimDiv, final double mapDimensionScale, final int bufferSize, final int viewW, final float sizeFix, final float partial, final int level, final boolean retryIfError, final boolean useWorldMap, final boolean lockedNorth, final int shape, final double ps, final double pc, final boolean cave, final boolean circle, final CustomVertexConsumers cvc, final CallbackInfo ci,
+    public void drawRenderDistanceSquare(final MinimapSession minimapSession, final GuiGraphics guiGraphics, final MinimapProcessor minimap, final Vec3 renderPos, final ResourceKey<Level> mapDimension, final double mapDimensionScale, final int viewW, final float partial, final int level, final boolean useWorldMap, final boolean lockedNorth, final int shape, final double ps, final double pc, final boolean cave, final CustomVertexConsumers cvc, final CallbackInfo ci,
                                          @Local(name = "xFloored") int xFloored,
                                          @Local(name = "zFloored") int zFloored,
                                          @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers,
@@ -202,11 +202,11 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endBatch()V",
         ordinal = 0
     ), remap = true)
-    public void drawWorldBorderSquare(final MinimapSession minimapSession, final GuiGraphics guiGraphics, final MinimapProcessor minimap, final Player player, final Entity renderEntity, final Vec3 renderPos, final double playerDimDiv, final double mapDimensionScale, final int bufferSize, final int viewW, final float sizeFix, final float partial, final int level, final boolean retryIfError, final boolean useWorldMap, final boolean lockedNorth, final int shape, final double ps, final double pc, final boolean cave, final boolean circle, final CustomVertexConsumers cvc, final CallbackInfo ci,
-                                         @Local(name = "xFloored") int xFloored,
-                                         @Local(name = "zFloored") int zFloored,
-                                         @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers,
-                                         @Local(name = "matrixStack") PoseStack matrixStack
+    public void drawWorldBorderSquare(final MinimapSession minimapSession, final GuiGraphics guiGraphics, final MinimapProcessor minimap, final Vec3 renderPos, final ResourceKey<Level> mapDimension, final double mapDimensionScale, final int viewW, final float partial, final int level, final boolean useWorldMap, final boolean lockedNorth, final int shape, final double ps, final double pc, final boolean cave, final CustomVertexConsumers cvc, final CallbackInfo ci,
+                                      @Local(name = "xFloored") int xFloored,
+                                      @Local(name = "zFloored") int zFloored,
+                                      @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers,
+                                      @Local(name = "matrixStack") PoseStack matrixStack
     ) {
         final boolean isDimensionSwitched = Globals.getCurrentDimensionId() != Minecraft.getInstance().level.dimension();
         if (!Settings.REGISTRY.showWorldBorderSetting.get() || isDimensionSwitched) return;
@@ -276,7 +276,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             target = "Lxaero/common/graphics/ImprovedFramebuffer;bindRead()V"
         )
     ), remap = true)
-    public void correctPostRotationTranslationForSizeMult(final MinimapSession minimapSession, final GuiGraphics guiGraphics, final MinimapProcessor minimap, final Player player, final Entity renderEntity, final Vec3 renderPos, final double playerDimDiv, final double mapDimensionScale, final int bufferSize, final int viewW, final float sizeFix, final float partial, final int level, final boolean retryIfError, final boolean useWorldMap, final boolean lockedNorth, final int shape, final double ps, final double pc, final boolean cave, final boolean circle, final CustomVertexConsumers cvc, final CallbackInfo ci,
+    public void correctPostRotationTranslationForSizeMult(final MinimapSession minimapSession, final GuiGraphics guiGraphics, final MinimapProcessor minimap, final Vec3 renderPos, final ResourceKey<Level> mapDimension, final double mapDimensionScale, final int viewW, final float partial, final int level, final boolean useWorldMap, final boolean lockedNorth, final int shape, final double ps, final double pc, final boolean cave, final CustomVertexConsumers cvc, final CallbackInfo ci,
                                                           @Local(name = "halfWView") float halfWView,
                                                           @Local(name = "shaderMatrixStack") PoseStack shaderMatrixStack) {
         float sizeMultTranslation = (halfWView / Globals.minimapSizeMultiplier) * (Globals.minimapSizeMultiplier - 1);

@@ -1,10 +1,8 @@
 package xaeroplus.mixin.client;
 
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -46,33 +44,30 @@ public class MixinMinimapRenderer {
 
     @Redirect(method = "renderMinimap", at = @At(
         value = "INVOKE",
-        target = "Lxaero/hud/minimap/element/render/over/MinimapElementOverMapRendererHandler;render(Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/math/Vec3d;DDDDZFLnet/minecraft/client/shader/Framebuffer;Lnet/minecraft/client/gui/ScaledResolution;)D"
+        target = "Lxaero/hud/minimap/element/render/over/MinimapElementOverMapRendererHandler;prepareRender(DDDIIIIZF)V"
     ))
-    public double editOvermapRender(final MinimapElementOverMapRendererHandler instance,
-                                    Entity renderEntity,
-                                    EntityPlayer player,
-                                    Vec3d renderPos,
-                                    double playerDimDiv,
-                                    double ps,
-                                    double pc,
-                                    double zoom,
-                                    boolean cave,
-                                    float partialTicks,
-                                    Framebuffer framebuffer,
-                                    ScaledResolution scaledRes) {
+    public void editOvermapRender(
+        final MinimapElementOverMapRendererHandler instance,
+        double ps,
+        double pc,
+        double zoom,
+        int specW,
+        int specH,
+        int halfViewW,
+        int halfViewH,
+        boolean circle,
+        float minimapScale) {
         double customZoom = zoom / Globals.minimapScalingFactor;
-        return instance.render(
-                renderEntity,
-                player,
-                renderPos,
-                playerDimDiv,
+        instance.prepareRender(
                 ps,
                 pc,
                 customZoom,
-                cave,
-                partialTicks,
-                framebuffer,
-                scaledRes
+                specW,
+                specH,
+                halfViewW,
+                halfViewH,
+                circle,
+                minimapScale
         );
     }
 

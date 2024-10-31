@@ -3,13 +3,13 @@ package xaeroplus.event;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import xaero.common.HudMod;
-import xaero.common.minimap.waypoints.render.WaypointsIngameRenderer;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.Minimap;
 import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.waypoint.render.world.WaypointWorldRenderer;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.CustomWaypointsIngameRenderer;
+import xaeroplus.util.WaypointBeaconRenderer;
 
 public class ForgeEventHandler {
     int errorCount = 0;
@@ -20,12 +20,12 @@ public class ForgeEventHandler {
         if (hudMod == null) return;
         Minimap minimap = hudMod.getMinimap();
         if (minimap == null) return;
-        WaypointsIngameRenderer waypointsIngameRenderer = minimap.getWaypointsIngameRenderer();
+        WaypointWorldRenderer waypointsIngameRenderer = minimap.getWaypointWorldRenderer();
         if (waypointsIngameRenderer == null) return;
         MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
         if (minimapSession == null) return;
         try {
-            ((CustomWaypointsIngameRenderer) waypointsIngameRenderer).renderWaypointBeacons(minimapSession, event.getContext(), event.getPartialTicks());
+            WaypointBeaconRenderer.INSTANCE.renderWaypointBeacons(event.getPartialTicks());
         } catch (final Exception e) {
             if (errorCount++ < 2) {
                 XaeroPlus.LOGGER.info("Error rendering waypoints", e);

@@ -75,8 +75,8 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
 
     @ModifyArg(method = "renderChunks", at = @At(
         value = "INVOKE",
-        target = "Lxaero/common/minimap/render/MinimapFBORenderer;renderChunksToFBO(Lxaero/hud/minimap/module/MinimapSession;Lxaero/common/minimap/MinimapProcessor;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;DDIIFFIZZZIDDZZLnet/minecraft/client/gui/ScaledResolution;)V"
-    ), index = 8)
+        target = "Lxaero/common/minimap/render/MinimapFBORenderer;renderChunksToFBO(Lxaero/hud/minimap/module/MinimapSession;Lxaero/common/minimap/MinimapProcessor;Lnet/minecraft/util/math/Vec3d;IDIFIZZIDDZLnet/minecraft/client/gui/ScaledResolution;)V"
+    ), index = 5)
     public int modifyViewW(final int viewW) {
         return viewW * Globals.minimapScalingFactor;
     }

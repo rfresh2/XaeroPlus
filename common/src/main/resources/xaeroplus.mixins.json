@@ -60,7 +60,7 @@
     "MixinSupportXaeroWorldmap",
     "MixinWaypointReader",
     "MixinWaypointSharingHandler",
-    "MixinWaypointsIngameRenderer",
+    "MixinWaypointWorldRenderer",
     "MixinWidgetLoadingHandler",
     "MixinWorldDataReader",
     "MixinWorldMapGuiSettings",

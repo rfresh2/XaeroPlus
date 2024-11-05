@@ -18,6 +18,7 @@ import xaeroplus.util.XaeroPlusGameTest;
         modid = XaeroPlus.MODID,
         name = XaeroPlus.NAME,
         version = XaeroPlus.VERSION,
+        clientSideOnly = true,
         dependencies = "required:mixinbooter@[9.4,);after:xaerominimap@[24.6.1];required-after:xaeroworldmap@[1.39.0];"
 )
 public class XaeroPlus {

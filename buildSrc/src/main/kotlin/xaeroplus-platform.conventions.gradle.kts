@@ -15,7 +15,7 @@ loom {
 val minecraft_version: String by gradle.extra
 val parchment_version: String by gradle.extra
 val mc = "com.mojang:minecraft:${minecraft_version}"
-val parchment = "org.parchmentmc.data:parchment-${minecraft_version}:${parchment_version}"
+val parchment = "org.parchmentmc.data:parchment-1.21:${parchment_version}"
 
 dependencies {
     minecraft(mc)

@@ -138,10 +138,10 @@ public class DrawManager {
     public synchronized void drawMinimapFeaturesShader(
         final PoseStack matrixStack
     ) {
-        XaeroPlusShaders.ensureShaders();
-        var shader = XaeroPlusShaders.HIGHLIGHT_SHADER;
-        if (shader == null) return;
-        shader.setMapViewMatrix(matrixStack.last().pose());
+        var shader = Minecraft.getInstance()
+            .getShaderManager()
+            .getProgram(XaeroPlusShaders.HIGHLIGHT_SHADER_PROGRAM);
+        XaeroPlusShaders.setMapViewMatrix(matrixStack.last().pose());
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.blendFuncSeparate(
@@ -161,7 +161,7 @@ public class DrawManager {
             var r = ColorHelper.getR(color);
             var g = ColorHelper.getG(color);
             var b = ColorHelper.getB(color);
-            shader.setHighlightColor(r, g, b, a);
+            XaeroPlusShaders.setHighlightColor(r, g, b, a);
             var highlights = feature.getChunkHighlights();
             var drawBuffer = feature.getDrawBuffer();
             if (drawBuffer.needsRefresh(false)) {
@@ -197,10 +197,10 @@ public class DrawManager {
     public synchronized void drawWorldMapFeaturesShader(
         final PoseStack matrixStack
     ) {
-        XaeroPlusShaders.ensureShaders();
-        var shader = XaeroPlusShaders.HIGHLIGHT_SHADER;
-        if (shader == null) return;
-        shader.setMapViewMatrix(matrixStack.last().pose());
+        var shader = Minecraft.getInstance()
+            .getShaderManager()
+            .getProgram(XaeroPlusShaders.HIGHLIGHT_SHADER_PROGRAM);
+        XaeroPlusShaders.setMapViewMatrix(matrixStack.last().pose());
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(
             GlStateManager.SourceFactor.SRC_ALPHA,
@@ -219,7 +219,7 @@ public class DrawManager {
             var r = ColorHelper.getR(color);
             var g = ColorHelper.getG(color);
             var b = ColorHelper.getB(color);
-            shader.setHighlightColor(r, g, b, a);
+            XaeroPlusShaders.setHighlightColor(r, g, b, a);
             var highlights = feature.getChunkHighlights();
             var drawBuffer = feature.getDrawBuffer();
             if (drawBuffer.needsRefresh(true)) {

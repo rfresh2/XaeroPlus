@@ -97,7 +97,7 @@ public class Portals extends Module {
 
     private boolean findPortalInChunk(final ChunkAccess chunk) {
         final boolean chunkHadPortal = portalsCache.get().isHighlighted(chunk.getPos().x, chunk.getPos().z, ChunkUtils.getActualDimension());
-        var hasPortal = ChunkScanner.chunkContainsBlocks(chunk, PORTAL_BLOCKS, mc.level.getMinBuildHeight());
+        var hasPortal = ChunkScanner.chunkContainsBlocks(chunk, PORTAL_BLOCKS, mc.level.getMinY());
         if (hasPortal) {
             return portalsCache.get().addHighlight(chunk.getPos().x, chunk.getPos().z);
         } else if (chunkHadPortal) {

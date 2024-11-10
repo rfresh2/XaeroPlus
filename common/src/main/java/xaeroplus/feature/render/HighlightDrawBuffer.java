@@ -1,11 +1,13 @@
 package xaeroplus.feature.render;
 
+import com.mojang.blaze3d.buffers.BufferUsage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexBuffer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import it.unimi.dsi.fastutil.longs.LongList;
+import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.Nullable;
 import xaeroplus.util.ChunkUtils;
 
@@ -44,7 +46,7 @@ public class HighlightDrawBuffer {
         }
         if (vertexBuffer == null || vertexBuffer.isInvalid()) {
             close();
-            vertexBuffer = new VertexBuffer(VertexBuffer.Usage.DYNAMIC);
+            vertexBuffer = new VertexBuffer(BufferUsage.STATIC_WRITE);
         }
         var meshData = bufferBuilder.buildOrThrow();
         vertexBuffer.bind();
@@ -53,9 +55,10 @@ public class HighlightDrawBuffer {
 
     public void render() {
         if (vertexBuffer == null || vertexBuffer.isInvalid()) return;
-        var shader = XaeroPlusShaders.HIGHLIGHT_SHADER;
-        if (shader == null) return;
         vertexBuffer.bind();
+        var shader = Minecraft.getInstance()
+            .getShaderManager()
+            .getProgram(XaeroPlusShaders.HIGHLIGHT_SHADER_PROGRAM);
         vertexBuffer.drawWithShader(RenderSystem.getModelViewMatrix(), RenderSystem.getProjectionMatrix(), shader);
     }
 

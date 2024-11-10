@@ -1,12 +1,12 @@
-name: 1.21 Build
+name: 1.21.3 Build
 
 on:
   pull_request:
   push:
     branches:
-      - "1.21"
+      - "1.21.3"
 env:
-  MINECRAFT_VERSION: "1.21"
+  MINECRAFT_VERSION: "1.21.3"
 
 jobs:
   build:
@@ -103,7 +103,7 @@ jobs:
         modloader: fabric
         regex: .*fabric.*
         mc-runtime-test: fabric
-        fabric-api: 0.100.8
+        fabric-api: 0.107.3
         java: 21
         xvfb: false
         headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true

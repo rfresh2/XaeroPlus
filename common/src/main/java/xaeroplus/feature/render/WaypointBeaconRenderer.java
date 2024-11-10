@@ -15,6 +15,7 @@ import xaero.common.minimap.waypoints.WaypointVisibilityType;
 import xaero.common.settings.ModSettings;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.module.MinimapSession;
+import xaeroplus.XaeroPlus;
 import xaeroplus.settings.Settings;
 
 import java.util.ArrayList;
@@ -26,6 +27,24 @@ public class WaypointBeaconRenderer {
     public static final WaypointBeaconRenderer INSTANCE = new WaypointBeaconRenderer();
     private final List<Waypoint> waypointList = new ArrayList<>();
     private long lastWaypointRenderListUpdate = -1L;
+
+    private int errorCount = 0;
+    public void renderHook(final PoseStack matrix, final float tickDelta) {
+        if (!Settings.REGISTRY.waypointBeacons.get()) return;
+        var hudMod = HudMod.INSTANCE;
+        if (hudMod == null) return;
+        var minimap = hudMod.getMinimap();
+        if (minimap == null) return;
+        var waypointsIngameRenderer = minimap.getWaypointWorldRenderer();
+        if (waypointsIngameRenderer == null) return;
+        MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
+        if (minimapSession == null) return;
+        try {
+            WaypointBeaconRenderer.INSTANCE.renderWaypointBeacons(tickDelta, matrix);
+        } catch (final Exception e) {
+            if (errorCount++ < 2) XaeroPlus.LOGGER.error("Error rendering waypoints", e);
+        }
+    }
 
     public void updateWaypointRenderList(final MinimapSession session, final ModSettings settings) {
         waypointList.clear();

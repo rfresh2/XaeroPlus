@@ -69,7 +69,6 @@
     "MixinWorldMapOption",
     "mc.MixinClientPlayNetworkHandler",
     "mc.MixinGlStateManager",
-    "mc.MixinMinecraftClient",
-    "mc.MixinWorldRenderer"
+    "mc.MixinMinecraftClient"
   ]
 }

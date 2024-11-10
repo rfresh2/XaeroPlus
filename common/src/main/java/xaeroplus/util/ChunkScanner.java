@@ -13,7 +13,7 @@ public class ChunkScanner {
     public static boolean chunkContainsBlocks(ChunkAccess chunk, ReferenceSet<Block> filter, int yLevelMin) {
         final LevelChunkSection[] sectionArray = chunk.getSections();
         for (int i = 0; i < sectionArray.length; i++) {
-            var sectionBottomY = chunk.getMinBuildHeight() + (i * 16);
+            var sectionBottomY = chunk.getMinY() + (i * 16);
             if (yLevelMin > sectionBottomY + 15) continue;
             int yScanStart = yLevelMin > sectionBottomY ? yLevelMin % 16 : 0;
             final LevelChunkSection section = sectionArray[i];
@@ -40,7 +40,7 @@ public class ChunkScanner {
     public static void chunkScanBlockstatePredicate(ChunkAccess chunk, ReferenceSet<Block> filter, BlockStateScanPredicate statePredicate, int yLevelMin) {
         final LevelChunkSection[] sectionArray = chunk.getSections();
         for (int i = 0; i < sectionArray.length; i++) {
-            var sectionBottomY = chunk.getMinBuildHeight() + (i * 16);
+            var sectionBottomY = chunk.getMinY() + (i * 16);
             if (yLevelMin > sectionBottomY + 15) continue;
             int yScanStart = yLevelMin > sectionBottomY ? yLevelMin % 16 : 0;
             final LevelChunkSection section = sectionArray[i];

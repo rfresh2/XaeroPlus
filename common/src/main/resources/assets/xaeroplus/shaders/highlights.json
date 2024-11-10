@@ -1,6 +1,6 @@
 {
-    "vertex": "xaeroplus/highlights",
-    "fragment": "xaeroplus/highlights",
+    "vertex": "xaeroplus:highlights",
+    "fragment": "xaeroplus:highlights",
     "attributes": [
         "Position"
     ],

@@ -1,5 +1,6 @@
 package xaeroplus.feature.render.buffered;
 
+import com.mojang.blaze3d.buffers.BufferUsage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
@@ -24,7 +25,7 @@ public class Model {
             var uv = texUvMatrix[i];
             bufferbuilder.addVertex(pos.x(), pos.y(), pos.z()).setUv(uv.x(), uv.y());
         }
-        vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
+        vertexBuffer = new VertexBuffer(BufferUsage.STATIC_WRITE);
         RenderSystem.assertOnRenderThread();
         var renderedBuffer = bufferbuilder.build();
         if (renderedBuffer != null) {

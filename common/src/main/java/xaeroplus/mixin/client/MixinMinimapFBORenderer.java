@@ -11,13 +11,11 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
-import org.joml.Matrix4f;
-import org.joml.Matrix4fStack;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
@@ -28,7 +26,7 @@ import xaero.common.graphics.CustomVertexConsumers;
 import xaero.common.graphics.ImprovedFramebuffer;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRenderer;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
-import xaero.common.graphics.shader.MinimapShaders;
+import xaero.common.graphics.shader.FramebufferLinesShaderHelper;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.render.MinimapFBORenderer;
 import xaero.common.minimap.render.MinimapRenderer;
@@ -122,14 +120,13 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
 
     @Redirect(method = "renderChunksToFBO", at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V"
+        target = "Lxaero/common/minimap/render/MinimapRendererHelper;drawMyColoredRect(Lorg/joml/Matrix4f;FFFFI)V"
     ), remap = true)
-    public void modifyMMBackgroundFill(final GuiGraphics guiGraphics, final int x1, final int y1, final int x2, final int y2, final int color,
-                                       @Share("scaledSize") LocalIntRef scaledSize) {
+    public void modifyMMBackgroundFill(final MinimapRendererHelper instance, final Matrix4f matrix, final float x1, final float y1, final float x2, final float y2, final int color, @Share("scaledSize") LocalIntRef scaledSize) {
         if (!Settings.REGISTRY.transparentMinimapBackground.get())
-            guiGraphics.fill(-scaledSize.get(), -scaledSize.get(), scaledSize.get(), scaledSize.get(), ColorHelper.getColor(0, 0, 0, 255));
+            instance.drawMyColoredRect(matrix, -scaledSize.get(), -scaledSize.get(), scaledSize.get(), scaledSize.get(), ColorHelper.getColor(0, 0, 0, 255));
         else
-            guiGraphics.fill(-scaledSize.get(), -scaledSize.get(), scaledSize.get(), scaledSize.get(), ColorHelper.getColor(0, 0, 0, 0));
+            instance.drawMyColoredRect(matrix, -scaledSize.get(), -scaledSize.get(), scaledSize.get(), scaledSize.get(), ColorHelper.getColor(0, 0, 0, 0));
     }
 
     @ModifyArg(method = "renderChunksToFBO", at = @At(
@@ -170,7 +167,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         final int x1 = x0 + width * 16;
         final int z1 = z0 + width * 16;
         VertexConsumer lineBufferBuilder = renderTypeBuffers.getBuffer(CustomRenderTypes.MAP_LINES);
-        MinimapShaders.FRAMEBUFFER_LINES.setFrameSize((float) scalingFramebuffer.viewWidth, (float) scalingFramebuffer.viewHeight);
+        FramebufferLinesShaderHelper.setFrameSize((float) scalingFramebuffer.viewWidth, (float) scalingFramebuffer.viewHeight);
         float lineWidth = Math.max(1.0f, modMain.getSettings().chunkGridLineWidth * Globals.minimapScaleMultiplier / (float) Globals.minimapSizeMultiplier);
         RenderSystem.lineWidth(lineWidth);
         float r = 1.0f;
@@ -225,7 +222,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         float z1 = wbMaxZ - zFloored;
 
         VertexConsumer lineBufferBuilder = renderTypeBuffers.getBuffer(CustomRenderTypes.MAP_LINES);
-        MinimapShaders.FRAMEBUFFER_LINES.setFrameSize((float) scalingFramebuffer.viewWidth, (float) scalingFramebuffer.viewHeight);
+        FramebufferLinesShaderHelper.setFrameSize((float) scalingFramebuffer.viewWidth, (float) scalingFramebuffer.viewHeight);
         float lineWidth = Math.max(1.0f, modMain.getSettings().chunkGridLineWidth * Globals.minimapScaleMultiplier / (float) Globals.minimapSizeMultiplier);
         RenderSystem.lineWidth(lineWidth);
         var matrix = matrixStack.last();

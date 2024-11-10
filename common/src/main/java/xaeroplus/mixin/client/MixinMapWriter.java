@@ -14,7 +14,6 @@ import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
@@ -149,11 +148,10 @@ public abstract class MixinMapWriter {
 
     @WrapOperation(method = "loadPixelHelp", at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/world/level/block/state/BlockState;getLightBlock(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)I",
+        target = "Lnet/minecraft/world/level/block/state/BlockState;getLightBlock()I",
         ordinal = 1
     ), remap = true)
-    public int getOpacityForObsidianRoof(BlockState instance, BlockGetter world, BlockPos pos, Operation<Integer> original,
-                                         @Local(name = "h") int h) {
+    public int getOpacityForObsidianRoof(final BlockState instance, final Operation<Integer> original, @Local(argsOnly = true) Level world, @Local(name = "h") int h) {
         if (Settings.REGISTRY.transparentObsidianRoofSetting.get()
             && h > Settings.REGISTRY.transparentObsidianRoofYSetting.get()) {
             boolean shouldMakeTransparent = instance.getBlock() == Blocks.OBSIDIAN || instance.getBlock() == Blocks.CRYING_OBSIDIAN;
@@ -168,7 +166,7 @@ public abstract class MixinMapWriter {
                 return 5;
             }
         }
-        return original.call(instance, world, pos);
+        return original.call(instance);
     }
 
     @Inject(method = "onRender", at = @At(

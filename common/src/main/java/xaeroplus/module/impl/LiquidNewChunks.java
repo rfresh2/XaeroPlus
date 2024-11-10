@@ -135,8 +135,8 @@ public class LiquidNewChunks extends Module {
             }
             return false;
         }, Settings.REGISTRY.liquidNewChunksOnlyAboveY0Setting.get()
-            ? Math.max(1, level.getMinBuildHeight())
-            : level.getMinBuildHeight());
+            ? Math.max(1, level.getMinY())
+            : level.getMinY());
     }
 
     @EventHandler

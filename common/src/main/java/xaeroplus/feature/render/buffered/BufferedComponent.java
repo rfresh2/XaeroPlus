@@ -5,7 +5,7 @@ import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.CoreShaders;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -19,7 +19,7 @@ import java.util.function.IntSupplier;
 public class BufferedComponent {
     private static final Minecraft mc = Minecraft.getInstance();
     private Model model = null;
-    private final RenderTarget renderTarget = new TextureTarget(100, 100, true, false);
+    private final RenderTarget renderTarget = new TextureTarget(100, 100, true);
     private long nextRenderCapture = System.currentTimeMillis();
     private final IntSupplier fpsLimitSupplier;
     private final Matrix4f modelViewMatrix = new Matrix4f(RenderSystem.getModelViewMatrix());
@@ -54,7 +54,7 @@ public class BufferedComponent {
         var forceRender = false;
         if (renderTarget.width != windowWidth
             || renderTarget.height != windowHeight) {
-            renderTarget.resize(windowWidth, windowHeight, true);
+            renderTarget.resize(windowWidth, windowHeight);
             refreshModel(windowWidth, windowHeight);
             forceRender = true;
         }
@@ -64,7 +64,7 @@ public class BufferedComponent {
         }
         if (forceRender || System.currentTimeMillis() > nextRenderCapture) {
             renderTarget.setClearColor(0, 0, 0, 0);
-            renderTarget.clear(false);
+            renderTarget.clear();
             renderTarget.bindWrite(false);
             FpsLimiter.renderTargetOverwrite = renderTarget;
             RenderSystem.enableBlend();
@@ -99,7 +99,7 @@ public class BufferedComponent {
             GlStateManager.SourceFactor.ONE,
             GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA
         );
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(CoreShaders.POSITION_TEX);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, textureId);
         modelViewMatrix.set(RenderSystem.getModelViewMatrix());

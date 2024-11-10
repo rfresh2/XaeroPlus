@@ -9,12 +9,10 @@
   "plugin": "xaeroplus.fabric.util.compat.XaeroPlusCompatibleMinimapMixinPlugin",
   "client": [
     "MixinBetterPVP",
-    "MixinPlatformContextFabric",
     "MixinSodium6OptionsGUI",
-    "MixinSodiumOptionsGUI",
     "MixinWorldMap",
-    "MixinWorldMapFabric",
     "MixinXaeroMinimap",
+    "mc.MixinLevelRenderer",
     "mc.MixinMinecraftClientFabric"
   ]
 }

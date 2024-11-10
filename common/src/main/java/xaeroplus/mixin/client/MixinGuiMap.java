@@ -20,6 +20,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -32,7 +33,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import xaero.common.graphics.shader.MinimapShaders;
+import xaero.common.graphics.shader.FramebufferLinesShaderHelper;
 import xaero.hud.HudSession;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMap;
@@ -56,6 +57,7 @@ import xaeroplus.util.ChunkUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
@@ -124,12 +126,16 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                              WorldMap.guiTextures,
                                              this::onFollowButton,
                                              () -> new CursorBox(Component.translatable("xaeroplus.gui.world_map.toggle_follow_mode")
-                                                                         .append(" " + I18n.get(this.follow ? "xaeroplus.gui.off" : "xaeroplus.gui.on"))));
+                                                                         .append(" " + I18n.get(this.follow ? "xaeroplus.gui.off" : "xaeroplus.gui.on"))),
+                                             256,
+                                             256);
         addButton(followButton);
         coordinateGotoButton = new GuiTexturedButton(0, followButton.getY() - 20 , 20, 20, 229, 16, 16, 16,
                                                      WorldMap.guiTextures,
                                                      this::onGotoCoordinatesButton,
-                                                     () -> new CursorBox(Component.translatable("xaeroplus.gui.world_map.go_to_coordinates")));
+                                                     () -> new CursorBox(Component.translatable("xaeroplus.gui.world_map.go_to_coordinates")),
+                                                     256,
+                                                     256);
         addButton(coordinateGotoButton);
         xTextEntryField = new EditBox(Minecraft.getInstance().font, 20, coordinateGotoButton.getY() - 10, 50, 20, Component.nullToEmpty("X:"));
         xTextEntryField.setVisible(false);
@@ -152,15 +158,21 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         switchToEndButton = new GuiTexturedButton(this.width - 20, zoomInButton.getY() - 20, 20, 20, 31, 0, 16, 16,
                                                   this.xpGuiTextures,
                                                   (button -> onSwitchDimensionButton(END)),
-                                                  () -> new CursorBox(Component.translatable("xaeroplus.keybind.switch_to_end")));
+                                                  () -> new CursorBox(Component.translatable("xaeroplus.keybind.switch_to_end")),
+                                                  256,
+                                                  256);
         switchToOverworldButton = new GuiTexturedButton(this.width - 20, this.switchToEndButton.getY() - 20, 20, 20, 16, 0, 16, 16,
                                                         this.xpGuiTextures,
                                                         (button -> onSwitchDimensionButton(OVERWORLD)),
-                                                        () -> new CursorBox(Component.translatable("xaeroplus.keybind.switch_to_overworld")));
+                                                        () -> new CursorBox(Component.translatable("xaeroplus.keybind.switch_to_overworld")),
+                                                        256,
+                                                        256);
         switchToNetherButton = new GuiTexturedButton(this.width - 20, this.switchToOverworldButton.getY() - 20, 20, 20, 0, 0, 16, 16,
                                                      this.xpGuiTextures,
                                                      (button -> onSwitchDimensionButton(NETHER)),
-                                                     () -> new CursorBox(Component.translatable("xaeroplus.keybind.switch_to_nether")));
+                                                     () -> new CursorBox(Component.translatable("xaeroplus.keybind.switch_to_nether")),
+                                                     256,
+                                                     256);
         addButton(switchToEndButton);
         addButton(switchToOverworldButton);
         addButton(switchToNetherButton);
@@ -352,7 +364,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         final float z1 = chunkBottomZ - camZ;
         VertexConsumer lineBufferBuilder = renderTypeBuffers.getBuffer(xaero.common.graphics.CustomRenderTypes.MAP_LINES);
         PoseStack.Pose matrices = matrixStack.last();
-        MinimapShaders.FRAMEBUFFER_LINES.setFrameSize(mc.getWindow().getWidth(), mc.getWindow().getHeight());
+        FramebufferLinesShaderHelper.setFrameSize(mc.getWindow().getWidth(), mc.getWindow().getHeight());
         float settingWidth = (float) HudSession.getCurrentSession().getHudMod().getSettings().chunkGridLineWidth;
         float lineScale = (float) Math.max(1.0, Math.min(settingWidth * scale, settingWidth));
         RenderSystem.lineWidth(lineScale);
@@ -408,7 +420,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         float z1 = wbMaxZ - camZ;
         VertexConsumer lineBufferBuilder = renderTypeBuffers.getBuffer(xaero.common.graphics.CustomRenderTypes.MAP_LINES);
         PoseStack.Pose matrices = matrixStack.last();
-        MinimapShaders.FRAMEBUFFER_LINES.setFrameSize(mc.getWindow().getWidth(), mc.getWindow().getHeight());
+        FramebufferLinesShaderHelper.setFrameSize(mc.getWindow().getWidth(), mc.getWindow().getHeight());
         float settingWidth = (float) HudSession.getCurrentSession().getHudMod().getSettings().chunkGridLineWidth;
         float lineScale = (float) Math.max(1.0, Math.min(settingWidth * scale, settingWidth));
         RenderSystem.lineWidth(lineScale);
@@ -448,9 +460,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @WrapWithCondition(method = "render", at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Lnet/minecraft/resources/ResourceLocation;IIIIII)V"
+        target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Ljava/util/function/Function;Lnet/minecraft/resources/ResourceLocation;IIFFIIII)V"
     ), remap = true)
-    public boolean hideCompassOnF1(final GuiGraphics instance, final ResourceLocation texture, final int x, final int y, final int u, final int v, final int width, final int height) {
+    public boolean hideCompassOnF1(final GuiGraphics instance, final Function<ResourceLocation, RenderType> function, final ResourceLocation resourceLocation, final int i, final int j, final float f, final float g, final int k, final int l, final int m, final int n) {
         return !Minecraft.getInstance().options.hideGui;
     }
 

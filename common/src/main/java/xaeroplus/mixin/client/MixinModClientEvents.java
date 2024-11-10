@@ -16,7 +16,7 @@ public class MixinModClientEvents {
 
     @Inject(method = "handleRenderModOverlay", at = @At("HEAD"), cancellable = true)
     public void handleRenderModOverlayHead(final GuiGraphics guiGraphics, final DeltaTracker deltaTracker, final CallbackInfo ci) {
-        minimapRenderEvent = new MinimapRenderEvent();
+        minimapRenderEvent = new MinimapRenderEvent(guiGraphics);
         XaeroPlus.EVENT_BUS.call(minimapRenderEvent);
         if (minimapRenderEvent.cancelled) ci.cancel();
     }

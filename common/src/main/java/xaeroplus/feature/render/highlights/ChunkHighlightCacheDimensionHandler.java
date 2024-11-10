@@ -50,7 +50,8 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
             );
             try {
                 if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
-                    for (final ChunkHighlightData chunk : chunks) {
+                    for (int i = 0; i < chunks.size(); i++) {
+                        final ChunkHighlightData chunk = chunks.get(i);
                         this.chunks.put(chunkPosToLong(chunk.x(), chunk.z()), chunk.foundTime());
                     }
                     lock.writeLock().unlock();
@@ -66,19 +67,23 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
             final List<ChunkHighlightData> chunksToWrite = new ArrayList<>();
             try {
                 if (lock.writeLock().tryLock(1L, TimeUnit.SECONDS)) {
-                    chunks.long2LongEntrySet().removeIf(entry -> {
+                    var minChunkX = regionCoordToChunkCoord(windowRegionX - windowRegionSize);
+                    var maxChunkX = regionCoordToChunkCoord(windowRegionX + windowRegionSize);
+                    var minChunkZ = regionCoordToChunkCoord(windowRegionZ - windowRegionSize);
+                    var maxChunkZ = regionCoordToChunkCoord(windowRegionZ + windowRegionSize);
+                    for (var it = chunks.long2LongEntrySet().iterator(); it.hasNext(); ) {
+                        var entry = it.next();
                         final long chunkPos = entry.getLongKey();
                         final int chunkX = ChunkUtils.longToChunkX(chunkPos);
                         final int chunkZ = ChunkUtils.longToChunkZ(chunkPos);
-                        if (chunkX < regionCoordToChunkCoord(windowRegionX - windowRegionSize)
-                                || chunkX > regionCoordToChunkCoord(windowRegionX + windowRegionSize)
-                                || chunkZ < regionCoordToChunkCoord(windowRegionZ - windowRegionSize)
-                                || chunkZ > regionCoordToChunkCoord(windowRegionZ + windowRegionSize)) {
+                        if (chunkX < minChunkX
+                                || chunkX > maxChunkX
+                                || chunkZ < minChunkZ
+                                || chunkZ > maxChunkZ) {
                             chunksToWrite.add(new ChunkHighlightData(chunkX, chunkZ, entry.getLongValue()));
-                            return true;
+                            it.remove();
                         }
-                        return false;
-                    });
+                    }
                     lock.writeLock().unlock();
                 }
             } catch (final Exception e) {
@@ -93,12 +98,13 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
             final List<ChunkHighlightData> chunksToWrite = new ArrayList<>(chunks.size());
             try {
                 if (lock.readLock().tryLock(1, TimeUnit.SECONDS)) {
-                    chunks.long2LongEntrySet().forEach(entry -> {
+                    for (var it = chunks.long2LongEntrySet().iterator(); it.hasNext(); ) {
+                        var entry = it.next();
                         final long chunkPos = entry.getLongKey();
                         final int chunkX = ChunkUtils.longToChunkX(chunkPos);
                         final int chunkZ = ChunkUtils.longToChunkZ(chunkPos);
                         chunksToWrite.add(new ChunkHighlightData(chunkX, chunkZ, entry.getLongValue()));
-                    });
+                    }
                     lock.readLock().unlock();
                 }
             } catch (final Exception e) {

@@ -1,11 +1,10 @@
 package xaeroplus.feature.render.highlights;
 
+import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import xaeroplus.XaeroPlus;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public class ChunkHighlightLocalCache extends ChunkHighlightBaseCacheHandler {
     private static final int maxNumber = 5000;
@@ -29,14 +28,16 @@ public class ChunkHighlightLocalCache extends ChunkHighlightBaseCacheHandler {
             if (chunks.size() > maxNumber) {
                 if (lock.readLock().tryLock(1, TimeUnit.SECONDS)) {
                     // remove oldest 500 chunks
-                    final List<Long> toRemove = chunks.long2LongEntrySet().stream()
-                            .sorted(Map.Entry.comparingByValue())
-                            .limit(500)
-                            .map(Map.Entry::getKey)
-                            .collect(Collectors.toList());
+                    var toRemove = chunks.long2LongEntrySet().stream()
+                        .sorted(Map.Entry.comparingByValue())
+                        .limit(500)
+                        .mapToLong(Long2LongMap.Entry::getLongKey)
+                        .toArray();
                     lock.readLock().unlock();
                     if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
-                        toRemove.forEach(l -> chunks.remove((long) l));
+                        for (int i = 0; i < toRemove.length; i++) {
+                            chunks.remove(toRemove[i]);
+                        }
                         lock.writeLock().unlock();
                     }
                 }

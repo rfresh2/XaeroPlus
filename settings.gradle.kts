@@ -51,7 +51,9 @@ dependencyResolutionManagement {
             library("embeddium", "maven.modrinth:embeddium:0.2.12+mc1.20.2")
             library("fpsdisplay", "maven.modrinth:fpsdisplay:3.1.0+1.20.x")
 			library("cloth-config-fabric", "me.shedaniel.cloth:cloth-config-fabric:12.0.111")
-            library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0")
+            library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")
+            library("baritone-fabric", "com.github.rfresh2:baritone-fabric:${gradle.extra.get("minecraft_version")}")
+            library("baritone-forge", "com.github.rfresh2:baritone-forge:${gradle.extra.get("minecraft_version")}")
         }
 	}
 }

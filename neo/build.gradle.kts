@@ -40,7 +40,7 @@ dependencies {
     neoForge(libs.neoforge)
     modImplementation(libs.worldmap.neo)
     modImplementation(libs.minimap.neo)
-    modCompileOnly(files("libs/baritone-unoptimized-neoforge-1.10.5.jar"))
+    modImplementation(libs.baritone.neoforge)
     modCompileOnly(files("libs/sodium-neoforge-1.21-0.6.0-alpha.2.jar"))
     modCompileOnly(libs.waystones.neoforge)
     modCompileOnly(libs.balm.neoforge)

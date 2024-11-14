@@ -41,7 +41,9 @@ dependencyResolutionManagement {
 			library("sodium", "maven.modrinth:sodium:mc1.19.2-0.4.4")
 			library("embeddium", "maven.modrinth:embeddium:0.3.18+mc1.19.2")
             library("modmenu", "maven.modrinth:modmenu:4.2.0-beta.2")
-            library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0")
+            library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")
+            library("baritone-fabric", "com.github.rfresh2:baritone-fabric:1.19.4")
+            library("baritone-forge", "com.github.rfresh2:baritone-forge:1.19.4")
         }
 	}
 }

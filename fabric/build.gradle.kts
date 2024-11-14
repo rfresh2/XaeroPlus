@@ -45,7 +45,7 @@ dependencies {
 	implementation(libs.sqlite)
 	modImplementation(libs.worldmap.fabric)
 	modImplementation(libs.minimap.fabric)
-	modCompileOnly(files("libs/baritone-api-fabric-1.20.1-elytra-beta-v1.jar"))
+    modImplementation(libs.baritone.fabric)
 	modCompileOnly(libs.waystones.fabric)
 	modCompileOnly(libs.balm.fabric)
 	modCompileOnly(libs.fabric.waystones)

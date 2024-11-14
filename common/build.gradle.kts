@@ -19,7 +19,7 @@ dependencies {
     modCompileOnly(libs.minimap.fabric)
     implementation(libs.caffeine)
     implementation(libs.lambdaEvents)
-    modCompileOnly(files("../fabric/libs/baritone-api-fabric-1.20.1-elytra-beta-v1.jar"))
+    modCompileOnly(libs.baritone.fabric)
     modCompileOnly(libs.waystones.fabric)
     modCompileOnly(libs.balm.fabric)
     modCompileOnly(libs.fabric.waystones)

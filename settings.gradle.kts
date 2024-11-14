@@ -40,7 +40,9 @@ dependencyResolutionManagement {
             library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.46.1.0") // relocated xerial sqlite to avoid conflicts with other mods
 			library("sodium", "maven.modrinth:sodium:mc1.19.4-0.4.10")
             library("modmenu", "maven.modrinth:modmenu:6.3.1")
-            library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0")
+            library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")
+            library("baritone-fabric", "com.github.rfresh2:baritone-fabric:${gradle.extra.get("minecraft_version")}")
+            library("baritone-forge", "com.github.rfresh2:baritone-forge:${gradle.extra.get("minecraft_version")}")
         }
 	}
 }

@@ -47,7 +47,7 @@ dependencies {
     implementation(include(libs.mixinextras.forge.get())!!)
     modImplementation(libs.worldmap.forge)
     modImplementation(libs.minimap.forge)
-    modCompileOnly(files("libs/baritone-unoptimized-forge-1.10.2.jar"))
+    modImplementation(libs.baritone.forge)
     modCompileOnly(libs.waystones.forge)
     modCompileOnly(libs.balm.forge)
     modCompileOnly(libs.worldtools)

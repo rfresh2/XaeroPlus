@@ -53,7 +53,10 @@ dependencyResolutionManagement {
 			library("sodium-neo", "maven.modrinth:sodium:mc1.21.3-0.6.0-beta.4-neoforge")
 //			library("fpsdisplay", "maven.modrinth:fpsdisplay:3.1.0+1.20.x")
 			library("cloth-config-fabric", "me.shedaniel.cloth:cloth-config-fabric:16.0.141")
-            library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0")
+            library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")
+            library("baritone-fabric", "com.github.rfresh2:baritone-fabric:${gradle.extra.get("minecraft_version")}")
+            library("baritone-forge", "com.github.rfresh2:baritone-forge:${gradle.extra.get("minecraft_version")}")
+            library("baritone-neoforge", "com.github.rfresh2:baritone-neoforge:${gradle.extra.get("minecraft_version")}")
         }
 	}
 }

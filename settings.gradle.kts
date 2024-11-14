@@ -46,7 +46,9 @@ dependencyResolutionManagement {
 			library("cloth-config-fabric", "me.shedaniel.cloth:cloth-config-fabric:11.1.118")
 			library("opac-fabric", "maven.modrinth:open-parties-and-claims:fabric-1.20.1-0.23.2")
 			library("forge-config-api-port", "maven.modrinth:forge-config-api-port:v8.0.0-1.20.1-Fabric")
-			library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0")
+			library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")
+			library("baritone-fabric", "com.github.rfresh2:baritone-fabric:${gradle.extra.get("minecraft_version")}")
+			library("baritone-forge", "com.github.rfresh2:baritone-forge:${gradle.extra.get("minecraft_version")}")
 		}
 	}
 }

@@ -52,7 +52,6 @@ dependencies {
     modCompileOnly(libs.balm.forge)
     modCompileOnly(libs.worldtools)
     modCompileOnly(libs.fabric.waystones)
-    modCompileOnly(libs.embeddium)
     shadow(libs.sqlite)
     implementation(include(libs.oldbiomes.get())!!)
     forgeRuntimeLibrary(implementation(include(libs.caffeine.get())!!)!!)

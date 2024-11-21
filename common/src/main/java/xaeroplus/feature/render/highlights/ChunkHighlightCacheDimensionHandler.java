@@ -34,11 +34,14 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
     }
 
     public void setWindow(int regionX, int regionZ, int regionSize) {
+        boolean windowChanged = regionX != windowRegionX || regionZ != windowRegionZ || regionSize != windowRegionSize;
         this.windowRegionX = regionX;
         this.windowRegionZ = regionZ;
         this.windowRegionSize = regionSize;
-        writeHighlightsOutsideWindowToDatabase();
-        loadHighlightsInWindow();
+        if (windowChanged) {
+            writeHighlightsOutsideWindowToDatabase();
+            loadHighlightsInWindow();
+        }
     }
 
     private void loadHighlightsInWindow() {

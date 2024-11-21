@@ -93,13 +93,17 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
 
     @Override
     public void handleWorldChange() {
-        Futures.whenAllComplete(saveAllChunks())
-                .call(() -> {
+        try {
+            Futures.whenAllComplete(saveAllChunks())
+                .run(() -> {
                     reset();
                     initializeWorld();
                     loadChunksInActualDimension();
-                    return null;
-                }, Globals.cacheRefreshExecutorService.get());
+                }, Runnable::run)
+                .get();
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Error handling {} cache world change", databaseName, e);
+        }
     }
 
     public synchronized void reset() {
@@ -215,10 +219,14 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
 
     @Override
     public void onDisable() {
-        Futures.whenAllComplete(saveAllChunks()).call(() -> {
-            reset();
-            return null;
-        }, Globals.cacheRefreshExecutorService.get());
+        try {
+            Futures.whenAllComplete(saveAllChunks())
+                .run(() -> reset(),
+                     Runnable::run)
+                .get();
+        } catch (Exception e) {
+            XaeroPlus.LOGGER.error("Error handling {} cache disable", databaseName, e);
+        }
     }
 
     @Override

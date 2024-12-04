@@ -180,6 +180,8 @@
     "xaeroplus.setting.waypoint_eta.tooltip": "Hiển thị thời gian đến ước tính trên văn bản khoảng cách đến điểm đường. ETA dựa trên tốc độ và hướng di chuyển hiện tại của người chơi",
     "xaeroplus.setting.disable_internet": "Vô Hiệu Hóa Truy Cập Internet Xaero",
     "xaeroplus.setting.disable_internet.tooltip": "Vô hiệu hóa các mod WorldMap và Minimap từ việc sử dụng internet để kiểm tra cập nhật và đăng ký patreon khi khởi động.\n Các mod Xaero không hiển thị cài đặt này trong giao diện người dùng bình thường.\n XaeroPlus không sử dụng internet bất kể cài đặt này.",
+    "xaeroplus.setting.radar_hide_invisible_entities": "Ẩn thực thể vô hình",
+    "xaeroplus.setting.radar_hide_invisible_entities.tooltip": "Cấu hình liệu các thực thể vô hình hoặc đang lén lút có được hiển thị trên radar hay không",
     "xaeroplus.setting.expanded_settings": "Cài đặt mở rộng",
     "xaeroplus.setting.expanded_settings.tooltip": "Tăng số lượng cài đặt hiển thị trên mỗi trang trên màn hình lớn hơn",
     "xaeroplus.setting.sodium_embeddium_integration": "Tích hợp Cài đặt Sodium/Embeddium",

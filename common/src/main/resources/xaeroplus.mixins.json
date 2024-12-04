@@ -33,6 +33,7 @@
     "MixinGuiWaypointSettings",
     "MixinGuiWaypointsList",
     "MixinGuiWorldMapSettings",
+    "MixinHudMod",
     "MixinImprovedFramebuffer",
     "MixinKeyEventHandler",
     "MixinLeveledRegion",

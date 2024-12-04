@@ -1,8 +1,10 @@
 package xaeroplus.settings;
 
 import net.minecraft.client.Minecraft;
+import xaero.common.HudMod;
 import xaero.map.WorldMapSession;
 import xaeroplus.Globals;
+import xaeroplus.XaeroPlus;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.*;
 import xaeroplus.util.BaritoneHelper;
@@ -700,6 +702,20 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.disable_internet",
             false),
         SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting radarHideInvisibleEntities = register(
+        BooleanSetting.create(
+            "Hide Invisible Entities",
+            "xaeroplus.setting.radar_hide_invisible_entities",
+            true,
+            (b) -> {
+                if (!Globals.minimapSettingsInitialized) return;
+                try {
+                    HudMod.INSTANCE.getSettings().radarHideInvisibleEntities = b;
+                } catch (Exception e) {
+                    XaeroPlus.LOGGER.error("Error updating radarHideInvisibleEntities", e);
+                }
+            }),
+        SettingLocation.MINIMAP_ENTITY_RADAR);
     public final BooleanSetting expandSettingEntries = register(
         BooleanSetting.create(
             "Expanded Setting Entries",

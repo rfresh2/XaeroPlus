@@ -23,10 +23,10 @@ gradle.extra.apply {
 dependencyResolutionManagement {
 	versionCatalogs {
 		create("libs") {
-			library("fabric-loader", "net.fabricmc:fabric-loader:0.16.8")
-			library("forge", "net.minecraftforge:forge:${gradle.extra.get("minecraft_version")}-53.0.11")
-			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.107.3+1.21.3")
-			library("neoforge", "net.neoforged:neoforge:21.3.26-beta")
+			library("fabric-loader", "net.fabricmc:fabric-loader:0.16.9")
+			library("forge", "net.minecraftforge:forge:${gradle.extra.get("minecraft_version")}-53.0.25")
+			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.110.0+1.21.3")
+			library("neoforge", "net.neoforged:neoforge:21.3.57")
 			library("worldmap-fabric", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version_fabric")}_Fabric_${gradle.extra.get("minecraft_version")}")
 			library("worldmap-forge", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version_forge")}_Forge_${gradle.extra.get("minecraft_version")}")
 			library("worldmap-neo", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version_neo")}_NeoForge_${gradle.extra.get("minecraft_version")}")
@@ -46,11 +46,11 @@ dependencyResolutionManagement {
 			library("fabric-waystones", "maven.modrinth:fwaystones:3.3.4+mc1.21.1")
 			library("worldtools", "maven.modrinth:worldtools:1.2.6+1.21.1")
             library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.46.1.0") // relocated xerial sqlite to avoid conflicts with other mods
-			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.3.0+1.21.3-fabric")
-			library("immediatelyfast-neo", "maven.modrinth:immediatelyfast:1.3.0+1.21.3-neoforge")
-			library("modmenu", "maven.modrinth:modmenu:12.0.0-beta.1")
-			library("sodium-fabric", "maven.modrinth:sodium:mc1.21.3-0.6.0-fabric")
-			library("sodium-neoforge", "maven.modrinth:sodium:mc1.21.3-0.6.0-neoforge")
+			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.3.1+1.21.3-fabric")
+			library("immediatelyfast-neo", "maven.modrinth:immediatelyfast:1.3.1+1.21.3-neoforge")
+			library("modmenu", "maven.modrinth:modmenu:12.0.0")
+			library("sodium-fabric", "maven.modrinth:sodium:mc1.21.3-0.6.2-fabric")
+			library("sodium-neoforge", "maven.modrinth:sodium:mc1.21.3-0.6.2-neoforge")
 //			library("fpsdisplay", "maven.modrinth:fpsdisplay:3.1.0+1.20.x")
 			library("cloth-config-fabric", "me.shedaniel.cloth:cloth-config-fabric:16.0.141")
             library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")

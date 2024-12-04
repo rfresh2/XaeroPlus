@@ -180,6 +180,8 @@
   "xaeroplus.setting.waypoint_eta.tooltip": "在航点距离文本上显示预计到达时间。ETA 基于玩家当前的速度和移动方向",
   "xaeroplus.setting.disable_internet": "禁用 Xaero 互联网访问",
   "xaeroplus.setting.disable_internet.tooltip": "禁止 WorldMap 和 Minimap mods 在启动时使用互联网检查更新和 patreon 订阅。\n Xaero mods 通常不会在 GUI 中公开此设置。\n 无论此设置如何，XaeroPlus 都不会使用互联网。",
+  "xaeroplus.setting.radar_hide_invisible_entities": "隐藏隐形实体",
+  "xaeroplus.setting.radar_hide_invisible_entities.tooltip": "设置是否在雷达上显示隐形或潜行的实体",
   "xaeroplus.setting.expanded_settings": "扩展设置",
   "xaeroplus.setting.expanded_settings.tooltip": "增加大屏幕上每页显示的设置数量",
   "xaeroplus.setting.sodium_embeddium_integration": "Sodium/Embeddium 设置集成",

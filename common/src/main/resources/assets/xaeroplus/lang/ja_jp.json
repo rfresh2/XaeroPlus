@@ -178,6 +178,8 @@
     "xaeroplus.setting.waypoint_eta.tooltip": "プレイヤーの現在の速度と移動方向に基づいて、ウェイポイントの距離に推定到着時刻を表示します",
     "xaeroplus.setting.disable_internet": "Xaeroのインターネットアクセスを無効にする",
     "xaeroplus.setting.disable_internet.tooltip": "WorldMapとMinimapのMODが起動時にインターネットを使用してアップデートとパトロン購読をチェックするのを無効にします。\nXaeroのMODは通常GUIでこの設定を公開しません。\nXaeroPlusはこの設定に関係なくインターネットを使用しません。",
+    "xaeroplus.setting.radar_hide_invisible_entities": "透明なエンティティを非表示",
+    "xaeroplus.setting.radar_hide_invisible_entities.tooltip": "透明またはスニーク中のエンティティをレーダーに表示するかどうかを設定します",
     "xaeroplus.setting.expanded_settings": "拡張設定",
     "xaeroplus.setting.expanded_settings.tooltip": "大きな画面では、ページごとに表示される設定の数が増加します",
     "xaeroplus.setting.sodium_embeddium_integration": "Sodium/Embeddium 設定の統合",

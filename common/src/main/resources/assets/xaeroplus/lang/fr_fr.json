@@ -180,6 +180,8 @@
   "xaeroplus.setting.waypoint_eta.tooltip": "Affiche l'heure d'arrivée estimée sur le texte de distance du point de passage. L'ETA est basé sur la vitesse et la direction de déplacement actuelles du joueur",
   "xaeroplus.setting.disable_internet": "Désactiver l'accès Internet Xaero",
   "xaeroplus.setting.disable_internet.tooltip": "Empêche les mods WorldMap et Minimap d'utiliser Internet pour vérifier les mises à jour et les abonnements Patreon au lancement.\n Les mods Xaero n'exposent pas normalement ce paramètre dans l'interface graphique.\n XaeroPlus n'utilise pas Internet quel que soit ce paramètre.",
+  "xaeroplus.setting.radar_hide_invisible_entities": "Masquer les entités invisibles",
+  "xaeroplus.setting.radar_hide_invisible_entities.tooltip": "Configure si les entités invisibles ou accroupies sont affichées sur le radar",
   "xaeroplus.setting.expanded_settings": "Paramètres étendus",
   "xaeroplus.setting.expanded_settings.tooltip": "Augmente le nombre de paramètres affichés par page sur des écrans plus grands",
   "xaeroplus.setting.sodium_embeddium_integration": "Intégration des Paramètres Sodium/Embeddium",

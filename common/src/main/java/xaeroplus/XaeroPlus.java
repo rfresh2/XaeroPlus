@@ -5,6 +5,7 @@ import net.lenni0451.lambdaevents.generator.LambdaMetaFactoryGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xaero.map.platform.Services;
+import xaeroplus.event.MinimapInitCompletedEvent;
 import xaeroplus.settings.Settings;
 import xaeroplus.settings.XaeroPlusSetting;
 
@@ -23,5 +24,10 @@ public class XaeroPlus {
 		loadXPSettings();
 		Settings.REGISTRY.getAllSettings().forEach(XaeroPlusSetting::init);
 		Globals.initStickySettings();
+		XaeroPlus.EVENT_BUS.registerConsumer((e) -> {
+			if (Globals.minimapSettingsInitialized) return;
+			Globals.minimapSettingsInitialized = true;
+			Globals.initSyncedSettings();
+		}, MinimapInitCompletedEvent.class);
 	}
 }

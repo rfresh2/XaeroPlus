@@ -180,6 +180,8 @@
   "xaeroplus.setting.waypoint_eta.tooltip": "在航點距離文本上顯示預計到達時間。ETA 基於玩家當前的速度和移動方向",
   "xaeroplus.setting.disable_internet": "停用 Xaero 網際網路存取",
   "xaeroplus.setting.disable_internet.tooltip": "停用世界地圖和小地圖模組在啟動時使用網際網路檢查更新和 Patreon 訂閱。\n Xaero 模組通常不會在介面中公開此設定。\n 無論此設定如何，XaeroPlus 都不会使用網際網路。",
+  "xaeroplus.setting.radar_hide_invisible_entities": "隱藏隱形實體",
+  "xaeroplus.setting.radar_hide_invisible_entities.tooltip": "設置是否在雷達上顯示隱形或潛行的實體",
   "xaeroplus.setting.expanded_settings": "擴展設定",
   "xaeroplus.setting.expanded_settings.tooltip": "在較大的螢幕上增加每頁顯示的設定數量",
   "xaeroplus.setting.sodium_embeddium_integration": "Sodium/Embeddium 設定集成",

@@ -15,7 +15,6 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static xaeroplus.util.ChunkUtils.regionCoordToChunkCoord;
 
@@ -84,12 +83,16 @@ public class ChunkHighlightDatabase implements Closeable {
 
     private void insertHighlightsListInternal(final List<ChunkHighlightData> chunks, final ResourceKey<Level> dimension) {
         try {
-            String statement = "INSERT OR IGNORE INTO \"" + getTableName(dimension) + "\" VALUES ";
-            statement += chunks.stream()
-                    .map(chunk -> "(" + chunk.x() + ", " + chunk.z() + ", " + chunk.foundTime() + ")")
-                    .collect(Collectors.joining(", "));
+            StringBuilder sb = new StringBuilder("INSERT OR IGNORE INTO \"" + getTableName(dimension) + "\" VALUES ");
+            for (int i = 0; i < chunks.size(); i++) {
+                ChunkHighlightData chunk = chunks.get(i);
+                sb.append("(").append(chunk.x()).append(", ").append(chunk.z()).append(", ").append(chunk.foundTime()).append(")");
+                if (i < chunks.size() - 1) {
+                    sb.append(", ");
+                }
+            }
             try (var stmt = connection.createStatement()) {
-                stmt.executeUpdate(statement);
+                stmt.executeUpdate(sb.toString());
             }
         } catch (Exception e) {
             XaeroPlus.LOGGER.error("Error inserting {} chunks into {} database in dimension: {}", chunks.size(), databaseName, dimension.location(), e);

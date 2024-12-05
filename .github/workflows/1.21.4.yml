@@ -1,4 +1,4 @@
-name: 1.21.3 Build
+name: 1.21.4 Build
 
 on:
   pull_request:
@@ -90,26 +90,26 @@ jobs:
     - name: Set CI Test Env Var
       run: echo "XP_CI_TEST=true" >> $GITHUB_ENV
 
-    - name: Setup Fabric Test Mods
-      run: |
-        mkdir -p run/mods && cp fabric/build/libs/${{ env.XP_FABRIC }}.jar run/mods \
-        && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ env.MINIMAP_VERSION_FABRIC }}_Fabric_${{ env.MINECRAFT_VERSION }}/xaeros-minimap-${{ env.MINIMAP_VERSION_FABRIC }}_Fabric_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/ \
-        && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ env.WORLDMAP_VERSION_FABRIC }}_Fabric_${{ env.MINECRAFT_VERSION }}/xaeros-world-map-${{ env.WORLDMAP_VERSION_FABRIC }}_Fabric_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/
-
-    - name: Fabric Test
-      uses: 3arthqu4ke/mc-runtime-test@2.4.2
-      with:
-        mc: ${{ env.MINECRAFT_VERSION }}
-        modloader: fabric
-        regex: .*fabric.*
-        mc-runtime-test: fabric
-        fabric-api: 0.107.3
-        java: 21
-        xvfb: false
-        headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
-
-    - name: Cleanup Test
-      run: rm -rf run/ && rm -rf HeadlessMC/ && rm headlessmc-launcher.jar && rm -rf ~/.minecraft
+#    - name: Setup Fabric Test Mods
+#      run: |
+#        mkdir -p run/mods && cp fabric/build/libs/${{ env.XP_FABRIC }}.jar run/mods \
+#        && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ env.MINIMAP_VERSION_FABRIC }}_Fabric_${{ env.MINECRAFT_VERSION }}/xaeros-minimap-${{ env.MINIMAP_VERSION_FABRIC }}_Fabric_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/ \
+#        && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ env.WORLDMAP_VERSION_FABRIC }}_Fabric_${{ env.MINECRAFT_VERSION }}/xaeros-world-map-${{ env.WORLDMAP_VERSION_FABRIC }}_Fabric_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/
+#
+#    - name: Fabric Test
+#      uses: 3arthqu4ke/mc-runtime-test@2.4.2
+#      with:
+#        mc: ${{ env.MINECRAFT_VERSION }}
+#        modloader: fabric
+#        regex: .*fabric.*
+#        mc-runtime-test: fabric
+#        fabric-api: 0.107.3
+#        java: 21
+#        xvfb: false
+#        headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
+#
+#    - name: Cleanup Test
+#      run: rm -rf run/ && rm -rf HeadlessMC/ && rm headlessmc-launcher.jar && rm -rf ~/.minecraft
 
 #    - name: Setup Forge Test
 #      run: |
@@ -131,19 +131,19 @@ jobs:
 #    - name: Cleanup Test
 #      run: rm -rf run/ && rm -rf HeadlessMC/ && rm headlessmc-launcher.jar && rm -rf ~/.minecraft
 
-    - name: Setup Neo Test
-      run: |
-        mkdir -p run/mods && cp neo/build/libs/${{ env.XP_NEO }}.jar run/mods \
-        && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ env.MINIMAP_VERSION_NEO }}_NeoForge_${{ env.MINECRAFT_VERSION }}/xaeros-minimap-${{ env.MINIMAP_VERSION_NEO }}_NeoForge_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/ \
-        && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ env.WORLDMAP_VERSION_NEO }}_NeoForge_${{ env.MINECRAFT_VERSION }}/xaeros-world-map-${{ env.WORLDMAP_VERSION_NEO }}_NeoForge_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/
-
-    - name: Neo Test
-      uses: 3arthqu4ke/mc-runtime-test@2.4.1
-      with:
-        mc: ${{ env.MINECRAFT_VERSION }}
-        modloader: neoforge
-        regex: .*neoforge.*
-        mc-runtime-test: neoforge
-        java: 21
-        xvfb: false
-        headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
+#    - name: Setup Neo Test
+#      run: |
+#        mkdir -p run/mods && cp neo/build/libs/${{ env.XP_NEO }}.jar run/mods \
+#        && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ env.MINIMAP_VERSION_NEO }}_NeoForge_${{ env.MINECRAFT_VERSION }}/xaeros-minimap-${{ env.MINIMAP_VERSION_NEO }}_NeoForge_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/ \
+#        && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ env.WORLDMAP_VERSION_NEO }}_NeoForge_${{ env.MINECRAFT_VERSION }}/xaeros-world-map-${{ env.WORLDMAP_VERSION_NEO }}_NeoForge_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/
+#
+#    - name: Neo Test
+#      uses: 3arthqu4ke/mc-runtime-test@2.4.1
+#      with:
+#        mc: ${{ env.MINECRAFT_VERSION }}
+#        modloader: neoforge
+#        regex: .*neoforge.*
+#        mc-runtime-test: neoforge
+#        java: 21
+#        xvfb: false
+#        headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true

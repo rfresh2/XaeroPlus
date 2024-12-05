@@ -44,16 +44,13 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
 
     private void loadHighlightsInWindow() {
         executorService.execute(() -> {
-            final List<ChunkHighlightData> chunks = database.getHighlightsInWindow(
+            synchronized (this.chunks) {
+                database.getHighlightsInWindow(
                     dimension,
                     windowRegionX - windowRegionSize, windowRegionX + windowRegionSize,
-                    windowRegionZ - windowRegionSize, windowRegionZ + windowRegionSize
-            );
-            synchronized (this.chunks) {
-                for (int i = 0; i < chunks.size(); i++) {
-                    final ChunkHighlightData chunk = chunks.get(i);
-                    this.chunks.put(chunkPosToLong(chunk.x(), chunk.z()), chunk.foundTime());
-                }
+                    windowRegionZ - windowRegionSize, windowRegionZ + windowRegionSize,
+                    (x, y, time) -> this.chunks.put(chunkPosToLong(x, y), time)
+                );
             }
         });
     }

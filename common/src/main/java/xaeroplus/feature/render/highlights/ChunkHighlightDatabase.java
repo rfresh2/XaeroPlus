@@ -83,16 +83,15 @@ public class ChunkHighlightDatabase implements Closeable {
 
     private void insertHighlightsListInternal(final List<ChunkHighlightData> chunks, final ResourceKey<Level> dimension) {
         try {
-            StringBuilder sb = new StringBuilder("INSERT OR IGNORE INTO \"" + getTableName(dimension) + "\" VALUES ");
-            for (int i = 0; i < chunks.size(); i++) {
-                ChunkHighlightData chunk = chunks.get(i);
-                sb.append("(").append(chunk.x()).append(", ").append(chunk.z()).append(", ").append(chunk.foundTime()).append(")");
-                if (i < chunks.size() - 1) {
-                    sb.append(", ");
+            try (var ps = connection.prepareStatement("INSERT OR IGNORE INTO \"" + getTableName(dimension) + "\" VALUES (?, ?, ?)")) {
+                for (int i = 0; i < chunks.size(); i++) {
+                    final ChunkHighlightData chunk = chunks.get(i);
+                    ps.setInt(1, chunk.x());
+                    ps.setInt(2, chunk.z());
+                    ps.setLong(3, chunk.foundTime());
+                    ps.addBatch();
                 }
-            }
-            try (var stmt = connection.createStatement()) {
-                stmt.executeUpdate(sb.toString());
+                ps.executeBatch();
             }
         } catch (Exception e) {
             XaeroPlus.LOGGER.error("Error inserting {} chunks into {} database in dimension: {}", chunks.size(), databaseName, dimension.location(), e);
@@ -113,7 +112,7 @@ public class ChunkHighlightDatabase implements Closeable {
                     chunks.add(new ChunkHighlightData(
                         resultSet.getInt("x"),
                         resultSet.getInt("z"),
-                        resultSet.getInt("foundTime")));
+                        resultSet.getLong("foundTime")));
                 }
                 return chunks;
             }
@@ -122,6 +121,37 @@ public class ChunkHighlightDatabase implements Closeable {
             // fall through
         }
         return Collections.emptyList();
+    }
+
+    @FunctionalInterface
+    public interface HighlightConsumer {
+        void accept(int x, int z, long foundTime);
+    }
+
+    // avoids instantiating the intermediary list
+    public void getHighlightsInWindow(
+        final ResourceKey<Level> dimension,
+        final int regionXMin, final int regionXMax,
+        final int regionZMin, final int regionZMax,
+        HighlightConsumer consumer
+    ) {
+        try (var statement = connection.createStatement()) {
+            try (ResultSet resultSet = statement.executeQuery(
+                "SELECT * FROM \"" + getTableName(dimension) + "\" "
+                    + "WHERE x >= " + regionCoordToChunkCoord(regionXMin) + " AND x <= " + regionCoordToChunkCoord(regionXMax)
+                    + " AND z >= " + regionCoordToChunkCoord(regionZMin) + " AND z <= " + regionCoordToChunkCoord(regionZMax))) {
+                while (resultSet.next()) {
+                    consumer.accept(
+                        resultSet.getInt("x"),
+                        resultSet.getInt("z"),
+                        resultSet.getLong("foundTime")
+                    );
+                }
+            }
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Error getting chunks from {} database in dimension: {}, window: {}-{}, {}-{}", databaseName, dimension.location(), regionXMin, regionXMax, regionZMin, regionZMax, e);
+            // fall through
+        }
     }
 
     public void removeHighlight(final int x, final int z, final ResourceKey<Level> dimension) {

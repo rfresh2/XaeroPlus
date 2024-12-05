@@ -4,9 +4,9 @@ on:
   pull_request:
   push:
     branches:
-      - "1.21.3"
+      - "1.21.4"
 env:
-  MINECRAFT_VERSION: "1.21.3"
+  MINECRAFT_VERSION: "1.21.4"
 
 jobs:
   build:
@@ -39,11 +39,11 @@ jobs:
     - name: Get Minimap Version Fabric
       run: echo "MINIMAP_VERSION_FABRIC=$(./gradlew -q printMinimapVersionFabric)" >> $GITHUB_ENV
 
-    - name: Get WorldMap Version Forge
-      run: echo "WORLDMAP_VERSION_FORGE=$(./gradlew -q printWorldMapVersionForge)" >> $GITHUB_ENV
-
-    - name: Get Minimap Version Forge
-      run: echo "MINIMAP_VERSION_FORGE=$(./gradlew -q printMinimapVersionForge)" >> $GITHUB_ENV
+#    - name: Get WorldMap Version Forge
+#      run: echo "WORLDMAP_VERSION_FORGE=$(./gradlew -q printWorldMapVersionForge)" >> $GITHUB_ENV
+#
+#    - name: Get Minimap Version Forge
+#      run: echo "MINIMAP_VERSION_FORGE=$(./gradlew -q printMinimapVersionForge)" >> $GITHUB_ENV
 
     - name: Get WorldMap Version NeoForge
       run: |
@@ -59,8 +59,8 @@ jobs:
     - name: Get Fabric Jar Filename
       run: echo "XP_FABRIC=XaeroPlus-${{ env.XP_VERSION}}+fabric-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FABRIC }}-MM${{ env.MINIMAP_VERSION_FABRIC }}" >> $GITHUB_ENV
 
-    - name: Get Forge Jar Filename
-      run: echo "XP_FORGE=XaeroPlus-${{ env.XP_VERSION}}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
+#    - name: Get Forge Jar Filename
+#      run: echo "XP_FORGE=XaeroPlus-${{ env.XP_VERSION}}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
 
     - name: Get Neo Jar Filename
       run: |
@@ -73,12 +73,12 @@ jobs:
         path: fabric/build/libs/${{ env.XP_FABRIC }}.jar
         if-no-files-found: error
 
-    - name: Upload Forge Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ env.XP_FORGE }}
-        path: forge/build/libs/${{ env.XP_FORGE }}.jar
-        if-no-files-found: error
+#    - name: Upload Forge Artifact
+#      uses: actions/upload-artifact@v4
+#      with:
+#        name: ${{ env.XP_FORGE }}
+#        path: forge/build/libs/${{ env.XP_FORGE }}.jar
+#        if-no-files-found: error
 
     - name: Upload NeoForge Artifact
       uses: actions/upload-artifact@v4
@@ -111,25 +111,25 @@ jobs:
     - name: Cleanup Test
       run: rm -rf run/ && rm -rf HeadlessMC/ && rm headlessmc-launcher.jar && rm -rf ~/.minecraft
 
-    - name: Setup Forge Test
-      run: |
-        mkdir -p run/mods && cp forge/build/libs/${{ env.XP_FORGE }}.jar run/mods \
-        && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ env.MINIMAP_VERSION_FORGE }}_Forge_${{ env.MINECRAFT_VERSION }}/xaeros-minimap-${{ env.MINIMAP_VERSION_FORGE }}_Forge_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/ \
-        && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ env.WORLDMAP_VERSION_FORGE }}_Forge_${{ env.MINECRAFT_VERSION }}/xaeros-world-map-${{ env.WORLDMAP_VERSION_FORGE }}_Forge_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/
-
-    - name: Forge Test
-      uses: 3arthqu4ke/mc-runtime-test@2.4.2
-      with:
-        mc: ${{ env.MINECRAFT_VERSION }}
-        modloader: forge
-        regex: .*forge.*
-        mc-runtime-test: none
-        java: 21
-        xvfb: false
-        headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
-
-    - name: Cleanup Test
-      run: rm -rf run/ && rm -rf HeadlessMC/ && rm headlessmc-launcher.jar && rm -rf ~/.minecraft
+#    - name: Setup Forge Test
+#      run: |
+#        mkdir -p run/mods && cp forge/build/libs/${{ env.XP_FORGE }}.jar run/mods \
+#        && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ env.MINIMAP_VERSION_FORGE }}_Forge_${{ env.MINECRAFT_VERSION }}/xaeros-minimap-${{ env.MINIMAP_VERSION_FORGE }}_Forge_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/ \
+#        && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ env.WORLDMAP_VERSION_FORGE }}_Forge_${{ env.MINECRAFT_VERSION }}/xaeros-world-map-${{ env.WORLDMAP_VERSION_FORGE }}_Forge_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/
+#
+#    - name: Forge Test
+#      uses: 3arthqu4ke/mc-runtime-test@2.4.2
+#      with:
+#        mc: ${{ env.MINECRAFT_VERSION }}
+#        modloader: forge
+#        regex: .*forge.*
+#        mc-runtime-test: none
+#        java: 21
+#        xvfb: false
+#        headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
+#
+#    - name: Cleanup Test
+#      run: rm -rf run/ && rm -rf HeadlessMC/ && rm headlessmc-launcher.jar && rm -rf ~/.minecraft
 
     - name: Setup Neo Test
       run: |

@@ -45,7 +45,7 @@ dependencyResolutionManagement {
 			library("balm-neoforge", "maven.modrinth:balm:21.3.3+neoforge-1.21.3")
 			library("fabric-waystones", "maven.modrinth:fwaystones:3.3.4+mc1.21.1")
 			library("worldtools", "maven.modrinth:worldtools:1.2.6+1.21.1")
-            library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.46.1.0") // relocated xerial sqlite to avoid conflicts with other mods
+            library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.47.1.0") // relocated xerial sqlite to avoid conflicts with other mods
 			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.3.1+1.21.3-fabric")
 			library("immediatelyfast-neo", "maven.modrinth:immediatelyfast:1.3.1+1.21.3-neoforge")
 			library("modmenu", "maven.modrinth:modmenu:12.0.0")

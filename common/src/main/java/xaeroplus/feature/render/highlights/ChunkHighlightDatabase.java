@@ -83,16 +83,15 @@ public class ChunkHighlightDatabase implements Closeable {
 
     private void insertHighlightsListInternal(final List<ChunkHighlightData> chunks, final ResourceKey<Level> dimension) {
         try {
-            StringBuilder sb = new StringBuilder("INSERT OR IGNORE INTO \"" + getTableName(dimension) + "\" VALUES ");
-            for (int i = 0; i < chunks.size(); i++) {
-                ChunkHighlightData chunk = chunks.get(i);
-                sb.append("(").append(chunk.x()).append(", ").append(chunk.z()).append(", ").append(chunk.foundTime()).append(")");
-                if (i < chunks.size() - 1) {
-                    sb.append(", ");
+            try (var ps = connection.prepareStatement("INSERT OR IGNORE INTO \"" + getTableName(dimension) + "\" VALUES (?, ?, ?)")) {
+                for (int i = 0; i < chunks.size(); i++) {
+                    final ChunkHighlightData chunk = chunks.get(i);
+                    ps.setInt(1, chunk.x());
+                    ps.setInt(2, chunk.z());
+                    ps.setLong(3, chunk.foundTime());
+                    ps.addBatch();
                 }
-            }
-            try (var stmt = connection.createStatement()) {
-                stmt.executeUpdate(sb.toString());
+                ps.executeBatch();
             }
         } catch (Exception e) {
             XaeroPlus.LOGGER.error("Error inserting {} chunks into {} database in dimension: {}", chunks.size(), databaseName, dimension.location(), e);

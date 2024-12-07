@@ -31,7 +31,10 @@ public class XaeroPlusFabric implements ClientModInitializer {
 			XaeroPlus.initializeSettings();
 			Settings.REGISTRY.getKeybindings().forEach(KeyBindingHelper::registerKeyBinding);
 			if (System.getenv("XP_CI_TEST") != null)
-				Minecraft.getInstance().execute(XaeroPlusGameTest::applyMixinsTest);
+				Minecraft.getInstance().execute(() -> {
+					XaeroPlusGameTest.applyMixinsTest();
+					System.exit(0);
+				});
         }
 	}
 

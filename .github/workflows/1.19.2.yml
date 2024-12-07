@@ -68,44 +68,87 @@ jobs:
         name: ${{ env.XP_FORGE }}
         path: forge/build/libs/${{ env.XP_FORGE }}.jar
         if-no-files-found: error
+    outputs:
+      worldmap_version_fabric: ${{ env.WORLDMAP_VERSION_FABRIC }}
+      worldmap_version_forge: ${{ env.WORLDMAP_VERSION_FORGE }}
+      minimap_version_fabric: ${{ env.MINIMAP_VERSION_FABRIC }}
+      minimap_version_forge: ${{ env.MINIMAP_VERSION_FORGE }}
+      xp_fabric: ${{ env.XP_FABRIC }}
+      xp_forge: ${{ env.XP_FORGE }}
 
-    - name: Set CI Test Env Var
-      run: echo "XP_CI_TEST=true" >> $GITHUB_ENV
+  test-fabric:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
 
-    - name: Setup Fabric Test Mods
-      run: |
-        mkdir -p run/mods && cp fabric/build/libs/${{ env.XP_FABRIC }}.jar run/mods \
-        && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ env.MINIMAP_VERSION_FABRIC }}_Fabric_1.19.1/xaeros-minimap-${{ env.MINIMAP_VERSION_FABRIC }}_Fabric_1.19.1.jar -P run/mods/ \
-        && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ env.WORLDMAP_VERSION_FABRIC }}_Fabric_1.19.1/xaeros-world-map-${{ env.WORLDMAP_VERSION_FABRIC }}_Fabric_1.19.1.jar -P run/mods/
+      - name: Download job artifacts
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          path: artifacts/
 
-    - name: Fabric Test
-      uses: 3arthqu4ke/mc-runtime-test@2.4.2
-      with:
-        mc: ${{ env.MINECRAFT_VERSION }}
-        modloader: fabric
-        regex: .*fabric.*
-        mc-runtime-test: fabric
-        fabric-api: 0.77.0
-        java: 17
-        xvfb: false
-        headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
+      - name: Set CI Test Env Var
+        run: echo "XP_CI_TEST=true" >> $GITHUB_ENV
 
-    - name: Cleanup Test
-      run: rm -rf run/ && rm -rf HeadlessMC/ && rm headlessmc-launcher.jar && rm -rf ~/.minecraft
+      - name: Setup Fabric Test Mods
+        run: |
+          mkdir -p run/mods && cp artifacts/${{ needs.build.outputs.xp_fabric }}.jar run/mods \
+          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ needs.build.outputs.minimap_version_fabric }}_Fabric_1.19.1/xaeros-minimap-${{ needs.build.outputs.minimap_version_fabric }}_Fabric_1.19.1.jar -P run/mods/ \
+          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ needs.build.outputs.worldmap_version_fabric }}_Fabric_1.19.1/xaeros-world-map-${{ needs.build.outputs.worldmap_version_fabric }}_Fabric_1.19.1.jar -P run/mods/
 
-    - name: Setup Forge Test
-      run: |
-        mkdir -p run/mods && cp forge/build/libs/${{ env.XP_FORGE }}.jar run/mods \
-        && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ env.MINIMAP_VERSION_FORGE }}_Forge_1.19.1/xaeros-minimap-${{ env.MINIMAP_VERSION_FORGE }}_Forge_1.19.1.jar -P run/mods/ \
-        && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ env.WORLDMAP_VERSION_FORGE }}_Forge_1.19.1/xaeros-world-map-${{ env.WORLDMAP_VERSION_FORGE }}_Forge_1.19.1.jar -P run/mods/
+      - name: Fabric Test
+        uses: headlesshq/mc-runtime-test@3.0.0
+        with:
+          mc: ${{ env.MINECRAFT_VERSION }}
+          modloader: fabric
+          regex: .*fabric.*
+          mc-runtime-test: fabric
+          fabric-api: 0.77.0
+          java: 17
+          xvfb: false
+          headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
+          cache-mc: true
 
-    - name: Forge Test
-      uses: 3arthqu4ke/mc-runtime-test@2.4.2
-      with:
-        mc: ${{ env.MINECRAFT_VERSION }}
-        modloader: forge
-        regex: .*forge.*
-        mc-runtime-test: lexforge
-        java: 17
-        xvfb: false
-        headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
+  test-forge:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Download job artifacts
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          path: artifacts/
+
+      - name: Set CI Test Env Var
+        run: echo "XP_CI_TEST=true" >> $GITHUB_ENV
+
+      - name: Setup Forge Test
+        run: |
+          mkdir -p run/mods && cp artifacts/${{ needs.build.outputs.xp_forge }}.jar run/mods \
+          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ needs.build.outputs.minimap_version_forge }}_Forge_1.19.1/xaeros-minimap-${{ needs.build.outputs.minimap_version_forge }}_Forge_1.19.1.jar -P run/mods/ \
+          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ needs.build.outputs.worldmap_version_forge }}_Forge_1.19.1/xaeros-world-map-${{ needs.build.outputs.worldmap_version_forge }}_Forge_1.19.1.jar -P run/mods/
+
+      - name: Forge Test
+        uses: headlesshq/mc-runtime-test@3.0.0
+        with:
+          mc: ${{ env.MINECRAFT_VERSION }}
+          modloader: forge
+          regex: .*forge.*
+          mc-runtime-test: lexforge
+          java: 17
+          xvfb: false
+          headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
+          cache-mc: true

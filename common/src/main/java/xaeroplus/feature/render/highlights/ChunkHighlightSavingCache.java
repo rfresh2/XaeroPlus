@@ -17,6 +17,7 @@ import xaeroplus.util.ChunkUtils;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static net.minecraft.world.level.Level.*;
@@ -93,23 +94,25 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
 
     @Override
     public void handleWorldChange() {
-        try {
-            Futures.whenAllComplete(saveAllChunks())
+        Futures.whenAllComplete(saveAllChunks())
                 .run(() -> {
                     reset();
                     initializeWorld();
                     loadChunksInActualDimension();
-                }, Runnable::run)
-                .get();
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error handling {} cache world change", databaseName, e);
-        }
+                }, Globals.cacheRefreshExecutorService.get());
     }
 
     public synchronized void reset() {
         this.worldCacheInitialized = false;
         this.currentWorldId = null;
-        if (this.executorService != null) this.executorService.shutdown();
+        if (this.executorService != null) {
+            this.executorService.shutdown();
+            try {
+                this.executorService.awaitTermination(3L, TimeUnit.SECONDS);
+            } catch (final Throwable e) {
+                XaeroPlus.LOGGER.error("Timed out waiting for {} executor to shutdown", databaseName, e);
+            }
+        }
         if (this.database != null) this.database.close();
         this.dimensionCacheMap.clear();
         this.database = null;
@@ -219,14 +222,9 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
 
     @Override
     public void onDisable() {
-        try {
-            Futures.whenAllComplete(saveAllChunks())
-                .run(() -> reset(),
-                     Runnable::run)
-                .get();
-        } catch (Exception e) {
-            XaeroPlus.LOGGER.error("Error handling {} cache disable", databaseName, e);
-        }
+        Futures.whenAllComplete(saveAllChunks())
+            .run(() -> reset(),
+                 Globals.cacheRefreshExecutorService.get());
     }
 
     @Override

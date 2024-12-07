@@ -50,10 +50,7 @@ public class XaeroPlusForge {
             XaeroPlus.initializeSettings();
             Settings.REGISTRY.getKeybindings().forEach(event::register);
             if (System.getenv("XP_CI_TEST") != null) {
-                Minecraft.getInstance().execute(() -> {
-                    XaeroPlusGameTest.applyMixinsTest();
-                    System.exit(0);
-                });
+                Minecraft.getInstance().execute(XaeroPlusGameTest::applyMixinsTest);
             }
         }
     }

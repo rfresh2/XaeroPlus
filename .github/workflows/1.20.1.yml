@@ -91,7 +91,7 @@ jobs:
         headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
 
     - name: Cleanup Test
-      run: rm -rf run/ && rm -rf HeadlessMC/ && rm headlessmc-launcher.jar && rm -rf ~/.minecraft
+      run: rm -rf run/ && rm -rf HeadlessMC/ && rm headlessmc-*.jar && rm -rf ~/.minecraft
 
     - name: Setup Forge Test
       run: |

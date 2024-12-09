@@ -1,17 +1,18 @@
 package xaeroplus.mixin.client;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.At;
 import xaero.common.gui.GuiAddWaypoint;
 import xaeroplus.settings.Settings;
 
 @Mixin(value = GuiAddWaypoint.class, remap = false)
 public class MixinGuiAddWaypoint {
-    @ModifyConstant(
+    @ModifyExpressionValue(
         method = "checkFields",
-        constant = @Constant(
-            intValue = 2
+        at = @At(
+            value = "CONSTANT",
+            args = "intValue=2"
         )
     )
     public int allowLongerInitials(int original) {

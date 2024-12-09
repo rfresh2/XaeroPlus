@@ -178,6 +178,8 @@
   "xaeroplus.setting.waypoint_beacon_distance_min.tooltip": "Sets the minimum xz distance from the player the waypoint must be to render a beacon.",
   "xaeroplus.setting.waypoint_eta": "Waypoint Distance ETA",
   "xaeroplus.setting.waypoint_eta.tooltip": "Renders the estimated time of arrival on waypoint distance text. The ETA is based on the player's current speed and movement direction",
+  "xaeroplus.setting.allow_longer_waypoint_initials": "Long Waypoint Initials",
+  "xaeroplus.setting.allow_longer_waypoint_initials.tooltip": "Removes the 2 character size limit when editing waypoint initials",
   "xaeroplus.setting.disable_internet": "Disable Xaero Internet Access",
   "xaeroplus.setting.disable_internet.tooltip": "Disables WorldMap and Minimap mods from using the internet to check for updates and patreon subscriptions at launch.\n Xaero mods do not expose this setting in the GUI normally.\n XaeroPlus does not use the internet regardless of this setting.",
   "xaeroplus.setting.radar_hide_invisible_entities": "Hide Invisible Entities",

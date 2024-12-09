@@ -178,6 +178,8 @@
   "xaeroplus.setting.waypoint_beacon_distance_min.tooltip": "设置将路径点渲染为信标所需的最短水平距离。",
   "xaeroplus.setting.waypoint_eta": "航点距离 ETA",
   "xaeroplus.setting.waypoint_eta.tooltip": "在航点距离文本上显示预计到达时间。ETA 基于玩家当前的速度和移动方向",
+  "xaeroplus.setting.allow_longer_waypoint_initials": "允许更长的航点缩写",
+  "xaeroplus.setting.allow_longer_waypoint_initials.tooltip": "移除编辑航点缩写时的2字符限制",
   "xaeroplus.setting.disable_internet": "禁用 Xaero 互联网访问",
   "xaeroplus.setting.disable_internet.tooltip": "禁止 WorldMap 和 Minimap mods 在启动时使用互联网检查更新和 patreon 订阅。\n Xaero mods 通常不会在 GUI 中公开此设置。\n 无论此设置如何，XaeroPlus 都不会使用互联网。",
   "xaeroplus.setting.radar_hide_invisible_entities": "隐藏隐形实体",

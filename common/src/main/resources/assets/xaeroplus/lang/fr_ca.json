@@ -178,6 +178,8 @@
   "xaeroplus.setting.waypoint_beacon_distance_min.tooltip": "Définit la distance xz minimale du joueur à laquelle le point de passage doit se trouver pour qu'une balise soit affichée.",
   "xaeroplus.setting.waypoint_eta": "Distance du Point de Passage ETA",
   "xaeroplus.setting.waypoint_eta.tooltip": "Affiche l'heure d'arrivée estimée sur le texte de distance du point de passage. L'ETA est basé sur la vitesse et la direction de déplacement actuelles du joueur",
+  "xaeroplus.setting.allow_longer_waypoint_initials": "Initiales de point de repère plus longues",
+  "xaeroplus.setting.allow_longer_waypoint_initials.tooltip": "Supprime la limite de 2 caractères lors de la modification des initiales des points de repère",
   "xaeroplus.setting.disable_internet": "Désactiver l'accès Internet Xaero",
   "xaeroplus.setting.disable_internet.tooltip": "Empêche les mods WorldMap et Minimap d'utiliser Internet pour vérifier les mises à jour et les abonnements Patreon au lancement.\n Les mods Xaero n'exposent pas normalement ce paramètre dans l'interface graphique.\n XaeroPlus n'utilise pas Internet quel que soit ce paramètre.",
   "xaeroplus.setting.radar_hide_invisible_entities": "Masquer les entités invisibles",

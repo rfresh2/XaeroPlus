@@ -246,6 +246,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache {
     @Override
     public void handleTick() {
         if (!worldCacheInitialized) return;
+        if (XaeroWorldMapCore.currentSession == null) return;
         // limit so we don't overflow
         if (tickCounter > 2400) tickCounter = 0;
         if (tickCounter++ % 30 != 0) { // run once every 1.5 seconds

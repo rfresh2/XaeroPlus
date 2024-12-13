@@ -678,6 +678,12 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.waypoint_eta",
             false),
         SettingLocation.MINIMAP_WAYPOINTS);
+    public final BooleanSetting longWaypointInitials = register(
+        BooleanSetting.create(
+            "Long Waypoint Initials",
+            "xaeroplus.setting.allow_longer_waypoint_initials",
+            false),
+        SettingLocation.MINIMAP_WAYPOINTS);
     public final BooleanSetting disableWaypointSharing = register(
         BooleanSetting.create(
             "Disable Waypoint Sharing",

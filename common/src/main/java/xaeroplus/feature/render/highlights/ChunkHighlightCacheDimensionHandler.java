@@ -5,10 +5,12 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
+import xaeroplus.XaeroPlus;
 import xaeroplus.util.ChunkUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static xaeroplus.util.ChunkUtils.chunkPosToLong;
 import static xaeroplus.util.ChunkUtils.regionCoordToChunkCoord;
@@ -44,13 +46,21 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
 
     private void loadHighlightsInWindow() {
         executorService.execute(() -> {
-            synchronized (this.chunks) {
-                database.getHighlightsInWindow(
+            final List<ChunkHighlightData> chunks = database.getHighlightsInWindow(
                     dimension,
                     windowRegionX - windowRegionSize, windowRegionX + windowRegionSize,
-                    windowRegionZ - windowRegionSize, windowRegionZ + windowRegionSize,
-                    (x, y, time) -> this.chunks.put(chunkPosToLong(x, y), time)
-                );
+                    windowRegionZ - windowRegionSize, windowRegionZ + windowRegionSize
+            );
+            try {
+                if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
+                    for (int i = 0; i < chunks.size(); i++) {
+                        final ChunkHighlightData chunk = chunks.get(i);
+                        this.chunks.put(chunkPosToLong(chunk.x(), chunk.z()), chunk.foundTime());
+                    }
+                    lock.writeLock().unlock();
+                }
+            } catch (final Exception e) {
+                XaeroPlus.LOGGER.error("Failed to load highlights in window for {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
             }
         });
     }
@@ -58,24 +68,29 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
     private void writeHighlightsOutsideWindowToDatabase() {
         executorService.execute(() -> {
             final List<ChunkHighlightData> chunksToWrite = new ArrayList<>();
-            var minChunkX = regionCoordToChunkCoord(windowRegionX - windowRegionSize);
-            var maxChunkX = regionCoordToChunkCoord(windowRegionX + windowRegionSize);
-            var minChunkZ = regionCoordToChunkCoord(windowRegionZ - windowRegionSize);
-            var maxChunkZ = regionCoordToChunkCoord(windowRegionZ + windowRegionSize);
-            synchronized (this.chunks) {
-                for (var it = chunks.long2LongEntrySet().iterator(); it.hasNext(); ) {
-                    var entry = it.next();
-                    final long chunkPos = entry.getLongKey();
-                    final int chunkX = ChunkUtils.longToChunkX(chunkPos);
-                    final int chunkZ = ChunkUtils.longToChunkZ(chunkPos);
-                    if (chunkX < minChunkX
-                        || chunkX > maxChunkX
-                        || chunkZ < minChunkZ
-                        || chunkZ > maxChunkZ) {
-                        chunksToWrite.add(new ChunkHighlightData(chunkX, chunkZ, entry.getLongValue()));
-                        it.remove();
+            try {
+                if (lock.writeLock().tryLock(1L, TimeUnit.SECONDS)) {
+                    var minChunkX = regionCoordToChunkCoord(windowRegionX - windowRegionSize);
+                    var maxChunkX = regionCoordToChunkCoord(windowRegionX + windowRegionSize);
+                    var minChunkZ = regionCoordToChunkCoord(windowRegionZ - windowRegionSize);
+                    var maxChunkZ = regionCoordToChunkCoord(windowRegionZ + windowRegionSize);
+                    for (var it = chunks.long2LongEntrySet().iterator(); it.hasNext(); ) {
+                        var entry = it.next();
+                        final long chunkPos = entry.getLongKey();
+                        final int chunkX = ChunkUtils.longToChunkX(chunkPos);
+                        final int chunkZ = ChunkUtils.longToChunkZ(chunkPos);
+                        if (chunkX < minChunkX
+                                || chunkX > maxChunkX
+                                || chunkZ < minChunkZ
+                                || chunkZ > maxChunkZ) {
+                            chunksToWrite.add(new ChunkHighlightData(chunkX, chunkZ, entry.getLongValue()));
+                            it.remove();
+                        }
                     }
+                    lock.writeLock().unlock();
                 }
+            } catch (final Exception e) {
+                XaeroPlus.LOGGER.error("Error while writing highlights outside window to {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
             }
             database.insertHighlightList(chunksToWrite, dimension);
         });
@@ -84,14 +99,19 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
     public ListenableFuture<?> writeAllHighlightsToDatabase() {
         return executorService.submit(() -> {
             final List<ChunkHighlightData> chunksToWrite = new ArrayList<>(chunks.size());
-            synchronized (chunks) {
-                for (var it = chunks.long2LongEntrySet().iterator(); it.hasNext(); ) {
-                    var entry = it.next();
-                    final long chunkPos = entry.getLongKey();
-                    final int chunkX = ChunkUtils.longToChunkX(chunkPos);
-                    final int chunkZ = ChunkUtils.longToChunkZ(chunkPos);
-                    chunksToWrite.add(new ChunkHighlightData(chunkX, chunkZ, entry.getLongValue()));
+            try {
+                if (lock.readLock().tryLock(1, TimeUnit.SECONDS)) {
+                    for (var it = chunks.long2LongEntrySet().iterator(); it.hasNext(); ) {
+                        var entry = it.next();
+                        final long chunkPos = entry.getLongKey();
+                        final int chunkX = ChunkUtils.longToChunkX(chunkPos);
+                        final int chunkZ = ChunkUtils.longToChunkZ(chunkPos);
+                        chunksToWrite.add(new ChunkHighlightData(chunkX, chunkZ, entry.getLongValue()));
+                    }
+                    lock.readLock().unlock();
                 }
+            } catch (final Exception e) {
+                XaeroPlus.LOGGER.error("Error while writing all chunks to {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
             }
             database.insertHighlightList(chunksToWrite, dimension);
         });

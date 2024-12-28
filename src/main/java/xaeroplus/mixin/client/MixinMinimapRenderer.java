@@ -1,8 +1,10 @@
 package xaeroplus.mixin.client;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -12,10 +14,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.IXaeroMinimap;
 import xaero.common.minimap.MinimapProcessor;
-import xaero.common.minimap.radar.MinimapRadar;
 import xaero.common.minimap.render.MinimapFBORenderer;
 import xaero.common.minimap.render.MinimapRenderer;
-import xaero.common.settings.ModSettings;
 import xaero.hud.minimap.Minimap;
 import xaero.hud.minimap.element.render.over.MinimapElementOverMapRendererHandler;
 import xaero.hud.minimap.module.MinimapSession;
@@ -75,51 +75,18 @@ public class MixinMinimapRenderer {
      * Inspiration for the below mods came from: https://github.com/Abbie5/xaeroarrowfix
      */
 
-    @Redirect(method = "renderMinimap", at = @At(value = "INVOKE", target = "Lxaero/common/minimap/render/MinimapFBORenderer;renderMainEntityDot(Lxaero/common/minimap/MinimapProcessor;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/entity/Entity;DDDDFLxaero/common/minimap/radar/MinimapRadar;ZIZZZDLxaero/common/settings/ModSettings;Lnet/minecraft/client/gui/ScaledResolution;F)V"))
-    public void redirectRenderMainEntityDot(final MinimapFBORenderer instance,
-                                            final MinimapProcessor minimap,
-                                            final EntityPlayer p,
-                                            final Entity renderEntity,
-                                            final double ps,
-                                            final double pc,
-                                            final double playerX,
-                                            final double playerZ,
-                                            final float partial,
-                                            final MinimapRadar minimapRadar,
-                                            final boolean lockedNorth,
-                                            final int style,
-                                            final boolean smooth,
-                                            final boolean debug,
-                                            final boolean cave,
-                                            final double dotNameScale,
-                                            final ModSettings settings,
-                                            final ScaledResolution scaledRes,
-                                            final float minimapScale) {
+    @WrapOperation(method = "renderMinimap", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/common/minimap/render/MinimapFBORenderer;renderMainEntityDot(Lnet/minecraft/entity/Entity;ZLnet/minecraft/client/gui/ScaledResolution;)V"))
+    public void redirectRenderMainEntityDot(MinimapFBORenderer instance, Entity entity, boolean cave, ScaledResolution scaledRes, final Operation<Void> original,
+        @Local(name = "lockedNorth") boolean lockedNorth
+    ) {
         if (XaeroPlusSettingRegistry.fixMainEntityDot.getValue()) {
             if (!(modMain.getSettings().mainEntityAs != 2 && !lockedNorth)) {
                 return;
             }
         }
-        instance.renderMainEntityDot(
-                minimap,
-                p,
-                renderEntity,
-                ps,
-                pc,
-                playerX,
-                playerZ,
-                partial,
-                minimapRadar,
-                lockedNorth,
-                style,
-                smooth,
-                debug,
-                cave,
-                dotNameScale,
-                settings,
-                scaledRes,
-                minimapScale
-        );
+        original.call(instance, entity, cave, scaledRes);
     }
 
     @ModifyVariable(method = "drawArrow", name = "offsetY", ordinal = 0, at = @At(value = "STORE"))

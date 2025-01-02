@@ -9,7 +9,7 @@ pluginManagement {
 	}
 }
 gradle.extra.apply {
-	set("mod_version", "2.25")
+	set("mod_version", "2.25.1")
 	set("minecraft_version", "1.21")
 	set("parchment_version", "2024.07.28")
     set("worldmap_version_fabric", "1.39.2")

@@ -130,7 +130,7 @@ jobs:
           modloader: fabric
           regex: .*fabric.*
           mc-runtime-test: fabric
-          fabric-api: 0.100.8
+          fabric-api: 0.114.0
           java: 21
           xvfb: false
           headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true

@@ -57,6 +57,7 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
     }
 
     @Shadow public abstract String getDimensionName(final ResourceKey<Level> id);
+    @Shadow private MapWorld mapWorld;
 
     @Inject(method = "getMainId(I)Ljava/lang/String;", at = @At("HEAD"),
         cancellable = true,
@@ -71,6 +72,15 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
             if (id == Level.OVERWORLD) {
                 cir.setReturnValue("DIM0");
             }
+        }
+    }
+
+    @Inject(method = "onWorldUnload", at = @At("HEAD"))
+    public void resetCustomDimOnWorldUnload(final CallbackInfo ci) {
+        // Fixes a bug in base mods where if a custom viewed dimension is set,
+        // and the player changes dimensions, the same custom viewed dimension will persist
+        if (this.mapWorld != null) {
+            this.mapWorld.setCustomDimensionId(null);
         }
     }
 

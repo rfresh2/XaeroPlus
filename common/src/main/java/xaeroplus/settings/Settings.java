@@ -540,7 +540,8 @@ public final class Settings extends SettingRegistry {
             "null OW Dim Dir",
             "xaeroplus.setting.null_overworld_dimension_folder",
             true,
-            Globals::setNullOverworldDimFolderIfAble),
+            Globals::setNullOverworldDimFolderIfAble,
+            () -> false),
         SettingLocation.WORLD_MAP_MAIN);
     public final EnumSetting<DataFolderResolutionMode> dataFolderResolutionMode = register(
         EnumSetting.create(

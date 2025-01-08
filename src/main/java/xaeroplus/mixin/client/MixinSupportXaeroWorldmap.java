@@ -10,10 +10,12 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.lwjgl.opengl.GL14;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.IXaeroMinimap;
 import xaero.common.minimap.render.MinimapRendererHelper;
@@ -22,9 +24,17 @@ import xaero.hud.minimap.module.MinimapSession;
 import xaero.map.MapProcessor;
 import xaero.map.gui.GuiMap;
 import xaero.map.region.MapTileChunk;
+import xaeroplus.module.ModuleManager;
+import xaeroplus.module.impl.NewChunks;
+import xaeroplus.module.impl.PortalSkipDetection;
+import xaeroplus.module.impl.Portals;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.Globals;
 import xaeroplus.util.GuiHelper;
+import xaeroplus.util.WDLHelper;
+
+import java.util.Set;
 
 import static org.lwjgl.opengl.GL11.GL_LINE_LOOP;
 import static xaeroplus.settings.XaeroPlusSettingRegistry.transparentMinimapBackground;
@@ -140,81 +150,81 @@ public abstract class MixinSupportXaeroWorldmap {
         }
     }
 
-//    @WrapOperation(method = "renderChunks", at = @At(
-//        value = "FIELD",
-//        target = "Lxaero/common/mods/SupportXaeroWorldmap;compatibilityVersion:I",
-//        opcode = Opcodes.GETFIELD,
-//        ordinal = 0
-//    ),
-//        slice = @Slice(
-//            from = @At(
-//                value = "INVOKE",
-//                target = "Lxaero/common/mods/SupportXaeroWorldmap;renderSlimeChunks(Lxaero/map/region/MapTileChunk;Ljava/lang/Long;IIFLxaero/common/minimap/render/MinimapRendererHelper;)V"
-//            )
-//        ))
-//    public int drawChunkHighlightFeatures(final SupportXaeroWorldmap instance, final Operation<Integer> original,
-//                                          @Local(name = "drawX") int drawX,
-//                                          @Local(name = "drawZ") int drawZ,
-//                                          @Local(name = "chunk") MapTileChunk chunk,
-//                                          @Local(name = "brightness") float brightness) {
-//        GuiMap.restoreTextureStates();
-//        if (compatibilityVersion >= 7) {
-//            GL14.glBlendFuncSeparate(770, 771, 1, 771);
-//        }
-//        final boolean isDimensionSwitched = Globals.getCurrentDimensionId() != Minecraft.getMinecraft().player.dimension;
-//        if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
-//            final NewChunks newChunks = ModuleManager.getModule(NewChunks.class);
-//            GuiHelper.drawMMHighlights(
-//                (x, z) -> newChunks.isNewChunk(x, z, Globals.getCurrentDimensionId()),
-//                drawX,
-//                drawZ,
-//                chunk.getX() << 2,
-//                chunk.getZ() << 2,
-//                newChunks.getNewChunksColor());
-//        }
-//        if (XaeroPlusSettingRegistry.portalSkipDetectionEnabledSetting.getValue() && XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
-//            final PortalSkipDetection portalSkipDetection = ModuleManager.getModule(
-//                PortalSkipDetection.class);
-//            GuiHelper.drawMMHighlights(
-//                portalSkipDetection::isPortalSkipChunk,
-//                drawX,
-//                drawZ,
-//                chunk.getX() << 2,
-//                chunk.getZ() << 2,
-//                portalSkipDetection.getPortalSkipChunksColor());
-//        }
-//        if (XaeroPlusSettingRegistry.portalsEnabledSetting.getValue()) {
-//            final Portals portalModule = ModuleManager.getModule(Portals.class);
-//            GuiHelper.drawMMHighlights(
-//                (x, z) -> portalModule.isPortalChunk(x, z, Globals.getCurrentDimensionId()),
-//                drawX,
-//                drawZ,
-//                chunk.getX() << 2,
-//                chunk.getZ() << 2,
-//                portalModule.getPortalsColor());
-//        }
-//        if (XaeroPlusSettingRegistry.wdlEnabledSetting.getValue()
-//            && WDLHelper.isWdlPresent()
-//            && WDLHelper.isDownloading()
-//            && !isDimensionSwitched) {
-//            final Set<Long> wdlSavedChunksWithCache = WDLHelper.getSavedChunksWithCache();
-//            GuiHelper.drawMMHighlights(
-//                (x, z) -> wdlSavedChunksWithCache.contains(ChunkUtils.chunkPosToLong(x, z)),
-//                drawX,
-//                drawZ,
-//                chunk.getX() << 2,
-//                chunk.getZ() << 2,
-//                WDLHelper.getWdlColor()
-//            );
-//        }
-//        if (compatibilityVersion >= 6) {
-//            GuiMap.setupTextures(brightness);
-//        }
-//
-//        if (compatibilityVersion >= 7) {
-//            GL14.glBlendFuncSeparate(1, 0, 0, 1);
-//            GlStateManager.enableBlend();
-//        }
-//        return original.call(instance);
-//    }
+    @WrapOperation(method = "renderChunks", at = @At(
+        value = "FIELD",
+        target = "Lxaero/common/mods/SupportXaeroWorldmap;compatibilityVersion:I",
+        opcode = Opcodes.GETFIELD,
+        ordinal = 0
+    ),
+        slice = @Slice(
+            from = @At(
+                value = "INVOKE",
+                target = "Lxaero/common/mods/SupportXaeroWorldmap;renderSlimeChunks(Lxaero/map/region/MapTileChunk;Ljava/lang/Long;IIFLxaero/common/minimap/render/MinimapRendererHelper;)V"
+            )
+        ))
+    public int drawChunkHighlightFeatures(final SupportXaeroWorldmap instance, final Operation<Integer> original,
+                                          @Local(name = "drawX") int drawX,
+                                          @Local(name = "drawZ") int drawZ,
+                                          @Local(name = "chunk") MapTileChunk chunk,
+                                          @Local(name = "brightness") float brightness) {
+        GuiMap.restoreTextureStates();
+        if (compatibilityVersion >= 7) {
+            GL14.glBlendFuncSeparate(770, 771, 1, 771);
+        }
+        final boolean isDimensionSwitched = Globals.getCurrentDimensionId() != Minecraft.getMinecraft().player.dimension;
+        if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
+            final NewChunks newChunks = ModuleManager.getModule(NewChunks.class);
+            GuiHelper.drawMMHighlights(
+                (x, z) -> newChunks.isNewChunk(x, z, Globals.getCurrentDimensionId()),
+                drawX,
+                drawZ,
+                chunk.getX() << 2,
+                chunk.getZ() << 2,
+                newChunks.getNewChunksColor());
+        }
+        if (XaeroPlusSettingRegistry.portalSkipDetectionEnabledSetting.getValue() && XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
+            final PortalSkipDetection portalSkipDetection = ModuleManager.getModule(
+                PortalSkipDetection.class);
+            GuiHelper.drawMMHighlights(
+                portalSkipDetection::isPortalSkipChunk,
+                drawX,
+                drawZ,
+                chunk.getX() << 2,
+                chunk.getZ() << 2,
+                portalSkipDetection.getPortalSkipChunksColor());
+        }
+        if (XaeroPlusSettingRegistry.portalsEnabledSetting.getValue()) {
+            final Portals portalModule = ModuleManager.getModule(Portals.class);
+            GuiHelper.drawMMHighlights(
+                (x, z) -> portalModule.isPortalChunk(x, z, Globals.getCurrentDimensionId()),
+                drawX,
+                drawZ,
+                chunk.getX() << 2,
+                chunk.getZ() << 2,
+                portalModule.getPortalsColor());
+        }
+        if (XaeroPlusSettingRegistry.wdlEnabledSetting.getValue()
+            && WDLHelper.isWdlPresent()
+            && WDLHelper.isDownloading()
+            && !isDimensionSwitched) {
+            final Set<Long> wdlSavedChunksWithCache = WDLHelper.getSavedChunksWithCache();
+            GuiHelper.drawMMHighlights(
+                (x, z) -> wdlSavedChunksWithCache.contains(ChunkUtils.chunkPosToLong(x, z)),
+                drawX,
+                drawZ,
+                chunk.getX() << 2,
+                chunk.getZ() << 2,
+                WDLHelper.getWdlColor()
+            );
+        }
+        if (compatibilityVersion >= 6) {
+            GuiMap.setupTextures(brightness);
+        }
+
+        if (compatibilityVersion >= 7) {
+            GL14.glBlendFuncSeparate(1, 0, 0, 1);
+            GlStateManager.enableBlend();
+        }
+        return original.call(instance);
+    }
 }

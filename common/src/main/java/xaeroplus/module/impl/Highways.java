@@ -17,7 +17,7 @@ import static xaeroplus.util.ColorHelper.getColor;
 public class Highways extends Module {
     private int highwaysColor = getColor(0, 0, 255, 100);
 
-    // Highway data sourced from: https://www.desmos.com/calculator/ogsleiq29o
+    // Highway data sourced from: https://www.desmos.com/calculator/oexoz81fxy
 
     /**
      * Known Errors / Missing Data
@@ -41,6 +41,7 @@ public class Highways extends Module {
         20000,
         25000,
         50000,
+        55000,
         62500,
         100000,
         125000,

@@ -105,6 +105,8 @@
   "xaeroplus.setting.portal_skip_old_chunks_inverse.tooltip": "Usa ChunksAntiguos para determinar si un chunk no se cargó antes. Por lo tanto, no se pudo haber creado un portal en su radio. \n Requiere que ChunksAntiguos Invertido esté habilitado.",
   "xaeroplus.setting.2b2t_highways_enabled": "Carreteras 2b2t",
   "xaeroplus.setting.2b2t_highways_enabled.tooltip": "Destaca los chunks en las carreteras de 2b2t",
+  "xaeroplus.setting.2b2t_highways_width": "Ancho de las autopistas 2b2t",
+  "xaeroplus.setting.2b2t_highways_width.tooltip": "Establece el ancho de las marcas de las autopistas",
   "xaeroplus.setting.2b2t_highways_color": "Color de las Carreteras 2b2t",
   "xaeroplus.setting.2b2t_highways_color.tooltip": "Establece el color de los resaltados de las carreteras de 2b2t",
   "xaeroplus.setting.2b2t_highways_opacity": "Opacidad de las Carreteras 2b2t",

@@ -105,6 +105,8 @@
   "xaeroplus.setting.portal_skip_old_chunks_inverse.tooltip": "Używa OldChunks Inverse, aby określić, czy porcja nie była wcześniej załadowana. Dlatego w jego promieniu nie można było stworzyć portalu.\n  Wymaga włączenia odwrotności OldChunks.",
   "xaeroplus.setting.2b2t_highways_enabled": "Autostrady 2b2t",
   "xaeroplus.setting.2b2t_highways_enabled.tooltip": "Podświetla chunki na autostradach 2b2t",
+  "xaeroplus.setting.2b2t_highways_width": "Szerokość autostrad 2b2t",
+  "xaeroplus.setting.2b2t_highways_width.tooltip": "Ustawia szerokość wyróżnień autostrad",
   "xaeroplus.setting.2b2t_highways_color": "Kolor Autostrad 2b2t",
   "xaeroplus.setting.2b2t_highways_color.tooltip": "Ustawia kolor podświetleń autostrad 2b2t",
   "xaeroplus.setting.2b2t_highways_opacity": "Przezroczystość Autostrad 2b2t",

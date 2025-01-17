@@ -19,7 +19,7 @@ import java.util.List;
 import static xaeroplus.util.ChunkUtils.regionCoordToChunkCoord;
 
 public class ChunkHighlightDatabase implements Closeable {
-    public static int MAX_HIGHLIGHTS_LIST = 25000;
+    public static final int MAX_HIGHLIGHTS_LIST = 25000;
     private final Connection connection;
     protected final String databaseName;
     private static final DatabaseMigrator MIGRATOR = new DatabaseMigrator();

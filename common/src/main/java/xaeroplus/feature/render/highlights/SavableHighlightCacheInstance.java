@@ -25,20 +25,23 @@ public class SavableHighlightCacheInstance {
      * These must be called when the owning module is enabled/disabled
      */
 
-    public void onEnable() {
+    public synchronized void onEnable() {
         XaeroPlus.EVENT_BUS.register(this);
         cache.onEnable();
     }
 
-    public void onDisable() {
+    public synchronized void onDisable() {
         cache.onDisable();
         XaeroPlus.EVENT_BUS.unregister(this);
     }
 
-    public void setDiskCache(final boolean disk, final boolean enabled) {
+    public synchronized void setDiskCache(final boolean disk, final boolean enabled) {
         try {
             final Long2LongMap map = cache.getHighlightsState();
             cache.onDisable();
+            if (cache instanceof ChunkHighlightSavingCache savingCache) {
+                savingCache.close();
+            }
             if (disk) {
                 cache = new ChunkHighlightSavingCache(dbName);
             } else {
@@ -55,11 +58,19 @@ public class SavableHighlightCacheInstance {
 
     @EventHandler
     public void onXaeroWorldChange(XaeroWorldChangeEvent event) {
-        cache.handleWorldChange();
+        try {
+            cache.handleWorldChange();
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Error handling world change event for cache: {} event: {}", dbName, event, e);
+        }
     }
 
     @EventHandler
     public void onClientTickEvent(final ClientTickEvent.Post event) {
-        cache.handleTick();
+        try {
+            cache.handleTick();
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Error handling tick event for cache: {} event: {}", dbName, event, e);
+        }
     }
 }

@@ -39,7 +39,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     // Executor used for db read/writes
     @Nullable private ListeningExecutorService workerExecutor;
     // executor used for single threaded tasks that involve changing worlds and preparing the cache for operations
-    @Nullable private final ListeningExecutorService parentExecutor;
+    @NotNull private final ListeningExecutorService parentExecutor;
     private final Map<ResourceKey<Level>, ChunkHighlightCacheDimensionHandler> dimensionCacheMap = new ConcurrentHashMap<>(3);
 
     public ChunkHighlightSavingCache(final @NotNull String databaseName) {

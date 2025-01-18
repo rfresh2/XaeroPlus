@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static net.minecraft.world.level.Level.OVERWORLD;
 
 public class OldBiomes extends Module {
-    private final SavableHighlightCacheInstance oldBiomesCache = new SavableHighlightCacheInstance("XaeroPlusOldBiomes");
+    public final SavableHighlightCacheInstance oldBiomesCache = new SavableHighlightCacheInstance("XaeroPlusOldBiomes");
     // todo: configurable seed and MC version
     private static final long seed = -4172144997902289642L;
     private static final MCVersion mcVersion = MCVersion.v1_12_2;

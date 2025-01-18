@@ -29,7 +29,7 @@ import xaeroplus.util.ColorHelper;
 import static xaeroplus.util.ColorHelper.getColor;
 
 public class Portals extends Module {
-    private final SavableHighlightCacheInstance portalsCache = new SavableHighlightCacheInstance("XaeroPlusPortals");
+    public final SavableHighlightCacheInstance portalsCache = new SavableHighlightCacheInstance("XaeroPlusPortals");
     private int portalsColor = getColor(0, 255, 0, 100);
     private static final ReferenceSet<Block> PORTAL_BLOCKS = ReferenceOpenHashSet.of(
         Blocks.END_PORTAL,

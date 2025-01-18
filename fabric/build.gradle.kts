@@ -46,7 +46,6 @@ dependencies {
 	modImplementation(libs.worldmap.fabric)
 	modImplementation(libs.minimap.fabric)
 	modImplementation(libs.baritone.fabric)
-	modCompileOnly(files("libs/sodium-fabric-1.20.1-0.6.0-alpha.2.jar"))
 	modImplementation(libs.waystones.fabric)
 	modImplementation(libs.balm.fabric)
 	modCompileOnly(libs.fabric.waystones)

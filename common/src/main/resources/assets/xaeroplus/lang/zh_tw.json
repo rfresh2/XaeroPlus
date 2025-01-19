@@ -105,6 +105,8 @@
   "xaeroplus.setting.portal_skip_old_chunks_inverse.tooltip": "使用舊區塊反轉來確定區塊之前是否未載入。因此，無法在其半徑內建立傳送門。 \n 需要啟用舊區塊反轉。",
   "xaeroplus.setting.2b2t_highways_enabled": "2b2t 公路",
   "xaeroplus.setting.2b2t_highways_enabled.tooltip": "高亮顯示 2b2t 公路上的區塊",
+  "xaeroplus.setting.2b2t_highways_width": "2b2t 高速公路寬度",
+  "xaeroplus.setting.2b2t_highways_width.tooltip": "設置高速公路高亮顯示的寬度",
   "xaeroplus.setting.2b2t_highways_color": "2b2t 公路顏色",
   "xaeroplus.setting.2b2t_highways_color.tooltip": "設定 2b2t 公路高亮的顏色",
   "xaeroplus.setting.2b2t_highways_opacity": "2b2t 公路不透明度",

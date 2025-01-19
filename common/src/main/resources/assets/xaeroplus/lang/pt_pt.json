@@ -105,6 +105,8 @@
   "xaeroplus.setting.portal_skip_old_chunks_inverse.tooltip": "Usa partes antigas inversamente para determinar se essa parte ainda não tinha sido carregada. Portanto um portal não poderá ter sido criado na sua área. \n É necessário Partes Antigas Invertidas ativo.",
   "xaeroplus.setting.2b2t_highways_enabled": "Rodovias 2b2t",
   "xaeroplus.setting.2b2t_highways_enabled.tooltip": "Destaca chunks nas rodovias 2b2t",
+  "xaeroplus.setting.2b2t_highways_width": "Largura das rodovias 2b2t",
+  "xaeroplus.setting.2b2t_highways_width.tooltip": "Define a largura dos destaques das rodovias",
   "xaeroplus.setting.2b2t_highways_color": "Cor das Rodovias 2b2t",
   "xaeroplus.setting.2b2t_highways_color.tooltip": "Define a cor dos destaques das rodovias 2b2t",
   "xaeroplus.setting.2b2t_highways_opacity": "Opacidade das Rodovias 2b2t",

@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static net.minecraft.world.level.Level.OVERWORLD;
 
 public class OldBiomes extends Module {
-    private final SavableHighlightCacheInstance oldBiomesCache = new SavableHighlightCacheInstance("XaeroPlusOldBiomes");
+    public final SavableHighlightCacheInstance oldBiomesCache = new SavableHighlightCacheInstance("XaeroPlusOldBiomes");
     // todo: configurable seed and MC version
     private static final long seed = -4172144997902289642L;
     private static final MCVersion mcVersion = MCVersion.v1_12_2;
@@ -60,23 +60,12 @@ public class OldBiomes extends Module {
         if (event.seenChunk()) return;
         try {
             if (event.chunk().getLevel().dimension() != OVERWORLD) return;
-            searchBiomeAsync(event.chunk());
+            searchBiome(event.chunk());
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error checking for OldBiome at chunk pos: [{}, {}]", event.chunk().getPos().x, event.chunk().getPos().z, e);
         }
     }
 
-    private void searchBiomeAsync(ChunkAccess chunk) {
-        Globals.moduleExecutorService.get().execute(() -> {
-            try {
-                searchBiome(chunk);
-            } catch (final Exception e) {
-                XaeroPlus.LOGGER.error("Error checking for OldBiome at chunk pos: [{}, {}]", chunk.getPos().x, chunk.getPos().z, e);
-            }
-        });
-    }
-
-    // todo: benchmark performance to see if we should search async
     private void searchBiome(final ChunkAccess chunk) {
         var x = chunk.getPos().x;
         var z = chunk.getPos().z;
@@ -132,9 +121,8 @@ public class OldBiomes extends Module {
         for (int x = xMin; x <= xMax; x++) {
             for (int z = zMin; z <= zMax; z++) {
                 ChunkAccess chunk = mc.level.getChunkSource().getChunk(x, z, false);
-                if (chunk instanceof EmptyLevelChunk) continue;
-                if (chunk == null) continue;
-                searchBiomeAsync(chunk);
+                if (chunk instanceof EmptyLevelChunk || chunk == null) continue;
+                searchBiome(chunk);
             }
         }
     }

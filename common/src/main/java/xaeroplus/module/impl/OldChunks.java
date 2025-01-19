@@ -15,7 +15,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.EmptyLevelChunk;
 import xaeroplus.Globals;
-import xaeroplus.XaeroPlus;
 import xaeroplus.event.ChunkDataEvent;
 import xaeroplus.feature.render.highlights.SavableHighlightCacheInstance;
 import xaeroplus.module.Module;
@@ -28,8 +27,8 @@ import static net.minecraft.world.level.Level.*;
 import static xaeroplus.util.ColorHelper.getColor;
 
 public class OldChunks extends Module {
-    private final SavableHighlightCacheInstance oldChunksCache = new SavableHighlightCacheInstance("XaeroPlusOldChunks");
-    private final SavableHighlightCacheInstance modernChunksCache = new SavableHighlightCacheInstance("XaeroPlusModernChunks");
+    public final SavableHighlightCacheInstance oldChunksCache = new SavableHighlightCacheInstance("XaeroPlusOldChunks");
+    public final SavableHighlightCacheInstance modernChunksCache = new SavableHighlightCacheInstance("XaeroPlusModernChunks");
     private int oldChunksColor = getColor(0, 0, 255, 100);
 
     private boolean inverse = false;
@@ -69,41 +68,25 @@ public class OldChunks extends Module {
     @EventHandler
     public void onChunkData(final ChunkDataEvent event) {
         if (event.seenChunk()) return;
-        searchChunkAsync(event.chunk());
+        searchChunk(event.chunk());
     }
 
-    private void searchChunkAsync(final ChunkAccess chunk) {
-        Globals.moduleExecutorService.get().submit(() -> {
-            try {
-                int iterations = 0;
-                while (iterations++ < 3) {
-                    if (searchChunk(chunk)) break;
-                    Thread.sleep(500);
-                }
-                if (iterations == 3) {
-                    XaeroPlus.LOGGER.debug("[{}, {}] Too many search iterations", chunk.getPos().x, chunk.getPos().z);
-                }
-            } catch (final Throwable e) {
-                XaeroPlus.LOGGER.debug("Error searching for OldChunk in chunk: {}, {}", chunk.getPos().x, chunk.getPos().z, e);
-            }
-        });
-    }
-
-    private boolean searchChunk(final ChunkAccess chunk) {
+    private void searchChunk(final ChunkAccess chunk) {
         ResourceKey<Level> actualDimension = ChunkUtils.getActualDimension();
         var x = chunk.getPos().x;
         var z = chunk.getPos().z;
         if (actualDimension == OVERWORLD || actualDimension == NETHER) {
-            return ChunkScanner.chunkContainsBlocks(chunk, actualDimension == OVERWORLD ? OVERWORLD_BLOCKS : NETHER_BLOCKS, 5)
-                ? modernChunksCache.get().addHighlight(x, z)
-                : oldChunksCache.get().addHighlight(x, z);
+            if (ChunkScanner.chunkContainsBlocks(chunk, actualDimension == OVERWORLD ? OVERWORLD_BLOCKS : NETHER_BLOCKS, 5))
+                modernChunksCache.get().addHighlight(x, z);
+            else
+                oldChunksCache.get().addHighlight(x, z);
         } else if (actualDimension == END) {
             Holder<Biome> biomeHolder = mc.level.getBiome(new BlockPos(ChunkUtils.chunkCoordToCoord(x) + 8, 64, ChunkUtils.chunkCoordToCoord(z) + 8));
-            return biomeHolder.unwrapKey().filter(biome -> biome.equals(Biomes.THE_END)).isEmpty()
-                ? modernChunksCache.get().addHighlight(x, z)
-                : oldChunksCache.get().addHighlight(x, z);
+            if (biomeHolder.unwrapKey().filter(biome -> biome.equals(Biomes.THE_END)).isEmpty())
+                modernChunksCache.get().addHighlight(x, z);
+            else
+                oldChunksCache.get().addHighlight(x, z);
         }
-        return true;
     }
 
     public boolean inUnknownDimension() {
@@ -132,8 +115,8 @@ public class OldChunks extends Module {
         for (int x = xMin; x <= xMax; x++) {
             for (int z = zMin; z <= zMax; z++) {
                 ChunkAccess chunk = mc.level.getChunkSource().getChunk(x, z, false);
-                if (chunk instanceof EmptyLevelChunk) continue;
-                searchChunkAsync(chunk);
+                if (chunk instanceof EmptyLevelChunk || chunk == null) continue;
+                searchChunk(chunk);
             }
         }
     }

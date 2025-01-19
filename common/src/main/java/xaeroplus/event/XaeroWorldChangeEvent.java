@@ -1,3 +1,15 @@
 package xaeroplus.event;
 
-public record XaeroWorldChangeEvent(String worldId, String dimId, String mwId) { }
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
+
+public record XaeroWorldChangeEvent(WorldChangeType worldChangeType, @Nullable ResourceKey<Level> from, @Nullable ResourceKey<Level> to) {
+    public enum WorldChangeType {
+        ENTER_WORLD,
+        EXIT_WORLD,
+        ACTUAL_DIMENSION_SWITCH,
+        VIEWED_DIMENSION_SWITCH,
+        MULTIWORLD_SWITCH
+    }
+}

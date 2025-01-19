@@ -33,9 +33,9 @@ import static xaeroplus.util.ColorHelper.getColor;
 
 public class LiquidNewChunks extends Module {
     // chunks where liquid started flowing from source blocks after we loaded it
-    private final SavableHighlightCacheInstance newChunksCache = new SavableHighlightCacheInstance("XaeroPlusNewChunks");
+    public final SavableHighlightCacheInstance newChunksCache = new SavableHighlightCacheInstance("XaeroPlusNewChunks");
     // chunks where liquid was already flowing or flowed when we loaded it
-    private final SavableHighlightCacheInstance inverseNewChunksCache = new SavableHighlightCacheInstance("XaeroPlusNewChunksLiquidInverse");
+    public final SavableHighlightCacheInstance inverseNewChunksCache = new SavableHighlightCacheInstance("XaeroPlusNewChunksLiquidInverse");
     private final Cache<Long, Byte> seenChunksCache = Caffeine.newBuilder()
         .maximumSize(1000)
         .executor(Globals.cacheRefreshExecutorService.get())

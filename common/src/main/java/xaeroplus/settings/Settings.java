@@ -483,6 +483,31 @@ public final class Settings extends SettingRegistry {
             false,
             (b) -> ModuleManager.getModule(Highways.class).setEnabled(b)),
         SettingLocation.CHUNK_HIGHLIGHTS);
+    public enum HighwayWidth implements TranslatableSettingEnum {
+        // Must be odd numbers for the center to be aligned correctly
+        ONE(1), THREE(3), FIVE(5);
+        private final int width;
+        HighwayWidth(final int width) {
+            this.width = width;
+        }
+
+        @Override
+        public String getTranslationKey() {
+            return String.valueOf(width);
+        }
+
+        public int getWidth() {
+            return width;
+        }
+    }
+    public final EnumSetting<HighwayWidth> highwayWidthSetting = register(
+        EnumSetting.create(
+            "2b2t Highways Width",
+            "xaeroplus.setting.2b2t_highways_width",
+            HighwayWidth.values(),
+            HighwayWidth.ONE,
+            (v) -> ModuleManager.getModule(Highways.class).setWidth(v)),
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public final EnumSetting<ColorHelper.HighlightColor> highwaysColorSetting = register(
         EnumSetting.create(
             "2b2t Highways Color",
@@ -540,7 +565,8 @@ public final class Settings extends SettingRegistry {
             "null OW Dim Dir",
             "xaeroplus.setting.null_overworld_dimension_folder",
             true,
-            Globals::setNullOverworldDimFolderIfAble),
+            Globals::setNullOverworldDimFolderIfAble,
+            () -> false),
         SettingLocation.WORLD_MAP_MAIN);
     public final EnumSetting<DataFolderResolutionMode> dataFolderResolutionMode = register(
         EnumSetting.create(

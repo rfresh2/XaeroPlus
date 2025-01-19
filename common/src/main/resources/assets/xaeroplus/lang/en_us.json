@@ -105,6 +105,8 @@
   "xaeroplus.setting.portal_skip_old_chunks_inverse.tooltip": "Uses OldChunks Inverse to determine if a chunk was not loaded before. Therefore a portal could not have been created in its radius. \n Requires OldChunks inverse to be enabled.",
   "xaeroplus.setting.2b2t_highways_enabled": "2b2t Highways",
   "xaeroplus.setting.2b2t_highways_enabled.tooltip": "Highlights chunks on 2b2t highways",
+  "xaeroplus.setting.2b2t_highways_width": "2b2t Highways Width",
+  "xaeroplus.setting.2b2t_highways_width.tooltip": "Sets the width of the highway highlights",
   "xaeroplus.setting.2b2t_highways_color": "2b2t Highways Color",
   "xaeroplus.setting.2b2t_highways_color.tooltip": "Sets the color of 2b2t Highways highlights",
   "xaeroplus.setting.2b2t_highways_opacity": "2b2t Highways Opacity",

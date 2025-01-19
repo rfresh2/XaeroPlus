@@ -105,6 +105,8 @@
   "xaeroplus.setting.portal_skip_old_chunks_inverse.tooltip": "Utilise OldChunks Inverse pour déterminer si un morceau n'a pas été chargé auparavant. Un portail n’aurait donc pas pu être créé dans son rayon.\n  Nécessite l’activation d’OldChunks inverse.",
   "xaeroplus.setting.2b2t_highways_enabled": "Autoroutes 2b2t",
   "xaeroplus.setting.2b2t_highways_enabled.tooltip": "Surligne les chunks sur les autoroutes de 2b2t",
+  "xaeroplus.setting.2b2t_highways_width": "Largeur des autoroutes 2b2t",
+  "xaeroplus.setting.2b2t_highways_width.tooltip": "Définit la largeur des surbrillances des autoroutes",
   "xaeroplus.setting.2b2t_highways_color": "Couleur des Autoroutes 2b2t",
   "xaeroplus.setting.2b2t_highways_color.tooltip": "Définit la couleur des surlignages des autoroutes de 2b2t",
   "xaeroplus.setting.2b2t_highways_opacity": "Opacité des Autoroutes 2b2t",

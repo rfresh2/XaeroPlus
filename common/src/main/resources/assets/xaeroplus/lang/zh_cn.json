@@ -105,6 +105,8 @@
   "xaeroplus.setting.portal_skip_old_chunks_inverse.tooltip": "使用 OldChunks Inverse 来确定之前是否未加载过块。 因此不可能在其半径内创建传送门。\n  需要启用 OldChunks 逆功能。",
   "xaeroplus.setting.2b2t_highways_enabled": "2b2t 高速公路",
   "xaeroplus.setting.2b2t_highways_enabled.tooltip": "突出显示 2b2t 高速公路上的区块",
+  "xaeroplus.setting.2b2t_highways_width": "2b2t 高速公路宽度",
+  "xaeroplus.setting.2b2t_highways_width.tooltip": "设置高速公路高亮显示的宽度",
   "xaeroplus.setting.2b2t_highways_color": "2b2t 高速公路颜色",
   "xaeroplus.setting.2b2t_highways_color.tooltip": "设置 2b2t 高速公路高亮显示的颜色",
   "xaeroplus.setting.2b2t_highways_opacity": "2b2t 高速公路不透明度",

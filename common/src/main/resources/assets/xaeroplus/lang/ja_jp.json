@@ -103,6 +103,8 @@
     "xaeroplus.setting.portal_skip_old_chunks_inverse.tooltip": "チャンクが以前にロードされていないかどうかを判断するために、OldChunks Inverseを使用する。そのため、ポータルがその半径内に作成されていない可能性があります。\nOldChunks Inverseが有効になっている必要があります。",
     "xaeroplus.setting.2b2t_highways_enabled": "2b2t ハイウェイ",
     "xaeroplus.setting.2b2t_highways_enabled.tooltip": "2b2t ハイウェイ上のチャンクを強調表示します",
+    "xaeroplus.setting.2b2t_highways_width": "2b2t ハイウェイの幅",
+    "xaeroplus.setting.2b2t_highways_width.tooltip": "ハイウェイのハイライトの幅を設定します",
     "xaeroplus.setting.2b2t_highways_color": "2b2t ハイウェイの色",
     "xaeroplus.setting.2b2t_highways_color.tooltip": "2b2t ハイウェイの強調表示の色を設定します",
     "xaeroplus.setting.2b2t_highways_opacity": "2b2t ハイウェイの不透明度",

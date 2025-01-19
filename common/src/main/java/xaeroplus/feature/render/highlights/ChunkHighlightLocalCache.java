@@ -2,6 +2,7 @@ package xaeroplus.feature.render.highlights;
 
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import xaeroplus.XaeroPlus;
+import xaeroplus.event.XaeroWorldChangeEvent;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -48,7 +49,12 @@ public class ChunkHighlightLocalCache extends ChunkHighlightBaseCacheHandler {
     }
 
     @Override
-    public void handleWorldChange() {}
+    public void handleWorldChange(final XaeroWorldChangeEvent event) {
+        // intentionally not clearing cache on any world change state
+        // its somewhat useful for players so they don't lose all date if they get disconnected somehow
+        // but it does lead to data incoherence if they switch dimensions or servers in the same session
+        // so its a tradeoff, generally players will always use the database cache anyway
+    }
 
     @Override
     public void handleTick() {}

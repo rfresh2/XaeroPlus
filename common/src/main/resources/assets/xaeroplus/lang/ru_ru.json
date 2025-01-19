@@ -105,6 +105,8 @@
   "xaeroplus.setting.portal_skip_old_chunks_inverse.tooltip": "Использует OldChunks Inverse, чтобы определить, не был ли чанк загружен ранее. Следовательно, портал не мог быть создан в его радиусе.\n  Требуется, чтобы инверсия OldChunks была включена.",
   "xaeroplus.setting.2b2t_highways_enabled": "Шоссе 2b2t",
   "xaeroplus.setting.2b2t_highways_enabled.tooltip": "Выделяет чанки на шоссе 2b2t",
+  "xaeroplus.setting.2b2t_highways_width": "Ширина шоссе 2b2t",
+  "xaeroplus.setting.2b2t_highways_width.tooltip": "Устанавливает ширину выделения шоссе",
   "xaeroplus.setting.2b2t_highways_color": "Цвет шоссе 2b2t",
   "xaeroplus.setting.2b2t_highways_color.tooltip": "Устанавливает цвет выделения шоссе 2b2t",
   "xaeroplus.setting.2b2t_highways_opacity": "Прозрачность шоссе 2b2t",

@@ -16,8 +16,9 @@ import static xaeroplus.util.ColorHelper.getColor;
 
 public class Highways extends Module {
     private int highwaysColor = getColor(0, 0, 255, 100);
+    private int width = 2;
 
-    // Highway data sourced from: https://www.desmos.com/calculator/ogsleiq29o
+    // Highway data sourced from: https://www.desmos.com/calculator/oexoz81fxy
 
     /**
      * Known Errors / Missing Data
@@ -41,6 +42,7 @@ public class Highways extends Module {
         20000,
         25000,
         50000,
+        55000,
         62500,
         100000,
         125000,
@@ -83,25 +85,71 @@ public class Highways extends Module {
 
     public boolean isHighwayChunk(int x, int z, ResourceKey<Level> dimension) {
         if (x == 0 || z == 0) return true; // cardinal directions
+        int w = width / 2;
+        if (w >= 1) {
+            for (int i = 1; i <= w; i++) {
+                if (x + i == 0 || x - i == 0) return true;
+                if (z + i == 0 || z - i == 0) return true;
+            }
+        }
         var xAbs = Math.abs(x);
         var zAbs = Math.abs(z);
         if (xAbs == zAbs) return true; // diags
+        if (w >= 1) {
+            for (int i = 1; i <= w; i++) {
+                if (xAbs - i == zAbs || xAbs + i == zAbs) return true;
+            }
+        }
         if (dimension == Level.NETHER) {
             // ring roads
             if (ringRoads.contains(xAbs)) {
                 if (z >= -xAbs && z <= xAbs) return true;
             }
+            if (w >= 1) {
+                for (int i = 1; i <= w; i++) {
+                    if (ringRoads.contains(xAbs - i)) {
+                        if (z >= -xAbs + i && z <= xAbs - i) return true;
+                    }
+                    if (ringRoads.contains(xAbs + i)) {
+                        if (z >= -xAbs - i && z <= xAbs + i) return true;
+                    }
+                }
+            }
             if (ringRoads.contains(zAbs)) {
                 if (x >= -zAbs && x <= zAbs) return true;
+            }
+            if (w >= 1) {
+                for (int i = 1; i <= w; i++) {
+                    if (ringRoads.contains(zAbs - i)) {
+                        if (x >= -zAbs + i && x <= zAbs - i) return true;
+                    }
+                    if (ringRoads.contains(zAbs + i)) {
+                        if (x >= -zAbs - i && x <= zAbs + i) return true;
+                    }
+                }
             }
 
             // diamonds
             if (diamonds.contains(xAbs + zAbs)) return true;
+            if (w >= 1) {
+                for (int i = 1; i <= w; i++) {
+                    if (diamonds.contains(xAbs + zAbs - i)) return true;
+                    if (diamonds.contains(xAbs + zAbs + i)) return true;
+                }
+            }
 
             // grid
             if (xAbs < fiftyK && zAbs < fiftyK) {
                 if ((xAbs * 16) % 5000 == 0) return true;
                 if ((zAbs * 16) % 5000 == 0) return true;
+            }
+            if (w >= 1) {
+                for (int i = 1; i <= w; i++) {
+                    if ((xAbs - i) * 16 % 5000 == 0) return true;
+                    if ((xAbs + i) * 16 % 5000 == 0) return true;
+                    if ((zAbs - i) * 16 % 5000 == 0) return true;
+                    if ((zAbs + i) * 16 % 5000 == 0) return true;
+                }
             }
         }
         return false;
@@ -133,6 +181,10 @@ public class Highways extends Module {
 
     public void setAlpha(final double a) {
         highwaysColor = ColorHelper.getColorWithAlpha(highwaysColor, (int) a);
+    }
+
+    public void setWidth(final Settings.HighwayWidth w) {
+        width = w.getWidth();
     }
 
     private static IntOpenHashSet chunkSetFromPosList(int... pos) {

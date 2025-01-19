@@ -19,7 +19,7 @@ import java.util.List;
 import static xaeroplus.util.ChunkUtils.regionCoordToChunkCoord;
 
 public class ChunkHighlightDatabase implements Closeable {
-    public static int MAX_HIGHLIGHTS_LIST = 25000;
+    public static final int MAX_HIGHLIGHTS_LIST = 25000;
     private final Connection connection;
     protected final String databaseName;
     private static final DatabaseMigrator MIGRATOR = new DatabaseMigrator();
@@ -83,15 +83,21 @@ public class ChunkHighlightDatabase implements Closeable {
 
     private void insertHighlightsListInternal(final List<ChunkHighlightData> chunks, final ResourceKey<Level> dimension) {
         try {
-            try (var ps = connection.prepareStatement("INSERT OR IGNORE INTO \"" + getTableName(dimension) + "\" VALUES (?, ?, ?)")) {
-                for (int i = 0; i < chunks.size(); i++) {
-                    final ChunkHighlightData chunk = chunks.get(i);
-                    ps.setInt(1, chunk.x());
-                    ps.setInt(2, chunk.z());
-                    ps.setLong(3, chunk.foundTime());
-                    ps.addBatch();
+            // Prepared statements is orders of magnitude slower than single insert like this
+            // batches even slower
+            // only issue is gc spam from string allocations
+            // could reuse this stringbuilder as this should only be called from a single thread
+            StringBuilder sb = new StringBuilder(50 * chunks.size() + 75);
+            sb.append("INSERT OR IGNORE INTO \"").append(getTableName(dimension)).append("\" VALUES ");
+            for (int i = 0; i < chunks.size(); i++) {
+                ChunkHighlightData chunk = chunks.get(i);
+                sb.append("(").append(chunk.x()).append(", ").append(chunk.z()).append(", ").append(chunk.foundTime()).append(")");
+                if (i < chunks.size() - 1) {
+                    sb.append(", ");
                 }
-                ps.executeBatch();
+            }
+            try (var stmt = connection.createStatement()) {
+                stmt.executeUpdate(sb.toString());
             }
         } catch (Exception e) {
             XaeroPlus.LOGGER.error("Error inserting {} chunks into {} database in dimension: {}", chunks.size(), databaseName, dimension.location(), e);

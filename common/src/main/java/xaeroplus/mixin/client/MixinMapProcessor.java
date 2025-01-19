@@ -31,6 +31,7 @@ import xaeroplus.util.DataFolderResolveUtil;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.UUID;
 
 @Mixin(value = MapProcessor.class, remap = false)
@@ -107,7 +108,34 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
         ordinal = 0
     ))
     public void fireWorldChangedEvent(final CallbackInfo ci) {
-        XaeroPlus.EVENT_BUS.call(new XaeroWorldChangeEvent(this.currentWorldId, this.currentDimId, this.currentMWId));
+        var customDimensionId = mapWorld != null ? mapWorld.getCustomDimensionId() : null;
+        var mapWorldDim = this.mapWorld != null ? this.mapWorld.getCurrentDimensionId() : null;
+        XaeroWorldChangeEvent.WorldChangeType type;
+        ResourceKey<Level> from, to;
+        if (xaeroPlus$prevWorldId == null) {
+            type = XaeroWorldChangeEvent.WorldChangeType.ENTER_WORLD;
+            from = null;
+            to = mapWorldDim;
+        } else if (currentWorldId == null) {
+            type = XaeroWorldChangeEvent.WorldChangeType.EXIT_WORLD;
+            from = mapWorldDim;
+            to = null;
+        } else if (!Objects.equals(xaeroPlus$prevMWId, currentMWId) && mapWorldDim == ChunkUtils.getActualDimension()) {
+            type = XaeroWorldChangeEvent.WorldChangeType.MULTIWORLD_SWITCH;
+            from = null;
+            to = null;
+        } else if (customDimensionId != ChunkUtils.getActualDimension()) {
+            type = XaeroWorldChangeEvent.WorldChangeType.SWITCH_TO_ALT_DIMENSION;
+            from = mapWorldDim;
+            to = customDimensionId;
+        } else {
+            type = XaeroWorldChangeEvent.WorldChangeType.SWITCH_BACK_TO_ACTUAL_DIMENSION;
+            from = null;
+            to = mapWorldDim;
+        }
+//        XaeroPlus.LOGGER.info("Firing world change event: {} from {} to {}", type, from, to);
+        var event = new XaeroWorldChangeEvent(type, from, to);
+        XaeroPlus.EVENT_BUS.call(event);
     }
 
     @Inject(method = "getCurrentDimension", at = @At("HEAD"), cancellable = true)

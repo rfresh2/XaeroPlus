@@ -59,7 +59,7 @@ public class SavableHighlightCacheInstance {
     @EventHandler
     public void onXaeroWorldChange(XaeroWorldChangeEvent event) {
         try {
-            cache.handleWorldChange();
+            cache.handleWorldChange(event);
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error handling world change event for cache: {} event: {}", dbName, event, e);
         }

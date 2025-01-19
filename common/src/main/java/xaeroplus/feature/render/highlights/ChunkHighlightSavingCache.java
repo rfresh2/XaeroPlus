@@ -12,6 +12,7 @@ import xaero.map.core.XaeroWorldMapCore;
 import xaero.map.gui.GuiMap;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
+import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.util.ChunkUtils;
 
 import java.io.Closeable;
@@ -27,6 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static net.minecraft.world.level.Level.*;
+import static xaeroplus.event.XaeroWorldChangeEvent.WorldChangeType.ENTER_WORLD;
 import static xaeroplus.util.ChunkUtils.getActualDimension;
 import static xaeroplus.util.GuiMapHelper.*;
 
@@ -57,9 +59,9 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     @Override
     public boolean addHighlight(final int x, final int z) {
         try {
-            ChunkHighlightCacheDimensionHandler cacheForCurrentDimension = getCacheForCurrentDimension();
-            if (cacheForCurrentDimension == null) throw new RuntimeException("Didn't find cache for current dimension");
-            cacheForCurrentDimension.addHighlight(x, z);
+            ChunkHighlightCacheDimensionHandler cacheForActualDimension = getCacheForActualDimension();
+            if (cacheForActualDimension == null) throw new RuntimeException("Didn't find cache for current dimension");
+            cacheForActualDimension.addHighlight(x, z);
             return true;
         } catch (final Exception e) {
             XaeroPlus.LOGGER.debug("Error adding highlight to {} disk cache: {}, {}", databaseName, x, z, e);
@@ -77,9 +79,9 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     @Override
     public boolean removeHighlight(final int x, final int z) {
         try {
-            ChunkHighlightCacheDimensionHandler cacheForCurrentDimension = getCacheForCurrentDimension();
-            if (cacheForCurrentDimension == null) throw new RuntimeException("Didn't find cache for current dimension");
-            cacheForCurrentDimension.removeHighlight(x, z);
+            ChunkHighlightCacheDimensionHandler cacheForActualDimension = getCacheForActualDimension();
+            if (cacheForActualDimension == null) throw new RuntimeException("Didn't find cache for current dimension");
+            cacheForActualDimension.removeHighlight(x, z);
             return true;
         } catch (final Exception e) {
             XaeroPlus.LOGGER.debug("Error removing highlight from {} disk cache: {}, {}", databaseName, x, z, e);
@@ -110,22 +112,33 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     }
 
     @Override
-    public void handleWorldChange() {
+    public void handleWorldChange(final XaeroWorldChangeEvent event) {
         parentExecutor.execute(() -> {
-            // make sure we mark as unready to prevent further mutations
-            if (cacheReady.compareAndSet(true, false)) {
-                try {
-                    Futures.allAsList(flushAllChunks()).get(30, TimeUnit.SECONDS);
-                } catch (final Exception e) {
-                    XaeroPlus.LOGGER.error("Error saving all chunks before world change", e);
+            switch (event.worldChangeType()) {
+                case ENTER_WORLD -> {
+                    cacheReady.set(false);
+                    reset();
+                    if (initializeWorld()) {
+                        cacheReady.set(true);
+                    }
                 }
-            } else {
-                // will happen on initial world load, i.e. not switching dimensions
-                cacheReady.set(false);
-            }
-            reset();
-            if (initializeWorld()) {
-                cacheReady.set(true);
+                case EXIT_WORLD -> {
+                    // make sure we mark as unready to prevent further mutations
+                    if (cacheReady.compareAndSet(true, false)) {
+                        try {
+                            Futures.allAsList(flushAllChunks()).get(30, TimeUnit.SECONDS);
+                        } catch (final Exception e) {
+                            XaeroPlus.LOGGER.error("Error saving all chunks before world change", e);
+                        }
+                    }
+                    reset();
+                }
+                case SWITCH_TO_ALT_DIMENSION -> {
+                    loadChunksInCurrentDimension();
+                }
+                case SWITCH_BACK_TO_ACTUAL_DIMENSION -> {
+                    loadChunksInActualDimension();
+                }
             }
         });
     }
@@ -152,7 +165,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
             .collect(Collectors.toList());
     }
 
-    public ChunkHighlightCacheDimensionHandler getCacheForCurrentDimension() {
+    public ChunkHighlightCacheDimensionHandler getCacheForActualDimension() {
         if (!cacheReady.get()) return null;
         return getCacheForDimension(ChunkUtils.getActualDimension(), true);
     }
@@ -228,6 +241,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
             initializeDimensionCacheHandler(OVERWORLD);
             initializeDimensionCacheHandler(NETHER);
             initializeDimensionCacheHandler(END);
+            loadChunksInCurrentDimension();
             loadChunksInActualDimension();
             return true;
         } catch (final Exception e) {
@@ -238,15 +252,22 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     }
 
     private void loadChunksInActualDimension() {
-        ChunkHighlightCacheDimensionHandler cacheForCurrentDimension = getCacheForCurrentDimension();
+        var cacheForActualDimension = getCacheForActualDimension();
+        if (cacheForActualDimension == null) return;
+        cacheForActualDimension
+            .setWindow(ChunkUtils.actualPlayerRegionX(), ChunkUtils.actualPlayerRegionZ(), getMinimapRegionWindowSize());
+    }
+
+    private void loadChunksInCurrentDimension() {
+        var cacheForCurrentDimension = getCacheForActualDimension();
         if (cacheForCurrentDimension == null) return;
         cacheForCurrentDimension
-            .setWindow(ChunkUtils.actualPlayerRegionX(), ChunkUtils.actualPlayerRegionZ(), getMinimapRegionWindowSize());
+            .setWindow(ChunkUtils.getPlayerRegionX(), ChunkUtils.getPlayerRegionZ(), getMinimapRegionWindowSize());
     }
 
     @Override
     public void onEnable() {
-        handleWorldChange();
+        handleWorldChange(new XaeroWorldChangeEvent(ENTER_WORLD, null, ChunkUtils.getActualDimension()));
     }
 
     @Override
@@ -296,39 +317,35 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         final ResourceKey<Level> mapDimension = Globals.getCurrentDimensionId();
         final ResourceKey<Level> actualDimension = ChunkUtils.getActualDimension();
 
+        final int windowSize;
+        final int actualPlayerRegionX = ChunkUtils.actualPlayerRegionX();
+        final int actualPlayerRegionZ = ChunkUtils.actualPlayerRegionZ();
+        final int windowCenterX;
+        final int windowCenterZ;
+
         Optional<GuiMap> guiMapOptional = getGuiMap();
-        if (guiMapOptional.isPresent()) { // viewing worldmap
-            final GuiMap guiMap = guiMapOptional.get();
-            final int mapCenterX = getGuiMapCenterRegionX(guiMap);
-            final int mapCenterZ = getGuiMapCenterRegionZ(guiMap);
-            final int mapSize = getGuiMapRegionSize(guiMap);
-            final ChunkHighlightCacheDimensionHandler viewedDimCache = getCacheForDimension(mapDimension, true);
-            if (viewedDimCache != null) viewedDimCache.setWindow(mapCenterX, mapCenterZ, mapSize);
-            if (mapDimension == actualDimension) {
-                getCachesExceptDimension(mapDimension)
-                    .forEach(cache -> cache.setWindow(0, 0, 0));
-            } else {
-                final ChunkHighlightCacheDimensionHandler actualDimCache = getCacheForDimension(actualDimension, true);
-                if (actualDimCache != null) {
-                    actualDimCache.setWindow(ChunkUtils.getPlayerRegionX(), ChunkUtils.getPlayerRegionZ(), mapSize);
-                }
-                getCachesExceptDimensions(List.of(mapDimension, actualDimension))
-                    .forEach(cache -> cache.setWindow(0, 0, 0));
+        if (guiMapOptional.isPresent()) {
+            var guiMap = guiMapOptional.get();
+            windowSize = getGuiMapRegionSize(guiMap);
+            windowCenterX = getGuiMapCenterRegionX(guiMap);
+            windowCenterZ = getGuiMapCenterRegionZ(guiMap);
+        } else {
+            windowSize = getMinimapRegionWindowSize();
+            windowCenterX = ChunkUtils.getPlayerRegionX();
+            windowCenterZ = ChunkUtils.getPlayerRegionZ();
+        }
+        var cacheForDimension = getCacheForDimension(mapDimension, true);
+        if (cacheForDimension != null) cacheForDimension.setWindow(windowCenterX, windowCenterZ, windowSize);
+        if (mapDimension == actualDimension) {
+            getCachesExceptDimension(mapDimension)
+                .forEach(cache -> cache.setWindow(0, 0, 0));
+        } else {
+            var actualDimCache = getCacheForDimension(actualDimension, true);
+            if (actualDimCache != null) {
+                actualDimCache.setWindow(actualPlayerRegionX, actualPlayerRegionZ, windowSize);
             }
-        } else { // viewing minimap
-            final ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(mapDimension, true);
-            if (cacheForDimension != null) cacheForDimension.setWindow(ChunkUtils.getPlayerRegionX(), ChunkUtils.getPlayerRegionZ(), getMinimapRegionWindowSize());
-            if (mapDimension == actualDimension) {
-                getCachesExceptDimension(mapDimension)
-                    .forEach(cache -> cache.setWindow(0, 0, 0));
-            } else {
-                final ChunkHighlightCacheDimensionHandler actualDimCache = getCacheForDimension(actualDimension, true);
-                if (actualDimCache != null) {
-                    actualDimCache.setWindow(ChunkUtils.getPlayerRegionX(), ChunkUtils.getPlayerRegionZ(), getMinimapRegionWindowSize());
-                }
-                getCachesExceptDimensions(List.of(mapDimension, actualDimension))
-                    .forEach(cache -> cache.setWindow(0, 0, 0));
-            }
+            getCachesExceptDimensions(List.of(mapDimension, actualDimension))
+                .forEach(cache -> cache.setWindow(0, 0, 0));
         }
     }
 

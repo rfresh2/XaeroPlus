@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import xaeroplus.XaeroPlus;
+import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.util.ChunkUtils;
 
 import java.util.ArrayList;
@@ -144,7 +145,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
     }
 
     @Override
-    public void handleWorldChange() {}
+    public void handleWorldChange(final XaeroWorldChangeEvent event) {}
 
     @Override
     public void handleTick() {}

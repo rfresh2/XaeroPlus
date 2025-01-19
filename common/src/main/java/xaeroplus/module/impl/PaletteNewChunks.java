@@ -27,8 +27,8 @@ import static xaeroplus.module.impl.PaletteNewChunks.BiomeCheckResult.*;
 import static xaeroplus.util.ColorHelper.getColor;
 
 public class PaletteNewChunks extends Module {
-    private final SavableHighlightCacheInstance newChunksCache = new SavableHighlightCacheInstance("XaeroPlusPaletteNewChunks");
-    private final SavableHighlightCacheInstance newChunksInverseCache = new SavableHighlightCacheInstance("XaeroPlusPaletteNewChunksInverse");
+    public final SavableHighlightCacheInstance newChunksCache = new SavableHighlightCacheInstance("XaeroPlusPaletteNewChunks");
+    public final SavableHighlightCacheInstance newChunksInverseCache = new SavableHighlightCacheInstance("XaeroPlusPaletteNewChunksInverse");
     private int newChunksColor = getColor(255, 0, 0, 100);
     private final IntSet presentStateIdsBuf = new IntOpenHashSet();
     private boolean renderInverse = false;

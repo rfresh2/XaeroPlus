@@ -8,8 +8,8 @@ public record XaeroWorldChangeEvent(WorldChangeType worldChangeType, @Nullable R
     public enum WorldChangeType {
         ENTER_WORLD,
         EXIT_WORLD,
-        SWITCH_TO_ALT_DIMENSION,
-        SWITCH_BACK_TO_ACTUAL_DIMENSION,
+        ACTUAL_DIMENSION_SWITCH,
+        VIEWED_DIMENSION_SWITCH,
         MULTIWORLD_SWITCH
     }
 }

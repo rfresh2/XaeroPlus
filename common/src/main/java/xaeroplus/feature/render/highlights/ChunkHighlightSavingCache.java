@@ -133,10 +133,10 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
                     }
                     reset();
                 }
-                case SWITCH_TO_ALT_DIMENSION -> {
+                case VIEWED_DIMENSION_SWITCH -> {
                     loadChunksInCurrentDimension();
                 }
-                case SWITCH_BACK_TO_ACTUAL_DIMENSION -> {
+                case ACTUAL_DIMENSION_SWITCH -> {
                     loadChunksInActualDimension();
                 }
             }
@@ -242,7 +242,6 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
             initializeDimensionCacheHandler(NETHER);
             initializeDimensionCacheHandler(END);
             loadChunksInCurrentDimension();
-            loadChunksInActualDimension();
             return true;
         } catch (final Exception e) {
             // expected on game launch

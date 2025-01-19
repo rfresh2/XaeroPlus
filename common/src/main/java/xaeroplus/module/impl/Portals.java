@@ -16,7 +16,6 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.EmptyLevelChunk;
 import net.minecraft.world.level.chunk.LevelChunk;
 import xaeroplus.Globals;
-import xaeroplus.XaeroPlus;
 import xaeroplus.event.ChunkBlockUpdateEvent;
 import xaeroplus.event.ChunkBlocksUpdateEvent;
 import xaeroplus.event.ChunkDataEvent;
@@ -30,7 +29,7 @@ import xaeroplus.util.ColorHelper;
 import static xaeroplus.util.ColorHelper.getColor;
 
 public class Portals extends Module {
-    private final SavableHighlightCacheInstance portalsCache = new SavableHighlightCacheInstance("XaeroPlusPortals");
+    public final SavableHighlightCacheInstance portalsCache = new SavableHighlightCacheInstance("XaeroPlusPortals");
     private int portalsColor = getColor(0, 255, 0, 100);
     private static final ReferenceSet<Block> PORTAL_BLOCKS = ReferenceOpenHashSet.of(
         Blocks.END_PORTAL,
@@ -61,7 +60,7 @@ public class Portals extends Module {
 
     @EventHandler
     public void onChunkData(final ChunkDataEvent event) {
-        findPortalInChunkAsync(event.chunk());
+        findPortalInChunk(event.chunk());
     }
 
     @EventHandler
@@ -74,36 +73,14 @@ public class Portals extends Module {
         handleBlockChange(event.packet().getPos(), event.packet().getBlockState());
     }
 
-    private void findPortalInChunkAsync(final ChunkAccess chunk) {
-        findPortalInChunkAsync(chunk, 0);
-    }
-
-    private void findPortalInChunkAsync(final ChunkAccess chunk, final int waitMs) {
-        if (chunk == null) return;
-        Globals.moduleExecutorService.get().execute(() -> {
-            try {
-                Thread.sleep(waitMs);
-                int iterations = 0;
-                while (iterations++ < 3) {
-                    if (findPortalInChunk(chunk)) break;
-                    // mitigate race condition during world changes hackily
-                    Thread.sleep(500);
-                }
-            } catch (final Throwable e) {
-                XaeroPlus.LOGGER.debug("Error searching for portal in chunk: {}, {}", chunk.getPos().x, chunk.getPos().z, e);
-            }
-        });
-    }
-
-    private boolean findPortalInChunk(final ChunkAccess chunk) {
+    private void findPortalInChunk(final ChunkAccess chunk) {
         final boolean chunkHadPortal = portalsCache.get().isHighlighted(chunk.getPos().x, chunk.getPos().z, ChunkUtils.getActualDimension());
         var hasPortal = ChunkScanner.chunkContainsBlocks(chunk, PORTAL_BLOCKS, mc.level.getMinBuildHeight());
         if (hasPortal) {
-            return portalsCache.get().addHighlight(chunk.getPos().x, chunk.getPos().z);
+            portalsCache.get().addHighlight(chunk.getPos().x, chunk.getPos().z);
         } else if (chunkHadPortal) {
             portalsCache.get().removeHighlight(chunk.getPos().x, chunk.getPos().z);
         }
-        return true;
     }
 
     private boolean findPortalAtBlockPos(final BlockPos pos) {
@@ -126,8 +103,8 @@ public class Portals extends Module {
         for (int x = xMin; x <= xMax; x++) {
             for (int z = zMin; z <= zMax; z++) {
                 ChunkAccess chunk = mc.level.getChunkSource().getChunk(x, z, false);
-                if (chunk instanceof EmptyLevelChunk) continue;
-                findPortalInChunkAsync(chunk);
+                if (chunk instanceof EmptyLevelChunk || chunk == null) continue;
+                findPortalInChunk(chunk);
             }
         }
     }
@@ -141,7 +118,14 @@ public class Portals extends Module {
                 LevelChunk worldChunk = mc.level.getChunkSource().getChunk(chunkX, chunkZ, false);
                 if (worldChunk != null && !(worldChunk instanceof EmptyLevelChunk)) {
                     // todo: this isn't guaranteed to search _after_ the block update is processed
-                    findPortalInChunkAsync(worldChunk, 250);
+                    Globals.moduleExecutorService.get().execute(() -> {
+                        try {
+                            Thread.sleep(250L);
+                        } catch (InterruptedException e) {
+                            // fall through
+                        }
+                        findPortalInChunk(worldChunk);
+                    });
                 }
             }
         } else if (state.getBlock() instanceof NetherPortalBlock || state.getBlock() instanceof EndPortalBlock) {

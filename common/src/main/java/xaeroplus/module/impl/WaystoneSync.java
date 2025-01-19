@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Locale;
 
 import static xaero.common.settings.ModSettings.COLORS;
+import static xaeroplus.event.XaeroWorldChangeEvent.WorldChangeType.ENTER_WORLD;
+import static xaeroplus.event.XaeroWorldChangeEvent.WorldChangeType.EXIT_WORLD;
 
 public class WaystoneSync extends Module {
     private final BlayWaystonesHelper blayWaystonesHelper = new BlayWaystonesHelper();
@@ -51,7 +53,7 @@ public class WaystoneSync extends Module {
 
     @EventHandler
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
-        if (event.worldId() == null) {
+        if (event.worldChangeType() == EXIT_WORLD || event.worldChangeType() == ENTER_WORLD) {
             blayWaystonesHelper.toSyncWaystones = Collections.emptyList();
         }
     }

@@ -28,20 +28,33 @@ import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.DataFolderResolveUtil;
 
+import java.lang.ref.WeakReference;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.UUID;
+
+import static xaeroplus.event.XaeroWorldChangeEvent.WorldChangeType.*;
 
 @Mixin(value = MapProcessor.class, remap = false)
 public abstract class MixinMapProcessor implements CustomMapProcessor {
-    @Shadow private String currentWorldId;
-    @Shadow private String currentDimId;
-    @Shadow private String currentMWId;
     @Unique private String xaeroPlus$prevWorldId;
     @Unique private String xaeroPlus$prevDimId;
     @Unique private String xaeroPlus$prevMWId;
+
+    @Unique private boolean xaeroPlus$worldChange_prevMapWorldUsable;
+    @Unique private WeakReference<ClientLevel> xaeroPlus$worldChange_prevWorld;
+    @Unique private String xaeroPlus$worldChange_prevCurrentMWId;
+    @Unique private ResourceKey<Level> xaeroPlus$worldChange_prevMapWorldCurrentDimId;
+    @Unique private boolean xaeroPlus$nextWorldChangeIsDimSwitch = false;
     @Unique private final static String LOCK_ID = UUID.randomUUID().toString();
+
     @Shadow private ClientLevel world;
+    @Shadow private MapWorld mapWorld;
+    @Shadow private boolean mapWorldUsable;
+    @Shadow private String currentWorldId;
+    @Shadow private String currentDimId;
+    @Shadow private String currentMWId;
 
     @Unique
     private static final ThreadLocal<Boolean> xaeroPlus$getLeafRegionActualDimSignal = ThreadLocal.withInitial(() -> false);
@@ -57,7 +70,6 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
     }
 
     @Shadow public abstract String getDimensionName(final ResourceKey<Level> id);
-    @Shadow private MapWorld mapWorld;
 
     @Inject(method = "getMainId(I)Ljava/lang/String;", at = @At("HEAD"),
         cancellable = true,
@@ -102,11 +114,59 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
 
     @Inject(method = "updateWorldSynced", at = @At(
         value = "INVOKE",
+        target = "Lxaero/map/MapProcessor;pushRenderPause(ZZ)V",
+        ordinal = 0
+    ))
+    public void capturePrevStateForWorldChangeEvent(CallbackInfo ci) {
+        this.xaeroPlus$worldChange_prevMapWorldUsable = this.mapWorldUsable;
+        this.xaeroPlus$worldChange_prevWorld = new WeakReference<>(this.world);
+        this.xaeroPlus$worldChange_prevCurrentMWId = this.currentMWId;
+        this.xaeroPlus$worldChange_prevMapWorldCurrentDimId = this.mapWorld != null ? this.mapWorld.getCurrentDimensionId() : null;
+    }
+
+    @Inject(method = "updateWorldSynced", at = @At(
+        value = "INVOKE",
         target = "Lxaero/map/MapProcessor;popRenderPause(ZZ)V",
         ordinal = 0
     ))
     public void fireWorldChangedEvent(final CallbackInfo ci) {
-        XaeroPlus.EVENT_BUS.call(new XaeroWorldChangeEvent(this.currentWorldId, this.currentDimId, this.currentMWId));
+        if (Globals.switchingDimension) {
+            XaeroPlus.LOGGER.info("Skipping dim switch world change event firing");
+            xaeroPlus$nextWorldChangeIsDimSwitch = true;
+            return;
+        }
+        boolean dimSwitching = this.xaeroPlus$nextWorldChangeIsDimSwitch;
+        this.xaeroPlus$nextWorldChangeIsDimSwitch = false;
+        var mapWorldDim = this.mapWorld != null ? this.mapWorld.getCurrentDimensionId() : null;
+        XaeroWorldChangeEvent.WorldChangeType type;
+        ResourceKey<Level> from, to;
+        if (!xaeroPlus$worldChange_prevMapWorldUsable && mapWorldUsable && xaeroPlus$worldChange_prevWorld.get() == null && !dimSwitching) {
+            type = ENTER_WORLD;
+            from = null;
+            to = mapWorldDim;
+        } else if (xaeroPlus$worldChange_prevMapWorldUsable && !mapWorldUsable && world == null) {
+            type = EXIT_WORLD;
+            from = mapWorldDim;
+            to = null;
+        } else if (dimSwitching) {
+            type = ACTUAL_DIMENSION_SWITCH;
+            from = null;
+            to = mapWorldDim;
+        } else if (xaeroPlus$worldChange_prevMapWorldUsable && mapWorldUsable && xaeroPlus$worldChange_prevMapWorldCurrentDimId != mapWorldDim) {
+            type = VIEWED_DIMENSION_SWITCH;
+            from = ChunkUtils.getActualDimension();
+            to = mapWorldDim;
+        } else if (!Objects.equals(xaeroPlus$worldChange_prevCurrentMWId, currentMWId) && xaeroPlus$worldChange_prevWorld.get() == world) {
+            type = MULTIWORLD_SWITCH;
+            from = null;
+            to = null;
+        } else {
+            XaeroPlus.LOGGER.info("Unhandled XaeroWorldChangeEvent type :(");
+            return;
+        }
+//        XaeroPlus.LOGGER.info("Firing world change event: {} from {} to {}", type, from, to);
+        var event = new XaeroWorldChangeEvent(type, from, to);
+        XaeroPlus.EVENT_BUS.call(event);
     }
 
     @Inject(method = "getCurrentDimension", at = @At("HEAD"), cancellable = true)

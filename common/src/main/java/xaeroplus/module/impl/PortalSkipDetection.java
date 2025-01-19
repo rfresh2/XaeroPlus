@@ -34,7 +34,7 @@ import static xaeroplus.util.GuiMapHelper.*;
 public class PortalSkipDetection extends Module {
     private Future<?> portalSkipDetectionSearchFuture = null;
     private int portalSkipChunksColor = ColorHelper.getColor(255, 255, 255, 100);
-    private final ChunkHighlightLocalCache cache = new ChunkHighlightLocalCache();
+    public final ChunkHighlightLocalCache cache = new ChunkHighlightLocalCache();
     private int windowRegionX = 0;
     private int windowRegionZ = 0;
     private int windowRegionSize = 0;

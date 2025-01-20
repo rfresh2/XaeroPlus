@@ -7,6 +7,7 @@ import it.unimi.dsi.fastutil.longs.LongList;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaeroplus.Globals;
+import xaeroplus.XaeroPlus;
 import xaeroplus.module.Module;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
@@ -142,13 +143,13 @@ public class Highways extends Module {
             if (xAbs < fiftyK && zAbs < fiftyK) {
                 if ((xAbs * 16) % 5000 == 0) return true;
                 if ((zAbs * 16) % 5000 == 0) return true;
-            }
-            if (w >= 1) {
-                for (int i = 1; i <= w; i++) {
-                    if ((xAbs - i) * 16 % 5000 == 0) return true;
-                    if ((xAbs + i) * 16 % 5000 == 0) return true;
-                    if ((zAbs - i) * 16 % 5000 == 0) return true;
-                    if ((zAbs + i) * 16 % 5000 == 0) return true;
+                if (w >= 1) {
+                    for (int i = 1; i <= w; i++) {
+                        if (((xAbs - i) * 16) % 5000 == 0) return true;
+                        if (((xAbs + i) * 16) % 5000 == 0) return true;
+                        if (((zAbs - i) * 16) % 5000 == 0) return true;
+                        if (((zAbs + i) * 16) % 5000 == 0) return true;
+                    }
                 }
             }
         }

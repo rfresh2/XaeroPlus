@@ -1,17 +1,17 @@
 package xaeroplus.module.impl;
 
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import it.unimi.dsi.fastutil.ints.IntSet;
-import it.unimi.dsi.fastutil.longs.LongArrayList;
-import it.unimi.dsi.fastutil.longs.LongList;
+import it.unimi.dsi.fastutil.ints.IntList;
+import kaptainwutax.mathutils.util.Mth;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaeroplus.Globals;
-import xaeroplus.XaeroPlus;
+import xaeroplus.feature.render.Line;
 import xaeroplus.module.Module;
 import xaeroplus.settings.Settings;
-import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static xaeroplus.util.ColorHelper.getColor;
 
@@ -29,7 +29,10 @@ public class Highways extends Module {
      * OW/End highways extend past actual road
      */
 
-    private static final IntSet ringRoads = chunkSetFromPosList(
+    private final List<Line> OVERWORLD_END_LINES = generateHighwayLines(Level.OVERWORLD);
+    private final List<Line> NETHER_LINES = generateHighwayLines(Level.NETHER);
+
+    private static final IntList ringRoads = IntList.of(
         200,
         500,
         1000,
@@ -58,7 +61,7 @@ public class Highways extends Module {
         3750000
     );
 
-    private static final IntSet diamonds = chunkSetFromPosList(
+    private static final IntList diamonds = IntList.of(
         2500,
         5000,
         25000,
@@ -69,107 +72,80 @@ public class Highways extends Module {
         3750000
     );
 
-    private static final int fiftyK = ChunkUtils.posToChunkPos(50000);
-
     @Override
     public void onEnable() {
-        Globals.drawManager.registerChunkHighlightProvider(
-            this.getClass(),
-            this::getWindowedHighlightsSnapshot,
-            this::getHighwayColor);
+        Globals.drawManager.registerLineProvider(
+            this.getClass().getName(),
+            this::getHighwayLines,
+            this::getHighwayColor,
+            this::getLineWidth,
+            5000
+        );
     }
 
-    @Override
-    public void onDisable() {
-        Globals.drawManager.unregisterChunkHighlightProvider(this.getClass());
+    private List<Line> getHighwayLines(int windowRegionX, int windowRegionZ, int windowSize, ResourceKey<Level> dimension) {
+        if (dimension == Level.OVERWORLD || dimension == Level.END) {
+            return OVERWORLD_END_LINES;
+        } else if (dimension == Level.NETHER) {
+            return NETHER_LINES;
+        } else {
+            return new ArrayList<>();
+        }
     }
 
-    public boolean isHighwayChunk(int x, int z, ResourceKey<Level> dimension) {
-        if (x == 0 || z == 0) return true; // cardinal directions
-        int w = width / 2;
-        if (w >= 1) {
-            for (int i = 1; i <= w; i++) {
-                if (x + i == 0 || x - i == 0) return true;
-                if (z + i == 0 || z - i == 0) return true;
-            }
+    private List<Line> generateHighwayLines(ResourceKey<Level> dimension) {
+        var lines = new ArrayList<Line>(500);
+        // if a line is too long we will start hitting floating point precision errors in opengl
+        // as the lines are translated to map and screen space
+        // so we break these up into smaller lines
+        int stride = 500_000;
+
+        // cardinals
+        for (int i = -30_000_000; i < 30_000_000; i += stride) {
+            lines.add(new Line(i, 0, i + stride, 0));
+            lines.add(new Line(0, i, 0, i + stride));
         }
-        var xAbs = Math.abs(x);
-        var zAbs = Math.abs(z);
-        if (xAbs == zAbs) return true; // diags
-        if (w >= 1) {
-            for (int i = 1; i <= w; i++) {
-                if (xAbs - i == zAbs || xAbs + i == zAbs) return true;
-            }
+
+        // diagonals
+        for (int i = -30_000_000; i < 30_000_000; i += stride) {
+            lines.add(new Line(i, i, i + stride, i + stride));
+            lines.add(new Line(-i, i, -i - stride, i + stride));
         }
+
         if (dimension == Level.NETHER) {
             // ring roads
-            if (ringRoads.contains(xAbs)) {
-                if (z >= -xAbs && z <= xAbs) return true;
-            }
-            if (w >= 1) {
-                for (int i = 1; i <= w; i++) {
-                    if (ringRoads.contains(xAbs - i)) {
-                        if (z >= -xAbs + i && z <= xAbs - i) return true;
-                    }
-                    if (ringRoads.contains(xAbs + i)) {
-                        if (z >= -xAbs - i && z <= xAbs + i) return true;
-                    }
-                }
-            }
-            if (ringRoads.contains(zAbs)) {
-                if (x >= -zAbs && x <= zAbs) return true;
-            }
-            if (w >= 1) {
-                for (int i = 1; i <= w; i++) {
-                    if (ringRoads.contains(zAbs - i)) {
-                        if (x >= -zAbs + i && x <= zAbs - i) return true;
-                    }
-                    if (ringRoads.contains(zAbs + i)) {
-                        if (x >= -zAbs - i && x <= zAbs + i) return true;
-                    }
+            for (int ringRoad : ringRoads) {
+                int i = -ringRoad;
+                while (i < ringRoad) {
+                    lines.add(new Line(i, -ringRoad, Mth.min(i + stride, ringRoad), -ringRoad));
+                    lines.add(new Line(i, ringRoad, Mth.min(i + stride, ringRoad), ringRoad));
+                    lines.add(new Line(-ringRoad, i, -ringRoad, Mth.min(i + stride, ringRoad)));
+                    lines.add(new Line(ringRoad, i, ringRoad, Mth.min(i + stride, ringRoad)));
+                    i += stride;
                 }
             }
 
             // diamonds
-            if (diamonds.contains(xAbs + zAbs)) return true;
-            if (w >= 1) {
-                for (int i = 1; i <= w; i++) {
-                    if (diamonds.contains(xAbs + zAbs - i)) return true;
-                    if (diamonds.contains(xAbs + zAbs + i)) return true;
-                }
+            for (int diamond : diamonds) {
+                lines.add(new Line(diamond, 0, 0, diamond));
+                lines.add(new Line(0, -diamond, diamond, 0));
+                lines.add(new Line(0, -diamond, -diamond, 0));
+                lines.add(new Line(-diamond, 0, 0, diamond));
             }
 
-            // grid
-            if (xAbs < fiftyK && zAbs < fiftyK) {
-                if ((xAbs * 16) % 5000 == 0) return true;
-                if ((zAbs * 16) % 5000 == 0) return true;
-                if (w >= 1) {
-                    for (int i = 1; i <= w; i++) {
-                        if (((xAbs - i) * 16) % 5000 == 0) return true;
-                        if (((xAbs + i) * 16) % 5000 == 0) return true;
-                        if (((zAbs - i) * 16) % 5000 == 0) return true;
-                        if (((zAbs + i) * 16) % 5000 == 0) return true;
-                    }
-                }
+            // 50k grid - vertical and horizontal line every 5k blocks
+            for (int i = -50000; i < 50000; i += 5000) {
+                if (i == 0) continue;
+                lines.add(new Line(i, -50000, i, 50000));
+                lines.add(new Line(-50000, i, 50000, i));
             }
         }
-        return false;
+        return lines;
     }
 
-    public LongList getWindowedHighlightsSnapshot(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
-        int minChunkX = ChunkUtils.regionCoordToChunkCoord(windowRegionX - windowRegionSize);
-        int maxChunkX = ChunkUtils.regionCoordToChunkCoord(windowRegionX + windowRegionSize);
-        int minChunkZ = ChunkUtils.regionCoordToChunkCoord(windowRegionZ - windowRegionSize);
-        int maxChunkZ = ChunkUtils.regionCoordToChunkCoord(windowRegionZ + windowRegionSize);
-        LongList chunks = new LongArrayList(8);
-        for (int x = minChunkX; x <= maxChunkX; x++) {
-            for (int z = minChunkZ; z <= maxChunkZ; z++) {
-                if (isHighwayChunk(x, z, dimension)) {
-                    chunks.add(ChunkUtils.chunkPosToLong(x, z));
-                }
-            }
-        }
-        return chunks;
+    @Override
+    public void onDisable() {
+        Globals.drawManager.unregisterLineProvider(this.getClass().getName());
     }
 
     public int getHighwayColor() {
@@ -188,11 +164,7 @@ public class Highways extends Module {
         width = w.getWidth();
     }
 
-    private static IntOpenHashSet chunkSetFromPosList(int... pos) {
-        final IntOpenHashSet set = new IntOpenHashSet(pos.length);
-        for (int i = 0; i < pos.length; i++) {
-            set.add(ChunkUtils.posToChunkPos(pos[i]));
-        }
-        return set;
+    private float getLineWidth() {
+        return width;
     }
 }

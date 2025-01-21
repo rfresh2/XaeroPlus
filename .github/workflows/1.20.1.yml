@@ -50,31 +50,46 @@ jobs:
       run: echo "XP_VERSION=$(./gradlew -q printXaeroPlusVersion)" >> $GITHUB_ENV
 
     - name: Get Fabric Jar Filename
-      run: echo "XP_FABRIC=XaeroPlus-${{ env.XP_VERSION}}+fabric-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FABRIC }}-MM${{ env.MINIMAP_VERSION_FABRIC }}" >> $GITHUB_ENV
+      run: echo "XP_FABRIC=XaeroPlus-${{ env.XP_VERSION }}+fabric-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FABRIC }}-MM${{ env.MINIMAP_VERSION_FABRIC }}" >> $GITHUB_ENV
 
     - name: Get Forge Jar Filename
-      run: echo "XP_FORGE=XaeroPlus-${{ env.XP_VERSION}}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
+      run: echo "XP_FORGE=XaeroPlus-${{ env.XP_VERSION }}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
+
+    - name: Get Commit Hash
+      run: echo "COMMIT_HASH=$(git rev-parse --short=8 HEAD)" >> $GITHUB_ENV
+
+    - name: Get Fabric Jar Result Filename
+      run: echo "XP_FABRIC_OUT=XaeroPlus-${{ env.XP_VERSION }}-DEV-${{ env.COMMIT_HASH }}+fabric-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FABRIC }}-MM${{ env.MINIMAP_VERSION_FABRIC }}" >> $GITHUB_ENV
+
+    - name: Append Commit Hash To Fabric Jar Name
+      run: mv fabric/build/libs/${{ env.XP_FABRIC }}.jar fabric/build/libs/${{ env.XP_FABRIC_OUT }}.jar
+
+    - name: Get Forge Jar Result Filename
+      run: echo "XP_FORGE_OUT=XaeroPlus-${{ env.XP_VERSION }}-DEV-${{ env.COMMIT_HASH }}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
+
+    - name: Append Commit Hash To Forge Jar Name
+      run: mv forge/build/libs/${{ env.XP_FORGE }}.jar forge/build/libs/${{ env.XP_FORGE_OUT }}.jar
 
     - name: Upload Fabric Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ env.XP_FABRIC }}
-        path: fabric/build/libs/${{ env.XP_FABRIC }}.jar
+        name: ${{ env.XP_FABRIC_OUT }}
+        path: fabric/build/libs/${{ env.XP_FABRIC_OUT }}.jar
         if-no-files-found: error
 
     - name: Upload Forge Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ env.XP_FORGE }}
-        path: forge/build/libs/${{ env.XP_FORGE }}.jar
+        name: ${{ env.XP_FORGE_OUT }}
+        path: forge/build/libs/${{ env.XP_FORGE_OUT }}.jar
         if-no-files-found: error
     outputs:
       worldmap_version_fabric: ${{ env.WORLDMAP_VERSION_FABRIC }}
       worldmap_version_forge: ${{ env.WORLDMAP_VERSION_FORGE }}
       minimap_version_fabric: ${{ env.MINIMAP_VERSION_FABRIC }}
       minimap_version_forge: ${{ env.MINIMAP_VERSION_FORGE }}
-      xp_fabric: ${{ env.XP_FABRIC }}
-      xp_forge: ${{ env.XP_FORGE }}
+      xp_fabric: ${{ env.XP_FABRIC_OUT }}
+      xp_forge: ${{ env.XP_FORGE_OUT }}
 
   test-fabric:
     runs-on: ubuntu-latest

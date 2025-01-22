@@ -24,6 +24,7 @@ import xaero.common.graphics.CustomVertexConsumers;
 import xaero.common.graphics.ImprovedFramebuffer;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRenderer;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
+import xaero.common.graphics.shader.FramebufferLinesShaderHelper;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.render.MinimapFBORenderer;
 import xaero.common.minimap.render.MinimapRenderer;
@@ -181,8 +182,8 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         value = "INVOKE",
         target = "Lxaero/common/mods/SupportXaeroWorldmap;drawMinimap(Lxaero/hud/minimap/module/MinimapSession;Lcom/mojang/blaze3d/vertex/PoseStack;Lxaero/common/minimap/render/MinimapRendererHelper;IIIIIIZDDLcom/mojang/blaze3d/vertex/VertexConsumer;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;)V"),
         remap = true) // $REMAP
-    public void captureDrawContext(final SupportXaeroWorldmap instance, final MinimapSession minimapSession, final PoseStack matrixStack, final MinimapRendererHelper helper, final int xFloored, final int zFloored, final int minViewX, final int minViewZ, final int maxViewX, final int maxViewZ, final boolean zooming, final double zoom, final double mapDimensionScale, final VertexConsumer overlayBufferBuilder, final MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers, final Operation<Void> original,
-                                   @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers) {
+    public void drawMinimapFeatures(final SupportXaeroWorldmap instance, final MinimapSession minimapSession, final PoseStack matrixStack, final MinimapRendererHelper helper, final int xFloored, final int zFloored, final int minViewX, final int minViewZ, final int maxViewX, final int maxViewZ, final boolean zooming, final double zoom, final double mapDimensionScale, final VertexConsumer overlayBufferBuilder, final MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers, final Operation<Void> original,
+                                    @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers) {
         original.call(instance, minimapSession, matrixStack, helper, xFloored, zFloored, minViewX, minViewZ, maxViewX, maxViewZ, zooming, zoom, mapDimensionScale, overlayBufferBuilder, multiTextureRenderTypeRenderers);
         int mapX = xFloored >> 4;
         int mapZ = zFloored >> 4;
@@ -192,6 +193,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         int tileZ = mapZ & 3;
         int insideX = xFloored & 15;
         int insideZ = zFloored & 15;
+        FramebufferLinesShaderHelper.setFrameSize((float)this.scalingFramebuffer.viewWidth, (float)this.scalingFramebuffer.viewHeight);
         Globals.drawManager.drawMinimapFeatures(
             minViewX,
             maxViewX,

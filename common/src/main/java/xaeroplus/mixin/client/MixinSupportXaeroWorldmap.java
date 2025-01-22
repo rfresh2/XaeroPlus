@@ -23,7 +23,7 @@ import xaero.map.MapProcessor;
 import xaero.map.WorldMapSession;
 import xaero.map.region.MapTileChunk;
 import xaeroplus.Globals;
-import xaeroplus.feature.render.MinimapBackgroundDrawHelper;
+import xaeroplus.feature.render.DrawHelper;
 import xaeroplus.settings.Settings;
 
 @Mixin(value = SupportXaeroWorldmap.class, remap = false)
@@ -72,11 +72,11 @@ public abstract class MixinSupportXaeroWorldmap {
                                       @Local(name = "chunk") MapTileChunk chunk
     ) {
         if (Settings.REGISTRY.transparentMinimapBackground.get()) {
-            MinimapBackgroundDrawHelper.addMMBackgroundToBuffer(matrixStack.last().pose(),
-                                                                bgBufferBuilderRef.get(),
-                                                                drawX,
-                                                                drawZ,
-                                                                chunk);
+            DrawHelper.addMMBackgroundToBuffer(matrixStack.last().pose(),
+                                               bgBufferBuilderRef.get(),
+                                               drawX,
+                                               drawZ,
+                                               chunk);
         }
     }
 
@@ -92,32 +92,6 @@ public abstract class MixinSupportXaeroWorldmap {
     public void drawTransparentMMBackground(final PoseStack matrixStack, final int minX, final int maxX, final int minZ, final int maxZ, final int minViewX, final int maxViewX, final int minViewZ, final int maxViewZ, final MapProcessor mapProcessor, final boolean noCaveMaps, final boolean slimeChunks, final int chunkX, final int chunkZ, final int tileX, final int tileZ, final int insideX, final int insideZ, final Long seed, final MultiTextureRenderTypeRenderer mapWithLightRenderer, final MultiTextureRenderTypeRenderer mapNoLightRenderer, final MinimapRendererHelper helper, final VertexConsumer overlayBufferBuilder, final CallbackInfo ci,
                                @Share("bgTesselator") LocalRef<Tesselator> bgTesselatorRef) {
         if (Settings.REGISTRY.transparentMinimapBackground.get()) bgTesselatorRef.get().end();
-    }
-
-    @Inject(method = "drawMinimap", at = @At(value = "RETURN"), remap = false)
-    public void drawXPShaderFeatures(final MinimapSession minimapSession, final PoseStack matrixStack, final MinimapRendererHelper helper, final int xFloored, final int zFloored, final int minViewX, final int minViewZ, final int maxViewX, final int maxViewZ, final boolean zooming, final double zoom, final double mapDimensionScale, final VertexConsumer overlayBufferBuilder, final MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers, final CallbackInfo ci) {
-        int mapX = xFloored >> 4;
-        int mapZ = zFloored >> 4;
-        int chunkX = mapX >> 2;
-        int chunkZ = mapZ >> 2;
-        int tileX = mapX & 3;
-        int tileZ = mapZ & 3;
-        int insideX = xFloored & 15;
-        int insideZ = zFloored & 15;
-        Globals.drawManager.drawMinimapFeatures(
-            minViewX,
-            maxViewX,
-            minViewZ,
-            maxViewZ,
-            chunkX,
-            chunkZ,
-            tileX,
-            tileZ,
-            insideX,
-            insideZ,
-            matrixStack,
-            overlayBufferBuilder,
-            helper);
     }
 
     @Inject(method = "tryToGetMultiworldId", at = @At(

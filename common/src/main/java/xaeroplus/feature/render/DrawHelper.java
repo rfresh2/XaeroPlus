@@ -1,12 +1,13 @@
 package xaeroplus.feature.render;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import org.joml.Matrix4f;
 import xaero.map.region.MapTileChunk;
 import xaeroplus.feature.extensions.SeenChunksTrackingMapTileChunk;
 import xaeroplus.util.ChunkUtils;
 
-public class MinimapBackgroundDrawHelper {
+public class DrawHelper {
 
     public static void addMMBackgroundToBuffer(Matrix4f matrix, VertexConsumer bufferBuilder, final int drawX, final int drawY, final MapTileChunk chunk) {
         // Most of the cpu cost in this method is submitting vertices to the buffer
@@ -63,5 +64,12 @@ public class MinimapBackgroundDrawHelper {
         bufferBuilder.vertex(matrix, x2, y2, 0.0F).color(r, g, b, a).endVertex();
         bufferBuilder.vertex(matrix, x2, y1, 0.0F).color(r, g, b, a).endVertex();
         bufferBuilder.vertex(matrix, x1, y1, 0.0F).color(r, g, b, a).endVertex();
+    }
+
+    public static void addColoredLineToExistingBuffer(
+        PoseStack.Pose matrices, VertexConsumer vertexBuffer, float x1, float y1, float x2, float y2, float r, float g, float b, float a
+    ) {
+        vertexBuffer.vertex(matrices.pose(), x1, y1, 0.0F).color(r, g, b, a).normal(matrices, x2 - x1, y2 - y1, 0.0F).endVertex();
+        vertexBuffer.vertex(matrices.pose(), x2, y2, 0.0F).color(r, g, b, a).normal(matrices, x2 - x1, y2 - y1, 0.0F).endVertex();
     }
 }

@@ -15,11 +15,11 @@ public class GuiXaeroPlusWorldMapSettings extends GuiSettings {
         super(Component.translatable("xaeroplus.gui.world_map_settings"), parent, escapeScreen);
         var mainSettingsEntries = Settings.REGISTRY.getWorldmapConfigSettingEntries(SettingLocation.WORLD_MAP_MAIN);
         var chunkHighlightSettingSwitchEntry = GuiXaeroPlusChunkHighlightSettings.getScreenSwitchSettingEntry(parent);
-        this.entries = new ISettingEntry[mainSettingsEntries.length + 1];
+        var overlaySettingSwitchEntry = GuiXaeroPlusOverlaySettings.getScreenSwitchSettingEntry(parent);
+        this.entries = new ISettingEntry[mainSettingsEntries.length + 2];
         this.entries[0] = chunkHighlightSettingSwitchEntry;
-        for (int i = 0; i < mainSettingsEntries.length; i++) {
-            this.entries[i + 1] = mainSettingsEntries[i];
-        }
+        this.entries[1] = overlaySettingSwitchEntry;
+        System.arraycopy(mainSettingsEntries, 0, this.entries, 2, mainSettingsEntries.length);
     }
 
     @Override

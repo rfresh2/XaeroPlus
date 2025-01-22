@@ -6,7 +6,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.ChatFormatting;
@@ -33,7 +32,6 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.common.graphics.shader.MinimapShaders;
-import xaero.hud.HudSession;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMap;
 import xaero.map.animation.SlowingAnimation;
@@ -44,7 +42,6 @@ import xaero.map.graphics.renderer.multitexture.MultiTextureRenderTypeRendererPr
 import xaero.map.gui.*;
 import xaero.map.gui.dropdown.rightclick.RightClickOption;
 import xaero.map.misc.Misc;
-import xaero.map.misc.OptimizedMath;
 import xaero.map.mods.SupportMods;
 import xaero.map.world.MapDimension;
 import xaeroplus.Globals;
@@ -245,8 +242,11 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                      @Local(name = "flooredCameraX") int flooredCameraX,
                                      @Local(name = "flooredCameraZ") int flooredCameraZ,
                                      @Local(name = "matrixStack") PoseStack matrixStack,
-                                     @Local(name = "overlayBuffer") VertexConsumer overlayBuffer) {
+                                     @Local(name = "overlayBuffer") VertexConsumer overlayBuffer,
+                                     @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers) {
         if (Minecraft.getInstance().options.hideGui) return;
+        var mc = Minecraft.getInstance();
+        MinimapShaders.FRAMEBUFFER_LINES.setFrameSize(mc.getWindow().getWidth(), mc.getWindow().getHeight());
         Globals.drawManager.drawWorldMapFeatures(
             leftBorder,
             rightBorder,
@@ -255,7 +255,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             flooredCameraX,
             flooredCameraZ,
             matrixStack,
-            overlayBuffer);
+            overlayBuffer,
+            scale,
+            renderTypeBuffers
+        );
     }
 
     @WrapWithCondition(method = "render", at = @At(
@@ -319,123 +322,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         int x = (int) (mouseBlockPosX / dimDiv);
         int z = (int) (mouseBlockPosZ / dimDiv);
         return original + " [" + x + ", " + z + "]";
-    }
-
-    @Inject(method = "render", at = @At(
-        value = "FIELD",
-        target = "Lxaero/map/settings/ModSettings;renderArrow:Z",
-        opcode = Opcodes.GETFIELD,
-        ordinal = 0
-    ), remap = true)
-    public void showRenderDistanceWorldMap(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci,
-                                           @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers,
-                                           @Local(name = "matrixStack") PoseStack matrixStack) {
-        Minecraft mc = Minecraft.getInstance();
-        if (!Settings.REGISTRY.showRenderDistanceWorldMapSetting.get()
-            || mc.options.hideGui
-            || mc.level.dimension() != Globals.getCurrentDimensionId()) return;
-        final int viewDistance = mc.options.serverRenderDistance;
-        int width = viewDistance * 2 + 1;
-        double playerX = getPlayerX();
-        double playerZ = getPlayerZ();
-        int xFloored = OptimizedMath.myFloor(playerX);
-        int zFloored = OptimizedMath.myFloor(playerZ);
-        int chunkLeftX = (xFloored >> 4) - (width / 2) << 4;
-        int chunkRightX = (xFloored >> 4) + 1 + (width / 2) << 4;
-        int chunkTopZ = (zFloored >> 4) - (width / 2) << 4;
-        int chunkBottomZ = (zFloored >> 4) + 1 + (width / 2) << 4;
-        float camX = (float) cameraX;
-        float camZ = (float) cameraZ;
-        final float x0 = chunkLeftX - camX;
-        final float x1 = chunkRightX - camX;
-        final float z0 = chunkTopZ - camZ;
-        final float z1 = chunkBottomZ - camZ;
-        VertexConsumer lineBufferBuilder = renderTypeBuffers.getBuffer(xaero.common.graphics.CustomRenderTypes.MAP_LINES);
-        PoseStack.Pose matrices = matrixStack.last();
-        MinimapShaders.FRAMEBUFFER_LINES.setFrameSize(mc.getWindow().getWidth(), mc.getWindow().getHeight());
-        float settingWidth = (float) HudSession.getCurrentSession().getHudMod().getSettings().chunkGridLineWidth;
-        float lineScale = (float) Math.max(1.0, Math.min(settingWidth * scale, settingWidth));
-        RenderSystem.lineWidth(lineScale);
-        float r = 1.0f;
-        float g = 1.0f;
-        float b = 0.0f;
-        float a = 0.8f;
-        addColoredLineToExistingBuffer(
-            matrices, lineBufferBuilder,
-            x0, z0, x1, z0,
-            r, g, b, a
-        );
-        addColoredLineToExistingBuffer(
-            matrices, lineBufferBuilder,
-            x1, z0, x1, z1,
-            r, g, b, a
-        );
-        addColoredLineToExistingBuffer(
-            matrices, lineBufferBuilder,
-            x1, z1, x0, z1,
-            r, g, b, a
-        );
-        addColoredLineToExistingBuffer(
-            matrices, lineBufferBuilder,
-            x0, z0, x0, z1,
-            r, g, b, a
-        );
-    }
-
-    @Inject(method = "render", at = @At(
-        value = "FIELD",
-        target = "Lxaero/map/settings/ModSettings;renderArrow:Z",
-        opcode = Opcodes.GETFIELD,
-        ordinal = 0
-    ), remap = true)
-    public void showWorldBorderWorldMap(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci,
-                                           @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers,
-                                           @Local(name = "matrixStack") PoseStack matrixStack) {
-        Minecraft mc = Minecraft.getInstance();
-        if (!Settings.REGISTRY.showWorldBorderWorldMapSetting.get()
-            || mc.options.hideGui
-            || mc.level.dimension() != Globals.getCurrentDimensionId()) return;
-        var worldBorder = mc.level.getWorldBorder();
-        float wbMinX = (float) worldBorder.getMinX();
-        float wbMinZ = (float) worldBorder.getMinZ();
-        float wbMaxX = (float) worldBorder.getMaxX();
-        float wbMaxZ = (float) worldBorder.getMaxZ();
-        float camX = (float) cameraX;
-        float camZ = (float) cameraZ;
-        float x0 = wbMinX - camX;
-        float z0 = wbMinZ - camZ;
-        float x1 = wbMaxX - camX;
-        float z1 = wbMaxZ - camZ;
-        VertexConsumer lineBufferBuilder = renderTypeBuffers.getBuffer(xaero.common.graphics.CustomRenderTypes.MAP_LINES);
-        PoseStack.Pose matrices = matrixStack.last();
-        MinimapShaders.FRAMEBUFFER_LINES.setFrameSize(mc.getWindow().getWidth(), mc.getWindow().getHeight());
-        float settingWidth = (float) HudSession.getCurrentSession().getHudMod().getSettings().chunkGridLineWidth;
-        float lineScale = (float) Math.max(1.0, Math.min(settingWidth * scale, settingWidth));
-        RenderSystem.lineWidth(lineScale);
-        float r = 0.0f;
-        float g = 1.0f;
-        float b = 1.0f;
-        float a = 0.8f;
-        addColoredLineToExistingBuffer(
-            matrices, lineBufferBuilder,
-            x0, z0, x1, z0,
-            r, g, b, a
-        );
-        addColoredLineToExistingBuffer(
-            matrices, lineBufferBuilder,
-            x1, z0, x1, z1,
-            r, g, b, a
-        );
-        addColoredLineToExistingBuffer(
-            matrices, lineBufferBuilder,
-            x1, z1, x0, z1,
-            r, g, b, a
-        );
-        addColoredLineToExistingBuffer(
-            matrices, lineBufferBuilder,
-            x0, z0, x0, z1,
-            r, g, b, a
-        );
     }
 
     @WrapWithCondition(method = "render", at = @At(
@@ -627,14 +513,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if (Settings.REGISTRY.disableWaypointSharing.get()) {
             options.removeIf(option -> ((AccessorRightClickOption) option).getName().equals("gui.xaero_right_click_map_share_location"));
         }
-    }
-
-    @Unique
-    public void addColoredLineToExistingBuffer(
-            PoseStack.Pose matrices, VertexConsumer vertexBuffer, float x1, float y1, float x2, float y2, float r, float g, float b, float a
-    ) {
-        vertexBuffer.vertex(matrices.pose(), x1, y1, 0.0F).color(r, g, b, a).normal(matrices.normal(), x2 - x1, y2 - y1, 0.0F).endVertex();
-        vertexBuffer.vertex(matrices.pose(), x2, y2, 0.0F).color(r, g, b, a).normal(matrices.normal(), x2 - x1, y2 - y1, 0.0F).endVertex();
     }
 
     @Unique

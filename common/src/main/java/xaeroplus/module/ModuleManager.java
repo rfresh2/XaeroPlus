@@ -20,7 +20,9 @@ public class ModuleManager {
             new PaletteNewChunks(),
             new Portals(),
             new PortalSkipDetection(),
+            new RenderDistance(),
             new WaystoneSync(),
+            new WorldBorder(),
             new WorldTools()
         ).forEach(ModuleManager::addModule);
     }

@@ -27,7 +27,6 @@
     "MixinGuiEntityRadarSettings",
     "MixinGuiMap",
     "MixinGuiMinimapMain",
-    "MixinGuiMinimapOverlaysSettings",
     "MixinGuiSettingsWorldMap",
     "MixinGuiUpdateAll",
     "MixinGuiWaypoints",

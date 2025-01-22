@@ -195,6 +195,7 @@
   "xaeroplus.gui.off": "Wyłączony",
   "xaeroplus.gui.world_map_settings": "Ustawienia mapy świata XaeroPlus",
   "xaeroplus.gui.chunk_highlight_settings": "Ustawienia podświetlania fragmentów",
+  "xaeroplus.gui.overlay_settings": "Ustawienia nakładki",
   "xaeroplus.gui.random": "Losowy",
   "xaeroplus.gui.minimap_incompatible.title": "XaeroPlus wymaga minimapy Xaero lub BetterPVP",
   "xaeroplus.gui.minimap_incompatible.currently_installed_version": "Aktualnie zainstalowana wersja: ",

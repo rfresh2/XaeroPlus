@@ -174,6 +174,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
             }
         }
         if (this.database != null) this.database.close();
+        // dimension cache instances will be GC'd, no need to explicitly clear them
         this.dimensionCacheMap.clear();
         this.database = null;
     }
@@ -217,7 +218,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     }
 
     public List<ChunkHighlightCacheDimensionHandler> getAllCaches() {
-        return new ArrayList<>(dimensionCacheMap.values());
+        return List.copyOf(dimensionCacheMap.values());
     }
 
     public List<ChunkHighlightCacheDimensionHandler> getCachesExceptDimension(final ResourceKey<Level> dimension) {

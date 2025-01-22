@@ -7,6 +7,7 @@ import net.minecraft.world.level.Level;
 import xaeroplus.Globals;
 import xaeroplus.feature.render.Line;
 import xaeroplus.module.Module;
+import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
 
 import java.util.Collections;
@@ -38,6 +39,7 @@ public class RenderDistance extends Module {
         Minecraft mc = Minecraft.getInstance();
         var player = mc.player;
         if (player == null) return Collections.emptyList();
+        if (dimension != ChunkUtils.getActualDimension()) return Collections.emptyList();
         final int viewDistance = mc.options.serverRenderDistance;
         final int width = viewDistance * 2 + 1;
         final int middleChunkX = coordToChunkCoord(Mth.floor(player.getX()));

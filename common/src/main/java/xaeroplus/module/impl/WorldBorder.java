@@ -35,6 +35,7 @@ public class WorldBorder extends Module {
         Minecraft mc = Minecraft.getInstance();
         var level = mc.level;
         if (level == null) return Collections.emptyList();
+        if (level.dimension() != dimension) return Collections.emptyList();
         var worldBorder = mc.level.getWorldBorder();
         int minX = Mth.floor(worldBorder.getMinX());
         int minZ = Mth.floor(worldBorder.getMinZ());

@@ -3,6 +3,10 @@ package xaeroplus.feature.render.highlights;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
+import it.unimi.dsi.fastutil.longs.Long2LongArrayMap;
+import it.unimi.dsi.fastutil.longs.Long2LongMap;
+import it.unimi.dsi.fastutil.longs.Long2LongMaps;
+import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
@@ -10,8 +14,6 @@ import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.util.ChunkUtils;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static xaeroplus.util.ChunkUtils.chunkPosToLong;
@@ -49,17 +51,18 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
     private void loadHighlightsInWindow() {
         try {
             executorService.execute(() -> {
-                final List<ChunkHighlightData> chunks = database.getHighlightsInWindow(
+                Long2LongMap data = new Long2LongOpenHashMap();
+                database.getHighlightsInWindow(
                     dimension,
                     windowRegionX - windowRegionSize, windowRegionX + windowRegionSize,
-                    windowRegionZ - windowRegionSize, windowRegionZ + windowRegionSize
+                    windowRegionZ - windowRegionSize, windowRegionZ + windowRegionSize,
+                    (chunkX, chunkZ, foundTime) -> data.put(chunkPosToLong(chunkX, chunkZ), foundTime)
                 );
                 try {
+                    // minimizes time we have to hold the lock by querying the database outside the lock's scope
+                    // at cost of a bit more memory
                     if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
-                        for (int i = 0; i < chunks.size(); i++) {
-                            final ChunkHighlightData chunk = chunks.get(i);
-                            this.chunks.put(chunkPosToLong(chunk.x(), chunk.z()), chunk.foundTime());
-                        }
+                        this.chunks.putAll(data);
                         lock.writeLock().unlock();
                     }
                 } catch (final Exception e) {
@@ -71,17 +74,62 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
         }
     }
 
+    public ListenableFuture<Long2LongMap> getHighlightsInCustomWindow(int windowRegionX, int windowRegionZ, int windowRegionSize) {
+        try {
+            return executorService.submit(() -> {
+                var map = new Long2LongOpenHashMap();
+                int regionXMin = windowRegionX - windowRegionSize;
+                int regionZMin = windowRegionZ - windowRegionSize;
+                int regionXMax = windowRegionX + windowRegionSize;
+                int regionZMax = windowRegionZ + windowRegionSize;
+                database.getHighlightsInWindow(
+                    dimension,
+                    regionXMin, regionXMax,
+                    regionZMin, regionZMax,
+                    (chunkX, chunkZ, foundTime) -> map.put(chunkPosToLong(chunkX, chunkZ), foundTime)
+                );
+                // append chunks from local cache
+                try {
+                    int chunkXMin = regionCoordToChunkCoord(regionXMin);
+                    int chunkXMax = regionCoordToChunkCoord(regionXMax);
+                    int chunkZMin = regionCoordToChunkCoord(regionZMin);
+                    int chunkZMax = regionCoordToChunkCoord(regionZMax);
+                    if (lock.readLock().tryLock(1, TimeUnit.SECONDS)) {
+                        for (var entry : chunks.long2LongEntrySet()) {
+                            final long chunkPos = entry.getLongKey();
+                            final int chunkX = ChunkUtils.longToChunkX(chunkPos);
+                            final int chunkZ = ChunkUtils.longToChunkZ(chunkPos);
+                            if (chunkX >= chunkXMin
+                                && chunkX <= chunkXMax
+                                && chunkZ >= chunkZMin
+                                && chunkZ <= chunkZMax) {
+                                map.put(chunkPos, entry.getLongValue());
+                            }
+                        }
+                    }
+                } catch (final Exception e) {
+                    XaeroPlus.LOGGER.error("Failed to load highlights in custom window for {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
+                }
+                return map;
+            });
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Failed submitting load highlights task for {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
+            return Futures.immediateFuture(Long2LongMaps.EMPTY_MAP);
+        }
+    }
+
+    // removes chunks outside window from local cache and writes them to database
     private void writeHighlightsOutsideWindowToDatabase() {
         try {
             executorService.execute(() -> {
-                final List<ChunkHighlightData> chunksToWrite = new ArrayList<>();
+                final Long2LongMap chunksToWrite = new Long2LongOpenHashMap();
                 try {
                     if (lock.writeLock().tryLock(1L, TimeUnit.SECONDS)) {
                         var minChunkX = regionCoordToChunkCoord(windowRegionX - windowRegionSize);
                         var maxChunkX = regionCoordToChunkCoord(windowRegionX + windowRegionSize);
                         var minChunkZ = regionCoordToChunkCoord(windowRegionZ - windowRegionSize);
                         var maxChunkZ = regionCoordToChunkCoord(windowRegionZ + windowRegionSize);
-                        for (var it = chunks.long2LongEntrySet().iterator(); it.hasNext(); ) {
+                        for (var it = Long2LongMaps.fastIterator(chunks); it.hasNext(); ) {
                             var entry = it.next();
                             final long chunkPos = entry.getLongKey();
                             final int chunkX = ChunkUtils.longToChunkX(chunkPos);
@@ -90,7 +138,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
                                 || chunkX > maxChunkX
                                 || chunkZ < minChunkZ
                                 || chunkZ > maxChunkZ) {
-                                chunksToWrite.add(new ChunkHighlightData(chunkX, chunkZ, entry.getLongValue()));
+                                chunksToWrite.put(chunkPos, entry.getLongValue());
                                 it.remove();
                             }
                         }
@@ -106,19 +154,16 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
         }
     }
 
+    // does not remove from local cache
     public ListenableFuture<?> writeAllHighlightsToDatabase() {
         try {
             return executorService.submit(() -> {
-                final List<ChunkHighlightData> chunksToWrite = new ArrayList<>(chunks.size());
+                Long2LongMap chunksToWrite = Long2LongMaps.EMPTY_MAP;
                 try {
                     if (lock.readLock().tryLock(1, TimeUnit.SECONDS)) {
-                        for (var it = chunks.long2LongEntrySet().iterator(); it.hasNext(); ) {
-                            var entry = it.next();
-                            final long chunkPos = entry.getLongKey();
-                            final int chunkX = ChunkUtils.longToChunkX(chunkPos);
-                            final int chunkZ = ChunkUtils.longToChunkZ(chunkPos);
-                            chunksToWrite.add(new ChunkHighlightData(chunkX, chunkZ, entry.getLongValue()));
-                        }
+                        // we are simply going to iterate through all entries anyway
+                        // no need for a hashing map
+                        chunksToWrite = new Long2LongArrayMap(chunks);
                         lock.readLock().unlock();
                     }
                 } catch (final Exception e) {

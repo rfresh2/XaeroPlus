@@ -195,6 +195,7 @@
   "xaeroplus.gui.off": "關閉",
   "xaeroplus.gui.world_map_settings": "XaeroPlus 世界地圖設定",
   "xaeroplus.gui.chunk_highlight_settings": "區塊高亮設定",
+  "xaeroplus.gui.overlay_settings": "覆蓋設定",
   "xaeroplus.gui.random": "隨機",
   "xaeroplus.gui.minimap_incompatible.title": "XaeroPlus 需要 Xaero 的小地圖或 BetterPVP",
   "xaeroplus.gui.minimap_incompatible.currently_installed_version": "目前安裝的版本：",

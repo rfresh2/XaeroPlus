@@ -195,6 +195,7 @@
     "xaeroplus.gui.off": "Tắt",
     "xaeroplus.gui.world_map_settings": "Cài Đặt XaeroPlus WorldMap",
     "xaeroplus.gui.chunk_highlight_settings": "Cài đặt đánh dấu đoạn",
+    "xaeroplus.gui.overlay_settings": "Cài đặt lớp phủ",
     "xaeroplus.gui.random": "Ngẫu Nhiên",
     "xaeroplus.gui.minimap_incompatible.title": "XaeroPlus Yêu Cầu Xaero's Minimap hoặc BetterPVP",
     "xaeroplus.gui.minimap_incompatible.currently_installed_version": "Phiên Bản Đã Cài Đặt: ",

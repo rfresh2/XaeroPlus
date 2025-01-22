@@ -31,7 +31,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import xaero.common.graphics.shader.MinimapShaders;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMap;
 import xaero.map.animation.SlowingAnimation;
@@ -82,7 +81,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Shadow private int[] cameraDestination = null;
     @Shadow private SlowingAnimation cameraDestinationAnimX = null;
     @Shadow private SlowingAnimation cameraDestinationAnimZ = null;
-    @Shadow private double scale;
     @Shadow private double prevPlayerDimDiv;
     @Shadow private MapProcessor mapProcessor;
     @Shadow private Button exportButton;
@@ -243,10 +241,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                      @Local(name = "flooredCameraZ") int flooredCameraZ,
                                      @Local(name = "matrixStack") PoseStack matrixStack,
                                      @Local(name = "overlayBuffer") VertexConsumer overlayBuffer,
-                                     @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers) {
+                                     @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers,
+                                     @Local(name = "fboScale") double fboScale) {
         if (Minecraft.getInstance().options.hideGui) return;
-        var mc = Minecraft.getInstance();
-        MinimapShaders.FRAMEBUFFER_LINES.setFrameSize(mc.getWindow().getWidth(), mc.getWindow().getHeight());
         Globals.drawManager.drawWorldMapFeatures(
             leftBorder,
             rightBorder,
@@ -256,7 +253,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             flooredCameraZ,
             matrixStack,
             overlayBuffer,
-            scale,
+            fboScale,
             renderTypeBuffers
         );
     }

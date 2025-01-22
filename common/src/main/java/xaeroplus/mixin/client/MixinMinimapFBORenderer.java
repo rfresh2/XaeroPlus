@@ -5,7 +5,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
@@ -23,18 +22,16 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.IXaeroMinimap;
-import xaero.common.graphics.CustomRenderTypes;
 import xaero.common.graphics.CustomVertexConsumers;
 import xaero.common.graphics.ImprovedFramebuffer;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRenderer;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
-import xaero.common.graphics.shader.MinimapShaders;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.render.MinimapFBORenderer;
 import xaero.common.minimap.render.MinimapRenderer;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.minimap.waypoints.render.WaypointsGuiRenderer;
-import xaero.common.misc.OptimizedMath;
+import xaero.common.mods.SupportXaeroWorldmap;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.Minimap;
 import xaero.hud.minimap.MinimapLogs;
@@ -140,121 +137,6 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         return Math.max(1.0f, original * Globals.minimapScaleMultiplier / (float) Globals.minimapSizeMultiplier);
     }
 
-    @Inject(method = "renderChunksToFBO", at = @At(
-        value = "INVOKE",
-        target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endBatch()V",
-        ordinal = 0
-    ), remap = true)
-    public void drawRenderDistanceSquare(final MinimapSession minimapSession, final GuiGraphics guiGraphics, final MinimapProcessor minimap, final Vec3 renderPos, final ResourceKey<Level> mapDimension, final double mapDimensionScale, final int viewW, final float partial, final int level, final boolean useWorldMap, final boolean lockedNorth, final int shape, final double ps, final double pc, final boolean cave, final CustomVertexConsumers cvc, final CallbackInfo ci,
-                                         @Local(name = "xFloored") int xFloored,
-                                         @Local(name = "zFloored") int zFloored,
-                                         @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers,
-                                         @Local(name = "matrixStack") PoseStack matrixStack
-    ) {
-        final boolean isDimensionSwitched = Globals.getCurrentDimensionId() != Minecraft.getInstance().level.dimension();
-        if (!Settings.REGISTRY.showRenderDistanceSetting.get() || isDimensionSwitched) return;
-        double actualPlayerX = minimap.getEntityRadar().getEntityX(mc.player, partial);
-        double actualPlayerZ = minimap.getEntityRadar().getEntityZ(mc.player, partial);
-        int actualXFloored = OptimizedMath.myFloor(actualPlayerX);
-        int actualZFloored = OptimizedMath.myFloor(actualPlayerZ);
-        final int viewDistance = mc.options.serverRenderDistance;
-        int width = viewDistance * 2 + 1;
-        // origin of the chunk we are standing in
-        final int middleChunkX = -(actualXFloored & 15);
-        final int middleChunkZ = -(actualZFloored & 15);
-        int distanceFlooredX = actualXFloored - xFloored;
-        int distanceFlooredZ = actualZFloored - zFloored;
-
-        final int x0 = distanceFlooredX + middleChunkX - (width / 2) * 16;
-        final int z0 = distanceFlooredZ + middleChunkZ - (width / 2) * 16;
-        final int x1 = x0 + width * 16;
-        final int z1 = z0 + width * 16;
-        VertexConsumer lineBufferBuilder = renderTypeBuffers.getBuffer(CustomRenderTypes.MAP_LINES);
-        MinimapShaders.FRAMEBUFFER_LINES.setFrameSize((float) scalingFramebuffer.viewWidth, (float) scalingFramebuffer.viewHeight);
-        float lineWidth = Math.max(1.0f, modMain.getSettings().chunkGridLineWidth * Globals.minimapScaleMultiplier / (float) Globals.minimapSizeMultiplier);
-        RenderSystem.lineWidth(lineWidth);
-        float r = 1.0f;
-        float g = 1.0f;
-        float b = 0.0f;
-        float a = 0.8f;
-        PoseStack.Pose matrices = matrixStack.last();
-
-        helper.addColoredLineToExistingBuffer(
-            matrices, lineBufferBuilder,
-            x0, z0, x1, z0,
-            r, g, b, a
-        );
-        helper.addColoredLineToExistingBuffer(
-            matrices, lineBufferBuilder,
-            x1, z0, x1, z1,
-            r, g, b, a
-        );
-        helper.addColoredLineToExistingBuffer(
-            matrices, lineBufferBuilder,
-            x1, z1, x0, z1,
-            r, g, b, a
-        );
-        helper.addColoredLineToExistingBuffer(
-            matrices, lineBufferBuilder,
-            x0, z0, x0, z1,
-            r, g, b, a
-        );
-    }
-
-    @Inject(method = "renderChunksToFBO", at = @At(
-        value = "INVOKE",
-        target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endBatch()V",
-        ordinal = 0
-    ), remap = true)
-    public void drawWorldBorderSquare(final MinimapSession minimapSession, final GuiGraphics guiGraphics, final MinimapProcessor minimap, final Vec3 renderPos, final ResourceKey<Level> mapDimension, final double mapDimensionScale, final int viewW, final float partial, final int level, final boolean useWorldMap, final boolean lockedNorth, final int shape, final double ps, final double pc, final boolean cave, final CustomVertexConsumers cvc, final CallbackInfo ci,
-                                      @Local(name = "xFloored") int xFloored,
-                                      @Local(name = "zFloored") int zFloored,
-                                      @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers,
-                                      @Local(name = "matrixStack") PoseStack matrixStack
-    ) {
-        final boolean isDimensionSwitched = Globals.getCurrentDimensionId() != Minecraft.getInstance().level.dimension();
-        if (!Settings.REGISTRY.showWorldBorderSetting.get() || isDimensionSwitched) return;
-        var worldBorder = mc.level.getWorldBorder();
-        float wbMinX = (float) worldBorder.getMinX();
-        float wbMinZ = (float) worldBorder.getMinZ();
-        float wbMaxX = (float) worldBorder.getMaxX();
-        float wbMaxZ = (float) worldBorder.getMaxZ();
-        float x0 = wbMinX - xFloored;
-        float z0 = wbMinZ - zFloored;
-        float x1 = wbMaxX - xFloored;
-        float z1 = wbMaxZ - zFloored;
-
-        VertexConsumer lineBufferBuilder = renderTypeBuffers.getBuffer(CustomRenderTypes.MAP_LINES);
-        MinimapShaders.FRAMEBUFFER_LINES.setFrameSize((float) scalingFramebuffer.viewWidth, (float) scalingFramebuffer.viewHeight);
-        float lineWidth = Math.max(1.0f, modMain.getSettings().chunkGridLineWidth * Globals.minimapScaleMultiplier / (float) Globals.minimapSizeMultiplier);
-        RenderSystem.lineWidth(lineWidth);
-        var matrix = matrixStack.last();
-        float r = 0.0f;
-        float g = 1.0f;
-        float b = 1.0f;
-        float a = 0.8f;
-        helper.addColoredLineToExistingBuffer(
-            matrix, lineBufferBuilder,
-            x0, z0, x1, z0,
-            r, g, b, a
-        );
-        helper.addColoredLineToExistingBuffer(
-            matrix, lineBufferBuilder,
-            x0, z1, x1, z1,
-            r, g, b, a
-        );
-        helper.addColoredLineToExistingBuffer(
-            matrix, lineBufferBuilder,
-            x1, z0, x1, z1,
-            r, g, b, a
-        );
-        helper.addColoredLineToExistingBuffer(
-            matrix, lineBufferBuilder,
-            x0, z0, x0, z1,
-            r, g, b, a
-        );
-    }
-
     @Redirect(method = "renderChunksToFBO", at = @At(
         value = "INVOKE",
         target = "Lorg/joml/Matrix4fStack;translate(FFF)Lorg/joml/Matrix4f;",
@@ -298,6 +180,38 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         this.helper.drawMyTexturedModalRect(matrixStack, -scaledSize.get(), -scaledSize.get(), 0, 0, scaledSizeM, scaledSizeM, scaledSizeM, scaledSizeM);
     }
 
+    @WrapOperation(method = "renderChunksToFBO", at= @At(
+        value = "INVOKE",
+        target = "Lxaero/common/mods/SupportXaeroWorldmap;drawMinimap(Lxaero/hud/minimap/module/MinimapSession;Lcom/mojang/blaze3d/vertex/PoseStack;Lxaero/common/minimap/render/MinimapRendererHelper;IIIIIIZDDLcom/mojang/blaze3d/vertex/VertexConsumer;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;)V"),
+        remap = true) // $REMAP
+    public void captureDrawContext(final SupportXaeroWorldmap instance, final MinimapSession minimapSession, final PoseStack matrixStack, final MinimapRendererHelper helper, final int xFloored, final int zFloored, final int minViewX, final int minViewZ, final int maxViewX, final int maxViewZ, final boolean zooming, final double zoom, final double mapDimensionScale, final VertexConsumer overlayBufferBuilder, final MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers, final Operation<Void> original,
+                                   @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers) {
+        original.call(instance, minimapSession, matrixStack, helper, xFloored, zFloored, minViewX, minViewZ, maxViewX, maxViewZ, zooming, zoom, mapDimensionScale, overlayBufferBuilder, multiTextureRenderTypeRenderers);
+        int mapX = xFloored >> 4;
+        int mapZ = zFloored >> 4;
+        int chunkX = mapX >> 2;
+        int chunkZ = mapZ >> 2;
+        int tileX = mapX & 3;
+        int tileZ = mapZ & 3;
+        int insideX = xFloored & 15;
+        int insideZ = zFloored & 15;
+        Globals.drawManager.drawMinimapFeatures(
+            minViewX,
+            maxViewX,
+            minViewZ,
+            maxViewZ,
+            chunkX,
+            chunkZ,
+            tileX,
+            tileZ,
+            insideX,
+            insideZ,
+            matrixStack,
+            overlayBufferBuilder,
+            helper,
+            renderTypeBuffers);
+    }
+
     @WrapOperation(method = "renderChunksToFBO", at = @At(
         value = "INVOKE",
         target = "Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;draw(Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRenderer;)V"
@@ -310,7 +224,8 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
                                             @Local(name = "minX") int minXRef,
                                             @Local(name = "maxX") int maxXRef,
                                             @Local(name = "minZ") int minZRef,
-                                            @Local(name = "maxZ") int maxZRef
+                                            @Local(name = "maxZ") int maxZRef,
+                                            @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers
     ) {
         original.call(instance, renderer);
         int mapX = xFloored >> 4;
@@ -326,7 +241,8 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             chunkX, chunkZ,
             tileX, tileZ,
             insideX, insideZ,
-            matrixStack, overlayBufferBuilder, helper
+            matrixStack, overlayBufferBuilder, helper,
+            renderTypeBuffers
         );
     }
 }

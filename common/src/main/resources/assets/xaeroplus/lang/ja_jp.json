@@ -193,6 +193,7 @@
     "xaeroplus.gui.off": "Off",
     "xaeroplus.gui.world_map_settings": "XaeroPlus WorldMapの設定",
     "xaeroplus.gui.chunk_highlight_settings": "チャンクハイライト設定",
+    "xaeroplus.gui.overlay_settings": "オーバーレイ設定",
     "xaeroplus.gui.random": "ランダム",
     "xaeroplus.gui.minimap_incompatible.title": "XaeroPlusにはXaero's MinimapまたはBetterPVPが必要です。",
     "xaeroplus.gui.minimap_incompatible.currently_installed_version": "現在のバージョン: ",

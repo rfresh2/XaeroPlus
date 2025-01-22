@@ -195,6 +195,7 @@
   "xaeroplus.gui.off": "Выкл",
   "xaeroplus.gui.world_map_settings": "Настройки карты мира XaeroPlus",
   "xaeroplus.gui.chunk_highlight_settings": "Настройки выделения чанка",
+  "xaeroplus.gui.overlay_settings": "Настройки наложения",
   "xaeroplus.gui.random": "Случайный",
   "xaeroplus.gui.minimap_incompatible.title": "Для XaeroPlus требуется мини-карта Xaero или BetterPVP.",
   "xaeroplus.gui.minimap_incompatible.currently_installed_version": "Текущая установленная версия: ",

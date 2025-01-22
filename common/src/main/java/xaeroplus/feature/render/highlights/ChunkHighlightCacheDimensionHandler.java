@@ -3,6 +3,9 @@ package xaeroplus.feature.render.highlights;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
+import it.unimi.dsi.fastutil.longs.Long2LongMap;
+import it.unimi.dsi.fastutil.longs.Long2LongMaps;
+import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
@@ -68,6 +71,50 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
             });
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Failed submitting load highlights task for {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
+        }
+    }
+
+    public ListenableFuture<Long2LongMap> getHighlightsInCustomWindow(int windowRegionX, int windowRegionZ, int windowRegionSize) {
+        try {
+            return executorService.submit(() -> {
+                var map = new Long2LongOpenHashMap();
+                int regionXMin = windowRegionX - windowRegionSize;
+                int regionZMin = windowRegionZ - windowRegionSize;
+                int regionXMax = windowRegionX + windowRegionSize;
+                int regionZMax = windowRegionZ + windowRegionSize;
+                database.getHighlightsInWindow(
+                    dimension,
+                    regionXMin, regionXMax,
+                    regionZMin, regionZMax,
+                    (chunkX, chunkZ, foundTime) -> map.put(chunkPosToLong(chunkX, chunkZ), foundTime)
+                );
+                // append chunks from local cache
+                try {
+                    int chunkXMin = regionCoordToChunkCoord(regionXMin);
+                    int chunkXMax = regionCoordToChunkCoord(regionXMax);
+                    int chunkZMin = regionCoordToChunkCoord(regionZMin);
+                    int chunkZMax = regionCoordToChunkCoord(regionZMax);
+                    if (lock.readLock().tryLock(1, TimeUnit.SECONDS)) {
+                        for (var entry : chunks.long2LongEntrySet()) {
+                            final long chunkPos = entry.getLongKey();
+                            final int chunkX = ChunkUtils.longToChunkX(chunkPos);
+                            final int chunkZ = ChunkUtils.longToChunkZ(chunkPos);
+                            if (chunkX >= chunkXMin
+                                && chunkX <= chunkXMax
+                                && chunkZ >= chunkZMin
+                                && chunkZ <= chunkZMax) {
+                                map.put(chunkPos, entry.getLongValue());
+                            }
+                        }
+                    }
+                } catch (final Exception e) {
+                    XaeroPlus.LOGGER.error("Failed to load highlights in custom window for {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
+                }
+                return map;
+            });
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Failed submitting load highlights task for {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
+            return Futures.immediateFuture(Long2LongMaps.EMPTY_MAP);
         }
     }
 

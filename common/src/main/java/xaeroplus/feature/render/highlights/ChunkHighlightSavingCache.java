@@ -2,6 +2,7 @@ package xaeroplus.feature.render.highlights;
 
 import com.google.common.util.concurrent.*;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
+import it.unimi.dsi.fastutil.longs.Long2LongMaps;
 import it.unimi.dsi.fastutil.longs.LongList;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -111,6 +112,25 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         return cacheForDimension.getHighlightsSnapshot(dimensionId);
     }
 
+    /**
+     * Gets all highlight data both from the database and local cache in a square set of regions.
+     * Can be used to get highlight data that may be outside the current loaded window
+     *
+     * @param dimension the dimension to get highlights for
+     * @param windowRegionX Centered region X coordinate
+     * @param windowRegionZ Centered region Z coordinate
+     * @param windowRegionSize Region window size.
+     *                   Total area of square = (2 * (windowRegionSize + 1)) ^ 2
+     *                   region = 1024 (32x32) chunks
+     * @return Listenable future of a Long2LongMap: packed chunk coordinates -> found time unix epoch
+     *       To convert packed coordinates in the map, see `ChunkUtils.longToChunkX` and `ChunkUtils.longToChunkZ`
+     */
+    public ListenableFuture<Long2LongMap> getHighlightsInCustomWindow(int windowRegionX, int windowRegionZ, int windowRegionSize, ResourceKey<Level> dimension) {
+        ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimension, false);
+        if (cacheForDimension == null) return Futures.immediateFuture(Long2LongMaps.EMPTY_MAP);
+        return cacheForDimension.getHighlightsInCustomWindow(windowRegionX, windowRegionZ, windowRegionSize);
+    }
+
     @Override
     public void handleWorldChange(final XaeroWorldChangeEvent event) {
         parentExecutor.execute(() -> {
@@ -143,7 +163,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         });
     }
 
-    public synchronized void reset() {
+    private synchronized void reset() {
         this.currentWorldId = null;
         if (this.workerExecutor != null) {
             this.workerExecutor.shutdown();
@@ -196,7 +216,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         return dimensionCache;
     }
 
-    private List<ChunkHighlightCacheDimensionHandler> getAllCaches() {
+    public List<ChunkHighlightCacheDimensionHandler> getAllCaches() {
         return new ArrayList<>(dimensionCacheMap.values());
     }
 

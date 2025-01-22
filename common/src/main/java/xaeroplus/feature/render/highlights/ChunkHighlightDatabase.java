@@ -1,20 +1,19 @@
 package xaeroplus.feature.render.highlights;
 
-import com.google.common.collect.Lists;
+import it.unimi.dsi.fastutil.longs.Long2LongMap;
+import it.unimi.dsi.fastutil.longs.Long2LongMaps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaero.map.WorldMap;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.render.highlights.db.DatabaseMigrator;
+import xaeroplus.util.ChunkUtils;
 
 import java.io.Closeable;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import static xaeroplus.util.ChunkUtils.regionCoordToChunkCoord;
 
@@ -70,63 +69,38 @@ public class ChunkHighlightDatabase implements Closeable {
         }
     }
 
-    public void insertHighlightList(final List<ChunkHighlightData> chunks, final ResourceKey<Level> dimension) {
-        if (chunks.isEmpty()) {
-            return;
-        }
-        if (chunks.size() > MAX_HIGHLIGHTS_LIST) {
-            Lists.partition(chunks, MAX_HIGHLIGHTS_LIST).forEach(l -> insertHighlightsListInternal(l, dimension));
-        } else {
-            insertHighlightsListInternal(chunks, dimension);
-        }
-    }
-
-    private void insertHighlightsListInternal(final List<ChunkHighlightData> chunks, final ResourceKey<Level> dimension) {
+    public void insertHighlightList(final Long2LongMap chunks, final ResourceKey<Level> dimension) {
+        if (chunks.isEmpty()) return;
         try {
             // Prepared statements is orders of magnitude slower than single insert like this
             // batches even slower
             // only issue is gc spam from string allocations
-            // could reuse this stringbuilder as this should only be called from a single thread
-            StringBuilder sb = new StringBuilder(50 * chunks.size() + 75);
-            sb.append("INSERT OR IGNORE INTO \"").append(getTableName(dimension)).append("\" VALUES ");
-            for (int i = 0; i < chunks.size(); i++) {
-                ChunkHighlightData chunk = chunks.get(i);
-                sb.append("(").append(chunk.x()).append(", ").append(chunk.z()).append(", ").append(chunk.foundTime()).append(")");
-                if (i < chunks.size() - 1) {
+            int batchSize = MAX_HIGHLIGHTS_LIST;
+            var it = Long2LongMaps.fastIterator(chunks);
+            // iterate over entry set, inserting in batches of at most 25000
+            StringBuilder sb = new StringBuilder(50 * batchSize + 75);
+            while (it.hasNext()) {
+                sb.setLength(0);
+                sb.append("INSERT OR IGNORE INTO \"").append(getTableName(dimension)).append("\" VALUES ");
+                boolean trailingComma = false;
+                for (int i = 0; i < batchSize && it.hasNext(); i++) {
+                    var entry = it.next();
+                    var chunk = entry.getLongKey();
+                    var chunkX = ChunkUtils.longToChunkX(chunk);
+                    var chunkZ = ChunkUtils.longToChunkZ(chunk);
+                    var foundTime = entry.getLongValue();
+                    sb.append("(").append(chunkX).append(", ").append(chunkZ).append(", ").append(foundTime).append(")");
                     sb.append(", ");
+                    trailingComma = true;
                 }
-            }
-            try (var stmt = connection.createStatement()) {
-                stmt.executeUpdate(sb.toString());
+                if (trailingComma) sb.replace(sb.length() - 2, sb.length(), "");
+                try (var stmt = connection.createStatement()) {
+                    stmt.executeUpdate(sb.toString());
+                }
             }
         } catch (Exception e) {
             XaeroPlus.LOGGER.error("Error inserting {} chunks into {} database in dimension: {}", chunks.size(), databaseName, dimension.location(), e);
         }
-    }
-
-    public List<ChunkHighlightData> getHighlightsInWindow(
-            final ResourceKey<Level> dimension,
-            final int regionXMin, final int regionXMax,
-            final int regionZMin, final int regionZMax) {
-        try (var statement = connection.createStatement()) {
-            try (ResultSet resultSet = statement.executeQuery(
-                "SELECT * FROM \"" + getTableName(dimension) + "\" "
-                    + "WHERE x >= " + regionCoordToChunkCoord(regionXMin) + " AND x <= " + regionCoordToChunkCoord(regionXMax)
-                    + " AND z >= " + regionCoordToChunkCoord(regionZMin) + " AND z <= " + regionCoordToChunkCoord(regionZMax))) {
-                List<ChunkHighlightData> chunks = new ArrayList<>();
-                while (resultSet.next()) {
-                    chunks.add(new ChunkHighlightData(
-                        resultSet.getInt("x"),
-                        resultSet.getInt("z"),
-                        resultSet.getLong("foundTime")));
-                }
-                return chunks;
-            }
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error getting chunks from {} database in dimension: {}, window: {}-{}, {}-{}", databaseName, dimension.location(), regionXMin, regionXMax, regionZMin, regionZMax, e);
-            // fall through
-        }
-        return Collections.emptyList();
     }
 
     @FunctionalInterface

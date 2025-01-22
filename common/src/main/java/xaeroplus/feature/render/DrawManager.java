@@ -8,14 +8,19 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.util.Mth;
 import xaero.common.HudMod;
+import xaero.common.graphics.CustomRenderTypes;
+import xaero.common.graphics.shader.FramebufferLinesShaderHelper;
 import xaero.common.minimap.render.MinimapRendererHelper;
+import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
-import xaeroplus.event.DimensionSwitchEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
+import xaeroplus.util.FloatSupplier;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -23,8 +28,10 @@ import java.util.List;
 import java.util.function.IntSupplier;
 
 public class DrawManager {
-    private final Object2ObjectMap<String, DrawFeature> chunkHighlightDrawFeatures = new Object2ObjectOpenHashMap<>();
-    private final List<String> sortedKeySet = new ArrayList<>();
+    private final Object2ObjectMap<String, ChunkHighlightDrawFeature> chunkHighlightDrawFeatures = new Object2ObjectOpenHashMap<>();
+    private final Object2ObjectMap<String, LineDrawFeature> lineDrawFeatures = new Object2ObjectOpenHashMap<>();
+    private final List<String> sortedChunkHighlightKeySet = new ArrayList<>();
+    private final List<String> sortedLineKeySet = new ArrayList<>();
 
     public DrawManager() {
         XaeroPlus.EVENT_BUS.register(this);
@@ -32,15 +39,15 @@ public class DrawManager {
 
     public synchronized void registerChunkHighlightProvider(String id, ChunkHighlightSupplier chunkHighlightSupplier, IntSupplier colorSupplier) {
         unregisterChunkHighlightProvider(id); // just in case
-        chunkHighlightDrawFeatures.put(id, new DrawFeature(new ChunkHighlightProvider(chunkHighlightSupplier, colorSupplier)));
-        sortedKeySet.add(id);
+        chunkHighlightDrawFeatures.put(id, new ChunkHighlightDrawFeature(new ChunkHighlightProvider(chunkHighlightSupplier, colorSupplier)));
+        sortedChunkHighlightKeySet.add(id);
         // arbitrary order, just needs to be consistent so colors blend consistently
-        sortedKeySet.sort(Comparator.naturalOrder());
+        sortedChunkHighlightKeySet.sort(Comparator.naturalOrder());
     }
 
     public synchronized void unregisterChunkHighlightProvider(String id) {
-        sortedKeySet.remove(id);
-        DrawFeature feature = chunkHighlightDrawFeatures.remove(id);
+        sortedChunkHighlightKeySet.remove(id);
+        ChunkHighlightDrawFeature feature = chunkHighlightDrawFeatures.remove(id);
         if (feature != null) {
             Minecraft.getInstance().execute(feature::closeDrawBuffers);
         }
@@ -54,14 +61,22 @@ public class DrawManager {
         unregisterChunkHighlightProvider(clazz.getName());
     }
 
-    @EventHandler
-    public void onDimensionChange(DimensionSwitchEvent event) {
-        chunkHighlightDrawFeatures.values().forEach(DrawFeature::invalidateCache);
+    public synchronized void registerLineProvider(String id, LineSupplier lineSupplier, IntSupplier colorSupplier, FloatSupplier lineWidthSupplier, int refreshIntervalMs) {
+        unregisterLineProvider(id); // just in case
+        lineDrawFeatures.put(id, new LineDrawFeature(new LineProvider(lineSupplier, colorSupplier, lineWidthSupplier), refreshIntervalMs));
+        sortedLineKeySet.add(id);
+        sortedLineKeySet.sort(Comparator.naturalOrder());
+    }
+
+    public synchronized void unregisterLineProvider(String id) {
+        sortedLineKeySet.remove(id);
+        lineDrawFeatures.remove(id);
     }
 
     @EventHandler
     public void onXaeroWorldChange(XaeroWorldChangeEvent event) {
-        chunkHighlightDrawFeatures.values().forEach(DrawFeature::invalidateCache);
+        chunkHighlightDrawFeatures.values().forEach(ChunkHighlightDrawFeature::invalidateCache);
+        lineDrawFeatures.values().forEach(LineDrawFeature::invalidateCache);
     }
 
     public synchronized void drawMinimapFeatures(
@@ -77,25 +92,61 @@ public class DrawManager {
         int insideZ,
         final PoseStack matrixStack,
         final VertexConsumer overlayBufferBuilder,
-        MinimapRendererHelper helper
-    ) {
+        MinimapRendererHelper helper,
+        final MultiBufferSource.BufferSource renderTypeBuffers) {
         if (HudMod.INSTANCE.isFairPlay()) return;
         matrixStack.pushPose();
         matrixStack.translate(
             -(chunkX * 64) - (tileX * 16) - insideX,
             -(chunkZ * 64) - (tileZ * 16) - insideZ,
             0);
+        matrixStack.pushPose();
         matrixStack.scale(16f, 16f, 1f);
         if (Settings.REGISTRY.highlightShader.get()) {
-            drawMinimapFeaturesShader(matrixStack);
+            drawMinimapHighlightsShader(matrixStack);
         } else {
-            drawMinimapFeaturesImmediate(minViewMapTileChunkCoordX, maxViewMapTileChunkCoordX, minViewMapTileChunkCoordZ, maxViewMapTileChunkCoordZ,
-                                         matrixStack, overlayBufferBuilder, helper);
+            drawMinimapHighlightsImmediate(minViewMapTileChunkCoordX, maxViewMapTileChunkCoordX, minViewMapTileChunkCoordZ, maxViewMapTileChunkCoordZ,
+                                           matrixStack, overlayBufferBuilder, helper);
         }
+        matrixStack.popPose();
+        drawMinimapLines(matrixStack, Globals.minimapScaleMultiplier, renderTypeBuffers);
         matrixStack.popPose();
     }
 
-    public synchronized void drawMinimapFeaturesImmediate(
+    public synchronized void drawMinimapLines(
+        final PoseStack matrixStack,
+        final int scale,
+        final MultiBufferSource.BufferSource renderTypeBuffers
+    ) {
+        FramebufferLinesShaderHelper.setFrameSize(scale * 512, scale * 512);
+        for (int i = 0; i < sortedLineKeySet.size(); i++) {
+            var k = sortedLineKeySet.get(i);
+            if (k == null) continue;
+            var feature = lineDrawFeatures.get(k);
+            if (feature == null) continue;
+            int color = feature.colorInt();
+            var a = ColorHelper.getA(color);
+            if (a == 0.0f) return;
+            VertexConsumer lineBuffer = renderTypeBuffers.getBuffer(CustomRenderTypes.MAP_LINES);
+            float lineWidthScale = Mth.clamp(feature.lineWidth() * scale, 0.1f, 1000.0f);
+            RenderSystem.lineWidth(16 * lineWidthScale);
+            var r = ColorHelper.getR(color);
+            var g = ColorHelper.getG(color);
+            var b = ColorHelper.getB(color);
+            var lines = feature.getLines();
+            for (int j = 0; j < lines.size(); j++) {
+                var line = lines.get(j);
+                DrawHelper.addColoredLineToExistingBuffer(
+                    matrixStack.last(), lineBuffer,
+                    line.x1(), line.z1(),
+                    line.x2(), line.z2(),
+                    r, g, b, a);
+            }
+            renderTypeBuffers.endBatch(CustomRenderTypes.MAP_LINES);
+        }
+    }
+
+    public synchronized void drawMinimapHighlightsImmediate(
         int minViewMapTileChunkCoordX,
         int maxViewMapTileChunkCoordX,
         int minViewMapTileChunkCoordZ,
@@ -105,8 +156,8 @@ public class DrawManager {
         MinimapRendererHelper helper
     ) {
         var matrix = matrixStack.last().pose();
-        for (int i = 0; i < sortedKeySet.size(); i++) {
-            var k = sortedKeySet.get(i);
+        for (int i = 0; i < sortedChunkHighlightKeySet.size(); i++) {
+            var k = sortedChunkHighlightKeySet.get(i);
             if (k == null) continue;
             var feature = chunkHighlightDrawFeatures.get(k);
             if (feature == null) continue;
@@ -135,7 +186,7 @@ public class DrawManager {
         }
     }
 
-    public synchronized void drawMinimapFeaturesShader(
+    public synchronized void drawMinimapHighlightsShader(
         final PoseStack matrixStack
     ) {
         var shader = Minecraft.getInstance()
@@ -150,8 +201,8 @@ public class DrawManager {
             GlStateManager.SourceFactor.ONE,
             GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA
         );
-        for (int i = 0; i < sortedKeySet.size(); i++) {
-            var k = sortedKeySet.get(i);
+        for (int i = 0; i < sortedChunkHighlightKeySet.size(); i++) {
+            var k = sortedChunkHighlightKeySet.get(i);
             if (k == null) continue;
             var feature = chunkHighlightDrawFeatures.get(k);
             if (feature == null) continue;
@@ -180,23 +231,57 @@ public class DrawManager {
         final int flooredCameraX,
         final int flooredCameraZ,
         final PoseStack matrixStack,
-        final VertexConsumer overlayBuffer
+        final VertexConsumer overlayBuffer,
+        final double scale,
+        final MultiBufferSource.BufferSource renderTypeBuffers
     ) {
         if (HudMod.INSTANCE.isFairPlay()) return;
         matrixStack.pushPose();
         matrixStack.translate(-flooredCameraX, -flooredCameraZ, 1.0f);
+        matrixStack.pushPose();
         matrixStack.scale(16f, 16f, 1f);
         if (Settings.REGISTRY.highlightShader.get())
-            drawWorldMapFeaturesShader(matrixStack);
+            drawWorldMapHighlightsShader(matrixStack);
         else
-            drawWorldMapFeaturesImmediate(minBlockX, maxBlockX, minBlockZ, maxBlockZ,
-                                          matrixStack, overlayBuffer);
+            drawWorldMapHighlightsImmediate(minBlockX, maxBlockX, minBlockZ, maxBlockZ, matrixStack, overlayBuffer);
+        matrixStack.popPose();
+        drawWorldMapLines(matrixStack, scale, renderTypeBuffers);
         matrixStack.popPose();
     }
 
-    public synchronized void drawWorldMapFeaturesShader(
-        final PoseStack matrixStack
+    public synchronized void drawWorldMapLines(
+        final PoseStack matrixStack,
+        double scale,
+        final MultiBufferSource.BufferSource renderTypeBuffers
     ) {
+        for (int i = 0; i < sortedLineKeySet.size(); i++) {
+            var k = sortedLineKeySet.get(i);
+            if (k == null) continue;
+            var feature = lineDrawFeatures.get(k);
+            if (feature == null) continue;
+            int color = feature.colorInt();
+            var a = ColorHelper.getA(color);
+            if (a == 0.0f) return;
+            VertexConsumer lineBuffer = renderTypeBuffers.getBuffer(CustomRenderTypes.MAP_LINES);
+            float lineWidthScale = (float) Mth.clamp(feature.lineWidth() * scale, 0.1f, 1000.0f);
+            RenderSystem.lineWidth(16 * lineWidthScale);
+            var r = ColorHelper.getR(color);
+            var g = ColorHelper.getG(color);
+            var b = ColorHelper.getB(color);
+            var lines = feature.getLines();
+            for (int j = 0; j < lines.size(); j++) {
+                var line = lines.get(j);
+                DrawHelper.addColoredLineToExistingBuffer(
+                    matrixStack.last(), lineBuffer,
+                    line.x2(), line.z2(),
+                    line.x1(), line.z1(),
+                    r, g, b, a);
+            }
+            renderTypeBuffers.endBatch(CustomRenderTypes.MAP_LINES);
+        }
+    }
+
+    public synchronized void drawWorldMapHighlightsShader(final PoseStack matrixStack) {
         var shader = Minecraft.getInstance()
             .getShaderManager()
             .getProgram(XaeroPlusShaders.HIGHLIGHT_SHADER_PROGRAM);
@@ -208,8 +293,8 @@ public class DrawManager {
             GlStateManager.SourceFactor.ONE,
             GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA
         );
-        for (int i = 0; i < sortedKeySet.size(); i++) {
-            var k = sortedKeySet.get(i);
+        for (int i = 0; i < sortedChunkHighlightKeySet.size(); i++) {
+            var k = sortedChunkHighlightKeySet.get(i);
             if (k == null) continue;
             var feature = chunkHighlightDrawFeatures.get(k);
             if (feature == null) continue;
@@ -230,7 +315,7 @@ public class DrawManager {
         RenderSystem.disableBlend();
     }
 
-    public synchronized void drawWorldMapFeaturesImmediate(
+    public synchronized void drawWorldMapHighlightsImmediate(
         final double minBlockX,
         final double maxBlockX,
         final double minBlockZ,
@@ -239,8 +324,8 @@ public class DrawManager {
         final VertexConsumer overlayBuffer
     ) {
         var matrix = matrixStack.last().pose();
-        for (int i = 0; i < sortedKeySet.size(); i++) {
-            var k = sortedKeySet.get(i);
+        for (int i = 0; i < sortedChunkHighlightKeySet.size(); i++) {
+            var k = sortedChunkHighlightKeySet.get(i);
             if (k == null) continue;
             var feature = chunkHighlightDrawFeatures.get(k);
             if (feature == null) continue;
@@ -264,7 +349,7 @@ public class DrawManager {
                 final float top = chunkPosZ;
                 final float right = left + 1;
                 final float bottom = top + 1;
-                MinimapBackgroundDrawHelper.fillIntoExistingBuffer(
+                DrawHelper.fillIntoExistingBuffer(
                     matrix, overlayBuffer,
                     left, top, right, bottom,
                     r, g, b, a

@@ -482,7 +482,7 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.2b2t_highways_enabled",
             false,
             (b) -> ModuleManager.getModule(Highways.class).setEnabled(b)),
-        SettingLocation.CHUNK_HIGHLIGHTS);
+        SettingLocation.OVERLAYS);
     public enum HighwayWidth implements TranslatableSettingEnum {
         // Must be odd numbers for the center to be aligned correctly
         ONE(1), THREE(3), FIVE(5);
@@ -507,7 +507,7 @@ public final class Settings extends SettingRegistry {
             HighwayWidth.values(),
             HighwayWidth.ONE,
             (v) -> ModuleManager.getModule(Highways.class).setWidth(v)),
-        SettingLocation.CHUNK_HIGHLIGHTS);
+        SettingLocation.OVERLAYS);
     public final EnumSetting<ColorHelper.HighlightColor> highwaysColorSetting = register(
         EnumSetting.create(
             "2b2t Highways Color",
@@ -515,7 +515,7 @@ public final class Settings extends SettingRegistry {
             ColorHelper.HighlightColor.values(),
             ColorHelper.HighlightColor.BLUE,
             (b) -> ModuleManager.getModule(Highways.class).setRgbColor(b.getColor())),
-        SettingLocation.CHUNK_HIGHLIGHTS);
+        SettingLocation.OVERLAYS);
     public final DoubleSetting highwaysColorAlphaSetting = register(
         DoubleSetting.create(
             "2b2t Highways Opacity",
@@ -523,7 +523,7 @@ public final class Settings extends SettingRegistry {
             0, 255, 10,
             100,
             (b) -> ModuleManager.getModule(Highways.class).setAlpha(b)),
-        SettingLocation.CHUNK_HIGHLIGHTS);
+        SettingLocation.OVERLAYS);
     public final BooleanSetting owAutoWaypointDimension = register(
         BooleanSetting.create(
             "Prefer Overworld Waypoints",
@@ -540,26 +540,18 @@ public final class Settings extends SettingRegistry {
         BooleanSetting.create(
             "Show Render Distance",
             "xaeroplus.setting.show_render_distance",
-            false),
-        SettingLocation.MINIMAP_OVERLAYS);
-    public final BooleanSetting showRenderDistanceWorldMapSetting = register(
-        BooleanSetting.create(
-            "Show Render Distance WorldMap",
-            "xaeroplus.setting.show_render_distance_world_map",
-            false),
-        SettingLocation.MINIMAP_OVERLAYS);
+            false,
+            (b) -> ModuleManager.getModule(RenderDistance.class).setEnabled(b)
+        ),
+        SettingLocation.OVERLAYS);
     public final BooleanSetting showWorldBorderSetting = register(
         BooleanSetting.create(
             "Show World Border",
             "xaeroplus.setting.show_world_border",
-            false),
-        SettingLocation.MINIMAP_OVERLAYS);
-    public final BooleanSetting showWorldBorderWorldMapSetting = register(
-        BooleanSetting.create(
-            "Show World Border WorldMap",
-            "xaeroplus.setting.show_world_border_world_map",
-            false),
-        SettingLocation.MINIMAP_OVERLAYS);
+            false,
+            (b) -> ModuleManager.getModule(WorldBorder.class).setEnabled(b)
+        ),
+        SettingLocation.OVERLAYS);
     public final BooleanSetting nullOverworldDimensionFolder = register(
         BooleanSetting.create(
             "null OW Dim Dir",

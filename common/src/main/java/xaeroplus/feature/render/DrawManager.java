@@ -109,16 +109,14 @@ public class DrawManager {
                                            matrixStack, overlayBufferBuilder, helper);
         }
         matrixStack.popPose();
-        drawMinimapLines(matrixStack, Globals.minimapScaleMultiplier, renderTypeBuffers);
+        drawMinimapLines(matrixStack, renderTypeBuffers);
         matrixStack.popPose();
     }
 
     public synchronized void drawMinimapLines(
         final PoseStack matrixStack,
-        final int scale,
         final MultiBufferSource.BufferSource renderTypeBuffers
     ) {
-        FramebufferLinesShaderHelper.setFrameSize(scale * 512, scale * 512);
         for (int i = 0; i < sortedLineKeySet.size(); i++) {
             var k = sortedLineKeySet.get(i);
             if (k == null) continue;
@@ -128,8 +126,8 @@ public class DrawManager {
             var a = ColorHelper.getA(color);
             if (a == 0.0f) return;
             VertexConsumer lineBuffer = renderTypeBuffers.getBuffer(CustomRenderTypes.MAP_LINES);
-            float lineWidthScale = Mth.clamp(feature.lineWidth() * scale, 0.1f, 1000.0f);
-            RenderSystem.lineWidth(16 * lineWidthScale);
+            float lineWidthScale = 16f * Mth.clamp(feature.lineWidth(), 0.1f * Globals.minimapScaleMultiplier, 1000.0f);
+            RenderSystem.lineWidth(lineWidthScale);
             var r = ColorHelper.getR(color);
             var g = ColorHelper.getG(color);
             var b = ColorHelper.getB(color);
@@ -232,7 +230,7 @@ public class DrawManager {
         final int flooredCameraZ,
         final PoseStack matrixStack,
         final VertexConsumer overlayBuffer,
-        final double scale,
+        final double fboScale,
         final MultiBufferSource.BufferSource renderTypeBuffers
     ) {
         if (HudMod.INSTANCE.isFairPlay()) return;
@@ -245,15 +243,17 @@ public class DrawManager {
         else
             drawWorldMapHighlightsImmediate(minBlockX, maxBlockX, minBlockZ, maxBlockZ, matrixStack, overlayBuffer);
         matrixStack.popPose();
-        drawWorldMapLines(matrixStack, scale, renderTypeBuffers);
+        drawWorldMapLines(matrixStack, fboScale, renderTypeBuffers);
         matrixStack.popPose();
     }
 
     public synchronized void drawWorldMapLines(
         final PoseStack matrixStack,
-        double scale,
+        double fboScale,
         final MultiBufferSource.BufferSource renderTypeBuffers
     ) {
+        var mc = Minecraft.getInstance();
+        FramebufferLinesShaderHelper.setFrameSize(mc.getWindow().getWidth(), mc.getWindow().getHeight());
         for (int i = 0; i < sortedLineKeySet.size(); i++) {
             var k = sortedLineKeySet.get(i);
             if (k == null) continue;
@@ -263,8 +263,8 @@ public class DrawManager {
             var a = ColorHelper.getA(color);
             if (a == 0.0f) return;
             VertexConsumer lineBuffer = renderTypeBuffers.getBuffer(CustomRenderTypes.MAP_LINES);
-            float lineWidthScale = (float) Mth.clamp(feature.lineWidth() * scale, 0.1f, 1000.0f);
-            RenderSystem.lineWidth(16 * lineWidthScale);
+            float lineWidthScale = 16f * (float) Mth.clamp(feature.lineWidth() * fboScale, 0.1f, 1000.0f);
+            RenderSystem.lineWidth(lineWidthScale);
             var r = ColorHelper.getR(color);
             var g = ColorHelper.getG(color);
             var b = ColorHelper.getB(color);

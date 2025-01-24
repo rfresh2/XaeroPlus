@@ -106,6 +106,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
                                 map.put(chunkPos, entry.getLongValue());
                             }
                         }
+                        lock.readLock().unlock();
                     }
                 } catch (final Exception e) {
                     XaeroPlus.LOGGER.error("Failed to load highlights in custom window for {} disk cache dimension: {}", database.databaseName, dimension.location(), e);

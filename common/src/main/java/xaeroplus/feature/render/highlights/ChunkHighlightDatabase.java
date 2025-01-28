@@ -78,7 +78,7 @@ public class ChunkHighlightDatabase implements Closeable {
             int batchSize = MAX_HIGHLIGHTS_LIST;
             var it = Long2LongMaps.fastIterator(chunks);
             // iterate over entry set, inserting in batches of at most 25000
-            StringBuilder sb = new StringBuilder(50 * batchSize + 75);
+            StringBuilder sb = new StringBuilder(50 * Math.min(batchSize, chunks.size()) + 75);
             while (it.hasNext()) {
                 sb.setLength(0);
                 sb.append("INSERT OR IGNORE INTO \"").append(getTableName(dimension)).append("\" VALUES ");

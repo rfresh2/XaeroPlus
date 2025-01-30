@@ -78,7 +78,7 @@ public class ChunkHighlightDatabase implements Closeable {
             int batchSize = MAX_HIGHLIGHTS_LIST;
             var it = Long2LongMaps.fastIterator(chunks);
             // iterate over entry set, inserting in batches of at most 25000
-            StringBuilder sb = new StringBuilder(50 * batchSize + 75);
+            StringBuilder sb = new StringBuilder(50 * Math.min(batchSize, chunks.size()) + 75);
             while (it.hasNext()) {
                 sb.setLength(0);
                 sb.append("INSERT OR IGNORE INTO \"").append(getTableName(dimension)).append("\" VALUES ");
@@ -120,6 +120,44 @@ public class ChunkHighlightDatabase implements Closeable {
                 "SELECT * FROM \"" + getTableName(dimension) + "\" "
                     + "WHERE x >= " + regionCoordToChunkCoord(regionXMin) + " AND x <= " + regionCoordToChunkCoord(regionXMax)
                     + " AND z >= " + regionCoordToChunkCoord(regionZMin) + " AND z <= " + regionCoordToChunkCoord(regionZMax))) {
+                while (resultSet.next()) {
+                    consumer.accept(
+                        resultSet.getInt("x"),
+                        resultSet.getInt("z"),
+                        resultSet.getLong("foundTime")
+                    );
+                }
+            }
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Error getting chunks from {} database in dimension: {}, window: {}-{}, {}-{}", databaseName, dimension.location(), regionXMin, regionXMax, regionZMin, regionZMax, e);
+            // fall through
+        }
+    }
+
+    // avoids instantiating the intermediary list
+    public void getHighlightsInWindowAndOutsidePrevWindow(
+        final ResourceKey<Level> dimension,
+        final int regionXMin, final int regionXMax,
+        final int regionZMin, final int regionZMax,
+        final int prevRegionXMin, final int prevRegionXMax,
+        final int prevRegionZMin, final int prevRegionZMax,
+        HighlightConsumer consumer
+    ) {
+        int xMin = regionCoordToChunkCoord(regionXMin);
+        int xMax = regionCoordToChunkCoord(regionXMax);
+        int zMin = regionCoordToChunkCoord(regionZMin);
+        int zMax = regionCoordToChunkCoord(regionZMax);
+        int prevXMin = regionCoordToChunkCoord(prevRegionXMin);
+        int prevXMax = regionCoordToChunkCoord(prevRegionXMax);
+        int prevZMin = regionCoordToChunkCoord(prevRegionZMin);
+        int prevZMax = regionCoordToChunkCoord(prevRegionZMax);
+        try (var statement = connection.createStatement()) {
+            try (ResultSet resultSet = statement.executeQuery(
+                "SELECT * FROM \"" + getTableName(dimension) + "\" " +
+                    "WHERE x BETWEEN " + xMin + " AND " + xMax + " " +
+                    "AND z BETWEEN " + zMin + " AND " + zMax + " " +
+                    "AND NOT (x BETWEEN " + prevXMin + " AND " + prevXMax + " " +
+                    "AND z BETWEEN " + prevZMin + " AND " + prevZMax + ")")) {
                 while (resultSet.next()) {
                     consumer.accept(
                         resultSet.getInt("x"),

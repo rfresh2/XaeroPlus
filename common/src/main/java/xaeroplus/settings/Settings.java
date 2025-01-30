@@ -752,6 +752,13 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.sodium_embeddium_integration",
             true),
         SettingLocation.WORLD_MAP_MAIN);
+    public final DoubleSetting cacheWindowUpdateInterval = register(
+        DoubleSetting.create(
+            "Window Update Interval",
+            "xaeroplus.setting.cache_window_update_interval",
+            1, 100, 1,
+            10),
+            SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting highlightShader = register(
         BooleanSetting.create(
             "Highlight Shader",

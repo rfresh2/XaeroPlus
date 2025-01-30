@@ -2,6 +2,7 @@ package xaeroplus.mixin.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.util.Mth;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -34,8 +35,8 @@ public class MixinWaypointReader {
             }
         });
         if (BaritoneHelper.isBaritonePresent()) {
-            int goalX = element.getX();
-            int goalZ = element.getZ();
+            int goalX = Mth.floor(element.getRenderX() - 0.5);
+            int goalZ = Mth.floor(element.getRenderZ() - 0.5);
             options.add(index++,
                 new RightClickOption("xaeroplus.gui.world_map.baritone_goal_here", options.size(), target) {
                     @Override

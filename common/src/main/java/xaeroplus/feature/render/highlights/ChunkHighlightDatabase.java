@@ -134,6 +134,44 @@ public class ChunkHighlightDatabase implements Closeable {
         }
     }
 
+    // avoids instantiating the intermediary list
+    public void getHighlightsInWindowAndOutsidePrevWindow(
+        final ResourceKey<Level> dimension,
+        final int regionXMin, final int regionXMax,
+        final int regionZMin, final int regionZMax,
+        final int prevRegionXMin, final int prevRegionXMax,
+        final int prevRegionZMin, final int prevRegionZMax,
+        HighlightConsumer consumer
+    ) {
+        int xMin = regionCoordToChunkCoord(regionXMin);
+        int xMax = regionCoordToChunkCoord(regionXMax);
+        int zMin = regionCoordToChunkCoord(regionZMin);
+        int zMax = regionCoordToChunkCoord(regionZMax);
+        int prevXMin = regionCoordToChunkCoord(prevRegionXMin);
+        int prevXMax = regionCoordToChunkCoord(prevRegionXMax);
+        int prevZMin = regionCoordToChunkCoord(prevRegionZMin);
+        int prevZMax = regionCoordToChunkCoord(prevRegionZMax);
+        try (var statement = connection.createStatement()) {
+            try (ResultSet resultSet = statement.executeQuery(
+                "SELECT * FROM \"" + getTableName(dimension) + "\" " +
+                    "WHERE x BETWEEN " + xMin + " AND " + xMax + " " +
+                    "AND z BETWEEN " + zMin + " AND " + zMax + " " +
+                    "AND NOT (x BETWEEN " + prevXMin + " AND " + prevXMax + " " +
+                    "AND z BETWEEN " + prevZMin + " AND " + prevZMax + ")")) {
+                while (resultSet.next()) {
+                    consumer.accept(
+                        resultSet.getInt("x"),
+                        resultSet.getInt("z"),
+                        resultSet.getLong("foundTime")
+                    );
+                }
+            }
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Error getting chunks from {} database in dimension: {}, window: {}-{}, {}-{}", databaseName, dimension.location(), regionXMin, regionXMax, regionZMin, regionZMax, e);
+            // fall through
+        }
+    }
+
     public void removeHighlight(final int x, final int z, final ResourceKey<Level> dimension) {
         try (var statement = connection.createStatement()) {
             statement.executeUpdate("DELETE FROM \"" + getTableName(dimension) + "\" WHERE x = " + x + " AND z = " + z);

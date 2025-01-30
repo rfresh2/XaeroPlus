@@ -14,6 +14,7 @@ import xaero.map.gui.GuiMap;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
 
 import java.io.Closeable;
@@ -182,7 +183,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     // note: writes occur on the worker thread
     private List<ListenableFuture<?>> flushAllChunks() {
         return getAllCaches().stream()
-            .map(ChunkHighlightCacheDimensionHandler::writeAllHighlightsToDatabase)
+            .map(ChunkHighlightCacheDimensionHandler::writeStaleHighlightsToDatabase)
             .collect(Collectors.toList());
     }
 
@@ -325,12 +326,11 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         if (XaeroWorldMapCore.currentSession == null) return;
         // limit so we don't overflow
         if (tickCounter > 2400) tickCounter = 0;
-        if (tickCounter++ % 30 != 0) { // run once every 1.5 seconds
-            return;
-        }
-        // autosave current window every 60 seconds
         if (tickCounter % 1200 == 0) {
-            getAllCaches().forEach(ChunkHighlightCacheDimensionHandler::writeAllHighlightsToDatabase);
+            getAllCaches().forEach(ChunkHighlightCacheDimensionHandler::writeStaleHighlightsToDatabase);
+        }
+        // only update window on an interval
+        if (++tickCounter % Settings.REGISTRY.cacheWindowUpdateInterval.getAsInt() != 0) {
             return;
         }
 

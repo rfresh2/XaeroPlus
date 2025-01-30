@@ -155,10 +155,10 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
                     reset();
                 }
                 case VIEWED_DIMENSION_SWITCH -> {
-                    loadChunksInCurrentDimension();
+                    loadChunksInViewedDimension();
                 }
                 case ACTUAL_DIMENSION_SWITCH -> {
-                    loadChunksInActualDimension();
+                    loadChunksOnActualDimensionSwitch();
                 }
             }
         });
@@ -263,7 +263,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
             initializeDimensionCacheHandler(OVERWORLD);
             initializeDimensionCacheHandler(NETHER);
             initializeDimensionCacheHandler(END);
-            loadChunksInCurrentDimension();
+            loadChunksInViewedDimension();
             return true;
         } catch (final Exception e) {
             // expected on game launch
@@ -272,18 +272,33 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         }
     }
 
-    private void loadChunksInActualDimension() {
+    private void loadChunksOnActualDimensionSwitch() {
         var cacheForActualDimension = getCacheForActualDimension();
         if (cacheForActualDimension == null) return;
         cacheForActualDimension
             .setWindow(ChunkUtils.actualPlayerRegionX(), ChunkUtils.actualPlayerRegionZ(), getMinimapRegionWindowSize());
     }
 
-    private void loadChunksInCurrentDimension() {
-        var cacheForCurrentDimension = getCacheForActualDimension();
+    private void loadChunksInViewedDimension() {
+        var viewedDim = Globals.getCurrentDimensionId();
+        var cacheForCurrentDimension = getCacheForDimension(viewedDim, true);
         if (cacheForCurrentDimension == null) return;
+        final int windowSize;
+        final int windowCenterX;
+        final int windowCenterZ;
+        Optional<GuiMap> guiMapOptional = getGuiMap();
+        if (guiMapOptional.isPresent()) {
+            var guiMap = guiMapOptional.get();
+            windowSize = getGuiMapRegionSize(guiMap);
+            windowCenterX = getGuiMapCenterRegionX(guiMap);
+            windowCenterZ = getGuiMapCenterRegionZ(guiMap);
+        } else {
+            windowSize = getMinimapRegionWindowSize();
+            windowCenterX = ChunkUtils.getPlayerRegionX();
+            windowCenterZ = ChunkUtils.getPlayerRegionZ();
+        }
         cacheForCurrentDimension
-            .setWindow(ChunkUtils.getPlayerRegionX(), ChunkUtils.getPlayerRegionZ(), getMinimapRegionWindowSize());
+            .setWindow(windowCenterX, windowCenterZ, windowSize);
     }
 
     @Override
@@ -324,11 +339,11 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     public void handleTick() {
         if (!cacheReady.get()) return;
         if (XaeroWorldMapCore.currentSession == null) return;
-        // limit so we don't overflow
-        if (tickCounter > 2400) tickCounter = 0;
         if (tickCounter % 1200 == 0) {
             getAllCaches().forEach(ChunkHighlightCacheDimensionHandler::writeStaleHighlightsToDatabase);
         }
+        // limit so we don't overflow
+        if (tickCounter > 2400) tickCounter = 0;
         // only update window on an interval
         if (++tickCounter % Settings.REGISTRY.cacheWindowUpdateInterval.getAsInt() != 0) {
             return;

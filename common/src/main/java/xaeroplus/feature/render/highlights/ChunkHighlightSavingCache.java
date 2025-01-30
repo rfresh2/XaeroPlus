@@ -14,6 +14,7 @@ import xaero.map.gui.GuiMap;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
 
 import java.io.Closeable;
@@ -154,10 +155,10 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
                     reset();
                 }
                 case VIEWED_DIMENSION_SWITCH -> {
-                    loadChunksInCurrentDimension();
+                    loadChunksInViewedDimension();
                 }
                 case ACTUAL_DIMENSION_SWITCH -> {
-                    loadChunksInActualDimension();
+                    loadChunksOnActualDimensionSwitch();
                 }
             }
         });
@@ -182,7 +183,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     // note: writes occur on the worker thread
     private List<ListenableFuture<?>> flushAllChunks() {
         return getAllCaches().stream()
-            .map(ChunkHighlightCacheDimensionHandler::writeAllHighlightsToDatabase)
+            .map(ChunkHighlightCacheDimensionHandler::writeStaleHighlightsToDatabase)
             .collect(Collectors.toList());
     }
 
@@ -262,7 +263,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
             initializeDimensionCacheHandler(OVERWORLD);
             initializeDimensionCacheHandler(NETHER);
             initializeDimensionCacheHandler(END);
-            loadChunksInCurrentDimension();
+            loadChunksInViewedDimension();
             return true;
         } catch (final Exception e) {
             // expected on game launch
@@ -271,18 +272,33 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         }
     }
 
-    private void loadChunksInActualDimension() {
+    private void loadChunksOnActualDimensionSwitch() {
         var cacheForActualDimension = getCacheForActualDimension();
         if (cacheForActualDimension == null) return;
         cacheForActualDimension
             .setWindow(ChunkUtils.actualPlayerRegionX(), ChunkUtils.actualPlayerRegionZ(), getMinimapRegionWindowSize());
     }
 
-    private void loadChunksInCurrentDimension() {
-        var cacheForCurrentDimension = getCacheForActualDimension();
+    private void loadChunksInViewedDimension() {
+        var viewedDim = Globals.getCurrentDimensionId();
+        var cacheForCurrentDimension = getCacheForDimension(viewedDim, true);
         if (cacheForCurrentDimension == null) return;
+        final int windowSize;
+        final int windowCenterX;
+        final int windowCenterZ;
+        Optional<GuiMap> guiMapOptional = getGuiMap();
+        if (guiMapOptional.isPresent()) {
+            var guiMap = guiMapOptional.get();
+            windowSize = getGuiMapRegionSize(guiMap);
+            windowCenterX = getGuiMapCenterRegionX(guiMap);
+            windowCenterZ = getGuiMapCenterRegionZ(guiMap);
+        } else {
+            windowSize = getMinimapRegionWindowSize();
+            windowCenterX = ChunkUtils.getPlayerRegionX();
+            windowCenterZ = ChunkUtils.getPlayerRegionZ();
+        }
         cacheForCurrentDimension
-            .setWindow(ChunkUtils.getPlayerRegionX(), ChunkUtils.getPlayerRegionZ(), getMinimapRegionWindowSize());
+            .setWindow(windowCenterX, windowCenterZ, windowSize);
     }
 
     @Override
@@ -323,14 +339,13 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     public void handleTick() {
         if (!cacheReady.get()) return;
         if (XaeroWorldMapCore.currentSession == null) return;
+        if (tickCounter % 1200 == 0) {
+            getAllCaches().forEach(ChunkHighlightCacheDimensionHandler::writeStaleHighlightsToDatabase);
+        }
         // limit so we don't overflow
         if (tickCounter > 2400) tickCounter = 0;
-        if (tickCounter++ % 30 != 0) { // run once every 1.5 seconds
-            return;
-        }
-        // autosave current window every 60 seconds
-        if (tickCounter % 1200 == 0) {
-            getAllCaches().forEach(ChunkHighlightCacheDimensionHandler::writeAllHighlightsToDatabase);
+        // only update window on an interval
+        if (++tickCounter % Settings.REGISTRY.cacheWindowUpdateInterval.getAsInt() != 0) {
             return;
         }
 

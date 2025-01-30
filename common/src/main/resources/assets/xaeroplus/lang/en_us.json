@@ -186,6 +186,8 @@
   "xaeroplus.setting.expanded_settings.tooltip": "Increases the number of settings shown per page on larger screens",
   "xaeroplus.setting.sodium_embeddium_integration": "Sodium/Embeddium Settings Integration",
   "xaeroplus.setting.sodium_embeddium_integration.tooltip": "Enables the XaeroPlus settings page in Sodium/Embeddium",
+  "xaeroplus.setting.cache_window_update_interval": "Window Update Interval",
+  "xaeroplus.setting.cache_window_update_interval.tooltip": "How frequently to update the window of loaded highlights in ticks (1 tick = 50ms). \nA lower interval means faster updates but higher system resource usage.",
   "xaeroplus.gui.world_map.toggle_follow_mode": "Toggle Follow Mode",
   "xaeroplus.gui.on": "On",
   "xaeroplus.gui.off": "Off",

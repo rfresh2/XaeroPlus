@@ -19,6 +19,10 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
     public final ReadWriteLock lock = new StampedLock().asReadWriteLock();
     public final Long2LongMap chunks = new Long2LongOpenHashMap();
 
+    public ChunkHighlightBaseCacheHandler() {
+        chunks.defaultReturnValue(-1);
+    }
+
     @Override
     public boolean addHighlight(final int x, final int z) {
         return addHighlight(x, z, System.currentTimeMillis());

@@ -12,21 +12,21 @@ gradle.extra.apply {
 	set("mod_version", "2.25.3")
 	set("minecraft_version", "1.21.4")
     set("parchment_version", "2024.12.29")
-    set("worldmap_version_fabric", "1.39.2")
-	set("minimap_version_fabric", "25.0.0")
-	set("worldmap_version_forge", "1.39.2")
-	set("minimap_version_forge", "25.0.0")
-	set("worldmap_version_neo", "1.39.2")
-	set("minimap_version_neo", "25.0.0")
+    set("worldmap_version_fabric", "1.39.3")
+	set("minimap_version_fabric", "25.0.1")
+	set("worldmap_version_forge", "1.39.3")
+	set("minimap_version_forge", "25.0.1")
+	set("worldmap_version_neo", "1.39.3")
+	set("minimap_version_neo", "25.0.1")
 }
 
 dependencyResolutionManagement {
 	versionCatalogs {
 		create("libs") {
 			library("fabric-loader", "net.fabricmc:fabric-loader:0.16.9")
-			library("forge", "net.minecraftforge:forge:${gradle.extra.get("minecraft_version")}-54.0.15")
-			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.114.0+1.21.4")
-			library("neoforge", "net.neoforged:neoforge:21.4.47-beta")
+			library("forge", "net.minecraftforge:forge:${gradle.extra.get("minecraft_version")}-54.0.17")
+			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.115.1+1.21.4")
+			library("neoforge", "net.neoforged:neoforge:21.4.68-beta")
 			library("worldmap-fabric", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version_fabric")}_Fabric_${gradle.extra.get("minecraft_version")}")
 			library("worldmap-forge", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version_forge")}_Forge_${gradle.extra.get("minecraft_version")}")
 			library("worldmap-neo", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version_neo")}_NeoForge_${gradle.extra.get("minecraft_version")}")

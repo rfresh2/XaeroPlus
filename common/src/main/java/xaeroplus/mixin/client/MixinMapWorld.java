@@ -1,44 +1,46 @@
 package xaeroplus.mixin.client;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xaero.map.MapProcessor;
 import xaero.map.world.MapDimension;
 import xaero.map.world.MapWorld;
-import xaeroplus.util.DelegatingHashTable;
-
-import java.util.Hashtable;
 
 @Mixin(value = MapWorld.class, remap = false)
-public class MixinMapWorld {
+public abstract class MixinMapWorld {
+    @Unique MapDimension xaeroPlus$currentDimensionRef = null;
 
-    @Shadow
-    private Hashtable<ResourceKey<Level>, MapDimension> dimensions;
-    @Shadow
-    private ResourceKey<Level> currentDimensionId;
+    @Shadow public abstract MapDimension getDimension(final ResourceKey<Level> dimId);
+    @Shadow private ResourceKey<Level> currentDimensionId;
 
-    @Inject(method = "<init>", at = @At("RETURN"))
-    public void init(String mainId, String oldUnfixedMainId, MapProcessor mapProcessor, final CallbackInfo ci) {
-        // Hashtable is slow af as every operation is synchronized
-        // replace it with our own implementation
-        // will still be thread-safe
-        // except with iterators - however, the base Xaero code does use synchronization blocks.
-        this.dimensions = new DelegatingHashTable<>();
+    @WrapOperation(method = "switchToFutureUnsynced",
+        at = @At(
+            value = "FIELD",
+            opcode = Opcodes.PUTFIELD,
+            target = "Lxaero/map/world/MapWorld;currentDimensionId:Lnet/minecraft/resources/ResourceKey;"),
+        remap = true) // $REMAP
+    public void setCurrentDimensionRef(final MapWorld instance, final ResourceKey<Level> value, final Operation<Void> original) {
+        original.call(instance, value);
+        this.xaeroPlus$currentDimensionRef = getDimension(value);
     }
 
     /**
      * @author rfresh2
-     * @reason fast dimension map lookup without synchronization
+     * @reason skip hot hashtable lookup with cached reference
      */
     @Overwrite
-    public MapDimension getDimension(ResourceKey<Level> dimId) {
+    public MapDimension getCurrentDimension() {
+        ResourceKey<Level> dimId = this.currentDimensionId;
+        MapDimension ref = xaeroPlus$currentDimensionRef;
         if (dimId == null) return null;
-        else return this.dimensions.get(dimId);
+        if (ref != null) return ref;
+        return this.getDimension(dimId);
     }
 }

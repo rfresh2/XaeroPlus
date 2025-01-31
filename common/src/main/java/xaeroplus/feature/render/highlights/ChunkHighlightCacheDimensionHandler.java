@@ -48,7 +48,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
             && !windowMoveFuture.isDone()
             && (regionX != 0 || regionZ != 0 || regionSize != 0) // queue window change if we are clearing it (setting size to 0)
         ) {
-            XaeroPlus.LOGGER.info("Rejecting window move to: [{} {} {}] from: [{} {} {}]", regionX, regionZ, regionSize, windowRegionX, windowRegionZ, windowRegionSize);
+            XaeroPlus.LOGGER.debug("Rejecting window move to: [{} {} {}] from: [{} {} {}]", regionX, regionZ, regionSize, windowRegionX, windowRegionZ, windowRegionSize);
             return;
         }
         int prevWindowRegionX = windowRegionX;
@@ -71,17 +71,17 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
     private void moveWindow0(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final int prevWindowRegionX, final int prevWindowRegionZ, final int prevWindowRegionSize) {
         // load new data
         Long2LongMap dataBuf = new Long2LongOpenHashMap();
-        database.getHighlightsInWindowAndOutsidePrevWindow(
-            dimension,
-            windowRegionX - windowRegionSize, windowRegionX + windowRegionSize,
-            windowRegionZ - windowRegionSize, windowRegionZ + windowRegionSize,
-            prevWindowRegionX - prevWindowRegionSize, prevWindowRegionX + prevWindowRegionSize,
-            prevWindowRegionZ - prevWindowRegionSize, prevWindowRegionZ + prevWindowRegionSize,
-            (chunkX, chunkZ, foundTime) -> dataBuf.put(chunkPosToLong(chunkX, chunkZ), foundTime)
-        );
         try {
             // minimizes time we have to hold the lock by querying the database outside the lock's scope
             // at cost of a bit more memory
+            database.getHighlightsInWindowAndOutsidePrevWindow(
+                dimension,
+                windowRegionX - windowRegionSize, windowRegionX + windowRegionSize,
+                windowRegionZ - windowRegionSize, windowRegionZ + windowRegionSize,
+                prevWindowRegionX - prevWindowRegionSize, prevWindowRegionX + prevWindowRegionSize,
+                prevWindowRegionZ - prevWindowRegionSize, prevWindowRegionZ + prevWindowRegionSize,
+                (chunkX, chunkZ, foundTime) -> dataBuf.put(chunkPosToLong(chunkX, chunkZ), foundTime)
+            );
             if (!dataBuf.isEmpty() && lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
                 for (var entry : Long2LongMaps.fastIterable(dataBuf)) {
                     chunks.put(entry.getLongKey(), entry.getLongValue());
@@ -156,18 +156,19 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
         int regionZMin = windowRegionZ - windowRegionSize;
         int regionXMax = windowRegionX + windowRegionSize;
         int regionZMax = windowRegionZ + windowRegionSize;
-        database.getHighlightsInWindow(
-            dimension,
-            regionXMin, regionXMax,
-            regionZMin, regionZMax,
-            (chunkX, chunkZ, foundTime) -> map.put(chunkPosToLong(chunkX, chunkZ), foundTime)
-        );
-        // append chunks from local cache
+
         try {
+            database.getHighlightsInWindow(
+                dimension,
+                regionXMin, regionXMax,
+                regionZMin, regionZMax,
+                (chunkX, chunkZ, foundTime) -> map.put(chunkPosToLong(chunkX, chunkZ), foundTime)
+            );
             int chunkXMin = regionCoordToChunkCoord(regionXMin);
             int chunkXMax = regionCoordToChunkCoord(regionXMax);
             int chunkZMin = regionCoordToChunkCoord(regionZMin);
             int chunkZMax = regionCoordToChunkCoord(regionZMax);
+            // append chunks from local cache
             if (lock.readLock().tryLock(1, TimeUnit.SECONDS)) {
                 for (var entry : Long2LongMaps.fastIterable(chunks)) {
                     final long chunkPos = entry.getLongKey();

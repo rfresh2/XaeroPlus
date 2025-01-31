@@ -1,6 +1,5 @@
 package xaeroplus.module.impl;
 
-import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -31,26 +30,9 @@ public class WorldTools extends Module {
         Globals.drawManager.unregisterChunkHighlightProvider(this.getClass());
     }
 
-    public boolean isChunkDownloaded(final int x, final int z, final ResourceKey<Level> dimension) {
-        return WorldToolsHelper.isDownloading()
-            && dimension == ChunkUtils.getActualDimension()
-            && HotCache.INSTANCE.isChunkSaved(x, z);
-    }
-
     public LongList getWindowedHighlightsSnapshot(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
-        int minChunkX = ChunkUtils.regionCoordToChunkCoord(windowRegionX - windowRegionSize);
-        int maxChunkX = ChunkUtils.regionCoordToChunkCoord(windowRegionX + windowRegionSize);
-        int minChunkZ = ChunkUtils.regionCoordToChunkCoord(windowRegionZ - windowRegionSize);
-        int maxChunkZ = ChunkUtils.regionCoordToChunkCoord(windowRegionZ + windowRegionSize);
-        LongList chunks = new LongArrayList(8);
-        for (int x = minChunkX; x <= maxChunkX; x++) {
-            for (int z = minChunkZ; z <= maxChunkZ; z++) {
-                if (isChunkDownloaded(x, z, dimension)) {
-                    chunks.add(ChunkUtils.chunkPosToLong(x, z));
-                }
-            }
-        }
-        return chunks;
+        if (!WorldToolsHelper.isDownloading() || dimension != ChunkUtils.getActualDimension()) return LongList.of();
+        return HotCache.INSTANCE.getSavedChunks();
     }
 
     public int getWorldToolsColor() {

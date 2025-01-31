@@ -23,7 +23,7 @@ dependencies {
     modCompileOnly(libs.waystones.fabric)
     modCompileOnly(libs.balm.fabric)
     modCompileOnly(libs.fabric.waystones)
-    modCompileOnly(libs.worldtools)
+    modCompileOnly(files("libs/WorldTools-fabric-1.2.9-poc+1.21.4.jar"))
     implementation(libs.oldbiomes)
     implementation(libs.sqlite)
 }

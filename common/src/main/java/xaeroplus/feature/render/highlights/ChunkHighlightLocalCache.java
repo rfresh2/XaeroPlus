@@ -5,10 +5,15 @@ import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
 
 import java.util.Map;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 
 public class ChunkHighlightLocalCache extends ChunkHighlightBaseCacheHandler {
     private static final int maxNumber = 5000;
+
+    public ChunkHighlightLocalCache() {
+        super(ForkJoinPool.commonPool());
+    }
 
     @Override
     public boolean addHighlight(final int x, final int z) {

@@ -230,6 +230,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
                                             @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers
     ) {
         original.call(instance, renderer);
+        MinimapShaders.FRAMEBUFFER_LINES.setFrameSize((float)this.scalingFramebuffer.viewWidth, (float)this.scalingFramebuffer.viewHeight);
         int mapX = xFloored >> 4;
         int mapZ = zFloored >> 4;
         int chunkX = mapX >> 2;

@@ -15,10 +15,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import xaeroplus.Globals;
-import xaeroplus.event.ChunkBlockUpdateEvent;
-import xaeroplus.event.ChunkBlocksUpdateEvent;
-import xaeroplus.event.ChunkDataEvent;
-import xaeroplus.event.XaeroWorldChangeEvent;
+import xaeroplus.event.*;
 import xaeroplus.feature.render.highlights.SavableHighlightCacheInstance;
 import xaeroplus.module.Module;
 import xaeroplus.settings.Settings;
@@ -58,6 +55,7 @@ public class LiquidNewChunks extends Module {
 
     @EventHandler
     public void onMultiBlockUpdate(final ChunkBlocksUpdateEvent event) {
+        if (event.phase() != Phase.PRE) return;
         var level = mc.level;
         if (level == null || mc.levelRenderer.viewArea == null) return;
         event.packet().runUpdates((pos, state) -> {
@@ -67,6 +65,7 @@ public class LiquidNewChunks extends Module {
 
     @EventHandler
     public void onBlockUpdate(final ChunkBlockUpdateEvent event) {
+        if (event.phase() != Phase.PRE) return;
         var level = mc.level;
         if (level == null || mc.levelRenderer.viewArea == null) return;
         handleBlockUpdate(level, event.packet().getPos(), event.packet().getBlockState());

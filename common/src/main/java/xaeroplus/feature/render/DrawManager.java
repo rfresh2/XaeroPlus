@@ -117,7 +117,6 @@ public class DrawManager {
         final PoseStack matrixStack,
         final MultiBufferSource.BufferSource renderTypeBuffers
     ) {
-        MinimapShaders.ensureShaders();
         for (int i = 0; i < sortedLineKeySet.size(); i++) {
             var k = sortedLineKeySet.get(i);
             if (k == null) continue;
@@ -253,7 +252,6 @@ public class DrawManager {
         double fboScale,
         final MultiBufferSource.BufferSource renderTypeBuffers
     ) {
-        MinimapShaders.ensureShaders();
         var mc = Minecraft.getInstance();
         FramebufferLinesShaderHelper.setFrameSize(mc.getWindow().getWidth(), mc.getWindow().getHeight());
         for (int i = 0; i < sortedLineKeySet.size(); i++) {

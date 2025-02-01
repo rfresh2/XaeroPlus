@@ -236,16 +236,34 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
     public boolean addHighlight(final int x, final int z) {
         boolean b = super.addHighlight(x, z, System.currentTimeMillis());
         if (b) {
+            // todo: we should always add to stalechunks during the base cache write lock
             try {
-                if (staleChunksLock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
+                if (staleChunksLock.writeLock().tryLock()) {
                     staleChunks.add(chunkPosToLong(x, z));
                     staleChunksLock.writeLock().unlock();
+                } else {
+                    executorService.execute(() -> addQueuedStaleHighlight(x, z));
                 }
             } catch (final Exception e) {
                 XaeroPlus.LOGGER.error("Failed to add highlight to {} stale chunks: {}", database.databaseName, dimension.location(), e);
             }
         }
         return b;
+    }
+
+    private void addQueuedStaleHighlight(final int x, final int z) {
+        try {
+            if (staleChunksLock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
+                staleChunks.add(chunkPosToLong(x, z));
+                staleChunksLock.writeLock().unlock();
+            } else {
+                XaeroPlus.LOGGER.error("Failed to add new queued stale highlight: timed out: {}, {}", x, z);
+            }
+        } catch (InterruptedException e) {
+            XaeroPlus.LOGGER.debug("Thread interrupted while adding new queued stale highlight: {}, {}", x, z, e);
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Failed to add new stale highlight: {}, {}", x, z, e);
+        }
     }
 
     @Override
@@ -269,14 +287,17 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
 
     @Override
     public boolean removeHighlight(final int x, final int z) {
-        super.removeHighlight(x, z);
-        try {
-            database.removeHighlight(x, z, dimension);
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Failed to remove highlight from {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
-            return false;
+        boolean b = super.removeHighlight(x, z);
+        if (b) {
+            executorService.execute(() -> {
+                try {
+                    database.removeHighlight(x, z, dimension);
+                } catch (final Exception e) {
+                    XaeroPlus.LOGGER.error("Failed to remove highlight from {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
+                }
+            });
         }
-        return true;
+        return b;
     }
 
     @Override

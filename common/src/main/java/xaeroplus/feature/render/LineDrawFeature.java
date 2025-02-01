@@ -20,6 +20,7 @@ public class LineDrawFeature {
         this.lineRenderCache = Caffeine.newBuilder()
             .expireAfterWrite(10, TimeUnit.SECONDS)
             .refreshAfterWrite(refreshIntervalMs, TimeUnit.MILLISECONDS)
+            .executor(Globals.cacheRefreshExecutorService.get())
             .buildAsync(k -> loadLinesInWindow());
     }
 

@@ -37,6 +37,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
         @NotNull ResourceKey<Level> dimension,
         @NotNull ChunkHighlightDatabase database,
         @NotNull ListeningExecutorService executorService) {
+        super(executorService);
         this.dimension = dimension;
         this.database = database;
         this.executorService = executorService;

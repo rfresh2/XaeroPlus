@@ -233,71 +233,96 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
     }
 
     @Override
-    public boolean addHighlight(final int x, final int z) {
-        boolean b = super.addHighlight(x, z, System.currentTimeMillis());
-        if (b) {
-            // todo: we should always add to stalechunks during the base cache write lock
-            try {
+    public boolean addHighlight(final int x, final int z, final long foundTime) {
+        final long chunkPos = chunkPosToLong(x, z);
+        try {
+            boolean b = false;
+            if (lock.writeLock().tryLock()) {
                 if (staleChunksLock.writeLock().tryLock()) {
+                    chunks.put(chunkPos, foundTime);
+                    staleChunks.add(chunkPosToLong(x, z));
+                    b = true;
+                    staleChunksLock.writeLock().unlock();
+                }
+                lock.writeLock().unlock();
+            }
+            if (!b) {
+                try {
+                    executorService.execute(() -> addQueuedHighlight(x, z, foundTime));
+                } catch (final Exception e) {
+                    XaeroPlus.LOGGER.error("Failed to submit new queued highlight write: {}, {}", x, z, e);
+                }
+            }
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Failed to add new highlight: {}, {}", x, z, e);
+        }
+        return true;
+    }
+
+    @Override
+    void addQueuedHighlight(final int x, final int z, final long foundTime) {
+        final long chunkPos = chunkPosToLong(x, z);
+        try {
+            if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
+                if (staleChunksLock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
+                    chunks.put(chunkPos, foundTime);
                     staleChunks.add(chunkPosToLong(x, z));
                     staleChunksLock.writeLock().unlock();
                 } else {
-                    executorService.execute(() -> addQueuedStaleHighlight(x, z));
+                    XaeroPlus.LOGGER.error("Failed to add new queued highlight: timed out stale lock {}, {}", x, z);
                 }
-            } catch (final Exception e) {
-                XaeroPlus.LOGGER.error("Failed to add highlight to {} stale chunks: {}", database.databaseName, dimension.location(), e);
-            }
-        }
-        return b;
-    }
-
-    private void addQueuedStaleHighlight(final int x, final int z) {
-        try {
-            if (staleChunksLock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
-                staleChunks.add(chunkPosToLong(x, z));
-                staleChunksLock.writeLock().unlock();
+                lock.writeLock().unlock();
             } else {
-                XaeroPlus.LOGGER.error("Failed to add new queued stale highlight: timed out: {}, {}", x, z);
+                XaeroPlus.LOGGER.error("Failed to add new queued highlight: timed out cache lock: {}, {}", x, z);
             }
         } catch (InterruptedException e) {
-            XaeroPlus.LOGGER.debug("Thread interrupted while adding new queued stale highlight: {}, {}", x, z, e);
+            XaeroPlus.LOGGER.debug("Thread interrupted while adding new queued highlight: {}, {}", x, z, e);
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Failed to add new stale highlight: {}, {}", x, z, e);
+            XaeroPlus.LOGGER.error("Failed to add new highlight: {}, {}", x, z, e);
         }
     }
 
     @Override
     public void loadPreviousState(final Long2LongMap state) {
-        super.loadPreviousState(state);
+        if (state == null) return;
         try {
             if (staleChunksLock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
                 staleChunks.clear();
-                if (lock.readLock().tryLock(1, TimeUnit.SECONDS)) {
-                    for (var it = Long2LongMaps.fastIterator(chunks); it.hasNext(); ) {
-                        staleChunks.add(it.next().getLongKey());
-                    }
-                    lock.readLock().unlock();
+                staleChunks.addAll(state.keySet());
+                if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
+                    chunks.putAll(state);
+                    lock.writeLock().unlock();
                 }
-                staleChunksLock.writeLock().unlock();
             }
+
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Failed to load previous state for {} stale chunks: {}", database.databaseName, dimension.location(), e);
+            XaeroPlus.LOGGER.error("Error loading previous highlight cache state", e);
         }
     }
 
     @Override
     public boolean removeHighlight(final int x, final int z) {
-        boolean b = super.removeHighlight(x, z);
-        if (b) {
-            executorService.execute(() -> {
-                try {
-                    database.removeHighlight(x, z, dimension);
-                } catch (final Exception e) {
-                    XaeroPlus.LOGGER.error("Failed to remove highlight from {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
-                }
-            });
+        executorService.execute(() -> removeHighlight0(x, z));
+        return true;
+    }
+
+    private void removeHighlight0(final int x, final int z) {
+        final long chunkPos = chunkPosToLong(x, z);
+        try {
+            if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
+                chunks.remove(chunkPos);
+                lock.writeLock().unlock();
+            } else {
+                XaeroPlus.LOGGER.error("Failed to remove queued highlight: timed out: {}, {}", x, z);
+            }
+            try {
+                database.removeHighlight(x, z, dimension);
+            } catch (final Exception e) {
+                XaeroPlus.LOGGER.error("Failed to remove highlight from {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
+            }
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Failed to remove queued highlight: {}, {}", x, z, e);
         }
-        return b;
     }
 
     @Override

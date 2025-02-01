@@ -269,14 +269,17 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
 
     @Override
     public boolean removeHighlight(final int x, final int z) {
-        super.removeHighlight(x, z);
-        try {
-            database.removeHighlight(x, z, dimension);
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Failed to remove highlight from {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
-            return false;
+        boolean b = super.removeHighlight(x, z);
+        if (b) {
+            executorService.execute(() -> {
+                try {
+                    database.removeHighlight(x, z, dimension);
+                } catch (final Exception e) {
+                    XaeroPlus.LOGGER.error("Failed to remove highlight from {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
+                }
+            });
         }
-        return true;
+        return b;
     }
 
     @Override

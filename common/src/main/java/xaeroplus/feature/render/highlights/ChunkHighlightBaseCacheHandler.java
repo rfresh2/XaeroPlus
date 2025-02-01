@@ -50,7 +50,7 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
         return true;
     }
 
-    private void addQueuedHighlight(final int x, final int z, final long foundTime) {
+    void addQueuedHighlight(final int x, final int z, final long foundTime) {
         final long chunkPos = chunkPosToLong(x, z);
         try {
             if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {

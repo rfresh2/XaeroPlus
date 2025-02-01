@@ -1,23 +1,27 @@
 package xaeroplus.mixin.client.mc;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaeroplus.XaeroPlus;
-import xaeroplus.event.ChunkBlockUpdateEvent;
-import xaeroplus.event.ChunkBlocksUpdateEvent;
-import xaeroplus.event.ChunkDataEvent;
-import xaeroplus.event.ClientPlaySessionFinalizedEvent;
+import xaeroplus.event.*;
+
+import java.util.function.BiConsumer;
 
 @Mixin(ClientPacketListener.class)
 public class MixinClientPlayNetworkHandler {
@@ -42,20 +46,31 @@ public class MixinClientPlayNetworkHandler {
         XaeroPlus.EVENT_BUS.call(new ChunkDataEvent(level.getChunk(packet.getX(), packet.getZ()), seenChunkRef.get()));
     }
 
-    @Inject(method = "handleChunkBlocksUpdate", at = @At(
+    @WrapOperation(method = "handleChunkBlocksUpdate", at = @At(
         value = "INVOKE",
         target = "Lnet/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket;runUpdates(Ljava/util/function/BiConsumer;)V"
     ))
-    public void onChunkBlocksUpdate(final ClientboundSectionBlocksUpdatePacket packet, final CallbackInfo ci) {
-        XaeroPlus.EVENT_BUS.call(new ChunkBlocksUpdateEvent(packet));
+    public void onChunkBlocksUpdate(final ClientboundSectionBlocksUpdatePacket instance, final BiConsumer<BlockPos, BlockState> mutableBlockPos, final Operation<Void> original) {
+        var event = new ChunkBlocksUpdateEvent(instance);
+        event.setPhase(Phase.PRE);
+        XaeroPlus.EVENT_BUS.call(event);
+        original.call(instance, mutableBlockPos);
+        event.setPhase(Phase.POST);
+        XaeroPlus.EVENT_BUS.call(event);
     }
 
-    @Inject(method = "handleBlockUpdate", at = @At(
+    @WrapOperation(method = "handleBlockUpdate", at = @At(
         value = "INVOKE",
         target = "Lnet/minecraft/client/multiplayer/ClientLevel;setServerVerifiedBlockState(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)V"
     ))
-    public void onBlockUpdate(final ClientboundBlockUpdatePacket packet, final CallbackInfo ci) {
-        XaeroPlus.EVENT_BUS.call(new ChunkBlockUpdateEvent(packet));
+    public void onBlockUpdate(final ClientLevel instance, final BlockPos pos, final BlockState state, final int flags, final Operation<Void> original,
+                              @Local(argsOnly = true) final ClientboundBlockUpdatePacket packet) {
+        var event = new ChunkBlockUpdateEvent(packet);
+        event.setPhase(Phase.PRE);
+        XaeroPlus.EVENT_BUS.call(event);
+        original.call(instance, pos, state, flags);
+        event.setPhase(Phase.POST);
+        XaeroPlus.EVENT_BUS.call(event);
     }
 
     @Inject(method = "close", at = @At(

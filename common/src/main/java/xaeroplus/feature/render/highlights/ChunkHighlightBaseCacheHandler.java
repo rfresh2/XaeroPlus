@@ -9,6 +9,7 @@ import net.minecraft.world.level.Level;
 import xaeroplus.XaeroPlus;
 import xaeroplus.util.ChunkUtils;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.StampedLock;
@@ -18,9 +19,11 @@ import static xaeroplus.util.ChunkUtils.chunkPosToLong;
 public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCache {
     public final ReadWriteLock lock = new StampedLock().asReadWriteLock();
     public final Long2LongMap chunks = new Long2LongOpenHashMap();
+    private final ExecutorService queuedWriteExecutor;
 
-    public ChunkHighlightBaseCacheHandler() {
-        chunks.defaultReturnValue(-1);
+    public ChunkHighlightBaseCacheHandler(ExecutorService queuedWriteExecutor) {
+        this.queuedWriteExecutor = queuedWriteExecutor;
+        this.chunks.defaultReturnValue(-1);
     }
 
     @Override
@@ -31,9 +34,15 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
     public boolean addHighlight(final int x, final int z, final long foundTime) {
         final long chunkPos = chunkPosToLong(x, z);
         try {
-            if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
+            if (lock.writeLock().tryLock()) {
                 chunks.put(chunkPos, foundTime);
                 lock.writeLock().unlock();
+            } else {
+                try {
+                    queuedWriteExecutor.execute(() -> addQueuedHighlight(x, z, foundTime));
+                } catch (final Exception e) {
+                    XaeroPlus.LOGGER.error("Failed to submit new queued highlight write: {}, {}", x, z, e);
+                }
             }
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Failed to add new highlight: {}, {}", x, z, e);
@@ -41,18 +50,54 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
         return true;
     }
 
+    private void addQueuedHighlight(final int x, final int z, final long foundTime) {
+        final long chunkPos = chunkPosToLong(x, z);
+        try {
+            if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
+                chunks.put(chunkPos, foundTime);
+                lock.writeLock().unlock();
+            } else {
+                XaeroPlus.LOGGER.error("Failed to add new queued highlight: timed out: {}, {}", x, z);
+            }
+        } catch (InterruptedException e) {
+            XaeroPlus.LOGGER.debug("Thread interrupted while adding new queued highlight: {}, {}", x, z, e);
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Failed to add new highlight: {}, {}", x, z, e);
+        }
+    }
+
     @Override
     public boolean removeHighlight(final int x, final int z) {
         final long chunkPos = chunkPosToLong(x, z);
         try {
-            if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
+            if (lock.writeLock().tryLock()) {
                 chunks.remove(chunkPos);
                 lock.writeLock().unlock();
+            } else {
+                try {
+                    queuedWriteExecutor.execute(() -> removeQueuedHighlight(x, z));
+                } catch (final Exception e) {
+                    XaeroPlus.LOGGER.error("Failed to submit new queued highlight remove: {}, {}", x, z, e);
+                }
             }
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Failed to add new highlight: {}, {}", x, z, e);
         }
         return true;
+    }
+
+    private void removeQueuedHighlight(final int x, final int z) {
+        final long chunkPos = chunkPosToLong(x, z);
+        try {
+            if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
+                chunks.remove(chunkPos);
+                lock.writeLock().unlock();
+            } else {
+                XaeroPlus.LOGGER.error("Failed to remove queued highlight: timed out: {}, {}", x, z);
+            }
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Failed to remove queued highlight: {}, {}", x, z, e);
+        }
     }
 
     @Override

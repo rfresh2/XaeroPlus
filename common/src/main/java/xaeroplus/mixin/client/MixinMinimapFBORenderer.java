@@ -197,11 +197,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         int insideX = xFloored & 15;
         int insideZ = zFloored & 15;
         MinimapShaders.FRAMEBUFFER_LINES.setFrameSize((float)this.scalingFramebuffer.viewWidth, (float)this.scalingFramebuffer.viewHeight);
-        Globals.drawManager.drawMinimapFeatures(
-            minViewX,
-            maxViewX,
-            minViewZ,
-            maxViewZ,
+        Globals.DRAW_MANAGER.drawMinimapFeatures(
             chunkX,
             chunkZ,
             tileX,
@@ -209,8 +205,6 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             insideX,
             insideZ,
             matrixStack,
-            overlayBufferBuilder,
-            helper,
             renderTypeBuffers);
     }
 
@@ -221,12 +215,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
     public void drawMinimapFeaturesCaveMode(final MultiTextureRenderTypeRendererProvider instance, final MultiTextureRenderTypeRenderer renderer, final Operation<Void> original,
                                             @Local(name = "xFloored") int xFloored,
                                             @Local(name = "zFloored") int zFloored,
-                                            @Local(name = "overlayBufferBuilder") VertexConsumer overlayBufferBuilder,
                                             @Local(name = "matrixStack") PoseStack matrixStack,
-                                            @Local(name = "minX") int minXRef,
-                                            @Local(name = "maxX") int maxXRef,
-                                            @Local(name = "minZ") int minZRef,
-                                            @Local(name = "maxZ") int maxZRef,
                                             @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers
     ) {
         original.call(instance, renderer);
@@ -239,12 +228,11 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         int tileZ = mapZ & 3;
         int insideX = xFloored & 15;
         int insideZ = zFloored & 15;
-        Globals.drawManager.drawMinimapFeatures(
-            minXRef, maxXRef, minZRef, maxZRef,
+        Globals.DRAW_MANAGER.drawMinimapFeatures(
             chunkX, chunkZ,
             tileX, tileZ,
             insideX, insideZ,
-            matrixStack, overlayBufferBuilder, helper,
+            matrixStack,
             renderTypeBuffers
         );
     }

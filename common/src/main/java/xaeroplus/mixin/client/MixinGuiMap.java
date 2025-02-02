@@ -245,26 +245,16 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         ),
         remap = true)
     public void drawWorldMapFeatures(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci,
-                                     @Local(name = "leftBorder") double leftBorder,
-                                     @Local(name = "rightBorder") double rightBorder,
-                                     @Local(name = "topBorder") double topBorder,
-                                     @Local(name = "bottomBorder") double bottomBorder,
                                      @Local(name = "flooredCameraX") int flooredCameraX,
                                      @Local(name = "flooredCameraZ") int flooredCameraZ,
                                      @Local(name = "matrixStack") PoseStack matrixStack,
-                                     @Local(name = "overlayBuffer") VertexConsumer overlayBuffer,
                                      @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers,
                                      @Local(name = "fboScale") double fboScale) {
         if (Minecraft.getInstance().options.hideGui) return;
-        Globals.drawManager.drawWorldMapFeatures(
-            leftBorder,
-            rightBorder,
-            topBorder,
-            bottomBorder,
+        Globals.DRAW_MANAGER.drawWorldMapFeatures(
             flooredCameraX,
             flooredCameraZ,
             matrixStack,
-            overlayBuffer,
             fboScale,
             renderTypeBuffers
         );

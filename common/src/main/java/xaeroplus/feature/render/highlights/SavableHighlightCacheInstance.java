@@ -65,7 +65,13 @@ public class SavableHighlightCacheInstance {
     @EventHandler
     public void onClientTickEvent(final ClientTickEvent.Post event) {
         try {
+//            long before = System.nanoTime();
             cache.handleTick();
+//            long after = System.nanoTime();
+//            long duration = after - before;
+//            if (duration > TimeUnit.NANOSECONDS.convert(1, TimeUnit.MILLISECONDS)) {
+//                XaeroPlus.LOGGER.warn("Cache {} took {} ms to tick", dbName, TimeUnit.MILLISECONDS.convert(duration, TimeUnit.NANOSECONDS));
+//            }
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error handling tick event for cache: {} event: {}", dbName, event, e);
         }

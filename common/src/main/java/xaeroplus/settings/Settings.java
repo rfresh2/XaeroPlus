@@ -759,10 +759,4 @@ public final class Settings extends SettingRegistry {
             1, 100, 1,
             10),
             SettingLocation.CHUNK_HIGHLIGHTS);
-    public final BooleanSetting highlightShader = register(
-        BooleanSetting.create(
-            "Highlight Shader",
-            "xaeroplus.setting.highlight_shader",
-            true),
-        SettingLocation.CHUNK_HIGHLIGHTS);
 }

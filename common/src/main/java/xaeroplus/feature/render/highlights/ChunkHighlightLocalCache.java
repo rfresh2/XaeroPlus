@@ -5,47 +5,37 @@ import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
 
 import java.util.Map;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
 
 public class ChunkHighlightLocalCache extends ChunkHighlightBaseCacheHandler {
     private static final int maxNumber = 5000;
 
     public ChunkHighlightLocalCache() {
-        super(ForkJoinPool.commonPool());
+        super();
     }
 
     @Override
-    public boolean addHighlight(final int x, final int z) {
-        limitChunksSize();
+    public void addHighlight(final int x, final int z) {
         super.addHighlight(x, z);
-        return true;
+
+        limitChunksSize();
     }
 
     @Override
-    public boolean addHighlight(final int x, final int z, final long foundTime) {
-        limitChunksSize();
+    public void addHighlight(final int x, final int z, final long foundTime) {
         super.addHighlight(x, z, foundTime);
-        return true;
+        limitChunksSize();
     }
 
     private void limitChunksSize() {
         try {
             if (chunks.size() > maxNumber) {
-                if (lock.readLock().tryLock(1, TimeUnit.SECONDS)) {
-                    // remove oldest 500 chunks
-                    var toRemove = chunks.long2LongEntrySet().stream()
-                        .sorted(Map.Entry.comparingByValue())
-                        .limit(500)
-                        .mapToLong(Long2LongMap.Entry::getLongKey)
-                        .toArray();
-                    lock.readLock().unlock();
-                    if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
-                        for (int i = 0; i < toRemove.length; i++) {
-                            chunks.remove(toRemove[i]);
-                        }
-                        lock.writeLock().unlock();
-                    }
+                var toRemove = chunks.long2LongEntrySet().stream()
+                    .sorted(Map.Entry.comparingByValue())
+                    .limit(500)
+                    .mapToLong(Long2LongMap.Entry::getLongKey)
+                    .toArray();
+                for (int i = 0; i < toRemove.length; i++) {
+                    chunks.remove(toRemove[i]);
                 }
             }
         } catch (final Exception e) {

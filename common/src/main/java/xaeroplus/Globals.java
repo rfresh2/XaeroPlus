@@ -22,7 +22,7 @@ import static net.minecraft.world.level.Level.OVERWORLD;
  * static variables and functions to share or persist across mixins
  */
 public class Globals {
-    public static final DrawManager drawManager = new DrawManager();
+    public static final DrawManager DRAW_MANAGER = new DrawManager();
     // cache and only update this on new world loads
     public static boolean nullOverworldDimensionFolder = false;
     public static Settings.DataFolderResolutionMode dataFolderResolutionMode = Settings.DataFolderResolutionMode.IP;

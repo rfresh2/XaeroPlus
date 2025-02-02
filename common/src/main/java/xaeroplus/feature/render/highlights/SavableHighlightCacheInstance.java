@@ -1,6 +1,5 @@
 package xaeroplus.feature.render.highlights;
 
-import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import net.lenni0451.lambdaevents.EventHandler;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.ClientTickEvent;
@@ -37,7 +36,6 @@ public class SavableHighlightCacheInstance {
 
     public synchronized void setDiskCache(final boolean disk, final boolean enabled) {
         try {
-            final Long2LongMap map = cache.getHighlightsState();
             cache.onDisable();
             if (cache instanceof ChunkHighlightSavingCache savingCache) {
                 savingCache.close();
@@ -49,7 +47,6 @@ public class SavableHighlightCacheInstance {
             }
             if (enabled) {
                 cache.onEnable();
-                if (map != null) cache.loadPreviousState(map);
             }
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error setting {} cache [{} {}]", dbName, disk, enabled, e);

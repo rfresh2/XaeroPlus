@@ -1,6 +1,6 @@
 package xaeroplus.module.impl;
 
-import it.unimi.dsi.fastutil.longs.LongList;
+import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
 import net.lenni0451.lambdaevents.EventHandler;
@@ -96,9 +96,9 @@ public class OldChunks extends Module {
 
     @Override
     public void onEnable() {
-        Globals.drawManager.registerChunkHighlightProvider(
-            this.getClass(),
-            this::getHighlightsSnapshot,
+        Globals.DRAW_MANAGER.registry().registerDirectChunkHighlightProvider(
+            this.getClass().getName(),
+            this::getHighlightsState,
             this::getOldChunksColor);
         oldChunksCache.onEnable();
         modernChunksCache.onEnable();
@@ -125,7 +125,7 @@ public class OldChunks extends Module {
     public void onDisable() {
         oldChunksCache.onDisable();
         modernChunksCache.onDisable();
-        Globals.drawManager.unregisterChunkHighlightProvider(this.getClass());
+        Globals.DRAW_MANAGER.registry().unregisterChunkHighlightProvider(this.getClass().getName());
     }
 
     public int getOldChunksColor() {
@@ -146,10 +146,10 @@ public class OldChunks extends Module {
             : isOldChunk(chunkPosX, chunkPosZ, dimensionId);
     }
 
-    public LongList getHighlightsSnapshot(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
+    public Long2LongMap getHighlightsState(final ResourceKey<Level> dimension) {
         return inverse
-            ? modernChunksCache.get().getHighlightsSnapshot(dimension)
-            : oldChunksCache.get().getHighlightsSnapshot(dimension);
+            ? modernChunksCache.get().getHighlightsState(dimension)
+            : oldChunksCache.get().getHighlightsState(dimension);
     }
 
     public boolean isOldChunk(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> dimensionId) {

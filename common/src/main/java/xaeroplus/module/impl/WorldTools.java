@@ -1,7 +1,7 @@
 package xaeroplus.module.impl;
 
-import it.unimi.dsi.fastutil.longs.LongArrayList;
-import it.unimi.dsi.fastutil.longs.LongList;
+import it.unimi.dsi.fastutil.longs.Long2LongMap;
+import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.waste.of.time.storage.cache.HotCache;
@@ -20,15 +20,16 @@ public class WorldTools extends Module {
     @Override
     public void onEnable() {
         if (!WorldToolsHelper.isWorldToolsPresent()) return;
-        Globals.drawManager.registerChunkHighlightProvider(
-            this.getClass(),
+        Globals.DRAW_MANAGER.registry().registerAsyncChunkHighlightProvider(
+            this.getClass().getName(),
             this::getWindowedHighlightsSnapshot,
-            this::getWorldToolsColor);
+            this::getWorldToolsColor
+        );
     }
 
     @Override
     public void onDisable() {
-        Globals.drawManager.unregisterChunkHighlightProvider(this.getClass());
+        Globals.DRAW_MANAGER.registry().unregisterChunkHighlightProvider(this.getClass().getName());
     }
 
     public boolean isChunkDownloaded(final int x, final int z, final ResourceKey<Level> dimension) {
@@ -37,16 +38,16 @@ public class WorldTools extends Module {
             && HotCache.INSTANCE.isChunkSaved(x, z);
     }
 
-    public LongList getWindowedHighlightsSnapshot(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
+    public Long2LongMap getWindowedHighlightsSnapshot(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
         int minChunkX = ChunkUtils.regionCoordToChunkCoord(windowRegionX - windowRegionSize);
         int maxChunkX = ChunkUtils.regionCoordToChunkCoord(windowRegionX + windowRegionSize);
         int minChunkZ = ChunkUtils.regionCoordToChunkCoord(windowRegionZ - windowRegionSize);
         int maxChunkZ = ChunkUtils.regionCoordToChunkCoord(windowRegionZ + windowRegionSize);
-        LongList chunks = new LongArrayList(8);
+        Long2LongMap chunks = new Long2LongOpenHashMap(8);
         for (int x = minChunkX; x <= maxChunkX; x++) {
             for (int z = minChunkZ; z <= maxChunkZ; z++) {
                 if (isChunkDownloaded(x, z, dimension)) {
-                    chunks.add(ChunkUtils.chunkPosToLong(x, z));
+                    chunks.put(ChunkUtils.chunkPosToLong(x, z), 0);
                 }
             }
         }

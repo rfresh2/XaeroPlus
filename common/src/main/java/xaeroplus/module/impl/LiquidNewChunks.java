@@ -2,7 +2,7 @@ package xaeroplus.module.impl;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import it.unimi.dsi.fastutil.longs.LongList;
+import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
 import net.lenni0451.lambdaevents.EventHandler;
@@ -148,15 +148,15 @@ public class LiquidNewChunks extends Module {
         if (this.renderInverse && this.isEnabled()) {
             registerInverseChunkHighlightProvider();
         } else {
-            Globals.drawManager.unregisterChunkHighlightProvider(inverseDrawFeatureId);
+            Globals.DRAW_MANAGER.registry().unregisterChunkHighlightProvider(inverseDrawFeatureId);
         }
     }
 
     @Override
     public void onEnable() {
-        Globals.drawManager.registerChunkHighlightProvider(
-            this.getClass(),
-            this::getNewChunkHighlightsSnapshot,
+        Globals.DRAW_MANAGER.registry().registerDirectChunkHighlightProvider(
+            this.getClass().getName(),
+            this::getNewChunkHighlightsState,
             this::getNewChunksColor);
         if (renderInverse) {
             registerInverseChunkHighlightProvider();
@@ -166,9 +166,9 @@ public class LiquidNewChunks extends Module {
     }
 
     private void registerInverseChunkHighlightProvider() {
-        Globals.drawManager.registerChunkHighlightProvider(
+        Globals.DRAW_MANAGER.registry().registerDirectChunkHighlightProvider(
             inverseDrawFeatureId,
-            this::getInverseNewChunkHighlightsSnapshot,
+            this::getInverseNewChunkHighlightsState,
             this::getInverseColor);
     }
 
@@ -176,8 +176,8 @@ public class LiquidNewChunks extends Module {
     public void onDisable() {
         newChunksCache.onDisable();
         inverseNewChunksCache.onDisable();
-        Globals.drawManager.unregisterChunkHighlightProvider(this.getClass());
-        Globals.drawManager.unregisterChunkHighlightProvider(inverseDrawFeatureId);
+        Globals.DRAW_MANAGER.registry().unregisterChunkHighlightProvider(this.getClass().getName());
+        Globals.DRAW_MANAGER.registry().unregisterChunkHighlightProvider(inverseDrawFeatureId);
     }
 
     public int getNewChunksColor() {
@@ -201,12 +201,12 @@ public class LiquidNewChunks extends Module {
         inverseColor = ColorHelper.getColorWithAlpha(inverseColor, (int) (a));
     }
 
-    public LongList getNewChunkHighlightsSnapshot(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
-        return newChunksCache.get().getHighlightsSnapshot(dimension);
+    public Long2LongMap getNewChunkHighlightsState(final ResourceKey<Level> dimension) {
+        return newChunksCache.get().getHighlightsState(dimension);
     }
 
-    public LongList getInverseNewChunkHighlightsSnapshot(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
-        return inverseNewChunksCache.get().getHighlightsSnapshot(dimension);
+    public Long2LongMap getInverseNewChunkHighlightsState(final ResourceKey<Level> dimension) {
+        return inverseNewChunksCache.get().getHighlightsState(dimension);
     }
 
     public boolean isNewChunk(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> dimensionId) {

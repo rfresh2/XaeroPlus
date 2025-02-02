@@ -6,7 +6,8 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexBuffer;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import it.unimi.dsi.fastutil.longs.LongList;
+import it.unimi.dsi.fastutil.longs.Long2LongMap;
+import it.unimi.dsi.fastutil.longs.Long2LongMaps;
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.Nullable;
 import xaeroplus.util.ChunkUtils;
@@ -15,13 +16,15 @@ public class HighlightDrawBuffer {
     private boolean stale = true;
     @Nullable private VertexBuffer vertexBuffer = null;
     private boolean flipped = false;
+    long lastRefreshed = 0L;
 
     public boolean needsRefresh(boolean needsFlip) {
         return vertexBuffer == null || vertexBuffer.isInvalid() || stale || flipped != needsFlip;
     }
 
-    public void refresh(LongList highlights, boolean needsFlip) {
+    public void refresh(Long2LongMap highlights, boolean needsFlip) {
         stale = false;
+        lastRefreshed = System.currentTimeMillis();
         flipped = needsFlip;
         if (highlights.isEmpty()) {
             close();
@@ -30,9 +33,8 @@ public class HighlightDrawBuffer {
 
         var bufferBuilder = Tesselator.getInstance()
             .begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
-
-        for (int j = 0; j < highlights.size(); j++) {
-            long highlight = highlights.getLong(j);
+        for (var entry : Long2LongMaps.fastIterable(highlights)) {
+            long highlight = entry.getLongKey();
             var chunkPosX = ChunkUtils.longToChunkX(highlight);
             var chunkPosZ = ChunkUtils.longToChunkZ(highlight);
             float x1 = chunkPosX;

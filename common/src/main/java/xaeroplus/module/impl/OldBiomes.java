@@ -1,6 +1,6 @@
 package xaeroplus.module.impl;
 
-import it.unimi.dsi.fastutil.longs.LongList;
+import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import kaptainwutax.biomeutils.source.OverworldBiomeSource;
 import kaptainwutax.mcutils.version.MCVersion;
 import net.lenni0451.lambdaevents.EventHandler;
@@ -37,9 +37,9 @@ public class OldBiomes extends Module {
 
     @Override
     public void onEnable() {
-        Globals.drawManager.registerChunkHighlightProvider(
-            this.getClass(),
-            this::getHighlightsSnapshot,
+        Globals.DRAW_MANAGER.registry().registerDirectChunkHighlightProvider(
+            this.getClass().getName(),
+            this::getHighlightsState,
             this::getOldBiomesColor);
         oldBiomesCache.onEnable();
         try {
@@ -52,7 +52,7 @@ public class OldBiomes extends Module {
     @Override
     public void onDisable() {
         oldBiomesCache.onDisable();
-        Globals.drawManager.unregisterChunkHighlightProvider(this.getClass());
+        Globals.DRAW_MANAGER.registry().unregisterChunkHighlightProvider(this.getClass().getName());
     }
 
     @EventHandler
@@ -131,8 +131,8 @@ public class OldBiomes extends Module {
         return oldBiomesColor;
     }
 
-    public LongList getHighlightsSnapshot(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
-        return oldBiomesCache.get().getHighlightsSnapshot(dimension);
+    public Long2LongMap getHighlightsState(final ResourceKey<Level> dimension) {
+        return oldBiomesCache.get().getHighlightsState(dimension);
     }
 
     public void setDiskCache(final boolean b) {

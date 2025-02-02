@@ -155,17 +155,17 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
             to = mapWorldDim;
         } else if (xaeroPlus$worldChange_prevMapWorldUsable && mapWorldUsable && xaeroPlus$worldChange_prevMapWorldCurrentDimId != mapWorldDim) {
             type = VIEWED_DIMENSION_SWITCH;
-            from = ChunkUtils.getActualDimension();
+            from = xaeroPlus$worldChange_prevMapWorldCurrentDimId;
             to = mapWorldDim;
         } else if (!Objects.equals(xaeroPlus$worldChange_prevCurrentMWId, currentMWId) && xaeroPlus$worldChange_prevWorld.get() == world) {
             type = MULTIWORLD_SWITCH;
             from = null;
             to = null;
         } else {
-            XaeroPlus.LOGGER.info("Unhandled XaeroWorldChangeEvent type :(");
+            XaeroPlus.LOGGER.warn("Unhandled XaeroWorldChangeEvent type :(");
             return;
         }
-//        XaeroPlus.LOGGER.info("Firing world change event: {} from {} to {}", type, from, to);
+        XaeroPlus.LOGGER.info("Firing world change event: {} from {} to {}", type, from, to);
         var event = new XaeroWorldChangeEvent(type, from, to);
         XaeroPlus.EVENT_BUS.call(event);
     }

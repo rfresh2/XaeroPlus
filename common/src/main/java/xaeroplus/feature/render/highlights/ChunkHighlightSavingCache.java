@@ -1,9 +1,11 @@
 package xaeroplus.feature.render.highlights;
 
-import com.google.common.util.concurrent.*;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.longs.Long2LongMaps;
-import it.unimi.dsi.fastutil.longs.LongList;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
@@ -19,19 +21,13 @@ import xaeroplus.util.ChunkUtils;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static net.minecraft.world.level.Level.*;
 import static xaeroplus.event.XaeroWorldChangeEvent.WorldChangeType.ENTER_WORLD;
-import static xaeroplus.util.ChunkUtils.getActualDimension;
 import static xaeroplus.util.GuiMapHelper.*;
 
 public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable {
@@ -41,10 +37,12 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     private final AtomicBoolean cacheReady = new AtomicBoolean(false);
     @Nullable private final String databaseName;
     // Executor used for db read/writes
-    @Nullable private ListeningExecutorService workerExecutor;
+    @Nullable private ListeningExecutorService dbExecutor;
     // executor used for single threaded tasks that involve changing worlds and preparing the cache for operations
     @NotNull private final ListeningExecutorService parentExecutor;
     private final Map<ResourceKey<Level>, ChunkHighlightCacheDimensionHandler> dimensionCacheMap = new ConcurrentHashMap<>(3);
+    private final Queue<Runnable> taskQueue = new LinkedBlockingDeque<>();
+    Minecraft mc = Minecraft.getInstance();
 
     public ChunkHighlightSavingCache(final @NotNull String databaseName) {
         this.databaseName = databaseName;
@@ -59,35 +57,32 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     }
 
     @Override
-    public boolean addHighlight(final int x, final int z) {
+    public void addHighlight(final int x, final int z) {
         try {
             ChunkHighlightCacheDimensionHandler cacheForActualDimension = getCacheForActualDimension();
-            if (cacheForActualDimension == null) throw new RuntimeException("Didn't find cache for current dimension");
+            if (cacheForActualDimension == null) {
+                // if the cache is not ready yet, queue the highlight to be added
+                taskQueue.add(() -> addHighlight(x, z));
+                return;
+            }
             cacheForActualDimension.addHighlight(x, z);
-            return true;
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.debug("Error adding highlight to {} disk cache: {}, {}", databaseName, x, z, e);
-            return false;
+            XaeroPlus.LOGGER.warn("Error adding highlight to {} disk cache: {}, {}", databaseName, x, z, e);
         }
     }
 
-    public void addHighlight(final int x, final int z, final long foundTime, final ResourceKey<Level> dimension) {
-        if (dimension == null) return;
-        ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimension, true);
-        if (cacheForDimension == null) return;
-        cacheForDimension.addHighlight(x, z, foundTime);
-    }
-
     @Override
-    public boolean removeHighlight(final int x, final int z) {
+    public void removeHighlight(final int x, final int z) {
         try {
             ChunkHighlightCacheDimensionHandler cacheForActualDimension = getCacheForActualDimension();
-            if (cacheForActualDimension == null) throw new RuntimeException("Didn't find cache for current dimension");
+            if (cacheForActualDimension == null) {
+                // if the cache is not ready yet, queue the highlight to be added
+                taskQueue.add(() -> addHighlight(x, z));
+                return;
+            }
             cacheForActualDimension.removeHighlight(x, z);
-            return true;
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.debug("Error removing highlight from {} disk cache: {}, {}", databaseName, x, z, e);
-            return false;
+            XaeroPlus.LOGGER.warn("Error removing highlight from {} disk cache: {}, {}", databaseName, x, z, e);
         }
     }
 
@@ -99,37 +94,12 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         return cacheForDimension.isHighlighted(chunkPosX, chunkPosZ, dimensionId);
     }
 
-    public boolean isHighlighted(final int chunkPosX, final int chunkPosZ) {
-        ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(getActualDimension(), false);
-        if (cacheForDimension == null) return false;
-        return cacheForDimension.isHighlighted(chunkPosX, chunkPosZ, getActualDimension());
-    }
-
     @Override
-    public LongList getHighlightsSnapshot(final ResourceKey<Level> dimensionId) {
-        if (dimensionId == null) return LongList.of();
+    public Long2LongMap getHighlightsState(final ResourceKey<Level> dimensionId) {
+        if (dimensionId == null) return Long2LongMaps.EMPTY_MAP;
         ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimensionId, false);
-        if (cacheForDimension == null) return LongList.of();
-        return cacheForDimension.getHighlightsSnapshot(dimensionId);
-    }
-
-    /**
-     * Gets all highlight data both from the database and local cache in a square set of regions.
-     * Can be used to get highlight data that may be outside the current loaded window
-     *
-     * @param dimension the dimension to get highlights for
-     * @param windowRegionX Centered region X coordinate
-     * @param windowRegionZ Centered region Z coordinate
-     * @param windowRegionSize Region window size.
-     *                   Total area of square = (2 * (windowRegionSize + 1)) ^ 2
-     *                   region = 1024 (32x32) chunks
-     * @return Listenable future of a Long2LongMap: packed chunk coordinates -> found time unix epoch
-     *       To convert packed coordinates in the map, see `ChunkUtils.longToChunkX` and `ChunkUtils.longToChunkZ`
-     */
-    public ListenableFuture<Long2LongMap> getHighlightsInCustomWindow(int windowRegionX, int windowRegionZ, int windowRegionSize, ResourceKey<Level> dimension) {
-        ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimension, false);
-        if (cacheForDimension == null) return Futures.immediateFuture(Long2LongMaps.EMPTY_MAP);
-        return cacheForDimension.getHighlightsInCustomWindow(windowRegionX, windowRegionZ, windowRegionSize);
+        if (cacheForDimension == null) return Long2LongMaps.EMPTY_MAP;
+        return cacheForDimension.getHighlightsState(dimensionId);
     }
 
     @Override
@@ -137,28 +107,32 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         parentExecutor.execute(() -> {
             switch (event.worldChangeType()) {
                 case ENTER_WORLD -> {
-                    cacheReady.set(false);
-                    reset();
-                    if (initializeWorld()) {
-                        cacheReady.set(true);
+                    if (!cacheReady.get()) {
+                        if (initializeWorld()) {
+                            cacheReady.set(true);
+                        }
+                    } else {
+                        XaeroPlus.LOGGER.warn("[{}] Entered world when cache was already initialized", databaseName);
                     }
                 }
                 case EXIT_WORLD -> {
                     // make sure we mark as unready to prevent further mutations
                     if (cacheReady.compareAndSet(true, false)) {
                         try {
-                            Futures.allAsList(flushAllChunks()).get(30, TimeUnit.SECONDS);
+                            CompletableFuture.allOf(flushAllChunks().toArray(new CompletableFuture[0])).get(30, TimeUnit.SECONDS);
                         } catch (final Exception e) {
                             XaeroPlus.LOGGER.error("Error saving all chunks before world change", e);
                         }
+                    } else {
+                        XaeroPlus.LOGGER.warn("[{}] Exited world when cache was already uninitialized", databaseName);
                     }
                     reset();
                 }
                 case VIEWED_DIMENSION_SWITCH -> {
-                    loadChunksInViewedDimension();
+                    mc.execute(this::loadChunksInViewedDimension);
                 }
                 case ACTUAL_DIMENSION_SWITCH -> {
-                    loadChunksOnActualDimensionSwitch();
+                    mc.execute(this::loadChunksOnActualDimensionSwitch);
                 }
             }
         });
@@ -166,10 +140,10 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
 
     private synchronized void reset() {
         this.currentWorldId = null;
-        if (this.workerExecutor != null) {
-            this.workerExecutor.shutdown();
+        if (this.dbExecutor != null) {
+            this.dbExecutor.shutdown();
             try {
-                this.workerExecutor.awaitTermination(3L, TimeUnit.SECONDS);
+                this.dbExecutor.awaitTermination(3L, TimeUnit.SECONDS);
             } catch (final Throwable e) {
                 XaeroPlus.LOGGER.error("Timed out waiting for {} executor to shutdown", databaseName, e);
             }
@@ -178,12 +152,13 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         // dimension cache instances will be GC'd, no need to explicitly clear them
         this.dimensionCacheMap.clear();
         this.database = null;
+        this.taskQueue.clear();
     }
 
     // note: writes occur on the worker thread
-    private List<ListenableFuture<?>> flushAllChunks() {
+    private List<CompletableFuture<?>> flushAllChunks() {
         return getAllCaches().stream()
-            .map(ChunkHighlightCacheDimensionHandler::writeStaleHighlightsToDatabase)
+            .map(cache -> mc.submit(cache::writeStaleHighlightsToDatabase))
             .collect(Collectors.toList());
     }
 
@@ -195,7 +170,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     private ChunkHighlightCacheDimensionHandler initializeDimensionCacheHandler(final ResourceKey<Level> dimension) {
         if (dimension == null) return null;
         var db = this.database;
-        var executor = this.workerExecutor;
+        var executor = this.dbExecutor;
         if (db == null || executor == null) {
             XaeroPlus.LOGGER.error("[{}] Unable to initialize {} disk cache handler for: {}, database: {} or executor: {} is null", Thread.currentThread().getName(), databaseName, dimension.location(), db, executor);
             return null;
@@ -251,7 +226,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
             final String worldId = mapProcessor.getCurrentWorldId();
             if (worldId == null) return false;
             this.currentWorldId = worldId;
-            this.workerExecutor = MoreExecutors.listeningDecorator(
+            this.dbExecutor = MoreExecutors.listeningDecorator(
                 Executors.newSingleThreadExecutor(
                     new ThreadFactoryBuilder()
                         .setNameFormat(databaseName + "-Worker")
@@ -264,6 +239,10 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
             initializeDimensionCacheHandler(NETHER);
             initializeDimensionCacheHandler(END);
             loadChunksInViewedDimension();
+            if (!taskQueue.isEmpty()) XaeroPlus.LOGGER.info("[{}] Running {} queued tasks", databaseName, taskQueue.size());
+            while (!this.taskQueue.isEmpty()) {
+                mc.execute(this.taskQueue.poll());
+            }
             return true;
         } catch (final Exception e) {
             // expected on game launch
@@ -311,22 +290,12 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         parentExecutor.execute(() -> {
             cacheReady.set(false);
             try {
-                Futures.allAsList(flushAllChunks()).get(30, TimeUnit.SECONDS);
+                CompletableFuture.allOf(flushAllChunks().toArray(new CompletableFuture[0])).get(30, TimeUnit.SECONDS);
             } catch (final Exception e) {
                 XaeroPlus.LOGGER.error("Error saving all chunks before disabling", e);
             }
             reset();
         });
-    }
-
-    @Override
-    public Long2LongMap getHighlightsState() {
-        return null;
-    }
-
-    @Override
-    public void loadPreviousState(final Long2LongMap state) {
-
     }
 
     public int getMinimapRegionWindowSize() {

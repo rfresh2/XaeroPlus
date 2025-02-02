@@ -1,5 +1,6 @@
 package xaeroplus.feature.render.highlights;
 
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
@@ -11,10 +12,6 @@ import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.util.ChunkUtils;
 
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.StampedLock;
-
 import static xaeroplus.util.ChunkUtils.chunkPosToLong;
 import static xaeroplus.util.ChunkUtils.regionCoordToChunkCoord;
 
@@ -25,25 +22,24 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
     // square centered at windowX, windowZ with size windowSize
     private int windowRegionSize = 0;
     @NotNull private final ChunkHighlightDatabase database;
-    @NotNull private final ListeningExecutorService executorService;
+    @NotNull private final ListeningExecutorService dbExecutor;
     // newly added highlights we need to write back to the database
     // if a highlight is not in this set, we do not write it to the database
     // helps performance at very low zoom levels as most data is old and does not need to be rewritten constantly
     public final LongSet staleChunks = new LongOpenHashSet();
-    public final ReadWriteLock staleChunksLock = new StampedLock().asReadWriteLock();
     ListenableFuture<?> windowMoveFuture = Futures.immediateVoidFuture();
 
     public ChunkHighlightCacheDimensionHandler(
         @NotNull ResourceKey<Level> dimension,
         @NotNull ChunkHighlightDatabase database,
-        @NotNull ListeningExecutorService executorService) {
-        super(executorService);
+        @NotNull ListeningExecutorService dbExecutor) {
+        super();
         this.dimension = dimension;
         this.database = database;
-        this.executorService = executorService;
+        this.dbExecutor = dbExecutor;
     }
 
-    public void setWindow(int regionX, int regionZ, int regionSize) {
+    public synchronized void setWindow(int regionX, int regionZ, int regionSize) {
         boolean windowChanged = regionX != windowRegionX || regionZ != windowRegionZ || regionSize != windowRegionSize;
         if (windowChanged
             && !windowMoveFuture.isDone()
@@ -60,269 +56,90 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
         this.windowRegionSize = regionSize;
         if (windowChanged) {
             try {
-                windowMoveFuture = executorService.submit(() ->
-                      moveWindow0(regionX, regionZ, regionSize, prevWindowRegionX, prevWindowRegionZ, prevWindowRegionSize)
-                );
+                windowMoveFuture = moveWindow0(regionX, regionZ, regionSize, prevWindowRegionX, prevWindowRegionZ, prevWindowRegionSize);
             } catch (final Exception e) {
                 XaeroPlus.LOGGER.error("Failed submitting move window task for {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
             }
         }
     }
 
-    private void moveWindow0(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final int prevWindowRegionX, final int prevWindowRegionZ, final int prevWindowRegionSize) {
+    private ListenableFuture<?> moveWindow0(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final int prevWindowRegionX, final int prevWindowRegionZ, final int prevWindowRegionSize) {
+        ListenableFuture<Long2LongMap> loadDataFuture = dbExecutor.submit(() -> loadUpdatedWindowFromDatabase(windowRegionX, windowRegionZ, windowRegionSize, prevWindowRegionX, prevWindowRegionZ, prevWindowRegionSize));
+        Futures.addCallback(loadDataFuture, new WindowDataLoadFutureCallback(), mc);
+        ListenableFuture<?> removeDataFuture = flushChunksOutsideWindow(windowRegionX, windowRegionZ, windowRegionSize);
+        return Futures.allAsList(loadDataFuture, removeDataFuture);
+    }
+
+
+    private Long2LongMap loadUpdatedWindowFromDatabase(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final int prevWindowRegionX, final int prevWindowRegionZ, final int prevWindowRegionSize) {
         // load new data
         Long2LongMap dataBuf = new Long2LongOpenHashMap();
-        try {
-            // minimizes time we have to hold the lock by querying the database outside the lock's scope
-            // at cost of a bit more memory
-            database.getHighlightsInWindowAndOutsidePrevWindow(
-                dimension,
-                windowRegionX - windowRegionSize, windowRegionX + windowRegionSize,
-                windowRegionZ - windowRegionSize, windowRegionZ + windowRegionSize,
-                prevWindowRegionX - prevWindowRegionSize, prevWindowRegionX + prevWindowRegionSize,
-                prevWindowRegionZ - prevWindowRegionSize, prevWindowRegionZ + prevWindowRegionSize,
-                (chunkX, chunkZ, foundTime) -> dataBuf.put(chunkPosToLong(chunkX, chunkZ), foundTime)
-            );
-            if (!dataBuf.isEmpty() && lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
-                for (var entry : Long2LongMaps.fastIterable(dataBuf)) {
-                    chunks.put(entry.getLongKey(), entry.getLongValue());
-                }
-                lock.writeLock().unlock();
-            }
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Failed to load highlights in window for {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
-        }
+        database.getHighlightsInWindowAndOutsidePrevWindow(
+            dimension,
+            windowRegionX - windowRegionSize, windowRegionX + windowRegionSize,
+            windowRegionZ - windowRegionSize, windowRegionZ + windowRegionSize,
+            prevWindowRegionX - prevWindowRegionSize, prevWindowRegionX + prevWindowRegionSize,
+            prevWindowRegionZ - prevWindowRegionSize, prevWindowRegionZ + prevWindowRegionSize,
+            (chunkX, chunkZ, foundTime) -> dataBuf.put(chunkPosToLong(chunkX, chunkZ), foundTime)
+        );
+        return dataBuf;
+    }
 
-        dataBuf.clear();
+    private ListenableFuture<?> flushChunksOutsideWindow(final int windowRegionX, final int windowRegionZ, final int windowRegionSize) {
+        if (!mc.isSameThread()) {
+            throw new RuntimeException("removeChunksOutsideWindow must be called on the main thread");
+        }
+        Long2LongMap dataBuf = new Long2LongOpenHashMap();
         // write to db and remove data from local cache outside window
         var chunkXMin = regionCoordToChunkCoord(windowRegionX - windowRegionSize);
         var chunkXMax = regionCoordToChunkCoord(windowRegionX + windowRegionSize);
         var chunkZMin = regionCoordToChunkCoord(windowRegionZ - windowRegionSize);
         var chunkZMax = regionCoordToChunkCoord(windowRegionZ + windowRegionSize);
-        try {
-            if (staleChunksLock.readLock().tryLock(1, TimeUnit.SECONDS)) {
-                if (!chunks.isEmpty() && lock.readLock().tryLock(1, TimeUnit.SECONDS)) {
-                    for (var it = Long2LongMaps.fastIterator(chunks); it.hasNext(); ) {
-                        var entry = it.next();
-                        final long chunkPos = entry.getLongKey();
-                        final int chunkX = ChunkUtils.longToChunkX(chunkPos);
-                        final int chunkZ = ChunkUtils.longToChunkZ(chunkPos);
-                        if (chunkX < chunkXMin
-                            || chunkX > chunkXMax
-                            || chunkZ < chunkZMin
-                            || chunkZ > chunkZMax) {
-                            dataBuf.put(chunkPos, entry.getLongValue());
-                        }
-                    }
-                    lock.readLock().unlock();
-                }
-                staleChunksLock.readLock().unlock();
-                if (!dataBuf.isEmpty() && lock.writeLock().tryLock(1L, TimeUnit.SECONDS)) {
-                    for (var it = Long2LongMaps.fastIterator(dataBuf); it.hasNext(); ) {
-                        chunks.remove(it.next().getLongKey());
-                    }
-                    lock.writeLock().unlock();
+        for (var it = Long2LongMaps.fastIterator(chunks); it.hasNext(); ) {
+            var entry = it.next();
+            final long chunkPos = entry.getLongKey();
+            final int chunkX = ChunkUtils.longToChunkX(chunkPos);
+            final int chunkZ = ChunkUtils.longToChunkZ(chunkPos);
+            if (chunkX < chunkXMin
+                || chunkX > chunkXMax
+                || chunkZ < chunkZMin
+                || chunkZ > chunkZMax) {
+                it.remove();
+                if (staleChunks.contains(chunkPos)) {
+                    dataBuf.put(chunkPos, entry.getLongValue());
                 }
             }
-            if (!dataBuf.isEmpty() && staleChunksLock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
-                for (var it = Long2LongMaps.fastIterator(dataBuf); it.hasNext(); ) {
-                    long chunkPos = it.next().getLongKey();
-                    if (staleChunks.contains(chunkPos)) {
-                        // retain in buf to be written to db
-                        staleChunks.remove(chunkPos);
-                    } else {
-                        it.remove();
-                    }
-                }
-                staleChunksLock.writeLock().unlock();
-            }
-            database.insertHighlightList(dataBuf, dimension);
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error while writing highlights outside window to {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
         }
+        return dbExecutor.submit(() -> database.insertHighlightList(dataBuf, dimension));
     }
 
-    public ListenableFuture<Long2LongMap> getHighlightsInCustomWindow(int windowRegionX, int windowRegionZ, int windowRegionSize) {
-        try {
-            return executorService.submit(() -> getHighlightsInCustomWindow0(windowRegionX, windowRegionZ, windowRegionSize));
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Failed submitting load highlights task for {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
-            return Futures.immediateFuture(Long2LongMaps.EMPTY_MAP);
-        }
-    }
-
-    private @NotNull Long2LongOpenHashMap getHighlightsInCustomWindow0(final int windowRegionX, final int windowRegionZ, final int windowRegionSize) {
-        var map = new Long2LongOpenHashMap();
-        int regionXMin = windowRegionX - windowRegionSize;
-        int regionZMin = windowRegionZ - windowRegionSize;
-        int regionXMax = windowRegionX + windowRegionSize;
-        int regionZMax = windowRegionZ + windowRegionSize;
-
-        try {
-            database.getHighlightsInWindow(
-                dimension,
-                regionXMin, regionXMax,
-                regionZMin, regionZMax,
-                (chunkX, chunkZ, foundTime) -> map.put(chunkPosToLong(chunkX, chunkZ), foundTime)
-            );
-            int chunkXMin = regionCoordToChunkCoord(regionXMin);
-            int chunkXMax = regionCoordToChunkCoord(regionXMax);
-            int chunkZMin = regionCoordToChunkCoord(regionZMin);
-            int chunkZMax = regionCoordToChunkCoord(regionZMax);
-            // append chunks from local cache
-            if (lock.readLock().tryLock(1, TimeUnit.SECONDS)) {
-                for (var entry : Long2LongMaps.fastIterable(chunks)) {
-                    final long chunkPos = entry.getLongKey();
-                    final int chunkX = ChunkUtils.longToChunkX(chunkPos);
-                    final int chunkZ = ChunkUtils.longToChunkZ(chunkPos);
-                    if (chunkX >= chunkXMin
-                        && chunkX <= chunkXMax
-                        && chunkZ >= chunkZMin
-                        && chunkZ <= chunkZMax) {
-                        map.put(chunkPos, entry.getLongValue());
-                    }
-                }
-                lock.readLock().unlock();
-            }
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Failed to load highlights in custom window for {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
-        }
-        return map;
-    }
-
-    // does not remove from local cache
+        // does not remove from local cache
     public ListenableFuture<?> writeStaleHighlightsToDatabase() {
-        try {
-            return executorService.submit(this::writeStaleHighlightsToDatabase0);
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Failed submitting write all highlights task for {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
-            return Futures.immediateFuture(null);
+        if (!mc.isSameThread()) {
+            throw new RuntimeException("writeStaleHighlightsToDatabase must be called on the main thread");
         }
-    }
-
-    private void writeStaleHighlightsToDatabase0() {
-        if (staleChunks.isEmpty()) return;
-        Long2LongMap chunksToWrite = new Long2LongOpenHashMap();
+        if (staleChunks.isEmpty()) return Futures.immediateVoidFuture();
+        Long2LongMap chunksToWrite = new Long2LongOpenHashMap(staleChunks.size());
         try {
-            LongSet hangingStaleChunks = new LongOpenHashSet();
-            if (staleChunksLock.readLock().tryLock(1, TimeUnit.SECONDS)) {
-                if (lock.readLock().tryLock(1L, TimeUnit.SECONDS)) {
-                    for (long chunkPos : staleChunks) {
-                        long foundTime = chunks.get(chunkPos);
-                        if (foundTime != chunks.defaultReturnValue()) {
-                            chunksToWrite.put(chunkPos, foundTime);
-                        } else {
-                            hangingStaleChunks.add(chunkPos);
-                        }
-                    }
-                    lock.readLock().unlock();
+            for (var it = staleChunks.longIterator(); it.hasNext(); ) {
+                long chunkPos = it.nextLong();
+                long foundTime = chunks.get(chunkPos);
+                if (foundTime != chunks.defaultReturnValue()) {
+                    chunksToWrite.put(chunkPos, foundTime);
                 }
-                staleChunksLock.readLock().unlock();
+                it.remove();
             }
-            if (staleChunksLock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
-                for (var entry : Long2LongMaps.fastIterable(chunksToWrite)) {
-                    staleChunks.remove(entry.getLongKey());
-                }
-                staleChunks.removeAll(hangingStaleChunks);
-                staleChunksLock.writeLock().unlock();
-            }
-            database.insertHighlightList(chunksToWrite, dimension);
+            return dbExecutor.submit(() -> database.insertHighlightList(chunksToWrite, dimension));
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error while writing all highlights to {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
         }
+        return Futures.immediateVoidFuture();
     }
 
     @Override
-    public boolean addHighlight(final int x, final int z, final long foundTime) {
-        final long chunkPos = chunkPosToLong(x, z);
-        try {
-            boolean b = false;
-            if (lock.writeLock().tryLock()) {
-                if (staleChunksLock.writeLock().tryLock()) {
-                    chunks.put(chunkPos, foundTime);
-                    staleChunks.add(chunkPosToLong(x, z));
-                    b = true;
-                    staleChunksLock.writeLock().unlock();
-                }
-                lock.writeLock().unlock();
-            }
-            if (!b) {
-                try {
-                    executorService.execute(() -> addQueuedHighlight(x, z, foundTime));
-                } catch (final Exception e) {
-                    XaeroPlus.LOGGER.error("Failed to submit new queued highlight write: {}, {}", x, z, e);
-                }
-            }
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Failed to add new highlight: {}, {}", x, z, e);
-        }
-        return true;
-    }
-
-    @Override
-    void addQueuedHighlight(final int x, final int z, final long foundTime) {
-        final long chunkPos = chunkPosToLong(x, z);
-        try {
-            if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
-                if (staleChunksLock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
-                    chunks.put(chunkPos, foundTime);
-                    staleChunks.add(chunkPosToLong(x, z));
-                    staleChunksLock.writeLock().unlock();
-                } else {
-                    XaeroPlus.LOGGER.error("Failed to add new queued highlight: timed out stale lock {}, {}", x, z);
-                }
-                lock.writeLock().unlock();
-            } else {
-                XaeroPlus.LOGGER.error("Failed to add new queued highlight: timed out cache lock: {}, {}", x, z);
-            }
-        } catch (InterruptedException e) {
-            XaeroPlus.LOGGER.debug("Thread interrupted while adding new queued highlight: {}, {}", x, z, e);
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Failed to add new highlight: {}, {}", x, z, e);
-        }
-    }
-
-    @Override
-    public void loadPreviousState(final Long2LongMap state) {
-        if (state == null) return;
-        try {
-            if (staleChunksLock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
-                staleChunks.clear();
-                staleChunks.addAll(state.keySet());
-                if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
-                    chunks.putAll(state);
-                    lock.writeLock().unlock();
-                }
-            }
-
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error loading previous highlight cache state", e);
-        }
-    }
-
-    @Override
-    public boolean removeHighlight(final int x, final int z) {
-        executorService.execute(() -> removeHighlight0(x, z));
-        return true;
-    }
-
-    private void removeHighlight0(final int x, final int z) {
-        final long chunkPos = chunkPosToLong(x, z);
-        try {
-            if (lock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
-                chunks.remove(chunkPos);
-                lock.writeLock().unlock();
-            } else {
-                XaeroPlus.LOGGER.error("Failed to remove queued highlight: timed out: {}, {}", x, z);
-            }
-            try {
-                database.removeHighlight(x, z, dimension);
-            } catch (final Exception e) {
-                XaeroPlus.LOGGER.error("Failed to remove highlight from {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
-            }
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Failed to remove queued highlight: {}, {}", x, z, e);
-        }
+    public void removeHighlight(final int x, final int z) {
+        super.removeHighlight(x, z);
+        dbExecutor.execute(() -> database.removeHighlight(x, z, dimension));
     }
 
     @Override
@@ -336,4 +153,24 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
 
     @Override
     public void onDisable() {}
+
+    private final class WindowDataLoadFutureCallback implements FutureCallback<Long2LongMap> {
+        @Override
+        public void onSuccess(Long2LongMap dataBuf) {
+            if (!mc.isSameThread()) {
+                XaeroPlus.LOGGER.error("WindowDataLoadFutureCallback must be called on the main thread");
+            }
+            if (dataBuf.isEmpty()) return;
+            // write new data to local cache
+            chunks.putAll(dataBuf);
+        }
+
+        @Override
+        public void onFailure(Throwable t) {
+            XaeroPlus.LOGGER.error("Error while moving window for {} disk cache dimension: {}",
+                                   database.databaseName,
+                                   dimension.location(),
+                                   t);
+        }
+    }
 }

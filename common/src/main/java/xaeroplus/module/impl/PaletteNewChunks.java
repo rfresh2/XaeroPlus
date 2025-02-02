@@ -2,7 +2,7 @@ package xaeroplus.module.impl;
 
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import it.unimi.dsi.fastutil.longs.LongList;
+import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
@@ -178,9 +178,9 @@ public class PaletteNewChunks extends Module {
 
     @Override
     public void onEnable() {
-        Globals.drawManager.registerChunkHighlightProvider(
-            this.getClass(),
-            this::getHighlightsSnapshot,
+        Globals.DRAW_MANAGER.registry().registerDirectChunkHighlightProvider(
+            this.getClass().getName(),
+            this::getHighlightsState,
             this::getNewChunksColor);
         newChunksCache.onEnable();
         newChunksInverseCache.onEnable();
@@ -190,7 +190,7 @@ public class PaletteNewChunks extends Module {
     public void onDisable() {
         newChunksCache.onDisable();
         newChunksInverseCache.onDisable();
-        Globals.drawManager.unregisterChunkHighlightProvider(this.getClass());
+        Globals.DRAW_MANAGER.registry().unregisterChunkHighlightProvider(this.getClass().getName());
     }
 
     public int getNewChunksColor() {
@@ -215,10 +215,10 @@ public class PaletteNewChunks extends Module {
             : isNewChunk(chunkPosX, chunkPosZ, dimensionId);
     }
 
-    public LongList getHighlightsSnapshot(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
+    public Long2LongMap getHighlightsState(final ResourceKey<Level> dimension) {
         return renderInverse
-            ? newChunksInverseCache.get().getHighlightsSnapshot(dimension)
-            : newChunksCache.get().getHighlightsSnapshot(dimension);
+            ? newChunksInverseCache.get().getHighlightsState(dimension)
+            : newChunksCache.get().getHighlightsState(dimension);
     }
 
     public boolean isNewChunk(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> dimensionId) {

@@ -1,7 +1,7 @@
 package xaeroplus.module.impl;
 
+import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
-import it.unimi.dsi.fastutil.longs.LongList;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.client.Minecraft;
@@ -77,9 +77,9 @@ public class PortalSkipDetection extends Module {
 
     @Override
     public void onEnable() {
-        Globals.drawManager.registerChunkHighlightProvider(
-            this.getClass(),
-            this::getHighlightsSnapshot,
+        Globals.DRAW_MANAGER.registry().registerDirectChunkHighlightProvider(
+            this.getClass().getName(),
+            this::getHighlightsState,
             this::getPortalSkipChunksColor);
         reset();
         initializeWorld();
@@ -90,7 +90,7 @@ public class PortalSkipDetection extends Module {
     @Override
     public void onDisable() {
         reset();
-        Globals.drawManager.unregisterChunkHighlightProvider(this.getClass());
+        Globals.DRAW_MANAGER.registry().unregisterChunkHighlightProvider(this.getClass().getName());
     }
 
     private void initializeWorld() {
@@ -165,7 +165,7 @@ public class PortalSkipDetection extends Module {
                 }
                 if (allSeen) portalChunkTempSetBuf.forEach(c -> portalAreaChunksBuf.put(c, 0));
             }
-            cache.replaceState(portalAreaChunksBuf);
+            mc.execute(() -> cache.replaceState(portalAreaChunksBuf));
         } catch (final Exception e) {
             XaeroPlus.LOGGER.debug("Error searching for portal skip chunks", e);
         }
@@ -232,8 +232,8 @@ public class PortalSkipDetection extends Module {
         return isPortalSkipChunk(chunkPosToLong(chunkPosX, chunkPosZ));
     }
 
-    public LongList getHighlightsSnapshot(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
-        return cache.getHighlightsSnapshot(dimension);
+    public Long2LongMap getHighlightsState(final ResourceKey<Level> dimension) {
+        return cache.getHighlightsState(dimension);
     }
 
     public boolean isPortalSkipChunk(final long chunkPos) {

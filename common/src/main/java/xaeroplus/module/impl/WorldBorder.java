@@ -17,7 +17,7 @@ public class WorldBorder extends Module {
 
     @Override
     public void onEnable() {
-        Globals.drawManager.registerLineProvider(
+        Globals.DRAW_MANAGER.registry().registerLineProvider(
             this.getClass().getName(),
             this::getLines,
             this::getColor,
@@ -28,7 +28,7 @@ public class WorldBorder extends Module {
 
     @Override
     public void onDisable() {
-        Globals.drawManager.unregisterLineProvider(this.getClass().getName());
+        Globals.DRAW_MANAGER.registry().unregisterLineProvider(this.getClass().getName());
     }
 
     List<Line> getLines(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
@@ -36,7 +36,7 @@ public class WorldBorder extends Module {
         var level = mc.level;
         if (level == null) return Collections.emptyList();
         if (level.dimension() != dimension) return Collections.emptyList();
-        var worldBorder = mc.level.getWorldBorder();
+        var worldBorder = level.getWorldBorder();
         int minX = Mth.floor(worldBorder.getMinX());
         int minZ = Mth.floor(worldBorder.getMinZ());
         int maxX = Mth.floor(worldBorder.getMaxX());

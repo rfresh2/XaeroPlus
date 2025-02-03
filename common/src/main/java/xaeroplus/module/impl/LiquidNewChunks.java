@@ -202,11 +202,11 @@ public class LiquidNewChunks extends Module {
     }
 
     public Long2LongMap getNewChunkHighlightsState(final ResourceKey<Level> dimension) {
-        return newChunksCache.get().getHighlightsState(dimension);
+        return newChunksCache.get().getCacheMap(dimension);
     }
 
     public Long2LongMap getInverseNewChunkHighlightsState(final ResourceKey<Level> dimension) {
-        return inverseNewChunksCache.get().getHighlightsState(dimension);
+        return inverseNewChunksCache.get().getCacheMap(dimension);
     }
 
     public boolean isNewChunk(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> dimensionId) {

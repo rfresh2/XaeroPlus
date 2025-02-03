@@ -4,16 +4,15 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
-import it.unimi.dsi.fastutil.longs.Long2LongMap;
-import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
-import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
-import it.unimi.dsi.fastutil.longs.LongSet;
+import it.unimi.dsi.fastutil.longs.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.util.ChunkUtils;
+
+import java.util.concurrent.CompletableFuture;
 
 import static xaeroplus.util.ChunkUtils.chunkPosToLong;
 import static xaeroplus.util.ChunkUtils.regionCoordToChunkCoord;
@@ -153,6 +152,35 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
         super.removeHighlight(x, z);
         staleChunks.add(chunkPosToLong(x, z));
         dbExecutor.execute(() -> database.removeHighlight(x, z, dimension));
+    }
+
+    @Override
+    public CompletableFuture<Long2LongMap> getHighlightsInCustomWindow(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
+        // stale highlight write is async but our db executor is single threaded so we will always execute after the write task
+        return mc.submit(this::writeStaleHighlightsToDatabase)
+            .thenApplyAsync((v) -> {
+                int regionXMin = windowRegionX - windowRegionSize;
+                int regionZMin = windowRegionZ - windowRegionSize;
+                int regionXMax = windowRegionX + windowRegionSize;
+                int regionZMax = windowRegionZ + windowRegionSize;
+                var resultMap = new Long2LongOpenHashMap();
+                ListenableFuture<?> dbLoadFuture = dbExecutor.submit(() -> database.getHighlightsInWindow(
+                    dimension,
+                    regionXMin, regionXMax,
+                    regionZMin, regionZMax,
+                    (chunkX, chunkZ, foundTime) -> resultMap.put(chunkPosToLong(chunkX, chunkZ), foundTime)
+                ));
+                try {
+                    dbLoadFuture.get();
+                    return resultMap;
+                } catch (final Exception e) {
+                    XaeroPlus.LOGGER.error("Failed to load highlights in custom window for {} disk cache dimension: {}",
+                                           database.databaseName,
+                                           this.dimension.location(),
+                                           e);
+                }
+                return Long2LongMaps.EMPTY_MAP;
+            });
     }
 
     @Override

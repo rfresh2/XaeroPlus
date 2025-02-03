@@ -159,6 +159,6 @@ public class Portals extends Module {
     }
 
     public Long2LongMap getHighlightsState(final ResourceKey<Level> dimension) {
-        return portalsCache.get().getHighlightsState(dimension);
+        return portalsCache.get().getCacheMap(dimension);
     }
 }

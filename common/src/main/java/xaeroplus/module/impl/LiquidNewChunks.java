@@ -148,13 +148,13 @@ public class LiquidNewChunks extends Module {
         if (this.renderInverse && this.isEnabled()) {
             registerInverseChunkHighlightProvider();
         } else {
-            Globals.DRAW_MANAGER.registry().unregisterChunkHighlightProvider(inverseDrawFeatureId);
+            Globals.drawManager.registry().unregisterChunkHighlightProvider(inverseDrawFeatureId);
         }
     }
 
     @Override
     public void onEnable() {
-        Globals.DRAW_MANAGER.registry().registerDirectChunkHighlightProvider(
+        Globals.drawManager.registry().registerDirectChunkHighlightProvider(
             this.getClass().getName(),
             this::getNewChunkHighlightsState,
             this::getNewChunksColor);
@@ -166,7 +166,7 @@ public class LiquidNewChunks extends Module {
     }
 
     private void registerInverseChunkHighlightProvider() {
-        Globals.DRAW_MANAGER.registry().registerDirectChunkHighlightProvider(
+        Globals.drawManager.registry().registerDirectChunkHighlightProvider(
             inverseDrawFeatureId,
             this::getInverseNewChunkHighlightsState,
             this::getInverseColor);
@@ -176,8 +176,8 @@ public class LiquidNewChunks extends Module {
     public void onDisable() {
         newChunksCache.onDisable();
         inverseNewChunksCache.onDisable();
-        Globals.DRAW_MANAGER.registry().unregisterChunkHighlightProvider(this.getClass().getName());
-        Globals.DRAW_MANAGER.registry().unregisterChunkHighlightProvider(inverseDrawFeatureId);
+        Globals.drawManager.registry().unregisterChunkHighlightProvider(this.getClass().getName());
+        Globals.drawManager.registry().unregisterChunkHighlightProvider(inverseDrawFeatureId);
     }
 
     public int getNewChunksColor() {

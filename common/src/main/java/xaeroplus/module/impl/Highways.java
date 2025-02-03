@@ -74,7 +74,7 @@ public class Highways extends Module {
 
     @Override
     public void onEnable() {
-        Globals.DRAW_MANAGER.registry().registerLineProvider(
+        Globals.drawManager.registry().registerLineProvider(
             this.getClass().getName(),
             this::getHighwayLines,
             this::getHighwayColor,
@@ -145,7 +145,7 @@ public class Highways extends Module {
 
     @Override
     public void onDisable() {
-        Globals.DRAW_MANAGER.registry().unregisterLineProvider(this.getClass().getName());
+        Globals.drawManager.registry().unregisterLineProvider(this.getClass().getName());
     }
 
     public int getHighwayColor() {

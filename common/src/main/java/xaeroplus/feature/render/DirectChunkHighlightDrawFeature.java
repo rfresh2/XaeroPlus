@@ -3,6 +3,8 @@ package xaeroplus.feature.render;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import xaeroplus.Globals;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 public class DirectChunkHighlightDrawFeature implements ChunkHighlightDrawFeature {
     private final DirectChunkHighlightProvider chunkHighlightProvider;
     private final HighlightDrawBuffer drawBuffer = new HighlightDrawBuffer();
@@ -32,7 +34,7 @@ public class DirectChunkHighlightDrawFeature implements ChunkHighlightDrawFeatur
     public void render(boolean worldmap) {
         Long2LongMap highlights = getChunkHighlights();
         if (lastRefreshedHighlightCount != highlights.size()
-            && System.currentTimeMillis() - drawBuffer.lastRefreshed > REFRESH_INTERVAL_MS) {
+            && System.currentTimeMillis() - drawBuffer.lastRefreshed > REFRESH_INTERVAL_MS + ThreadLocalRandom.current().nextInt(0, 100)) {
             this.invalidateCache();
             lastRefreshedHighlightCount = highlights.size();
         }

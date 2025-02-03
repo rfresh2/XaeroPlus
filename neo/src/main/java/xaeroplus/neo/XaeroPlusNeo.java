@@ -55,6 +55,10 @@ public class XaeroPlusNeo {
             c.getSource().sendSuccess(DataFolderResolveUtil::getCurrentDataDirPath, false);
             return 1;
         }));
+        event.getDispatcher().register(LiteralArgumentBuilder.<CommandSourceStack>literal("xaeroWaypointDir").executes(c -> {
+            c.getSource().sendSuccess(DataFolderResolveUtil::getCurrentWaypointDataDirPath, false);
+            return 1;
+        }));
     }
 
     public void onRegisterClientResourceReloadListeners(RegisterClientReloadListenersEvent event) {

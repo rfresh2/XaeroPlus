@@ -7,7 +7,6 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexBuffer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
-import it.unimi.dsi.fastutil.longs.Long2LongMaps;
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.Nullable;
 import xaeroplus.util.ChunkUtils;
@@ -30,11 +29,9 @@ public class HighlightDrawBuffer {
             close();
             return;
         }
-
         var bufferBuilder = Tesselator.getInstance()
             .begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
-        for (var entry : Long2LongMaps.fastIterable(highlights)) {
-            long highlight = entry.getLongKey();
+        for (var highlight : highlights.keySet()) {
             var chunkPosX = ChunkUtils.longToChunkX(highlight);
             var chunkPosZ = ChunkUtils.longToChunkZ(highlight);
             float x1 = chunkPosX;

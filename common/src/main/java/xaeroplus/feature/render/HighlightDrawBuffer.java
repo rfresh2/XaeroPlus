@@ -6,7 +6,6 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexBuffer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
-import it.unimi.dsi.fastutil.longs.Long2LongMaps;
 import org.jetbrains.annotations.Nullable;
 import xaeroplus.util.ChunkUtils;
 
@@ -30,8 +29,7 @@ public class HighlightDrawBuffer {
         }
         var bufferBuilder = Tesselator.getInstance().getBuilder();
         bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
-        for (var entry : Long2LongMaps.fastIterable(highlights)) {
-            long highlight = entry.getLongKey();
+        for (var highlight : highlights.keySet()) {
             var chunkPosX = ChunkUtils.longToChunkX(highlight);
             var chunkPosZ = ChunkUtils.longToChunkZ(highlight);
             float x1 = chunkPosX;

@@ -178,7 +178,7 @@ public class PaletteNewChunks extends Module {
 
     @Override
     public void onEnable() {
-        Globals.DRAW_MANAGER.registry().registerDirectChunkHighlightProvider(
+        Globals.drawManager.registry().registerDirectChunkHighlightProvider(
             this.getClass().getName(),
             this::getHighlightsState,
             this::getNewChunksColor);
@@ -190,7 +190,7 @@ public class PaletteNewChunks extends Module {
     public void onDisable() {
         newChunksCache.onDisable();
         newChunksInverseCache.onDisable();
-        Globals.DRAW_MANAGER.registry().unregisterChunkHighlightProvider(this.getClass().getName());
+        Globals.drawManager.registry().unregisterChunkHighlightProvider(this.getClass().getName());
     }
 
     public int getNewChunksColor() {

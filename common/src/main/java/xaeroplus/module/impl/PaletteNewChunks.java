@@ -217,8 +217,8 @@ public class PaletteNewChunks extends Module {
 
     public Long2LongMap getHighlightsState(final ResourceKey<Level> dimension) {
         return renderInverse
-            ? newChunksInverseCache.get().getHighlightsState(dimension)
-            : newChunksCache.get().getHighlightsState(dimension);
+            ? newChunksInverseCache.get().getCacheMap(dimension)
+            : newChunksCache.get().getCacheMap(dimension);
     }
 
     public boolean isNewChunk(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> dimensionId) {

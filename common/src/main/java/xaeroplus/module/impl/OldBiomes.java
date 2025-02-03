@@ -132,7 +132,7 @@ public class OldBiomes extends Module {
     }
 
     public Long2LongMap getHighlightsState(final ResourceKey<Level> dimension) {
-        return oldBiomesCache.get().getHighlightsState(dimension);
+        return oldBiomesCache.get().getCacheMap(dimension);
     }
 
     public void setDiskCache(final boolean b) {

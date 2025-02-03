@@ -4,7 +4,10 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
-import it.unimi.dsi.fastutil.longs.*;
+import it.unimi.dsi.fastutil.longs.Long2LongMap;
+import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
@@ -95,19 +98,22 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
         var chunkXMax = regionCoordToChunkCoord(windowRegionX + windowRegionSize);
         var chunkZMin = regionCoordToChunkCoord(windowRegionZ - windowRegionSize);
         var chunkZMax = regionCoordToChunkCoord(windowRegionZ + windowRegionSize);
-        for (var it = Long2LongMaps.fastIterator(chunks); it.hasNext(); ) {
-            var entry = it.next();
-            final long chunkPos = entry.getLongKey();
+        // critical section in mc client tick thread
+        // it would have huge benefits if we could optimize this
+        // there is no cap on the size of the chunks map
+        // so this can require iterating through millions of entries
+        for (var it = chunks.keySet().longIterator(); it.hasNext(); ) {
+            var chunkPos = it.nextLong();
             final int chunkX = ChunkUtils.longToChunkX(chunkPos);
             final int chunkZ = ChunkUtils.longToChunkZ(chunkPos);
             if (chunkX < chunkXMin
                 || chunkX > chunkXMax
                 || chunkZ < chunkZMin
                 || chunkZ > chunkZMax) {
-                it.remove();
                 if (staleChunks.contains(chunkPos)) {
-                    dataBuf.put(chunkPos, entry.getLongValue());
+                    dataBuf.put(chunkPos, chunks.get(chunkPos));
                 }
+                it.remove();
             }
         }
         return dbExecutor.submit(() -> database.insertHighlightList(dataBuf, dimension));

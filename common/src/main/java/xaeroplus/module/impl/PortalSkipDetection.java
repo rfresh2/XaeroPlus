@@ -233,7 +233,7 @@ public class PortalSkipDetection extends Module {
     }
 
     public Long2LongMap getHighlightsState(final ResourceKey<Level> dimension) {
-        return cache.getHighlightsState(dimension);
+        return cache.getCacheMap(dimension);
     }
 
     public boolean isPortalSkipChunk(final long chunkPos) {

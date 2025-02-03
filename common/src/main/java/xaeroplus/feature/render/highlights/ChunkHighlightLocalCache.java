@@ -1,10 +1,14 @@
 package xaeroplus.feature.render.highlights;
 
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
+import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class ChunkHighlightLocalCache extends ChunkHighlightBaseCacheHandler {
     private static final int maxNumber = 5000;
@@ -40,6 +44,15 @@ public class ChunkHighlightLocalCache extends ChunkHighlightBaseCacheHandler {
             }
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error limiting local cache size", e);
+        }
+    }
+
+    @Override
+    public CompletableFuture<Long2LongMap> getHighlightsInCustomWindow(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
+        if (mc.isSameThread()) {
+            return CompletableFuture.completedFuture(new Long2LongOpenHashMap(chunks));
+        } else {
+            return mc.submit(() -> new Long2LongOpenHashMap(chunks));
         }
     }
 

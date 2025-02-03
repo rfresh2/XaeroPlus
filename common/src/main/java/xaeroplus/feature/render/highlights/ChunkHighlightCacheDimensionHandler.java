@@ -143,8 +143,15 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
     }
 
     @Override
+    public void addHighlight(final int x, final int z, final long foundTime) {
+        super.addHighlight(x, z, foundTime);
+        staleChunks.add(chunkPosToLong(x, z));
+    }
+
+    @Override
     public void removeHighlight(final int x, final int z) {
         super.removeHighlight(x, z);
+        staleChunks.add(chunkPosToLong(x, z));
         dbExecutor.execute(() -> database.removeHighlight(x, z, dimension));
     }
 

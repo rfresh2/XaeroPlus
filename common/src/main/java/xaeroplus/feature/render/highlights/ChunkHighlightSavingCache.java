@@ -41,7 +41,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     // executor used for single threaded tasks that involve changing worlds and preparing the cache for operations
     @NotNull private final ListeningExecutorService parentExecutor;
     private final Map<ResourceKey<Level>, ChunkHighlightCacheDimensionHandler> dimensionCacheMap = new ConcurrentHashMap<>(3);
-    private final Queue<Runnable> taskQueue = new LinkedBlockingDeque<>();
+    private final Queue<Runnable> taskQueue = new ConcurrentLinkedQueue<>();
     Minecraft mc = Minecraft.getInstance();
 
     public ChunkHighlightSavingCache(final @NotNull String databaseName) {
@@ -308,15 +308,16 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     public void handleTick() {
         if (!cacheReady.get()) return;
         if (XaeroWorldMapCore.currentSession == null) return;
-        if (tickCounter % 1200 == 0) {
-            getAllCaches().forEach(ChunkHighlightCacheDimensionHandler::writeStaleHighlightsToDatabase);
-        }
-        // limit so we don't overflow
-        if (tickCounter > 2400) tickCounter = 0;
+        // reduce likelihood of all caches updating at the same time
+        // changing the window involves iterating through every chunk in the cache to find which are now outside the window
+        // which can be expensive if there are thousands of cache entries
+        // this does make the update interval setting kind of a lie, but its for the best
+        int jitter = ThreadLocalRandom.current().nextInt(0, 10);
         // only update window on an interval
-        if (++tickCounter % Settings.REGISTRY.cacheWindowUpdateInterval.getAsInt() != 0) {
+        if (++tickCounter < Settings.REGISTRY.cacheWindowUpdateInterval.getAsInt() + jitter) {
             return;
         }
+        tickCounter = 0;
 
         final ResourceKey<Level> mapDimension = Globals.getCurrentDimensionId();
         final ResourceKey<Level> actualDimension = ChunkUtils.getActualDimension();

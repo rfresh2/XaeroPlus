@@ -42,7 +42,7 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
     }
 
     @Override
-    public Long2LongMap getHighlightsState(final ResourceKey<Level> dimension) {
+    public Long2LongMap getCacheMap(final ResourceKey<Level> dimension) {
         return chunks;
     }
 

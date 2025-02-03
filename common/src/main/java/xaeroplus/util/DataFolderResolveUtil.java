@@ -6,6 +6,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import xaero.common.HudMod;
+import xaero.common.core.XaeroMinimapCore;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMapSession;
 import xaero.map.core.XaeroWorldMapCore;
@@ -72,6 +74,22 @@ public class DataFolderResolveUtil {
             MapProcessor mapProcessor = currentSession.getMapProcessor();
             String mainId = mapProcessor.getMapWorld().getMainId();
             Path rootFolder = MapSaveLoad.getRootFolder(mainId);
+            return Component.literal(rootFolder.toString())
+                .append(Component.literal(" (")
+                            .append(Component.literal("Click To Open").withStyle(style -> style
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, rootFolder.toString()))
+                                .withColor(ChatFormatting.GOLD)))
+                            .append(Component.literal(")")));
+        } catch (final Throwable e) {
+            XaeroPlus.LOGGER.error("Failed to get data directory", e);
+            return Component.literal("Failed to get data directory");
+        }
+    }
+
+    public static Component getCurrentWaypointDataDirPath() {
+        try {
+            Path minimapDataFolder = HudMod.INSTANCE.getMinimapFolder();
+            Path rootFolder = XaeroMinimapCore.currentSession.getWaypointsManager().getWorldState().getCurrentRootContainerPath().applyToFilePath(minimapDataFolder);
             return Component.literal(rootFolder.toString())
                 .append(Component.literal(" (")
                             .append(Component.literal("Click To Open").withStyle(style -> style

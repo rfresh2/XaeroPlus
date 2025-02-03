@@ -227,6 +227,8 @@ jobs:
             xaeroworldmap@${{ needs.build.outputs.worldmap_version_neo }}(required){modrinth:NcUtCpym}{curseforge:317780}
             worldtools(optional){modrinth:FlFKBOIX}{curseforge:909868}
             waystones(optional){modrinth:LOpKHB2A}{curseforge:245755}
+          fail-mode: warn
+          modrinth-retry-attempts: 0
 
       - name: Github Release
         if: ${{ inputs.fabric }} || ${{ inputs.forge }} || ${{ inputs.neo }}

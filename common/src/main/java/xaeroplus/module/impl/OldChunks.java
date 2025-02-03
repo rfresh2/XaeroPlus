@@ -96,7 +96,7 @@ public class OldChunks extends Module {
 
     @Override
     public void onEnable() {
-        Globals.DRAW_MANAGER.registry().registerDirectChunkHighlightProvider(
+        Globals.drawManager.registry().registerDirectChunkHighlightProvider(
             this.getClass().getName(),
             this::getHighlightsState,
             this::getOldChunksColor);
@@ -125,7 +125,7 @@ public class OldChunks extends Module {
     public void onDisable() {
         oldChunksCache.onDisable();
         modernChunksCache.onDisable();
-        Globals.DRAW_MANAGER.registry().unregisterChunkHighlightProvider(this.getClass().getName());
+        Globals.drawManager.registry().unregisterChunkHighlightProvider(this.getClass().getName());
     }
 
     public int getOldChunksColor() {

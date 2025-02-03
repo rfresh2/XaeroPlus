@@ -194,7 +194,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         int insideX = xFloored & 15;
         int insideZ = zFloored & 15;
         FramebufferLinesShaderHelper.setFrameSize((float)this.scalingFramebuffer.viewWidth, (float)this.scalingFramebuffer.viewHeight);
-        Globals.DRAW_MANAGER.drawMinimapFeatures(
+        Globals.drawManager.drawMinimapFeatures(
             chunkX,
             chunkZ,
             tileX,
@@ -225,7 +225,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         int tileZ = mapZ & 3;
         int insideX = xFloored & 15;
         int insideZ = zFloored & 15;
-        Globals.DRAW_MANAGER.drawMinimapFeatures(
+        Globals.drawManager.drawMinimapFeatures(
             chunkX, chunkZ,
             tileX, tileZ,
             insideX, insideZ,

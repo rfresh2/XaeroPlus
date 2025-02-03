@@ -239,7 +239,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                      @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers,
                                      @Local(name = "fboScale") double fboScale) {
         if (Minecraft.getInstance().options.hideGui) return;
-        Globals.DRAW_MANAGER.drawWorldMapFeatures(
+        Globals.drawManager.drawWorldMapFeatures(
             flooredCameraX,
             flooredCameraZ,
             matrixStack,

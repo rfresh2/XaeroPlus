@@ -20,7 +20,7 @@ public class WorldTools extends Module {
     @Override
     public void onEnable() {
         if (!WorldToolsHelper.isWorldToolsPresent()) return;
-        Globals.DRAW_MANAGER.registry().registerAsyncChunkHighlightProvider(
+        Globals.drawManager.registry().registerAsyncChunkHighlightProvider(
             this.getClass().getName(),
             this::getWindowedHighlightsSnapshot,
             this::getWorldToolsColor
@@ -29,7 +29,7 @@ public class WorldTools extends Module {
 
     @Override
     public void onDisable() {
-        Globals.DRAW_MANAGER.registry().unregisterChunkHighlightProvider(this.getClass().getName());
+        Globals.drawManager.registry().unregisterChunkHighlightProvider(this.getClass().getName());
     }
 
     public boolean isChunkDownloaded(final int x, final int z, final ResourceKey<Level> dimension) {

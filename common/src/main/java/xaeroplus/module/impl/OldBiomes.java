@@ -37,7 +37,7 @@ public class OldBiomes extends Module {
 
     @Override
     public void onEnable() {
-        Globals.DRAW_MANAGER.registry().registerDirectChunkHighlightProvider(
+        Globals.drawManager.registry().registerDirectChunkHighlightProvider(
             this.getClass().getName(),
             this::getHighlightsState,
             this::getOldBiomesColor);
@@ -52,7 +52,7 @@ public class OldBiomes extends Module {
     @Override
     public void onDisable() {
         oldBiomesCache.onDisable();
-        Globals.DRAW_MANAGER.registry().unregisterChunkHighlightProvider(this.getClass().getName());
+        Globals.drawManager.registry().unregisterChunkHighlightProvider(this.getClass().getName());
     }
 
     @EventHandler

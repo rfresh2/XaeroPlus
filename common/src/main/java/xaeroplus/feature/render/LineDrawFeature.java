@@ -2,6 +2,7 @@ package xaeroplus.feature.render;
 
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import net.minecraft.client.Minecraft;
 import xaeroplus.Globals;
 import xaeroplus.util.ChunkUtils;
 
@@ -20,7 +21,7 @@ public class LineDrawFeature {
         this.lineRenderCache = Caffeine.newBuilder()
             .expireAfterWrite(10, TimeUnit.SECONDS)
             .refreshAfterWrite(refreshIntervalMs, TimeUnit.MILLISECONDS)
-            .executor(Globals.cacheRefreshExecutorService.get())
+            .executor(Minecraft.getInstance())
             .buildAsync(k -> loadLinesInWindow());
     }
 
@@ -53,6 +54,6 @@ public class LineDrawFeature {
     }
 
     public List<Line> getLines() {
-        return lineRenderCache.get(0L).getNow(Collections.EMPTY_LIST);
+        return lineRenderCache.get(0L).getNow(Collections.emptyList());
     }
 }

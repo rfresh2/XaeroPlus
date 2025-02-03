@@ -150,6 +150,7 @@ jobs:
             waystones(optional){modrinth:LOpKHB2A}{curseforge:245755}
             fwaystones(optional){modrinth:sTZr7NVo}{curseforge:410902}
           fail-mode: warn
+          modrinth-retry-attempts: -1
 
       - name: Release Forge CurseForge and Modrinth
         if: ${{ inputs.forge }}
@@ -177,6 +178,7 @@ jobs:
             worldtools(optional){modrinth:FlFKBOIX}{curseforge:909868}
             waystones(optional){modrinth:LOpKHB2A}{curseforge:245755}
           fail-mode: warn
+          modrinth-retry-attempts: -1
 
       - name: Github Release
         if: ${{ inputs.fabric }} || ${{ inputs.forge }}

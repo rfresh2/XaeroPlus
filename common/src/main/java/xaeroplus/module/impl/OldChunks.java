@@ -148,8 +148,8 @@ public class OldChunks extends Module {
 
     public Long2LongMap getHighlightsState(final ResourceKey<Level> dimension) {
         return inverse
-            ? modernChunksCache.get().getHighlightsState(dimension)
-            : oldChunksCache.get().getHighlightsState(dimension);
+            ? modernChunksCache.get().getCacheMap(dimension)
+            : oldChunksCache.get().getCacheMap(dimension);
     }
 
     public boolean isOldChunk(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> dimensionId) {

@@ -95,11 +95,20 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     }
 
     @Override
-    public Long2LongMap getHighlightsState(final ResourceKey<Level> dimensionId) {
+    public Long2LongMap getCacheMap(final ResourceKey<Level> dimensionId) {
         if (dimensionId == null) return Long2LongMaps.EMPTY_MAP;
         ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimensionId, false);
         if (cacheForDimension == null) return Long2LongMaps.EMPTY_MAP;
-        return cacheForDimension.getHighlightsState(dimensionId);
+        return cacheForDimension.getCacheMap(dimensionId);
+    }
+
+    @Override
+    public CompletableFuture<Long2LongMap> getHighlightsInCustomWindow(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
+        if (dimension == null) return CompletableFuture.completedFuture(Long2LongMaps.EMPTY_MAP);
+        ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimension, true);
+        if (cacheForDimension == null) return CompletableFuture.completedFuture(Long2LongMaps.EMPTY_MAP);
+        return cacheForDimension.getHighlightsInCustomWindow(windowRegionX,
+                                                             windowRegionZ, windowRegionSize, dimension);
     }
 
     @Override

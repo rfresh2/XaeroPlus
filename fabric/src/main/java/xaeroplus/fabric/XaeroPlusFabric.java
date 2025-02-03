@@ -51,6 +51,10 @@ public class XaeroPlusFabric implements ClientModInitializer {
 				c.getSource().sendFeedback(DataFolderResolveUtil.getCurrentDataDirPath());
 				return 1;
 			}));
+			dispatcher.register(ClientCommandManager.literal("xaeroWaypointDir").executes(c -> {
+				c.getSource().sendFeedback(DataFolderResolveUtil.getCurrentWaypointDataDirPath());
+				return 1;
+			}));
 		});
 	}
 }

@@ -28,6 +28,7 @@ public class Globals {
     public static Settings.DataFolderResolutionMode dataFolderResolutionMode = Settings.DataFolderResolutionMode.IP;
     public static int minimapScaleMultiplier = 1;
     public static int minimapSizeMultiplier = 1;
+    public static final int MAX_REGION_LEVEL = 4;
     public static boolean shouldResetFBO = false;
     public static boolean minimapSettingsInitialized = false;
     public static boolean switchingDimension = false;

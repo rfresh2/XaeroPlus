@@ -104,6 +104,51 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Shadow public abstract <T extends GuiEventListener & Renderable & NarratableEntry> T addButton(final T guiEventListener);
     @Shadow public abstract <T extends GuiEventListener & NarratableEntry> T addWidget(final T guiEventListener);
 
+    @ModifyExpressionValue(method = "render", at = @At(
+        value = "CONSTANT",
+        args = "intValue=3",
+        ordinal = 0
+    ))
+    public int mutateMaxLevel0(final int original) {
+        return Globals.MAX_REGION_LEVEL;
+    }
+
+    @ModifyExpressionValue(method = "render", at = @At(
+        value = "CONSTANT",
+        args = "intValue=3",
+        ordinal = 1
+    ))
+    public int mutateMaxLevel1(final int original) {
+        return Globals.MAX_REGION_LEVEL;
+    }
+
+    @ModifyExpressionValue(method = "render", at = @At(
+        value = "CONSTANT",
+        args = "intValue=3",
+        ordinal = 2
+    ))
+    public int mutateMaxLevel2(final int original) {
+        return Globals.MAX_REGION_LEVEL;
+    }
+
+    @ModifyConstant(method = "render",
+        constant = @Constant(
+            intValue = 3,
+            ordinal = 2
+        ),
+        slice = @Slice(
+            from = @At(
+                value = "FIELD",
+                target = "Lxaero/map/settings/ModSettings;pauseRequests:Z",
+                opcode = Opcodes.GETFIELD,
+                ordinal = 0
+            )
+        )
+    )
+    public int modifyMaxLevel(final int original) {
+        return Globals.MAX_REGION_LEVEL;
+    }
+
     @ModifyExpressionValue(method = "changeZoom",
         at = @At(
             value = "CONSTANT",

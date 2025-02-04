@@ -17,8 +17,30 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import xaero.map.MapLimiter;
 import xaero.map.MapProcessor;
+import xaero.map.MapWriter;
+import xaero.map.biome.BiomeColorCalculator;
+import xaero.map.biome.BiomeGetter;
+import xaero.map.cache.BlockStateShortShapeCache;
+import xaero.map.cache.BrokenBlockTintCache;
+import xaero.map.deallocator.ByteBufferDeallocator;
+import xaero.map.file.MapSaveLoad;
+import xaero.map.file.worldsave.WorldDataHandler;
+import xaero.map.graphics.CustomVertexConsumers;
+import xaero.map.graphics.TextureUploader;
+import xaero.map.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
+import xaero.map.gui.message.MessageBox;
+import xaero.map.gui.message.render.MessageBoxRenderer;
+import xaero.map.highlight.HighlighterRegistry;
+import xaero.map.highlight.MapRegionHighlightsPreparer;
+import xaero.map.misc.CaveStartCalculator;
+import xaero.map.pool.MapTilePool;
+import xaero.map.radar.tracker.synced.ClientSyncedTrackedPlayerManager;
+import xaero.map.region.LeveledRegion;
 import xaero.map.region.MapRegion;
+import xaero.map.region.OverlayManager;
+import xaero.map.region.texture.BranchTextureRenderer;
 import xaero.map.world.MapDimension;
 import xaero.map.world.MapWorld;
 import xaeroplus.Globals;
@@ -32,6 +54,7 @@ import xaeroplus.util.DataFolderResolveUtil;
 import java.lang.ref.WeakReference;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -56,6 +79,7 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
     @Shadow private String currentWorldId;
     @Shadow private String currentDimId;
     @Shadow private String currentMWId;
+    @Shadow private ArrayList<LeveledRegion<?>>[] toProcessLevels;
 
     @Unique
     private static final ThreadLocal<Boolean> xaeroPlus$getLeafRegionActualDimSignal = ThreadLocal.withInitial(() -> false);
@@ -71,6 +95,14 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
     }
 
     @Shadow public abstract String getDimensionName(final ResourceKey<Level> id);
+
+    @Inject(method = "<init>", at = @At("RETURN"))
+    public void modifyToProcessLevelsSize(final MapSaveLoad mapSaveLoad, final MapWriter mapWriter, final MapLimiter mapLimiter, final ByteBufferDeallocator bufferDeallocator, final MapTilePool tilePool, final OverlayManager overlayManager, final TextureUploader textureUploader, final WorldDataHandler worldDataHandler, final BranchTextureRenderer branchTextureRenderer, final MultiTextureRenderTypeRendererProvider mtrtrs, final CustomVertexConsumers cvc, final BiomeColorCalculator biomeColorCalculator, final BlockStateShortShapeCache blockStateShortShapeCache, final BiomeGetter biomeGetter, final BrokenBlockTintCache brokenBlockTintCache, final HighlighterRegistry highlighterRegistry, final MapRegionHighlightsPreparer mapRegionHighlightsPreparer, final MessageBox messageBox, final MessageBoxRenderer messageBoxRenderer, final CaveStartCalculator caveStartCalculator, final ClientSyncedTrackedPlayerManager clientSyncedTrackedPlayerManager, final CallbackInfo ci) {
+        toProcessLevels = new ArrayList[Globals.MAX_REGION_LEVEL + 1];
+        for (int i = 0; i < toProcessLevels.length; i++) {
+            toProcessLevels[i] = new ArrayList<>();
+        }
+    }
 
     @Inject(method = "getMainId(ILnet/minecraft/client/multiplayer/ClientPacketListener;)Ljava/lang/String;", at = @At("HEAD"),
         cancellable = true,

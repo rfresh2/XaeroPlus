@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static net.minecraft.world.level.Level.*;
@@ -41,7 +42,11 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     // executor used for single threaded tasks that involve changing worlds and preparing the cache for operations
     @NotNull private final ListeningExecutorService parentExecutor;
     private final Map<ResourceKey<Level>, ChunkHighlightCacheDimensionHandler> dimensionCacheMap = new ConcurrentHashMap<>(3);
-    private final Queue<Runnable> taskQueue = new ConcurrentLinkedQueue<>();
+    private final Queue<Runnable> initializeTaskQueue = new ConcurrentLinkedQueue<>();
+    // mc's task executor can be flushed when the player disconnects
+    // meaning any tasks we had submitted to it are dropped and never completed
+    // so we have our own minimal executor with this queue to ensure we don't lose any tasks
+    private final Queue<Runnable> tickTaskQueue = new ConcurrentLinkedQueue<>();
     Minecraft mc = Minecraft.getInstance();
 
     public ChunkHighlightSavingCache(final @NotNull String databaseName) {
@@ -56,13 +61,29 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
                     .build()));
     }
 
+    private <V> CompletableFuture<V> submitTickTask(Supplier<V> task) {
+        if (mc.isSameThread()) {
+            return CompletableFuture.completedFuture(task.get());
+        }
+        CompletableFuture<V> future = new CompletableFuture<>();
+        tickTaskQueue.add(() -> {
+            try {
+                var result = task.get();
+                future.complete(result);
+            } catch (final Throwable e) {
+                future.completeExceptionally(e);
+            }
+        });
+        return future;
+    }
+
     @Override
     public void addHighlight(final int x, final int z) {
         try {
             ChunkHighlightCacheDimensionHandler cacheForActualDimension = getCacheForActualDimension();
             if (cacheForActualDimension == null) {
                 // if the cache is not ready yet, queue the highlight to be added
-                taskQueue.add(() -> addHighlight(x, z));
+                initializeTaskQueue.add(() -> addHighlight(x, z));
                 return;
             }
             cacheForActualDimension.addHighlight(x, z);
@@ -77,7 +98,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
             ChunkHighlightCacheDimensionHandler cacheForActualDimension = getCacheForActualDimension();
             if (cacheForActualDimension == null) {
                 // if the cache is not ready yet, queue the highlight to be removed
-                taskQueue.add(() -> removeHighlight(x, z));
+                initializeTaskQueue.add(() -> removeHighlight(x, z));
                 return;
             }
             cacheForActualDimension.removeHighlight(x, z);
@@ -161,13 +182,13 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         // dimension cache instances will be GC'd, no need to explicitly clear them
         this.dimensionCacheMap.clear();
         this.database = null;
-        this.taskQueue.clear();
+        this.initializeTaskQueue.clear();
     }
 
     // note: writes occur on the worker thread
     private List<CompletableFuture<?>> flushAllChunks() {
         return getAllCaches().stream()
-            .map(cache -> mc.submit(cache::writeStaleHighlightsToDatabase))
+            .map(cache -> submitTickTask(cache::writeStaleHighlightsToDatabase))
             .collect(Collectors.toList());
     }
 
@@ -248,9 +269,9 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
             initializeDimensionCacheHandler(NETHER);
             initializeDimensionCacheHandler(END);
             loadChunksInViewedDimension();
-            if (!taskQueue.isEmpty()) XaeroPlus.LOGGER.info("[{}] Running {} queued tasks", databaseName, taskQueue.size());
-            while (!this.taskQueue.isEmpty()) {
-                mc.execute(this.taskQueue.poll());
+            if (!initializeTaskQueue.isEmpty()) XaeroPlus.LOGGER.info("[{}] Running {} queued tasks", databaseName, initializeTaskQueue.size());
+            while (!this.initializeTaskQueue.isEmpty()) {
+                mc.execute(this.initializeTaskQueue.poll());
             }
             return true;
         } catch (final Exception e) {
@@ -315,6 +336,9 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
 
     @Override
     public void handleTick() {
+        while (!tickTaskQueue.isEmpty()) {
+            tickTaskQueue.poll().run();
+        }
         if (!cacheReady.get()) return;
         if (XaeroWorldMapCore.currentSession == null) return;
         // reduce likelihood of all caches updating at the same time

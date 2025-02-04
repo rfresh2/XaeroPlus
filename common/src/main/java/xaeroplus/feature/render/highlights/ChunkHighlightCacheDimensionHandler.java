@@ -118,27 +118,40 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
         return dbExecutor.submit(() -> database.insertHighlightList(dataBuf, dimension));
     }
 
-        // does not remove from local cache
+    public Long2LongMap collectStaleHighlightsToWrite() {
+        if (!mc.isSameThread()) {
+            throw new RuntimeException("collectStaleHighlightsToWrite must be called on the main thread");
+        }
+        if (staleChunks.isEmpty()) return Long2LongMaps.EMPTY_MAP;
+        Long2LongMap chunksToWrite = new Long2LongOpenHashMap(staleChunks.size());
+        for (var it = staleChunks.longIterator(); it.hasNext(); ) {
+            long chunkPos = it.nextLong();
+            long foundTime = chunks.get(chunkPos);
+            if (foundTime != chunks.defaultReturnValue()) {
+                chunksToWrite.put(chunkPos, foundTime);
+            }
+            it.remove();
+        }
+        return chunksToWrite;
+    }
+
+    public ListenableFuture<?> writeDataToDatabase(Long2LongMap toWrite) {
+        try {
+            return dbExecutor.submit(() -> database.insertHighlightList(toWrite, dimension));
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Failed to submit db write task for {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
+            return Futures.immediateFailedFuture(e);
+        }
+    }
+
+    // does not remove from local cache
     public ListenableFuture<?> writeStaleHighlightsToDatabase() {
         if (!mc.isSameThread()) {
             throw new RuntimeException("writeStaleHighlightsToDatabase must be called on the main thread");
         }
-        if (staleChunks.isEmpty()) return Futures.immediateVoidFuture();
-        Long2LongMap chunksToWrite = new Long2LongOpenHashMap(staleChunks.size());
-        try {
-            for (var it = staleChunks.longIterator(); it.hasNext(); ) {
-                long chunkPos = it.nextLong();
-                long foundTime = chunks.get(chunkPos);
-                if (foundTime != chunks.defaultReturnValue()) {
-                    chunksToWrite.put(chunkPos, foundTime);
-                }
-                it.remove();
-            }
-            return dbExecutor.submit(() -> database.insertHighlightList(chunksToWrite, dimension));
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error while writing all highlights to {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
-        }
-        return Futures.immediateVoidFuture();
+        var toWrite = collectStaleHighlightsToWrite();
+        if (toWrite.isEmpty()) return Futures.immediateVoidFuture();
+        return writeDataToDatabase(toWrite);
     }
 
     @Override
@@ -157,7 +170,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
     @Override
     public CompletableFuture<Long2LongMap> getHighlightsInCustomWindow(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
         // stale highlight write is async but our db executor is single threaded so we will always execute after the write task
-        return mc.submit(this::writeStaleHighlightsToDatabase)
+        return mc.submit(() -> writeStaleHighlightsToDatabase())
             .thenApplyAsync((v) -> {
                 int regionXMin = windowRegionX - windowRegionSize;
                 int regionZMin = windowRegionZ - windowRegionSize;

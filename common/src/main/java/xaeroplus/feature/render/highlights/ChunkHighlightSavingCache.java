@@ -76,8 +76,8 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         try {
             ChunkHighlightCacheDimensionHandler cacheForActualDimension = getCacheForActualDimension();
             if (cacheForActualDimension == null) {
-                // if the cache is not ready yet, queue the highlight to be added
-                taskQueue.add(() -> addHighlight(x, z));
+                // if the cache is not ready yet, queue the highlight to be removed
+                taskQueue.add(() -> removeHighlight(x, z));
                 return;
             }
             cacheForActualDimension.removeHighlight(x, z);

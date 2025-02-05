@@ -4,14 +4,16 @@ import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaeroplus.event.XaeroWorldChangeEvent;
+import xaeroplus.module.ModuleManager;
+import xaeroplus.module.impl.TickTaskExecutor;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 public interface ChunkHighlightCache {
     void addHighlight(final int x, final int z);
     void removeHighlight(final int x, final int z);
     boolean isHighlighted(final int x, final int z, ResourceKey<Level> dimensionId);
-
     /**
      * retrieves the current cache map for the given dimension. Database data is loaded in a window around the current view asynchronously
      *
@@ -37,4 +39,10 @@ public interface ChunkHighlightCache {
     void handleTick();
     void onEnable();
     void onDisable();
+    default <V> CompletableFuture<V> submitTickTask(final Supplier<V> task) {
+        return ModuleManager.getModule(TickTaskExecutor.class).submit(task);
+    }
+    default CompletableFuture<Void> submitTickTask(final Runnable task) {
+        return ModuleManager.getModule(TickTaskExecutor.class).submit(task);
+    }
 }

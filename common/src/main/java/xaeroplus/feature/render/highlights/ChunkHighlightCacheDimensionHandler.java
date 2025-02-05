@@ -170,7 +170,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
     @Override
     public CompletableFuture<Long2LongMap> getHighlightsInCustomWindow(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
         // stale highlight write is async but our db executor is single threaded so we will always execute after the write task
-        return mc.submit(() -> writeStaleHighlightsToDatabase())
+        return submitTickTask(this::writeStaleHighlightsToDatabase)
             .thenApplyAsync((v) -> {
                 int regionXMin = windowRegionX - windowRegionSize;
                 int regionZMin = windowRegionZ - windowRegionSize;

@@ -60,8 +60,9 @@ public class AsyncChunkHighlightDrawFeature implements ChunkHighlightDrawFeature
 
     @Override
     public void render(final boolean worldmap) {
+        Long2LongMap highlights = getChunkHighlights(); // needed for cache to async refresh
         if (drawBuffer.needsRefresh(worldmap)) {
-            drawBuffer.refresh(getChunkHighlights(), worldmap);
+            drawBuffer.refresh(highlights, worldmap);
         }
         drawBuffer.render();
     }

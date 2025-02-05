@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static net.minecraft.world.level.Level.*;
@@ -43,10 +42,6 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     @NotNull private final ListeningExecutorService parentExecutor;
     private final Map<ResourceKey<Level>, ChunkHighlightCacheDimensionHandler> dimensionCacheMap = new ConcurrentHashMap<>(3);
     private final Queue<Runnable> initializeTaskQueue = new ConcurrentLinkedQueue<>();
-    // mc's task executor can be flushed when the player disconnects
-    // meaning any tasks we had submitted to it are dropped and never completed
-    // so we have our own minimal executor with this queue to ensure we don't lose any tasks
-    private final Queue<Runnable> tickTaskQueue = new ConcurrentLinkedQueue<>();
     Minecraft mc = Minecraft.getInstance();
 
     public ChunkHighlightSavingCache(final @NotNull String databaseName) {
@@ -59,22 +54,6 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
                         XaeroPlus.LOGGER.error("Uncaught exception in {}", t.getName(), e);
                     })
                     .build()));
-    }
-
-    private <V> CompletableFuture<V> submitTickTask(Supplier<V> task) {
-        if (mc.isSameThread()) {
-            return CompletableFuture.completedFuture(task.get());
-        }
-        CompletableFuture<V> future = new CompletableFuture<>();
-        tickTaskQueue.add(() -> {
-            try {
-                var result = task.get();
-                future.complete(result);
-            } catch (final Throwable e) {
-                future.completeExceptionally(e);
-            }
-        });
-        return future;
     }
 
     @Override
@@ -159,10 +138,10 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
                     reset();
                 }
                 case VIEWED_DIMENSION_SWITCH -> {
-                    mc.execute(this::loadChunksInViewedDimension);
+                    submitTickTask(this::loadChunksInViewedDimension);
                 }
                 case ACTUAL_DIMENSION_SWITCH -> {
-                    mc.execute(this::loadChunksOnActualDimensionSwitch);
+                    submitTickTask(this::loadChunksOnActualDimensionSwitch);
                 }
             }
         });
@@ -271,7 +250,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
             loadChunksInViewedDimension();
             if (!initializeTaskQueue.isEmpty()) XaeroPlus.LOGGER.info("[{}] Running {} queued tasks", databaseName, initializeTaskQueue.size());
             while (!this.initializeTaskQueue.isEmpty()) {
-                mc.execute(this.initializeTaskQueue.poll());
+                submitTickTask(this.initializeTaskQueue.poll());
             }
             return true;
         } catch (final Exception e) {
@@ -336,9 +315,6 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
 
     @Override
     public void handleTick() {
-        while (!tickTaskQueue.isEmpty()) {
-            tickTaskQueue.poll().run();
-        }
         if (!cacheReady.get()) return;
         if (XaeroWorldMapCore.currentSession == null) return;
         // reduce likelihood of all caches updating at the same time

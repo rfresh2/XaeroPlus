@@ -49,11 +49,7 @@ public class ChunkHighlightLocalCache extends ChunkHighlightBaseCacheHandler {
 
     @Override
     public CompletableFuture<Long2LongMap> getHighlightsInCustomWindow(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
-        if (mc.isSameThread()) {
-            return CompletableFuture.completedFuture(new Long2LongOpenHashMap(chunks));
-        } else {
-            return mc.submit(() -> new Long2LongOpenHashMap(chunks));
-        }
+        return submitTickTask(() -> new Long2LongOpenHashMap(chunks));
     }
 
     @Override

@@ -21,6 +21,7 @@ public class ModuleManager {
             new Portals(),
             new PortalSkipDetection(),
             new RenderDistance(),
+            new TickTaskExecutor(),
             new WaystoneSync(),
             new WorldBorder(),
             new WorldTools()

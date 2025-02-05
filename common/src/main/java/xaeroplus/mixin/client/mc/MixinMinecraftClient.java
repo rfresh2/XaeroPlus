@@ -23,6 +23,11 @@ import xaeroplus.settings.Settings;
 public class MixinMinecraftClient {
     @Shadow public ClientLevel level;
 
+    @Inject(method = "runTick", at = @At("HEAD"))
+    public void renderTickHead(final CallbackInfo ci) {
+        XaeroPlus.EVENT_BUS.call(ClientTickEvent.RenderPre.INSTANCE);
+    }
+
     @Inject(method = "tick", at = @At("HEAD"))
     public void tickHead(final CallbackInfo ci) {
         XaeroPlus.EVENT_BUS.call(ClientTickEvent.Pre.INSTANCE);

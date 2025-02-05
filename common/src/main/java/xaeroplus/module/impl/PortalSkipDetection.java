@@ -165,7 +165,7 @@ public class PortalSkipDetection extends Module {
                 }
                 if (allSeen) portalChunkTempSetBuf.forEach(c -> portalAreaChunksBuf.put(c, 0));
             }
-            mc.execute(() -> cache.replaceState(portalAreaChunksBuf));
+            cache.submitTickTask(() -> cache.replaceState(portalAreaChunksBuf));
         } catch (final Exception e) {
             XaeroPlus.LOGGER.debug("Error searching for portal skip chunks", e);
         }

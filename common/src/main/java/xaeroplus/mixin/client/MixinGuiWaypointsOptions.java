@@ -3,8 +3,10 @@ package xaeroplus.mixin.client;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -19,6 +21,7 @@ import xaeroplus.settings.Settings;
 public abstract class MixinGuiWaypointsOptions extends ScreenBase {
     @Unique
     private Button showWaypointDistancesButton;
+    @Shadow private boolean buttonTest;
 
     protected MixinGuiWaypointsOptions(final IXaeroMinimap modMain, final Screen parent, final Screen escape, final Component titleIn) {
         super(modMain, parent, escape, titleIn);
@@ -42,8 +45,12 @@ public abstract class MixinGuiWaypointsOptions extends ScreenBase {
                 999,
                 this.width / 2 + 3,
                 prevButtonY + 25,
-                Component.literal(Settings.REGISTRY.showWaypointDistances.getTranslatedName()),
+                Component.literal(
+                    Settings.REGISTRY.showWaypointDistances.getTranslatedName()
+                        + ": "
+                        + I18n.get(Settings.REGISTRY.showWaypointDistances.get() ? "gui.xaero_on" : "gui.xaero_off")),
                 (b) -> {
+                    this.buttonTest = true;
                     Settings.REGISTRY.showWaypointDistances.setValue(!Settings.REGISTRY.showWaypointDistances.get());
                 }
             )

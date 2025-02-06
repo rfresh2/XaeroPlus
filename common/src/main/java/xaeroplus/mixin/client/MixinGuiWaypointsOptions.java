@@ -19,8 +19,7 @@ import xaeroplus.settings.Settings;
 
 @Mixin(value = GuiWaypointsOptions.class, remap = false)
 public abstract class MixinGuiWaypointsOptions extends ScreenBase {
-    @Unique
-    private Button showWaypointDistancesButton;
+    @Unique private Button xaeroPlus$showWaypointDistancesButton;
     @Shadow private boolean buttonTest;
 
     protected MixinGuiWaypointsOptions(final IXaeroMinimap modMain, final Screen parent, final Screen escape, final Component titleIn) {
@@ -41,19 +40,25 @@ public abstract class MixinGuiWaypointsOptions extends ScreenBase {
             .map(AbstractWidget::getY)
             .orElse(280);
         addRenderableWidget(
-            showWaypointDistancesButton = new MyBigButton(
+            xaeroPlus$showWaypointDistancesButton = new MyBigButton(
                 999,
                 this.width / 2 + 3,
                 prevButtonY + 25,
-                Component.literal(
-                    Settings.REGISTRY.showWaypointDistances.getTranslatedName()
-                        + ": "
-                        + I18n.get(Settings.REGISTRY.showWaypointDistances.get() ? "gui.xaero_on" : "gui.xaero_off")),
+                xaeroPlus$getShowWaypointDistancesButtonComponent(),
                 (b) -> {
                     this.buttonTest = true;
                     Settings.REGISTRY.showWaypointDistances.setValue(!Settings.REGISTRY.showWaypointDistances.get());
+                    xaeroPlus$showWaypointDistancesButton.setMessage(xaeroPlus$getShowWaypointDistancesButtonComponent());
                 }
             )
         );
+    }
+
+    @Unique
+    private Component xaeroPlus$getShowWaypointDistancesButtonComponent() {
+        return Component.literal(
+            Settings.REGISTRY.showWaypointDistances.getTranslatedName()
+                + ": "
+                + I18n.get(Settings.REGISTRY.showWaypointDistances.get() ? "gui.xaero_on" : "gui.xaero_off"));
     }
 }

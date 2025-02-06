@@ -27,16 +27,16 @@ import java.util.stream.Collectors;
 public final class AtlasWaypointImport {
     private AtlasWaypointImport() {}
 
-    public static void importAtlasWaypoints() {
+    public static int importAtlasWaypoints() {
         MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
-        if (minimapSession == null) return;
+        if (minimapSession == null) return 0;
         MinimapWorld currentWorld = minimapSession.getWorldManager().getCurrentWorld();
-        if (currentWorld == null) return;
+        if (currentWorld == null) return 0;
         WaypointSet currentWpSet = currentWorld.getCurrentWaypointSet();
-        if (currentWpSet == null) return;
+        if (currentWpSet == null) return 0;
 
         List<AtlasWaypoint> atlasWaypoints = getAtlasApiResponse();
-        if (atlasWaypoints.isEmpty()) return;
+        if (atlasWaypoints.isEmpty()) return 0;
         Map<ResourceKey<Level>, ArrayList<AtlasWaypoint>> atlasByDimension = atlasWaypoints.stream()
             .filter(AtlasWaypoint::isValid)
             .collect(Collectors.toMap(
@@ -79,6 +79,7 @@ public final class AtlasWaypointImport {
         if (altWorld.getWaypointSet("atlas") != null) {
             altWorld.getWaypointSet("atlas").clear();
         }
+        int addedWaypoints = 0;
         for (var atlasWp : atlasByDimension.entrySet()) {
             ResourceKey<Level> dim = atlasWp.getKey();
             List<AtlasWaypoint> waypoints = atlasWp.getValue();
@@ -101,9 +102,11 @@ public final class AtlasWaypointImport {
                     WaypointPurpose.NORMAL
                 );
                 waypointSet.add(wp);
+                addedWaypoints++;
             }
         }
         SupportMods.xaeroMinimap.requestWaypointsRefresh();
+        return addedWaypoints;
     }
 
     private static List<AtlasWaypoint> getAtlasApiResponse() {

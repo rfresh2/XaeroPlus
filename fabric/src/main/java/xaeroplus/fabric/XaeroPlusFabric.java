@@ -74,7 +74,8 @@ public class XaeroPlusFabric implements ClientModInitializer {
 				c.getSource().sendFeedback(Component.literal("Atlas import started..."));
 				CompletableFuture.runAsync(() -> {
 					try {
-						AtlasWaypointImport.importAtlasWaypoints();
+						int addedCount = AtlasWaypointImport.importAtlasWaypoints();
+						c.getSource().sendFeedback(Component.literal(addedCount + " waypoints imported to the \"atlas\" waypoint set!"));
 					} catch (final Exception e) {
 						XaeroPlus.LOGGER.error("Atlas import failed", e);
 						c.getSource().sendFeedback(Component.literal("Atlas import failed! Check log for details."));

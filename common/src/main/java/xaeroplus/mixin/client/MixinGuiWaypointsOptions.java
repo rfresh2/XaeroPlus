@@ -24,7 +24,11 @@ public abstract class MixinGuiWaypointsOptions extends ScreenBase {
         super(modMain, parent, escape, titleIn);
     }
 
-    @Inject(method = "init", at = @At("RETURN"))
+    @Inject(
+        method = "init",
+        at = @At("RETURN"),
+        remap = true
+    )
     public void injectShowWaypointDistancesButton(final CallbackInfo ci) {
         int prevButtonY = this.children().stream()
             .filter(c -> c instanceof MyBigButton)

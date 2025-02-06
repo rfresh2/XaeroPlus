@@ -15,6 +15,8 @@ import xaero.hud.minimap.world.MinimapWorld;
 import xaero.hud.path.XaeroPath;
 import xaero.map.mods.SupportMods;
 import xaeroplus.XaeroPlus;
+import xaeroplus.module.ModuleManager;
+import xaeroplus.module.impl.TickTaskExecutor;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -22,20 +24,30 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
 public final class AtlasWaypointImport {
     private AtlasWaypointImport() {}
 
-    public static int importAtlasWaypoints() {
+    public static CompletableFuture<Integer> importAtlasWaypoints() {
+        return CompletableFuture
+            .supplyAsync(AtlasWaypointImport::getAtlasApiResponse, ForkJoinPool.commonPool())
+            .thenApplyAsync((atlasWaypoints) -> {
+                int addedWaypoints = importAtlasWaypoints(atlasWaypoints);
+                XaeroPlus.LOGGER.info("Imported {} Atlas waypoints", addedWaypoints);
+                return addedWaypoints;
+            }, ModuleManager.getModule(TickTaskExecutor.class));
+    }
+
+    private static int importAtlasWaypoints(List<AtlasWaypoint> atlasWaypoints) {
         MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
         if (minimapSession == null) return 0;
         MinimapWorld currentWorld = minimapSession.getWorldManager().getCurrentWorld();
         if (currentWorld == null) return 0;
         WaypointSet currentWpSet = currentWorld.getCurrentWaypointSet();
         if (currentWpSet == null) return 0;
-
-        List<AtlasWaypoint> atlasWaypoints = getAtlasApiResponse();
         if (atlasWaypoints.isEmpty()) return 0;
         Map<ResourceKey<Level>, ArrayList<AtlasWaypoint>> atlasByDimension = atlasWaypoints.stream()
             .filter(AtlasWaypoint::isValid)

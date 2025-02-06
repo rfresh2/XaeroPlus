@@ -5,15 +5,22 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.Version;
+import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.Minecraft;
 import xaeroplus.XaeroPlus;
+import net.minecraft.network.chat.Component;
 import xaeroplus.fabric.util.FabricWaystonesHelperInit;
 import xaeroplus.fabric.util.compat.IncompatibleMinimapWarningScreen;
 import xaeroplus.fabric.util.compat.XaeroPlusMinimapCompatibilityChecker;
 import xaeroplus.settings.Settings;
+import xaeroplus.util.AtlasWaypointImport;
 import xaeroplus.util.DataFolderResolveUtil;
 import xaeroplus.util.XaeroPlusGameTest;
+
+import java.util.concurrent.CompletableFuture;
 
 import static xaeroplus.fabric.util.compat.XaeroPlusMinimapCompatibilityChecker.versionCheckResult;
 
@@ -27,6 +34,11 @@ public class XaeroPlusFabric implements ClientModInitializer {
 									   versionCheckResult.anyPresentMinimapVersion().map(Version::getFriendlyString).orElse("None!"));
 				return;
 			}
+			XaeroPlus.XP_VERSION = FabricLoader.getInstance().getModContainer("xaeroplus")
+				.map(ModContainer::getMetadata)
+				.map(ModMetadata::getVersion)
+				.map(Version::getFriendlyString)
+				.orElse("2.x");
 			FabricWaystonesHelperInit.doInit();
 			XaeroPlus.initializeSettings();
 			Settings.REGISTRY.getKeybindings().forEach(KeyBindingHelper::registerKeyBinding);
@@ -56,6 +68,20 @@ public class XaeroPlusFabric implements ClientModInitializer {
 			}));
 			dispatcher.register(ClientCommandManager.literal("xaeroWaypointDir").executes(c -> {
 				c.getSource().sendFeedback(DataFolderResolveUtil.getCurrentWaypointDataDirPath());
+				return 1;
+			}));
+			dispatcher.register(ClientCommandManager.literal("xaero2b2tAtlasImport").executes(c -> {
+				c.getSource().sendFeedback(Component.literal("Atlas import started..."));
+				CompletableFuture.runAsync(() -> {
+					try {
+						int addedCount = AtlasWaypointImport.importAtlasWaypoints();
+						c.getSource().sendFeedback(Component.literal(addedCount + " waypoints imported to the \"atlas\" waypoint set!"));
+					} catch (final Exception e) {
+						XaeroPlus.LOGGER.error("Atlas import failed", e);
+						c.getSource().sendFeedback(Component.literal("Atlas import failed! Check log for details."));
+					}
+				}).whenCompleteAsync((a, b) -> c.getSource()
+					.sendFeedback(Component.literal("Atlas Import Complete!")));
 				return 1;
 			}));
 		});

@@ -10,19 +10,16 @@ import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
-import xaero.map.gui.GuiWorldMapSettings;
 import xaeroplus.XaeroPlus;
-import xaeroplus.feature.extensions.GuiXaeroPlusWorldMapSettings;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.DataFolderResolveUtil;
 import xaeroplus.util.XaeroPlusGameTest;
-
-import java.util.List;
 
 @Mod(value = "xaeroplus", dist = Dist.CLIENT)
 public class XaeroPlusNeo {
@@ -50,6 +47,7 @@ public class XaeroPlusNeo {
 
     public void onRegisterKeyMappingsEvent(final RegisterKeyMappingsEvent event) {
         if (XaeroPlus.initialized.compareAndSet(false, true)) {
+            XaeroPlus.XP_VERSION = FMLLoader.getLoadingModList().getModFileById("xaeroplus").versionString();
             XaeroPlus.initializeSettings();
             Settings.REGISTRY.getKeybindings().forEach(event::register);
             if (System.getenv("XP_CI_TEST") != null)

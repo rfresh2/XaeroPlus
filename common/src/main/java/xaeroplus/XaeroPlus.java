@@ -2,6 +2,7 @@ package xaeroplus;
 
 import net.lenni0451.lambdaevents.LambdaManager;
 import net.lenni0451.lambdaevents.generator.LambdaMetaFactoryGenerator;
+import net.minecraft.DetectedVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xaero.map.platform.Services;
@@ -19,6 +20,8 @@ public class XaeroPlus {
 	public static final LambdaManager EVENT_BUS = LambdaManager.basic(new LambdaMetaFactoryGenerator());
 	public static final AtomicBoolean initialized = new AtomicBoolean(false);
 	public static final File configFile = Services.PLATFORM.getConfigDir().resolve("xaeroplus.txt").toFile();
+	public static String XP_VERSION = "2";
+	public static final String MC_VERSION = DetectedVersion.BUILT_IN.getName();
 
 	public static void initializeSettings() {
 		loadXPSettings();

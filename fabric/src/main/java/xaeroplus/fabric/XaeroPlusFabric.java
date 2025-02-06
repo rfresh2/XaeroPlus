@@ -15,12 +15,12 @@ import net.minecraft.network.chat.Component;
 import xaeroplus.fabric.util.FabricWaystonesHelperInit;
 import xaeroplus.fabric.util.compat.IncompatibleMinimapWarningScreen;
 import xaeroplus.fabric.util.compat.XaeroPlusMinimapCompatibilityChecker;
+import xaeroplus.module.ModuleManager;
+import xaeroplus.module.impl.TickTaskExecutor;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.AtlasWaypointImport;
 import xaeroplus.util.DataFolderResolveUtil;
 import xaeroplus.util.XaeroPlusGameTest;
-
-import java.util.concurrent.CompletableFuture;
 
 import static xaeroplus.fabric.util.compat.XaeroPlusMinimapCompatibilityChecker.versionCheckResult;
 
@@ -72,16 +72,16 @@ public class XaeroPlusFabric implements ClientModInitializer {
 			}));
 			dispatcher.register(ClientCommandManager.literal("xaero2b2tAtlasImport").executes(c -> {
 				c.getSource().sendFeedback(Component.literal("Atlas import started..."));
-				CompletableFuture.runAsync(() -> {
-					try {
-						int addedCount = AtlasWaypointImport.importAtlasWaypoints();
-						c.getSource().sendFeedback(Component.literal(addedCount + " waypoints imported to the \"atlas\" waypoint set!"));
-					} catch (final Exception e) {
-						XaeroPlus.LOGGER.error("Atlas import failed", e);
-						c.getSource().sendFeedback(Component.literal("Atlas import failed! Check log for details."));
-					}
-				}).whenCompleteAsync((a, b) -> c.getSource()
-					.sendFeedback(Component.literal("Atlas Import Complete!")));
+				AtlasWaypointImport.importAtlasWaypoints()
+					.whenCompleteAsync((addedCount, e) -> {
+						if (e != null) {
+							XaeroPlus.LOGGER.error("Atlas import failed", e);
+							c.getSource().sendFeedback(Component.literal("Atlas import failed! Check log for details."));
+						} else {
+							c.getSource().sendFeedback(Component.literal(addedCount + " waypoints imported to the \"atlas\" waypoint set!"));
+						}
+						c.getSource().sendFeedback(Component.literal("Atlas Import Complete!"));
+					}, ModuleManager.getModule(TickTaskExecutor.class));
 				return 1;
 			}));
 		});

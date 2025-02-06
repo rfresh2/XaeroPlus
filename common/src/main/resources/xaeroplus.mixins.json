@@ -32,6 +32,7 @@
     "MixinGuiWaypoints",
     "MixinGuiWaypointSettings",
     "MixinGuiWaypointsList",
+    "MixinGuiWaypointsOptions",
     "MixinGuiWorldMapSettings",
     "MixinHudMod",
     "MixinImprovedFramebuffer",

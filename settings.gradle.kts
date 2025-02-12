@@ -8,13 +8,13 @@ pluginManagement {
 	}
 }
 gradle.extra.apply {
-	set("mod_version", "2.26.1")
+	set("mod_version", "2.26.2")
 	set("minecraft_version", "1.19.4")
 	set("parchment_version", "2023.06.26")
     set("worldmap_version_fabric", "1.39.2")
-	set("minimap_version_fabric", "25.0.0")
+	set("minimap_version_fabric", "25.1.0")
 	set("worldmap_version_forge", "1.39.2")
-	set("minimap_version_forge", "25.0.0")
+	set("minimap_version_forge", "25.1.0")
 }
 
 dependencyResolutionManagement {

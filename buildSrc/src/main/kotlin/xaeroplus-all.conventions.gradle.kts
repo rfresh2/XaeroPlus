@@ -18,6 +18,9 @@ repositories {
     maven("https://maven.2b2t.vc/releases") {
         name = "maven.2b2t.vc"
     }
+    maven("https://cursemaven.com") {
+        name = "CurseForge"
+    }
     maven("https://maven.parchmentmc.org") {
         name = "ParchmentMC"
     }

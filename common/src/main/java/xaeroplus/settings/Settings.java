@@ -552,6 +552,87 @@ public final class Settings extends SettingRegistry {
             (b) -> ModuleManager.getModule(WorldBorder.class).setEnabled(b)
         ),
         SettingLocation.OVERLAYS);
+    public final BooleanSetting spawnChunksEnabledSetting = register(
+        BooleanSetting.create(
+            "Spawn Chunks",
+            "xaeroplus.setting.spawn_chunks",
+            false,
+            (b) -> ModuleManager.getModule(SpawnChunks.class).setEnabled(b)),
+        SettingLocation.OVERLAYS);
+    public final BooleanSetting playerSpawnChunksEnabledSetting = register(
+        BooleanSetting.create(
+            "Player Spawn Chunks",
+            "xaeroplus.setting.player_spawn_chunks",
+            false,
+            (b) -> ModuleManager.getModule(SpawnChunksPlayer.class).setEnabled(b)),
+        SettingLocation.OVERLAYS);
+    public final BooleanSetting spawnChunksRedstoneProcessingEnabled = register(
+        BooleanSetting.create(
+            "Spawn Chunks Redstone Processing",
+            "xaeroplus.setting.spawn_chunks_redstone_processing",
+            false),
+        SettingLocation.OVERLAYS);
+    public final BooleanSetting spawnChunksOuterChunksEnabled = register(
+        BooleanSetting.create(
+            "Spawn Chunks Outer Chunks",
+            "xaeroplus.setting.spawn_chunks_outer_chunks",
+            false),
+        SettingLocation.OVERLAYS);
+    public final EnumSetting<ColorHelper.HighlightColor> spawnChunksEntityProcessingColor = register(
+        EnumSetting.create(
+            "Spawn Chunks Entity Processing Color",
+            "xaeroplus.setting.spawn_chunks_entity_processing_color",
+            ColorHelper.HighlightColor.values(),
+            ColorHelper.HighlightColor.GREEN,
+            (b) -> {
+                ModuleManager.getModule(SpawnChunks.class).setEntityProcessingColor(b.getColor());
+                ModuleManager.getModule(SpawnChunksPlayer.class).setEntityProcessingColor(b.getColor());
+            }),
+        SettingLocation.OVERLAYS);
+    public final EnumSetting<ColorHelper.HighlightColor> spawnChunksRedstoneProcessingColor = register(
+        EnumSetting.create(
+            "Spawn Chunks Redstone Processing Color",
+            "xaeroplus.setting.spawn_chunks_redstone_processing_color",
+            ColorHelper.HighlightColor.values(),
+            ColorHelper.HighlightColor.RED,
+            (b) -> {
+                ModuleManager.getModule(SpawnChunks.class).setRedstoneProcessingColor(b.getColor());
+                ModuleManager.getModule(SpawnChunksPlayer.class).setRedstoneProcessingColor(b.getColor());
+            }),
+        SettingLocation.OVERLAYS);
+    public final EnumSetting<ColorHelper.HighlightColor> spawnChunksLazyChunksColor = register(
+        EnumSetting.create(
+            "Spawn Chunks Lazy Chunks Color",
+            "xaeroplus.setting.spawn_chunks_lazy_chunks_color",
+            ColorHelper.HighlightColor.values(),
+            ColorHelper.HighlightColor.BLUE,
+            (b) -> {
+                ModuleManager.getModule(SpawnChunks.class).setLazyChunksColor(b.getColor());
+                ModuleManager.getModule(SpawnChunksPlayer.class).setLazyChunksColor(b.getColor());
+            }),
+        SettingLocation.OVERLAYS);
+    public final EnumSetting<ColorHelper.HighlightColor> spawnChunksOuterChunksColor = register(
+        EnumSetting.create(
+            "Spawn Chunks Outer Chunks Color",
+            "xaeroplus.setting.spawn_chunks_outer_chunks_color",
+            ColorHelper.HighlightColor.values(),
+            ColorHelper.HighlightColor.YELLOW,
+            (b) -> {
+                ModuleManager.getModule(SpawnChunks.class).setOuterChunksColor(b.getColor());
+                ModuleManager.getModule(SpawnChunksPlayer.class).setOuterChunksColor(b.getColor());
+            }),
+        SettingLocation.OVERLAYS);
+    public final DoubleSetting spawnChunksAlphaSetting = register(
+        DoubleSetting.create(
+            "Spawn Chunks Opacity",
+            "xaeroplus.setting.spawn_chunks_opacity",
+            0, 255, 10,
+            100,
+            (b) -> {
+                ModuleManager.getModule(SpawnChunks.class).setAlpha((int) b);
+                ModuleManager.getModule(SpawnChunksPlayer.class).setAlpha((int) b);
+            }),
+        SettingLocation.OVERLAYS);
     public final BooleanSetting nullOverworldDimensionFolder = register(
         BooleanSetting.create(
             "null OW Dim Dir",

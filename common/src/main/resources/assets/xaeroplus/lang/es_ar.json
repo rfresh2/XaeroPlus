@@ -119,8 +119,6 @@
   "xaeroplus.setting.spawn_chunks_lazy_chunks_color.tooltip": "Establece el color de los chunks perezosos",
   "xaeroplus.setting.spawn_chunks_outer_chunks_color": "Color de Chunks Exteriores",
   "xaeroplus.setting.spawn_chunks_outer_chunks_color.tooltip": "Establece el color de los chunks exteriores",
-  "xaeroplus.setting.spawn_chunks_opacity": "Opacidad de Chunks de Spawn",
-  "xaeroplus.setting.spawn_chunks_opacity.tooltip": "Establece la opacidad del color de los tipos de Chunks de Spawn",
   "xaeroplus.setting.2b2t_highways_enabled": "Carreteras 2b2t",
   "xaeroplus.setting.2b2t_highways_enabled.tooltip": "Destaca los chunks en las carreteras de 2b2t",
   "xaeroplus.setting.2b2t_highways_width": "Ancho de las autopistas 2b2t",

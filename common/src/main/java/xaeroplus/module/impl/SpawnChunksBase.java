@@ -1,36 +1,35 @@
 package xaeroplus.module.impl;
 
-import it.unimi.dsi.fastutil.longs.Long2LongMap;
-import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaeroplus.Globals;
+import xaeroplus.feature.render.Line;
 import xaeroplus.module.Module;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public abstract class SpawnChunksBase extends Module {
     final String entityProcessingId = getClass().getName() + "$EntityProcessing";
     final String redstoneProcessingId = getClass().getName() + "$RedstoneProcessing";
     final String lazyChunkId = getClass().getName() + "$LazyChunk";
     final String outerChunksId = getClass().getName() + "$OuterChunks";
-    final Long2LongMap entityProcessingCache = new Long2LongOpenHashMap();
-    final Long2LongMap redstoneProcessingCache = new Long2LongOpenHashMap();
-    final Long2LongMap lazyChunksCache = new Long2LongOpenHashMap();
-    final Long2LongMap outerChunksCache = new Long2LongOpenHashMap();
-    int entityProcessingColor = ColorHelper.getColor(0, 255, 0, 100);
-    int redstoneProcessingColor = ColorHelper.getColor(255, 0, 0, 100);
-    int lazyChunksColor = ColorHelper.getColor(0, 0, 255, 100);
-    int outerChunksColor = ColorHelper.getColor(255, 255, 0, 100);
+    final List<Line> entityProcessingCache = new ArrayList<>();
+    final List<Line> redstoneProcessingCache = new ArrayList<>();
+    final List<Line> lazyChunksCache = new ArrayList<>();
+    final List<Line> outerChunksCache = new ArrayList<>();
+    int alpha = 204;
+    int entityProcessingColor = ColorHelper.getColor(0, 255, 0, alpha);
+    int redstoneProcessingColor = ColorHelper.getColor(255, 0, 0, alpha);
+    int lazyChunksColor = ColorHelper.getColor(0, 0, 255, alpha);
+    int outerChunksColor = ColorHelper.getColor(255, 255, 0, alpha);
+    float lineWidth = 0.1f;
 
-    public abstract Long2LongMap entityProcessing(ResourceKey<Level> dimension);
-
-    public abstract Long2LongMap redstoneProcessing(ResourceKey<Level> dimension);
-
-    public abstract Long2LongMap lazyChunks(ResourceKey<Level> dimension);
-
-    public abstract Long2LongMap outerChunks(ResourceKey<Level> dimension);
+    public abstract ResourceKey<Level> dimension();
 
     abstract int getSpawnRadius();
 
@@ -42,38 +41,62 @@ public abstract class SpawnChunksBase extends Module {
 
     @Override
     public void onEnable() {
-        Globals.drawManager.registry().registerDirectChunkHighlightProvider(
+        Globals.drawManager.registry().registerLineProvider(
             entityProcessingId,
-            true,
             this::entityProcessing,
-            this::entityProcessingColor
+            this::entityProcessingColor,
+            this::getLineWidth,
+            50
         );
-        Globals.drawManager.registry().registerDirectChunkHighlightProvider(
+        Globals.drawManager.registry().registerLineProvider(
             redstoneProcessingId,
-            true,
             this::redstoneProcessing,
-            this::redstoneProcessingColor
+            this::redstoneProcessingColor,
+            this::getLineWidth,
+            50
         );
-        Globals.drawManager.registry().registerDirectChunkHighlightProvider(
+        Globals.drawManager.registry().registerLineProvider(
             lazyChunkId,
-            true,
             this::lazyChunks,
-            this::lazyChunksColor
+            this::lazyChunksColor,
+            this::getLineWidth,
+            50
         );
-        Globals.drawManager.registry().registerDirectChunkHighlightProvider(
+        Globals.drawManager.registry().registerLineProvider(
             outerChunksId,
-            true,
             this::outerChunks,
-            this::outerChunksColor
+            this::outerChunksColor,
+            this::getLineWidth,
+            50
         );
     }
 
     @Override
     public void onDisable() {
-        Globals.drawManager.registry().unregisterChunkHighlightProvider(entityProcessingId);
-        Globals.drawManager.registry().unregisterChunkHighlightProvider(redstoneProcessingId);
-        Globals.drawManager.registry().unregisterChunkHighlightProvider(lazyChunkId);
-        Globals.drawManager.registry().unregisterChunkHighlightProvider(outerChunksId);
+        Globals.drawManager.registry().unregisterLineProvider(entityProcessingId);
+        Globals.drawManager.registry().unregisterLineProvider(redstoneProcessingId);
+        Globals.drawManager.registry().unregisterLineProvider(lazyChunkId);
+        Globals.drawManager.registry().unregisterLineProvider(outerChunksId);
+    }
+
+    public List<Line> entityProcessing(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, ResourceKey<Level> dimension) {
+        if (dimension != dimension()) return Collections.emptyList();
+        return entityProcessingCache;
+    }
+
+    public List<Line> redstoneProcessing(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, ResourceKey<Level> dimension) {
+        if (dimension != dimension()) return Collections.emptyList();
+        return redstoneProcessingCache;
+    }
+
+    public List<Line> lazyChunks(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, ResourceKey<Level> dimension) {
+        if (dimension != dimension()) return Collections.emptyList();
+        return lazyChunksCache;
+    }
+
+    public List<Line> outerChunks(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, ResourceKey<Level> dimension) {
+        if (dimension != dimension()) return Collections.emptyList();
+        return outerChunksCache;
     }
 
     int entityProcessingColor() {
@@ -93,26 +116,35 @@ public abstract class SpawnChunksBase extends Module {
     }
 
     public void setEntityProcessingColor(final int color) {
-        entityProcessingColor = ColorHelper.getColorWithAlpha(color, Settings.REGISTRY.spawnChunksAlphaSetting.getAsInt());
+        entityProcessingColor = ColorHelper.getColorWithAlpha(color, alpha);
     }
 
     public void setRedstoneProcessingColor(final int color) {
-        redstoneProcessingColor = ColorHelper.getColorWithAlpha(color, Settings.REGISTRY.spawnChunksAlphaSetting.getAsInt());
+        redstoneProcessingColor = ColorHelper.getColorWithAlpha(color, alpha);
     }
 
     public void setLazyChunksColor(final int color) {
-        lazyChunksColor = ColorHelper.getColorWithAlpha(color, Settings.REGISTRY.spawnChunksAlphaSetting.getAsInt());
+        lazyChunksColor = ColorHelper.getColorWithAlpha(color, alpha);
     }
 
     public void setOuterChunksColor(final int color) {
-        outerChunksColor = ColorHelper.getColorWithAlpha(color, Settings.REGISTRY.spawnChunksAlphaSetting.getAsInt());
+        outerChunksColor = ColorHelper.getColorWithAlpha(color, alpha);
     }
 
     public void setAlpha(final int alpha) {
+        this.alpha = alpha;
         setEntityProcessingColor(entityProcessingColor);
         setRedstoneProcessingColor(redstoneProcessingColor);
         setLazyChunksColor(lazyChunksColor);
         setOuterChunksColor(outerChunksColor);
+    }
+
+    public float getLineWidth() {
+        return lineWidth;
+    }
+
+    public void setLineWidth(final float lineWidth) {
+        this.lineWidth = lineWidth;
     }
 
     void updateCaches() {
@@ -130,26 +162,25 @@ public abstract class SpawnChunksBase extends Module {
 
         populateCache(entityProcessingCache, spawnChunkX, spawnChunkZ, entityProcessingRadius);
         if (Settings.REGISTRY.spawnChunksRedstoneProcessingEnabled.get())
-            populateCache(redstoneProcessingCache, spawnChunkX, spawnChunkZ, redstoneRadius, entityProcessingCache);
-        populateCache(lazyChunksCache, spawnChunkX, spawnChunkZ, lazyRadius, entityProcessingCache, redstoneProcessingCache);
+            populateCache(redstoneProcessingCache, spawnChunkX, spawnChunkZ, redstoneRadius);
+        populateCache(lazyChunksCache, spawnChunkX, spawnChunkZ, lazyRadius);
         if (Settings.REGISTRY.spawnChunksOuterChunksEnabled.get())
-            populateCache(outerChunksCache, spawnChunkX, spawnChunkZ, worldGenRadius, entityProcessingCache, redstoneProcessingCache, lazyChunksCache);
+            populateCache(outerChunksCache, spawnChunkX, spawnChunkZ, worldGenRadius);
     }
 
-    void populateCache(Long2LongMap cache, int centerX, int centerZ, int radius, Long2LongMap... except) {
-        for (int x = centerX - radius; x <= centerX + radius; x++) {
-            for (int z = centerZ - radius; z <= centerZ + radius; z++) {
-                long pos = ChunkUtils.chunkPosToLong(x, z);
-                boolean skip = false;
-                for (Long2LongMap ex : except) {
-                    if (ex.containsKey(pos)) {
-                        skip = true;
-                        break;
-                    }
-                }
-                if (!skip) cache.put(pos, 0);
-            }
-        }
+    void populateCache(List<Line> cache, int centerX, int centerZ, int radius) {
+        int minChunkX = centerX - radius;
+        int maxChunkX = centerX + radius;
+        int minChunkZ = centerZ - radius;
+        int maxChunkZ = centerZ + radius;
+        int minBlockX = ChunkUtils.chunkCoordToCoord(minChunkX);
+        int maxBlockX = ChunkUtils.chunkCoordToCoord(maxChunkX + 1);
+        int minBlockZ = ChunkUtils.chunkCoordToCoord(minChunkZ);
+        int maxBlockZ = ChunkUtils.chunkCoordToCoord(maxChunkZ + 1);
+        cache.add(new Line(minBlockX, minBlockZ, maxBlockX, minBlockZ));
+        cache.add(new Line(minBlockX, minBlockZ, minBlockX, maxBlockZ));
+        cache.add(new Line(maxBlockX, minBlockZ, maxBlockX, maxBlockZ));
+        cache.add(new Line(minBlockX, maxBlockZ, maxBlockX, maxBlockZ));
     }
 
     void clearCaches() {

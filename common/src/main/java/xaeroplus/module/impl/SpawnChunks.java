@@ -1,7 +1,5 @@
 package xaeroplus.module.impl;
 
-import it.unimi.dsi.fastutil.longs.Long2LongMap;
-import it.unimi.dsi.fastutil.longs.Long2LongMaps;
 import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceKey;
@@ -19,27 +17,8 @@ public class SpawnChunks extends SpawnChunksBase {
     }
 
     @Override
-    public Long2LongMap entityProcessing(ResourceKey<Level> dimension) {
-        if (dimension != Level.OVERWORLD) return Long2LongMaps.EMPTY_MAP;
-        return entityProcessingCache;
-    }
-
-    @Override
-    public Long2LongMap redstoneProcessing(ResourceKey<Level> dimension) {
-        if (dimension != Level.OVERWORLD) return Long2LongMaps.EMPTY_MAP;
-        return redstoneProcessingCache;
-    }
-
-    @Override
-    public Long2LongMap lazyChunks(ResourceKey<Level> dimension) {
-        if (dimension != Level.OVERWORLD) return Long2LongMaps.EMPTY_MAP;
-        return lazyChunksCache;
-    }
-
-    @Override
-    public Long2LongMap outerChunks(ResourceKey<Level> dimension) {
-        if (dimension != Level.OVERWORLD) return Long2LongMaps.EMPTY_MAP;
-        return outerChunksCache;
+    public ResourceKey<Level> dimension() {
+        return Level.OVERWORLD;
     }
 
     @Override

@@ -622,17 +622,6 @@ public final class Settings extends SettingRegistry {
                 ModuleManager.getModule(SpawnChunksPlayer.class).setOuterChunksColor(b.getColor());
             }),
         SettingLocation.OVERLAYS);
-    public final DoubleSetting spawnChunksAlphaSetting = register(
-        DoubleSetting.create(
-            "Spawn Chunks Opacity",
-            "xaeroplus.setting.spawn_chunks_opacity",
-            0, 255, 10,
-            100,
-            (b) -> {
-                ModuleManager.getModule(SpawnChunks.class).setAlpha((int) b);
-                ModuleManager.getModule(SpawnChunksPlayer.class).setAlpha((int) b);
-            }),
-        SettingLocation.OVERLAYS);
     public final BooleanSetting nullOverworldDimensionFolder = register(
         BooleanSetting.create(
             "null OW Dim Dir",

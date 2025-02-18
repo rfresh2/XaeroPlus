@@ -21,6 +21,8 @@ public class ModuleManager {
             new Portals(),
             new PortalSkipDetection(),
             new RenderDistance(),
+            new SpawnChunks(),
+            new SpawnChunksPlayer(),
             new TickTaskExecutor(),
             new WaystoneSync(),
             new WorldBorder(),

@@ -65,44 +65,25 @@ public final class AtlasWaypointImport {
                     return v1;
                 }
             ));
-        ResourceKey<Level> currentWaypointWorldDim = currentWorld.getDimId();
-        ResourceKey<Level> altDim = Objects.equals(currentWaypointWorldDim, Level.OVERWORLD)
-            ? Level.END
-            : Level.OVERWORLD;
-        var rootContainer = minimapSession.getWorldManager().getCurrentRootContainer();
-        MinimapWorld altWorld = null;
-        for (MinimapWorld world : rootContainer.getWorlds()) {
-            if (world.getDimId() == altDim) {
-                altWorld = world;
-            }
+        MinimapWorld owMinimapWorld = getMinimapWorld(Level.OVERWORLD);
+        MinimapWorld endMinimapWorld = getMinimapWorld(Level.END);
+
+        if (owMinimapWorld.getWaypointSet("atlas") != null) {
+            owMinimapWorld.getWaypointSet("atlas").clear();
+        } else {
+            owMinimapWorld.addWaypointSet("atlas");
         }
-        if (altWorld == null) {
-            String waystoneDimensionDirectoryName = minimapSession.getDimensionHelper().getDimensionDirectoryName(altDim);
-            String waystoneWpWorldNode = minimapSession.getWorldStateUpdater().getPotentialWorldNode(altDim, true);
-            XaeroPath waystoneWpContainerPath = minimapSession.getWorldState()
-                .getAutoRootContainerPath()
-                .resolve(waystoneDimensionDirectoryName)
-                .resolve(waystoneWpWorldNode);
-            altWorld = minimapSession.getWorldManager().getWorld(waystoneWpContainerPath);
-        }
-        if (currentWorld.getWaypointSet("atlas") != null) {
-            currentWorld.getWaypointSet("atlas").clear();
-        }
-        if (altWorld.getWaypointSet("atlas") != null) {
-            altWorld.getWaypointSet("atlas").clear();
+        if (endMinimapWorld.getWaypointSet("atlas") != null) {
+            endMinimapWorld.getWaypointSet("atlas").clear();
+        } else {
+            endMinimapWorld.addWaypointSet("atlas");
         }
         int addedWaypoints = 0;
         for (var atlasWp : atlasByDimension.entrySet()) {
             ResourceKey<Level> dim = atlasWp.getKey();
             List<AtlasWaypoint> waypoints = atlasWp.getValue();
-            MinimapWorld world = Objects.equals(dim, currentWorld.getDimId())
-                ? currentWorld
-                : altWorld;
+            MinimapWorld world = dim == Level.OVERWORLD ? owMinimapWorld : endMinimapWorld;
             WaypointSet waypointSet = world.getWaypointSet("atlas");
-            if (waypointSet == null) {
-                world.addWaypointSet("atlas");
-                waypointSet = world.getWaypointSet("atlas");
-            }
             for (var waypoint : waypoints) {
                 Waypoint wp = new Waypoint(
                     waypoint.x,
@@ -143,6 +124,33 @@ public final class AtlasWaypointImport {
             XaeroPlus.LOGGER.error("Failed to get Atlas API response", e);
             return Collections.emptyList();
         }
+    }
+
+    private static MinimapWorld getMinimapWorld(ResourceKey<Level> dim) {
+        MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
+        MinimapWorld currentWorld = minimapSession.getWorldManager().getCurrentWorld();
+        ResourceKey<Level> currentWaypointWorldDim = currentWorld.getDimId();
+        if (currentWaypointWorldDim == dim) {
+            return currentWorld;
+        }
+        var rootContainer = minimapSession.getWorldManager().getCurrentRootContainer();
+        MinimapWorld minimapWorld = null;
+        for (MinimapWorld world : rootContainer.getWorlds()) {
+            if (world.getDimId() == dim) {
+                minimapWorld = world;
+                break;
+            }
+        }
+        if (minimapWorld == null) {
+            String waystoneDimensionDirectoryName = minimapSession.getDimensionHelper().getDimensionDirectoryName(dim);
+            String waystoneWpWorldNode = minimapSession.getWorldStateUpdater().getPotentialWorldNode(dim, true);
+            XaeroPath waystoneWpContainerPath = minimapSession.getWorldState()
+                .getAutoRootContainerPath()
+                .resolve(waystoneDimensionDirectoryName)
+                .resolve(waystoneWpWorldNode);
+            minimapWorld = minimapSession.getWorldManager().getWorld(waystoneWpContainerPath);
+        }
+        return minimapWorld;
     }
 
 

@@ -2,8 +2,9 @@ package xaeroplus.feature.render;
 
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import net.minecraft.client.Minecraft;
 import xaeroplus.Globals;
+import xaeroplus.module.ModuleManager;
+import xaeroplus.module.impl.TickTaskExecutor;
 import xaeroplus.util.ChunkUtils;
 
 import java.util.Collections;
@@ -21,7 +22,7 @@ public class LineDrawFeature {
         this.lineRenderCache = Caffeine.newBuilder()
             .expireAfterWrite(10, TimeUnit.SECONDS)
             .refreshAfterWrite(refreshIntervalMs, TimeUnit.MILLISECONDS)
-            .executor(Minecraft.getInstance())
+            .executor(ModuleManager.getModule(TickTaskExecutor.class))
             .buildAsync(k -> loadLinesInWindow());
     }
 

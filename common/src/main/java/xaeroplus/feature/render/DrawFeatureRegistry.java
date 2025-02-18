@@ -17,7 +17,12 @@ public class DrawFeatureRegistry {
     private final List<String> sortedLineKeySet = new ArrayList<>();
 
     public synchronized void registerDirectChunkHighlightProvider(String id, DirectChunkHighlightSupplier chunkHighlightSupplier, IntSupplier colorSupplier) {
-        registerChunkHighlightDrawFeature(id, new DirectChunkHighlightDrawFeature(new DirectChunkHighlightProvider(chunkHighlightSupplier, colorSupplier)));
+        registerChunkHighlightDrawFeature(id, new DirectChunkHighlightDrawFeature(new DirectChunkHighlightProvider(chunkHighlightSupplier, colorSupplier), false));
+    }
+
+    // refresh render buffers every tick instead of lazily
+    public synchronized void registerDirectChunkHighlightProvider(String id, boolean refreshEveryTick, DirectChunkHighlightSupplier chunkHighlightSupplier, IntSupplier colorSupplier) {
+        registerChunkHighlightDrawFeature(id, new DirectChunkHighlightDrawFeature(new DirectChunkHighlightProvider(chunkHighlightSupplier, colorSupplier), refreshEveryTick));
     }
 
     public synchronized void registerAsyncChunkHighlightProvider(String id, AsyncChunkHighlightSupplier chunkHighlightSupplier, IntSupplier colorSupplier) {

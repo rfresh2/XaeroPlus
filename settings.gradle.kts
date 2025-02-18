@@ -8,7 +8,7 @@ pluginManagement {
 	}
 }
 gradle.extra.apply {
-	set("mod_version", "2.26.2")
+	set("mod_version", "2.26.3")
 	set("minecraft_version", "1.19.4")
 	set("parchment_version", "2023.06.26")
     set("worldmap_version_fabric", "1.39.2")
@@ -29,7 +29,7 @@ dependencyResolutionManagement {
             library("minimap-forge", "curse.maven:xaeros-minimap-263420:6184426")
 			library("mixinextras-common", "io.github.llamalad7:mixinextras-common:0.4.1")
 			library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.4.1")
-			library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.1.8")
+			library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.0")
 			library("lambdaEvents", "net.lenni0451:LambdaEvents:2.4.2")
 			library("waystones-fabric", "maven.modrinth:waystones:13.1.0+fabric-1.19.4")
 			library("waystones-forge", "maven.modrinth:waystones:13.1.0+forge-1.19.4")

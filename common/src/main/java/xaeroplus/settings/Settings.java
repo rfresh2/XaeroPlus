@@ -24,20 +24,10 @@ public final class Settings extends SettingRegistry {
     /**
      * The order settings are defined here determines the order in the settings GUI's.
      */
-    public final BooleanSetting minimapFpsLimiter = register(
-        BooleanSetting.create(
-            "Minimap FPS Limiter",
-            "xaeroplus.setting.fps_limiter",
-            false,
-            (b) -> ModuleManager.getModule(FpsLimiter.class).setEnabled(b)),
-        SettingLocation.MINIMAP_MAIN);
-    public final DoubleSetting minimapFpsLimit = register(
-        DoubleSetting.create(
-            "Minimap FPS Limit",
-            "xaeroplus.setting.fps_limiter_limit",
-            5, 120, 5,
-            60),
-        SettingLocation.MINIMAP_MAIN);
+
+    /**
+     * WorldMap Main
+     */
     public final BooleanSetting fastMapSetting = register(
         BooleanSetting.create(
             "Fast Mapping",
@@ -217,6 +207,79 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.cross_dimension_cursor_coordinates",
             false),
         SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting owAutoWaypointDimension = register(
+        BooleanSetting.create(
+            "Prefer Overworld Waypoints",
+            "xaeroplus.setting.ow_auto_waypoint_dimension",
+            false),
+        SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting showWaypointDistances = register(
+        BooleanSetting.create(
+            "Show Waypoint Distances",
+            "xaeroplus.setting.show_waypoint_distances",
+            true),
+        SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting nullOverworldDimensionFolder = register(
+        BooleanSetting.create(
+            "null OW Dim Dir",
+            "xaeroplus.setting.null_overworld_dimension_folder",
+            true,
+            Globals::setNullOverworldDimFolderIfAble,
+            () -> false),
+        SettingLocation.WORLD_MAP_MAIN);
+    public final EnumSetting<DataFolderResolutionMode> dataFolderResolutionMode = register(
+        EnumSetting.create(
+            "Data Dir Mode",
+            "xaeroplus.setting.data_folder_resolution_mode",
+            DataFolderResolutionMode.values(),
+            DataFolderResolutionMode.IP,
+            Globals::setDataFolderResolutionModeIfAble),
+        SettingLocation.WORLD_MAP_MAIN);
+    public enum DataFolderResolutionMode implements TranslatableSettingEnum {
+        IP("xaeroplus.setting.data_folder_resolution_mode.ip"),
+        SERVER_NAME("xaeroplus.setting.data_folder_resolution_mode.server_name"),
+        BASE_DOMAIN("xaeroplus.setting.data_folder_resolution_mode.base_domain");
+
+        private final String translationKey;
+
+        DataFolderResolutionMode(final String translationKey) {
+            this.translationKey = translationKey;
+        }
+
+        @Override
+        public String getTranslationKey() {
+            return translationKey;
+        }
+    }
+    public final BooleanSetting netherCaveFix = register(
+        BooleanSetting.create(
+            "Nether Cave Fix",
+            "xaeroplus.setting.nether_cave_fix",
+            true),
+        SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting disableXaeroInternetAccess = register(
+        BooleanSetting.create(
+            "Disable Xaero Internet Access",
+            "xaeroplus.setting.disable_internet",
+            false),
+        SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting expandSettingEntries = register(
+        BooleanSetting.create(
+            "Expanded Setting Entries",
+            "xaeroplus.setting.expanded_settings",
+            false),
+        SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting sodiumSettingIntegration = register(
+        BooleanSetting.create(
+            "Sodium/Embeddium Setting Integration",
+            "xaeroplus.setting.sodium_embeddium_integration",
+            true),
+        SettingLocation.WORLD_MAP_MAIN);
+
+    /**
+     * Chunk Highlights
+     */
+
     public final BooleanSetting paletteNewChunksEnabledSetting = register(
         BooleanSetting.create(
             "Palette NewChunks",
@@ -507,6 +570,11 @@ public final class Settings extends SettingRegistry {
             (b) -> ModuleManager.getModule(PortalSkipDetection.class).setOldChunksInverse(b),
             () -> ModuleManager.getModule(PortalSkipDetection.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
+
+    /**
+     * Overlays
+     */
+
     public final BooleanSetting highwayHighlightsSetting = register(
         BooleanSetting.create(
             "2b2t Highways",
@@ -558,18 +626,6 @@ public final class Settings extends SettingRegistry {
             (b) -> ModuleManager.getModule(Highways.class).setAlpha(b),
             () -> ModuleManager.getModule(Highways.class).isEnabled()),
         SettingLocation.OVERLAYS);
-    public final BooleanSetting owAutoWaypointDimension = register(
-        BooleanSetting.create(
-            "Prefer Overworld Waypoints",
-            "xaeroplus.setting.ow_auto_waypoint_dimension",
-            false),
-        SettingLocation.WORLD_MAP_MAIN);
-    public final BooleanSetting showWaypointDistances = register(
-        BooleanSetting.create(
-            "Show Waypoint Distances",
-            "xaeroplus.setting.show_waypoint_distances",
-            true),
-        SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting showRenderDistanceSetting = register(
         BooleanSetting.create(
             "Show Render Distance",
@@ -662,39 +718,30 @@ public final class Settings extends SettingRegistry {
             },
             () -> ModuleManager.getModule(SpawnChunks.class).isEnabled() || ModuleManager.getModule(SpawnChunksPlayer.class).isEnabled()),
         SettingLocation.OVERLAYS);
-    public final BooleanSetting nullOverworldDimensionFolder = register(
+
+    /**
+     * Minimap Main
+     */
+
+    public final BooleanSetting minimapFpsLimiter = register(
         BooleanSetting.create(
-            "null OW Dim Dir",
-            "xaeroplus.setting.null_overworld_dimension_folder",
-            true,
-            Globals::setNullOverworldDimFolderIfAble,
-            () -> false),
-        SettingLocation.WORLD_MAP_MAIN);
-    public final EnumSetting<DataFolderResolutionMode> dataFolderResolutionMode = register(
-        EnumSetting.create(
-            "Data Dir Mode",
-            "xaeroplus.setting.data_folder_resolution_mode",
-            DataFolderResolutionMode.values(),
-            DataFolderResolutionMode.IP,
-            Globals::setDataFolderResolutionModeIfAble),
-        SettingLocation.WORLD_MAP_MAIN);
+            "Minimap FPS Limiter",
+            "xaeroplus.setting.fps_limiter",
+            false,
+            (b) -> ModuleManager.getModule(FpsLimiter.class).setEnabled(b)),
+        SettingLocation.MINIMAP_MAIN);
+    public final DoubleSetting minimapFpsLimit = register(
+        DoubleSetting.create(
+            "Minimap FPS Limit",
+            "xaeroplus.setting.fps_limiter_limit",
+            5, 120, 5,
+            60),
+        SettingLocation.MINIMAP_MAIN);
 
-    public enum DataFolderResolutionMode implements TranslatableSettingEnum {
-        IP("xaeroplus.setting.data_folder_resolution_mode.ip"),
-        SERVER_NAME("xaeroplus.setting.data_folder_resolution_mode.server_name"),
-        BASE_DOMAIN("xaeroplus.setting.data_folder_resolution_mode.base_domain");
+    /**
+     * Minimap View
+     */
 
-        private final String translationKey;
-
-        DataFolderResolutionMode(final String translationKey) {
-            this.translationKey = translationKey;
-        }
-
-        @Override
-        public String getTranslationKey() {
-            return translationKey;
-        }
-    }
     public final BooleanSetting transparentMinimapBackground = register(
         BooleanSetting.create(
             "Transparent Background",
@@ -717,51 +764,11 @@ public final class Settings extends SettingRegistry {
             1,
             (b) -> Globals.shouldResetFBO = true),
         SettingLocation.MINIMAP_VIEW);
-    public final BooleanSetting switchToNetherSetting = register(
-        BooleanSetting.create(
-            "Switch to Nether",
-            "xaeroplus.keybind.switch_to_nether",
-            false,
-            (b) -> Globals.switchToDimension(NETHER)),
-        SettingLocation.KEYBINDS);
-    public final BooleanSetting switchToOverworldSetting = register(
-        BooleanSetting.create(
-            "Switch to Overworld",
-            "xaeroplus.keybind.switch_to_overworld",
-            false,
-            (b) -> Globals.switchToDimension(OVERWORLD)),
-        SettingLocation.KEYBINDS);
-    public final BooleanSetting switchToEndSetting = register(
-        BooleanSetting.create(
-            "Switch to End",
-            "xaeroplus.keybind.switch_to_end",
-            false,
-            (b) -> Globals.switchToDimension(END)),
-        SettingLocation.KEYBINDS);
-    public final BooleanSetting worldMapBaritoneGoalHereKeybindSetting = register(
-        BooleanSetting.create(
-            "WorldMap Baritone Goal Here",
-            "xaeroplus.keybind.world_map_baritone_goal_here",
-            false),
-        SettingLocation.KEYBINDS);
-    public final BooleanSetting worldMapBaritonePathHereKeybindSetting = register(
-        BooleanSetting.create(
-            "WorldMap Baritone Path Here",
-            "xaeroplus.keybind.world_map_baritone_path_here",
-            false),
-        SettingLocation.KEYBINDS);
-    public final BooleanSetting worldMapBaritoneElytraHereKeybindSetting = register(
-        BooleanSetting.create(
-            "WorldMap Baritone Elytra Here",
-            "xaeroplus.keybind.world_map_baritone_elytra_here",
-            false),
-        SettingLocation.KEYBINDS);
-    public final BooleanSetting netherCaveFix = register(
-        BooleanSetting.create(
-            "Nether Cave Fix",
-            "xaeroplus.setting.nether_cave_fix",
-            true),
-        SettingLocation.WORLD_MAP_MAIN);
+
+    /**
+     * Minimap Entity Radar
+     */
+
     public final BooleanSetting alwaysRenderPlayerWithNameOnRadar = register(
         BooleanSetting.create(
             "Always Render Player Name",
@@ -780,6 +787,25 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.fix_main_entity_dot",
             true),
         SettingLocation.MINIMAP_ENTITY_RADAR);
+    public final BooleanSetting radarHideInvisibleEntities = register(
+        BooleanSetting.create(
+            "Hide Invisible Entities",
+            "xaeroplus.setting.radar_hide_invisible_entities",
+            true,
+            (b) -> {
+                if (!Globals.minimapSettingsInitialized) return;
+                try {
+                    HudMod.INSTANCE.getSettings().radarHideInvisibleEntities = b;
+                } catch (Exception e) {
+                    XaeroPlus.LOGGER.error("Error updating radarHideInvisibleEntities", e);
+                }
+            }),
+        SettingLocation.MINIMAP_ENTITY_RADAR);
+
+    /**
+     * Minimap Waypoints
+     */
+
     public final BooleanSetting waypointBeacons = register(
         BooleanSetting.create(
             "Waypoint Beacons",
@@ -832,36 +858,48 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.disable_receiving_waypoints",
             false),
         SettingLocation.MINIMAP_WAYPOINTS);
-    public final BooleanSetting disableXaeroInternetAccess = register(
+
+    /**
+     * Keybinds (hidden toggles)
+     */
+
+    public final BooleanSetting switchToNetherSetting = register(
         BooleanSetting.create(
-            "Disable Xaero Internet Access",
-            "xaeroplus.setting.disable_internet",
+            "Switch to Nether",
+            "xaeroplus.keybind.switch_to_nether",
+            false,
+            (b) -> Globals.switchToDimension(NETHER)),
+        SettingLocation.KEYBINDS);
+    public final BooleanSetting switchToOverworldSetting = register(
+        BooleanSetting.create(
+            "Switch to Overworld",
+            "xaeroplus.keybind.switch_to_overworld",
+            false,
+            (b) -> Globals.switchToDimension(OVERWORLD)),
+        SettingLocation.KEYBINDS);
+    public final BooleanSetting switchToEndSetting = register(
+        BooleanSetting.create(
+            "Switch to End",
+            "xaeroplus.keybind.switch_to_end",
+            false,
+            (b) -> Globals.switchToDimension(END)),
+        SettingLocation.KEYBINDS);
+    public final BooleanSetting worldMapBaritoneGoalHereKeybindSetting = register(
+        BooleanSetting.create(
+            "WorldMap Baritone Goal Here",
+            "xaeroplus.keybind.world_map_baritone_goal_here",
             false),
-        SettingLocation.WORLD_MAP_MAIN);
-    public final BooleanSetting radarHideInvisibleEntities = register(
+        SettingLocation.KEYBINDS);
+    public final BooleanSetting worldMapBaritonePathHereKeybindSetting = register(
         BooleanSetting.create(
-            "Hide Invisible Entities",
-            "xaeroplus.setting.radar_hide_invisible_entities",
-            true,
-            (b) -> {
-                if (!Globals.minimapSettingsInitialized) return;
-                try {
-                    HudMod.INSTANCE.getSettings().radarHideInvisibleEntities = b;
-                } catch (Exception e) {
-                    XaeroPlus.LOGGER.error("Error updating radarHideInvisibleEntities", e);
-                }
-            }),
-        SettingLocation.MINIMAP_ENTITY_RADAR);
-    public final BooleanSetting expandSettingEntries = register(
-        BooleanSetting.create(
-            "Expanded Setting Entries",
-            "xaeroplus.setting.expanded_settings",
+            "WorldMap Baritone Path Here",
+            "xaeroplus.keybind.world_map_baritone_path_here",
             false),
-        SettingLocation.WORLD_MAP_MAIN);
-    public final BooleanSetting sodiumSettingIntegration = register(
+        SettingLocation.KEYBINDS);
+    public final BooleanSetting worldMapBaritoneElytraHereKeybindSetting = register(
         BooleanSetting.create(
-            "Sodium/Embeddium Setting Integration",
-            "xaeroplus.setting.sodium_embeddium_integration",
-            true),
-        SettingLocation.WORLD_MAP_MAIN);
+            "WorldMap Baritone Elytra Here",
+            "xaeroplus.keybind.world_map_baritone_elytra_here",
+            false),
+        SettingLocation.KEYBINDS);
 }

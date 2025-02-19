@@ -19,12 +19,14 @@ import xaeroplus.settings.Settings;
 
 
 @Mixin(value = ModSettings.class, remap = false)
-public class MixinMinimapModSettings {
+public abstract class MixinMinimapModSettings {
 
     @Shadow
     public int caveMaps;
     @Shadow
     protected IXaeroMinimap modMain;
+
+    @Shadow protected abstract void refreshScreen();
 
     @Inject(method = "<init>", at = @At(value = "RETURN"))
     private void init(CallbackInfo ci) {
@@ -73,6 +75,7 @@ public class MixinMinimapModSettings {
     @Inject(method = "setOptionValue", at = @At("HEAD"))
     public void setOptionValue(ModOptions o, Object value, final CallbackInfo ci) {
         SettingHooks.setOptionValue(o.getEnumString(), value);
+        refreshScreen();
     }
 
     @Inject(method = "getOptionValue", at = @At("HEAD"), cancellable = true)
@@ -83,6 +86,7 @@ public class MixinMinimapModSettings {
     @Inject(method = "setOptionDoubleValue", at = @At("HEAD"))
     public void setOptionFloatValue(ModOptions o, double f, CallbackInfo ci) {
         SettingHooks.setOptionDoubleValue(o.getEnumString(), f);
+        refreshScreen();
     }
 
     @Inject(method = "getOptionDoubleValue", at = @At("HEAD"), cancellable = true)

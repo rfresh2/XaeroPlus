@@ -74,6 +74,22 @@ public class DoubleSetting extends XaeroPlusSetting {
                                        double valueMax,
                                        double valueStep,
                                        double defaultValue,
+                                       BooleanSupplier visibilitySupplier) {
+        return new DoubleSetting(
+            SETTING_PREFIX + settingName,
+            settingNameTranslationKey,
+            buildTooltipTranslationKey(settingNameTranslationKey),
+            null,
+            valueMin, valueMax, valueStep, defaultValue, null, visibilitySupplier
+        );
+    }
+
+    public static DoubleSetting create(String settingName,
+                                       String settingNameTranslationKey,
+                                       double valueMin,
+                                       double valueMax,
+                                       double valueStep,
+                                       double defaultValue,
                                        DoubleConsumer changeConsumer,
                                        BooleanSupplier visibilitySupplier) {
         return new DoubleSetting(

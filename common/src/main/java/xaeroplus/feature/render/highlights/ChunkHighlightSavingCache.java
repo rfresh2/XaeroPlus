@@ -16,7 +16,6 @@ import xaero.map.gui.GuiMap;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
-import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
 
 import java.io.Closeable;
@@ -323,7 +322,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         // this does make the update interval setting kind of a lie, but its for the best
         int jitter = ThreadLocalRandom.current().nextInt(0, 10);
         // only update window on an interval
-        if (++tickCounter < Settings.REGISTRY.cacheWindowUpdateInterval.getAsInt() + jitter) {
+        if (++tickCounter < 10 + jitter) {
             return;
         }
         tickCounter = 0;

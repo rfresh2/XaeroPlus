@@ -24,20 +24,10 @@ public final class Settings extends SettingRegistry {
     /**
      * The order settings are defined here determines the order in the settings GUI's.
      */
-    public final BooleanSetting minimapFpsLimiter = register(
-        BooleanSetting.create(
-            "Minimap FPS Limiter",
-            "xaeroplus.setting.fps_limiter",
-            false,
-            (b) -> ModuleManager.getModule(FpsLimiter.class).setEnabled(b)),
-        SettingLocation.MINIMAP_MAIN);
-    public final DoubleSetting minimapFpsLimit = register(
-        DoubleSetting.create(
-            "Minimap FPS Limit",
-            "xaeroplus.setting.fps_limiter_limit",
-            5, 120, 5,
-            60),
-        SettingLocation.MINIMAP_MAIN);
+
+    /**
+     * WorldMap Main
+     */
     public final BooleanSetting fastMapSetting = register(
         BooleanSetting.create(
             "Fast Mapping",
@@ -49,14 +39,16 @@ public final class Settings extends SettingRegistry {
             "Fast Mapping Delay",
             "xaeroplus.setting.fast_mapping_delay",
             10, 1000, 10,
-            250),
+            250,
+            fastMapSetting::get),
         SettingLocation.WORLD_MAP_MAIN);
     public final DoubleSetting fastMapMaxTilesPerCycle = register(
         DoubleSetting.create(
             "Fast Mapping Rate Limit",
             "xaeroplus.setting.fast_mapping_rate_limit",
             10, 120, 10,
-            25),
+            25,
+            fastMapSetting::get),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting fastZipWrite = register(
         BooleanSetting.create(
@@ -102,7 +94,7 @@ public final class Settings extends SettingRegistry {
             (b) -> {
                 if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setColor(b);
             },
-            WaystonesHelper::isAnyWaystonesPresent),
+            () -> WaystonesHelper.isAnyWaystonesPresent() && ModuleManager.getModule(WaystoneSync.class).isEnabled()),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting waystoneWaypointSetSetting = register(
         BooleanSetting.create(
@@ -112,7 +104,7 @@ public final class Settings extends SettingRegistry {
             (b) -> {
                 if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setWaypointSet(b);
             },
-            WaystonesHelper::isAnyWaystonesPresent),
+            () -> WaystonesHelper.isAnyWaystonesPresent() && ModuleManager.getModule(WaystoneSync.class).isEnabled()),
         SettingLocation.WORLD_MAP_MAIN);
     public final EnumSetting<WaystoneWpVisibilityType> waystoneWaypointVisibilityModeSetting = register(
         EnumSetting.create(
@@ -123,7 +115,7 @@ public final class Settings extends SettingRegistry {
             (mode) -> {
                 if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setVisibilityType(mode.ordinal());
             },
-            WaystonesHelper::isAnyWaystonesPresent),
+            () -> WaystonesHelper.isAnyWaystonesPresent() && ModuleManager.getModule(WaystoneSync.class).isEnabled()),
         SettingLocation.WORLD_MAP_MAIN);
     public enum WaystoneWpVisibilityType implements TranslatableSettingEnum {
         // order here must mirror xaero's visibility enum
@@ -175,7 +167,8 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.transparent_obsidian_roof_y",
             0, 320, 1,
             250,
-            (v) -> markChunksDirtyInWriteDistance()),
+            (v) -> markChunksDirtyInWriteDistance(),
+            transparentObsidianRoofSetting::get),
         SettingLocation.WORLD_MAP_MAIN);
     public final DoubleSetting transparentObsidianRoofDarkeningSetting = register(
         DoubleSetting.create(
@@ -183,7 +176,8 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.transparent_obsidian_roof_darkening",
             0, 255, 5,
             150,
-            (v) -> markChunksDirtyInWriteDistance()),
+            (v) -> markChunksDirtyInWriteDistance(),
+            transparentObsidianRoofSetting::get),
         SettingLocation.WORLD_MAP_MAIN);
     public final DoubleSetting transparentObsidianRoofSnowOpacitySetting = register(
         DoubleSetting.create(
@@ -191,7 +185,8 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.transparent_obsidian_roof_snow_opacity",
             0, 255, 5,
             10,
-            (v) -> markChunksDirtyInWriteDistance()),
+            (v) -> markChunksDirtyInWriteDistance(),
+            transparentObsidianRoofSetting::get),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting overlayOpacityFix = register(
         BooleanSetting.create(
@@ -212,6 +207,79 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.cross_dimension_cursor_coordinates",
             false),
         SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting owAutoWaypointDimension = register(
+        BooleanSetting.create(
+            "Prefer Overworld Waypoints",
+            "xaeroplus.setting.ow_auto_waypoint_dimension",
+            false),
+        SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting showWaypointDistances = register(
+        BooleanSetting.create(
+            "Show Waypoint Distances",
+            "xaeroplus.setting.show_waypoint_distances",
+            true),
+        SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting nullOverworldDimensionFolder = register(
+        BooleanSetting.create(
+            "null OW Dim Dir",
+            "xaeroplus.setting.null_overworld_dimension_folder",
+            true,
+            Globals::setNullOverworldDimFolderIfAble,
+            () -> false),
+        SettingLocation.WORLD_MAP_MAIN);
+    public final EnumSetting<DataFolderResolutionMode> dataFolderResolutionMode = register(
+        EnumSetting.create(
+            "Data Dir Mode",
+            "xaeroplus.setting.data_folder_resolution_mode",
+            DataFolderResolutionMode.values(),
+            DataFolderResolutionMode.IP,
+            Globals::setDataFolderResolutionModeIfAble),
+        SettingLocation.WORLD_MAP_MAIN);
+    public enum DataFolderResolutionMode implements TranslatableSettingEnum {
+        IP("xaeroplus.setting.data_folder_resolution_mode.ip"),
+        SERVER_NAME("xaeroplus.setting.data_folder_resolution_mode.server_name"),
+        BASE_DOMAIN("xaeroplus.setting.data_folder_resolution_mode.base_domain");
+
+        private final String translationKey;
+
+        DataFolderResolutionMode(final String translationKey) {
+            this.translationKey = translationKey;
+        }
+
+        @Override
+        public String getTranslationKey() {
+            return translationKey;
+        }
+    }
+    public final BooleanSetting netherCaveFix = register(
+        BooleanSetting.create(
+            "Nether Cave Fix",
+            "xaeroplus.setting.nether_cave_fix",
+            true),
+        SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting disableXaeroInternetAccess = register(
+        BooleanSetting.create(
+            "Disable Xaero Internet Access",
+            "xaeroplus.setting.disable_internet",
+            false),
+        SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting expandSettingEntries = register(
+        BooleanSetting.create(
+            "Expanded Setting Entries",
+            "xaeroplus.setting.expanded_settings",
+            false),
+        SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting sodiumSettingIntegration = register(
+        BooleanSetting.create(
+            "Sodium/Embeddium Setting Integration",
+            "xaeroplus.setting.sodium_embeddium_integration",
+            true),
+        SettingLocation.WORLD_MAP_MAIN);
+
+    /**
+     * Chunk Highlights
+     */
+
     public final BooleanSetting paletteNewChunksEnabledSetting = register(
         BooleanSetting.create(
             "Palette NewChunks",
@@ -224,7 +292,8 @@ public final class Settings extends SettingRegistry {
             "Save/Load Palette NewChunks to Disk",
             "xaeroplus.setting.palette_new_chunks_save_load_to_disk",
             true,
-            (b) -> ModuleManager.getModule(PaletteNewChunks.class).setDiskCache(b)),
+            (b) -> ModuleManager.getModule(PaletteNewChunks.class).setDiskCache(b),
+            () -> ModuleManager.getModule(PaletteNewChunks.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final DoubleSetting paletteNewChunksAlphaSetting = register(
         DoubleSetting.create(
@@ -232,7 +301,8 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.palette_new_chunks_opacity",
             0, 255, 10,
             100,
-            (b) -> ModuleManager.getModule(PaletteNewChunks.class).setAlpha(b)),
+            (b) -> ModuleManager.getModule(PaletteNewChunks.class).setAlpha(b),
+            () -> ModuleManager.getModule(PaletteNewChunks.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final EnumSetting<ColorHelper.HighlightColor> paletteNewChunksColorSetting = register(
         EnumSetting.create(
@@ -240,14 +310,16 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.palette_new_chunks_color",
             ColorHelper.HighlightColor.values(),
             ColorHelper.HighlightColor.RED,
-            (b) -> ModuleManager.getModule(PaletteNewChunks.class).setRgbColor(b.getColor())),
+            (b) -> ModuleManager.getModule(PaletteNewChunks.class).setRgbColor(b.getColor()),
+            () -> ModuleManager.getModule(PaletteNewChunks.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting paletteNewChunksRenderInverse = register(
         BooleanSetting.create(
             "Palette NewChunks Inverse",
             "xaeroplus.setting.palette_new_chunks_inverse",
             false,
-            (b) -> ModuleManager.getModule(PaletteNewChunks.class).setInverse(b)),
+            (b) -> ModuleManager.getModule(PaletteNewChunks.class).setInverse(b),
+            () -> ModuleManager.getModule(PaletteNewChunks.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting oldChunksEnabledSetting = register(
         BooleanSetting.create(
@@ -261,14 +333,16 @@ public final class Settings extends SettingRegistry {
             "OldChunks Inverse",
             "xaeroplus.setting.old_chunks_inverse",
             false,
-            (b) -> ModuleManager.getModule(OldChunks.class).setInverse(b)),
+            (b) -> ModuleManager.getModule(OldChunks.class).setInverse(b),
+            () -> ModuleManager.getModule(OldChunks.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting oldChunksSaveLoadToDisk = register(
         BooleanSetting.create(
             "Save/Load OldChunks to Disk",
             "xaeroplus.setting.old_chunks_save_load_to_disk",
             true,
-            (b) -> ModuleManager.getModule(OldChunks.class).setDiskCache(b)),
+            (b) -> ModuleManager.getModule(OldChunks.class).setDiskCache(b),
+            () -> ModuleManager.getModule(OldChunks.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final DoubleSetting oldChunksAlphaSetting = register(
         DoubleSetting.create(
@@ -276,7 +350,8 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.old_chunks_opacity",
             0, 255, 10,
             100,
-            (b) -> ModuleManager.getModule(OldChunks.class).setAlpha(b)),
+            (b) -> ModuleManager.getModule(OldChunks.class).setAlpha(b),
+            () -> ModuleManager.getModule(OldChunks.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final EnumSetting<ColorHelper.HighlightColor> oldChunksColorSetting = register(
         EnumSetting.create(
@@ -284,7 +359,8 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.old_chunks_color",
             ColorHelper.HighlightColor.values(),
             ColorHelper.HighlightColor.YELLOW,
-            (b) -> ModuleManager.getModule(OldChunks.class).setRgbColor(b.getColor())),
+            (b) -> ModuleManager.getModule(OldChunks.class).setRgbColor(b.getColor()),
+            () -> ModuleManager.getModule(OldChunks.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting portalsEnabledSetting = register(
         BooleanSetting.create(
@@ -298,7 +374,8 @@ public final class Settings extends SettingRegistry {
             "Save/Load Portals to Disk",
             "xaeroplus.setting.portals_save_load_to_disk",
             true,
-            (b) -> ModuleManager.getModule(Portals.class).setDiskCache(b)),
+            (b) -> ModuleManager.getModule(Portals.class).setDiskCache(b),
+            () -> ModuleManager.getModule(Portals.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final DoubleSetting portalsAlphaSetting = register(
         DoubleSetting.create(
@@ -306,7 +383,8 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.portals_opacity",
             0, 255, 10,
             100,
-            (b) -> ModuleManager.getModule(Portals.class).setAlpha(b)),
+            (b) -> ModuleManager.getModule(Portals.class).setAlpha(b),
+            () -> ModuleManager.getModule(Portals.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final EnumSetting<ColorHelper.HighlightColor> portalsColorSetting = register(
         EnumSetting.create(
@@ -314,7 +392,8 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.portals_color",
             ColorHelper.HighlightColor.values(),
             ColorHelper.HighlightColor.MAGENTA,
-            (b) -> ModuleManager.getModule(Portals.class).setRgbColor(b.getColor())),
+            (b) -> ModuleManager.getModule(Portals.class).setRgbColor(b.getColor()),
+            () -> ModuleManager.getModule(Portals.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting oldBiomesSetting = register(
         BooleanSetting.create(
@@ -328,7 +407,8 @@ public final class Settings extends SettingRegistry {
             "Save/Load OldBiomes To Disk",
             "xaeroplus.setting.old_biomes_save_load_to_disk",
             true,
-            (b) -> ModuleManager.getModule(OldBiomes.class).setDiskCache(b)),
+            (b) -> ModuleManager.getModule(OldBiomes.class).setDiskCache(b),
+            () -> ModuleManager.getModule(OldBiomes.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final DoubleSetting oldBiomesAlphaSetting = register(
         DoubleSetting.create(
@@ -336,7 +416,8 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.old_biomes_opacity",
             0, 255, 10,
             100,
-            (b) -> ModuleManager.getModule(OldBiomes.class).setAlpha(b)),
+            (b) -> ModuleManager.getModule(OldBiomes.class).setAlpha(b),
+            () -> ModuleManager.getModule(OldBiomes.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final EnumSetting<ColorHelper.HighlightColor> oldBiomesColorSetting = register(
         EnumSetting.create(
@@ -344,7 +425,8 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.old_biomes_color",
             ColorHelper.HighlightColor.values(),
             ColorHelper.HighlightColor.GREEN,
-            (b) -> ModuleManager.getModule(OldBiomes.class).setRgbColor(b.getColor())),
+            (b) -> ModuleManager.getModule(OldBiomes.class).setRgbColor(b.getColor()),
+            () -> ModuleManager.getModule(OldBiomes.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting liquidNewChunksEnabledSetting = register(
         BooleanSetting.create(
@@ -358,7 +440,8 @@ public final class Settings extends SettingRegistry {
             "Save/Load NewChunks to Disk",
             "xaeroplus.setting.new_chunks_save_load_to_disk",
             true,
-            (b) -> ModuleManager.getModule(LiquidNewChunks.class).setDiskCache(b)),
+            (b) -> ModuleManager.getModule(LiquidNewChunks.class).setDiskCache(b),
+            () -> ModuleManager.getModule(LiquidNewChunks.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final DoubleSetting liquidNewChunksAlphaSetting = register(
         DoubleSetting.create(
@@ -366,7 +449,8 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.new_chunks_opacity",
             0, 255, 10,
             100,
-            (b) -> ModuleManager.getModule(LiquidNewChunks.class).setAlpha(b)),
+            (b) -> ModuleManager.getModule(LiquidNewChunks.class).setAlpha(b),
+            () -> ModuleManager.getModule(LiquidNewChunks.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final EnumSetting<ColorHelper.HighlightColor> liquidNewChunksColorSetting = register(
         EnumSetting.create(
@@ -374,14 +458,16 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.new_chunks_color",
             ColorHelper.HighlightColor.values(),
             ColorHelper.HighlightColor.RED,
-            (b) -> ModuleManager.getModule(LiquidNewChunks.class).setRgbColor(b.getColor())),
+            (b) -> ModuleManager.getModule(LiquidNewChunks.class).setRgbColor(b.getColor()),
+            () -> ModuleManager.getModule(LiquidNewChunks.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting liquidNewChunksInverseHighlightsSetting = register(
         BooleanSetting.create(
             "New Chunks Render Inverse",
             "xaeroplus.setting.new_chunks_inverse_enabled",
             false,
-            (b) -> ModuleManager.getModule(LiquidNewChunks.class).setInverseRenderEnabled(b)),
+            (b) -> ModuleManager.getModule(LiquidNewChunks.class).setInverseRenderEnabled(b),
+            () -> ModuleManager.getModule(LiquidNewChunks.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final EnumSetting<ColorHelper.HighlightColor> liquidNewChunksInverseColorSetting = register(
         EnumSetting.create(
@@ -389,13 +475,15 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.new_chunks_inverse_color",
             ColorHelper.HighlightColor.values(),
             ColorHelper.HighlightColor.GREEN,
-            (b) -> ModuleManager.getModule(LiquidNewChunks.class).setInverseRgbColor(b.getColor())),
+            (b) -> ModuleManager.getModule(LiquidNewChunks.class).setInverseRgbColor(b.getColor()),
+            () -> ModuleManager.getModule(LiquidNewChunks.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting liquidNewChunksOnlyAboveY0Setting = register(
         BooleanSetting.create(
             "Liquid NewChunks Only Y > 0",
             "xaeroplus.setting.new_chunks_only_above_y0",
-            false),
+            false,
+            () -> ModuleManager.getModule(LiquidNewChunks.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting worldToolsEnabledSetting = register(
         BooleanSetting.create(
@@ -412,7 +500,7 @@ public final class Settings extends SettingRegistry {
             0, 255, 10,
             100,
             (b) -> ModuleManager.getModule(WorldTools.class).setAlpha(b),
-            WorldToolsHelper::isWorldToolsPresent),
+            () -> WorldToolsHelper.isWorldToolsPresent() && ModuleManager.getModule(WorldTools.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final EnumSetting<ColorHelper.HighlightColor> worldToolsColorSetting = register(
         EnumSetting.create(
@@ -421,7 +509,7 @@ public final class Settings extends SettingRegistry {
             ColorHelper.HighlightColor.values(),
             ColorHelper.HighlightColor.GREEN,
             (b) -> ModuleManager.getModule(WorldTools.class).setRgbColor(b.getColor()),
-            WorldToolsHelper::isWorldToolsPresent),
+            () -> WorldToolsHelper.isWorldToolsPresent() && ModuleManager.getModule(WorldTools.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting portalSkipDetectionEnabledSetting = register(
         BooleanSetting.create(
@@ -436,7 +524,8 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.portal_skip_opacity",
             0, 255, 10,
             100,
-            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setAlpha(b)),
+            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setAlpha(b),
+            () -> ModuleManager.getModule(PortalSkipDetection.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final EnumSetting<ColorHelper.HighlightColor> portalSkipDetectionColorSetting = register(
         EnumSetting.create(
@@ -444,7 +533,8 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.portal_skip_color",
             ColorHelper.HighlightColor.values(),
             ColorHelper.HighlightColor.WHITE,
-            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setRgbColor(b.getColor())),
+            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setRgbColor(b.getColor()),
+            () -> ModuleManager.getModule(PortalSkipDetection.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final DoubleSetting portalSkipPortalRadius = register(
         DoubleSetting.create(
@@ -452,7 +542,8 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.portal_skip_portal_radius",
             0, 32, 1,
             15,
-            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setPortalRadius(b)),
+            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setPortalRadius(b),
+            () -> ModuleManager.getModule(PortalSkipDetection.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final DoubleSetting portalSkipDetectionSearchDelayTicksSetting = register(
         DoubleSetting.create(
@@ -460,22 +551,30 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.portal_skip_search_delay",
             0, 100, 1,
             10,
-            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setSearchDelayTicks(b)),
+            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setSearchDelayTicks(b),
+            () -> ModuleManager.getModule(PortalSkipDetection.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting portalSkipNewChunksSetting = register(
         BooleanSetting.create(
             "PortalSkip NewChunks",
             "xaeroplus.setting.portal_skip_new_chunks",
             true,
-            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setNewChunks(b)),
+            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setNewChunks(b),
+            () -> ModuleManager.getModule(PortalSkipDetection.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting portalSkipOldChunkInverseSetting = register(
         BooleanSetting.create(
             "PortalSkip OldChunks Inverse",
             "xaeroplus.setting.portal_skip_old_chunks_inverse",
             true,
-            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setOldChunksInverse(b)),
+            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setOldChunksInverse(b),
+            () -> ModuleManager.getModule(PortalSkipDetection.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
+
+    /**
+     * Overlays
+     */
+
     public final BooleanSetting highwayHighlightsSetting = register(
         BooleanSetting.create(
             "2b2t Highways",
@@ -506,7 +605,8 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.2b2t_highways_width",
             HighwayWidth.values(),
             HighwayWidth.ONE,
-            (v) -> ModuleManager.getModule(Highways.class).setWidth(v)),
+            (v) -> ModuleManager.getModule(Highways.class).setWidth(v),
+            () -> ModuleManager.getModule(Highways.class).isEnabled()),
         SettingLocation.OVERLAYS);
     public final EnumSetting<ColorHelper.HighlightColor> highwaysColorSetting = register(
         EnumSetting.create(
@@ -514,7 +614,8 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.2b2t_highways_color",
             ColorHelper.HighlightColor.values(),
             ColorHelper.HighlightColor.BLUE,
-            (b) -> ModuleManager.getModule(Highways.class).setRgbColor(b.getColor())),
+            (b) -> ModuleManager.getModule(Highways.class).setRgbColor(b.getColor()),
+            () -> ModuleManager.getModule(Highways.class).isEnabled()),
         SettingLocation.OVERLAYS);
     public final DoubleSetting highwaysColorAlphaSetting = register(
         DoubleSetting.create(
@@ -522,20 +623,9 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.2b2t_highways_opacity",
             0, 255, 10,
             100,
-            (b) -> ModuleManager.getModule(Highways.class).setAlpha(b)),
+            (b) -> ModuleManager.getModule(Highways.class).setAlpha(b),
+            () -> ModuleManager.getModule(Highways.class).isEnabled()),
         SettingLocation.OVERLAYS);
-    public final BooleanSetting owAutoWaypointDimension = register(
-        BooleanSetting.create(
-            "Prefer Overworld Waypoints",
-            "xaeroplus.setting.ow_auto_waypoint_dimension",
-            false),
-        SettingLocation.WORLD_MAP_MAIN);
-    public final BooleanSetting showWaypointDistances = register(
-        BooleanSetting.create(
-            "Show Waypoint Distances",
-            "xaeroplus.setting.show_waypoint_distances",
-            true),
-        SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting showRenderDistanceSetting = register(
         BooleanSetting.create(
             "Show Render Distance",
@@ -570,13 +660,15 @@ public final class Settings extends SettingRegistry {
         BooleanSetting.create(
             "Spawn Chunks Redstone Processing",
             "xaeroplus.setting.spawn_chunks_redstone_processing",
-            false),
+            false,
+            () -> ModuleManager.getModule(SpawnChunks.class).isEnabled() || ModuleManager.getModule(SpawnChunksPlayer.class).isEnabled()),
         SettingLocation.OVERLAYS);
     public final BooleanSetting spawnChunksOuterChunksEnabled = register(
         BooleanSetting.create(
             "Spawn Chunks Outer Chunks",
             "xaeroplus.setting.spawn_chunks_outer_chunks",
-            false),
+            false,
+            () -> ModuleManager.getModule(SpawnChunks.class).isEnabled() || ModuleManager.getModule(SpawnChunksPlayer.class).isEnabled()),
         SettingLocation.OVERLAYS);
     public final EnumSetting<ColorHelper.HighlightColor> spawnChunksEntityProcessingColor = register(
         EnumSetting.create(
@@ -587,7 +679,8 @@ public final class Settings extends SettingRegistry {
             (b) -> {
                 ModuleManager.getModule(SpawnChunks.class).setEntityProcessingColor(b.getColor());
                 ModuleManager.getModule(SpawnChunksPlayer.class).setEntityProcessingColor(b.getColor());
-            }),
+            },
+            () -> ModuleManager.getModule(SpawnChunks.class).isEnabled() || ModuleManager.getModule(SpawnChunksPlayer.class).isEnabled()),
         SettingLocation.OVERLAYS);
     public final EnumSetting<ColorHelper.HighlightColor> spawnChunksRedstoneProcessingColor = register(
         EnumSetting.create(
@@ -598,7 +691,8 @@ public final class Settings extends SettingRegistry {
             (b) -> {
                 ModuleManager.getModule(SpawnChunks.class).setRedstoneProcessingColor(b.getColor());
                 ModuleManager.getModule(SpawnChunksPlayer.class).setRedstoneProcessingColor(b.getColor());
-            }),
+            },
+            () -> ModuleManager.getModule(SpawnChunks.class).isEnabled() || ModuleManager.getModule(SpawnChunksPlayer.class).isEnabled()),
         SettingLocation.OVERLAYS);
     public final EnumSetting<ColorHelper.HighlightColor> spawnChunksLazyChunksColor = register(
         EnumSetting.create(
@@ -609,7 +703,8 @@ public final class Settings extends SettingRegistry {
             (b) -> {
                 ModuleManager.getModule(SpawnChunks.class).setLazyChunksColor(b.getColor());
                 ModuleManager.getModule(SpawnChunksPlayer.class).setLazyChunksColor(b.getColor());
-            }),
+            },
+            () -> ModuleManager.getModule(SpawnChunks.class).isEnabled() || ModuleManager.getModule(SpawnChunksPlayer.class).isEnabled()),
         SettingLocation.OVERLAYS);
     public final EnumSetting<ColorHelper.HighlightColor> spawnChunksOuterChunksColor = register(
         EnumSetting.create(
@@ -620,41 +715,33 @@ public final class Settings extends SettingRegistry {
             (b) -> {
                 ModuleManager.getModule(SpawnChunks.class).setOuterChunksColor(b.getColor());
                 ModuleManager.getModule(SpawnChunksPlayer.class).setOuterChunksColor(b.getColor());
-            }),
+            },
+            () -> ModuleManager.getModule(SpawnChunks.class).isEnabled() || ModuleManager.getModule(SpawnChunksPlayer.class).isEnabled()),
         SettingLocation.OVERLAYS);
-    public final BooleanSetting nullOverworldDimensionFolder = register(
+
+    /**
+     * Minimap Main
+     */
+
+    public final BooleanSetting minimapFpsLimiter = register(
         BooleanSetting.create(
-            "null OW Dim Dir",
-            "xaeroplus.setting.null_overworld_dimension_folder",
-            true,
-            Globals::setNullOverworldDimFolderIfAble,
-            () -> false),
-        SettingLocation.WORLD_MAP_MAIN);
-    public final EnumSetting<DataFolderResolutionMode> dataFolderResolutionMode = register(
-        EnumSetting.create(
-            "Data Dir Mode",
-            "xaeroplus.setting.data_folder_resolution_mode",
-            DataFolderResolutionMode.values(),
-            DataFolderResolutionMode.IP,
-            Globals::setDataFolderResolutionModeIfAble),
-        SettingLocation.WORLD_MAP_MAIN);
+            "Minimap FPS Limiter",
+            "xaeroplus.setting.fps_limiter",
+            false,
+            (b) -> ModuleManager.getModule(FpsLimiter.class).setEnabled(b)),
+        SettingLocation.MINIMAP_MAIN);
+    public final DoubleSetting minimapFpsLimit = register(
+        DoubleSetting.create(
+            "Minimap FPS Limit",
+            "xaeroplus.setting.fps_limiter_limit",
+            5, 120, 5,
+            60),
+        SettingLocation.MINIMAP_MAIN);
 
-    public enum DataFolderResolutionMode implements TranslatableSettingEnum {
-        IP("xaeroplus.setting.data_folder_resolution_mode.ip"),
-        SERVER_NAME("xaeroplus.setting.data_folder_resolution_mode.server_name"),
-        BASE_DOMAIN("xaeroplus.setting.data_folder_resolution_mode.base_domain");
+    /**
+     * Minimap View
+     */
 
-        private final String translationKey;
-
-        DataFolderResolutionMode(final String translationKey) {
-            this.translationKey = translationKey;
-        }
-
-        @Override
-        public String getTranslationKey() {
-            return translationKey;
-        }
-    }
     public final BooleanSetting transparentMinimapBackground = register(
         BooleanSetting.create(
             "Transparent Background",
@@ -677,6 +764,105 @@ public final class Settings extends SettingRegistry {
             1,
             (b) -> Globals.shouldResetFBO = true),
         SettingLocation.MINIMAP_VIEW);
+
+    /**
+     * Minimap Entity Radar
+     */
+
+    public final BooleanSetting alwaysRenderPlayerWithNameOnRadar = register(
+        BooleanSetting.create(
+            "Always Render Player Name",
+            "xaeroplus.setting.always_render_player_name",
+            true),
+        SettingLocation.MINIMAP_ENTITY_RADAR);
+    public final BooleanSetting alwaysRenderPlayerIconOnRadar = register(
+        BooleanSetting.create(
+            "Always Render Player Icon",
+            "xaeroplus.setting.always_render_player_icon",
+            true),
+        SettingLocation.MINIMAP_ENTITY_RADAR);
+    public final BooleanSetting fixMainEntityDot = register(
+        BooleanSetting.create(
+            "Fix Main Entity Dot",
+            "xaeroplus.setting.fix_main_entity_dot",
+            true),
+        SettingLocation.MINIMAP_ENTITY_RADAR);
+    public final BooleanSetting radarHideInvisibleEntities = register(
+        BooleanSetting.create(
+            "Hide Invisible Entities",
+            "xaeroplus.setting.radar_hide_invisible_entities",
+            true,
+            (b) -> {
+                if (!Globals.minimapSettingsInitialized) return;
+                try {
+                    HudMod.INSTANCE.getSettings().radarHideInvisibleEntities = b;
+                } catch (Exception e) {
+                    XaeroPlus.LOGGER.error("Error updating radarHideInvisibleEntities", e);
+                }
+            }),
+        SettingLocation.MINIMAP_ENTITY_RADAR);
+
+    /**
+     * Minimap Waypoints
+     */
+
+    public final BooleanSetting waypointBeacons = register(
+        BooleanSetting.create(
+            "Waypoint Beacons",
+            "xaeroplus.setting.waypoint_beacons",
+            false),
+        SettingLocation.MINIMAP_WAYPOINTS);
+    public final DoubleSetting waypointBeaconScaleMin = register(
+        DoubleSetting.create(
+            "Waypoint Beacon Scale Min",
+            "xaeroplus.setting.waypoint_beacon_scale_min",
+            0, 30, 1,
+            0,
+            waypointBeacons::get),
+        SettingLocation.MINIMAP_WAYPOINTS);
+    public final DoubleSetting waypointBeaconDistanceMin = register(
+        DoubleSetting.create(
+            "Waypoint Beacon Distance Min",
+            "xaeroplus.setting.waypoint_beacon_distance_min",
+            0, 512, 8,
+            0,
+            waypointBeacons::get),
+        SettingLocation.MINIMAP_WAYPOINTS);
+    public final BooleanSetting waypointEta = register(
+        BooleanSetting.create(
+            "Waypoint ETA",
+            "xaeroplus.setting.waypoint_eta",
+            false),
+        SettingLocation.MINIMAP_WAYPOINTS);
+    public final BooleanSetting longWaypointInitials = register(
+        BooleanSetting.create(
+            "Long Waypoint Initials",
+            "xaeroplus.setting.allow_longer_waypoint_initials",
+            false),
+        SettingLocation.MINIMAP_WAYPOINTS);
+    public final BooleanSetting disableWaypointSharing = register(
+        BooleanSetting.create(
+            "Disable Waypoint Sharing",
+            "xaeroplus.setting.disable_waypoint_sharing",
+            false),
+        SettingLocation.MINIMAP_WAYPOINTS);
+    public final BooleanSetting plainWaypointSharing = register(
+        BooleanSetting.create(
+            "Plain Waypoint Sharing",
+            "xaeroplus.setting.plain_waypoint_sharing",
+            false),
+        SettingLocation.MINIMAP_WAYPOINTS);
+    public final BooleanSetting disableReceivingWaypoints = register(
+        BooleanSetting.create(
+            "Disable Receiving Waypoints",
+            "xaeroplus.setting.disable_receiving_waypoints",
+            false),
+        SettingLocation.MINIMAP_WAYPOINTS);
+
+    /**
+     * Keybinds (hidden toggles)
+     */
+
     public final BooleanSetting switchToNetherSetting = register(
         BooleanSetting.create(
             "Switch to Nether",
@@ -716,117 +902,4 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.keybind.world_map_baritone_elytra_here",
             false),
         SettingLocation.KEYBINDS);
-    public final BooleanSetting netherCaveFix = register(
-        BooleanSetting.create(
-            "Nether Cave Fix",
-            "xaeroplus.setting.nether_cave_fix",
-            true),
-        SettingLocation.WORLD_MAP_MAIN);
-    public final BooleanSetting alwaysRenderPlayerWithNameOnRadar = register(
-        BooleanSetting.create(
-            "Always Render Player Name",
-            "xaeroplus.setting.always_render_player_name",
-            true),
-        SettingLocation.MINIMAP_ENTITY_RADAR);
-    public final BooleanSetting alwaysRenderPlayerIconOnRadar = register(
-        BooleanSetting.create(
-            "Always Render Player Icon",
-            "xaeroplus.setting.always_render_player_icon",
-            true),
-        SettingLocation.MINIMAP_ENTITY_RADAR);
-    public final BooleanSetting fixMainEntityDot = register(
-        BooleanSetting.create(
-            "Fix Main Entity Dot",
-            "xaeroplus.setting.fix_main_entity_dot",
-            true),
-        SettingLocation.MINIMAP_ENTITY_RADAR);
-    public final BooleanSetting waypointBeacons = register(
-        BooleanSetting.create(
-            "Waypoint Beacons",
-            "xaeroplus.setting.waypoint_beacons",
-            false),
-        SettingLocation.MINIMAP_WAYPOINTS);
-    public final DoubleSetting waypointBeaconScaleMin = register(
-        DoubleSetting.create(
-            "Waypoint Beacon Scale Min",
-            "xaeroplus.setting.waypoint_beacon_scale_min",
-            0, 30, 1,
-            0),
-        SettingLocation.MINIMAP_WAYPOINTS);
-    public final DoubleSetting waypointBeaconDistanceMin = register(
-        DoubleSetting.create(
-            "Waypoint Beacon Distance Min",
-            "xaeroplus.setting.waypoint_beacon_distance_min",
-            0, 512, 8,
-            0),
-        SettingLocation.MINIMAP_WAYPOINTS);
-    public final BooleanSetting waypointEta = register(
-        BooleanSetting.create(
-            "Waypoint ETA",
-            "xaeroplus.setting.waypoint_eta",
-            false),
-        SettingLocation.MINIMAP_WAYPOINTS);
-    public final BooleanSetting longWaypointInitials = register(
-        BooleanSetting.create(
-            "Long Waypoint Initials",
-            "xaeroplus.setting.allow_longer_waypoint_initials",
-            false),
-        SettingLocation.MINIMAP_WAYPOINTS);
-    public final BooleanSetting disableWaypointSharing = register(
-        BooleanSetting.create(
-            "Disable Waypoint Sharing",
-            "xaeroplus.setting.disable_waypoint_sharing",
-            false),
-        SettingLocation.MINIMAP_WAYPOINTS);
-    public final BooleanSetting plainWaypointSharing = register(
-        BooleanSetting.create(
-            "Plain Waypoint Sharing",
-            "xaeroplus.setting.plain_waypoint_sharing",
-            false),
-        SettingLocation.MINIMAP_WAYPOINTS);
-    public final BooleanSetting disableReceivingWaypoints = register(
-        BooleanSetting.create(
-            "Disable Receiving Waypoints",
-            "xaeroplus.setting.disable_receiving_waypoints",
-            false),
-        SettingLocation.MINIMAP_WAYPOINTS);
-    public final BooleanSetting disableXaeroInternetAccess = register(
-        BooleanSetting.create(
-            "Disable Xaero Internet Access",
-            "xaeroplus.setting.disable_internet",
-            false),
-        SettingLocation.WORLD_MAP_MAIN);
-    public final BooleanSetting radarHideInvisibleEntities = register(
-        BooleanSetting.create(
-            "Hide Invisible Entities",
-            "xaeroplus.setting.radar_hide_invisible_entities",
-            true,
-            (b) -> {
-                if (!Globals.minimapSettingsInitialized) return;
-                try {
-                    HudMod.INSTANCE.getSettings().radarHideInvisibleEntities = b;
-                } catch (Exception e) {
-                    XaeroPlus.LOGGER.error("Error updating radarHideInvisibleEntities", e);
-                }
-            }),
-        SettingLocation.MINIMAP_ENTITY_RADAR);
-    public final BooleanSetting expandSettingEntries = register(
-        BooleanSetting.create(
-            "Expanded Setting Entries",
-            "xaeroplus.setting.expanded_settings",
-            false),
-        SettingLocation.WORLD_MAP_MAIN);
-    public final BooleanSetting sodiumSettingIntegration = register(
-        BooleanSetting.create(
-            "Sodium/Embeddium Setting Integration",
-            "xaeroplus.setting.sodium_embeddium_integration",
-            true),
-        SettingLocation.WORLD_MAP_MAIN);
-    public final DoubleSetting cacheWindowUpdateInterval = register(
-        DoubleSetting.create(
-            "Window Update Interval",
-            "xaeroplus.setting.cache_window_update_interval",
-            1, 100, 1,
-            10),
-            SettingLocation.CHUNK_HIGHLIGHTS);
 }

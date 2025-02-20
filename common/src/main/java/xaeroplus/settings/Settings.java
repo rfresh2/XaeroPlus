@@ -188,12 +188,6 @@ public final class Settings extends SettingRegistry {
             (v) -> markChunksDirtyInWriteDistance(),
             transparentObsidianRoofSetting::get),
         SettingLocation.WORLD_MAP_MAIN);
-    public final BooleanSetting overlayOpacityFix = register(
-        BooleanSetting.create(
-            "Overlay Opacity Fix",
-            "xaeroplus.setting.overlay_opacity_fix",
-            true),
-        SettingLocation.WORLD_MAP_MAIN);
     public final DoubleSetting worldMapMinZoomSetting = register(
         DoubleSetting.create(
             "Min WorldMap Zoom",

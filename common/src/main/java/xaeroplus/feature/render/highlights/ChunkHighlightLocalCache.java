@@ -58,6 +58,7 @@ public class ChunkHighlightLocalCache extends ChunkHighlightBaseCacheHandler {
         // its somewhat useful for players so they don't lose all date if they get disconnected somehow
         // but it does lead to data incoherence if they switch dimensions or servers in the same session
         // so its a tradeoff, generally players will always use the database cache anyway
+        chunks.clear();
     }
 
     @Override

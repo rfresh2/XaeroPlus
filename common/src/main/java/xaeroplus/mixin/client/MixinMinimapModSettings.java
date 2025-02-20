@@ -2,6 +2,7 @@ package xaeroplus.mixin.client;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,8 +26,6 @@ public abstract class MixinMinimapModSettings {
     public int caveMaps;
     @Shadow
     protected IXaeroMinimap modMain;
-
-    @Shadow protected abstract void refreshScreen();
 
     @Inject(method = "<init>", at = @At(value = "RETURN"))
     private void init(CallbackInfo ci) {
@@ -72,10 +71,13 @@ public abstract class MixinMinimapModSettings {
         SettingHooks.getClientBooleanValue(o.getEnumString(), cir);
     }
 
-    @Inject(method = "setOptionValue", at = @At("HEAD"))
+    @Inject(method = "setOptionValue", at = @At("RETURN"))
     public void setOptionValue(ModOptions o, Object value, final CallbackInfo ci) {
         SettingHooks.setOptionValue(o.getEnumString(), value);
-        refreshScreen();
+        var screen = Minecraft.getInstance().screen;
+        if (screen != null) {
+            Minecraft.getInstance().setScreen(screen);
+        }
     }
 
     @Inject(method = "getOptionValue", at = @At("HEAD"), cancellable = true)
@@ -83,10 +85,13 @@ public abstract class MixinMinimapModSettings {
         SettingHooks.getOptionValue(o.getEnumString(), cir);
     }
 
-    @Inject(method = "setOptionDoubleValue", at = @At("HEAD"))
+    @Inject(method = "setOptionDoubleValue", at = @At("RETURN"))
     public void setOptionFloatValue(ModOptions o, double f, CallbackInfo ci) {
         SettingHooks.setOptionDoubleValue(o.getEnumString(), f);
-        refreshScreen();
+        var screen = Minecraft.getInstance().screen;
+        if (screen != null) {
+            Minecraft.getInstance().setScreen(screen);
+        }
     }
 
     @Inject(method = "getOptionDoubleValue", at = @At("HEAD"), cancellable = true)

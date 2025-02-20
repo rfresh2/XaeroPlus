@@ -43,6 +43,8 @@
     "xaeroplus.setting.cross_dimension_cursor_coordinates.tooltip": "ネザー/オーバーワールドの次元を表示する際に、ワールドマップのカーソル座標に対応する反対の次元の座標をレンダリングします。",
     "xaeroplus.setting.palette_new_chunks_highlighting": "パレットNewChunks",
     "xaeroplus.setting.palette_new_chunks_highlighting.tooltip": "受信したチャンクデータパレットに基づいてNewChunksを検出します。すべてのバニラディメンションで機能し、液体流方法より信頼性があります。",
+    "xaeroplus.setting.palette_new_chunks_include_upgraded": "パレット 新しいチャンクのバージョンが更新",
+    "xaeroplus.setting.palette_new_chunks_include_upgraded.tooltip": "以前のMCバージョンから新しく更新されたチャンクを検出します。オーバーワールド/ネザーのみ。新しいチャンクの検出において若干の誤検出（偽陰性）の可能性があります。",
     "xaeroplus.setting.palette_new_chunks_save_load_to_disk": "ディスクにパレットNewChunksを保存/読み込み",
     "xaeroplus.setting.palette_new_chunks_save_load_to_disk.tooltip": "各ワールドおよびディメンションのNewChunkデータをディスクに保存および読み込みします。パレットNewChunksを有効にする必要があります。",
     "xaeroplus.setting.palette_new_chunks_opacity": "パレットNewChunksの不透明度",

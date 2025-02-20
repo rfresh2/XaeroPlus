@@ -48,6 +48,7 @@ public class Highways extends Module {
         50000,
         55000,
         62500,
+        75000,
         100000,
         125000,
         250000,

@@ -101,19 +101,14 @@ public class PaletteNewChunks extends Module {
     private boolean checkNewChunkBlockStatePalette(LevelChunk chunk) {
         var sections = chunk.getSections();
         if (sections.length == 0) return false;
-        var firstSection = sections[0];
-        Palette<BlockState> firstPalette = firstSection.getStates().data.palette();
-        if (isNotLinearOrHashMapPalette(firstPalette)) return false;
-        if (firstPalette instanceof LinearPalette<BlockState>) {
-            return firstPalette.valueFor(0).is(Blocks.AIR);
-        } else { // HashMapPalette
-            // we could iterate through more sections but this is good enough in most cases
-            // checking every blockstate is relatively expensive
-            for (int i = 0; i < Math.min(sections.length, 5); i++) {
-                var section = sections[i];
-                var paletteContainerData = section.getStates().data;
-                var palette = paletteContainerData.palette();
-                if (isNotLinearOrHashMapPalette(palette)) continue;
+        for (int i = 0; i < Math.min(sections.length, 8); i++) {
+            var section = sections[i];
+            var paletteContainerData = section.getStates().data;
+            var palette = paletteContainerData.palette();
+            if (palette.getSize() < 2) continue;
+            if (palette instanceof LinearPalette<BlockState>) {
+                if (palette.valueFor(0).is(Blocks.AIR)) return true;
+            } else if (palette instanceof HashMapPalette<BlockState>) {
                 if (checkForExtraPaletteEntries(paletteContainerData)) return true;
             }
         }

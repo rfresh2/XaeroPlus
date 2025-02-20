@@ -57,13 +57,17 @@ public class PaletteNewChunks extends Module {
 
     private boolean isNewChunk(final ResourceKey<Level> dim, final LevelChunk chunk) {
         if (dim == OVERWORLD) {
-            return switch (checkNewChunkBiomePalette(chunk, true)) {
-                case NO_PLAINS -> false;
-                case PLAINS_IN_PALETTE -> true;
-                case PLAINS_PRESENT -> checkNewChunkBlockStatePalette(chunk);
-            };
+            return Settings.REGISTRY.paletteNewChunksIncludeUpgradedChunks.get()
+                ? checkNewChunkBlockStatePalette(chunk)
+                : switch (checkNewChunkBiomePalette(chunk, true)) {
+                    case NO_PLAINS -> false;
+                    case PLAINS_IN_PALETTE -> true;
+                    case PLAINS_PRESENT -> checkNewChunkBlockStatePalette(chunk);
+                };
         } else if (dim == NETHER) {
-            return checkNewChunkBiomePalette(chunk, false) == PLAINS_IN_PALETTE;
+            return Settings.REGISTRY.paletteNewChunksIncludeUpgradedChunks.get()
+                ? checkNewChunkBlockStatePalette(chunk)
+                : checkNewChunkBiomePalette(chunk, false) == PLAINS_IN_PALETTE;
         } else if (dim == END) {
             return checkNewChunkBiomePalette(chunk, false) == PLAINS_IN_PALETTE;
         }

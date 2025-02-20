@@ -35,8 +35,6 @@
   "xaeroplus.setting.transparent_obsidian_roof_darkening.tooltip": "Define o nível de ofuscação da transparência do telhado de obsidiana.",
   "xaeroplus.setting.transparent_obsidian_roof_snow_opacity": "Transp. do Telhado de Neve",
   "xaeroplus.setting.transparent_obsidian_roof_snow_opacity.tooltip": "Define o nível de transparência da neve sobre o telhado de obsidiana.",
-  "xaeroplus.setting.overlay_opacity_fix": "Correção de opacidade de sobreposição",
-  "xaeroplus.setting.overlay_opacity_fix.tooltip": "Corrige um bug na lógica de opacidade/brilho dos pixels do mapa, fazendo com que certos pixels fiquem anormalmente brilhantes.\nPode ser notado em estruturas como colunas de água com mais de 128 blocos, há uma mudança abrupta em sua cor nessa altura conforme o brilho é invertido.",
   "xaeroplus.setting.min_zoom": "Zoom Min do Mapa-Mundo",
   "xaeroplus.setting.min_zoom.tooltip": "Definição do zoom mínimo do mapa-mundo. Isto é 10x o que é visível no mapa-mundo.",
   "xaeroplus.setting.cross_dimension_cursor_coordinates": "Coordenadas do Cursor entre Dimensões",

@@ -10,10 +10,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.map.WorldMap;
 import xaero.map.file.MapSaveLoad;
-import xaero.map.region.LeveledRegion;
 import xaero.map.region.MapRegion;
 import xaeroplus.Globals;
-import xaeroplus.XaeroPlus;
 import xaeroplus.settings.Settings;
 
 import java.io.DataOutputStream;
@@ -77,16 +75,5 @@ public abstract class MixinMapSaveLoad {
             // and the saveRegion method only catches IOExceptions
             throw new IOException(e);
         }
-    }
-
-    @Redirect(method = "run", at = @At(value = "INVOKE", target = "Lxaero/map/region/LeveledRegion;isAllCachePrepared()Z", ordinal = 0))
-    public boolean redirectCacheSaveFailCrash(final LeveledRegion instance) {
-        final boolean value = instance.isAllCachePrepared();
-        if (!value) {
-            XaeroPlus.LOGGER.warn("LeveledRegion cache not prepared. Attempting to repair crash");
-            instance.setRecacheHasBeenRequested(false, "crash fix");
-            // See MixinMapProcessor for where we catch the exception (which is still thrown)
-        }
-        return value;
     }
 }

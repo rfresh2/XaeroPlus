@@ -43,6 +43,8 @@
   "xaeroplus.setting.cross_dimension_cursor_coordinates.tooltip": "Podczas oglądania wymiarów Nether/Overworld wyświetlaj odpowiednie współrzędne przeciwnego wymiaru na współrzędnych kursora WorldMap.",
   "xaeroplus.setting.palette_new_chunks_highlighting": "Paleta NewChunks",
   "xaeroplus.setting.palette_new_chunks_highlighting.tooltip": "Wykrywa NewChunks na podstawie otrzymanych palet danych chunków. Działa we wszystkich wymiarach waniliowych, bardziej niezawodny niż metoda przepływu cieczy.",
+  "xaeroplus.setting.palette_new_chunks_include_upgraded": "Paleta Zaktualizowana Wersja Nowych Chunków",
+  "xaeroplus.setting.palette_new_chunks_include_upgraded.tooltip": "Wykrywa chunki niedawno zaktualizowane z poprzedniej wersji MC, tylko w overworld/nether. Nieco większa szansa na fałszywe negatywy w wykrywaniu nowych chunków.",
   "xaeroplus.setting.palette_new_chunks_save_load_to_disk": "Zapisz/Wczytaj Paletę NewChunks na Dysk",
   "xaeroplus.setting.palette_new_chunks_save_load_to_disk.tooltip": "Zapisuje i ładuje dane NewChunk na dysk dla każdego świata i wymiaru. Wymaga włączenia Palety NewChunks.",
   "xaeroplus.setting.palette_new_chunks_opacity": "Nieprzezroczystość Palety NewChunks",

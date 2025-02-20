@@ -1,5 +1,7 @@
 package xaeroplus.module.impl;
 
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
@@ -10,12 +12,9 @@ import net.minecraft.util.BitStorage;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.HashMapPalette;
-import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.chunk.LinearPalette;
-import net.minecraft.world.level.chunk.PalettedContainer;
+import net.minecraft.world.level.chunk.*;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.ChunkDataEvent;
@@ -24,6 +23,9 @@ import xaeroplus.module.Module;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
+
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static net.minecraft.world.level.Level.*;
 import static xaeroplus.module.impl.PaletteNewChunks.BiomeCheckResult.*;
@@ -34,6 +36,7 @@ public class PaletteNewChunks extends Module {
     public final SavableHighlightCacheInstance newChunksInverseCache = new SavableHighlightCacheInstance("XaeroPlusPaletteNewChunksInverse");
     private int newChunksColor = getColor(255, 0, 0, 100);
     private final IntSet presentStateIdsBuf = new IntOpenHashSet();
+    private final IntList presentStateIdsOrderedBuf = new IntArrayList();
     private boolean renderInverse = false;
 
     public void setDiskCache(final boolean disk) {
@@ -114,12 +117,45 @@ public class PaletteNewChunks extends Module {
             var palette = paletteContainerData.palette();
             if (palette.getSize() < 2) continue;
             if (palette instanceof LinearPalette<BlockState>) {
-                if (palette.valueFor(0).is(Blocks.AIR)) return true;
+                // no more iterating needed if we find a linear palette at any point
+                return checkLinearPaletteOrder(palette, section);
             } else if (palette instanceof HashMapPalette<BlockState>) {
-                if (checkForExtraPaletteEntries(paletteContainerData)) return true;
+                if (checkForExtraPaletteEntries(paletteContainerData)) {
+                    return true;
+                }
             }
         }
         return false;
+    }
+
+    private boolean checkLinearPaletteOrder(final Palette<BlockState> palette, final LevelChunkSection section) {
+        // when chunk data is saved to disk, a new palette is created to pack only present ids
+        // the new palette selects its ids in order of iterating over the backing BitStorage
+        // so if the order does not match it wasn't saved prior to us loading it, and therefore is a newly generated chunk
+        presentStateIdsOrderedBuf.clear();
+        for (int id = 0; id < palette.getSize(); id++) {
+            int blockStateId = Block.getId(palette.valueFor(id));
+            presentStateIdsOrderedBuf.add(blockStateId);
+        }
+        presentStateIdsBuf.clear();
+        // need atomics to mutate inside the lambda
+        final AtomicInteger searchIndex = new AtomicInteger(0);
+        final AtomicBoolean isNewChunk = new AtomicBoolean(false);
+        section.getStates().data.storage().getAll(dataId -> {
+            if (isNewChunk.get()) return;
+            if (searchIndex.get() == presentStateIdsOrderedBuf.size()) return;
+            int blockStateId = Block.getId(palette.valueFor(dataId));
+            if (presentStateIdsBuf.contains(blockStateId)) return; // we've already seen this blockstate, continue iterating
+            int nextExpectedId = presentStateIdsOrderedBuf.getInt(searchIndex.get());
+            if (blockStateId == nextExpectedId) {
+                presentStateIdsBuf.add(blockStateId);
+                searchIndex.incrementAndGet();
+            } else {
+                // found an id that is out of order
+                isNewChunk.set(true);
+            }
+        });
+        return isNewChunk.get();
     }
 
     /**

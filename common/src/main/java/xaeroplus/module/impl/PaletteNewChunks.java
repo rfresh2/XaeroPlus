@@ -12,7 +12,10 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.*;
+import net.minecraft.world.level.chunk.HashMapPalette;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.LinearPalette;
+import net.minecraft.world.level.chunk.PalettedContainer;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.ChunkDataEvent;
@@ -57,13 +60,17 @@ public class PaletteNewChunks extends Module {
 
     private boolean isNewChunk(final ResourceKey<Level> dim, final LevelChunk chunk) {
         if (dim == OVERWORLD) {
-            return switch (checkNewChunkBiomePalette(chunk, true)) {
-                case NO_PLAINS -> false;
-                case PLAINS_IN_PALETTE -> true;
-                case PLAINS_PRESENT -> checkNewChunkBlockStatePalette(chunk);
-            };
+            return Settings.REGISTRY.paletteNewChunksIncludeUpgradedChunks.get()
+                ? checkNewChunkBlockStatePalette(chunk)
+                : switch (checkNewChunkBiomePalette(chunk, true)) {
+                    case NO_PLAINS -> false;
+                    case PLAINS_IN_PALETTE -> true;
+                    case PLAINS_PRESENT -> checkNewChunkBlockStatePalette(chunk);
+                };
         } else if (dim == NETHER) {
-            return checkNewChunkBiomePalette(chunk, false) == PLAINS_IN_PALETTE;
+            return Settings.REGISTRY.paletteNewChunksIncludeUpgradedChunks.get()
+                ? checkNewChunkBlockStatePalette(chunk)
+                : checkNewChunkBiomePalette(chunk, false) == PLAINS_IN_PALETTE;
         } else if (dim == END) {
             return checkNewChunkBiomePalette(chunk, false) == PLAINS_IN_PALETTE;
         }
@@ -101,19 +108,14 @@ public class PaletteNewChunks extends Module {
     private boolean checkNewChunkBlockStatePalette(LevelChunk chunk) {
         var sections = chunk.getSections();
         if (sections.length == 0) return false;
-        var firstSection = sections[0];
-        Palette<BlockState> firstPalette = firstSection.getStates().data.palette();
-        if (isNotLinearOrHashMapPalette(firstPalette)) return false;
-        if (firstPalette instanceof LinearPalette<BlockState>) {
-            return firstPalette.valueFor(0).is(Blocks.AIR);
-        } else { // HashMapPalette
-            // we could iterate through more sections but this is good enough in most cases
-            // checking every blockstate is relatively expensive
-            for (int i = 0; i < Math.min(sections.length, 5); i++) {
-                var section = sections[i];
-                var paletteContainerData = section.getStates().data;
-                var palette = paletteContainerData.palette();
-                if (isNotLinearOrHashMapPalette(palette)) continue;
+        for (int i = 0; i < Math.min(sections.length, 8); i++) {
+            var section = sections[i];
+            var paletteContainerData = section.getStates().data;
+            var palette = paletteContainerData.palette();
+            if (palette.getSize() < 2) continue;
+            if (palette instanceof LinearPalette<BlockState>) {
+                if (palette.valueFor(0).is(Blocks.AIR)) return true;
+            } else if (palette instanceof HashMapPalette<BlockState>) {
                 if (checkForExtraPaletteEntries(paletteContainerData)) return true;
             }
         }
@@ -158,10 +160,6 @@ public class PaletteNewChunks extends Module {
         NO_PLAINS,
         PLAINS_IN_PALETTE,
         PLAINS_PRESENT
-    }
-
-    private boolean isNotLinearOrHashMapPalette(Palette palette) {
-        return palette.getSize() <= 0 || !(palette instanceof LinearPalette || palette instanceof HashMapPalette);
     }
 
     private synchronized boolean checkForExtraPaletteEntries(PalettedContainer.Data<BlockState> paletteContainer) {

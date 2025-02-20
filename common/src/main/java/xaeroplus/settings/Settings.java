@@ -287,6 +287,13 @@ public final class Settings extends SettingRegistry {
             false,
             (b) -> ModuleManager.getModule(PaletteNewChunks.class).setEnabled(b)),
         SettingLocation.CHUNK_HIGHLIGHTS);
+    public final BooleanSetting paletteNewChunksIncludeUpgradedChunks = register(
+        BooleanSetting.create(
+            "Palette NewChunks Include Upgraded",
+            "xaeroplus.setting.palette_new_chunks_include_upgraded",
+            false,
+            () -> ModuleManager.getModule(PaletteNewChunks.class).isEnabled()),
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting paletteNewChunksSaveLoadToDisk = register(
         BooleanSetting.create(
             "Save/Load Palette NewChunks to Disk",

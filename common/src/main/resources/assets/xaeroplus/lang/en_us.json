@@ -43,6 +43,8 @@
   "xaeroplus.setting.cross_dimension_cursor_coordinates.tooltip": "When viewing the Nether/Overworld dimensions render the corresponding opposite dimension's coordinates on the WorldMap's cursor coordinates.",
   "xaeroplus.setting.palette_new_chunks_highlighting": "Palette NewChunks",
   "xaeroplus.setting.palette_new_chunks_highlighting.tooltip": "Detects NewChunks based on received chunk data palettes. Works in all vanilla dimensions, more reliable than liquid flow method.",
+  "xaeroplus.setting.palette_new_chunks_include_upgraded": "Palette NewChunks Version Upgraded",
+  "xaeroplus.setting.palette_new_chunks_include_upgraded.tooltip": "Detects chunks newly upgraded from a previous MC version, overworld/nether only. Slightly higher chance for actual new chunk detection false negatives.",
   "xaeroplus.setting.palette_new_chunks_save_load_to_disk": "Save/Load Palette NewChunks to Disk",
   "xaeroplus.setting.palette_new_chunks_save_load_to_disk.tooltip": "Saves and loads NewChunk data to disk for each world and dimension. Requires Palette NewChunks to be enabled.",
   "xaeroplus.setting.palette_new_chunks_opacity": "Palette NewChunks Opacity",

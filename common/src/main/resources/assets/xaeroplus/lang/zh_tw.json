@@ -35,8 +35,6 @@
   "xaeroplus.setting.transparent_obsidian_roof_darkening.tooltip": "設定透明黑曜石屋頂圖塊的不透明度。",
   "xaeroplus.setting.transparent_obsidian_roof_snow_opacity": "屋頂雪不透明度",
   "xaeroplus.setting.transparent_obsidian_roof_snow_opacity.tooltip": "設定黑曜石屋頂上雪的不透明度。",
-  "xaeroplus.setting.overlay_opacity_fix": "覆蓋不透明度修復",
-  "xaeroplus.setting.overlay_opacity_fix.tooltip": "修補地圖像素的不透明度／亮度邏輯中的一個錯誤，導致某些像素異常明亮。\n可以在 128+ 格的水柱等結構上注意到，它們的顏色在該高度會發生突然變化，因為亮度被翻轉了。",
   "xaeroplus.setting.min_zoom": "最小世界地圖縮放",
   "xaeroplus.setting.min_zoom.tooltip": "最小世界地圖縮放設定。這是您在世界地圖上看到的 10 倍。",
   "xaeroplus.setting.cross_dimension_cursor_coordinates": "跨維度游標座標",

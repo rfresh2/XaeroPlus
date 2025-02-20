@@ -43,6 +43,8 @@
   "xaeroplus.setting.cross_dimension_cursor_coordinates.tooltip": "在查看下界/主世界维度时，在世界地图的光标坐标上渲染相应的对立维度的坐标。",
   "xaeroplus.setting.palette_new_chunks_highlighting": "调色板 NewChunks",
   "xaeroplus.setting.palette_new_chunks_highlighting.tooltip": "基于接收到的区块数据调色板检测 NewChunks。适用于所有原版维度，比液体流动方法更可靠。",
+  "xaeroplus.setting.palette_new_chunks_include_upgraded": "调色板 新区块版本升级",
+  "xaeroplus.setting.palette_new_chunks_include_upgraded.tooltip": "检测从先前 MC 版本升级的新区块，仅限主世界/地狱。检测新区块时稍微增加误判（假阴性）的可能性。",
   "xaeroplus.setting.palette_new_chunks_save_load_to_disk": "保存/加载调色板 NewChunks 到磁盘",
   "xaeroplus.setting.palette_new_chunks_save_load_to_disk.tooltip": "为每个世界和维度保存和加载 NewChunk 数据到磁盘。需要启用调色板 NewChunks。",
   "xaeroplus.setting.palette_new_chunks_opacity": "调色板 NewChunks 不透明度",

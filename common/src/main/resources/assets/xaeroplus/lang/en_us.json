@@ -35,8 +35,6 @@
   "xaeroplus.setting.transparent_obsidian_roof_darkening.tooltip": "Sets the opacity of the transparent obsidian roof tiles.",
   "xaeroplus.setting.transparent_obsidian_roof_snow_opacity": "Roof Snow Opacity",
   "xaeroplus.setting.transparent_obsidian_roof_snow_opacity.tooltip": "Sets the opacity of snow on top of the obsidian roof.",
-  "xaeroplus.setting.overlay_opacity_fix": "Overlay Opacity Fix",
-  "xaeroplus.setting.overlay_opacity_fix.tooltip": "Patches a bug in the opacity/brightness logic of map pixels causing certain pixels to be abnormally bright.\nCan be noticed on structures like 128+ block water columns, there is abrupt shift in their color at that height as the brightness is flipped.",
   "xaeroplus.setting.min_zoom": "Min WorldMap Zoom",
   "xaeroplus.setting.min_zoom.tooltip": "Minimum WorldMap Zoom Setting. This is 10x what you see on the WorldMap.",
   "xaeroplus.setting.cross_dimension_cursor_coordinates": "Cross Dim Cursor Coords",

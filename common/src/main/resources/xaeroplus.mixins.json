@@ -54,7 +54,6 @@
     "MixinMinimapWriter",
     "MixinMisc",
     "MixinModClientEvents",
-    "MixinOverlay",
     "MixinPatreon",
     "MixinRadarRenderer",
     "MixinSupportXaeroMinimap",

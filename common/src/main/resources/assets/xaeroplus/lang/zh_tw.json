@@ -43,6 +43,8 @@
   "xaeroplus.setting.cross_dimension_cursor_coordinates.tooltip": "在查看地獄／主世界維度時，在世界地圖的游標座標上渲染相應的相反維度座標。",
   "xaeroplus.setting.palette_new_chunks_highlighting": "調色板新區塊",
   "xaeroplus.setting.palette_new_chunks_highlighting.tooltip": "根據收到的區塊數據調色板檢測新區塊。適用於所有原版維度，比液體流動方法更可靠。",
+  "xaeroplus.setting.palette_new_chunks_include_upgraded": "調色板 新區塊版本升級",
+  "xaeroplus.setting.palette_new_chunks_include_upgraded.tooltip": "檢測從先前 MC 版本升級的新區塊，僅限主世界/地獄。檢測新區塊時稍微增加誤判（假陰性）的可能性。",
   "xaeroplus.setting.palette_new_chunks_save_load_to_disk": "將調色板新區塊儲存／載入到磁碟",
   "xaeroplus.setting.palette_new_chunks_save_load_to_disk.tooltip": "將新區塊數據儲存和載入到每個世界和維度的磁碟。需要啟用調色板新區塊。",
   "xaeroplus.setting.palette_new_chunks_opacity": "調色板新區塊不透明度",

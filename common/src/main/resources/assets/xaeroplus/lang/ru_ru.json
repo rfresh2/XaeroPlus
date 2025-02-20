@@ -43,6 +43,8 @@
   "xaeroplus.setting.cross_dimension_cursor_coordinates.tooltip": "При просмотре измерений Nether/Overworld отображайте координаты соответствующего противоположного измерения на координатах курсора WorldMap.",
   "xaeroplus.setting.palette_new_chunks_highlighting": "Палитра NewChunks",
   "xaeroplus.setting.palette_new_chunks_highlighting.tooltip": "Обнаруживает NewChunks на основе полученных палитр данных чанков. Работает во всех ванильных измерениях, более надежен, чем метод потока жидкости.",
+  "xaeroplus.setting.palette_new_chunks_include_upgraded": "Палитра Улучшенная Версия Новых Чанков",
+  "xaeroplus.setting.palette_new_chunks_include_upgraded.tooltip": "Обнаруживает чанки, недавно обновленные с предыдущей версии MC, только в верхнем мире/незере. Немного выше вероятность ложных отрицательных результатов при обнаружении новых чанков.",
   "xaeroplus.setting.palette_new_chunks_save_load_to_disk": "Сохранить/Загрузить Палитру NewChunks на Диск",
   "xaeroplus.setting.palette_new_chunks_save_load_to_disk.tooltip": "Сохраняет и загружает данные NewChunk на диск для каждого мира и измерения. Требуется включение Палитры NewChunks.",
   "xaeroplus.setting.palette_new_chunks_opacity": "Непрозрачность Палитры NewChunks",

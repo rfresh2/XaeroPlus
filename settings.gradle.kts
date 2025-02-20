@@ -11,11 +11,11 @@ gradle.extra.apply {
 	set("mod_version", "2.26.3")
 	set("minecraft_version", "1.20.4")
 	set("parchment_version", "2024.02.25")
-    set("worldmap_version_fabric", "1.39.2")
+    set("worldmap_version_fabric", "1.39.4")
 	set("minimap_version_fabric", "25.1.0")
-	set("worldmap_version_forge", "1.39.2")
+	set("worldmap_version_forge", "1.39.4")
 	set("minimap_version_forge", "25.1.0")
-	set("worldmap_version_neo", "1.39.2")
+	set("worldmap_version_neo", "1.39.4")
 	set("minimap_version_neo", "25.1.0")
 }
 

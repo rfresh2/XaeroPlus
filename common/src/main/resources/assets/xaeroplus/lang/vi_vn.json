@@ -35,8 +35,6 @@
     "xaeroplus.setting.transparent_obsidian_roof_darkening.tooltip": "Thiết lập độ mờ của các ô mái obsidian trong suốt.",
     "xaeroplus.setting.transparent_obsidian_roof_snow_opacity": "Độ Mờ Tuyết Mái",
     "xaeroplus.setting.transparent_obsidian_roof_snow_opacity.tooltip": "Thiết lập độ mờ của tuyết trên mái obsidian.",
-    "xaeroplus.setting.overlay_opacity_fix": "Sửa lỗi độ mờ lớp phủ",
-    "xaeroplus.setting.overlay_opacity_fix.tooltip": "Vá lỗi về logic độ mờ/độ sáng của các pixel bản đồ khiến một số pixel nhất định sáng bất thường.\nCó thể nhận thấy trên các cấu trúc như hơn 128 cột nước khối, có sự thay đổi đột ngột về màu sắc của chúng ở độ cao đó khi độ sáng bị đảo ngược.",
     "xaeroplus.setting.min_zoom": "Thu Phóng Tối Thiểu WorldMap",
     "xaeroplus.setting.min_zoom.tooltip": "Thiết lập thu phóng tối thiểu của WorldMap. Đây là 10 lần số bạn thấy trên WorldMap.",
     "xaeroplus.setting.cross_dimension_cursor_coordinates": "Tọa độ con trỏ giữa các chiều",

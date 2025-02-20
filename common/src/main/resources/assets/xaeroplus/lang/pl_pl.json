@@ -35,8 +35,6 @@
   "xaeroplus.setting.transparent_obsidian_roof_darkening.tooltip": "Ustawia nieprzezroczystość kafelków przezroczystego obsydianowego dachu.",
   "xaeroplus.setting.transparent_obsidian_roof_snow_opacity": "Nieprzezroczystość śniegu na dachu",
   "xaeroplus.setting.transparent_obsidian_roof_snow_opacity.tooltip": "Ustawia nieprzezroczystość śniegu na obsydianowym dachu.",
-  "xaeroplus.setting.overlay_opacity_fix": "Poprawka krycia nakładki",
-  "xaeroplus.setting.overlay_opacity_fix.tooltip": "Naprawia błąd w logice krycia/jasności pikseli mapy, powodujący, że niektóre piksele są nienormalnie jasne.\nMożna to zauważyć na konstrukcjach takich jak ponad 128 słupów wody. Na tej wysokości następuje nagła zmiana ich koloru wraz ze zmianą jasności.",
   "xaeroplus.setting.min_zoom": "Minimalne Zbliżenie Mapy Świata",
   "xaeroplus.setting.min_zoom.tooltip": "Ustawienie Minimalnego Zbliżenie Mapy Świata. To 10 razy więcej niż widzisz na Mapie Świata.",
   "xaeroplus.setting.cross_dimension_cursor_coordinates": "Współrzędne kursora międzywymiarowego",

@@ -35,8 +35,6 @@
   "xaeroplus.setting.transparent_obsidian_roof_darkening.tooltip": "Устанавливает непрозрачность прозрачной обсидиановой черепицы для крыши.",
   "xaeroplus.setting.transparent_obsidian_roof_snow_opacity": "Непрозрачность снега на крыше",
   "xaeroplus.setting.transparent_obsidian_roof_snow_opacity.tooltip": "Устанавливает непрозрачность снега поверх обсидиановой крыши.",
-  "xaeroplus.setting.overlay_opacity_fix": "Исправление непрозрачности наложения",
-  "xaeroplus.setting.overlay_opacity_fix.tooltip": "Исправляет ошибку в логике непрозрачности/яркости пикселей карты, из-за которой некоторые пиксели становились аномально яркими.\nМожно заметить на таких структурах, как водяные столбы из 128+ блоков, их цвет резко меняется на этой высоте при перевороте яркости.",
   "xaeroplus.setting.min_zoom": "Мин. Зум Карты Мира",
   "xaeroplus.setting.min_zoom.tooltip": "Минимальная настройка масштабирования карты мира. Это в 10 раз больше, чем вы видите на карте мира.",
   "xaeroplus.setting.cross_dimension_cursor_coordinates": "Координаты курсора межпространственного перемещения",

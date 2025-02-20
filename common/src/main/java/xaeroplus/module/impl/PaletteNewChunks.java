@@ -12,7 +12,10 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.*;
+import net.minecraft.world.level.chunk.HashMapPalette;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.LinearPalette;
+import net.minecraft.world.level.chunk.PalettedContainer;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.ChunkDataEvent;
@@ -157,10 +160,6 @@ public class PaletteNewChunks extends Module {
         NO_PLAINS,
         PLAINS_IN_PALETTE,
         PLAINS_PRESENT
-    }
-
-    private boolean isNotLinearOrHashMapPalette(Palette palette) {
-        return palette.getSize() <= 0 || !(palette instanceof LinearPalette || palette instanceof HashMapPalette);
     }
 
     private synchronized boolean checkForExtraPaletteEntries(PalettedContainer.Data<BlockState> paletteContainer) {

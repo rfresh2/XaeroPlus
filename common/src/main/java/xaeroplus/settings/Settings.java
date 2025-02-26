@@ -279,6 +279,7 @@ public final class Settings extends SettingRegistry {
             "Palette NewChunks",
             "xaeroplus.setting.palette_new_chunks_highlighting",
             false,
+            true,
             (b) -> ModuleManager.getModule(PaletteNewChunks.class).setEnabled(b)),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting paletteNewChunksVersionUpgradedChunks = register(
@@ -327,6 +328,7 @@ public final class Settings extends SettingRegistry {
             "OldChunks Highlighting",
             "xaeroplus.setting.old_chunks_highlighting",
             false,
+            true,
             (b) -> ModuleManager.getModule(OldChunks.class).setEnabled(b)),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting oldChunksInverse = register(
@@ -368,6 +370,7 @@ public final class Settings extends SettingRegistry {
             "Portal Highlights",
             "xaeroplus.setting.portals",
             false,
+            true,
             (b) -> ModuleManager.getModule(Portals.class).setEnabled(b)),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting portalsSaveLoadToDisk = register(
@@ -401,6 +404,7 @@ public final class Settings extends SettingRegistry {
             "Old Biomes",
             "xaeroplus.setting.old_biomes_enabled",
             false,
+            true,
             (b) -> ModuleManager.getModule(OldBiomes.class).setEnabled(b)),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting oldBiomesSaveToDiskSetting = register(
@@ -434,6 +438,7 @@ public final class Settings extends SettingRegistry {
             "NewChunks Highlighting",
             "xaeroplus.setting.new_chunks_highlighting",
             false,
+            true,
             (b) -> ModuleManager.getModule(LiquidNewChunks.class).setEnabled(b)),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting liquidNewChunksSaveLoadToDisk = register(
@@ -491,6 +496,7 @@ public final class Settings extends SettingRegistry {
             "WorldTools Highlights",
             "xaeroplus.setting.world_tools",
             true,
+            true,
             (b) -> ModuleManager.getModule(WorldTools.class).setEnabled(b),
             WorldToolsHelper::isWorldToolsPresent),
         SettingLocation.CHUNK_HIGHLIGHTS);
@@ -517,6 +523,7 @@ public final class Settings extends SettingRegistry {
             "PortalSkip Detection",
             "xaeroplus.setting.portal_skip_detection",
             false,
+            true,
             (b) -> ModuleManager.getModule(PortalSkipDetection.class).setEnabled(b)),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final DoubleSetting portalSkipDetectionAlphaSetting = register(
@@ -581,6 +588,7 @@ public final class Settings extends SettingRegistry {
             "2b2t Highways",
             "xaeroplus.setting.2b2t_highways_enabled",
             false,
+            true,
             (b) -> ModuleManager.getModule(Highways.class).setEnabled(b)),
         SettingLocation.OVERLAYS);
     public enum HighwayWidth implements TranslatableSettingEnum {
@@ -632,6 +640,7 @@ public final class Settings extends SettingRegistry {
             "Show Render Distance",
             "xaeroplus.setting.show_render_distance",
             false,
+            true,
             (b) -> ModuleManager.getModule(RenderDistance.class).setEnabled(b)
         ),
         SettingLocation.OVERLAYS);
@@ -648,6 +657,7 @@ public final class Settings extends SettingRegistry {
             "Spawn Chunks",
             "xaeroplus.setting.spawn_chunks",
             false,
+            true,
             (b) -> ModuleManager.getModule(SpawnChunks.class).setEnabled(b)),
         SettingLocation.OVERLAYS);
     public final BooleanSetting playerSpawnChunksEnabledSetting = register(
@@ -655,6 +665,7 @@ public final class Settings extends SettingRegistry {
             "Player Spawn Chunks",
             "xaeroplus.setting.player_spawn_chunks",
             false,
+            true,
             (b) -> ModuleManager.getModule(SpawnChunksPlayer.class).setEnabled(b)),
         SettingLocation.OVERLAYS);
     public final BooleanSetting spawnChunksRedstoneProcessingEnabled = register(
@@ -869,6 +880,7 @@ public final class Settings extends SettingRegistry {
             "Switch to Nether",
             "xaeroplus.keybind.switch_to_nether",
             false,
+            true,
             (b) -> Globals.switchToDimension(NETHER)),
         SettingLocation.KEYBINDS);
     public final BooleanSetting switchToOverworldSetting = register(
@@ -876,6 +888,7 @@ public final class Settings extends SettingRegistry {
             "Switch to Overworld",
             "xaeroplus.keybind.switch_to_overworld",
             false,
+            true,
             (b) -> Globals.switchToDimension(OVERWORLD)),
         SettingLocation.KEYBINDS);
     public final BooleanSetting switchToEndSetting = register(
@@ -883,24 +896,28 @@ public final class Settings extends SettingRegistry {
             "Switch to End",
             "xaeroplus.keybind.switch_to_end",
             false,
+            true,
             (b) -> Globals.switchToDimension(END)),
         SettingLocation.KEYBINDS);
     public final BooleanSetting worldMapBaritoneGoalHereKeybindSetting = register(
         BooleanSetting.create(
             "WorldMap Baritone Goal Here",
             "xaeroplus.keybind.world_map_baritone_goal_here",
-            false),
+            false,
+            true),
         SettingLocation.KEYBINDS);
     public final BooleanSetting worldMapBaritonePathHereKeybindSetting = register(
         BooleanSetting.create(
             "WorldMap Baritone Path Here",
             "xaeroplus.keybind.world_map_baritone_path_here",
-            false),
+            false,
+            true),
         SettingLocation.KEYBINDS);
     public final BooleanSetting worldMapBaritoneElytraHereKeybindSetting = register(
         BooleanSetting.create(
             "WorldMap Baritone Elytra Here",
             "xaeroplus.keybind.world_map_baritone_elytra_here",
-            false),
+            false,
+            true),
         SettingLocation.KEYBINDS);
 }

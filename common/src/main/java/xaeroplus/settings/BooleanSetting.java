@@ -33,11 +33,19 @@ public class BooleanSetting extends XaeroPlusSetting {
     public static BooleanSetting create(String settingName,
                                         String settingNameTranslationKey,
                                         boolean defaultValue) {
+        return create(settingName, settingNameTranslationKey, defaultValue, false);
+    }
+
+    public static BooleanSetting create(String settingName,
+                                        String settingNameTranslationKey,
+                                        boolean defaultValue,
+                                        boolean keybind
+    ) {
         return new BooleanSetting(
             SETTING_PREFIX + settingName,
             settingNameTranslationKey,
             buildTooltipTranslationKey(settingNameTranslationKey),
-            new KeyMapping(settingNameTranslationKey, -1, "XaeroPlus"),
+            keybind ? new KeyMapping(settingNameTranslationKey, -1, "XaeroPlus") : null,
             defaultValue,
             null, null
         );
@@ -47,11 +55,20 @@ public class BooleanSetting extends XaeroPlusSetting {
                                         String settingNameTranslationKey,
                                         boolean defaultValue,
                                         BooleanConsumer settingChangeConsumer) {
+        return create(settingName, settingNameTranslationKey, defaultValue, false, settingChangeConsumer);
+    }
+
+    public static BooleanSetting create(String settingName,
+                                        String settingNameTranslationKey,
+                                        boolean defaultValue,
+                                        boolean keybind,
+                                        BooleanConsumer settingChangeConsumer) {
         return new BooleanSetting(
             SETTING_PREFIX + settingName,
             settingNameTranslationKey,
             buildTooltipTranslationKey(settingNameTranslationKey),
-            new KeyMapping(settingNameTranslationKey, -1, "XaeroPlus"), defaultValue,
+            keybind ? new KeyMapping(settingNameTranslationKey, -1, "XaeroPlus") : null,
+            defaultValue,
             settingChangeConsumer, null
         );
     }
@@ -60,11 +77,21 @@ public class BooleanSetting extends XaeroPlusSetting {
                                         String settingNameTranslationKey,
                                         boolean defaultValue,
                                         BooleanSupplier visibilitySupplier) {
+        return create(settingName, settingNameTranslationKey, defaultValue, false, visibilitySupplier);
+    }
+
+    public static BooleanSetting create(String settingName,
+                                        String settingNameTranslationKey,
+                                        boolean defaultValue,
+                                        boolean keybind,
+                                        BooleanSupplier visibilitySupplier
+    ) {
         return new BooleanSetting(
             SETTING_PREFIX + settingName,
             settingNameTranslationKey,
             buildTooltipTranslationKey(settingNameTranslationKey),
-            new KeyMapping(settingNameTranslationKey, -1, "XaeroPlus"), defaultValue,
+            keybind ? new KeyMapping(settingNameTranslationKey, -1, "XaeroPlus") : null,
+            defaultValue,
             null, visibilitySupplier
         );
     }
@@ -74,11 +101,22 @@ public class BooleanSetting extends XaeroPlusSetting {
                                         boolean defaultValue,
                                         BooleanConsumer settingChangeConsumer,
                                         BooleanSupplier visibilitySupplier) {
+        return create(settingName, settingNameTranslationKey, defaultValue, false, settingChangeConsumer, visibilitySupplier);
+    }
+
+    public static BooleanSetting create(String settingName,
+                                        String settingNameTranslationKey,
+                                        boolean defaultValue,
+                                        boolean keybind,
+                                        BooleanConsumer settingChangeConsumer,
+                                        BooleanSupplier visibilitySupplier
+    ) {
         return new BooleanSetting(
             SETTING_PREFIX + settingName,
             settingNameTranslationKey,
             buildTooltipTranslationKey(settingNameTranslationKey),
-            new KeyMapping(settingNameTranslationKey, -1, "XaeroPlus"), defaultValue,
+            keybind ? new KeyMapping(settingNameTranslationKey, -1, "XaeroPlus") : null,
+            defaultValue,
             settingChangeConsumer, visibilitySupplier
         );
     }

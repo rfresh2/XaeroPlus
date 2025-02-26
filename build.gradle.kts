@@ -36,13 +36,13 @@ tasks {
     }
     register("printWorldMapVersionNeo") {
         doLast {
-            println(gradle.extra.get("worldmap_version_neo"))
+            println(project.properties["worldmap_version_neo"])
         }
         outputs.upToDateWhen { false }
     }
     register("printMinimapVersionNeo") {
         doLast {
-            println(gradle.extra.get("minimap_version_neo"))
+            println(project.properties["minimap_version_neo"])
         }
         outputs.upToDateWhen { false }
     }

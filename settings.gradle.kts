@@ -7,31 +7,28 @@ pluginManagement {
 		gradlePluginPortal()
 	}
 }
-gradle.extra.apply {
-	set("mod_version", "2.26.3")
-	set("minecraft_version", "1.20.4")
-	set("parchment_version", "2024.02.25")
-    set("worldmap_version_fabric", "1.39.4")
-	set("minimap_version_fabric", "25.1.0")
-	set("worldmap_version_forge", "1.39.4")
-	set("minimap_version_forge", "25.1.0")
-	set("worldmap_version_neo", "1.39.4")
-	set("minimap_version_neo", "25.1.0")
-}
+
+val minecraft_version: String by ext.properties
+val worldmap_version_fabric: String by ext.properties
+val minimap_version_fabric: String by ext.properties
+val worldmap_version_forge: String by ext.properties
+val minimap_version_forge: String by ext.properties
+val worldmap_version_neo: String by ext.properties
+val minimap_version_neo: String by ext.properties
 
 dependencyResolutionManagement {
 	versionCatalogs {
 		create("libs") {
 			library("fabric-loader", "net.fabricmc:fabric-loader:0.15.11")
-			library("forge", "net.minecraftforge:forge:${gradle.extra.get("minecraft_version")}-49.1.4")
-			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.97.1+${gradle.extra.get("minecraft_version")}")
+			library("forge", "net.minecraftforge:forge:${minecraft_version}-49.1.4")
+			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.97.1+${minecraft_version}")
 			library("neoforge", "net.neoforged:neoforge:20.4.178")
-			library("worldmap-fabric", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version_fabric")}_Fabric_${gradle.extra.get("minecraft_version")}")
-			library("worldmap-forge", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version_forge")}_Forge_${gradle.extra.get("minecraft_version")}")
-			library("worldmap-neo", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version_neo")}_NeoForge_${gradle.extra.get("minecraft_version")}")
-			library("minimap-fabric", "maven.modrinth:xaeros-minimap:${gradle.extra.get("minimap_version_fabric")}_Fabric_${gradle.extra.get("minecraft_version")}")
-			library("minimap-forge", "maven.modrinth:xaeros-minimap:${gradle.extra.get("minimap_version_forge")}_Forge_${gradle.extra.get("minecraft_version")}")
-			library("minimap-neo", "maven.modrinth:xaeros-minimap:${gradle.extra.get("minimap_version_neo")}_NeoForge_${gradle.extra.get("minecraft_version")}")
+			library("worldmap-fabric", "maven.modrinth:xaeros-world-map:${worldmap_version_fabric}_Fabric_${minecraft_version}")
+			library("worldmap-forge", "maven.modrinth:xaeros-world-map:${worldmap_version_forge}_Forge_${minecraft_version}")
+			library("worldmap-neo", "maven.modrinth:xaeros-world-map:${worldmap_version_neo}_NeoForge_${minecraft_version}")
+			library("minimap-fabric", "maven.modrinth:xaeros-minimap:${minimap_version_fabric}_Fabric_${minecraft_version}")
+			library("minimap-forge", "maven.modrinth:xaeros-minimap:${minimap_version_forge}_Forge_${minecraft_version}")
+			library("minimap-neo", "maven.modrinth:xaeros-minimap:${minimap_version_neo}_NeoForge_${minecraft_version}")
             library("mixinextras-common", "io.github.llamalad7:mixinextras-common:0.4.1")
             library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.4.1")
 			library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.0")
@@ -52,9 +49,9 @@ dependencyResolutionManagement {
 			library("cloth-config-fabric", "me.shedaniel.cloth:cloth-config-fabric:13.0.121")
             library("embeddium", "maven.modrinth:embeddium:0.3.25+mc1.20.4")
             library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")
-            library("baritone-fabric", "com.github.rfresh2:baritone-fabric:${gradle.extra.get("minecraft_version")}")
-            library("baritone-forge", "com.github.rfresh2:baritone-forge:${gradle.extra.get("minecraft_version")}")
-            library("baritone-neoforge", "com.github.rfresh2:baritone-neoforge:${gradle.extra.get("minecraft_version")}")
+            library("baritone-fabric", "com.github.rfresh2:baritone-fabric:${minecraft_version}")
+            library("baritone-forge", "com.github.rfresh2:baritone-forge:${minecraft_version}")
+            library("baritone-neoforge", "com.github.rfresh2:baritone-neoforge:${minecraft_version}")
         }
 	}
 }

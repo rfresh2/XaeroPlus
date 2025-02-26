@@ -7,24 +7,21 @@ pluginManagement {
 		gradlePluginPortal()
 	}
 }
-gradle.extra.apply {
-	set("mod_version", "2.26.3")
-	set("minecraft_version", "1.19.4")
-	set("parchment_version", "2023.06.26")
-    set("worldmap_version_fabric", "1.39.4")
-	set("minimap_version_fabric", "25.1.0")
-	set("worldmap_version_forge", "1.39.4")
-	set("minimap_version_forge", "25.1.0")
-}
+
+val minecraft_version: String by ext.properties
+val worldmap_version_fabric: String by ext.properties
+val minimap_version_fabric: String by ext.properties
+val worldmap_version_forge: String by ext.properties
+val minimap_version_forge: String by ext.properties
 
 dependencyResolutionManagement {
 	versionCatalogs {
 		create("libs") {
 			library("fabric-loader", "net.fabricmc:fabric-loader:0.15.11")
-			library("forge", "net.minecraftforge:forge:${gradle.extra.get("minecraft_version")}-45.2.8")
-			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.87.2+${gradle.extra.get("minecraft_version")}")
-            library("worldmap-fabric", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version_fabric")}_Fabric_${gradle.extra.get("minecraft_version")}")
-            library("worldmap-forge", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version_forge")}_Forge_${gradle.extra.get("minecraft_version")}")
+			library("forge", "net.minecraftforge:forge:${minecraft_version}-45.2.8")
+			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.87.2+${minecraft_version}")
+            library("worldmap-fabric", "maven.modrinth:xaeros-world-map:${worldmap_version_fabric}_Fabric_${minecraft_version}")
+            library("worldmap-forge", "maven.modrinth:xaeros-world-map:${worldmap_version_forge}_Forge_${minecraft_version}")
             library("minimap-fabric", "curse.maven:xaeros-minimap-263420:6184427")
             library("minimap-forge", "curse.maven:xaeros-minimap-263420:6184426")
 			library("mixinextras-common", "io.github.llamalad7:mixinextras-common:0.4.1")
@@ -41,8 +38,8 @@ dependencyResolutionManagement {
 			library("sodium", "maven.modrinth:sodium:mc1.19.4-0.4.10")
             library("modmenu", "maven.modrinth:modmenu:6.3.1")
             library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")
-            library("baritone-fabric", "com.github.rfresh2:baritone-fabric:${gradle.extra.get("minecraft_version")}")
-            library("baritone-forge", "com.github.rfresh2:baritone-forge:${gradle.extra.get("minecraft_version")}")
+			library("baritone-fabric", "com.github.rfresh2:baritone-fabric:${minecraft_version}")
+			library("baritone-forge", "com.github.rfresh2:baritone-forge:${minecraft_version}")
         }
 	}
 }

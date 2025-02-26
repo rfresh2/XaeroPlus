@@ -7,26 +7,23 @@ pluginManagement {
 		gradlePluginPortal()
 	}
 }
-gradle.extra.apply {
-	set("mod_version", "2.26.3")
-	set("minecraft_version", "1.19.2")
-	set("parchment_version", "2022.11.27")
-	set("worldmap_version_fabric", "1.39.4")
-	set("minimap_version_fabric", "25.1.0")
-	set("worldmap_version_forge", "1.39.4")
-	set("minimap_version_forge", "25.1.0")
-}
+
+val minecraft_version: String by ext.properties
+val worldmap_version_fabric: String by ext.properties
+val minimap_version_fabric: String by ext.properties
+val worldmap_version_forge: String by ext.properties
+val minimap_version_forge: String by ext.properties
 
 dependencyResolutionManagement {
 	versionCatalogs {
 		create("libs") {
 			library("fabric-loader", "net.fabricmc:fabric-loader:0.15.11")
-			library("forge", "net.minecraftforge:forge:${gradle.extra.get("minecraft_version")}-43.3.7")
-			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.77.0+${gradle.extra.get("minecraft_version")}")
-            library("worldmap-fabric", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version_fabric")}_Fabric_1.19.1")
-            library("worldmap-forge", "maven.modrinth:xaeros-world-map:${gradle.extra.get("worldmap_version_forge")}_Forge_1.19.1")
-            library("minimap-fabric", "maven.modrinth:xaeros-minimap:${gradle.extra.get("minimap_version_fabric")}_Fabric_1.19.1")
-            library("minimap-forge", "maven.modrinth:xaeros-minimap:${gradle.extra.get("minimap_version_forge")}_Forge_1.19.1")
+			library("forge", "net.minecraftforge:forge:${minecraft_version}-43.3.7")
+			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.77.0+${minecraft_version}")
+            library("worldmap-fabric", "maven.modrinth:xaeros-world-map:${worldmap_version_fabric}_Fabric_1.19.1")
+            library("worldmap-forge", "maven.modrinth:xaeros-world-map:${worldmap_version_forge}_Forge_1.19.1")
+            library("minimap-fabric", "maven.modrinth:xaeros-minimap:${minimap_version_fabric}_Fabric_1.19.1")
+            library("minimap-forge", "maven.modrinth:xaeros-minimap:${minimap_version_forge}_Forge_1.19.1")
 			library("mixinextras-common", "io.github.llamalad7:mixinextras-common:0.4.1")
 			library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.4.1")
 			library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.0")

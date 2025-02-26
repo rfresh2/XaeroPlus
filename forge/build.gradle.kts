@@ -32,9 +32,9 @@ loom {
     }
 }
 
-val worldmap_version_forge: String by gradle.extra
-val minimap_version_forge: String by gradle.extra
-val minecraft_version: String by gradle.extra
+val worldmap_version_forge: String by project.properties
+val minimap_version_forge: String by project.properties
+val minecraft_version: String by project.properties
 val destArchiveVersion = "${project.version}+${loom.platform.get().id()}-${minecraft_version}"
 val destArchiveClassifier = "WM${worldmap_version_forge}-MM${minimap_version_forge}"
 

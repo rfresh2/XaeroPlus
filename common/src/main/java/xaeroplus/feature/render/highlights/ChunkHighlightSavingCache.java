@@ -149,8 +149,14 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     private synchronized void reset() {
         this.currentWorldId = null;
         if (this.dbExecutor != null) {
-            this.dbExecutor.shutdown();
+            var closeFuture = this.dbExecutor.submit(() -> {
+                if (this.database != null) {
+                    this.database.close();
+                }
+            });
             try {
+                this.dbExecutor.shutdown();
+                closeFuture.get(3L, TimeUnit.SECONDS);
                 this.dbExecutor.awaitTermination(3L, TimeUnit.SECONDS);
             } catch (final Throwable e) {
                 XaeroPlus.LOGGER.error("Timed out waiting for {} executor to shutdown", databaseName, e);

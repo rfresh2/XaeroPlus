@@ -34,7 +34,7 @@ dependencyResolutionManagement {
 			library("balm-forge", "maven.modrinth:balm:6.0.2+forge-1.19.4")
 			library("fabric-waystones", "maven.modrinth:fwaystones:3.1.1+mc1.19.4")
 			library("worldtools", "maven.modrinth:worldtools:1.2.0+1.20.1")
-            library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.47.1.0") // relocated xerial sqlite to avoid conflicts with other mods
+            library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.49.1.0") // relocated xerial sqlite to avoid conflicts with other mods
 			library("sodium", "maven.modrinth:sodium:mc1.19.4-0.4.10")
             library("modmenu", "maven.modrinth:modmenu:6.3.1")
             library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")

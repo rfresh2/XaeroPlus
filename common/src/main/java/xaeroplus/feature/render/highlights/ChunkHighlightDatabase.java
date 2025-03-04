@@ -4,24 +4,29 @@ import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.longs.Long2LongMaps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import org.rfresh.sqlite.SQLiteErrorCode;
 import xaero.map.WorldMap;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.render.highlights.db.DatabaseMigrator;
 import xaeroplus.util.ChunkUtils;
 
 import java.io.Closeable;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import static xaeroplus.util.ChunkUtils.regionCoordToChunkCoord;
 
 public class ChunkHighlightDatabase implements Closeable {
     public static final int MAX_HIGHLIGHTS_LIST = 25000;
-    private final Connection connection;
+    private Connection connection;
     protected final String databaseName;
+    protected final Path dbPath;
     private static final DatabaseMigrator MIGRATOR = new DatabaseMigrator();
+    boolean recoveryAttempted = false;
 
     public ChunkHighlightDatabase(String worldId, String databaseName) {
         this.databaseName = databaseName;
@@ -30,7 +35,7 @@ public class ChunkHighlightDatabase implements Closeable {
             // before we are on the classpath
             var jdbcClass = org.rfresh.sqlite.JDBC.class;
 
-            final Path dbPath = WorldMap.saveFolder.toPath().resolve(worldId).resolve(databaseName + ".db");
+            dbPath = WorldMap.saveFolder.toPath().resolve(worldId).resolve(databaseName + ".db");
             boolean shouldRunMigrations = dbPath.toFile().exists();
             connection = DriverManager.getConnection("jdbc:rfresh_sqlite:" + dbPath);
             if (shouldRunMigrations) MIGRATOR.migrate(dbPath, databaseName, connection);
@@ -53,19 +58,75 @@ public class ChunkHighlightDatabase implements Closeable {
         try (var statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS metadata (id INTEGER PRIMARY KEY, version INTEGER)");
             statement.executeUpdate("INSERT OR REPLACE INTO metadata (id, version) VALUES (0, 1)");
-        } catch (Exception e) {
-            XaeroPlus.LOGGER.error("Error creating metadata table for db: {}", databaseName);
+        } catch (SQLException e) {
+            XaeroPlus.LOGGER.error("Error creating metadata table for db: {}", databaseName, e);
+            if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
+                XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
+                recoverCorruptDatabase();
+            } else {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    // this can take an extremely long time for large databases
+    private void recoverCorruptDatabase() {
+        if (recoveryAttempted) {
+            // prevent infinite retries if recovery fails
+            return;
+        }
+        recoveryAttempted = true;
+        XaeroPlus.LOGGER.info("Attempting to recover corrupt database: {}", databaseName);
+        final Path recoveredDbPath = dbPath.getParent().resolve("recovered_" + databaseName + "-" + System.currentTimeMillis() + ".db");
+        try (var statement = connection.createStatement()) {
+            statement.executeUpdate("recover to \"" + recoveredDbPath.toAbsolutePath() + "\"");
+            XaeroPlus.LOGGER.info("Wrote recovered database to: {}", recoveredDbPath);
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Error recovering corrupt database: {}", databaseName, e);
+            return;
+        }
+        try {
+            connection.close();
+            XaeroPlus.LOGGER.info("Closed DB connection to corrupt database: {}", databaseName);
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Error closing connection to corrupt database: {}", databaseName, e);
             throw new RuntimeException(e);
         }
+        // replace the corrupt database with the recovered one
+        // then reopen the connection
+        Path corruptedBackDbPath = dbPath.getParent().resolve("corrupted_" + databaseName + "-" + System.currentTimeMillis() + ".db");
+        try {
+            Files.move(dbPath, corruptedBackDbPath);
+            Files.move(recoveredDbPath, dbPath);
+            XaeroPlus.LOGGER.info("Replaced corrupt database with recovered: {}", databaseName);
+            connection = DriverManager.getConnection("jdbc:rfresh_sqlite:" + dbPath);
+            XaeroPlus.LOGGER.info("Opened DB connection to recovered database: {}", databaseName);
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Error reopening connection to recovered database: {}", databaseName, e);
+            throw new RuntimeException(e);
+        }
+        try {
+            // remove the corrupted backup
+            Files.delete(corruptedBackDbPath);
+            XaeroPlus.LOGGER.info("Deleted corrupted database backup: {}" , corruptedBackDbPath);
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Error deleting corrupted backup database: {}", databaseName, e);
+        }
+        XaeroPlus.LOGGER.info("Completed recovering corrupt database: {}", databaseName);
     }
 
     private void createHighlightsTableIfNotExists(ResourceKey<Level> dimension) {
         try (var statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS \"" + getTableName(dimension) + "\" (x INTEGER, z INTEGER, foundTime INTEGER)");
             statement.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS \"unique_xz_" + getTableName(dimension) + "\" ON \"" + getTableName(dimension) + "\" (x, z)");
-        } catch (Exception e) {
-            XaeroPlus.LOGGER.error("Error creating highlights table for db: {} in dimension: {}", databaseName, dimension.location());
-            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            XaeroPlus.LOGGER.error("Error creating highlights table for db: {} in dimension: {}", databaseName, dimension.location(), e);
+            if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
+                XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
+                recoverCorruptDatabase();
+            } else {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -98,8 +159,12 @@ public class ChunkHighlightDatabase implements Closeable {
                     stmt.executeUpdate(sb.toString());
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             XaeroPlus.LOGGER.error("Error inserting {} chunks into {} database in dimension: {}", chunks.size(), databaseName, dimension.location(), e);
+            if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
+                XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
+                recoverCorruptDatabase();
+            }
         }
     }
 
@@ -128,9 +193,12 @@ public class ChunkHighlightDatabase implements Closeable {
                     );
                 }
             }
-        } catch (final Exception e) {
+        } catch (SQLException e) {
             XaeroPlus.LOGGER.error("Error getting chunks from {} database in dimension: {}, window: {}-{}, {}-{}", databaseName, dimension.location(), regionXMin, regionXMax, regionZMin, regionZMax, e);
-            // fall through
+            if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
+                XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
+                recoverCorruptDatabase();
+            }
         }
     }
 
@@ -166,8 +234,12 @@ public class ChunkHighlightDatabase implements Closeable {
                     );
                 }
             }
-        } catch (final Exception e) {
+        } catch (SQLException e) {
             XaeroPlus.LOGGER.error("Error getting chunks from {} database in dimension: {}, window: {}-{}, {}-{}", databaseName, dimension.location(), regionXMin, regionXMax, regionZMin, regionZMax, e);
+            if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
+                XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
+                recoverCorruptDatabase();
+            }
             // fall through
         }
     }
@@ -175,8 +247,12 @@ public class ChunkHighlightDatabase implements Closeable {
     public void removeHighlight(final int x, final int z, final ResourceKey<Level> dimension) {
         try (var statement = connection.createStatement()) {
             statement.executeUpdate("DELETE FROM \"" + getTableName(dimension) + "\" WHERE x = " + x + " AND z = " + z);
-        } catch (Exception e) {
+        } catch (SQLException e) {
             XaeroPlus.LOGGER.error("Error while removing highlight from {} database in dimension: {}, at {}, {}", databaseName, dimension.location(), x, z, e);
+            if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
+                XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
+                recoverCorruptDatabase();
+            }
         }
     }
 

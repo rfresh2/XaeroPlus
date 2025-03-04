@@ -79,13 +79,15 @@ public class ChunkHighlightDatabase implements Closeable {
         XaeroPlus.LOGGER.info("Attempting to recover corrupt database: {}", databaseName);
         final Path recoveredDbPath = dbPath.getParent().resolve("recovered_" + databaseName + "-" + System.currentTimeMillis() + ".db");
         try (var statement = connection.createStatement()) {
-            statement.executeUpdate("recover to " + recoveredDbPath.toAbsolutePath());
+            statement.executeUpdate("recover to \"" + recoveredDbPath.toAbsolutePath() + "\"");
+            XaeroPlus.LOGGER.info("Wrote recovered database to: {}", recoveredDbPath);
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error recovering corrupt database: {}", databaseName, e);
             return;
         }
         try {
             connection.close();
+            XaeroPlus.LOGGER.info("Closed DB connection to corrupt database: {}", databaseName);
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error closing connection to corrupt database: {}", databaseName, e);
             throw new RuntimeException(e);
@@ -96,7 +98,9 @@ public class ChunkHighlightDatabase implements Closeable {
         try {
             Files.move(dbPath, corruptedBackDbPath);
             Files.move(recoveredDbPath, dbPath);
+            XaeroPlus.LOGGER.info("Replaced corrupt database with recovered: {}", databaseName);
             connection = DriverManager.getConnection("jdbc:rfresh_sqlite:" + dbPath);
+            XaeroPlus.LOGGER.info("Opened DB connection to recovered database: {}", databaseName);
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error reopening connection to recovered database: {}", databaseName, e);
             throw new RuntimeException(e);
@@ -104,6 +108,7 @@ public class ChunkHighlightDatabase implements Closeable {
         try {
             // remove the corrupted backup
             Files.delete(corruptedBackDbPath);
+            XaeroPlus.LOGGER.info("Deleted corrupted database backup: {}" , corruptedBackDbPath);
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error deleting corrupted backup database: {}", databaseName, e);
         }

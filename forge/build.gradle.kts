@@ -47,7 +47,6 @@ dependencies {
     modImplementation(libs.worldmap.forge)
     modImplementation(libs.minimap.forge)
     modImplementation(libs.baritone.forge)
-    modCompileOnly(files("libs/sodium-forge-1.20.1-0.6.0-alpha.2.jar"))
     modCompileOnly(libs.waystones.forge)
     modCompileOnly(libs.balm.forge)
     modCompileOnly(libs.worldtools)

@@ -113,7 +113,7 @@ public final class Settings extends SettingRegistry {
             WaystoneWpVisibilityType.values(),
             WaystoneWpVisibilityType.LOCAL,
             (mode) -> {
-                if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setVisibilityType(mode.ordinal());
+                if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setVisibilityType(mode);
             },
             () -> WaystonesHelper.isAnyWaystonesPresent() && ModuleManager.getModule(WaystoneSync.class).isEnabled()),
         SettingLocation.WORLD_MAP_MAIN);

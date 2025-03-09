@@ -12,9 +12,9 @@ import xaero.hud.minimap.waypoint.WaypointColor;
 import xaero.hud.minimap.waypoint.WaypointPurpose;
 import xaero.hud.minimap.waypoint.set.WaypointSet;
 import xaero.hud.minimap.world.MinimapWorld;
-import xaero.hud.path.XaeroPath;
 import xaero.map.mods.SupportMods;
 import xaeroplus.XaeroPlus;
+import xaeroplus.feature.waypoint.WaypointAPI;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.TickTaskExecutor;
 
@@ -65,25 +65,18 @@ public final class AtlasWaypointImport {
                     return v1;
                 }
             ));
-        MinimapWorld owMinimapWorld = getMinimapWorld(Level.OVERWORLD);
-        MinimapWorld endMinimapWorld = getMinimapWorld(Level.END);
+        MinimapWorld owMinimapWorld = WaypointAPI.getMinimapWorld(Level.OVERWORLD);
+        MinimapWorld endMinimapWorld = WaypointAPI.getMinimapWorld(Level.END);
+        WaypointSet owAtlasSet = WaypointAPI.getOrCreateWaypointSetInWorld(owMinimapWorld, "atlas");
+        WaypointSet endAtlasSet = WaypointAPI.getOrCreateWaypointSetInWorld(endMinimapWorld, "atlas");
+        owAtlasSet.clear();
+        endAtlasSet.clear();
 
-        if (owMinimapWorld.getWaypointSet("atlas") != null) {
-            owMinimapWorld.getWaypointSet("atlas").clear();
-        } else {
-            owMinimapWorld.addWaypointSet("atlas");
-        }
-        if (endMinimapWorld.getWaypointSet("atlas") != null) {
-            endMinimapWorld.getWaypointSet("atlas").clear();
-        } else {
-            endMinimapWorld.addWaypointSet("atlas");
-        }
         int addedWaypoints = 0;
         for (var atlasWp : atlasByDimension.entrySet()) {
             ResourceKey<Level> dim = atlasWp.getKey();
             List<AtlasWaypoint> waypoints = atlasWp.getValue();
-            MinimapWorld world = dim == Level.OVERWORLD ? owMinimapWorld : endMinimapWorld;
-            WaypointSet waypointSet = world.getWaypointSet("atlas");
+            WaypointSet waypointSet = dim == Level.OVERWORLD ? owAtlasSet : endAtlasSet;
             for (var waypoint : waypoints) {
                 Waypoint wp = new Waypoint(
                     waypoint.x,
@@ -125,34 +118,6 @@ public final class AtlasWaypointImport {
             return Collections.emptyList();
         }
     }
-
-    private static MinimapWorld getMinimapWorld(ResourceKey<Level> dim) {
-        MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
-        MinimapWorld currentWorld = minimapSession.getWorldManager().getCurrentWorld();
-        ResourceKey<Level> currentWaypointWorldDim = currentWorld.getDimId();
-        if (currentWaypointWorldDim == dim) {
-            return currentWorld;
-        }
-        var rootContainer = minimapSession.getWorldManager().getCurrentRootContainer();
-        MinimapWorld minimapWorld = null;
-        for (MinimapWorld world : rootContainer.getWorlds()) {
-            if (world.getDimId() == dim) {
-                minimapWorld = world;
-                break;
-            }
-        }
-        if (minimapWorld == null) {
-            String waystoneDimensionDirectoryName = minimapSession.getDimensionHelper().getDimensionDirectoryName(dim);
-            String waystoneWpWorldNode = minimapSession.getWorldStateUpdater().getPotentialWorldNode(dim, true);
-            XaeroPath waystoneWpContainerPath = minimapSession.getWorldState()
-                .getAutoRootContainerPath()
-                .resolve(waystoneDimensionDirectoryName)
-                .resolve(waystoneWpWorldNode);
-            minimapWorld = minimapSession.getWorldManager().getWorld(waystoneWpContainerPath);
-        }
-        return minimapWorld;
-    }
-
 
     public static class AtlasWaypoint {
         public String name;

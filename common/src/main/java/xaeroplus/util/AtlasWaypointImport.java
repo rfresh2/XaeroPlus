@@ -1,5 +1,6 @@
 package xaeroplus.util;
 
+import com.google.common.hash.Hashing;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import net.minecraft.resources.ResourceKey;
@@ -78,13 +79,17 @@ public final class AtlasWaypointImport {
             List<AtlasWaypoint> waypoints = atlasWp.getValue();
             WaypointSet waypointSet = dim == Level.OVERWORLD ? owAtlasSet : endAtlasSet;
             for (var waypoint : waypoints) {
+                int index = Math.abs(
+                    Hashing.murmur3_128().hashUnencodedChars(waypoint.name).asInt())
+                    % WaypointColor.values().length;
+                var color = WaypointColor.fromIndex(index);
                 Waypoint wp = new Waypoint(
                     waypoint.x,
                     waypoint.y == null ? 64 : waypoint.y,
                     waypoint.z,
                     waypoint.name,
                     waypoint.name.substring(0, Math.min(2, waypoint.name.length())),
-                    WaypointColor.getRandom(),
+                    color,
                     WaypointPurpose.NORMAL
                 );
                 waypointSet.add(wp);

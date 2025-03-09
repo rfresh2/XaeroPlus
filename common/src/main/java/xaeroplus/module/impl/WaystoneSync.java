@@ -154,8 +154,8 @@ public class WaystoneSync extends Module {
     private WaypointColor getWaystoneColor(Waystone waystone) {
         if (color == WaystoneColor.RANDOM) {
             int index = Math.abs(
-                Hashing.murmur3_128()
-                    .hashUnencodedChars(waystone.name()).asInt()) % WaypointColor.values().length;
+                Hashing.murmur3_128().hashUnencodedChars(waystone.name()).asInt())
+                % WaypointColor.values().length;
             return WaypointColor.fromIndex(index);
         } else {
             return WaypointColor.fromIndex(color.getColorIndex());

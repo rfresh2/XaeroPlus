@@ -88,10 +88,6 @@ public abstract class MixinMinimapModSettings {
     @Inject(method = "setOptionDoubleValue", at = @At("RETURN"))
     public void setOptionFloatValue(ModOptions o, double f, CallbackInfo ci) {
         SettingHooks.setOptionDoubleValue(o.getEnumString(), f);
-        var screen = Minecraft.getInstance().screen;
-        if (screen != null) {
-            Minecraft.getInstance().setScreen(screen);
-        }
     }
 
     @Inject(method = "getOptionDoubleValue", at = @At("HEAD"), cancellable = true)

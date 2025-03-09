@@ -164,6 +164,8 @@
   "xaeroplus.setting.minimap_scaling.tooltip": "Multiplie la mise à l'échelle du rendu de la minicarte.\nAugmente la quantité de chunks visibles.\nPour réduire les artefacts visuels, régler à moins de 2 de la valeur du Multiplicateur de Taille de la Minicarte.\nImpact modéré sur les FPS. Limiteur de FPS fortement recommandé si réglé > 2.",
   "xaeroplus.setting.minimap_size_multiplier": "Multiplicateur de Taille de la Minicarte",
   "xaeroplus.setting.minimap_size_multiplier.tooltip": "Multiplie la taille de la minicarte.\nPour de meilleurs résultats, augmenter uniquement lors de l'augmentation de la Mise à l'Échelle de la Minicarte.\nAucun impact sur les FPS.",
+  "xaeroplus.setting.minimap_render_z_offset": "Rendu Z",
+  "xaeroplus.setting.minimap_render_z_offset.tooltip": "Détermine si les autres interfaces graphiques s'affichent devant ou derrière la mini-carte. Z plus bas = plus en arrière",
   "xaeroplus.keybind.switch_to_nether": "Basculer vers le Nether",
   "xaeroplus.keybind.switch_to_nether.tooltip": "Bascule vers la carte du Nether.",
   "xaeroplus.keybind.switch_to_overworld": "Basculer vers l'Overworld",

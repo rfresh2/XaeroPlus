@@ -8,12 +8,11 @@
   },
   "plugin": "xaeroplus.fabric.util.compat.XaeroPlusCompatibleMinimapMixinPlugin",
   "client": [
-    "MixinBetterPVP",
+    "MixinHudMod",
     "MixinPlatformContextFabric",
     "MixinSodium6OptionsGUI",
     "MixinWorldMap",
     "MixinWorldMapFabric",
-    "MixinXaeroMinimap",
     "mc.MixinMinecraftClientFabric"
   ]
 }

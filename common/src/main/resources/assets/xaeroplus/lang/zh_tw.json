@@ -164,6 +164,8 @@
   "xaeroplus.setting.minimap_scaling.tooltip": "乘以小地圖的渲染縮放比例。\n增加可視區域的塊數量。\n為減少視覺偽影，請在小地圖尺寸倍數值的2以內設置。\n對FPS有中等影響。如果設置 > 2，強烈建議使用FPS限制器。",
   "xaeroplus.setting.minimap_size_multiplier": "小地圖尺寸倍數",
   "xaeroplus.setting.minimap_size_multiplier.tooltip": "乘以小地圖的尺寸。\n為了獲得最佳效果，僅在增加小地圖縮放時增加。\n對FPS沒有影響。",
+  "xaeroplus.setting.minimap_render_z_offset": "渲染 Z",
+  "xaeroplus.setting.minimap_render_z_offset.tooltip": "確定其他 GUI 是否在小地圖前方或後方渲染。較低的 Z = 更靠後",
   "xaeroplus.keybind.switch_to_nether": "切換到地獄",
   "xaeroplus.keybind.switch_to_nether.tooltip": "切換到地獄地圖。",
   "xaeroplus.keybind.switch_to_overworld": "切換到主世界",

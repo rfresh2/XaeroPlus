@@ -5,17 +5,20 @@ import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaero.common.minimap.waypoints.Waypoint;
+import xaero.common.minimap.waypoints.WaypointVisibilityType;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.waypoint.WaypointColor;
+import xaero.hud.minimap.waypoint.WaypointPurpose;
 import xaero.hud.minimap.waypoint.set.WaypointSet;
 import xaero.hud.minimap.world.MinimapWorld;
 import xaero.hud.minimap.world.MinimapWorldManager;
-import xaero.hud.path.XaeroPath;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.ClientTickEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
-import xaeroplus.mixin.client.AccessorWaypointSet;
+import xaeroplus.feature.waypoint.WaypointAPI;
 import xaeroplus.module.Module;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.BlayWaystonesHelper;
 import xaeroplus.util.ColorHelper.WaystoneColor;
 import xaeroplus.util.FabricWaystonesHelper;
@@ -24,7 +27,6 @@ import xaeroplus.util.WaystonesHelper;
 import java.util.List;
 import java.util.Locale;
 
-import static xaero.common.settings.ModSettings.COLORS;
 import static xaeroplus.event.XaeroWorldChangeEvent.WorldChangeType.ENTER_WORLD;
 import static xaeroplus.event.XaeroWorldChangeEvent.WorldChangeType.EXIT_WORLD;
 
@@ -32,7 +34,7 @@ public class WaystoneSync extends Module {
     private final BlayWaystonesHelper blayWaystonesHelper = new BlayWaystonesHelper();
     private WaystoneColor color = WaystoneColor.RANDOM;
     private boolean separateWaypointSet = false;
-    private int visibilityType = 0;
+    private WaypointVisibilityType visibilityType = WaypointVisibilityType.LOCAL;
 
     @Override
     public void onEnable() {
@@ -91,10 +93,10 @@ public class WaystoneSync extends Module {
             if (worldManager == null) return false;
             MinimapWorld currentWorld = worldManager.getCurrentWorld();
             if (currentWorld == null) return false;
-            clearWaystoneWaypoints(minimapSession);
+            clearWaystoneWaypoints();
             for (Waystone waystone : waystones) {
                 try {
-                    waypointsListSync(waystone, getWaypointSet(waystone, minimapSession));
+                    waypointsListSync(waystone, getWaypointSet(waystone));
                 } catch (final Exception e) {
                     XaeroPlus.LOGGER.error("Error syncing waystone: {}", waystone.name(), e);
                 }
@@ -107,21 +109,10 @@ public class WaystoneSync extends Module {
     }
 
     // iterate over ALL waypoint sets and lists and remove waystones
-    private void clearWaystoneWaypoints(final MinimapSession minimapSession) {
-        var rootContainer = minimapSession.getWorldManager().getCurrentRootContainer();
-        var rootWorlds = rootContainer.getWorlds();
-        for (var world : rootWorlds) {
-            for (WaypointSet set : world.getIterableWaypointSets()) {
-                ((AccessorWaypointSet) set).getList().removeIf(WaystoneSync::isWaystoneWaypoint);
-            }
-        }
-        for (var subContainer : rootContainer.getSubContainers()) {
-            for (var world : subContainer.getWorlds()) {
-                for (WaypointSet set : world.getIterableWaypointSets()) {
-                    ((AccessorWaypointSet) set).getList().removeIf(WaystoneSync::isWaystoneWaypoint);
-                }
-            }
-        }
+    private void clearWaystoneWaypoints() {
+        WaypointAPI.forEachWaypointSetInCurrentContainer(waypoints -> {
+            waypoints.removeIf(WaystoneSync::isWaystoneWaypoint);
+        });
     }
 
     private static boolean isWaystoneWaypoint(Waypoint waypoint) {
@@ -138,48 +129,36 @@ public class WaystoneSync extends Module {
                 ? "W"
                 : waystone.name().substring(0, 1).toUpperCase(Locale.ROOT),
             getWaystoneColor(waystone),
-            0,
+            WaypointPurpose.NORMAL,
             true
         );
-        waystoneWp.setVisibilityType(visibilityType);
+        waystoneWp.setVisibility(visibilityType);
         waypointsList.add(waystoneWp);
     }
 
-    private WaypointSet getWaypointSet(final Waystone waystone, final MinimapSession minimapSession) {
+    private WaypointSet getWaypointSet(final Waystone waystone) {
         final String waypointSetName = this.separateWaypointSet ? "Waystones" : "gui.xaero_default";
-        final MinimapWorld waypointWorld = getWaypointWorldForWaystone(waystone, minimapSession);
-        WaypointSet waypointSet = waypointWorld.getWaypointSet(waypointSetName);
-        if (waypointSet == null) {
-            waypointSet = WaypointSet.Builder.begin().setName(waypointSetName).build();
-            waypointWorld.addWaypointSet(waypointSet);
-        }
-        return waypointSet;
+        final MinimapWorld waypointWorld = getWaypointWorldForWaystone(waystone);
+        return WaypointAPI.getOrCreateWaypointSetInWorld(waypointWorld, waypointSetName);
     }
 
-    private MinimapWorld getWaypointWorldForWaystone(final Waystone waystone,
-                                                      MinimapSession minimapSession) {
-        ResourceKey<Level> waystoneDimension = waystone.dimension();
-        String waystoneDimensionDirectoryName = minimapSession.getDimensionHelper().getDimensionDirectoryName(waystoneDimension);
-        MinimapWorld currentWpWorld = minimapSession.getWorldManager().getCurrentWorld();
-        if (currentWpWorld == null) {
-            throw new RuntimeException("WaystoneSync: current waypoint world is null");
-        }
-        if (currentWpWorld.getDimId() == waystoneDimension) {
-            return currentWpWorld;
-        }
-        String waystoneWpWorldNode = minimapSession.getWorldStateUpdater().getPotentialWorldNode(waystoneDimension, true, minimapSession);
-        XaeroPath waystoneWpContainerPath = minimapSession.getWorldState()
-            .getAutoRootContainerPath()
-            .resolve(waystoneDimensionDirectoryName)
-            .resolve(waystoneWpWorldNode);
-        return minimapSession.getWorldManager().getWorld(waystoneWpContainerPath);
-    }
-
-    private int getWaystoneColor(Waystone waystone) {
-        if (color == WaystoneColor.RANDOM) {
-            return Math.abs(Hashing.murmur3_128().hashUnencodedChars(waystone.name()).asInt()) % COLORS.length;
+    private MinimapWorld getWaypointWorldForWaystone(final Waystone waystone) {
+        MinimapWorld waystoneWpMinimapWorld = WaypointAPI.getMinimapWorld(waystone.dimension);
+        if (waystoneWpMinimapWorld != null) {
+            return waystoneWpMinimapWorld;
         } else {
-            return color.getColorIndex();
+            throw new RuntimeException("WaystoneSync: waystone world is null");
+        }
+    }
+
+    private WaypointColor getWaystoneColor(Waystone waystone) {
+        if (color == WaystoneColor.RANDOM) {
+            int index = Math.abs(
+                Hashing.murmur3_128().hashUnencodedChars(waystone.name()).asInt())
+                % WaypointColor.values().length;
+            return WaypointColor.fromIndex(index);
+        } else {
+            return WaypointColor.fromIndex(color.getColorIndex());
         }
     }
 
@@ -193,8 +172,13 @@ public class WaystoneSync extends Module {
         reloadWaystones();
     }
 
-    public void setVisibilityType(final int visibilityType) {
-        this.visibilityType = visibilityType;
+    public void setVisibilityType(final Settings.WaystoneWpVisibilityType visibilityType) {
+        this.visibilityType = switch (visibilityType) {
+            case LOCAL -> WaypointVisibilityType.LOCAL;
+            case GLOBAL -> WaypointVisibilityType.GLOBAL;
+            case WORLD_MAP_LOCAL -> WaypointVisibilityType.WORLD_MAP_LOCAL;
+            case WORLD_MAP_GLOBAL -> WaypointVisibilityType.WORLD_MAP_GLOBAL;
+        };
         reloadWaystones();
     }
 

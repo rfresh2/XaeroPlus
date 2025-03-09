@@ -13,13 +13,11 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.IXaeroMinimap;
-import xaero.common.graphics.CustomVertexConsumers;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.render.MinimapFBORenderer;
 import xaero.common.minimap.render.MinimapRenderer;
 import xaero.hud.minimap.Minimap;
 import xaero.hud.minimap.element.render.over.MinimapElementOverMapRendererHandler;
-import xaero.hud.minimap.module.MinimapSession;
 import xaeroplus.Globals;
 import xaeroplus.feature.extensions.CustomMinimapFBORenderer;
 import xaeroplus.settings.Settings;
@@ -32,20 +30,10 @@ public class MixinMinimapRenderer {
     protected IXaeroMinimap modMain;
 
     @Inject(method = "renderMinimap", at = @At("HEAD"))
-    public void renderMinimap(
-        final MinimapSession minimapSession,
-        final PoseStack matrixStack,
-        final MinimapProcessor minimap,
-        final int x,
-        final int y,
-        final int width,
-        final int height,
-        final double scale,
-        final int size,
-        final float partial,
-        final CustomVertexConsumers cvc,
-        final CallbackInfo ci
-    ) {
+    public void resetFBOSize(
+        CallbackInfo ci,
+        @Local(argsOnly = true) MinimapProcessor minimap
+        ) {
         if (this.minimap.usingFBO() && Globals.shouldResetFBO) {
             Globals.minimapScaleMultiplier = Settings.REGISTRY.minimapScaleMultiplierSetting.getAsInt();
             Globals.minimapSizeMultiplier = Settings.REGISTRY.minimapSizeMultiplierSetting.getAsInt();
@@ -53,6 +41,23 @@ public class MixinMinimapRenderer {
             Globals.shouldResetFBO = false;
             minimap.setToResetImage(true);
         }
+    }
+
+    @Inject(method = "renderMinimap", at = @At("HEAD"))
+    public void shiftRenderZHead(
+        CallbackInfo ci,
+        @Local(argsOnly = true) PoseStack guiGraphics
+    ) {
+        guiGraphics.pushPose();
+        guiGraphics.translate(0, 0, Settings.REGISTRY.minimapRenderZOffsetSetting.get());
+    }
+
+    @Inject(method = "renderMinimap", at = @At("RETURN"))
+    public void shiftRenderZPost(
+        CallbackInfo ci,
+        @Local(argsOnly = true) PoseStack guiGraphics
+    ) {
+        guiGraphics.popPose();
     }
 
     @ModifyConstant(

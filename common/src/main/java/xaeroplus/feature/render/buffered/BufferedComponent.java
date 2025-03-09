@@ -93,6 +93,7 @@ public class BufferedComponent {
     }
 
     private void renderBufferedTexture(final int textureId) {
+        RenderSystem.enableDepthTest();
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(
             GlStateManager.SourceFactor.SRC_ALPHA,
@@ -104,11 +105,11 @@ public class BufferedComponent {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, textureId);
         modelViewMatrix.load(RenderSystem.getModelViewMatrix());
+        modelViewMatrix.translate(new Vector3f(0, 0, (float) Settings.REGISTRY.minimapRenderZOffsetSetting.get()));
         var guiScale = (float) Math.max(1.0, mc.getWindow().getGuiScale());
         float scalar = 1.0f / guiScale;
         Matrix4f scaleMatrix = Matrix4f.createScaleMatrix(scalar, scalar, scalar);
         modelViewMatrix.multiply(scaleMatrix);
-        modelViewMatrix.translate(new Vector3f(0, 0, (float) Settings.REGISTRY.minimapRenderZOffsetSetting.get()));
         model.draw(modelViewMatrix);
     }
 }

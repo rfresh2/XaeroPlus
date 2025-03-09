@@ -20,7 +20,7 @@ val minimap_version_neo: String by ext.properties
 dependencyResolutionManagement {
 	versionCatalogs {
 		create("libs") {
-			library("fabric-loader", "net.fabricmc:fabric-loader:0.15.11")
+			library("fabric-loader", "net.fabricmc:fabric-loader:0.16.10")
 			library("forge", "net.minecraftforge:forge:${minecraft_version}-52.0.38")
 			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.114.0+1.21.1")
 			library("neoforge", "net.neoforged:neoforge:21.1.92")

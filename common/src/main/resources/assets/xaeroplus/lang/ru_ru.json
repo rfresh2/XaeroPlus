@@ -164,6 +164,8 @@
   "xaeroplus.setting.minimap_scaling.tooltip": "Умножает масштабирование рендеринга миникарты.\nУвеличивает количество видимых фрагментов.\nЧтобы уменьшить визуальные артефакты, установите значение в пределах 2 от значения Множителя Размера Миникарты.\nУмеренное влияние на FPS. Настоятельно рекомендуется ограничитель FPS при установке > 2.",
   "xaeroplus.setting.minimap_size_multiplier": "Множитель Размера Миникарты",
   "xaeroplus.setting.minimap_size_multiplier.tooltip": "Умножает размер миникарты.\nДля лучших результатов увеличивайте только при увеличении Масштабирования Миникарты.\nНет влияния на FPS.",
+  "xaeroplus.setting.minimap_render_z_offset": "Рендер Z",
+  "xaeroplus.setting.minimap_render_z_offset.tooltip": "Определяет, отображаются ли другие GUI перед или за миникартой. Меньшее значение Z = дальше позади",
   "xaeroplus.keybind.switch_to_nether": "Переключиться на Незер",
   "xaeroplus.keybind.switch_to_nether.tooltip": "Переключиться на карту Незера",
   "xaeroplus.keybind.switch_to_overworld": "Переключиться на карту Верхнего Мира",

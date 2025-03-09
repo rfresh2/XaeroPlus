@@ -92,6 +92,7 @@ public class BufferedComponent {
     }
 
     private void renderBufferedTexture(final int textureId) {
+        RenderSystem.enableDepthTest();
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(
             GlStateManager.SourceFactor.SRC_ALPHA,

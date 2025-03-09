@@ -113,7 +113,7 @@ public final class Settings extends SettingRegistry {
             WaystoneWpVisibilityType.values(),
             WaystoneWpVisibilityType.LOCAL,
             (mode) -> {
-                if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setVisibilityType(mode.ordinal());
+                if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setVisibilityType(mode);
             },
             () -> WaystonesHelper.isAnyWaystonesPresent() && ModuleManager.getModule(WaystoneSync.class).isEnabled()),
         SettingLocation.WORLD_MAP_MAIN);
@@ -775,6 +775,13 @@ public final class Settings extends SettingRegistry {
             1, 4, 1,
             1,
             (b) -> Globals.shouldResetFBO = true),
+        SettingLocation.MINIMAP_VIEW);
+    public final DoubleSetting minimapRenderZOffsetSetting = register(
+        DoubleSetting.create(
+            "Minimap Render Z",
+            "xaeroplus.setting.minimap_render_z_offset",
+            -1000, 1000, 50,
+            0),
         SettingLocation.MINIMAP_VIEW);
 
     /**

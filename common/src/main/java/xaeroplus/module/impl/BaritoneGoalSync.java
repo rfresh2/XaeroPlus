@@ -11,6 +11,8 @@ import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.misc.OptimizedMath;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.waypoint.WaypointColor;
+import xaero.hud.minimap.waypoint.WaypointPurpose;
 import xaero.hud.minimap.waypoint.set.WaypointSet;
 import xaero.hud.minimap.world.MinimapWorld;
 import xaero.map.mods.SupportMods;
@@ -91,9 +93,10 @@ public class BaritoneGoalSync extends Module {
                     z,
                     "Baritone Goal",
                     "B",
-                    10, // green
-                    0,
-                    true);
+                    WaypointColor.GREEN,
+                    WaypointPurpose.NORMAL,
+                    true
+                );
                 baritoneWpRef = new WeakReference<>(baritoneWp);
                 baritoneWpSetRef.get().add(baritoneWp);
                 SupportMods.xaeroMinimap.requestWaypointsRefresh();
@@ -119,7 +122,7 @@ public class BaritoneGoalSync extends Module {
 
     private void initBaritoneWpWorld(final MinimapWorld currentWorld) {
         baritoneWpMinimapWorldRef = new WeakReference<>(currentWorld);
-        WaypointSet waypointSet = baritoneWpMinimapWorldRef.get().getCurrentWaypointSet();
+        WaypointSet waypointSet = currentWorld.getCurrentWaypointSet();
         baritoneWpSetRef = new WeakReference<>(waypointSet);
     }
 

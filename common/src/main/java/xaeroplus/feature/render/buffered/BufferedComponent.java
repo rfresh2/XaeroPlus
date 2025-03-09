@@ -10,6 +10,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import xaeroplus.module.impl.FpsLimiter;
+import xaeroplus.settings.Settings;
 
 import java.util.function.IntSupplier;
 
@@ -31,10 +32,10 @@ public class BufferedComponent {
     private void refreshModel(final int screenWidth, final int screenHeight) {
         if (model != null) model.close();
         var posMatrix = new Vector3f[] {
-            new Vector3f(0.0f, screenHeight, -90.0f),
-            new Vector3f(screenWidth, screenHeight, -90.0F),
-            new Vector3f(screenWidth, 0.0F, -90.0F),
-            new Vector3f(0.0F, 0.0F, -90.0F),
+            new Vector3f(0.0f, screenHeight, 1f),
+            new Vector3f(screenWidth, screenHeight, 1f),
+            new Vector3f(screenWidth, 0.0F, 1f),
+            new Vector3f(0.0F, 0.0F, 1f),
         };
         var texUvMatrix = new Vector2f[] {
             new Vector2f(0.0f, 0.0f),
@@ -53,7 +54,8 @@ public class BufferedComponent {
         var windowHeight = mc.getWindow().getHeight();
         var forceRender = false;
         if (renderTarget.width != windowWidth
-            || renderTarget.height != windowHeight) {
+            || renderTarget.height != windowHeight
+        ) {
             renderTarget.resize(windowWidth, windowHeight, true);
             refreshModel(windowWidth, windowHeight);
             forceRender = true;
@@ -90,8 +92,6 @@ public class BufferedComponent {
     }
 
     private void renderBufferedTexture(final int textureId) {
-        RenderSystem.disableDepthTest();
-        RenderSystem.depthMask(false);
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(
             GlStateManager.SourceFactor.SRC_ALPHA,
@@ -105,8 +105,8 @@ public class BufferedComponent {
         modelViewMatrix.set(RenderSystem.getModelViewMatrix());
         var guiScale = (float) Math.max(1.0, mc.getWindow().getGuiScale());
         modelViewMatrix.scale(1.0f / guiScale);
+        modelViewMatrix.m33(1f); // reset Z
+        modelViewMatrix.translate(0, 0, (float) Settings.REGISTRY.minimapRenderZOffsetSetting.get());
         model.draw(modelViewMatrix);
-        RenderSystem.depthMask(true);
-        RenderSystem.enableDepthTest();
     }
 }

@@ -117,7 +117,9 @@ Toggleable settings support keybinds through the standard Minecraft Controls GUI
 
 PR's are welcomed for language translations. 
 
-Language files are located in `src/main/resources/assets/xaeroplus/lang/`
+Language files are located in `common/src/main/resources/assets/xaeroplus/lang/`
+
+Submit PR's targeting the `1.20.1` branch only. Changes will be merged to all the other MC versions by me.
 
 # Other Useful Tools
 

@@ -154,7 +154,7 @@
   "xaeroplus.setting.null_overworld_dimension_folder": "null OW Dim Dir",
   "xaeroplus.setting.null_overworld_dimension_folder.tooltip": "Sets whether the overworld WorldMap directory is in DIM0 or null (default) \n MC must be restarted for changes to take effect.",
   "xaeroplus.setting.data_folder_resolution_mode": "Data Dir Mode",
-  "xaeroplus.setting.data_folder_resolution_mode.tooltip": "Sets how the WorldMap and Waypoints data folders are resolved. \n You must rejoin the current server for settings to take effect. \n IP = Server IP (Xaero Default). Example: .minecraft/XaeroWorldMap/Multiplayer_connect.2b2t.org \n SERVER_NAME = MC Server Entry Name. Example: .minecraft/XaeroWorldMap/Multiplayer_2b2t \n BASE_DOMAIN = Base Server Domain Name. Example: .minecraft/XaeroWorldMap/Multiplayer_2b2t.org",
+  "xaeroplus.setting.data_folder_resolution_mode.tooltip": "Sets how the WorldMap and Waypoints data folders are resolved. \n You must rejoin the current server for settings to take effect. \n IP = Server IP (Xaero Default). Example: .minecraft/xaero/world-map/Multiplayer_connect.2b2t.org \n SERVER_NAME = MC Server Entry Name. Example: .minecraft/xaero/world-map/Multiplayer_2b2t \n BASE_DOMAIN = Base Server Domain Name. Example: .minecraft/xaero/world-map/Multiplayer_2b2t.org",
   "xaeroplus.setting.data_folder_resolution_mode.ip": "IP",
   "xaeroplus.setting.data_folder_resolution_mode.server_name": "Server Name",
   "xaeroplus.setting.data_folder_resolution_mode.base_domain": "Base Domain",

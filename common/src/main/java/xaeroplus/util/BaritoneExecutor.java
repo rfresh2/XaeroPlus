@@ -42,6 +42,9 @@ public final class BaritoneExecutor {
     public static void elytra(int x, int z) {
         if (!BaritoneHelper.isBaritonePresent()) return;
         if (!BaritoneHelper.isBaritoneElytraPresent()) return;
-        BaritoneAPI.getProvider().getPrimaryBaritone().getElytraProcess().pathTo(getBaritoneGoalXZ(x, z));
+        BaritoneAPI.getSettings().elytraTermsAccepted.value = true;
+        var goal = getBaritoneGoalXZ(x, z);
+        BaritoneAPI.getProvider().getPrimaryBaritone().getCustomGoalProcess().setGoal(goal);
+        BaritoneAPI.getProvider().getPrimaryBaritone().getElytraProcess().pathTo(goal);
     }
 }

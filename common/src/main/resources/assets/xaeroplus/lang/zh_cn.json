@@ -154,7 +154,7 @@
   "xaeroplus.setting.null_overworld_dimension_folder": "null 主世界维度目录",
   "xaeroplus.setting.null_overworld_dimension_folder.tooltip": "设置主世界世界地图目录是在 DIM0 还是 null （默认）\n 必须重新启动 MC 才能使更改生效。",
   "xaeroplus.setting.data_folder_resolution_mode": "数据目录模式",
-  "xaeroplus.setting.data_folder_resolution_mode.tooltip": "设置世界地图和路径点数据文件夹的解析方式。\n 必须重新启动 MC 才能使更改生效。\n IP = 服务器 IP（Xaero 默认）。示例：.minecraft/XaeroWorldMap/Multiplayer_connect.2b2t.org \n SERVER_NAME = MC 服务器名称。示例：.minecraft/XaeroWorldMap/Multiplayer_2b2t \n BASE_DOMAIN = 基础服务器域名。示例：.minecraft/XaeroWorldMap/Multiplayer_2b2t.org",
+  "xaeroplus.setting.data_folder_resolution_mode.tooltip": "设置世界地图和路径点数据文件夹的解析方式。\n 必须重新启动 MC 才能使更改生效。\n IP = 服务器 IP（Xaero 默认）。示例：.minecraft/xaero/world-map/Multiplayer_connect.2b2t.org \n SERVER_NAME = MC 服务器名称。示例：.minecraft/xaero/world-map/Multiplayer_2b2t \n BASE_DOMAIN = 基础服务器域名。示例：.minecraft/xaero/world-map/Multiplayer_2b2t.org",
   "xaeroplus.setting.data_folder_resolution_mode.ip": "服务器 IP",
   "xaeroplus.setting.data_folder_resolution_mode.server_name": "服务器名称",
   "xaeroplus.setting.data_folder_resolution_mode.base_domain": "基础服务器域名",

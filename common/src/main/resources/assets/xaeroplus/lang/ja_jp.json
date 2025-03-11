@@ -152,7 +152,7 @@
     "xaeroplus.setting.null_overworld_dimension_folder": "nullかDIMディレクトリ",
     "xaeroplus.setting.null_overworld_dimension_folder.tooltip": "オーバーワールドのWorldMapディレクトリをDIM0にするかNULLにするかを設定します。\n変更を有効にするには、マイクラを再起動する必要があります。",
     "xaeroplus.setting.data_folder_resolution_mode": "Data Dir Mode",
-    "xaeroplus.setting.data_folder_resolution_mode.tooltip": "WorldMapとWaypointsのデータフォルダの解決方法を設定します。\n変更を有効にするには、MCを再起動する必要があります。\nIP = サーバーIP（Xaeroデフォルト）。例: .minecraft/XaeroWorldMap/Multiplayer_connect.2b2t.org ⅳ SERVER_NAME = MCサーバーエントリー名。例: .minecraft/XaeroWorldMap/Multiplayer_connect.2b2t ⅳ BASE_DOMAIN = ベースサーバーのドメイン名。例： .minecraft/XaeroWorldMap/Multiplayer_2b2t.org",
+    "xaeroplus.setting.data_folder_resolution_mode.tooltip": "WorldMapとWaypointsのデータフォルダの解決方法を設定します。\n変更を有効にするには、MCを再起動する必要があります。\nIP = サーバーIP（Xaeroデフォルト）。例: .minecraft/xaero/world-map/Multiplayer_connect.2b2t.org ⅳ SERVER_NAME = MCサーバーエントリー名。例: .minecraft/xaero/world-map/Multiplayer_connect.2b2t ⅳ BASE_DOMAIN = ベースサーバーのドメイン名。例： .minecraft/xaero/world-map/Multiplayer_2b2t.org",
     "xaeroplus.setting.data_folder_resolution_mode.ip": "IP",
     "xaeroplus.setting.data_folder_resolution_mode.server_name": "Serverの名前",
     "xaeroplus.setting.data_folder_resolution_mode.base_domain": "Base Domain",

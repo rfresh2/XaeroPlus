@@ -154,7 +154,7 @@
   "xaeroplus.setting.null_overworld_dimension_folder": "null MM Dim Dir",
   "xaeroplus.setting.null_overworld_dimension_folder.tooltip": "Define se a directoria do mapa-mundo é DIM0 ou null (valor por defeito). \n O jogo tem de ser reiniciado para ter efeito.",
   "xaeroplus.setting.data_folder_resolution_mode": "Modo das Dirs de Dados",
-  "xaeroplus.setting.data_folder_resolution_mode.tooltip": "Define como as diretorias do mapa-mundo e localizações são estruturadas. \n O jogo tem de ser reiniciado para ter efeito. \n IP = IP do servidor (valor por defeito do Xaero). Exemplo: .minecraft/XaeroWorldMap/Multiplayer_2b2t \n BASE_DOMAIN = Nome do domínio base do servidor. Exemplo: .minecraft/XaeroWorldMap/Multiplayer_2b2t.org",
+  "xaeroplus.setting.data_folder_resolution_mode.tooltip": "Define como as diretorias do mapa-mundo e localizações são estruturadas. \n O jogo tem de ser reiniciado para ter efeito. \n IP = IP do servidor (valor por defeito do Xaero). Exemplo: .minecraft/xaero/world-map/Multiplayer_2b2t \n BASE_DOMAIN = Nome do domínio base do servidor. Exemplo: .minecraft/xaero/world-map/Multiplayer_2b2t.org",
   "xaeroplus.setting.data_folder_resolution_mode.ip": "IP",
   "xaeroplus.setting.data_folder_resolution_mode.server_name": "Nome do Servidor",
   "xaeroplus.setting.data_folder_resolution_mode.base_domain": "Domínio Base",

@@ -154,7 +154,7 @@
   "xaeroplus.setting.null_overworld_dimension_folder": "Carpeta Dimension OW",
   "xaeroplus.setting.null_overworld_dimension_folder.tooltip": "Establece si la carpeta del MapaMundi del Overworld está en DIM0 o nulo (predeterminado) \n Minecraft debe reiniciarse para que los cambios se guarden.",
   "xaeroplus.setting.data_folder_resolution_mode": "Modo Datos Carpeta",
-  "xaeroplus.setting.data_folder_resolution_mode.tooltip": "Establece cómo estan las carpetas de datos del MapaMundi y los Waypoint. \n Minecraft debe reiniciarse para que los cambios se guarden. \n IP = IP del servidor (Xaero predeterminado). Ejemplo: .minecraft/XaeroWorldMap/Multiplayer_connect.2b2t.org \n SERVER_NAME = Nombre de Entrada del Servidor MC. Ejemplo: .minecraft/XaeroWorldMap/Multiplayer_2b2t \n BASE_DOMAIN = Nombre de Dominio Base del Servidor. Ejemplo: .minecraft/XaeroWorldMap/Multiplayer_2b2t.org",
+  "xaeroplus.setting.data_folder_resolution_mode.tooltip": "Establece cómo estan las carpetas de datos del MapaMundi y los Waypoint. \n Minecraft debe reiniciarse para que los cambios se guarden. \n IP = IP del servidor (Xaero predeterminado). Ejemplo: .minecraft/xaero/world-map/Multiplayer_connect.2b2t.org \n SERVER_NAME = Nombre de Entrada del Servidor MC. Ejemplo: .minecraft/xaero/world-map/Multiplayer_2b2t \n BASE_DOMAIN = Nombre de Dominio Base del Servidor. Ejemplo: .minecraft/xaero/world-map/Multiplayer_2b2t.org",
   "xaeroplus.setting.data_folder_resolution_mode.ip": "IP",
   "xaeroplus.setting.data_folder_resolution_mode.server_name": "Nombre del Servidor",
   "xaeroplus.setting.data_folder_resolution_mode.base_domain": "Dominio Base",

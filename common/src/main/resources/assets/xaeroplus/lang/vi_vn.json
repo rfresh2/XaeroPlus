@@ -154,7 +154,7 @@
     "xaeroplus.setting.null_overworld_dimension_folder": "Thư Mục Kích Thước OW null",
     "xaeroplus.setting.null_overworld_dimension_folder.tooltip": "Thiết lập liệu thư mục WorldMap thế giới trên có ở DIM0 hay null (mặc định) \n MC phải được khởi động lại để thay đổi có hiệu lực.",
     "xaeroplus.setting.data_folder_resolution_mode": "Chế Độ Thư Mục Dữ Liệu",
-    "xaeroplus.setting.data_folder_resolution_mode.tooltip": "Thiết lập cách giải quyết thư mục dữ liệu WorldMap và Điểm Đến. \n MC phải được khởi động lại để thay đổi có hiệu lực. \n IP = Địa Chỉ IP Máy Chủ (Mặc định Xaero). Ví dụ: .minecraft/XaeroWorldMap/Multiplayer_connect.2b2t.org \n SERVER_NAME = Tên Nhập Máy Chủ MC. Ví dụ: .minecraft/XaeroWorldMap/Multiplayer_2b2t \n BASE_DOMAIN = Tên Miền Cơ Bản Máy Chủ. Ví dụ: .minecraft/XaeroWorldMap/Multiplayer_2b2t.org",
+    "xaeroplus.setting.data_folder_resolution_mode.tooltip": "Thiết lập cách giải quyết thư mục dữ liệu WorldMap và Điểm Đến. \n MC phải được khởi động lại để thay đổi có hiệu lực. \n IP = Địa Chỉ IP Máy Chủ (Mặc định Xaero). Ví dụ: .minecraft/xaero/world-map/Multiplayer_connect.2b2t.org \n SERVER_NAME = Tên Nhập Máy Chủ MC. Ví dụ: .minecraft/xaero/world-map/Multiplayer_2b2t \n BASE_DOMAIN = Tên Miền Cơ Bản Máy Chủ. Ví dụ: .minecraft/xaero/world-map/Multiplayer_2b2t.org",
     "xaeroplus.setting.data_folder_resolution_mode.ip": "IP",
     "xaeroplus.setting.data_folder_resolution_mode.server_name": "Tên Máy Chủ",
     "xaeroplus.setting.data_folder_resolution_mode.base_domain": "Miền Cơ Bản",

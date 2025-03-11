@@ -103,9 +103,9 @@ Or a modpack zip with these jars is included in the Github releases.
   * Multiplayer server list name.
   * Base Server Domain Name
   * Server IP (Xaero's default)
-  * **Changing this setting requires you to manually rename existing folders in `.minecraft/XaeroWaypoints/` and `.minecraft/XaeroWorldMap/`**
+  * **Changing this setting requires you to manually rename existing folders in `.minecraft/xaero/minimap` and `.minecraft/xaero/world-map`**
 * Overworld dimension optionally stored in the "DIM0" directory instead of "null"
-  * **Changing this setting requires you to manually rename existing folders in `.minecraft/XaeroWorldMap/Multiplayer_<server name>/`**
+  * **Changing this setting requires you to manually rename existing folders in `.minecraft/xaero/world-map/Multiplayer_<server name>/`**
 * WorldMap 1.30.0 added cave data saving and rendering. There is a setting on by default in XaeroPlus that changes how the nether is rendered with cave mode off to be as it was previously.
   * This removes the need to manually move existing world data files.
 
@@ -117,7 +117,9 @@ Toggleable settings support keybinds through the standard Minecraft Controls GUI
 
 PR's are welcomed for language translations. 
 
-Language files are located in `src/main/resources/assets/xaeroplus/lang/`
+Language files are located in `common/src/main/resources/assets/xaeroplus/lang/`
+
+Submit PR's targeting the `1.20.1` branch only. Changes will be merged to all the other MC versions by me.
 
 # Other Useful Tools
 

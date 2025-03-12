@@ -730,6 +730,23 @@ public final class Settings extends SettingRegistry {
             },
             () -> ModuleManager.getModule(SpawnChunks.class).isEnabled() || ModuleManager.getModule(SpawnChunksPlayer.class).isEnabled()),
         SettingLocation.OVERLAYS);
+    public final BooleanSetting mapArtGridEnabledSetting = register(
+        BooleanSetting.create(
+            "Map Art Grid",
+            "xaeroplus.setting.map_art_grid",
+            false,
+            true,
+            (b) -> ModuleManager.getModule(MapArtGrid.class).setEnabled(b)),
+        SettingLocation.OVERLAYS);
+    public final EnumSetting<ColorHelper.HighlightColor> mapArtGridColorSetting = register(
+        EnumSetting.create(
+            "Map Art Grid Color",
+            "xaeroplus.setting.map_art_grid_color",
+            ColorHelper.HighlightColor.values(),
+            ColorHelper.HighlightColor.RED,
+            (b) -> ModuleManager.getModule(MapArtGrid.class).setRgbColor(b.getColor()),
+            () -> ModuleManager.getModule(MapArtGrid.class).isEnabled()),
+        SettingLocation.OVERLAYS);
 
     /**
      * Minimap Main

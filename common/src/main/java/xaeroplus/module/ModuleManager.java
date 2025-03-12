@@ -15,6 +15,7 @@ public class ModuleManager {
             new FpsLimiter(),
             new Highways(),
             new LiquidNewChunks(),
+            new MapArtGrid(),
             new OldChunks(),
             new OldBiomes(),
             new PaletteNewChunks(),

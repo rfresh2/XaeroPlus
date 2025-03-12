@@ -9,7 +9,6 @@ import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class MapArtGrid extends Module {
@@ -34,7 +33,6 @@ public class MapArtGrid extends Module {
     }
 
     public List<Line> getLines(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
-        if (dimension != ChunkUtils.getActualDimension()) return Collections.emptyList();
         ArrayList<Line> lines = new ArrayList<>();
         int padding = 10000;
         int minBlockX = ChunkUtils.regionCoordToCoord(windowRegionX - windowRegionSize) - padding;

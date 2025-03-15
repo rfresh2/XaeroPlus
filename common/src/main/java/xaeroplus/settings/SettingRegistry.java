@@ -3,11 +3,12 @@ package xaeroplus.settings;
 import net.minecraft.client.KeyMapping;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class SettingRegistry {
     private final Map<SettingLocation, ArrayList<XaeroPlusSetting>> settingLocationMap = new EnumMap<>(SettingLocation.class);
-    private final Map<String, XaeroPlusSetting> settingNameMap = new HashMap<>();
-    private final Map<KeyMapping, BooleanSetting> keybindingMap = new HashMap<>();
+    private final Map<String, XaeroPlusSetting> settingNameMap = new ConcurrentHashMap<>();
+    private final Map<KeyMapping, BooleanSetting> keybindingMap = new ConcurrentHashMap<>();
 
     public BooleanSetting register(BooleanSetting setting, SettingLocation settingLocation) {
         register0(settingLocation, setting);
@@ -42,8 +43,8 @@ public abstract class SettingRegistry {
         return settingNameMap.get(name);
     }
 
-    public List<KeyMapping> getKeybindings() {
-        return new ArrayList<>(keybindingMap.keySet());
+    public Set<KeyMapping> getKeybindings() {
+        return keybindingMap.keySet();
     }
 
     public BooleanSetting getKeybindingSetting(KeyMapping keyMapping) {

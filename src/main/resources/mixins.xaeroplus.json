@@ -8,8 +8,6 @@
     "MixinBlockStateColorTypeCache",
     "MixinCommonGuiSettings",
     "MixinCommonModSettings",
-    "MixinControlsHandler",
-    "MixinControlsRegister",
     "MixinGuiEntityRadarSettings",
     "MixinGuiMap",
     "MixinGuiMapAccessor",

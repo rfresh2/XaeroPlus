@@ -9,6 +9,7 @@ import net.minecraftforge.fml.common.eventhandler.EventBus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import xaeroplus.event.ForgeEventHandler;
+import xaeroplus.feature.keybind.KeybindListener;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
 import xaeroplus.util.Globals;
@@ -19,7 +20,7 @@ import xaeroplus.util.XaeroPlusGameTest;
         name = XaeroPlus.NAME,
         version = XaeroPlus.VERSION,
         clientSideOnly = true,
-        dependencies = "required:mixinbooter@[9.4,);after:xaerominimap@[25.1.0];required-after:xaeroworldmap@[1.39.4];"
+        dependencies = "required:mixinbooter@[9.4,);after:xaerominimap@[25.2.0];required-after:xaeroworldmap@[1.39.4];"
 )
 public class XaeroPlus {
     public static final String MODID = "xaeroplus";
@@ -28,6 +29,7 @@ public class XaeroPlus {
     public static EventBus EVENT_BUS = MinecraftForge.EVENT_BUS;
     public static Logger LOGGER = LogManager.getLogger("XaeroPlus");
     private static final ForgeEventHandler forgeEventHandler = new ForgeEventHandler();
+    private static final KeybindListener keybindListener = new KeybindListener();
 
     @Mod.Instance
     public static XaeroPlus INSTANCE;
@@ -46,6 +48,7 @@ public class XaeroPlus {
         if (System.getenv("XP_CI_TEST") != null) {
             XaeroPlusGameTest.applyMixinsTest();
         }
+        EVENT_BUS.register(keybindListener);
     }
 
     @Mod.EventHandler

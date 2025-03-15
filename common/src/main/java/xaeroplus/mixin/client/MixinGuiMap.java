@@ -20,6 +20,7 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -45,12 +46,14 @@ import xaero.map.mods.SupportMods;
 import xaero.map.world.MapDimension;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
+import xaeroplus.feature.render.Line;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.*;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.BaritoneExecutor;
 import xaeroplus.util.BaritoneHelper;
 import xaeroplus.util.ChunkUtils;
+import xaeroplus.util.DrawingMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,6 +79,12 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Unique Button switchToNetherButton;
     @Unique Button switchToOverworldButton;
     @Unique Button switchToEndButton;
+    @Unique Button startDrawingButton;
+    @Unique Button drawLineSegmentButton;
+    @Unique Button drawInfiniteLineButton;
+    @Unique boolean drawing = false;
+    @Unique BlockPos drawPos1 = null;
+    @Unique DrawingMode drawingMode = DrawingMode.LINE_SEGMENT;
     @Unique List<Button> guiMapButtonTempList = new ArrayList<>();
     @Unique ResourceLocation xpGuiTextures = new ResourceLocation("xaeroplus", "gui/xpgui.png");
     @Shadow private double cameraX = 0.0;
@@ -146,22 +155,59 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             this.zoomOutButton.setY(this.keybindingsButton.getY() - 20);
             this.zoomInButton.setY(this.zoomOutButton.getY() - 20);
         }
-        switchToEndButton = new GuiTexturedButton(this.width - 20, zoomInButton.getY() - 20, 20, 20, 31, 0, 16, 16,
-                                                  this.xpGuiTextures,
-                                                  (button -> onSwitchDimensionButton(END)),
-                                                  () -> new CursorBox(Component.translatable("xaeroplus.keybind.switch_to_end")));
-        switchToOverworldButton = new GuiTexturedButton(this.width - 20, this.switchToEndButton.getY() - 20, 20, 20, 16, 0, 16, 16,
-                                                        this.xpGuiTextures,
-                                                        (button -> onSwitchDimensionButton(OVERWORLD)),
-                                                        () -> new CursorBox(Component.translatable("xaeroplus.keybind.switch_to_overworld")));
-        switchToNetherButton = new GuiTexturedButton(this.width - 20, this.switchToOverworldButton.getY() - 20, 20, 20, 0, 0, 16, 16,
-                                                     this.xpGuiTextures,
-                                                     (button -> onSwitchDimensionButton(NETHER)),
-                                                     () -> new CursorBox(Component.translatable("xaeroplus.keybind.switch_to_nether")));
+        switchToEndButton = new GuiTexturedButton(
+            this.width - 20, zoomInButton.getY() - 20, 20, 20, 31, 0, 16, 16,
+            this.xpGuiTextures,
+            (button -> onSwitchDimensionButton(END)),
+            () -> new CursorBox(Component.translatable("xaeroplus.keybind.switch_to_end")));
+        switchToOverworldButton = new GuiTexturedButton(
+            this.width - 20, this.switchToEndButton.getY() - 20, 20, 20, 16, 0, 16, 16,
+            this.xpGuiTextures,
+            (button -> onSwitchDimensionButton(OVERWORLD)),
+            () -> new CursorBox(Component.translatable("xaeroplus.keybind.switch_to_overworld")));
+        switchToNetherButton = new GuiTexturedButton(
+            this.width - 20, this.switchToOverworldButton.getY() - 20, 20, 20, 0, 0, 16, 16,
+            this.xpGuiTextures,
+            (button -> onSwitchDimensionButton(NETHER)),
+            () -> new CursorBox(Component.translatable("xaeroplus.keybind.switch_to_nether")));
         addButton(switchToEndButton);
         addButton(switchToOverworldButton);
         addButton(switchToNetherButton);
+        startDrawingButton = new GuiTexturedButton(
+            this.width - 22, this.switchToNetherButton.getY() - 20, 20, 20, 45, 0, 16, 16,
+            this.xpGuiTextures,
+            (button -> onToggleDrawingButton()),
+            () -> new CursorBox(Component.literal("Start Drawing")));
+        addButton(startDrawingButton);
+        drawLineSegmentButton = new GuiTexturedButton(
+            this.width - 22 - 16, startDrawingButton.getY(), 20, 20, 63, 0, 16, 16,
+            this.xpGuiTextures,
+            (button -> drawingMode = DrawingMode.LINE_SEGMENT),
+            () -> new CursorBox(Component.literal("Line Segment")));
+        addButton(drawLineSegmentButton);
+        drawLineSegmentButton.visible = false;
+        drawInfiniteLineButton = new GuiTexturedButton(
+            this.width - 22 - 16, drawLineSegmentButton.getY() + 20, 20, 20, 100, 0, 16, 16,
+            this.xpGuiTextures,
+            (button -> drawingMode = DrawingMode.INFINITE_LINE),
+            () -> new CursorBox(Component.literal("Infinite Line")));
+        addButton(drawInfiniteLineButton);
+        drawInfiniteLineButton.visible = false;
         pan = false;
+        drawing = false;
+    }
+
+    @Unique
+    private void onToggleDrawingButton() {
+        drawing = !drawing;
+        if (drawing) {
+            drawLineSegmentButton.visible = true;
+            drawInfiniteLineButton.visible = true;
+        } else {
+            drawPos1 = null;
+            drawLineSegmentButton.visible = false;
+            drawInfiniteLineButton.visible = false;
+        }
     }
 
     @Override
@@ -188,14 +234,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         ordinal = 0,
         shift = At.Shift.AFTER
     ), remap = true)
-    public void toggleRadarWhileDimensionSwitched(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci, @Local(name = "currentFutureDim") MapDimension currentFutureDim) {
+    public void toggleRadarWhileDimensionSwitched(final CallbackInfo ci, @Local(name = "currentFutureDim") MapDimension currentFutureDim) {
         if (!Settings.REGISTRY.radarWhileDimensionSwitchedSetting.get()) {
             WorldMap.settings.minimapRadar = currentFutureDim.getDimId() == ChunkUtils.getActualDimension();
         }
     }
 
     @Redirect(method = "render", at = @At(value = "FIELD", target = "Lxaero/map/gui/GuiMap;cameraX:D", opcode = Opcodes.PUTFIELD, ordinal = 1), remap = true)
-    public void fixDimensionSwitchCameraCoordsX(GuiMap owner, double value , @Local(name = "playerDimDiv") double playerDimDiv) {
+    public void fixDimensionSwitchCameraCoordsX(GuiMap owner, double value, @Local(name = "playerDimDiv") double playerDimDiv) {
         this.cameraX *= prevPlayerDimDiv / playerDimDiv;
     }
 
@@ -205,7 +251,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     }
 
     @Inject(method = "render", at = @At(value = "FIELD", target = "Lxaero/map/gui/GuiMap;lastStartTime:J", opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER), remap = true)
-    public void injectFollowMode(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci) {
+    public void injectFollowMode(final CallbackInfo ci) {
         if (follow && isNull(this.cameraDestination) && isNull(this.cameraDestinationAnimX) && isNull(this.cameraDestinationAnimZ)) {
             this.cameraDestination = new int[]{(int) getPlayerX(), (int) getPlayerZ()};
         }
@@ -234,7 +280,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             ordinal = 0
         ),
         remap = true)
-    public void drawWorldMapFeatures(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci,
+    public void drawWorldMapFeatures(final CallbackInfo ci,
                                      @Local(name = "flooredCameraX") int flooredCameraX,
                                      @Local(name = "flooredCameraZ") int flooredCameraZ,
                                      @Local(name = "matrixStack") PoseStack matrixStack,
@@ -333,7 +379,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         value = "INVOKE",
         target = "Lxaero/map/gui/ScreenBase;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V"
     ), remap = true)
-    public void hideButtonsOnF1(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci) {
+    public void hideButtonsOnF1(final CallbackInfo ci) {
         if (Minecraft.getInstance().options.hideGui) {
             List<Button> buttonList = getButtonList();
             if (!buttonList.isEmpty()) {
@@ -383,7 +429,134 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     public void onTick(final CallbackInfo ci) {
         xTextEntryField.tick();
         zTextEntryField.tick();
+        if (drawing) {
+            switch (drawingMode) {
+                case LINE_SEGMENT -> {
+                    startDrawingButton.setFocused(false);
+                    drawLineSegmentButton.setFocused(true);
+                    drawInfiniteLineButton.setFocused(false);
+                }
+                case INFINITE_LINE -> {
+                    startDrawingButton.setFocused(false);
+                    drawLineSegmentButton.setFocused(false);
+                    drawInfiniteLineButton.setFocused(true);
+                }
+            }
+            if (drawPos1 == null) {
+                ModuleManager.getModule(Drawing.class).clearInProgressLine();
+            } else {
+                ModuleManager.getModule(Drawing.class).setInProgressLine(new Line(drawPos1.getX(), drawPos1.getZ(), mouseBlockPosX, mouseBlockPosZ));
+            }
+        } else {
+            ModuleManager.getModule(Drawing.class).clearInProgressLine();
+        }
     }
+
+    @Inject(method = "render", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/map/mods/SupportXaeroMinimap;getSubWorldNameToRender()Ljava/lang/String;"
+    ))
+    public void renderDrawingStatusText(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci,
+                                        @Local (name = "backgroundVertexBuffer") VertexConsumer backgroundVertexBuffer) {
+        if (!drawing) return;
+        MapRenderHelper.drawCenteredStringWithBackground(
+            guiGraphics, Minecraft.getInstance().font,
+            "Drawing Enabled",
+            this.width / 2,
+            36,
+            -1,
+            0.0F, 0.0F, 0.0F, 0.4F,
+            backgroundVertexBuffer
+        );
+    }
+
+    @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
+    public void cancelClicksWhileDrawing(final double par1, final double par2, final int par3, final CallbackInfoReturnable<Boolean> cir) {
+        if (!drawing) return;
+        boolean toReturn = super.mouseClicked(par1, par2, par3);
+        if (toReturn) {
+            cir.setReturnValue(true);
+            return;
+        }
+        cir.setReturnValue(true);
+        if (par3 == 0) { // start drawing on left click
+            if (drawPos1 == null) {
+                drawPos1 = new BlockPos(mouseBlockPosX, 0, mouseBlockPosZ);
+            }
+        }
+    }
+
+    @Inject(method = "mouseReleased", at = @At("HEAD"), cancellable = true)
+    public void drawingClickReleasedHandler(final double par1, final double par2, final int par3, final CallbackInfoReturnable<Boolean> cir) {
+        if (!drawing) return;
+        boolean toReturn = super.mouseReleased(par1, par2, par3);
+        if (toReturn) {
+            cir.setReturnValue(true);
+            return;
+        }
+        cir.setReturnValue(true);
+        if (par3 == 0) { // start drawing on left click
+            if (drawPos1 != null) {
+                Line line;
+                line = new Line(drawPos1.getX(), drawPos1.getZ(), mouseBlockPosX, mouseBlockPosZ);
+                switch (drawingMode) {
+                    case LINE_SEGMENT -> ModuleManager.getModule(Drawing.class).addLine(line);
+                    case INFINITE_LINE -> ModuleManager.getModule(Drawing.class).addInfiniteLine(line);
+                }
+                drawPos1 = null;
+                drawing = false;
+                drawLineSegmentButton.visible = false;
+                drawInfiniteLineButton.visible = false;
+            }
+        } else if (par3 == 1) { // clear drawing on right click
+            if (drawPos1 != null) return;
+            ModuleManager.getModule(Drawing.class).clearLine(mouseBlockPosX, mouseBlockPosZ);
+            drawing = false;
+            drawLineSegmentButton.visible = false;
+            drawInfiniteLineButton.visible = false;
+        }
+    }
+
+//    @Inject(method = "mouseReleased", at = @At("HEAD"), cancellable = true)
+//    public void drawMouseReleasedHandler(final double par1, final double par2, final int par3, final CallbackInfoReturnable<Boolean> cir) {
+//        if (cir.getReturnValueZ()) return;
+//        if (!drawing) return;
+//        boolean isLeftClick = (this.leftMouseButton.isDown && par3 == 0);
+//        if (drawPos1 == null) {
+//            drawPos1 = new BlockPos(mouseBlockPosX, 0, mouseBlockPosZ);
+//        } else {
+//            Line line;
+//            line = new Line(drawPos1.getX(), drawPos1.getZ(), mouseBlockPosX, mouseBlockPosZ);
+//            ModuleManager.getModule(Drawing.class).addLine(line);
+//            drawPos1 = null;
+//            drawing = false;
+//        }
+//    }
+
+//    @Inject(method = "onInputRelease", at = @At("RETURN"))
+//    public void drawStartClick(final InputConstants.Type type, final int code, final CallbackInfoReturnable<Boolean> cir) {
+//        if (cir.getReturnValueZ()) return;
+//        if (!drawing) return;
+//        if (code != GLFW_MOUSE_BUTTON_LEFT) return;
+//        if (drawPos1 == null) {
+//            drawPos1 = new BlockPos(mouseBlockPosX, 0, mouseBlockPosZ);
+//        } else {
+//            Line line;
+//            line = new Line(drawPos1.getX(), drawPos1.getZ(), mouseBlockPosX, mouseBlockPosZ);
+//            ModuleManager.getModule(Drawing.class).addLine(line);
+//            drawPos1 = null;
+//            drawing = false;
+//        }
+//    }
+
+//    @Inject(method = "onInputRelease", at = @At("HEAD"), cancellable = true)
+//    public void deleteDrawingClick(final InputConstants.Type type, final int code, final CallbackInfoReturnable<Boolean> cir) {
+//        if (!drawing) return;
+//        if (drawPos1 != null) return;
+//        if (code != GLFW_MOUSE_BUTTON_RIGHT) return;
+//        ModuleManager.getModule(Drawing.class).clearLine(mouseBlockPosX, mouseBlockPosZ);
+//        cir.setReturnValue(true);
+//    }
 
     // todo: mixin on mouseClicked to close coord entry fields when clicking on something else
 
@@ -558,6 +731,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         this.init(Minecraft.getInstance(), width, height);
     }
 
+    @Unique
     public void onGotoCoordinatesButton(final Button b) {
         if (xTextEntryField.isVisible() && zTextEntryField.isVisible()) {
             try {

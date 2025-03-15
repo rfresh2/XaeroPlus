@@ -7,6 +7,7 @@ import xaeroplus.Globals;
 import xaeroplus.feature.render.Line;
 import xaeroplus.module.Module;
 import xaeroplus.util.ColorHelper;
+import xaeroplus.util.DrawingMode;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -69,66 +70,48 @@ public class Drawing extends Module {
         var lines = this.lines.get(Globals.getCurrentDimensionId());
         if (lines == null) return;
         if (line.length() == 0) return;
-        // extrapolate the line segment to square -30m,-30m and 30m,30m in 500k increments
-        // y = mx + b
+        lines.add(extrapolateToWorldBorder(line));
+    }
+
+    private Line extrapolateToWorldBorder(Line line) {
+        int wb = 30_000_000;
+        // extrapolate the line and find its intersections with the world border rect
         int dx = line.x2() - line.x1();
-        if (dx == 0) {
-            for (int x = -30_000_000; x <= 30_000_000; x += 500_000) {
-                lines.add(new Line(x, line.z1(), x, line.z2()));
-            }
-            return;
+        if (dx == 0) { // vertical line
+            return new Line(line.x1(), -wb, line.x2(), wb);
         }
         int dz = line.z2() - line.z1();
-        if (dz == 0) {
-            for (int z = -30_000_000; z <= 30_000_000; z += 500_000) {
-                lines.add(new Line(line.x1(), z, line.x2(), z));
-            }
-            return;
+        if (dz == 0) { // horizontal line
+            return new Line(-wb, line.z1(), wb, line.z2());
         }
         double slope = (double) dz / dx;
         double intercept = line.z1() - slope * line.x1();
-
-        // now walk along the line in 500k length increments, starting at x1, z1, until we reach +-30_000_000 in either x or z
-        // we can size the walk length to 500k using our slope
-        // i.e. if slope is 2, then we can walk 250k x to get 500k z
-        int x1 = line.x1();
-        int z1 = line.z1();
-        int x = x1;
-        int z = z1;
-        boolean positiveSlope = Math.abs(slope) > 1;
-        // if positive slope, we are increasing z faster than x
-        // and therefore need to increment z by 500k
-        while (x >= -30_000_000 && x <= 30_000_000 && z >= -30_000_000 && z <= 30_000_000) {
-            int prevX = x;
-            int prevZ = z;
-            if (positiveSlope) {
-                z += 500_000;
-                x = (int) ((z - intercept) / slope);
-            } else {
-                x += 500_000;
-                z = (int) (slope * x + intercept);
-            }
-            lines.add(new Line(prevX, prevZ, x, z));
+        double x1 = -wb;
+        double z1 = slope * x1 + intercept;
+        if (z1 < -wb) {
+            z1 = -wb;
+            x1 = (z1 - intercept) / slope;
+        } else if (z1 > wb) {
+            z1 = wb;
+            x1 = (z1 - intercept) / slope;
         }
-        // now walk the other direction
-        x = x1;
-        z = z1;
-        while (x >= -30_000_000 && x <= 30_000_000 && z >= -30_000_000 && z <= 30_000_000) {
-            int prevX = x;
-            int prevZ = z;
-            if (positiveSlope) {
-                z -= 500_000;
-                x = (int) ((z - intercept) / slope);
-            } else {
-                x -= 500_000;
-                z = (int) (slope * x + intercept);
-            }
-            lines.add(new Line(prevX, prevZ, x, z));
+        double x2 = wb;
+        double z2 = slope * x2 + intercept;
+        if (z2 < -wb) {
+            z2 = -wb;
+            x2 = (z2 - intercept) / slope;
+        } else if (z2 > wb) {
+            z2 = wb;
+            x2 = (z2 - intercept) / slope;
         }
+        return new Line((int) Math.round(x1), (int) Math.round(z1), (int) Math.round(x2), (int) Math.round(z2));
     }
 
-    public void setInProgressLine(final Line inProgressLine) {
-        this.inProgressLine = inProgressLine;
+    public void setInProgressLine(final Line inProgressLine, final DrawingMode drawingMode) {
+        switch (drawingMode) {
+            case LINE_SEGMENT -> this.inProgressLine = inProgressLine;
+            case INFINITE_LINE -> this.inProgressLine = extrapolateToWorldBorder(inProgressLine);
+        }
     }
 
     public void clearInProgressLine() {
@@ -146,31 +129,29 @@ public class Drawing extends Module {
         Line sqLine4 = new Line(x, maxZ, maxX, maxZ);
         // find lines which intersect with square (x, z, maxX, maxZ)
         lines.removeIf(line -> {
-            var lx1 = line.x1();
-            var lz1 = line.z1();
-            var lx2 = line.x2();
-            var lz2 = line.z2();
-            if (lx1 < x && lx2 < x) return false;
-            if (lz1 < z && lz2 < z) return false;
-            if (lx1 > maxX && lx2 > maxX) return false;
-            if (lz1 > maxZ && lz2 > maxZ) return false;
-            return lineIntersects(line, sqLine1) || lineIntersects(line, sqLine2) || lineIntersects(line, sqLine3) || lineIntersects(line, sqLine4);
+            if (line.x1() < x && line.x2() < x) return false;
+            if (line.z1() < z && line.z2() < z) return false;
+            if (line.x1() > maxX && line.x2() > maxX) return false;
+            if (line.z1() > maxZ && line.z2() > maxZ) return false;
+            return linesIntersect(line, sqLine1)
+                || linesIntersect(line, sqLine2)
+                || linesIntersect(line, sqLine3)
+                || linesIntersect(line, sqLine4);
         });
     }
 
-    private boolean lineIntersects(Line line1, Line line2) {
-        var x1 = line1.x1();
-        var z1 = line1.z1();
-        var x2 = line1.x2();
-        var z2 = line1.z2();
-        var x3 = line2.x1();
-        var z3 = line2.z1();
-        var x4 = line2.x2();
-        var z4 = line2.z2();
-        var d = (z4 - z3) * (x2 - x1) - (x4 - x3) * (z2 - z1);
-        if (d == 0) return false;
-        var uA = ((x4 - x3) * (z1 - z3) - (z4 - z3) * (x1 - x3)) / d;
-        var uB = ((x2 - x1) * (z1 - z3) - (z2 - z1) * (x1 - x3)) / d;
-        return uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1;
+    private boolean linesIntersect(Line line1, Line line2) {
+        int bx = line1.x2() - line1.x1();
+        int bz = line1.z2() - line1.z1();
+        int dx = line2.x2() - line2.x1();
+        int dz = line2.z2() - line2.z1();
+        double bDotDPerp = bx * dz - bz * dx;
+        if (bDotDPerp == 0) return false;
+        int cx = line2.x1() - line1.x1();
+        int cz = line2.z1() - line1.z1();
+        double t = (cx * dz - cz * dx) / bDotDPerp;
+        if (t < 0 || t > 1) return false;
+        double u = (cx * bz - cz * bx) / bDotDPerp;
+        return u >= 0 && u <= 1;
     }
 }

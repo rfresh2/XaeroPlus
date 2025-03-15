@@ -429,23 +429,29 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     public void onTick(final CallbackInfo ci) {
         xTextEntryField.tick();
         zTextEntryField.tick();
-        if (drawing) {
-            switch (drawingMode) {
-                case LINE_SEGMENT -> {
-                    startDrawingButton.setFocused(false);
-                    drawLineSegmentButton.setFocused(true);
-                    drawInfiniteLineButton.setFocused(false);
-                }
-                case INFINITE_LINE -> {
-                    startDrawingButton.setFocused(false);
-                    drawLineSegmentButton.setFocused(false);
-                    drawInfiniteLineButton.setFocused(true);
-                }
+        if (!drawing) return;
+        switch (drawingMode) {
+            case LINE_SEGMENT -> {
+                startDrawingButton.setFocused(false);
+                drawLineSegmentButton.setFocused(true);
+                drawInfiniteLineButton.setFocused(false);
             }
+            case INFINITE_LINE -> {
+                startDrawingButton.setFocused(false);
+                drawLineSegmentButton.setFocused(false);
+                drawInfiniteLineButton.setFocused(true);
+            }
+        }
+    }
+
+    @Inject(method = "render", at = @At("RETURN"))
+    public void updateInProgressLine(CallbackInfo ci) {
+        if (drawing) {
             if (drawPos1 == null) {
                 ModuleManager.getModule(Drawing.class).clearInProgressLine();
             } else {
-                ModuleManager.getModule(Drawing.class).setInProgressLine(new Line(drawPos1.getX(), drawPos1.getZ(), mouseBlockPosX, mouseBlockPosZ));
+                var inProgress = new Line(drawPos1.getX(), drawPos1.getZ(), mouseBlockPosX, mouseBlockPosZ);
+                ModuleManager.getModule(Drawing.class).setInProgressLine(inProgress, drawingMode);
             }
         } else {
             ModuleManager.getModule(Drawing.class).clearInProgressLine();

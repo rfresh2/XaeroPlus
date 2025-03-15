@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xaero.map.platform.Services;
 import xaeroplus.event.MinimapInitCompletedEvent;
+import xaeroplus.feature.keybind.KeybindListener;
 import xaeroplus.settings.Settings;
 import xaeroplus.settings.XaeroPlusSetting;
 
@@ -22,6 +23,7 @@ public class XaeroPlus {
 	public static final File configFile = Services.PLATFORM.getConfigDir().resolve("xaeroplus.txt").toFile();
 	public static String XP_VERSION = "2";
 	public static final String MC_VERSION = DetectedVersion.BUILT_IN.getName();
+	public static final KeybindListener KEYBIND_LISTENER = new KeybindListener();
 
 	public static void initializeSettings() {
 		loadXPSettings();
@@ -32,5 +34,6 @@ public class XaeroPlus {
 			Globals.minimapSettingsInitialized = true;
 			Globals.initSyncedSettings();
 		}, MinimapInitCompletedEvent.class);
+		XaeroPlus.EVENT_BUS.register(KEYBIND_LISTENER);
 	}
 }

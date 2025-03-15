@@ -13,7 +13,7 @@ public class KeybindListener {
     private final Object2BooleanMap<KeyMapping> prevKeybindState = new Object2BooleanOpenHashMap<>();
 
     @EventHandler
-    public void onTick(ClientTickEvent.Pre event) {
+    public void onTick(ClientTickEvent.Post event) {
         if (Minecraft.getInstance().screen != null) return;
         if (Minecraft.getInstance().player == null) return;
         for (KeyMapping keybind : Settings.REGISTRY.getKeybindings()) {

@@ -1,6 +1,8 @@
 package xaeroplus;
 
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -12,6 +14,7 @@ import xaeroplus.event.ForgeEventHandler;
 import xaeroplus.feature.keybind.KeybindListener;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
 import xaeroplus.util.Globals;
 import xaeroplus.util.XaeroPlusGameTest;
 
@@ -47,6 +50,9 @@ public class XaeroPlus {
         LOGGER.info("XaeroPlus initialized");
         if (System.getenv("XP_CI_TEST") != null) {
             XaeroPlusGameTest.applyMixinsTest();
+        }
+        for (KeyBinding kb : XaeroPlusSettingsReflectionHax.keybindsSupplier.get()) {
+            ClientRegistry.registerKeyBinding(kb);
         }
         EVENT_BUS.register(keybindListener);
     }

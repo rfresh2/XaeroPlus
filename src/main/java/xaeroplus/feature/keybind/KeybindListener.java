@@ -5,7 +5,7 @@ import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.gameevent.InputEvent;
 import xaeroplus.settings.XaeroPlusBooleanSetting;
 import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
 
@@ -14,8 +14,7 @@ public class KeybindListener {
     private final Object2BooleanMap<KeyBinding> prevKeybindState = new Object2BooleanOpenHashMap<>();
 
     @SubscribeEvent
-    public void onTick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) return;
+    public void onTick(InputEvent.KeyInputEvent event) {
         if (Minecraft.getMinecraft().currentScreen != null) return;
         if (Minecraft.getMinecraft().player == null) return;
         for (KeyBinding keybind : XaeroPlusSettingsReflectionHax.keybindsSupplier.get()) {

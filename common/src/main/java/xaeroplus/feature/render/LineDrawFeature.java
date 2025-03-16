@@ -45,18 +45,18 @@ public class LineDrawFeature {
 
     private List<Line> preProcessLines(List<Line> lines) {
         if (lines.isEmpty()) return lines;
-        List<Line> linesCopy = new ArrayList<>(lines);
-        linesCopy.replaceAll(this::ensureOrientation);
-        for (int i = 0; i < linesCopy.size(); i++) {
-            Line line = linesCopy.get(i);
+        List<Line> out = new ArrayList<>(lines);
+        for (int i = 0; i < out.size(); i++) {
+            Line line = out.get(i);
             List<Line> newLines = ensureLength(line);
             if (!newLines.isEmpty()) {
-                linesCopy.remove(i);
-                linesCopy.addAll(i, newLines);
+                out.remove(i);
+                out.addAll(i, newLines);
                 i += newLines.size() - 1;
             }
         }
-        return linesCopy;
+        out.replaceAll(this::ensureOrientation);
+        return out;
     }
 
     private Line ensureOrientation(Line line) {

@@ -1,3 +1,5 @@
+import net.fabricmc.loom.task.prod.ClientProductionRunTask
+
 plugins {
 	id("xaeroplus-all.conventions")
 	id("xaeroplus-platform.conventions")
@@ -61,6 +63,9 @@ dependencies {
 	implementation(include(libs.caffeine.get())!!)
 	implementation(include(libs.lambdaEvents.get())!!)
 	implementation(include(libs.oldbiomes.get())!!)
+	productionRuntimeMods(libs.minimap.fabric)
+	productionRuntimeMods(libs.worldmap.fabric)
+	productionRuntimeMods(libs.fabric.api)
 
 	common(project(path = ":common", configuration = "namedElements")) { isTransitive = false }
     shadowCommon(project(path = ":common", configuration = "transformProductionFabric")) { isTransitive = false }
@@ -88,6 +93,14 @@ tasks {
 		inputFile.set(shadowJar.get().archiveFile)
 		archiveVersion = destArchiveVersion
 		archiveClassifier = destArchiveClassifier
+	}
+
+	register<ClientProductionRunTask>("runProdTest") {
+		this.jvmArgs.add("-DXP_CI_TEST")
+	}
+
+	register<ClientProductionRunTask>("runProd") {
+
 	}
 }
 

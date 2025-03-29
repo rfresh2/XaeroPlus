@@ -13,6 +13,7 @@ Xaero WorldMap / Minimap Extra Features
 '''
 logoFile = "icon.jpg"
 displayTest="IGNORE_ALL_VERSION"
+clientSideOnly = true
 
 [[dependencies.xaeroplus]]
 modId = "forge"

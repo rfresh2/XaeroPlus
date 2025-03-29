@@ -7,6 +7,7 @@ loom {
     silentMojangMappingsLicense()
     runs {
         getByName("client") {
+            vmArg("-Dsodium.checks.issue2561=false")
             programArgs("--username", "rfresh2")
         }
     }

@@ -141,12 +141,12 @@ public class Drawing extends Module {
     }
 
     private boolean linesIntersect(Line line1, Line line2) {
-        int bx = line1.x2() - line1.x1();
-        int bz = line1.z2() - line1.z1();
-        int dx = line2.x2() - line2.x1();
-        int dz = line2.z2() - line2.z1();
+        double bx = line1.x2() - line1.x1();
+        double bz = line1.z2() - line1.z1();
+        double dx = line2.x2() - line2.x1();
+        double dz = line2.z2() - line2.z1();
         double bDotDPerp = bx * dz - bz * dx;
-        if (bDotDPerp == 0) return false;
+        if (Math.round(bDotDPerp) == 0) return false;
         int cx = line2.x1() - line1.x1();
         int cz = line2.z1() - line1.z1();
         double t = (cx * dz - cz * dx) / bDotDPerp;

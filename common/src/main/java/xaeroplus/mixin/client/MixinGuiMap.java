@@ -484,11 +484,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             cir.setReturnValue(true);
             return;
         }
-        cir.setReturnValue(true);
         if (par3 == 0) { // start drawing on left click
             if (drawPos1 == null) {
                 drawPos1 = new BlockPos(mouseBlockPosX, 0, mouseBlockPosZ);
             }
+            cir.setReturnValue(true);
+        } else if (par3 == 1) {
+            cir.setReturnValue(true);
         }
     }
 
@@ -500,7 +502,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             cir.setReturnValue(true);
             return;
         }
-        cir.setReturnValue(true);
         if (par3 == 0) { // start drawing on left click
             if (drawPos1 != null) {
                 Line line;
@@ -514,12 +515,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 drawLineSegmentButton.visible = false;
                 drawInfiniteLineButton.visible = false;
             }
+            cir.setReturnValue(true);
         } else if (par3 == 1) { // clear drawing on right click
             if (drawPos1 != null) return;
             ModuleManager.getModule(Drawing.class).clearLine(mouseBlockPosX, mouseBlockPosZ);
             drawing = false;
             drawLineSegmentButton.visible = false;
             drawInfiniteLineButton.visible = false;
+            cir.setReturnValue(true);
         }
     }
 

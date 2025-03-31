@@ -1,6 +1,5 @@
 package xaeroplus.module.impl;
 
-import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaeroplus.Globals;
@@ -9,13 +8,10 @@ import xaeroplus.module.Module;
 import xaeroplus.util.ColorHelper;
 import xaeroplus.util.DrawingMode;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Drawing extends Module {
-    private final Map<ResourceKey<Level>, List<Line>> lines = new Reference2ObjectOpenHashMap<>(Map.of(
+    private final Map<ResourceKey<Level>, List<Line>> lines = new HashMap<>(Map.of(
         Level.OVERWORLD, new ArrayList<>(),
         Level.NETHER, new ArrayList<>(),
         Level.END, new ArrayList<>()
@@ -43,11 +39,7 @@ public class Drawing extends Module {
     }
 
     private List<Line> getSavedLines(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
-        var lines = this.lines.get(dimension);
-        if (lines == null) {
-            return Collections.emptyList();
-        }
-        return lines;
+        return this.lines.computeIfAbsent(dimension, k -> new ArrayList<>());
     }
 
     private List<Line> getInProgressLines(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
@@ -59,58 +51,29 @@ public class Drawing extends Module {
         }
     }
 
+    // call on server switch?
+    public void resetLines() {
+        for (var entry : lines.entrySet()) {
+            entry.getValue().clear();
+        }
+    }
+
     public void addLine(final Line line) {
-        var lines = this.lines.get(Globals.getCurrentDimensionId());
-        if (lines == null) return;
+        var lines = this.lines.computeIfAbsent(Globals.getCurrentDimensionId(), k -> new ArrayList<>());
         if (line.length() == 0) return;
         lines.add(line);
     }
 
     public void addInfiniteLine(final Line line) {
-        var lines = this.lines.get(Globals.getCurrentDimensionId());
-        if (lines == null) return;
+        var lines = this.lines.computeIfAbsent(Globals.getCurrentDimensionId(), k -> new ArrayList<>());
         if (line.length() == 0) return;
-        lines.add(extrapolateToWorldBorder(line));
-    }
-
-    private Line extrapolateToWorldBorder(Line line) {
-        int wb = 30_000_000;
-        // extrapolate the line and find its intersections with the world border rect
-        int dx = line.x2() - line.x1();
-        if (dx == 0) { // vertical line
-            return new Line(line.x1(), -wb, line.x2(), wb);
-        }
-        int dz = line.z2() - line.z1();
-        if (dz == 0) { // horizontal line
-            return new Line(-wb, line.z1(), wb, line.z2());
-        }
-        double slope = (double) dz / dx;
-        double intercept = line.z1() - slope * line.x1();
-        double x1 = -wb;
-        double z1 = slope * x1 + intercept;
-        if (z1 < -wb) {
-            z1 = -wb;
-            x1 = (z1 - intercept) / slope;
-        } else if (z1 > wb) {
-            z1 = wb;
-            x1 = (z1 - intercept) / slope;
-        }
-        double x2 = wb;
-        double z2 = slope * x2 + intercept;
-        if (z2 < -wb) {
-            z2 = -wb;
-            x2 = (z2 - intercept) / slope;
-        } else if (z2 > wb) {
-            z2 = wb;
-            x2 = (z2 - intercept) / slope;
-        }
-        return new Line((int) Math.round(x1), (int) Math.round(z1), (int) Math.round(x2), (int) Math.round(z2));
+        lines.add(line.extrapolateToWorldBorder());
     }
 
     public void setInProgressLine(final Line inProgressLine, final DrawingMode drawingMode) {
         switch (drawingMode) {
             case LINE_SEGMENT -> this.inProgressLine = inProgressLine;
-            case INFINITE_LINE -> this.inProgressLine = extrapolateToWorldBorder(inProgressLine);
+            case INFINITE_LINE -> this.inProgressLine = inProgressLine.extrapolateToWorldBorder();
         }
     }
 
@@ -119,8 +82,7 @@ public class Drawing extends Module {
     }
 
     public void clearLine(final int x, final int z) {
-        var lines = this.lines.get(Globals.getCurrentDimensionId());
-        if (lines == null) return;
+        var lines = this.lines.computeIfAbsent(Globals.getCurrentDimensionId(), k -> new ArrayList<>());
         int maxX = x + 16;
         int maxZ = z + 16;
         Line sqLine1 = new Line(x, z, maxX, z);

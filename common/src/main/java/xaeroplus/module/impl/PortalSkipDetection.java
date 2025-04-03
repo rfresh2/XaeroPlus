@@ -71,8 +71,10 @@ public class PortalSkipDetection extends Module {
 
     @EventHandler
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
-        reset();
-        initializeWorld();
+        ModuleManager.getModule(TickTaskExecutor.class).execute(() -> {
+            reset();
+            initializeWorld();
+        });
     }
 
     @Override
@@ -81,15 +83,19 @@ public class PortalSkipDetection extends Module {
             this.getClass().getName(),
             this::getHighlightsState,
             this::getPortalSkipChunksColor);
-        reset();
-        initializeWorld();
+        ModuleManager.getModule(TickTaskExecutor.class).execute(() -> {
+            reset();
+            initializeWorld();
+        });
         this.newChunksModule = ModuleManager.getModule(PaletteNewChunks.class);
         this.oldChunksModule = ModuleManager.getModule(OldChunks.class);
     }
 
     @Override
     public void onDisable() {
-        reset();
+        ModuleManager.getModule(TickTaskExecutor.class).execute(() -> {
+            reset();
+        });
         Globals.drawManager.registry().unregisterChunkHighlightProvider(this.getClass().getName());
     }
 

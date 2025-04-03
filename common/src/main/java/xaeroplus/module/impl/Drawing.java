@@ -59,14 +59,14 @@ public class Drawing extends Module {
     }
 
     public void addLine(final Line line) {
-        var lines = this.lines.computeIfAbsent(Globals.getCurrentDimensionId(), k -> new ArrayList<>());
         if (line.length() == 0) return;
+        var lines = this.lines.computeIfAbsent(Globals.getCurrentDimensionId(), k -> new ArrayList<>());
         lines.add(line);
     }
 
     public void addInfiniteLine(final Line line) {
-        var lines = this.lines.computeIfAbsent(Globals.getCurrentDimensionId(), k -> new ArrayList<>());
         if (line.length() == 0) return;
+        var lines = this.lines.computeIfAbsent(Globals.getCurrentDimensionId(), k -> new ArrayList<>());
         lines.add(line.extrapolateToWorldBorder());
     }
 

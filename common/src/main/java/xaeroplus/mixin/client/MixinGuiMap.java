@@ -147,6 +147,25 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         zTextEntryField.setHint(Component.literal("Z:").withStyle(ChatFormatting.DARK_GRAY));
         this.addWidget(xTextEntryField);
         this.addWidget(zTextEntryField);
+        startDrawingButton = new GuiTexturedButton(
+            0, this.coordinateGotoButton.getY() - 20, 20, 20, 47, 0, 16, 16,
+            this.xpGuiTextures,
+            (button -> onToggleDrawingButton()),
+            () -> new CursorBox(Component.literal("Start Drawing")));
+        addButton(startDrawingButton);
+        startDrawingButton.setFocused(true);
+        drawLineSegmentButton = new GuiTexturedButton(
+            startDrawingButton.getX() + 16, startDrawingButton.getY(), 20, 20, 65, 0, 16, 16,
+            this.xpGuiTextures,
+            (button -> drawingMode = DrawingMode.LINE_SEGMENT),
+            () -> new CursorBox(Component.literal("Line Segment")));
+        drawLineSegmentButton.visible = false;
+        drawInfiniteLineButton = new GuiTexturedButton(
+            startDrawingButton.getX() + 16, drawLineSegmentButton.getY() + 20, 20, 20, 101, 0, 16, 16,
+            this.xpGuiTextures,
+            (button -> drawingMode = DrawingMode.INFINITE_LINE),
+            () -> new CursorBox(Component.literal("Infinite Line")));
+        drawInfiniteLineButton.visible = false;
         // right side
         if (!SupportMods.pac()) {  // remove useless button when pac is not installed
             this.removeWidget(this.claimsButton);
@@ -173,40 +192,26 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         addButton(switchToEndButton);
         addButton(switchToOverworldButton);
         addButton(switchToNetherButton);
-        startDrawingButton = new GuiTexturedButton(
-            this.width - 22, this.switchToNetherButton.getY() - 20, 20, 20, 45, 0, 16, 16,
-            this.xpGuiTextures,
-            (button -> onToggleDrawingButton()),
-            () -> new CursorBox(Component.literal("Start Drawing")));
-        addButton(startDrawingButton);
-        drawLineSegmentButton = new GuiTexturedButton(
-            this.width - 22 - 16, startDrawingButton.getY(), 20, 20, 63, 0, 16, 16,
-            this.xpGuiTextures,
-            (button -> drawingMode = DrawingMode.LINE_SEGMENT),
-            () -> new CursorBox(Component.literal("Line Segment")));
-        addButton(drawLineSegmentButton);
-        drawLineSegmentButton.visible = false;
-        drawInfiniteLineButton = new GuiTexturedButton(
-            this.width - 22 - 16, drawLineSegmentButton.getY() + 20, 20, 20, 100, 0, 16, 16,
-            this.xpGuiTextures,
-            (button -> drawingMode = DrawingMode.INFINITE_LINE),
-            () -> new CursorBox(Component.literal("Infinite Line")));
-        addButton(drawInfiniteLineButton);
-        drawInfiniteLineButton.visible = false;
         pan = false;
         drawing = false;
     }
 
     @Unique
     private void onToggleDrawingButton() {
-        drawing = !drawing;
+        var prevDrawing = drawing;
+        this.init(Minecraft.getInstance(), width, height);
+        drawing = !prevDrawing;
         if (drawing) {
+            addButton(drawLineSegmentButton);
+            addButton(drawInfiniteLineButton);
             drawLineSegmentButton.visible = true;
             drawInfiniteLineButton.visible = true;
         } else {
             drawPos1 = null;
             drawLineSegmentButton.visible = false;
             drawInfiniteLineButton.visible = false;
+            removeWidget(drawLineSegmentButton);
+            removeWidget(drawInfiniteLineButton);
         }
     }
 
@@ -514,12 +519,16 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 drawing = false;
                 drawLineSegmentButton.visible = false;
                 drawInfiniteLineButton.visible = false;
+                removeWidget(drawLineSegmentButton);
+                removeWidget(drawInfiniteLineButton);
             }
             cir.setReturnValue(true);
         } else if (par3 == 1) { // clear drawing on right click
             if (drawPos1 != null) return;
             ModuleManager.getModule(Drawing.class).clearLine(mouseBlockPosX, mouseBlockPosZ);
             drawing = false;
+            removeWidget(drawLineSegmentButton);
+            removeWidget(drawInfiniteLineButton);
             drawLineSegmentButton.visible = false;
             drawInfiniteLineButton.visible = false;
             cir.setReturnValue(true);
@@ -753,9 +762,12 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             } catch (final NumberFormatException e) {
                 xTextEntryField.setValue("");
                 zTextEntryField.setValue("");
+                xTextEntryField.visible = false;
+                zTextEntryField.visible = false;
                 WorldMap.LOGGER.warn("Go to coordinates failed" , e);
             }
         } else {
+            this.init(Minecraft.getInstance(), width, height);
             xTextEntryField.setVisible(true);
             zTextEntryField.setVisible(true);
             // todo: this isn't setting the entry field active and available to type in for some reason

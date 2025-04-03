@@ -253,5 +253,8 @@
   "xaeroplus.gui.waystone_visibility_type.world_map_local": "世界地图本地",
   "xaeroplus.gui.waystone_visibility_type.world_map_global": "世界地图全局",
   "xaeroplus.setting.highlight_shader": "高亮着色器",
-  "xaeroplus.setting.highlight_shader.tooltip": "使用着色器来渲染高亮。减少内存使用，并将更多工作分配给GPU。"
+  "xaeroplus.setting.highlight_shader.tooltip": "使用着色器来渲染高亮。减少内存使用，并将更多工作分配给GPU。",
+  "xaeroplus.gui.world_map.start_drawing": "开始绘制",
+  "xaeroplus.gui.world_map.draw_line_segment": "线段",
+  "xaeroplus.gui.world_map.draw_infinite_line": "无限线"
 }

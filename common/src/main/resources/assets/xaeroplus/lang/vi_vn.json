@@ -253,5 +253,8 @@
     "xaeroplus.gui.waystone_visibility_type.world_map_local": "Bản Đồ Thế Giới Cục Bộ",
     "xaeroplus.gui.waystone_visibility_type.world_map_global": "Bản Đồ Thế Giới Toàn Cầu",
     "xaeroplus.setting.highlight_shader": "Shader Làm Nổi Bật",
-    "xaeroplus.setting.highlight_shader.tooltip": "Sử dụng shader để kết xuất điểm nổi bật. Giảm sử dụng bộ nhớ và chuyển nhiều công việc hơn cho GPU."
+    "xaeroplus.setting.highlight_shader.tooltip": "Sử dụng shader để kết xuất điểm nổi bật. Giảm sử dụng bộ nhớ và chuyển nhiều công việc hơn cho GPU.",
+    "xaeroplus.gui.world_map.start_drawing": "Bắt đầu vẽ",
+    "xaeroplus.gui.world_map.draw_line_segment": "Đoạn thẳng",
+    "xaeroplus.gui.world_map.draw_infinite_line": "Đường thẳng vô hạn"
 }

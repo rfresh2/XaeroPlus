@@ -253,5 +253,8 @@
   "xaeroplus.gui.waystone_visibility_type.world_map_local": "Mapa Mundial Loc.",
   "xaeroplus.gui.waystone_visibility_type.world_map_global": "Mapa Mundial Glob.",
   "xaeroplus.setting.highlight_shader": "Shader de Destaque",
-  "xaeroplus.setting.highlight_shader.tooltip": "Usa um shader para renderizar destaques. Reduz o uso de memória e transfere mais trabalho para a GPU."
+  "xaeroplus.setting.highlight_shader.tooltip": "Usa um shader para renderizar destaques. Reduz o uso de memória e transfere mais trabalho para a GPU.",
+  "xaeroplus.gui.world_map.start_drawing": "Começar a desenhar",
+  "xaeroplus.gui.world_map.draw_line_segment": "Segmento de linha",
+  "xaeroplus.gui.world_map.draw_infinite_line": "Linha infinita"
 }

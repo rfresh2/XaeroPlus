@@ -151,20 +151,20 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             0, this.coordinateGotoButton.getY() - 20, 20, 20, 47, 0, 16, 16,
             this.xpGuiTextures,
             (button -> onToggleDrawingButton()),
-            () -> new CursorBox(Component.literal("Start Drawing")));
+            () -> new CursorBox(Component.translatable("xaeroplus.gui.world_map.start_drawing")));
         addButton(startDrawingButton);
         startDrawingButton.setFocused(true);
         drawLineSegmentButton = new GuiTexturedButton(
             startDrawingButton.getX() + 16, startDrawingButton.getY(), 20, 20, 65, 0, 16, 16,
             this.xpGuiTextures,
             (button -> drawingMode = DrawingMode.LINE_SEGMENT),
-            () -> new CursorBox(Component.literal("Line Segment")));
+            () -> new CursorBox(Component.translatable("xaeroplus.gui.world_map.draw_line_segment")));
         drawLineSegmentButton.visible = false;
         drawInfiniteLineButton = new GuiTexturedButton(
             startDrawingButton.getX() + 16, drawLineSegmentButton.getY() + 20, 20, 20, 101, 0, 16, 16,
             this.xpGuiTextures,
             (button -> drawingMode = DrawingMode.INFINITE_LINE),
-            () -> new CursorBox(Component.literal("Infinite Line")));
+            () -> new CursorBox(Component.translatable("xaeroplus.gui.world_map.draw_infinite_line")));
         drawInfiniteLineButton.visible = false;
         // right side
         if (!SupportMods.pac()) {  // remove useless button when pac is not installed

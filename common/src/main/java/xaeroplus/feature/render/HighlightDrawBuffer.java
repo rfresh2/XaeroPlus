@@ -1,24 +1,26 @@
 package xaeroplus.feature.render;
 
+import com.mojang.blaze3d.buffers.BufferType;
 import com.mojang.blaze3d.buffers.BufferUsage;
+import com.mojang.blaze3d.buffers.GpuBuffer;
+import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexBuffer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
-import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.Nullable;
 import xaeroplus.util.ChunkUtils;
 
 public class HighlightDrawBuffer {
     private boolean stale = true;
-    @Nullable private VertexBuffer vertexBuffer = null;
+    @Nullable private GpuBuffer vertexBuffer = null;
     private boolean flipped = false;
     long lastRefreshed = 0L;
+    int vertexCount = 0;
 
     public boolean needsRefresh(boolean needsFlip) {
-        return vertexBuffer == null || vertexBuffer.isInvalid() || stale || flipped != needsFlip;
+        return vertexBuffer == null || vertexBuffer.isClosed() || stale || flipped != needsFlip;
     }
 
     public void refresh(Long2LongMap highlights, boolean needsFlip) {
@@ -30,7 +32,8 @@ public class HighlightDrawBuffer {
             return;
         }
         var bufferBuilder = Tesselator.getInstance()
-            .begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
+            // todo: fix quads
+            .begin(VertexFormat.Mode.TRIANGLES, DefaultVertexFormat.POSITION);
         for (var highlight : highlights.keySet()) {
             var chunkPosX = ChunkUtils.longToChunkX(highlight);
             var chunkPosZ = ChunkUtils.longToChunkZ(highlight);
@@ -41,24 +44,22 @@ public class HighlightDrawBuffer {
             bufferBuilder.addVertex(x1, y2, 0.0F);
             bufferBuilder.addVertex(x2, y2, 0.0F);
             bufferBuilder.addVertex(x2, y1, 0.0F);
+
+            bufferBuilder.addVertex(x1, y2, 0.0F);
+            bufferBuilder.addVertex(x2, y1, 0.0F);
             bufferBuilder.addVertex(x1, y1, 0.0F);
         }
-        if (vertexBuffer == null || vertexBuffer.isInvalid()) {
-            close();
-            vertexBuffer = new VertexBuffer(BufferUsage.STATIC_WRITE);
-        }
         var meshData = bufferBuilder.buildOrThrow();
-        vertexBuffer.bind();
-        vertexBuffer.upload(meshData);
+        close();
+        vertexBuffer = RenderSystem.getDevice().createBuffer(() -> "Chunk Highlight Buffer", BufferType.VERTICES, BufferUsage.STATIC_WRITE, meshData.vertexBuffer());
+        vertexCount = meshData.drawState().vertexCount();
+        meshData.close();
     }
 
-    public void render() {
-        if (vertexBuffer == null || vertexBuffer.isInvalid()) return;
-        vertexBuffer.bind();
-        var shader = Minecraft.getInstance()
-            .getShaderManager()
-            .getProgram(XaeroPlusShaders.HIGHLIGHT_SHADER_PROGRAM);
-        vertexBuffer.drawWithShader(RenderSystem.getModelViewMatrix(), RenderSystem.getProjectionMatrix(), shader);
+    public void render(final RenderPass pass) {
+        if (vertexBuffer == null || vertexBuffer.isClosed()) return;
+        pass.setVertexBuffer(0, vertexBuffer);
+        pass.draw(0, vertexCount);
     }
 
     public void markStale() {

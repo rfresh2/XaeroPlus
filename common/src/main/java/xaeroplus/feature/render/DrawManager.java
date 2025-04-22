@@ -1,6 +1,6 @@
 package xaeroplus.feature.render;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -15,6 +15,8 @@ import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.util.ColorHelper;
+
+import java.util.OptionalInt;
 
 public class DrawManager {
     private final DrawFeatureRegistry registry = new DrawFeatureRegistry();
@@ -156,27 +158,26 @@ public class DrawManager {
     }
 
     public void drawChunkHighlights(final PoseStack matrixStack, final boolean worldmap) {
-        var shader = Minecraft.getInstance()
-            .getShaderManager()
-            .getProgram(XaeroPlusShaders.HIGHLIGHT_SHADER_PROGRAM);
-        XaeroPlusShaders.setMapViewMatrix(matrixStack.last().pose());
-        RenderSystem.enableBlend();
-        RenderSystem.blendFuncSeparate(
-            GlStateManager.SourceFactor.SRC_ALPHA,
-            GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
-            GlStateManager.SourceFactor.ONE,
-            GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA
-        );
         registry.forEachChunkHighlightDrawFeature(feature -> {
-            int color = feature.colorInt();
-            var a = ColorHelper.getA(color);
-            if (a == 0.0f) return;
-            var r = ColorHelper.getR(color);
-            var g = ColorHelper.getG(color);
-            var b = ColorHelper.getB(color);
-            XaeroPlusShaders.setHighlightColor(r, g, b, a);
-            feature.render(worldmap);
+            feature.refreshIfNeeded(worldmap);
         });
-        RenderSystem.disableBlend();
+        try (final RenderPass pass = RenderSystem.getDevice().createCommandEncoder()
+            .createRenderPass(Minecraft.getInstance().getMainRenderTarget().getColorTexture(),
+                              OptionalInt.empty())) {
+            pass.setPipeline(XaeroPlusShaders.HIGHLIGHT_PIPELINE);
+            pass.setUniform("MapViewMatrix", matrixStack.last().pose());
+            pass.setUniform("ModelViewMat", RenderSystem.getModelViewMatrix());
+            pass.setUniform("ProjMat", RenderSystem.getProjectionMatrix());
+            registry.forEachChunkHighlightDrawFeature(feature -> {
+                int color = feature.colorInt();
+                var a = ColorHelper.getA(color);
+                if (a == 0.0f) return;
+                var r = ColorHelper.getR(color);
+                var g = ColorHelper.getG(color);
+                var b = ColorHelper.getB(color);
+                pass.setUniform("HighlightColor", r, g, b, a);
+                feature.render(worldmap, pass);
+            });
+        }
     }
 }

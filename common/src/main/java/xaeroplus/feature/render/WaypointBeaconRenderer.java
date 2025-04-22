@@ -11,10 +11,10 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import xaero.common.HudMod;
 import xaero.common.minimap.waypoints.Waypoint;
-import xaero.common.minimap.waypoints.WaypointVisibilityType;
 import xaero.common.settings.ModSettings;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.waypoint.WaypointVisibilityType;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.Settings;
 

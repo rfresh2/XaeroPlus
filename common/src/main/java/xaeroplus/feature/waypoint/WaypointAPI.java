@@ -54,13 +54,13 @@ public class WaypointAPI {
         var rootWorlds = rootContainer.getWorlds();
         for (var world : rootWorlds) {
             for (WaypointSet set : world.getIterableWaypointSets()) {
-                consumer.accept(((AccessorWaypointSet) set).getList());
+                consumer.accept(((AccessorWaypointSet) (Object) set).getList());
             }
         }
         for (var subContainer : rootContainer.getSubContainers()) {
             for (var world : subContainer.getWorlds()) {
                 for (WaypointSet set : world.getIterableWaypointSets()) {
-                    consumer.accept(((AccessorWaypointSet) set).getList());
+                    consumer.accept(((AccessorWaypointSet) (Object) set).getList());
                 }
             }
         }

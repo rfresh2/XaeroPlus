@@ -5,6 +5,8 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
@@ -29,13 +31,14 @@ import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.render.MinimapFBORenderer;
 import xaero.common.minimap.render.MinimapRenderer;
 import xaero.common.minimap.render.MinimapRendererHelper;
-import xaero.common.minimap.waypoints.render.WaypointsGuiRenderer;
 import xaero.common.mods.SupportXaeroWorldmap;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.Minimap;
 import xaero.hud.minimap.MinimapLogs;
 import xaero.hud.minimap.compass.render.CompassRenderer;
 import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.waypoint.render.WaypointMapRenderer;
+import xaero.hud.render.util.ImmediateRenderUtil;
 import xaeroplus.Globals;
 import xaeroplus.feature.extensions.CustomMinimapFBORenderer;
 import xaeroplus.settings.Settings;
@@ -51,7 +54,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
     @Shadow
     private boolean loadedFBO;
 
-    public MixinMinimapFBORenderer(final IXaeroMinimap modMain, final Minecraft mc, final WaypointsGuiRenderer waypointsGuiRenderer, final Minimap minimap, final CompassRenderer compassRenderer) {
+    public MixinMinimapFBORenderer(final IXaeroMinimap modMain, final Minecraft mc, final WaypointMapRenderer waypointsGuiRenderer, final Minimap minimap, final CompassRenderer compassRenderer) {
         super(modMain, mc, waypointsGuiRenderer, minimap, compassRenderer);
     }
 
@@ -70,10 +73,10 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             if (this.rotationFramebuffer != null)
                 this.rotationFramebuffer.destroyBuffers();
             final int scaledSize = Globals.minimapScaleMultiplier * 512;
-            this.scalingFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, false);
+            this.scalingFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, true);
             this.rotationFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, true);
-            this.rotationFramebuffer.setFilterMode(9729);
-            this.loadedFBO = this.scalingFramebuffer.frameBufferId != -1 && this.rotationFramebuffer.frameBufferId != -1;
+            this.rotationFramebuffer.setFilterMode(FilterMode.LINEAR);
+            this.loadedFBO = this.scalingFramebuffer.getColorTexture() != null;
         }
     }
 
@@ -170,12 +173,12 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
 
     @Redirect(method = "renderChunksToFBO", at = @At(
         value = "INVOKE",
-        target = "Lxaero/common/minimap/render/MinimapRendererHelper;drawMyTexturedModalRect(Lcom/mojang/blaze3d/vertex/PoseStack;FFIIFFFF)V"
+        target = "Lxaero/hud/render/util/ImmediateRenderUtil;texturedRect(Lcom/mojang/blaze3d/vertex/PoseStack;FFIIFFFFLcom/mojang/blaze3d/pipeline/RenderPipeline;)V"
     ), remap = true) // $REMAP
-    public void redirectModelViewDraw(final MinimapRendererHelper instance, final PoseStack matrixStack, final float x, final float y, final int textureX, final int textureY, final float width, final float height, final float theight, final float factor,
+    public void redirectModelViewDraw(final PoseStack matrixStack, final float x, final float y, final int textureX, final int textureY, final float width, final float height, final float textureH, final float factor, final RenderPipeline renderPipeline,
                                       @Share("scaledSize") LocalIntRef scaledSize) {
         final float scaledSizeM = Globals.minimapScaleMultiplier * 512f;
-        this.helper.drawMyTexturedModalRect(matrixStack, -scaledSize.get(), -scaledSize.get(), 0, 0, scaledSizeM, scaledSizeM, scaledSizeM, scaledSizeM);
+        ImmediateRenderUtil.texturedRect(matrixStack, -scaledSize.get(), -scaledSize.get(), 0, 0, scaledSizeM, scaledSizeM, scaledSizeM, scaledSizeM, renderPipeline);
     }
 
     @WrapOperation(method = "renderChunksToFBO", at= @At(

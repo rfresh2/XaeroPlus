@@ -1,17 +1,27 @@
 package xaeroplus.feature.render.buffered;
 
+import com.mojang.blaze3d.pipeline.BlendFunction;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.DestFactor;
+import com.mojang.blaze3d.platform.SourceFactor;
+import com.mojang.blaze3d.shaders.UniformType;
+import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.GpuTexture;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.CoreShaders;
+import net.minecraft.resources.ResourceLocation;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import xaero.common.graphics.TextureUtils;
 import xaeroplus.module.impl.FpsLimiter;
 import xaeroplus.settings.Settings;
 
+import java.util.OptionalInt;
 import java.util.function.IntSupplier;
 
 /**
@@ -20,10 +30,21 @@ import java.util.function.IntSupplier;
 public class BufferedComponent {
     private static final Minecraft mc = Minecraft.getInstance();
     private Model model = null;
-    private final RenderTarget renderTarget = new TextureTarget(100, 100, true);
+    private final RenderTarget renderTarget = new TextureTarget("XaeroPlus Minimap Buffered", 100, 100, true);
     private long nextRenderCapture = System.currentTimeMillis();
     private final IntSupplier fpsLimitSupplier;
     private final Matrix4f modelViewMatrix = new Matrix4f(RenderSystem.getModelViewMatrix());
+    private final RenderPipeline bufferedPipeline = RenderPipeline.builder()
+        .withLocation(ResourceLocation.fromNamespaceAndPath("xaeroplus", "buffered"))
+        .withVertexShader("core/position_tex")
+        .withFragmentShader("core/position_tex")
+        .withBlend(new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ONE_MINUS_SRC_ALPHA))
+        .withUniform("ModelViewMat", UniformType.MATRIX4X4)
+        .withUniform("ProjMat", UniformType.MATRIX4X4)
+        .withUniform("ColorModulator", UniformType.VEC4)
+        .withSampler("Sampler0")
+        .withVertexFormat(DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.QUADS)
+        .build();
 
     public BufferedComponent(final IntSupplier fpsLimitSupplier) {
         this.fpsLimitSupplier = fpsLimitSupplier;
@@ -64,49 +85,48 @@ public class BufferedComponent {
             refreshModel(windowWidth, windowHeight);
             forceRender = true;
         }
+        // todo:
         if (forceRender || System.currentTimeMillis() > nextRenderCapture) {
-            renderTarget.setClearColor(0, 0, 0, 0);
-            renderTarget.clear();
-            renderTarget.bindWrite(false);
+            TextureUtils.clearRenderTarget(renderTarget, 0, 1.0F);
+            // todo
+//            renderTarget.bindWrite(false);
             FpsLimiter.renderTargetOverwrite = renderTarget;
-            RenderSystem.enableBlend();
-            RenderSystem.blendFuncSeparate(
-                GlStateManager.SourceFactor.SRC_ALPHA,
-                GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
-                GlStateManager.SourceFactor.ONE,
-                GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA
-            );
-            renderTarget.bindWrite(false);
+//            RenderSystem.enableBlend();
+//            RenderSystem.blendFuncSeparate(
+//                GlStateManager.SourceFactor.SRC_ALPHA,
+//                GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
+//                GlStateManager.SourceFactor.ONE,
+//                GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA
+//            );
+//            renderTarget.bindWrite(false);
             return false;
         }
-        renderBufferedTexture(renderTarget.getColorTextureId());
+        renderBufferedTexture(renderTarget.getColorTexture());
         return true;
     }
 
     public void postRender() {
         FpsLimiter.renderTargetOverwrite = null;
-        renderTarget.unbindWrite();
-        mc.getMainRenderTarget().bindWrite(true);
+        // todo:
+//        renderTarget.unbindWrite();
+//        mc.getMainRenderTarget().bindWrite(true);
         nextRenderCapture = System.currentTimeMillis() + (1000 / fpsLimitSupplier.getAsInt());
-        renderBufferedTexture(renderTarget.getColorTextureId());
+        renderBufferedTexture(renderTarget.getColorTexture());
     }
 
-    private void renderBufferedTexture(final int textureId) {
-        RenderSystem.enableDepthTest();
-        RenderSystem.enableBlend();
-        RenderSystem.blendFuncSeparate(
-            GlStateManager.SourceFactor.SRC_ALPHA,
-            GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
-            GlStateManager.SourceFactor.ONE,
-            GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA
-        );
-        RenderSystem.setShader(CoreShaders.POSITION_TEX);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, textureId);
-        modelViewMatrix.set(RenderSystem.getModelViewMatrix());
-        modelViewMatrix.translate(0, 0, 399 + (float) Settings.REGISTRY.minimapRenderZOffsetSetting.get());
-        var guiScale = (float) Math.max(1.0, mc.getWindow().getGuiScale());
-        modelViewMatrix.scale(1.0f / guiScale);
-        model.draw(modelViewMatrix);
+    private void renderBufferedTexture(final GpuTexture textureId) {
+        try (final RenderPass pass = RenderSystem.getDevice().createCommandEncoder()
+            .createRenderPass(mc.getMainRenderTarget().getColorTexture(), OptionalInt.empty())) {
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.setShaderTexture(0, textureId);
+            modelViewMatrix.set(RenderSystem.getModelViewMatrix());
+            modelViewMatrix.translate(0, 0, 399 + (float) Settings.REGISTRY.minimapRenderZOffsetSetting.get());
+            var guiScale = (float) Math.max(1.0, mc.getWindow().getGuiScale());
+            modelViewMatrix.scale(1.0f / guiScale);
+            pass.setPipeline(bufferedPipeline);
+            pass.setUniform("ModelViewMat", modelViewMatrix);
+            pass.setUniform("ProjMat", RenderSystem.getProjectionMatrix());
+            model.draw(pass);
+        }
     }
 }

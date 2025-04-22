@@ -1,44 +1,26 @@
 package xaeroplus.feature.render;
 
-import com.mojang.blaze3d.shaders.Uniform;
+import com.mojang.blaze3d.pipeline.BlendFunction;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.platform.DestFactor;
+import com.mojang.blaze3d.platform.PolygonMode;
+import com.mojang.blaze3d.platform.SourceFactor;
+import com.mojang.blaze3d.shaders.UniformType;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.CompiledShaderProgram;
-import net.minecraft.client.renderer.ShaderDefines;
-import net.minecraft.client.renderer.ShaderProgram;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.resources.ResourceLocation;
-import org.joml.Matrix4f;
 
 public class XaeroPlusShaders {
-    public static final ShaderProgram HIGHLIGHT_SHADER_PROGRAM = new ShaderProgram(
-        ResourceLocation.fromNamespaceAndPath("xaeroplus", "highlights"),
-        DefaultVertexFormat.POSITION,
-        ShaderDefines.EMPTY
-    );
-
-    private static CompiledShaderProgram CACHED_HIGHLIGHT_SHADER_PROGRAM;
-    private static Uniform HIGHLIGHT_COLOR_UNIFORM;
-    private static Uniform HIGHLIGHT_MAP_VIEW_MATRIX_UNIFORM;
-
-    public static void setHighlightColor(float r, float g, float b, float a) {
-        CompiledShaderProgram currentProgram = Minecraft.getInstance().getShaderManager().getProgram(HIGHLIGHT_SHADER_PROGRAM);
-        if (currentProgram != CACHED_HIGHLIGHT_SHADER_PROGRAM) {
-            CACHED_HIGHLIGHT_SHADER_PROGRAM = currentProgram;
-            HIGHLIGHT_MAP_VIEW_MATRIX_UNIFORM = currentProgram.getUniform("MapViewMatrix");
-            HIGHLIGHT_COLOR_UNIFORM = currentProgram.getUniform("HighlightColor");
-        }
-
-        HIGHLIGHT_COLOR_UNIFORM.set(r, g, b, a);
-    }
-
-    public static void setMapViewMatrix(Matrix4f matrix) {
-        CompiledShaderProgram currentProgram = Minecraft.getInstance().getShaderManager().getProgram(HIGHLIGHT_SHADER_PROGRAM);
-        if (currentProgram != CACHED_HIGHLIGHT_SHADER_PROGRAM) {
-            CACHED_HIGHLIGHT_SHADER_PROGRAM = currentProgram;
-            HIGHLIGHT_MAP_VIEW_MATRIX_UNIFORM = currentProgram.getUniform("MapViewMatrix");
-            HIGHLIGHT_COLOR_UNIFORM = currentProgram.getUniform("HighlightColor");
-        }
-
-        HIGHLIGHT_MAP_VIEW_MATRIX_UNIFORM.set(matrix);
-    }
+    public static final RenderPipeline HIGHLIGHT_PIPELINE = RenderPipeline.builder()
+        .withLocation(ResourceLocation.fromNamespaceAndPath("xaeroplus", "pipeline/highlights"))
+        .withVertexShader(ResourceLocation.fromNamespaceAndPath("xaeroplus", "highlights"))
+        .withFragmentShader(ResourceLocation.fromNamespaceAndPath("xaeroplus", "highlights"))
+        .withVertexFormat(DefaultVertexFormat.POSITION, VertexFormat.Mode.TRIANGLES)
+        .withPolygonMode(PolygonMode.FILL)
+        .withUniform("ModelViewMat", UniformType.MATRIX4X4)
+        .withUniform("ProjMat", UniformType.MATRIX4X4)
+        .withUniform("MapViewMatrix", UniformType.MATRIX4X4)
+        .withUniform("HighlightColor", UniformType.VEC4)
+        .withBlend(new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ONE_MINUS_SRC_ALPHA))
+        .build();
 }

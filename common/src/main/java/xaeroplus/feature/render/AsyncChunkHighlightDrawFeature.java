@@ -2,6 +2,7 @@ package xaeroplus.feature.render;
 
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.mojang.blaze3d.systems.RenderPass;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.longs.Long2LongMaps;
 import xaeroplus.Globals;
@@ -59,12 +60,16 @@ public class AsyncChunkHighlightDrawFeature implements ChunkHighlightDrawFeature
     }
 
     @Override
-    public void render(final boolean worldmap) {
+    public void refreshIfNeeded(final boolean worldmap) {
         Long2LongMap highlights = getChunkHighlights(); // needed for cache to async refresh
         if (drawBuffer.needsRefresh(worldmap)) {
             drawBuffer.refresh(highlights, worldmap);
         }
-        drawBuffer.render();
+    }
+
+    @Override
+    public void render(final boolean worldmap, final RenderPass pass) {
+        drawBuffer.render(pass);
     }
 
     public void markDrawBuffersStale() {

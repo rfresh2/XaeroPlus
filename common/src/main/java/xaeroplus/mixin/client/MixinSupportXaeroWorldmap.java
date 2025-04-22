@@ -7,6 +7,7 @@ import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,6 +20,7 @@ import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendere
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.mods.SupportXaeroWorldmap;
 import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.render.util.ImmediateRenderUtil;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMapSession;
 import xaero.map.region.MapTileChunk;
@@ -91,8 +93,8 @@ public abstract class MixinSupportXaeroWorldmap {
     public void drawTransparentMMBackground(final PoseStack matrixStack, final int minX, final int maxX, final int minZ, final int maxZ, final int minViewX, final int maxViewX, final int minViewZ, final int maxViewZ, final MapProcessor mapProcessor, final boolean noCaveMaps, final boolean slimeChunks, final int chunkX, final int chunkZ, final int tileX, final int tileZ, final int insideX, final int insideZ, final Long seed, final MultiTextureRenderTypeRenderer mapWithLightRenderer, final MultiTextureRenderTypeRenderer mapNoLightRenderer, final MinimapRendererHelper helper, final VertexConsumer overlayBufferBuilder, final CallbackInfo ci,
                                @Share("bgBufferBuilder") LocalRef<BufferBuilder> bgBufferBuilderRef) {
         if (Settings.REGISTRY.transparentMinimapBackground.get()) {
-            MeshData meshData = bgBufferBuilderRef.get().build();
-            if (meshData != null) BufferUploader.drawWithShader(meshData);
+            var meshData = bgBufferBuilderRef.get().build();
+            if (meshData != null) ImmediateRenderUtil.drawImmediateMeshData(meshData, RenderPipelines.GUI);
         }
     }
 

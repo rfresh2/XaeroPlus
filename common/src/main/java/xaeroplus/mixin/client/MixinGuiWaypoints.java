@@ -20,9 +20,9 @@ import xaero.common.gui.GuiWaypoints;
 import xaero.common.gui.MySmallButton;
 import xaero.common.gui.ScreenBase;
 import xaero.common.minimap.waypoints.Waypoint;
-import xaero.common.minimap.waypoints.WaypointsSort;
 import xaero.common.misc.KeySortableByOther;
 import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.waypoint.WaypointsSort;
 import xaero.hud.minimap.world.MinimapWorld;
 import xaeroplus.settings.Settings;
 

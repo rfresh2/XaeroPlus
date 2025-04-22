@@ -140,6 +140,18 @@ public class Highways extends Module {
                 lines.add(new Line(i, -50000, i, 50000));
                 lines.add(new Line(-50000, i, 50000, i));
             }
+
+            // 50k extension roads, extends 50k to 125k
+            // horizontal
+            lines.add(new Line(-125000, -50000, -50000, -50000));
+            lines.add(new Line(-125000, 50000, -50000, 50000));
+            lines.add(new Line(125000, -50000, 50000, -50000));
+            lines.add(new Line(125000, 50000, 50000, 50000));
+            // vertical
+            lines.add(new Line(-50000, -125000, -50000, -50000));
+            lines.add(new Line(-50000, 125000, -50000, 50000));
+            lines.add(new Line(50000, -125000, 50000, -50000));
+            lines.add(new Line(50000, 125000, 50000, 50000));
         }
         return lines;
     }

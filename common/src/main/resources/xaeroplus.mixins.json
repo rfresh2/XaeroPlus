@@ -34,7 +34,6 @@
     "MixinGuiWaypointsOptions",
     "MixinGuiWorldMapSettings",
     "MixinHudMod",
-    "MixinImprovedFramebuffer",
     "MixinLeveledRegion",
     "MixinMapPixel",
     "MixinMapProcessor",

@@ -34,7 +34,6 @@
     "MixinGuiWaypointsOptions",
     "MixinGuiWorldMapSettings",
     "MixinHudMod",
-    "MixinImprovedFramebuffer",
     "MixinLeveledRegion",
     "MixinMapPixel",
     "MixinMapProcessor",
@@ -66,7 +65,6 @@
     "MixinWorldMapModSettings",
     "MixinWorldMapOption",
     "mc.MixinClientPlayNetworkHandler",
-    "mc.MixinGlStateManager",
     "mc.MixinMinecraftClient",
     "mc.MixinWorldRenderer"
   ]

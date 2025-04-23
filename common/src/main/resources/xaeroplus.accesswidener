@@ -70,3 +70,5 @@ transitive-accessible	field	net/minecraft/client/renderer/RenderPipelines	GUI_SN
 transitive-accessible	field	net/minecraft/client/renderer/RenderPipelines	GUI_TEXTURED_SNIPPET	Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 transitive-accessible	field	net/minecraft/client/renderer/RenderPipelines	OUTLINE_SNIPPET	Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 transitive-accessible	method	net/minecraft/client/renderer/RenderPipelines	register	(Lcom/mojang/blaze3d/pipeline/RenderPipeline;)Lcom/mojang/blaze3d/pipeline/RenderPipeline;
+transitive-accessible field net/minecraft/client/Minecraft mainRenderTarget Lcom/mojang/blaze3d/pipeline/RenderTarget;
+transitive-mutable field net/minecraft/client/Minecraft mainRenderTarget Lcom/mojang/blaze3d/pipeline/RenderTarget;

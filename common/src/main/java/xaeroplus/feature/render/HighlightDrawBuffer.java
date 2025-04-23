@@ -18,7 +18,6 @@ public class HighlightDrawBuffer {
     private boolean flipped = false;
     long lastRefreshed = 0L;
     int indexCount = 0;
-    VertexFormat.IndexType indexType;
 
     public boolean needsRefresh(boolean needsFlip) {
         return vertexBuffer == null || vertexBuffer.isClosed() || stale || flipped != needsFlip;
@@ -50,7 +49,6 @@ public class HighlightDrawBuffer {
             close();
             vertexBuffer = RenderSystem.getDevice().createBuffer(() -> "Chunk Highlight Buffer", BufferType.VERTICES, BufferUsage.STATIC_WRITE, meshData.vertexBuffer());
             indexCount = meshData.drawState().indexCount();
-            indexType = meshData.drawState().indexType();
         }
     }
 
@@ -58,7 +56,7 @@ public class HighlightDrawBuffer {
         if (vertexBuffer == null || vertexBuffer.isClosed()) return;
         var autoIndexBuffer = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
         var indexBuffer = autoIndexBuffer.getBuffer(indexCount);
-        pass.setIndexBuffer(indexBuffer, indexType);
+        pass.setIndexBuffer(indexBuffer, autoIndexBuffer.type());
         pass.setVertexBuffer(0, vertexBuffer);
         pass.drawIndexed(0, indexCount);
     }

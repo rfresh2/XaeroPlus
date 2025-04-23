@@ -16,6 +16,7 @@ import org.joml.Vector3f;
  */
 public class Model {
     private final GpuBuffer vertexBuffer;
+    private int indexCount = 0;
 
     public Model(final Vector3f[] posMatrix, final Vector2f[] texUvMatrix) {
         RenderSystem.assertOnRenderThread();
@@ -28,12 +29,16 @@ public class Model {
         }
         try (var renderedBuffer = bufferbuilder.buildOrThrow()) {
             this.vertexBuffer = RenderSystem.getDevice().createBuffer(() -> "XaeroPlus Buffered Minimap Model", BufferType.VERTICES, BufferUsage.STATIC_WRITE, renderedBuffer.vertexBuffer());
+            indexCount = renderedBuffer.drawState().indexCount();
         }
     }
 
     public void draw(RenderPass renderPass) {
+        var autoIndexBuffer = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
+        var indexBuffer = autoIndexBuffer.getBuffer(indexCount);
         renderPass.setVertexBuffer(0, vertexBuffer);
-        renderPass.draw(0, vertexBuffer.size());
+        renderPass.setIndexBuffer(indexBuffer, autoIndexBuffer.type());
+        renderPass.drawIndexed(0, indexCount);
     }
 
     public void close() {

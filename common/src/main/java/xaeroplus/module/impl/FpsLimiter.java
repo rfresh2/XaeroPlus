@@ -1,7 +1,6 @@
 package xaeroplus.module.impl;
 
 import com.google.common.base.Suppliers;
-import com.mojang.blaze3d.pipeline.RenderTarget;
 import net.lenni0451.lambdaevents.EventHandler;
 import xaeroplus.event.MinimapRenderEvent;
 import xaeroplus.feature.render.buffered.BufferedComponent;
@@ -16,12 +15,11 @@ public class FpsLimiter extends Module {
     // this must be initialized AFTER MC's screen is initialized
     private final Supplier<BufferedComponent> minimapRenderInstanceSupplier = Suppliers.memoize(
         () -> new BufferedComponent(Settings.REGISTRY.minimapFpsLimit::getAsInt));
-    public static RenderTarget renderTargetOverwrite = null;
 
     @EventHandler
     public void onMinimapRenderEvent(final MinimapRenderEvent event) {
-//        if (event.guiGraphics != null) event.guiGraphics.flush();
-//        event.cancelled = minimapRenderInstanceSupplier.get().render();
-//        event.postRenderCallback = minimapRenderInstanceSupplier.get()::postRender;
+        if (event.guiGraphics != null) event.guiGraphics.flush();
+        event.cancelled = minimapRenderInstanceSupplier.get().render();
+        event.postRenderCallback = minimapRenderInstanceSupplier.get()::postRender;
     }
 }

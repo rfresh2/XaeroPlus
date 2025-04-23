@@ -17,7 +17,8 @@ public class HighlightDrawBuffer {
     @Nullable private GpuBuffer vertexBuffer = null;
     private boolean flipped = false;
     long lastRefreshed = 0L;
-    int vertexCount = 0;
+    int indexCount = 0;
+    VertexFormat.IndexType indexType;
 
     public boolean needsRefresh(boolean needsFlip) {
         return vertexBuffer == null || vertexBuffer.isClosed() || stale || flipped != needsFlip;
@@ -32,8 +33,7 @@ public class HighlightDrawBuffer {
             return;
         }
         var bufferBuilder = Tesselator.getInstance()
-            // todo: fix quads
-            .begin(VertexFormat.Mode.TRIANGLES, DefaultVertexFormat.POSITION);
+            .begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
         for (var highlight : highlights.keySet()) {
             var chunkPosX = ChunkUtils.longToChunkX(highlight);
             var chunkPosZ = ChunkUtils.longToChunkZ(highlight);
@@ -44,22 +44,23 @@ public class HighlightDrawBuffer {
             bufferBuilder.addVertex(x1, y2, 0.0F);
             bufferBuilder.addVertex(x2, y2, 0.0F);
             bufferBuilder.addVertex(x2, y1, 0.0F);
-
-            bufferBuilder.addVertex(x1, y2, 0.0F);
-            bufferBuilder.addVertex(x2, y1, 0.0F);
             bufferBuilder.addVertex(x1, y1, 0.0F);
         }
-        var meshData = bufferBuilder.buildOrThrow();
-        close();
-        vertexBuffer = RenderSystem.getDevice().createBuffer(() -> "Chunk Highlight Buffer", BufferType.VERTICES, BufferUsage.STATIC_WRITE, meshData.vertexBuffer());
-        vertexCount = meshData.drawState().vertexCount();
-        meshData.close();
+        try (var meshData = bufferBuilder.buildOrThrow()) {
+            close();
+            vertexBuffer = RenderSystem.getDevice().createBuffer(() -> "Chunk Highlight Buffer", BufferType.VERTICES, BufferUsage.STATIC_WRITE, meshData.vertexBuffer());
+            indexCount = meshData.drawState().indexCount();
+            indexType = meshData.drawState().indexType();
+        }
     }
 
     public void render(final RenderPass pass) {
         if (vertexBuffer == null || vertexBuffer.isClosed()) return;
+        var autoIndexBuffer = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
+        var indexBuffer = autoIndexBuffer.getBuffer(indexCount);
+        pass.setIndexBuffer(indexBuffer, indexType);
         pass.setVertexBuffer(0, vertexBuffer);
-        pass.draw(0, vertexCount);
+        pass.drawIndexed(0, indexCount);
     }
 
     public void markStale() {

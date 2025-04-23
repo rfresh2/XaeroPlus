@@ -15,7 +15,7 @@ public class XaeroPlusShaders {
         .withLocation(ResourceLocation.fromNamespaceAndPath("xaeroplus", "pipeline/highlights"))
         .withVertexShader(ResourceLocation.fromNamespaceAndPath("xaeroplus", "highlights"))
         .withFragmentShader(ResourceLocation.fromNamespaceAndPath("xaeroplus", "highlights"))
-        .withVertexFormat(DefaultVertexFormat.POSITION, VertexFormat.Mode.TRIANGLES)
+        .withVertexFormat(DefaultVertexFormat.POSITION, VertexFormat.Mode.QUADS)
         .withPolygonMode(PolygonMode.FILL)
         .withUniform("ModelViewMat", UniformType.MATRIX4X4)
         .withUniform("ProjMat", UniformType.MATRIX4X4)

@@ -42,7 +42,7 @@ dependencyResolutionManagement {
 			library("fabric-waystones", "maven.modrinth:fwaystones:3.3.2+mc1.20.4")
 			library("worldtools", "maven.modrinth:worldtools:1.2.4+1.20.4")
             library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.49.1.0") // relocated xerial sqlite to avoid conflicts with other mods
-            library("immediatelyfast", "maven.modrinth:immediatelyfast:1.3.6+1.20.4-fabric")
+            library("immediatelyfast", "maven.modrinth:immediatelyfast:1.5.0+1.20.4-fabric")
 			library("modmenu", "maven.modrinth:modmenu:9.0.0")
 			library("sodium", "maven.modrinth:sodium:mc1.20.4-0.5.8")
 			library("fpsdisplay", "maven.modrinth:fpsdisplay:4.0.0+1.20.4")

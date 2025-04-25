@@ -6,6 +6,7 @@ import xaeroplus.XaeroPlus;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Comparator;
 
 public class SettingHooks {
     public static void saveSettings() {
@@ -20,7 +21,7 @@ public class SettingHooks {
         File tempFile = new File(XaeroPlus.configFile.getAbsolutePath() + ".tmp");
         if (tempFile.exists()) tempFile.delete();
         try (PrintWriter writer = new PrintWriter(new FileWriter(tempFile, true))) {
-            var allSettings = Settings.REGISTRY.getAllSettings();
+            var allSettings = Settings.REGISTRY.getAllSettings().stream().sorted(Comparator.comparing(XaeroPlusSetting::getSettingName)).toList();
             for (int i = 0; i < allSettings.size(); i++) {
                 final XaeroPlusSetting setting = allSettings.get(i);
                 writer.println(setting.getSettingName() + ":" + setting.getSerializedValue());

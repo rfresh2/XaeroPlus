@@ -114,6 +114,8 @@ public class BufferedComponent {
 
     private void renderBufferedTexture() {
         modelViewMatrixBackup.set(RenderSystem.getModelViewMatrix());
+        var autoIndexBuffer = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
+        var indexBuffer = autoIndexBuffer.getBuffer(model.getIndexCount());
         try (final RenderPass pass = RenderSystem.getDevice().createCommandEncoder()
             .createRenderPass(mc.getMainRenderTarget().getColorTexture(), OptionalInt.empty())) {
             pass.setPipeline(bufferedPipeline);
@@ -123,7 +125,7 @@ public class BufferedComponent {
             modelViewMatrix.translate(0, 0, 399 + (float) Settings.REGISTRY.minimapRenderZOffsetSetting.get());
             var guiScale = (float) Math.max(1.0, mc.getWindow().getGuiScale());
             modelViewMatrix.scale(1.0f / guiScale);
-            model.draw(pass);
+            model.draw(pass, indexBuffer, autoIndexBuffer.type());
         }
         RenderSystem.getModelViewMatrix().set(modelViewMatrixBackup);
     }

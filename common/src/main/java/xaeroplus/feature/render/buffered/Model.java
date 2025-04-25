@@ -33,15 +33,17 @@ public class Model {
         }
     }
 
-    public void draw(RenderPass renderPass) {
-        var autoIndexBuffer = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
-        var indexBuffer = autoIndexBuffer.getBuffer(indexCount);
+    public void draw(RenderPass renderPass, GpuBuffer indexBuffer, VertexFormat.IndexType indexType) {
         renderPass.setVertexBuffer(0, vertexBuffer);
-        renderPass.setIndexBuffer(indexBuffer, autoIndexBuffer.type());
+        renderPass.setIndexBuffer(indexBuffer, indexType);
         renderPass.drawIndexed(0, indexCount);
     }
 
     public void close() {
         vertexBuffer.close();
+    }
+
+    public int getIndexCount() {
+        return indexCount;
     }
 }

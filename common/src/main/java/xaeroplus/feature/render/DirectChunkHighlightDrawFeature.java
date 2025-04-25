@@ -1,6 +1,8 @@
 package xaeroplus.feature.render;
 
+import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.systems.RenderPass;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import xaeroplus.Globals;
 
@@ -35,7 +37,7 @@ public class DirectChunkHighlightDrawFeature implements ChunkHighlightDrawFeatur
     @Override
     public void refreshIfNeeded(final boolean worldmap) {
         Long2LongMap highlights = getChunkHighlights();
-        if (true) {
+        if (refreshEveryTick) {
             if (System.currentTimeMillis() - drawBuffer.lastRefreshed >= 50L) {
                 this.invalidateCache();
             }
@@ -52,8 +54,13 @@ public class DirectChunkHighlightDrawFeature implements ChunkHighlightDrawFeatur
     }
 
     @Override
-    public void render(boolean worldmap, final RenderPass pass) {
-        drawBuffer.render(pass);
+    public void render(boolean worldmap, final RenderPass pass, final GpuBuffer indexBuffer, final VertexFormat.IndexType indexType) {
+        drawBuffer.render(pass, indexBuffer, indexType);
+    }
+
+    @Override
+    public int indexCount() {
+        return drawBuffer.indexCount();
     }
 
     @Override

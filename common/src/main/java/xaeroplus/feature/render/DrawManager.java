@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -161,23 +162,26 @@ public class DrawManager {
         registry.forEachChunkHighlightDrawFeature(feature -> {
             feature.refreshIfNeeded(worldmap);
         });
-        try (final RenderPass pass = RenderSystem.getDevice().createCommandEncoder()
-            .createRenderPass(Minecraft.getInstance().getMainRenderTarget().getColorTexture(),
-                              OptionalInt.empty())) {
-            pass.setPipeline(XaeroPlusShaders.HIGHLIGHT_PIPELINE);
-            pass.setUniform("MapViewMatrix", matrixStack.last().pose());
-            pass.setUniform("ModelViewMat", RenderSystem.getModelViewMatrix());
-            pass.setUniform("ProjMat", RenderSystem.getProjectionMatrix());
-            registry.forEachChunkHighlightDrawFeature(feature -> {
-                int color = feature.colorInt();
-                var a = ColorHelper.getA(color);
-                if (a == 0.0f) return;
-                var r = ColorHelper.getR(color);
-                var g = ColorHelper.getG(color);
-                var b = ColorHelper.getB(color);
+        registry.forEachChunkHighlightDrawFeature(feature -> {
+            int color = feature.colorInt();
+            var a = ColorHelper.getA(color);
+            if (a == 0.0f) return;
+            var r = ColorHelper.getR(color);
+            var g = ColorHelper.getG(color);
+            var b = ColorHelper.getB(color);
+            var autoIndexBuffer = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
+            var indexType = autoIndexBuffer.type();
+            var indexBuffer = autoIndexBuffer.getBuffer(feature.indexCount());
+            try (final RenderPass pass = RenderSystem.getDevice().createCommandEncoder()
+                .createRenderPass(Minecraft.getInstance().getMainRenderTarget().getColorTexture(),
+                                  OptionalInt.empty())) {
+                pass.setPipeline(XaeroPlusShaders.HIGHLIGHT_PIPELINE);
+                pass.setUniform("MapViewMatrix", matrixStack.last().pose());
+                pass.setUniform("ModelViewMat", RenderSystem.getModelViewMatrix());
+                pass.setUniform("ProjMat", RenderSystem.getProjectionMatrix());
                 pass.setUniform("HighlightColor", r, g, b, a);
-                feature.render(worldmap, pass);
-            });
-        }
+                feature.render(worldmap, pass, indexBuffer, indexType);
+            }
+        });
     }
 }

@@ -52,11 +52,13 @@ public class HighlightDrawBuffer {
         }
     }
 
-    public void render(final RenderPass pass) {
+    public int indexCount() {
+        return indexCount;
+    }
+
+    public void render(final RenderPass pass, final GpuBuffer indexBuffer, final VertexFormat.IndexType indexType) {
         if (vertexBuffer == null || vertexBuffer.isClosed()) return;
-        var autoIndexBuffer = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
-        var indexBuffer = autoIndexBuffer.getBuffer(indexCount);
-        pass.setIndexBuffer(indexBuffer, autoIndexBuffer.type());
+        pass.setIndexBuffer(indexBuffer, indexType);
         pass.setVertexBuffer(0, vertexBuffer);
         pass.drawIndexed(0, indexCount);
     }

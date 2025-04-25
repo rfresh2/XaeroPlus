@@ -2,7 +2,9 @@ package xaeroplus.feature.render;
 
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.systems.RenderPass;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.longs.Long2LongMaps;
 import xaeroplus.Globals;
@@ -68,8 +70,13 @@ public class AsyncChunkHighlightDrawFeature implements ChunkHighlightDrawFeature
     }
 
     @Override
-    public void render(final boolean worldmap, final RenderPass pass) {
-        drawBuffer.render(pass);
+    public void render(final boolean worldmap, final RenderPass pass, final GpuBuffer indexBuffer, final VertexFormat.IndexType indexType) {
+        drawBuffer.render(pass, indexBuffer, indexType);
+    }
+
+    @Override
+    public int indexCount() {
+        return drawBuffer.indexCount();
     }
 
     public void markDrawBuffersStale() {

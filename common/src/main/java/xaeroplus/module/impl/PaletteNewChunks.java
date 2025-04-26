@@ -86,27 +86,25 @@ public class PaletteNewChunks extends Module {
      *
      * When a chunk is first generated it is populated first by air, then by additional block types like stone, water, etc
      * By the end of these steps, the chunk's blockstate palette will still contain references to all states that were ever present
-     * For more info on what chunk palettes are see: https://wiki.vg/Chunk_Format#Paletted_Container_structure
+     * For more info on what chunk palettes are see: https://minecraft.wiki/w/Minecraft_Wiki:Projects/wiki.vg_merge/Chunk_Format#Paletted_Container_structure
      *
-     * When the MC server writes + reads the chunks to region files it compacts the palette to save disk space
-     * the key is that this compaction occurs _after_ newly generated chunk data is sent to players
+     * When the MC server writes the chunks to region files it compacts the palette to save disk space
      *
      * compacting has 2 effects:
      * 1. palette entries without values present in the chunk are removed
      * 2. the order of ids in the palette can change as it is rebuilt in order of the actual blockstates present in the chunk
      *
-     * So we are simply checking if the first entry of the lowest section's block palette is air
-     * The lowest section should always have bedrock as the first entry at the bottom section after compacting
+     * Importantly, newly generated chunk data is first sent to the player, and only afterward is saved to disk and compacted
+     *
+     * We can examine palette and blockstate data to check if it was compacted or not. If it wasn't compacted, it's a newly generated chunk
+     * 1. For Linear (list) palettes: check if palette entries are in order of the blockstates present in the chunk
+     * 2. For HashMap palette, check if there are "extra" palette entries that are not present in the chunk
+     *
+     * There is a chance for false negatives if we load a chunk with another player that removes or adds a blockstate type from the chunk
+     * Or if the chunk is largely empty like in the End dimension, but these same mechanics can also be applied to the biome palette
+     *
      * Credits to etianl (https://github.com/etianl/Trouser-Streak) for first idea and public implementation for examining palette entries
-     * and crosby (https://github.com/RacoonDog) for idea to check if air is the first palette entry
-     *
-     * However, there is a chance for false negatives if the chunk's palette generates with more than 16 different blockstates
-     * The palette gets resized to a HashMapPalette which does not retain the original entry ordering
-     * Usually this happens when features like mineshafts or the deep dark generates
-     *
-     * The second check that can be applied is verifying every palette entry is actually present in the data.
-     * But this can still fail if air is still present in the section. Or if the chunk is modified by a
-     * different online player right before we enter it.
+     * and crosby (https://github.com/RacoonDog) for idea to check if air is the first palette entry that this was extended from
      */
     private boolean checkNewChunkBlockStatePalette(LevelChunk chunk) {
         var sections = chunk.getSections();
@@ -164,9 +162,9 @@ public class PaletteNewChunks extends Module {
      *
      * This check is very reliable in all dimensions - even the overworld as long as plains is not a real biome present.
      *
-     * This should generally be preferred over blockstate palette checks as its faster and more reliable.
-     * For example, this solves the issue of player activity modifying the chunk, and therefore possibly causing palette ID's
-     * without matching data present, at the same time as we load them.
+     * But the main reason we still use the blockstate palette check is for detecting newly upgraded
+     * chunks from previous MC versions like 1.12.2 - which is the vast majority of chunks on 2b2t
+     * Marking version upgraded chunks as new is useful for determining whether a 1.12 trail was already followed or not
      */
     private BiomeCheckResult checkNewChunkBiomePalette(LevelChunk chunk, boolean checkData) {
         var sections = chunk.getSections();

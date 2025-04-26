@@ -168,7 +168,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
                                                           @Local(name = "halfWView") float halfWView,
                                                           @Local(name = "shaderMatrixStack") Matrix4fStack shaderMatrixStack) {
         float sizeMultTranslation = (halfWView / Globals.minimapSizeMultiplier) * (Globals.minimapSizeMultiplier - 1);
-        shaderMatrixStack.translate(sizeMultTranslation, sizeMultTranslation, 1.0f);
+        shaderMatrixStack.translate(sizeMultTranslation, sizeMultTranslation, 0f);
     }
 
     @Redirect(method = "renderChunksToFBO", at = @At(

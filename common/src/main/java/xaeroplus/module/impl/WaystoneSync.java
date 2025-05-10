@@ -28,7 +28,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import static xaeroplus.event.XaeroWorldChangeEvent.WorldChangeType.ENTER_WORLD;
 import static xaeroplus.event.XaeroWorldChangeEvent.WorldChangeType.EXIT_WORLD;
 
 public class WaystoneSync extends Module {
@@ -55,7 +54,7 @@ public class WaystoneSync extends Module {
 
     @EventHandler
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
-        if (event.worldChangeType() == EXIT_WORLD || event.worldChangeType() == ENTER_WORLD) {
+        if (event.worldChangeType() == EXIT_WORLD) {
             blayWaystonesHelper.toSyncWaystones = Collections.emptyList();
         }
     }

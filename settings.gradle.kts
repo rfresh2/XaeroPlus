@@ -38,8 +38,8 @@ dependencyResolutionManagement {
 			library("sodium", "maven.modrinth:sodium:mc1.19.4-0.4.10")
             library("modmenu", "maven.modrinth:modmenu:6.3.1")
             library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")
-			library("baritone-fabric", "com.github.rfresh2:baritone-fabric:${minecraft_version}")
-			library("baritone-forge", "com.github.rfresh2:baritone-forge:${minecraft_version}")
+			library("baritone-fabric", "com.github.rfresh2:baritone-fabric:${minecraft_version}-SNAPSHOT")
+			library("baritone-forge", "com.github.rfresh2:baritone-forge:${minecraft_version}-SNAPSHOT")
         }
 	}
 }

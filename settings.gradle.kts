@@ -49,9 +49,9 @@ dependencyResolutionManagement {
 			library("cloth-config-fabric", "me.shedaniel.cloth:cloth-config-fabric:13.0.121")
             library("embeddium", "maven.modrinth:embeddium:0.3.25+mc1.20.4")
             library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")
-            library("baritone-fabric", "com.github.rfresh2:baritone-fabric:${minecraft_version}")
-            library("baritone-forge", "com.github.rfresh2:baritone-forge:${minecraft_version}")
-            library("baritone-neoforge", "com.github.rfresh2:baritone-neoforge:${minecraft_version}")
+            library("baritone-fabric", "com.github.rfresh2:baritone-fabric:${minecraft_version}-SNAPSHOT")
+            library("baritone-forge", "com.github.rfresh2:baritone-forge:${minecraft_version}-SNAPSHOT")
+            library("baritone-neoforge", "com.github.rfresh2:baritone-neoforge:${minecraft_version}-SNAPSHOT")
         }
 	}
 }

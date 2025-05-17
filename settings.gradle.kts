@@ -52,9 +52,9 @@ dependencyResolutionManagement {
             library("embeddium", "maven.modrinth:embeddium:0.3.19+mc1.20.6")
 			library("embeddium-forge", "maven.modrinth:embeddium:0.3.20+mc1.20.6")
             library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")
-            library("baritone-fabric", "com.github.rfresh2:baritone-fabric:${minecraft_version}")
-            library("baritone-forge", "com.github.rfresh2:baritone-forge:${minecraft_version}")
-            library("baritone-neoforge", "com.github.rfresh2:baritone-neoforge:${minecraft_version}")
+            library("baritone-fabric", "com.github.rfresh2:baritone-fabric:${minecraft_version}-SNAPSHOT")
+            library("baritone-forge", "com.github.rfresh2:baritone-forge:${minecraft_version}-SNAPSHOT")
+            library("baritone-neoforge", "com.github.rfresh2:baritone-neoforge:${minecraft_version}-SNAPSHOT")
         }
 	}
 }

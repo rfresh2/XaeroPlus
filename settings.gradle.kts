@@ -49,8 +49,8 @@ dependencyResolutionManagement {
             library("fpsdisplay", "maven.modrinth:fpsdisplay:3.1.0+1.20.x")
 			library("cloth-config-fabric", "me.shedaniel.cloth:cloth-config-fabric:12.0.111")
             library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")
-			library("baritone-fabric", "com.github.rfresh2:baritone-fabric:${minecraft_version}")
-			library("baritone-forge", "com.github.rfresh2:baritone-forge:${minecraft_version}")
+			library("baritone-fabric", "com.github.rfresh2:baritone-fabric:${minecraft_version}-SNAPSHOT")
+			library("baritone-forge", "com.github.rfresh2:baritone-forge:${minecraft_version}-SNAPSHOT")
         }
 	}
 }

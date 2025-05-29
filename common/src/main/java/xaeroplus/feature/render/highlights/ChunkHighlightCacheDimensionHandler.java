@@ -161,10 +161,22 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
     }
 
     @Override
-    public void removeHighlight(final int x, final int z) {
-        super.removeHighlight(x, z);
+    public void addHighlight(final int x, final int z, final ResourceKey<Level> dimensionId) {
+        super.addHighlight(x, z, dimensionId);
         staleChunks.add(chunkPosToLong(x, z));
-        dbExecutor.execute(() -> database.removeHighlight(x, z, dimension));
+    }
+
+    @Override
+    public void removeHighlight(final int x, final int z) {
+        if (!mc.isSameThread()) {
+            throw new RuntimeException("removeHighlight must be called on the main thread!");
+        }
+        var key = chunkPosToLong(x, z);
+        if (chunks.containsKey(key)) {
+            super.removeHighlight(x, z);
+            staleChunks.add(key);
+            dbExecutor.execute(() -> database.removeHighlight(x, z, dimension));
+        }
     }
 
     @Override

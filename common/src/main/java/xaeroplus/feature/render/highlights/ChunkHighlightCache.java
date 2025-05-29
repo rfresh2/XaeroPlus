@@ -12,7 +12,9 @@ import java.util.function.Supplier;
 
 public interface ChunkHighlightCache {
     void addHighlight(final int x, final int z);
+    void addHighlight(final int x, final int z, ResourceKey<Level> dimensionId);
     void removeHighlight(final int x, final int z);
+    void removeHighlight(final int x, final int z, ResourceKey<Level> dimensionId);
     boolean isHighlighted(final int x, final int z, ResourceKey<Level> dimensionId);
     /**
      * retrieves the current cache map for the given dimension. Database data is loaded in a window around the current view asynchronously

@@ -231,6 +231,7 @@
   "xaeroplus.gui.minimap_incompatible.download_minimap": "Скачать Xaero Minimap",
   "xaeroplus.gui.minimap_incompatible.exit": "Выход",
   "xaeroplus.gui.world_map.copy_coordinates": "[XP] Копировать коорд-ы",
+  "xaeroplus.gui.world_map.delete_highlights": "[XP] Удалить выделения",
   "xaeroplus.gui.world_map.go_to_coordinates": "Перейти к координатам",
   "xaeroplus.gui.world_map.baritone_goal_here": "§2%s§r [XP] Задать Baritone Goal",
   "xaeroplus.gui.world_map.baritone_path_here": "§2%s§r [XP] Задать Baritone Path",

@@ -578,6 +578,49 @@ public final class Settings extends SettingRegistry {
             (b) -> ModuleManager.getModule(PortalSkipDetection.class).setOldChunksInverse(b),
             () -> ModuleManager.getModule(PortalSkipDetection.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
+    public final BooleanSetting breadcrumbsEnabledSetting = register(
+        BooleanSetting.create(
+            "Breadcrumbs",
+            "xaeroplus.setting.breadcrumbs",
+            false,
+            (b) -> ModuleManager.getModule(Breadcrumbs.class).setEnabled(b)
+        ),
+        SettingLocation.CHUNK_HIGHLIGHTS);
+    public final BooleanSetting breadcrumbsSaveLoadToDiskSetting = register(
+        BooleanSetting.create(
+            "Save/Load Breadcrumbs to Disk",
+            "xaeroplus.setting.breadcrumbs_save_load_to_disk",
+            true,
+            (b) -> ModuleManager.getModule(Breadcrumbs.class).setDiskCache(b),
+            () -> ModuleManager.getModule(Breadcrumbs.class).isEnabled()),
+        SettingLocation.CHUNK_HIGHLIGHTS);
+    public final DoubleSetting breadcrumbsChunkRadiusSetting = register(
+        DoubleSetting.create(
+            "Breadcrumbs Chunk Radius",
+            "xaeroplus.setting.breadcrumbs_chunk_radius",
+            0, 16, 1,
+            0,
+            (d) -> ModuleManager.getModule(Breadcrumbs.class).setChunkRadius(d),
+            () -> ModuleManager.getModule(Breadcrumbs.class).isEnabled()),
+        SettingLocation.CHUNK_HIGHLIGHTS);
+    public final EnumSetting<ColorHelper.HighlightColor> breadcrumbsColorSetting = register(
+        EnumSetting.create(
+            "Breadcrumbs Color",
+            "xaeroplus.setting.breadcrumbs_color",
+            ColorHelper.HighlightColor.values(),
+            ColorHelper.HighlightColor.CYAN,
+            (b) -> ModuleManager.getModule(Breadcrumbs.class).setRgbColor(b.getColor()),
+            () -> ModuleManager.getModule(Breadcrumbs.class).isEnabled()),
+        SettingLocation.CHUNK_HIGHLIGHTS);
+    public final DoubleSetting breadcrumbsOpacitySetting = register(
+        DoubleSetting.create(
+            "Breadcrumbs Opacity",
+            "xaeroplus.setting.breadcrumbs_opacity",
+            0, 255, 10,
+            100,
+            (b) -> ModuleManager.getModule(Breadcrumbs.class).setAlpha(b),
+            () -> ModuleManager.getModule(Breadcrumbs.class).isEnabled()),
+        SettingLocation.CHUNK_HIGHLIGHTS);
 
     /**
      * Overlays

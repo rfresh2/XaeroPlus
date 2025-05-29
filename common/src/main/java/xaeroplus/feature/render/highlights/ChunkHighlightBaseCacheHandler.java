@@ -21,6 +21,11 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
         addHighlight(x, z, System.currentTimeMillis());
     }
 
+    @Override
+    public void addHighlight(final int x, final int z, final ResourceKey<Level> dimensionId) {
+        addHighlight(x, z);
+    }
+
     public void addHighlight(final int x, final int z, final long foundTime) {
         if (!mc.isSameThread()) {
             throw new RuntimeException("addHighlight must be called on the main thread!");
@@ -34,6 +39,11 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
             throw new RuntimeException("removeHighlight must be called on the main thread!");
         }
         chunks.remove(chunkPosToLong(x, z));
+    }
+
+    @Override
+    public void removeHighlight(final int x, final int z, final ResourceKey<Level> dimensionId) {
+        removeHighlight(x, z);
     }
 
     @Override

@@ -43,6 +43,8 @@ import xaero.map.mods.SupportMods;
 import xaero.map.world.MapDimension;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
+import xaeroplus.module.ModuleManager;
+import xaeroplus.module.impl.*;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.BaritoneExecutor;
 import xaeroplus.util.BaritoneHelper;
@@ -498,6 +500,48 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     }.setNameFormatArgs(Misc.getKeyName(Settings.REGISTRY.worldMapBaritoneElytraHereKeybindSetting.getKeyBinding())));
             }
         }
+        boolean tileSelPresent = this.mapTileSelection != null;
+        final int delHighlightMinX = tileSelPresent ? mapTileSelection.getStartX() : rightClickX;
+        final int delHighlightMaxX = tileSelPresent ? mapTileSelection.getEndX() : rightClickX;
+        final int delHighlightMinZ = tileSelPresent ? mapTileSelection.getStartZ() : rightClickZ;
+        final int delHighlightMaxZ = tileSelPresent ? mapTileSelection.getEndZ() : rightClickZ;
+        options.add(index++, new RightClickOption("xaeroplus.gui.world_map.delete_highlights", options.size(), this) {
+            @Override
+            public void onAction(final Screen screen) {
+                var dim = Globals.getCurrentDimensionId();
+                for (int x = delHighlightMinX; x <= delHighlightMaxX; x++) {
+                    for (int z = delHighlightMinZ; z <= delHighlightMaxZ; z++) {
+                        var breadcrumbs = ModuleManager.getModule(Breadcrumbs.class);
+                        if (breadcrumbs.isEnabled()) {
+                            breadcrumbs.breadcrumbsCache.get().removeHighlight(x, z, dim);
+                        }
+                        var liquidNewChunks = ModuleManager.getModule(LiquidNewChunks.class);
+                        if (liquidNewChunks.isEnabled()) {
+                            liquidNewChunks.newChunksCache.get().removeHighlight(x, z, dim);
+                            liquidNewChunks.inverseNewChunksCache.get().removeHighlight(x, z, dim);
+                        }
+                        var oldbiomes = ModuleManager.getModule(OldBiomes.class);
+                        if (oldbiomes.isEnabled()) {
+                            oldbiomes.oldBiomesCache.get().removeHighlight(x, z, dim);
+                        }
+                        var oldChunks = ModuleManager.getModule(OldChunks.class);
+                        if (oldChunks.isEnabled()) {
+                            oldChunks.oldChunksCache.get().removeHighlight(x, z, dim);
+                            oldChunks.modernChunksCache.get().removeHighlight(x, z, dim);
+                        }
+                        var paletteNewChunks = ModuleManager.getModule(PaletteNewChunks.class);
+                        if (paletteNewChunks.isEnabled()) {
+                            paletteNewChunks.newChunksCache.get().removeHighlight(x, z, dim);
+                            paletteNewChunks.newChunksInverseCache.get().removeHighlight(x, z, dim);
+                        }
+                        var portals = ModuleManager.getModule(Portals.class);
+                        if (portals.isEnabled()) {
+                            portals.portalsCache.get().removeHighlight(x, z, dim);
+                        }
+                    }
+                }
+            }
+        });
 
         if (Settings.REGISTRY.disableWaypointSharing.get()) {
             options.removeIf(option -> ((AccessorRightClickOption) option).getName().equals("gui.xaero_right_click_map_share_location"));

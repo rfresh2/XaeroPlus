@@ -57,8 +57,13 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
 
     @Override
     public void addHighlight(final int x, final int z) {
+        addHighlight(x, z, ChunkUtils.getActualDimension());
+    }
+
+    @Override
+    public void addHighlight(final int x, final int z, final ResourceKey<Level> dimension) {
         try {
-            ChunkHighlightCacheDimensionHandler cacheForActualDimension = getCacheForActualDimension();
+            ChunkHighlightCacheDimensionHandler cacheForActualDimension = getCacheForDimension(dimension, true);
             if (cacheForActualDimension == null) {
                 // if the cache is not ready yet, queue the highlight to be added
                 initializeTaskQueue.add(() -> addHighlight(x, z));
@@ -72,8 +77,13 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
 
     @Override
     public void removeHighlight(final int x, final int z) {
+        removeHighlight(x, z, ChunkUtils.getActualDimension());
+    }
+
+    @Override
+    public void removeHighlight(final int x, final int z, final ResourceKey<Level> dimension) {
         try {
-            ChunkHighlightCacheDimensionHandler cacheForActualDimension = getCacheForActualDimension();
+            ChunkHighlightCacheDimensionHandler cacheForActualDimension = getCacheForDimension(dimension, true);
             if (cacheForActualDimension == null) {
                 // if the cache is not ready yet, queue the highlight to be removed
                 initializeTaskQueue.add(() -> removeHighlight(x, z));

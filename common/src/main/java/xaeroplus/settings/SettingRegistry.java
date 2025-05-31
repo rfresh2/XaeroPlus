@@ -25,6 +25,11 @@ public abstract class SettingRegistry {
         return setting;
     }
 
+    public StringSetting register(StringSetting setting, SettingLocation settingLocation) {
+        register0(settingLocation, setting);
+        return setting;
+    }
+
     private synchronized void register0(SettingLocation settingLocation, XaeroPlusSetting setting) {
         if (settingNameMap.containsKey(setting.getSettingName())) {
             throw new RuntimeException("Setting with name '" + setting.getSettingName() + "' already exists");
@@ -58,12 +63,13 @@ public abstract class SettingRegistry {
     public synchronized xaero.common.gui.ConfigSettingEntry[] getMinimapConfigSettingEntries(SettingLocation settingLocation) {
         var settingList = this.settingLocationMap.get(settingLocation);
         if (settingList != null) {
-            xaero.common.gui.ConfigSettingEntry[] entries = new xaero.common.gui.ConfigSettingEntry[settingList.size()];
+            List<xaero.common.gui.ConfigSettingEntry> entries = new ArrayList<>(settingList.size());
             for (int i = 0; i < settingList.size(); i++) {
                 final XaeroPlusSetting xaeroPlusSetting = settingList.get(i);
-                entries[i] = xaeroPlusSetting.toMinimapConfigSettingEntry();
+                var entry = xaeroPlusSetting.toMinimapConfigSettingEntry();
+                if (entry != null) entries.add(entry);
             }
-            return entries;
+            return entries.toArray(new xaero.common.gui.ConfigSettingEntry[0]);
         }
         return new xaero.common.gui.ConfigSettingEntry[0];
     }
@@ -71,12 +77,13 @@ public abstract class SettingRegistry {
     public synchronized xaero.map.gui.ConfigSettingEntry[] getWorldmapConfigSettingEntries(SettingLocation settingLocation) {
         var settingList = this.settingLocationMap.get(settingLocation);
         if (settingList != null) {
-            xaero.map.gui.ConfigSettingEntry[] entries = new xaero.map.gui.ConfigSettingEntry[settingList.size()];
+            List<xaero.map.gui.ConfigSettingEntry> entries = new ArrayList<>(settingList.size());
             for (int i = 0; i < settingList.size(); i++) {
                 final XaeroPlusSetting xaeroPlusSetting = settingList.get(i);
-                entries[i] = xaeroPlusSetting.toWorldmapConfigSettingEntry();
+                var entry = xaeroPlusSetting.toWorldmapConfigSettingEntry();
+                entries.add(entry);
             }
-            return entries;
+            return entries.toArray(new xaero.map.gui.ConfigSettingEntry[0]);
         }
         return new xaero.map.gui.ConfigSettingEntry[0];
     }

@@ -86,7 +86,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
             ChunkHighlightCacheDimensionHandler cacheForActualDimension = getCacheForDimension(dimension, true);
             if (cacheForActualDimension == null) {
                 // if the cache is not ready yet, queue the highlight to be removed
-                initializeTaskQueue.add(() -> removeHighlight(x, z));
+                initializeTaskQueue.add(() -> removeHighlight(x, z, dimension));
                 return;
             }
             cacheForActualDimension.removeHighlight(x, z);
@@ -116,8 +116,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         if (dimension == null) return CompletableFuture.completedFuture(Long2LongMaps.EMPTY_MAP);
         ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimension, true);
         if (cacheForDimension == null) return CompletableFuture.completedFuture(Long2LongMaps.EMPTY_MAP);
-        return cacheForDimension.getHighlightsInCustomWindow(windowRegionX,
-                                                             windowRegionZ, windowRegionSize, dimension);
+        return cacheForDimension.getHighlightsInCustomWindow(windowRegionX, windowRegionZ, windowRegionSize, dimension);
     }
 
     @Override

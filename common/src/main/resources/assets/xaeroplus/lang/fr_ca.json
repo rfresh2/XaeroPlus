@@ -208,6 +208,8 @@
   "xaeroplus.setting.waypoint_beacon_distance_min.tooltip": "Définit la distance xz minimale du joueur à laquelle le point de passage doit se trouver pour qu'une balise soit affichée.",
   "xaeroplus.setting.waypoint_eta": "Distance du Point de Passage ETA",
   "xaeroplus.setting.waypoint_eta.tooltip": "Affiche l'heure d'arrivée estimée sur le texte de distance du point de passage. L'ETA est basé sur la vitesse et la direction de déplacement actuelles du joueur",
+  "xaeroplus.setting.waypoint_eta_time_buffer": "Tampon de ticks pour l'ETA du point de passage",
+  "xaeroplus.setting.waypoint_eta_time_buffer.tooltip": "Durée sur laquelle la vitesse est moyennée en ticks. 1 tick = 50 ms",
   "xaeroplus.setting.allow_longer_waypoint_initials": "Initiales de point de repère plus longues",
   "xaeroplus.setting.allow_longer_waypoint_initials.tooltip": "Supprime la limite de 2 caractères lors de la modification des initiales des points de repère",
   "xaeroplus.setting.disable_internet": "Désactiver l'accès Internet Xaero",

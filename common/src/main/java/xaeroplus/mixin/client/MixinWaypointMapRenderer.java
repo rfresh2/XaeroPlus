@@ -24,7 +24,8 @@ public class MixinWaypointMapRenderer {
         value = "INVOKE",
         target = "Lxaero/common/minimap/waypoints/Waypoint;isDestination()Z",
         ordinal = 0
-    ), cancellable = true)
+    ), cancellable = true,
+        remap = true) // $REMAP
     public void limitDeathpointsRenderDistance(
         final Waypoint w, final boolean highlighted, final boolean outOfBounds, final double optionalDepth, final float optionalScale, final double partialX, final double partialY, final MinimapElementRenderInfo renderInfo, final GuiGraphics guiGraphics, final MultiBufferSource.BufferSource vanillaBufferSource, final CallbackInfoReturnable<Boolean> cir,
         @Local(name = "scaledDistance2D") double scaledDistance2D

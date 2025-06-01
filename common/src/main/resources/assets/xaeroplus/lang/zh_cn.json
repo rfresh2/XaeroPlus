@@ -208,6 +208,8 @@
   "xaeroplus.setting.waypoint_beacon_distance_min.tooltip": "设置将路径点渲染为信标所需的最短水平距离。",
   "xaeroplus.setting.waypoint_eta": "航点距离 ETA",
   "xaeroplus.setting.waypoint_eta.tooltip": "在航点距离文本上显示预计到达时间。ETA 基于玩家当前的速度和移动方向",
+  "xaeroplus.setting.waypoint_eta_time_buffer": "航点预计到达时间的刻缓冲",
+  "xaeroplus.setting.waypoint_eta_time_buffer.tooltip": "用于平均速度的时间（以刻为单位）。1刻 = 50毫秒",
   "xaeroplus.setting.allow_longer_waypoint_initials": "允许更长的航点缩写",
   "xaeroplus.setting.allow_longer_waypoint_initials.tooltip": "移除编辑航点缩写时的2字符限制",
   "xaeroplus.setting.disable_internet": "禁用 Xaero 互联网访问",

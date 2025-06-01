@@ -208,6 +208,8 @@
     "xaeroplus.setting.waypoint_beacon_distance_min.tooltip": "Thiết lập khoảng cách xz tối thiểu từ người chơi mà điểm đến phải có để hiển thị đèn hiệu.",
     "xaeroplus.setting.waypoint_eta": "Khoảng cách đến Điểm Đường ETA",
     "xaeroplus.setting.waypoint_eta.tooltip": "Hiển thị thời gian đến ước tính trên văn bản khoảng cách đến điểm đường. ETA dựa trên tốc độ và hướng di chuyển hiện tại của người chơi",
+    "xaeroplus.setting.waypoint_eta_time_buffer": "Bộ đệm tick cho ETA điểm đánh dấu",
+    "xaeroplus.setting.waypoint_eta_time_buffer.tooltip": "Thời gian trung bình tốc độ theo số tick. 1 tick = 50 mili giây",
     "xaeroplus.setting.allow_longer_waypoint_initials": "Chữ viết tắt điểm tham chiếu dài hơn",
     "xaeroplus.setting.allow_longer_waypoint_initials.tooltip": "Loại bỏ giới hạn 2 ký tự khi chỉnh sửa chữ viết tắt điểm tham chiếu",
     "xaeroplus.setting.disable_internet": "Vô Hiệu Hóa Truy Cập Internet Xaero",

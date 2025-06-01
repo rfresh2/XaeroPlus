@@ -208,6 +208,8 @@
   "xaeroplus.setting.waypoint_beacon_distance_min.tooltip": "Establece la distancia xz mínima desde el jugador donde el waypoint debe estar para mostrar un Beacon (faro).",
   "xaeroplus.setting.waypoint_eta": "Distancia del Punto de Referencia ETA",
   "xaeroplus.setting.waypoint_eta.tooltip": "Muestra el tiempo estimado de llegada en el texto de distancia del punto de referencia. El ETA se basa en la velocidad y dirección de movimiento actuales del jugador",
+  "xaeroplus.setting.waypoint_eta_time_buffer": "Búfer de ticks para ETA del punto de ruta",
+  "xaeroplus.setting.waypoint_eta_time_buffer.tooltip": "Cuánto tiempo promediar la velocidad en ticks. 1 tick = 50 ms",
   "xaeroplus.setting.allow_longer_waypoint_initials": "Iniciales de punto de referencia más largas",
   "xaeroplus.setting.allow_longer_waypoint_initials.tooltip": "Elimina el límite de 2 caracteres al editar las iniciales del punto de referencia",
   "xaeroplus.setting.disable_internet": "Deshabilitar el acceso a Internet de Xaero",

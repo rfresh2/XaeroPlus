@@ -937,6 +937,12 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.disable_receiving_waypoints",
             false),
         SettingLocation.MINIMAP_WAYPOINTS);
+    public final BooleanSetting limitDeathpointsRenderDistance = register(
+        BooleanSetting.create(
+            "Deathpoints Render Distance",
+            "xaeroplus.setting.deathpoints_render_distance",
+            false),
+        SettingLocation.MINIMAP_WAYPOINTS);
 
     /**
      * Keybinds (hidden toggles)

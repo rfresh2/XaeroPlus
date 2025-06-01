@@ -3,6 +3,8 @@ package xaeroplus.mixin.client;
 import com.llamalad7.mixinextras.sugar.Local;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayFIFOQueue;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -10,10 +12,14 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.hud.minimap.BuiltInHudModules;
+import xaero.hud.minimap.element.render.MinimapElementRenderInfo;
 import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.waypoint.WaypointPurpose;
 import xaero.hud.minimap.waypoint.render.world.WaypointWorldRenderer;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
@@ -25,6 +31,26 @@ import static net.minecraft.world.level.Level.OVERWORLD;
 public class MixinWaypointWorldRenderer {
 
     @Shadow private String subWorldName;
+
+    @Shadow
+    private double waypointsDistance;
+
+    @Inject(method = "renderElement(Lxaero/common/minimap/waypoints/Waypoint;ZZDFDDLxaero/hud/minimap/element/render/MinimapElementRenderInfo;Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)Z", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/common/minimap/waypoints/Waypoint;isDestination()Z",
+        ordinal = 0
+    ), cancellable = true)
+    public void limitDeathpointsRenderDistance(
+        final Waypoint w, final boolean highlighted, final boolean outOfBounds, final double optionalDepth, final float optionalScale, final double partialX, final double partialY, final MinimapElementRenderInfo renderInfo, final GuiGraphics guiGraphics, final MultiBufferSource.BufferSource vanillaBufferSource, final CallbackInfoReturnable<Boolean> cir,
+        @Local(name = "scaledDistance2D") double scaledDistance2D
+    ) {
+        var purpose = w.getPurpose();
+        if (purpose == WaypointPurpose.DEATH && Settings.REGISTRY.limitDeathpointsRenderDistance.get()) {
+            if (waypointsDistance != 0 && scaledDistance2D > waypointsDistance) {
+                cir.setReturnValue(false);
+            }
+        }
+    }
 
     @ModifyArg(method = "renderElement(Lxaero/common/minimap/waypoints/Waypoint;ZZDFDDLxaero/hud/minimap/element/render/MinimapElementRenderInfo;Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)Z", at = @At(
         value = "INVOKE",

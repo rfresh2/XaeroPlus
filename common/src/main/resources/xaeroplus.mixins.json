@@ -55,6 +55,7 @@
     "MixinRadarRenderer",
     "MixinSupportXaeroMinimap",
     "MixinSupportXaeroWorldmap",
+    "MixinWaypointMapRenderer",
     "MixinWaypointReader",
     "MixinWaypointSharingHandler",
     "MixinWaypointWorldRenderer",

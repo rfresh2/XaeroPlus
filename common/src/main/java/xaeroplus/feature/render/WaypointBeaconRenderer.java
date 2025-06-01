@@ -15,6 +15,7 @@ import xaero.common.minimap.waypoints.WaypointVisibilityType;
 import xaero.common.settings.ModSettings;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.waypoint.WaypointPurpose;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.ColorHelper;
 
@@ -67,6 +68,14 @@ public class WaypointBeaconRenderer {
             double offZ = (double)w.getZ(dimDiv) - cameraPos.z + 0.5;
             double unscaledDistance2D = Math.sqrt(offX * offX + offZ * offZ);
             double distance2D = unscaledDistance2D * distanceScale;
+            if (Settings.REGISTRY.limitDeathpointsRenderDistance.get()) {
+                var purpose = w.getPurpose();
+                if (purpose == WaypointPurpose.DEATH && Settings.REGISTRY.limitDeathpointsRenderDistance.get()) {
+                    if (waypointsDistance != 0 && distance2D > waypointsDistance) {
+                        continue;
+                    }
+                }
+            }
             var shouldRender = w.isDestination()
                 || (w.getPurpose().isDeath()
                     || w.isGlobal()

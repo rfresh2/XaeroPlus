@@ -17,22 +17,28 @@ public class Drawing extends Module {
         Level.END, new ArrayList<>()
     ));
     private Line inProgressLine = null;
-    private int savedColor = ColorHelper.getColor(255, 0, 0, 255);
-    private int inProgressColor = ColorHelper.getColor(255, 0, 0, 80);
+    private int savedColorAlpha = 255;
+    private final DrawingColorCycler drawingColorCycler = new DrawingColorCycler();
+    private final int inProgressColorAlpha = 80;
+
+    public DrawingColorCycler getDrawingColorCycler() {
+        return drawingColorCycler;
+    }
+
 
     @Override
     public void onEnable() {
         Globals.drawManager.registry().registerLineProvider(
             this.getClass().getName() + "-saved",
             this::getSavedLines,
-            () -> savedColor,
+            () -> drawingColorCycler.getColorInt(savedColorAlpha),
             () -> 0.5f,
             50
         );
         Globals.drawManager.registry().registerLineProvider(
             this.getClass().getName() + "-in-progress",
             this::getInProgressLines,
-            () -> inProgressColor,
+            () -> drawingColorCycler.getColorInt(inProgressColorAlpha),
             () -> 0.5f,
             1
         );
@@ -115,5 +121,33 @@ public class Drawing extends Module {
         if (t < 0 || t > 1) return false;
         double u = (cx * bz - cz * bx) / bDotDPerp;
         return u >= 0 && u <= 1;
+    }
+
+    public static final class DrawingColorCycler {
+        private int index;
+
+        public DrawingColorCycler() {
+            index = 0;
+        }
+
+        public void setColor(ColorHelper.HighlightColor color) {
+            this.index = color.ordinal();
+        }
+
+        public ColorHelper.HighlightColor getColor() {
+            return ColorHelper.HighlightColor.fromIndex(index);
+        }
+
+        public int getColorInt(int alpha) {
+            int c = ColorHelper.HighlightColor.fromIndex(index).getColor();
+            return ColorHelper.getColorWithAlpha(c, alpha);
+        }
+
+        public void next() {
+            index++;
+            if (index >= ColorHelper.HighlightColor.VALUES.length) {
+                index = 0;
+            }
+        }
     }
 }

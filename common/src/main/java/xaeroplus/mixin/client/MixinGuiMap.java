@@ -47,6 +47,7 @@ import xaero.map.world.MapDimension;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.render.Line;
+import xaeroplus.feature.render.drawing.DrawingColorCyclerButton;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.*;
 import xaeroplus.settings.Settings;
@@ -82,6 +83,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Unique Button startDrawingButton;
     @Unique Button drawLineSegmentButton;
     @Unique Button drawInfiniteLineButton;
+    @Unique Button drawColorCyclerButton;
     @Unique boolean drawing = false;
     @Unique BlockPos drawPos1 = null;
     @Unique DrawingMode drawingMode = DrawingMode.LINE_SEGMENT;
@@ -166,6 +168,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             (button -> drawingMode = DrawingMode.INFINITE_LINE),
             () -> new CursorBox(Component.translatable("xaeroplus.gui.world_map.draw_infinite_line")));
         drawInfiniteLineButton.visible = false;
+        drawColorCyclerButton = new DrawingColorCyclerButton(
+            startDrawingButton.getX() + 16, drawInfiniteLineButton.getY() + 20,
+            this.xpGuiTextures,
+            () -> new CursorBox(Component.literal("Color")),
+            ModuleManager.getModule(Drawing.class).getDrawingColorCycler()
+        );
+        drawColorCyclerButton.visible = false;
         // right side
         if (!SupportMods.pac()) {  // remove useless button when pac is not installed
             this.removeWidget(this.claimsButton);
@@ -204,14 +213,18 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if (drawing) {
             addButton(drawLineSegmentButton);
             addButton(drawInfiniteLineButton);
+            addButton(drawColorCyclerButton);
             drawLineSegmentButton.visible = true;
             drawInfiniteLineButton.visible = true;
+            drawColorCyclerButton.visible = true;
         } else {
             drawPos1 = null;
             drawLineSegmentButton.visible = false;
             drawInfiniteLineButton.visible = false;
+            drawColorCyclerButton.visible = false;
             removeWidget(drawLineSegmentButton);
             removeWidget(drawInfiniteLineButton);
+            removeWidget(drawColorCyclerButton);
         }
     }
 
@@ -440,11 +453,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 startDrawingButton.setFocused(false);
                 drawLineSegmentButton.setFocused(true);
                 drawInfiniteLineButton.setFocused(false);
+                drawColorCyclerButton.setFocused(false);
             }
             case INFINITE_LINE -> {
                 startDrawingButton.setFocused(false);
                 drawLineSegmentButton.setFocused(false);
                 drawInfiniteLineButton.setFocused(true);
+                drawColorCyclerButton.setFocused(false);
             }
         }
     }
@@ -519,8 +534,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 drawing = false;
                 drawLineSegmentButton.visible = false;
                 drawInfiniteLineButton.visible = false;
+                drawColorCyclerButton.visible = false;
                 removeWidget(drawLineSegmentButton);
                 removeWidget(drawInfiniteLineButton);
+                removeWidget(drawColorCyclerButton);
             }
             cir.setReturnValue(true);
         } else if (par3 == 1) { // clear drawing on right click
@@ -529,8 +546,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             drawing = false;
             removeWidget(drawLineSegmentButton);
             removeWidget(drawInfiniteLineButton);
+            removeWidget(drawColorCyclerButton);
             drawLineSegmentButton.visible = false;
             drawInfiniteLineButton.visible = false;
+            drawColorCyclerButton.visible = false;
             cir.setReturnValue(true);
         }
     }

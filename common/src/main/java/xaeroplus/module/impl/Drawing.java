@@ -1,10 +1,13 @@
 package xaeroplus.module.impl;
 
+import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaeroplus.Globals;
+import xaeroplus.event.ClientTickEvent;
+import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.feature.render.Line;
-import xaeroplus.feature.render.highlights.SavableHighlightCacheInstance;
+import xaeroplus.feature.render.drawing.DrawingCache;
 import xaeroplus.module.Module;
 import xaeroplus.util.ColorHelper;
 import xaeroplus.util.DrawingMode;
@@ -17,7 +20,7 @@ public class Drawing extends Module {
         Level.NETHER, new ArrayList<>(),
         Level.END, new ArrayList<>()
     ));
-    private final SavableHighlightCacheInstance highlights = new SavableHighlightCacheInstance("XaeroPlusDrawingHighlights");
+    private final DrawingCache drawingCache = new DrawingCache("XaeroPlusDrawing");
     private Line inProgressLine = null;
     private int savedColorAlpha = 255;
     private final DrawingColorCycler drawingColorCycler = new DrawingColorCycler();
@@ -29,6 +32,7 @@ public class Drawing extends Module {
 
     @Override
     public void onEnable() {
+        drawingCache.onEnable();
         Globals.drawManager.registry().registerLineProvider(
             this.getClass().getName() + "-saved",
             this::getSavedLines,
@@ -46,9 +50,19 @@ public class Drawing extends Module {
         Globals.drawManager.registry().registerDirectChunkHighlightProvider(
             this.getClass().getName() + "-highlights",
             true,
-            dim -> this.highlights.get().getCacheMap(dim),
+            dim -> this.drawingCache.getCacheMap(dim),
             () -> drawingColorCycler.getColorInt(savedColorAlpha)
         );
+    }
+
+    @EventHandler
+    public void onTick(final ClientTickEvent.Post event) {
+        drawingCache.handleTick();
+    }
+
+    @EventHandler
+    public void onWorldChange(final XaeroWorldChangeEvent event) {
+        drawingCache.handleWorldChange(event);
     }
 
     private List<Line> getSavedLines(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
@@ -84,11 +98,11 @@ public class Drawing extends Module {
     }
 
     public void addHighlight(int chunkX, int chunkZ) {
-        highlights.get().addHighlight(chunkX, chunkZ, Globals.getCurrentDimensionId());
+        drawingCache.addHighlight(chunkX, chunkZ, Globals.getCurrentDimensionId());
     }
 
     public void removeHighlight(final int chunkX, final int chunkZ) {
-        highlights.get().removeHighlight(chunkX, chunkZ, Globals.getCurrentDimensionId());
+        drawingCache.removeHighlight(chunkX, chunkZ, Globals.getCurrentDimensionId());
     }
 
     public void setInProgressLine(final Line inProgressLine, final DrawingMode drawingMode) {

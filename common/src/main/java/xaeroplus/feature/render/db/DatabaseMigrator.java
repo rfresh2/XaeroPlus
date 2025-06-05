@@ -1,4 +1,4 @@
-package xaeroplus.feature.render.highlights.db;
+package xaeroplus.feature.render.db;
 
 import xaeroplus.XaeroPlus;
 
@@ -8,9 +8,11 @@ import java.time.Instant;
 import java.util.List;
 
 public class DatabaseMigrator {
-    private final List<DatabaseMigration> migrations = List.of(
-        new V0ToV1Migration()
-    );
+    private final List<DatabaseMigration> migrations;
+
+    public DatabaseMigrator(final List<DatabaseMigration> migrations) {
+        this.migrations = migrations;
+    }
 
     public void migrate(Path dbPath, String databaseName, Connection connection) {
         try {

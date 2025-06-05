@@ -7,6 +7,7 @@ import xaeroplus.XaeroPlus;
 
 public class XaeroPlusShaders {
     @Nullable public static HighlightShader HIGHLIGHT_SHADER = null;
+    @Nullable public static ColoredHighlightShader COLOR_HIGHLIGHT_SHADER = null;
     private static boolean firstReload = true;
 
     public static void onResourceReload(ResourceManager resourceManager) {
@@ -14,7 +15,11 @@ public class XaeroPlusShaders {
             if (HIGHLIGHT_SHADER != null) {
                 HIGHLIGHT_SHADER.close();
             }
+            if (COLOR_HIGHLIGHT_SHADER != null) {
+                COLOR_HIGHLIGHT_SHADER.close();
+            }
             HIGHLIGHT_SHADER = new HighlightShader(resourceManager);
+            COLOR_HIGHLIGHT_SHADER = new ColoredHighlightShader(resourceManager);
             XaeroPlus.LOGGER.info("Reloaded Shaders");
         } catch (final Exception e) {
             if (firstReload) {
@@ -26,7 +31,7 @@ public class XaeroPlusShaders {
     }
 
     public static void ensureShaders() {
-        if (HIGHLIGHT_SHADER == null && firstReload) {
+        if ((HIGHLIGHT_SHADER == null || COLOR_HIGHLIGHT_SHADER == null) && firstReload) {
             onResourceReload(Minecraft.getInstance().getResourceManager());
         }
     }

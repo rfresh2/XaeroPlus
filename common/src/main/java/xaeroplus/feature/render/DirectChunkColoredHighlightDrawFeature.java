@@ -1,0 +1,58 @@
+package xaeroplus.feature.render;
+
+import it.unimi.dsi.fastutil.longs.Long2LongMap;
+import xaeroplus.Globals;
+
+import java.util.concurrent.ThreadLocalRandom;
+
+public class DirectChunkColoredHighlightDrawFeature implements ChunkColoredHighlightDrawFeature {
+    private final DirectChunkHighlightProvider highlightSupplier;
+    private final ColoredHighlightDrawBuffer drawBuffer = new ColoredHighlightDrawBuffer();
+    private int lastRefreshedHighlightCount = 0;
+    private final boolean refreshEveryTick;
+
+    public DirectChunkColoredHighlightDrawFeature(DirectChunkHighlightProvider highlightSupplier, boolean refreshEveryTick) {
+        this.highlightSupplier = highlightSupplier;
+        this.refreshEveryTick = refreshEveryTick;
+    }
+
+    @Override
+    public void invalidateCache() {
+        drawBuffer.markStale();
+    }
+
+    @Override
+    public Long2LongMap getChunkHighlights() {
+        return highlightSupplier.chunkHighlightSupplier().getHighlights(Globals.getCurrentDimensionId());
+    }
+
+    @Override
+    public int getColorAlpha() {
+        return highlightSupplier.colorSupplier().getAsInt();
+    }
+
+    @Override
+    public void render(boolean worldmap) {
+        Long2LongMap highlights = getChunkHighlights();
+        if (refreshEveryTick) {
+            if (System.currentTimeMillis() - drawBuffer.lastRefreshed >= 50L) {
+                this.invalidateCache();
+            }
+        } else {
+            if (lastRefreshedHighlightCount != highlights.size()
+                && System.currentTimeMillis() - drawBuffer.lastRefreshed > 500L + ThreadLocalRandom.current().nextInt(0, 100)) {
+                this.invalidateCache();
+                lastRefreshedHighlightCount = highlights.size();
+            }
+        }
+        if (drawBuffer.needsRefresh(worldmap)) {
+            drawBuffer.refresh(highlights, worldmap, getColorAlpha());
+        }
+        drawBuffer.render();
+    }
+
+    @Override
+    public void close() {
+        drawBuffer.close();
+    }
+}

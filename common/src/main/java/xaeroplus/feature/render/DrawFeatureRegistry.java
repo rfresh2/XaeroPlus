@@ -12,6 +12,7 @@ import java.util.function.IntSupplier;
 
 public class DrawFeatureRegistry {
     private final HashMap<String, ChunkHighlightDrawFeature> chunkHighlightDrawFeatures = new HashMap<>();
+    private final HashMap<String, ChunkColoredHighlightDrawFeature> chunkColoredHighlightDrawFeatures = new HashMap<>();
     private final HashMap<String, LineDrawFeature> lineDrawFeatures = new HashMap<>();
     private final List<String> sortedChunkHighlightKeySet = new ArrayList<>();
     private final List<String> sortedLineKeySet = new ArrayList<>();
@@ -25,6 +26,10 @@ public class DrawFeatureRegistry {
         registerChunkHighlightDrawFeature(id, new DirectChunkHighlightDrawFeature(new DirectChunkHighlightProvider(chunkHighlightSupplier, colorSupplier), refreshEveryTick));
     }
 
+    public synchronized void registerDirectChunkColoredHighlightProvider(String id, boolean refreshEveryTick, DirectChunkHighlightSupplier chunkHighlightSupplier, IntSupplier colorAlphaSupplier) {
+        registerChunkColoredHighlightDrawFeature(id, new DirectChunkColoredHighlightDrawFeature(new DirectChunkHighlightProvider(chunkHighlightSupplier, colorAlphaSupplier), refreshEveryTick));
+    }
+
     public synchronized void registerAsyncChunkHighlightProvider(String id, AsyncChunkHighlightSupplier chunkHighlightSupplier, IntSupplier colorSupplier) {
         registerChunkHighlightDrawFeature(id, new AsyncChunkHighlightDrawFeature(new AsyncChunkHighlightProvider(chunkHighlightSupplier, colorSupplier)));
     }
@@ -32,6 +37,14 @@ public class DrawFeatureRegistry {
     private synchronized void registerChunkHighlightDrawFeature(String id, ChunkHighlightDrawFeature drawFeature) {
         unregisterChunkHighlightProvider(id); // just in case
         chunkHighlightDrawFeatures.put(id, drawFeature);
+        sortedChunkHighlightKeySet.add(id);
+        // arbitrary order, just needs to be consistent so colors blend consistently
+        sortedChunkHighlightKeySet.sort(Comparator.naturalOrder());
+    }
+
+    private synchronized void registerChunkColoredHighlightDrawFeature(String id, ChunkColoredHighlightDrawFeature drawFeature) {
+        unregisterChunkHighlightProvider(id); // just in case
+        chunkColoredHighlightDrawFeatures.put(id, drawFeature);
         sortedChunkHighlightKeySet.add(id);
         // arbitrary order, just needs to be consistent so colors blend consistently
         sortedChunkHighlightKeySet.sort(Comparator.naturalOrder());
@@ -65,6 +78,13 @@ public class DrawFeatureRegistry {
     protected synchronized void forEachChunkHighlightDrawFeature(Consumer<ChunkHighlightDrawFeature> consumer) {
         for (int i = 0; i < sortedChunkHighlightKeySet.size(); i++) {
             var feature = chunkHighlightDrawFeatures.get(sortedChunkHighlightKeySet.get(i));
+            if (feature != null) consumer.accept(feature);
+        }
+    }
+
+    protected synchronized void forEachChunkColoredHighlightDrawFeature(Consumer<ChunkColoredHighlightDrawFeature> consumer) {
+        for (int i = 0; i < sortedChunkHighlightKeySet.size(); i++) {
+            var feature = chunkColoredHighlightDrawFeatures.get(sortedChunkHighlightKeySet.get(i));
             if (feature != null) consumer.accept(feature);
         }
     }

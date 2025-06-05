@@ -50,6 +50,7 @@ public class DrawManager {
         matrixStack.pushPose();
         matrixStack.scale(16f, 16f, 1f);
         drawChunkHighlights(matrixStack, false);
+        drawChunkColoredHighlights(matrixStack, false);
         matrixStack.popPose();
         drawMinimapLines(matrixStack, renderTypeBuffers);
         matrixStack.popPose();
@@ -96,6 +97,7 @@ public class DrawManager {
         matrixStack.pushPose();
         matrixStack.scale(16f, 16f, 1f);
         drawChunkHighlights(matrixStack, true);
+        drawChunkColoredHighlights(matrixStack, true);
         matrixStack.popPose();
         drawWorldMapLines(matrixStack, fboScale, renderTypeBuffers);
         matrixStack.popPose();
@@ -146,6 +148,18 @@ public class DrawManager {
             var g = ColorHelper.getG(color);
             var b = ColorHelper.getB(color);
             shader.setHighlightColor(r, g, b, a);
+            feature.render(worldmap);
+        });
+        RenderSystem.disableBlend();
+    }
+
+    public void drawChunkColoredHighlights(final PoseStack matrixStack, final boolean worldmap) {
+        XaeroPlusShaders.ensureShaders();
+        var shader = XaeroPlusShaders.COLOR_HIGHLIGHT_SHADER;
+        if (shader == null) return;
+        shader.setMapViewMatrix(matrixStack.last().pose());
+        RenderSystem.enableBlend();
+        registry.forEachChunkColoredHighlightDrawFeature(feature -> {
             feature.render(worldmap);
         });
         RenderSystem.disableBlend();

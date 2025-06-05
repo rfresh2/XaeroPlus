@@ -20,7 +20,7 @@ public class Drawing extends Module {
         Level.NETHER, new ArrayList<>(),
         Level.END, new ArrayList<>()
     ));
-    private final DrawingCache drawingCache = new DrawingCache("XaeroPlusDrawing");
+    public final DrawingCache drawingCache = new DrawingCache("XaeroPlusDrawing");
     private Line inProgressLine = null;
     private int savedColorAlpha = 255;
     private final DrawingColorCycler drawingColorCycler = new DrawingColorCycler();
@@ -47,11 +47,11 @@ public class Drawing extends Module {
             () -> 0.5f,
             1
         );
-        Globals.drawManager.registry().registerDirectChunkHighlightProvider(
+        Globals.drawManager.registry().registerDirectChunkColoredHighlightProvider(
             this.getClass().getName() + "-highlights",
             true,
-            dim -> this.drawingCache.getCacheMap(dim),
-            () -> drawingColorCycler.getColorInt(savedColorAlpha)
+            drawingCache::getCacheMap,
+            () -> savedColorAlpha
         );
     }
 
@@ -97,8 +97,12 @@ public class Drawing extends Module {
         lines.add(line.extrapolateToWorldBorder());
     }
 
+    public void addHighlight(int chunkX, int chunkZ, int color) {
+        drawingCache.addHighlight(chunkX, chunkZ, color, Globals.getCurrentDimensionId());
+    }
+
     public void addHighlight(int chunkX, int chunkZ) {
-        drawingCache.addHighlight(chunkX, chunkZ, Globals.getCurrentDimensionId());
+        addHighlight(chunkX, chunkZ, drawingColorCycler.getColor().getColor());
     }
 
     public void removeHighlight(final int chunkX, final int chunkZ) {

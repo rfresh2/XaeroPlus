@@ -56,15 +56,15 @@ public class DrawingCache implements Closeable {
         );
     }
 
-    public void addHighlight(final int x, final int z, final ResourceKey<Level> dimension) {
+    public void addHighlight(final int x, final int z, final int color, final ResourceKey<Level> dimension) {
         try {
             DrawingHighlightCacheDimensionHandler cacheForActualDimension = getCacheForDimension(dimension, true);
             if (cacheForActualDimension == null) {
                 // if the cache is not ready yet, queue the highlight to be added
-                initializeTaskQueue.add(() -> addHighlight(x, z, dimension));
+                initializeTaskQueue.add(() -> addHighlight(x, z, color, dimension));
                 return;
             }
-            cacheForActualDimension.addHighlight(x, z);
+            cacheForActualDimension.addHighlight(x, z, color);
         } catch (final Exception e) {
             XaeroPlus.LOGGER.warn("Error adding highlight to {} disk cache: {}, {}", databaseName, x, z, e);
         }

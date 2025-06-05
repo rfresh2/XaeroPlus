@@ -4,6 +4,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaeroplus.Globals;
 import xaeroplus.feature.render.Line;
+import xaeroplus.feature.render.highlights.SavableHighlightCacheInstance;
 import xaeroplus.module.Module;
 import xaeroplus.util.ColorHelper;
 import xaeroplus.util.DrawingMode;
@@ -16,6 +17,7 @@ public class Drawing extends Module {
         Level.NETHER, new ArrayList<>(),
         Level.END, new ArrayList<>()
     ));
+    private final SavableHighlightCacheInstance highlights = new SavableHighlightCacheInstance("XaeroPlusDrawingHighlights");
     private Line inProgressLine = null;
     private int savedColorAlpha = 255;
     private final DrawingColorCycler drawingColorCycler = new DrawingColorCycler();
@@ -24,7 +26,6 @@ public class Drawing extends Module {
     public DrawingColorCycler getDrawingColorCycler() {
         return drawingColorCycler;
     }
-
 
     @Override
     public void onEnable() {
@@ -41,6 +42,12 @@ public class Drawing extends Module {
             () -> drawingColorCycler.getColorInt(inProgressColorAlpha),
             () -> 0.5f,
             1
+        );
+        Globals.drawManager.registry().registerDirectChunkHighlightProvider(
+            this.getClass().getName() + "-highlights",
+            true,
+            dim -> this.highlights.get().getCacheMap(dim),
+            () -> drawingColorCycler.getColorInt(savedColorAlpha)
         );
     }
 
@@ -74,6 +81,14 @@ public class Drawing extends Module {
         if (line.length() == 0) return;
         var lines = this.lines.computeIfAbsent(Globals.getCurrentDimensionId(), k -> new ArrayList<>());
         lines.add(line.extrapolateToWorldBorder());
+    }
+
+    public void addHighlight(int chunkX, int chunkZ) {
+        highlights.get().addHighlight(chunkX, chunkZ, Globals.getCurrentDimensionId());
+    }
+
+    public void removeHighlight(final int chunkX, final int chunkZ) {
+        highlights.get().removeHighlight(chunkX, chunkZ, Globals.getCurrentDimensionId());
     }
 
     public void setInProgressLine(final Line inProgressLine, final DrawingMode drawingMode) {

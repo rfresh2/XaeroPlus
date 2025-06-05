@@ -83,9 +83,12 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Unique Button startDrawingButton;
     @Unique Button drawLineSegmentButton;
     @Unique Button drawInfiniteLineButton;
+    @Unique Button drawHighlightsButton;
     @Unique Button drawColorCyclerButton;
     @Unique boolean drawing = false;
-    @Unique BlockPos drawPos1 = null;
+    @Unique BlockPos drawLinePos1 = null;
+    @Unique boolean drawingHighlightLeftClickDown = false;
+    @Unique boolean drawingHighlightRightClickDown = false;
     @Unique DrawingMode drawingMode = DrawingMode.LINE_SEGMENT;
     @Unique List<Button> guiMapButtonTempList = new ArrayList<>();
     @Unique ResourceLocation xpGuiTextures = new ResourceLocation("xaeroplus", "gui/xpgui.png");
@@ -155,7 +158,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             (button -> onToggleDrawingButton()),
             () -> new CursorBox(Component.translatable("xaeroplus.gui.world_map.start_drawing")));
         addButton(startDrawingButton);
-        startDrawingButton.setFocused(true);
         drawLineSegmentButton = new GuiTexturedButton(
             startDrawingButton.getX() + 16, startDrawingButton.getY(), 20, 20, 65, 0, 16, 16,
             this.xpGuiTextures,
@@ -168,8 +170,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             (button -> drawingMode = DrawingMode.INFINITE_LINE),
             () -> new CursorBox(Component.translatable("xaeroplus.gui.world_map.draw_infinite_line")));
         drawInfiniteLineButton.visible = false;
+        drawHighlightsButton = new GuiTexturedButton(
+            startDrawingButton.getX() + 16, drawInfiniteLineButton.getY() + 20, 20, 20, 82, 0, 16, 16,
+            this.xpGuiTextures,
+            (button -> drawingMode = DrawingMode.HIGHLIGHT),
+            () -> new CursorBox(Component.literal("Highlights")));
+        drawHighlightsButton.visible = false;
         drawColorCyclerButton = new DrawingColorCyclerButton(
-            startDrawingButton.getX() + 16, drawInfiniteLineButton.getY() + 20,
+            startDrawingButton.getX() + 16, drawHighlightsButton.getY() + 20,
             this.xpGuiTextures,
             () -> new CursorBox(Component.literal("Color")),
             ModuleManager.getModule(Drawing.class).getDrawingColorCycler()
@@ -213,17 +221,21 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if (drawing) {
             addButton(drawLineSegmentButton);
             addButton(drawInfiniteLineButton);
+            addButton(drawHighlightsButton);
             addButton(drawColorCyclerButton);
             drawLineSegmentButton.visible = true;
             drawInfiniteLineButton.visible = true;
+            drawHighlightsButton.visible = true;
             drawColorCyclerButton.visible = true;
         } else {
-            drawPos1 = null;
+            drawLinePos1 = null;
             drawLineSegmentButton.visible = false;
             drawInfiniteLineButton.visible = false;
+            drawHighlightsButton.visible = false;
             drawColorCyclerButton.visible = false;
             removeWidget(drawLineSegmentButton);
             removeWidget(drawInfiniteLineButton);
+            removeWidget(drawHighlightsButton);
             removeWidget(drawColorCyclerButton);
         }
     }
@@ -453,12 +465,20 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 startDrawingButton.setFocused(false);
                 drawLineSegmentButton.setFocused(true);
                 drawInfiniteLineButton.setFocused(false);
+                drawHighlightsButton.setFocused(false);
                 drawColorCyclerButton.setFocused(false);
             }
             case INFINITE_LINE -> {
                 startDrawingButton.setFocused(false);
                 drawLineSegmentButton.setFocused(false);
                 drawInfiniteLineButton.setFocused(true);
+                drawHighlightsButton.setFocused(false);
+                drawColorCyclerButton.setFocused(false);
+            } case HIGHLIGHT -> {
+                startDrawingButton.setFocused(false);
+                drawLineSegmentButton.setFocused(false);
+                drawInfiniteLineButton.setFocused(false);
+                drawHighlightsButton.setFocused(true);
                 drawColorCyclerButton.setFocused(false);
             }
         }
@@ -467,11 +487,23 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Inject(method = "render", at = @At("RETURN"))
     public void updateInProgressLine(CallbackInfo ci) {
         if (drawing) {
-            if (drawPos1 == null) {
-                ModuleManager.getModule(Drawing.class).clearInProgressLine();
-            } else {
-                var inProgress = new Line(drawPos1.getX(), drawPos1.getZ(), mouseBlockPosX, mouseBlockPosZ);
-                ModuleManager.getModule(Drawing.class).setInProgressLine(inProgress, drawingMode);
+            switch (drawingMode) {
+                case LINE_SEGMENT, INFINITE_LINE -> {
+                    if (drawLinePos1 == null) {
+                        ModuleManager.getModule(Drawing.class).clearInProgressLine();
+                    } else {
+                        var inProgress = new Line(drawLinePos1.getX(), drawLinePos1.getZ(), mouseBlockPosX, mouseBlockPosZ);
+                        ModuleManager.getModule(Drawing.class).setInProgressLine(inProgress, drawingMode);
+                    }
+                }
+                case HIGHLIGHT -> {
+                    ModuleManager.getModule(Drawing.class).clearInProgressLine();
+                    if (drawingHighlightLeftClickDown) {
+                        ModuleManager.getModule(Drawing.class).addHighlight(ChunkUtils.posToChunkPos(mouseBlockPosX), ChunkUtils.posToChunkPos(mouseBlockPosZ));
+                    } else if (drawingHighlightRightClickDown) {
+                        ModuleManager.getModule(Drawing.class).removeHighlight(ChunkUtils.posToChunkPos(mouseBlockPosX), ChunkUtils.posToChunkPos(mouseBlockPosZ));
+                    }
+                }
             }
         } else {
             ModuleManager.getModule(Drawing.class).clearInProgressLine();
@@ -505,11 +537,23 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             return;
         }
         if (par3 == 0) { // start drawing on left click
-            if (drawPos1 == null) {
-                drawPos1 = new BlockPos(mouseBlockPosX, 0, mouseBlockPosZ);
+            switch (drawingMode) {
+                case LINE_SEGMENT, INFINITE_LINE -> {
+                    if (drawLinePos1 == null) {
+                        drawLinePos1 = new BlockPos(mouseBlockPosX, 0, mouseBlockPosZ);
+                    }
+                }
+                case HIGHLIGHT -> {
+                    drawingHighlightLeftClickDown = true;
+                }
             }
             cir.setReturnValue(true);
         } else if (par3 == 1) {
+            switch (drawingMode) {
+                case HIGHLIGHT -> {
+                    drawingHighlightRightClickDown = true;
+                }
+            }
             cir.setReturnValue(true);
         }
     }
@@ -523,79 +567,48 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             return;
         }
         if (par3 == 0) { // start drawing on left click
-            if (drawPos1 != null) {
-                Line line;
-                line = new Line(drawPos1.getX(), drawPos1.getZ(), mouseBlockPosX, mouseBlockPosZ);
-                switch (drawingMode) {
-                    case LINE_SEGMENT -> ModuleManager.getModule(Drawing.class).addLine(line);
-                    case INFINITE_LINE -> ModuleManager.getModule(Drawing.class).addInfiniteLine(line);
+            switch (drawingMode) {
+                case LINE_SEGMENT, INFINITE_LINE -> {
+                    if (drawLinePos1 != null) {
+                        Line line;
+                        line = new Line(drawLinePos1.getX(), drawLinePos1.getZ(), mouseBlockPosX, mouseBlockPosZ);
+                        switch (drawingMode) {
+                            case LINE_SEGMENT -> ModuleManager.getModule(Drawing.class).addLine(line);
+                            case INFINITE_LINE -> ModuleManager.getModule(Drawing.class).addInfiniteLine(line);
+                        }
+                        drawLinePos1 = null;
+                    }
                 }
-                drawPos1 = null;
-                drawing = false;
-                drawLineSegmentButton.visible = false;
-                drawInfiniteLineButton.visible = false;
-                drawColorCyclerButton.visible = false;
-                removeWidget(drawLineSegmentButton);
-                removeWidget(drawInfiniteLineButton);
-                removeWidget(drawColorCyclerButton);
             }
-            cir.setReturnValue(true);
-        } else if (par3 == 1) { // clear drawing on right click
-            if (drawPos1 != null) return;
-            ModuleManager.getModule(Drawing.class).clearLine(mouseBlockPosX, mouseBlockPosZ);
             drawing = false;
+            drawingHighlightLeftClickDown = false;
+            drawingHighlightRightClickDown = false;
+            drawLineSegmentButton.visible = false;
+            drawInfiniteLineButton.visible = false;
+            drawHighlightsButton.visible = false;
+            drawColorCyclerButton.visible = false;
             removeWidget(drawLineSegmentButton);
             removeWidget(drawInfiniteLineButton);
+            removeWidget(drawHighlightsButton);
+            removeWidget(drawColorCyclerButton);
+            cir.setReturnValue(true);
+        } else if (par3 == 1) { // clear drawing on right click
+            if (drawLinePos1 != null) return;
+            ModuleManager.getModule(Drawing.class).clearLine(mouseBlockPosX, mouseBlockPosZ);
+            drawing = false;
+            drawingHighlightLeftClickDown = false;
+            drawingHighlightRightClickDown = false;
+            removeWidget(drawLineSegmentButton);
+            removeWidget(drawInfiniteLineButton);
+            removeWidget(drawHighlightsButton);
             removeWidget(drawColorCyclerButton);
             drawLineSegmentButton.visible = false;
             drawInfiniteLineButton.visible = false;
+            drawHighlightsButton.visible = false;
             drawColorCyclerButton.visible = false;
             cir.setReturnValue(true);
         }
     }
-
-//    @Inject(method = "mouseReleased", at = @At("HEAD"), cancellable = true)
-//    public void drawMouseReleasedHandler(final double par1, final double par2, final int par3, final CallbackInfoReturnable<Boolean> cir) {
-//        if (cir.getReturnValueZ()) return;
-//        if (!drawing) return;
-//        boolean isLeftClick = (this.leftMouseButton.isDown && par3 == 0);
-//        if (drawPos1 == null) {
-//            drawPos1 = new BlockPos(mouseBlockPosX, 0, mouseBlockPosZ);
-//        } else {
-//            Line line;
-//            line = new Line(drawPos1.getX(), drawPos1.getZ(), mouseBlockPosX, mouseBlockPosZ);
-//            ModuleManager.getModule(Drawing.class).addLine(line);
-//            drawPos1 = null;
-//            drawing = false;
-//        }
-//    }
-
-//    @Inject(method = "onInputRelease", at = @At("RETURN"))
-//    public void drawStartClick(final InputConstants.Type type, final int code, final CallbackInfoReturnable<Boolean> cir) {
-//        if (cir.getReturnValueZ()) return;
-//        if (!drawing) return;
-//        if (code != GLFW_MOUSE_BUTTON_LEFT) return;
-//        if (drawPos1 == null) {
-//            drawPos1 = new BlockPos(mouseBlockPosX, 0, mouseBlockPosZ);
-//        } else {
-//            Line line;
-//            line = new Line(drawPos1.getX(), drawPos1.getZ(), mouseBlockPosX, mouseBlockPosZ);
-//            ModuleManager.getModule(Drawing.class).addLine(line);
-//            drawPos1 = null;
-//            drawing = false;
-//        }
-//    }
-
-//    @Inject(method = "onInputRelease", at = @At("HEAD"), cancellable = true)
-//    public void deleteDrawingClick(final InputConstants.Type type, final int code, final CallbackInfoReturnable<Boolean> cir) {
-//        if (!drawing) return;
-//        if (drawPos1 != null) return;
-//        if (code != GLFW_MOUSE_BUTTON_RIGHT) return;
-//        ModuleManager.getModule(Drawing.class).clearLine(mouseBlockPosX, mouseBlockPosZ);
-//        cir.setReturnValue(true);
-//    }
-
-    // todo: mixin on mouseClicked to close coord entry fields when clicking on something else
 
     @Inject(method = "onInputPress", at = @At("HEAD"))
     public void panMouseButtonClick(final InputConstants.Type type, final int code, final CallbackInfoReturnable<Boolean> cir) {

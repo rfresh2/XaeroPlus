@@ -14,8 +14,11 @@ public class DrawFeatureRegistry {
     private final HashMap<String, ChunkHighlightDrawFeature> chunkHighlightDrawFeatures = new HashMap<>();
     private final HashMap<String, ChunkColoredHighlightDrawFeature> chunkColoredHighlightDrawFeatures = new HashMap<>();
     private final HashMap<String, LineDrawFeature> lineDrawFeatures = new HashMap<>();
+    private final HashMap<String, ColoredLineDrawFeature> coloredLineDrawFeatures = new HashMap<>();
     private final List<String> sortedChunkHighlightKeySet = new ArrayList<>();
+    private final List<String> sortedChunkColoredHighlightKeySet = new ArrayList<>();
     private final List<String> sortedLineKeySet = new ArrayList<>();
+    private final List<String> sortedColoredLineKeySet = new ArrayList<>();
 
     public synchronized void registerDirectChunkHighlightProvider(String id, DirectChunkHighlightSupplier chunkHighlightSupplier, IntSupplier colorSupplier) {
         registerChunkHighlightDrawFeature(id, new DirectChunkHighlightDrawFeature(new DirectChunkHighlightProvider(chunkHighlightSupplier, colorSupplier), false));
@@ -45,14 +48,22 @@ public class DrawFeatureRegistry {
     private synchronized void registerChunkColoredHighlightDrawFeature(String id, ChunkColoredHighlightDrawFeature drawFeature) {
         unregisterChunkHighlightProvider(id); // just in case
         chunkColoredHighlightDrawFeatures.put(id, drawFeature);
-        sortedChunkHighlightKeySet.add(id);
+        sortedChunkColoredHighlightKeySet.add(id);
         // arbitrary order, just needs to be consistent so colors blend consistently
-        sortedChunkHighlightKeySet.sort(Comparator.naturalOrder());
+        sortedChunkColoredHighlightKeySet.sort(Comparator.naturalOrder());
     }
 
     public synchronized void unregisterChunkHighlightProvider(String id) {
         sortedChunkHighlightKeySet.remove(id);
         ChunkHighlightDrawFeature feature = chunkHighlightDrawFeatures.remove(id);
+        if (feature != null) {
+            Minecraft.getInstance().execute(feature::close);
+        }
+    }
+
+    public synchronized void unregisterChunkColoredHighlightProvider(String id) {
+        sortedChunkColoredHighlightKeySet.remove(id);
+        ChunkColoredHighlightDrawFeature feature = chunkColoredHighlightDrawFeatures.remove(id);
         if (feature != null) {
             Minecraft.getInstance().execute(feature::close);
         }
@@ -70,6 +81,18 @@ public class DrawFeatureRegistry {
         lineDrawFeatures.remove(id);
     }
 
+    public synchronized void registerColoredLineProvider(String id, ColoredLineSupplier lineSupplier, IntSupplier colorAlphaSupplier, FloatSupplier lineWidthSupplier, int refreshIntervalMs) {
+        unregisterColoredLineProvider(id); // just in case
+        coloredLineDrawFeatures.put(id, new ColoredLineDrawFeature(new ColoredLineProvider(lineSupplier, colorAlphaSupplier, lineWidthSupplier), refreshIntervalMs));
+        sortedColoredLineKeySet.add(id);
+        sortedColoredLineKeySet.sort(Comparator.naturalOrder());
+    }
+
+    public synchronized void unregisterColoredLineProvider(String id) {
+        sortedColoredLineKeySet.remove(id);
+        coloredLineDrawFeatures.remove(id);
+    }
+
     protected synchronized void invalidateCaches() {
         chunkHighlightDrawFeatures.values().forEach(ChunkHighlightDrawFeature::invalidateCache);
         lineDrawFeatures.values().forEach(LineDrawFeature::invalidateCache);
@@ -83,8 +106,8 @@ public class DrawFeatureRegistry {
     }
 
     protected synchronized void forEachChunkColoredHighlightDrawFeature(Consumer<ChunkColoredHighlightDrawFeature> consumer) {
-        for (int i = 0; i < sortedChunkHighlightKeySet.size(); i++) {
-            var feature = chunkColoredHighlightDrawFeatures.get(sortedChunkHighlightKeySet.get(i));
+        for (int i = 0; i < sortedChunkColoredHighlightKeySet.size(); i++) {
+            var feature = chunkColoredHighlightDrawFeatures.get(sortedChunkColoredHighlightKeySet.get(i));
             if (feature != null) consumer.accept(feature);
         }
     }
@@ -92,6 +115,13 @@ public class DrawFeatureRegistry {
     protected synchronized void forEachLineDrawFeature(Consumer<LineDrawFeature> consumer) {
         for (int i = 0; i < sortedLineKeySet.size(); i++) {
             var feature = lineDrawFeatures.get(sortedLineKeySet.get(i));
+            if (feature != null) consumer.accept(feature);
+        }
+    }
+
+    protected synchronized void forEachColoredLineDrawFeature(Consumer<ColoredLineDrawFeature> consumer) {
+        for (int i = 0; i < sortedColoredLineKeySet.size(); i++) {
+            var feature = coloredLineDrawFeatures.get(sortedColoredLineKeySet.get(i));
             if (feature != null) consumer.accept(feature);
         }
     }

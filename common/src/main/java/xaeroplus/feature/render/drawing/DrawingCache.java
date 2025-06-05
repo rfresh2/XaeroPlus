@@ -5,6 +5,8 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.longs.Long2LongMaps;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -14,6 +16,7 @@ import xaero.map.gui.GuiMap;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
+import xaeroplus.feature.render.Line;
 import xaeroplus.feature.render.drawing.db.DrawingDatabase;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.TickTaskExecutor;
@@ -70,15 +73,15 @@ public class DrawingCache implements Closeable {
         }
     }
 
-    public void addLine(ColoredLine line, ResourceKey<Level> dimension) {
+    public void addLine(Line line, int color, ResourceKey<Level> dimension) {
         try {
             DrawingLinesCacheDimensionHandler cacheForActualDimension = getLinesCacheForDimension(dimension, true);
             if (cacheForActualDimension == null) {
                 // if the cache is not ready yet, queue the line to be added
-                initializeTaskQueue.add(() -> addLine(line, dimension));
+                initializeTaskQueue.add(() -> addLine(line, color, dimension));
                 return;
             }
-            cacheForActualDimension.addLine(line);
+            cacheForActualDimension.addLine(line, color);
         } catch (final Exception e) {
             XaeroPlus.LOGGER.warn("Error adding line to {} disk cache: {}, {}", databaseName, line, e);
         }
@@ -103,6 +106,13 @@ public class DrawingCache implements Closeable {
         DrawingHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimensionId, false);
         if (cacheForDimension == null) return Long2LongMaps.EMPTY_MAP;
         return cacheForDimension.getCacheMap(dimensionId);
+    }
+
+    public Object2IntMap<Line> getLines(final ResourceKey<Level> dimension) {
+        if (dimension == null) return Object2IntMaps.emptyMap();
+        var cacheForDimension = getLinesCacheForDimension(dimension, false);
+        if (cacheForDimension == null) return Object2IntMaps.emptyMap();
+        return cacheForDimension.getLines();
     }
 
     public void handleWorldChange(final XaeroWorldChangeEvent event) {

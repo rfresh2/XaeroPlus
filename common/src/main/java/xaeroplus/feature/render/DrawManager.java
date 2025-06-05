@@ -3,6 +3,7 @@ package xaeroplus.feature.render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -53,6 +54,7 @@ public class DrawManager {
         drawChunkColoredHighlights(matrixStack, false);
         matrixStack.popPose();
         drawMinimapLines(matrixStack, renderTypeBuffers);
+        drawMinimapColoredLines(matrixStack, renderTypeBuffers);
         matrixStack.popPose();
     }
 
@@ -84,6 +86,36 @@ public class DrawManager {
         });
     }
 
+    public void drawMinimapColoredLines(
+        final PoseStack matrixStack,
+        final MultiBufferSource.BufferSource renderTypeBuffers
+    ) {
+        MinimapShaders.ensureShaders();
+        registry.forEachColoredLineDrawFeature(feature -> {
+            var a = feature.colorAlphaInt() / 255.0f;
+            if (a == 0.0f) return;
+            VertexConsumer lineBuffer = renderTypeBuffers.getBuffer(CustomRenderTypes.MAP_LINES);
+            float lineWidthScale = 16f * Mth.clamp(feature.lineWidth(), 0.1f * Globals.minimapScaleMultiplier, 1000.0f);
+            RenderSystem.lineWidth(lineWidthScale);
+            var lines = feature.getLines();
+            var it = Object2IntMaps.fastIterator(lines);
+            while (it.hasNext()) {
+                var entry = it.next();
+                var line = entry.getKey();
+                var color = entry.getIntValue();
+                var r = ColorHelper.getR(color);
+                var g = ColorHelper.getG(color);
+                var b = ColorHelper.getB(color);
+                DrawHelper.addColoredLineToExistingBuffer(
+                    matrixStack.last(), lineBuffer,
+                    line.x1(), line.z1(),
+                    line.x2(), line.z2(),
+                    r, g, b, a);
+            }
+            renderTypeBuffers.endBatch(CustomRenderTypes.MAP_LINES);
+        });
+    }
+
     public void drawWorldMapFeatures(
         final int flooredCameraX,
         final int flooredCameraZ,
@@ -100,6 +132,7 @@ public class DrawManager {
         drawChunkColoredHighlights(matrixStack, true);
         matrixStack.popPose();
         drawWorldMapLines(matrixStack, fboScale, renderTypeBuffers);
+        drawWorldMapColoredLines(matrixStack, fboScale, renderTypeBuffers);
         matrixStack.popPose();
     }
 
@@ -124,6 +157,39 @@ public class DrawManager {
             var lines = feature.getLines();
             for (int j = 0; j < lines.size(); j++) {
                 var line = lines.get(j);
+                DrawHelper.addColoredLineToExistingBuffer(
+                    matrixStack.last(), lineBuffer,
+                    line.x2(), line.z2(),
+                    line.x1(), line.z1(),
+                    r, g, b, a);
+            }
+            renderTypeBuffers.endBatch(CustomRenderTypes.MAP_LINES);
+        });
+    }
+
+    public void drawWorldMapColoredLines(
+        final PoseStack matrixStack,
+        final double fboScale,
+        final MultiBufferSource.BufferSource renderTypeBuffers
+    ) {
+        MinimapShaders.ensureShaders();
+        var mc = Minecraft.getInstance();
+        MinimapShaders.FRAMEBUFFER_LINES.setFrameSize(mc.getWindow().getWidth(), mc.getWindow().getHeight());
+        registry.forEachColoredLineDrawFeature(feature -> {
+            var a = feature.colorAlphaInt() / 255.0f;
+            if (a == 0) return;
+            VertexConsumer lineBuffer = renderTypeBuffers.getBuffer(CustomRenderTypes.MAP_LINES);
+            float lineWidthScale = 16f * (float) Mth.clamp(feature.lineWidth() * fboScale, 0.1f, 1000.0f);
+            RenderSystem.lineWidth(lineWidthScale);
+            var lines = feature.getLines();
+            var it = Object2IntMaps.fastIterator(lines);
+            while (it.hasNext()) {
+                var entry = it.next();
+                var line = entry.getKey();
+                var color = entry.getIntValue();
+                var r = ColorHelper.getR(color);
+                var g = ColorHelper.getG(color);
+                var b = ColorHelper.getB(color);
                 DrawHelper.addColoredLineToExistingBuffer(
                     matrixStack.last(), lineBuffer,
                     line.x2(), line.z2(),

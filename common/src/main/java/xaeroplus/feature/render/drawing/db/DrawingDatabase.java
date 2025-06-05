@@ -2,13 +2,15 @@ package xaeroplus.feature.render.drawing.db;
 
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.longs.Long2LongMaps;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.rfresh.sqlite.SQLiteErrorCode;
 import xaero.map.WorldMap;
 import xaeroplus.XaeroPlus;
+import xaeroplus.feature.render.Line;
 import xaeroplus.feature.render.db.DatabaseMigrator;
-import xaeroplus.feature.render.drawing.ColoredLine;
 import xaeroplus.util.ChunkUtils;
 
 import java.io.Closeable;
@@ -190,7 +192,7 @@ public class DrawingDatabase implements Closeable {
         }
     }
 
-    public void insertLinesList(final List<ColoredLine> lines, final ResourceKey<Level> dimension) {
+    public void insertLinesList(final Object2IntMap<Line> lines, final ResourceKey<Level> dimension) {
         if (lines.isEmpty()) return;
         try {
             createLinesTable(databaseName, connection, dimension);
@@ -199,13 +201,15 @@ public class DrawingDatabase implements Closeable {
             // only issue is gc spam from string allocations
             int batchSize = MAX_HIGHLIGHTS_LIST;
             StringBuilder sb = new StringBuilder(50 * Math.min(batchSize, lines.size()) + 75);
-            for (int i = 0; i < lines.size(); i += batchSize) {
+            var it = Object2IntMaps.fastIterator(lines);
+            while (it.hasNext()) {
                 sb.setLength(0);
                 sb.append("INSERT OR IGNORE INTO \"").append(getTableName(dimension, LINES_TABLE)).append("\" VALUES ");
                 boolean trailingComma = false;
-                for (int j = 0; j < batchSize && i + j < lines.size(); j++) {
-                    var line = lines.get(i + j);
-                    sb.append("(").append(line.x1()).append(", ").append(line.z1()).append(", ").append(line.x2()).append(", ").append(line.z2()).append(", ").append(line.color()).append(")");
+                for (int i = 0; i < batchSize && it.hasNext(); i++) {
+                    var entry = it.next();
+                    var line = entry.getKey();
+                    sb.append("(").append(line.x1()).append(", ").append(line.z1()).append(", ").append(line.x2()).append(", ").append(line.z2()).append(", ").append(entry.getIntValue()).append(")");
                     sb.append(", ");
                     trailingComma = true;
                 }

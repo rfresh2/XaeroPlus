@@ -1,5 +1,7 @@
 package xaeroplus.module.impl;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -12,14 +14,10 @@ import xaeroplus.module.Module;
 import xaeroplus.util.ColorHelper;
 import xaeroplus.util.DrawingMode;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
 public class Drawing extends Module {
-    private final Map<ResourceKey<Level>, List<Line>> lines = new HashMap<>(Map.of(
-        Level.OVERWORLD, new ArrayList<>(),
-        Level.NETHER, new ArrayList<>(),
-        Level.END, new ArrayList<>()
-    ));
     public final DrawingCache drawingCache = new DrawingCache("XaeroPlusDrawing");
     private Line inProgressLine = null;
     private int savedColorAlpha = 255;
@@ -33,10 +31,10 @@ public class Drawing extends Module {
     @Override
     public void onEnable() {
         drawingCache.onEnable();
-        Globals.drawManager.registry().registerLineProvider(
+        Globals.drawManager.registry().registerColoredLineProvider(
             this.getClass().getName() + "-saved",
             this::getSavedLines,
-            () -> drawingColorCycler.getColorInt(savedColorAlpha),
+            () -> savedColorAlpha,
             () -> 0.5f,
             50
         );
@@ -65,8 +63,8 @@ public class Drawing extends Module {
         drawingCache.handleWorldChange(event);
     }
 
-    private List<Line> getSavedLines(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
-        return this.lines.computeIfAbsent(dimension, k -> new ArrayList<>());
+    private Object2IntMap<Line> getSavedLines(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
+        return drawingCache.getLines(dimension);
     }
 
     private List<Line> getInProgressLines(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
@@ -78,23 +76,22 @@ public class Drawing extends Module {
         }
     }
 
-    // call on server switch?
-    public void resetLines() {
-        for (var entry : lines.entrySet()) {
-            entry.getValue().clear();
-        }
+    public void addLine(final Line line, int color) {
+        if (line.length() == 0) return;
+        drawingCache.addLine(line, color, Globals.getCurrentDimensionId());
     }
 
     public void addLine(final Line line) {
+        addLine(line, drawingColorCycler.getColorInt(inProgressColorAlpha));
+    }
+
+    public void addInfiniteLine(final Line line, int color) {
         if (line.length() == 0) return;
-        var lines = this.lines.computeIfAbsent(Globals.getCurrentDimensionId(), k -> new ArrayList<>());
-        lines.add(line);
+        drawingCache.addLine(line.extrapolateToWorldBorder(), color, Globals.getCurrentDimensionId());
     }
 
     public void addInfiniteLine(final Line line) {
-        if (line.length() == 0) return;
-        var lines = this.lines.computeIfAbsent(Globals.getCurrentDimensionId(), k -> new ArrayList<>());
-        lines.add(line.extrapolateToWorldBorder());
+        addInfiniteLine(line, drawingColorCycler.getColorInt(inProgressColorAlpha));
     }
 
     public void addHighlight(int chunkX, int chunkZ, int color) {
@@ -121,7 +118,7 @@ public class Drawing extends Module {
     }
 
     public void clearLine(final int x, final int z) {
-        var lines = this.lines.computeIfAbsent(Globals.getCurrentDimensionId(), k -> new ArrayList<>());
+        Object2IntMap<Line> lines = drawingCache.getLines(Globals.getCurrentDimensionId());
         int maxX = x + 16;
         int maxZ = z + 16;
         Line sqLine1 = new Line(x, z, maxX, z);
@@ -129,16 +126,21 @@ public class Drawing extends Module {
         Line sqLine3 = new Line(maxX, z, maxX, maxZ);
         Line sqLine4 = new Line(x, maxZ, maxX, maxZ);
         // find lines which intersect with square (x, z, maxX, maxZ)
-        lines.removeIf(line -> {
-            if (line.x1() < x && line.x2() < x) return false;
-            if (line.z1() < z && line.z2() < z) return false;
-            if (line.x1() > maxX && line.x2() > maxX) return false;
-            if (line.z1() > maxZ && line.z2() > maxZ) return false;
-            return linesIntersect(line, sqLine1)
+        var it = Object2IntMaps.fastIterator(lines);
+        while (it.hasNext()) {
+            var entry = it.next();
+            Line line = entry.getKey();
+            if (line.x1() < x && line.x2() < x) continue;
+            if (line.z1() < z && line.z2() < z) continue;
+            if (line.x1() > maxX && line.x2() > maxX) continue;
+            if (line.z1() > maxZ && line.z2() > maxZ) continue;
+            if (linesIntersect(line, sqLine1)
                 || linesIntersect(line, sqLine2)
                 || linesIntersect(line, sqLine3)
-                || linesIntersect(line, sqLine4);
-        });
+                || linesIntersect(line, sqLine4)) {
+                it.remove();
+            }
+        }
     }
 
     private boolean linesIntersect(Line line1, Line line2) {

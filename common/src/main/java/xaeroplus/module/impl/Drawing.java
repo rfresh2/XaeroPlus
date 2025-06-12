@@ -20,7 +20,7 @@ import java.util.List;
 public class Drawing extends Module {
     public final DrawingCache drawingCache = new DrawingCache("XaeroPlusDrawing");
     private Line inProgressLine = null;
-    private int savedColorAlpha = 255;
+    private int savedColorAlpha = 150;
     private final DrawingColorCycler drawingColorCycler = new DrawingColorCycler();
     private final int inProgressColorAlpha = 80;
 
@@ -77,7 +77,7 @@ public class Drawing extends Module {
     }
 
     public void addLine(final Line line, int color) {
-        if (line.length() == 0) return;
+        if (line.length() < 2) return;
         drawingCache.addLine(line, color, Globals.getCurrentDimensionId());
     }
 
@@ -86,7 +86,7 @@ public class Drawing extends Module {
     }
 
     public void addInfiniteLine(final Line line, int color) {
-        if (line.length() == 0) return;
+        if (line.length() < 2) return;
         drawingCache.addLine(line.extrapolateToWorldBorder(), color, Globals.getCurrentDimensionId());
     }
 

@@ -40,7 +40,10 @@ public class FabricWaystonesHelperInit {
                 ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(waystone.getWorldName())),
                 waystone.way_getPos().getX(),
                 waystone.way_getPos().getY() + 1,// avoid teleporting directly into the waystone
-                waystone.way_getPos().getZ()))
+                waystone.way_getPos().getZ()
+                // todo: try to map the color int to waypoint color enum
+//                waystone.getColor()
+            ))
             .toList();
     }
 }

@@ -4,6 +4,7 @@ import com.google.common.hash.Hashing;
 import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.module.MinimapSession;
@@ -151,6 +152,9 @@ public class WaystoneSync extends Module {
     }
 
     private WaypointColor getWaystoneColor(Waystone waystone) {
+        if (waystone.color() != null) {
+            return waystone.color();
+        }
         if (color == WaystoneColor.RANDOM) {
             int index = Math.abs(
                 Hashing.murmur3_128().hashUnencodedChars(waystone.name()).asInt())
@@ -186,5 +190,9 @@ public class WaystoneSync extends Module {
         FabricWaystonesHelper.shouldSync = true;
     }
 
-    public record Waystone(String name, ResourceKey<Level> dimension, int x, int y, int z) { }
+    public record Waystone(String name, ResourceKey<Level> dimension, int x, int y, int z, @Nullable WaypointColor color) {
+        public Waystone(String name, ResourceKey<Level> dimension, int x, int y, int z) {
+            this(name, dimension, x, y, z, null);
+        }
+    }
 }

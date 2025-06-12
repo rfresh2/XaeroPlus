@@ -51,11 +51,12 @@ public class BlayWaystonesHelper {
                                 case YELLOW -> WaypointColor.YELLOW;
                                 case LIME -> WaypointColor.GREEN;
                                 case GREEN -> WaypointColor.DARK_GREEN;
-                                case PINK, PURPLE -> WaypointColor.PURPLE;
+                                case PINK-> WaypointColor.PURPLE;
+                                case PURPLE -> WaypointColor.BLUE;
                                 case GRAY ->  WaypointColor.DARK_GRAY;
                                 case LIGHT_GRAY -> WaypointColor.GRAY;
                                 case CYAN -> WaypointColor.DARK_AQUA;
-                                case BLUE -> WaypointColor.BLUE;
+                                case BLUE -> WaypointColor.DARK_BLUE;
                                 case BROWN -> WaypointColor.DARK_RED;
                                 case RED -> WaypointColor.RED;
                                 case BLACK -> WaypointColor.BLACK;

@@ -7,6 +7,8 @@ import net.blay09.mods.waystones.api.event.WaystoneRemoveReceivedEvent;
 import net.blay09.mods.waystones.api.event.WaystoneUpdateReceivedEvent;
 import net.blay09.mods.waystones.api.event.WaystonesListReceivedEvent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.DyeColor;
+import xaero.hud.minimap.waypoint.WaypointColor;
 import xaeroplus.module.impl.WaystoneSync;
 
 import java.util.ArrayList;
@@ -71,11 +73,41 @@ public class BlayWaystonesHelper {
     public List<WaystoneSync.Waystone> getCurrentWaystones() {
         return currentWaystoneTypeMap.values().stream()
             .flatMap(Collection::stream)
-            .map(waystone -> new WaystoneSync.Waystone(
-                waystone.getName().getString(),
-                waystone.getDimension(),
-                waystone.getPos().getX(),
-                waystone.getPos().getY() + 1,// avoid teleporting directly into the waystone
-                waystone.getPos().getZ())).toList();
+            .map(waystone -> {
+                WaypointColor color = null;
+                if (WaystoneTypes.isSharestone(waystone.getWaystoneType())) {
+                    var keyPath = waystone.getWaystoneType().getPath();
+                    int suffixIndex = keyPath.lastIndexOf("_sharestone");
+                    if (suffixIndex != -1) {
+                        String colorName = keyPath.substring(0, suffixIndex);
+                        DyeColor dyeColor = DyeColor.byName(colorName, null);
+                        if (dyeColor != null) {
+                            color = switch (dyeColor) {
+                                case WHITE -> WaypointColor.WHITE;
+                                case ORANGE -> WaypointColor.GOLD;
+                                case MAGENTA -> WaypointColor.DARK_PURPLE;
+                                case LIGHT_BLUE -> WaypointColor.BLUE;
+                                case YELLOW -> WaypointColor.YELLOW;
+                                case LIME, GREEN -> WaypointColor.GREEN;
+                                case PINK, PURPLE -> WaypointColor.PURPLE;
+                                case GRAY, LIGHT_GRAY -> WaypointColor.GRAY;
+                                case CYAN -> WaypointColor.AQUA;
+                                case BLUE -> WaypointColor.DARK_BLUE;
+                                case BROWN -> WaypointColor.DARK_GREEN;
+                                case RED -> WaypointColor.RED;
+                                case BLACK -> WaypointColor.BLACK;
+                            };
+                        }
+                    }
+                }
+                return new WaystoneSync.Waystone(
+                    waystone.getName().getString(),
+                    waystone.getDimension(),
+                    waystone.getPos().getX(),
+                    waystone.getPos().getY() + 1,// avoid teleporting directly into the waystone
+                    waystone.getPos().getZ(),
+                    color
+                );
+            }).toList();
     }
 }

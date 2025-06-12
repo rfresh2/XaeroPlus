@@ -178,7 +178,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         drawHighlightsButton.visible = false;
         drawColorCyclerButton = new DrawingColorCyclerButton(
             startDrawingButton.getX() + 16, drawHighlightsButton.getY() + 20,
-            this.xpGuiTextures,
             () -> new CursorBox(Component.literal("Color")),
             ModuleManager.getModule(Drawing.class).getDrawingColorCycler()
         );

@@ -490,14 +490,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             switch (drawingMode) {
                 case LINE_SEGMENT, INFINITE_LINE -> {
                     if (drawLinePos1 == null) {
-                        ModuleManager.getModule(Drawing.class).clearInProgressLine();
+                        ModuleManager.getModule(Drawing.class).removeInProgressLine();
                     } else {
                         var inProgress = new Line(drawLinePos1.getX(), drawLinePos1.getZ(), mouseBlockPosX, mouseBlockPosZ);
                         ModuleManager.getModule(Drawing.class).setInProgressLine(inProgress, drawingMode);
                     }
                 }
                 case HIGHLIGHT -> {
-                    ModuleManager.getModule(Drawing.class).clearInProgressLine();
+                    ModuleManager.getModule(Drawing.class).removeInProgressLine();
                     if (drawingHighlightLeftClickDown) {
                         ModuleManager.getModule(Drawing.class).addHighlight(ChunkUtils.posToChunkPos(mouseBlockPosX), ChunkUtils.posToChunkPos(mouseBlockPosZ));
                     } else if (drawingHighlightRightClickDown) {
@@ -506,7 +506,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 }
             }
         } else {
-            ModuleManager.getModule(Drawing.class).clearInProgressLine();
+            ModuleManager.getModule(Drawing.class).removeInProgressLine();
         }
     }
 
@@ -594,7 +594,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             cir.setReturnValue(true);
         } else if (par3 == 1) { // clear drawing on right click
             if (drawLinePos1 != null) return;
-            ModuleManager.getModule(Drawing.class).clearLine(mouseBlockPosX, mouseBlockPosZ);
+            ModuleManager.getModule(Drawing.class).removeLine(mouseBlockPosX, mouseBlockPosZ);
             drawing = false;
             drawingHighlightLeftClickDown = false;
             drawingHighlightRightClickDown = false;
@@ -765,6 +765,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                         if (portals.isEnabled()) {
                             portals.portalsCache.get().removeHighlight(x, z, dim);
                         }
+                        ModuleManager.getModule(Drawing.class).removeHighlight(x, z);
+                        ModuleManager.getModule(Drawing.class).removeLine(ChunkUtils.chunkCoordToCoord(x), ChunkUtils.chunkCoordToCoord(z));
                     }
                 }
             }

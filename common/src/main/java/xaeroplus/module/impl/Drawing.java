@@ -113,11 +113,11 @@ public class Drawing extends Module {
         }
     }
 
-    public void clearInProgressLine() {
+    public void removeInProgressLine() {
         inProgressLine = null;
     }
 
-    public void clearLine(final int x, final int z) {
+    public void removeLine(final int x, final int z) {
         Object2IntMap<Line> lines = drawingCache.getLines(Globals.getCurrentDimensionId());
         int maxX = x + 16;
         int maxZ = z + 16;

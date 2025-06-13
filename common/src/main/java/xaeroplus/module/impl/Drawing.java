@@ -158,6 +158,10 @@ public class Drawing extends Module {
         return u >= 0 && u <= 1;
     }
 
+    public void setOpacity(final int opacity) {
+        this.savedColorAlpha = opacity;
+    }
+
     public static final class DrawingColorCycler {
         private int index;
 

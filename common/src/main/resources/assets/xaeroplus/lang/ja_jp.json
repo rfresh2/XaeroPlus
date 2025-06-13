@@ -250,9 +250,11 @@
     "xaeroplus.gui.waystone_visibility_type.global": "グローバル",
     "xaeroplus.gui.waystone_visibility_type.world_map_local": "ワールドマップ ローカル",
     "xaeroplus.gui.waystone_visibility_type.world_map_global": "ワールドマップ グローバル",
-    "xaeroplus.setting.highlight_shader": "ハイライトシェーダー",
-    "xaeroplus.setting.highlight_shader.tooltip": "ハイライトをレンダリングするためにシェーダーを使用します。メモリ使用量を減らし、より多くの作業をGPUにオフロードします。",
     "xaeroplus.gui.world_map.start_drawing": "描画を開始",
     "xaeroplus.gui.world_map.draw_line_segment": "線分",
-    "xaeroplus.gui.world_map.draw_infinite_line": "無限直線"
+    "xaeroplus.gui.world_map.draw_infinite_line": "無限線",
+    "xaeroplus.gui.world_map.draw_highlights": "チャンクのハイライト",
+    "xaeroplus.gui.world_map.draw_color": "描画色",
+    "xaeroplus.setting.drawing_opacity": "描画の不透明度",
+    "xaeroplus.setting.drawing_opacity.tooltip": "描画の色の不透明度を設定します"
 }

@@ -252,9 +252,11 @@
   "xaeroplus.gui.waystone_visibility_type.global": "Глобальная",
   "xaeroplus.gui.waystone_visibility_type.world_map_local": "Карта мира лок.",
   "xaeroplus.gui.waystone_visibility_type.world_map_global": "Карта мира глоб.",
-  "xaeroplus.setting.highlight_shader": "Шейдер подсветки",
-  "xaeroplus.setting.highlight_shader.tooltip": "Использует шейдер для подсветки, снижая нагрузку на память и перекладывая работу на GPU",
   "xaeroplus.gui.world_map.start_drawing": "Начать рисование",
   "xaeroplus.gui.world_map.draw_line_segment": "Отрезок линии",
-  "xaeroplus.gui.world_map.draw_infinite_line": "Бесконечная линия"
+  "xaeroplus.gui.world_map.draw_infinite_line": "Бесконечная линия",
+  "xaeroplus.gui.world_map.draw_highlights": "Выделение чанка",
+  "xaeroplus.gui.world_map.draw_color": "Цвет рисования",
+  "xaeroplus.setting.drawing_opacity": "Прозрачность рисования",
+  "xaeroplus.setting.drawing_opacity.tooltip": "Устанавливает прозрачность цвета рисунков"
 }

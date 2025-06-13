@@ -252,9 +252,11 @@
   "xaeroplus.gui.waystone_visibility_type.global": "Global",
   "xaeroplus.gui.waystone_visibility_type.world_map_local": "World Map Loc.",
   "xaeroplus.gui.waystone_visibility_type.world_map_global": "World Map Glo.",
-  "xaeroplus.setting.highlight_shader": "Highlight Shader",
-  "xaeroplus.setting.highlight_shader.tooltip": "Uses a shader to render highlights. Reduces memory usage and offloads more work to the GPU.",
   "xaeroplus.gui.world_map.start_drawing": "Start Drawing",
   "xaeroplus.gui.world_map.draw_line_segment": "Line Segment",
-  "xaeroplus.gui.world_map.draw_infinite_line": "Infinite Line"
+  "xaeroplus.gui.world_map.draw_infinite_line": "Infinite Line",
+  "xaeroplus.gui.world_map.draw_highlights": "Chunk Highlight",
+  "xaeroplus.gui.world_map.draw_color": "Drawing Color",
+  "xaeroplus.setting.drawing_opacity": "Drawing Opacity",
+  "xaeroplus.setting.drawing_opacity.tooltip": "Sets the color opacity of drawings"
 }

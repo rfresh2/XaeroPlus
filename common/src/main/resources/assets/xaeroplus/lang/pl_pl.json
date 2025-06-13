@@ -250,9 +250,11 @@
   "xaeroplus.gui.waystone_visibility_type.global": "Globalny",
   "xaeroplus.gui.waystone_visibility_type.world_map_local": "Mapa Świata Lok.",
   "xaeroplus.gui.waystone_visibility_type.world_map_global": "Mapa Świata Glob.",
-  "xaeroplus.setting.highlight_shader": "Shader Podświetlenia",
-  "xaeroplus.setting.highlight_shader.tooltip": "Używa shaderu do renderowania podświetleń. Zmniejsza zużycie pamięci i przenosi więcej pracy na GPU.",
   "xaeroplus.gui.world_map.start_drawing": "Rozpocznij rysowanie",
   "xaeroplus.gui.world_map.draw_line_segment": "Odcinek linii",
-  "xaeroplus.gui.world_map.draw_infinite_line": "Linia nieskończona"
+  "xaeroplus.gui.world_map.draw_infinite_line": "Linia nieskończona",
+  "xaeroplus.gui.world_map.draw_highlights": "Podświetlenie chunków",
+  "xaeroplus.gui.world_map.draw_color": "Kolor rysunku",
+  "xaeroplus.setting.drawing_opacity": "Przezroczystość rysunku",
+  "xaeroplus.setting.drawing_opacity.tooltip": "Ustawia przezroczystość koloru rysunków"
 }

@@ -525,7 +525,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         );
     }
 
-    @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true, remap = true)
     public void cancelClicksWhileDrawing(final double par1, final double par2, final int par3, final CallbackInfoReturnable<Boolean> cir) {
         if (!drawing) return;
         boolean toReturn = super.mouseClicked(par1, par2, par3);
@@ -549,7 +549,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         }
     }
 
-    @Inject(method = "mouseReleased", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "mouseReleased", at = @At("HEAD"), cancellable = true, remap = true)
     public void drawingClickReleasedHandler(final double par1, final double par2, final int par3, final CallbackInfoReturnable<Boolean> cir) {
         if (!drawing) return;
         boolean toReturn = super.mouseReleased(par1, par2, par3);

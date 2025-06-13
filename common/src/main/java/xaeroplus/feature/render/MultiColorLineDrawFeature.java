@@ -17,11 +17,11 @@ import java.util.concurrent.TimeUnit;
 
 import static xaeroplus.util.GuiMapHelper.*;
 
-public class ColoredLineDrawFeature {
+public class MultiColorLineDrawFeature {
     private final AsyncLoadingCache<Long, Object2IntMap<Line>> lineRenderCache;
-    private final ColoredLineProvider lineProvider;
+    private final MultiColorLineProvider lineProvider;
 
-    public ColoredLineDrawFeature(ColoredLineProvider lineProvider, int refreshIntervalMs) {
+    public MultiColorLineDrawFeature(MultiColorLineProvider lineProvider, int refreshIntervalMs) {
         this.lineProvider = lineProvider;
         this.lineRenderCache = Caffeine.newBuilder()
             .expireAfterWrite(10, TimeUnit.SECONDS)

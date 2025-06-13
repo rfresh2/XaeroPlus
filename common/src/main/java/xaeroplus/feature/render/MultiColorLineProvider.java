@@ -4,8 +4,8 @@ import xaeroplus.util.FloatSupplier;
 
 import java.util.function.IntSupplier;
 
-public record ColoredLineProvider(
-    ColoredLineSupplier lineSupplier,
+public record MultiColorLineProvider(
+    MultiColorLineSupplier lineSupplier,
     IntSupplier colorAlphaSupplier,
     FloatSupplier lineWidthSupplier
 ) {

@@ -1,6 +1,6 @@
 {
-    "vertex": "xaeroplus/colored_highlights",
-    "fragment": "xaeroplus/colored_highlights",
+    "vertex": "xaeroplus/multi_color_highlights",
+    "fragment": "xaeroplus/multi_color_highlights",
     "attributes": [
         "Position",
         "Color"

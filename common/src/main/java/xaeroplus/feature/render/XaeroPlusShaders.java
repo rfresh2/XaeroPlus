@@ -7,7 +7,7 @@ import xaeroplus.XaeroPlus;
 
 public class XaeroPlusShaders {
     @Nullable public static HighlightShader HIGHLIGHT_SHADER = null;
-    @Nullable public static ColoredHighlightShader COLOR_HIGHLIGHT_SHADER = null;
+    @Nullable public static MultiColorHighlightShader COLOR_HIGHLIGHT_SHADER = null;
     private static boolean firstReload = true;
 
     public static void onResourceReload(ResourceManager resourceManager) {
@@ -19,7 +19,7 @@ public class XaeroPlusShaders {
                 COLOR_HIGHLIGHT_SHADER.close();
             }
             HIGHLIGHT_SHADER = new HighlightShader(resourceManager);
-            COLOR_HIGHLIGHT_SHADER = new ColoredHighlightShader(resourceManager);
+            COLOR_HIGHLIGHT_SHADER = new MultiColorHighlightShader(resourceManager);
             XaeroPlus.LOGGER.info("Reloaded Shaders");
         } catch (final Exception e) {
             if (firstReload) {

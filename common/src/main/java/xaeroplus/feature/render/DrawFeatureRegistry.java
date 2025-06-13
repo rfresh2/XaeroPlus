@@ -12,9 +12,9 @@ import java.util.function.IntSupplier;
 
 public class DrawFeatureRegistry {
     private final HashMap<String, ChunkHighlightDrawFeature> chunkHighlightDrawFeatures = new HashMap<>();
-    private final HashMap<String, ChunkColoredHighlightDrawFeature> chunkColoredHighlightDrawFeatures = new HashMap<>();
+    private final HashMap<String, MultiColorChunkHighlightDrawFeature> chunkColoredHighlightDrawFeatures = new HashMap<>();
     private final HashMap<String, LineDrawFeature> lineDrawFeatures = new HashMap<>();
-    private final HashMap<String, ColoredLineDrawFeature> coloredLineDrawFeatures = new HashMap<>();
+    private final HashMap<String, MultiColorLineDrawFeature> coloredLineDrawFeatures = new HashMap<>();
     private final List<String> sortedChunkHighlightKeySet = new ArrayList<>();
     private final List<String> sortedChunkColoredHighlightKeySet = new ArrayList<>();
     private final List<String> sortedLineKeySet = new ArrayList<>();
@@ -30,7 +30,7 @@ public class DrawFeatureRegistry {
     }
 
     public synchronized void registerDirectChunkColoredHighlightProvider(String id, boolean refreshEveryTick, DirectChunkHighlightSupplier chunkHighlightSupplier, IntSupplier colorAlphaSupplier) {
-        registerChunkColoredHighlightDrawFeature(id, new DirectChunkColoredHighlightDrawFeature(new DirectChunkHighlightProvider(chunkHighlightSupplier, colorAlphaSupplier), refreshEveryTick));
+        registerChunkColoredHighlightDrawFeature(id, new MultiColorDirectChunkHighlightDrawFeature(new DirectChunkHighlightProvider(chunkHighlightSupplier, colorAlphaSupplier), refreshEveryTick));
     }
 
     public synchronized void registerAsyncChunkHighlightProvider(String id, AsyncChunkHighlightSupplier chunkHighlightSupplier, IntSupplier colorSupplier) {
@@ -45,7 +45,7 @@ public class DrawFeatureRegistry {
         sortedChunkHighlightKeySet.sort(Comparator.naturalOrder());
     }
 
-    private synchronized void registerChunkColoredHighlightDrawFeature(String id, ChunkColoredHighlightDrawFeature drawFeature) {
+    private synchronized void registerChunkColoredHighlightDrawFeature(String id, MultiColorChunkHighlightDrawFeature drawFeature) {
         unregisterChunkHighlightProvider(id); // just in case
         chunkColoredHighlightDrawFeatures.put(id, drawFeature);
         sortedChunkColoredHighlightKeySet.add(id);
@@ -63,7 +63,7 @@ public class DrawFeatureRegistry {
 
     public synchronized void unregisterChunkColoredHighlightProvider(String id) {
         sortedChunkColoredHighlightKeySet.remove(id);
-        ChunkColoredHighlightDrawFeature feature = chunkColoredHighlightDrawFeatures.remove(id);
+        MultiColorChunkHighlightDrawFeature feature = chunkColoredHighlightDrawFeatures.remove(id);
         if (feature != null) {
             Minecraft.getInstance().execute(feature::close);
         }
@@ -81,9 +81,9 @@ public class DrawFeatureRegistry {
         lineDrawFeatures.remove(id);
     }
 
-    public synchronized void registerColoredLineProvider(String id, ColoredLineSupplier lineSupplier, IntSupplier colorAlphaSupplier, FloatSupplier lineWidthSupplier, int refreshIntervalMs) {
+    public synchronized void registerColoredLineProvider(String id, MultiColorLineSupplier lineSupplier, IntSupplier colorAlphaSupplier, FloatSupplier lineWidthSupplier, int refreshIntervalMs) {
         unregisterColoredLineProvider(id); // just in case
-        coloredLineDrawFeatures.put(id, new ColoredLineDrawFeature(new ColoredLineProvider(lineSupplier, colorAlphaSupplier, lineWidthSupplier), refreshIntervalMs));
+        coloredLineDrawFeatures.put(id, new MultiColorLineDrawFeature(new MultiColorLineProvider(lineSupplier, colorAlphaSupplier, lineWidthSupplier), refreshIntervalMs));
         sortedColoredLineKeySet.add(id);
         sortedColoredLineKeySet.sort(Comparator.naturalOrder());
     }
@@ -95,7 +95,9 @@ public class DrawFeatureRegistry {
 
     protected synchronized void invalidateCaches() {
         chunkHighlightDrawFeatures.values().forEach(ChunkHighlightDrawFeature::invalidateCache);
+        chunkColoredHighlightDrawFeatures.values().forEach(MultiColorChunkHighlightDrawFeature::invalidateCache);
         lineDrawFeatures.values().forEach(LineDrawFeature::invalidateCache);
+        coloredLineDrawFeatures.values().forEach(MultiColorLineDrawFeature::invalidateCache);
     }
 
     protected synchronized void forEachChunkHighlightDrawFeature(Consumer<ChunkHighlightDrawFeature> consumer) {
@@ -105,7 +107,7 @@ public class DrawFeatureRegistry {
         }
     }
 
-    protected synchronized void forEachChunkColoredHighlightDrawFeature(Consumer<ChunkColoredHighlightDrawFeature> consumer) {
+    protected synchronized void forEachChunkColoredHighlightDrawFeature(Consumer<MultiColorChunkHighlightDrawFeature> consumer) {
         for (int i = 0; i < sortedChunkColoredHighlightKeySet.size(); i++) {
             var feature = chunkColoredHighlightDrawFeatures.get(sortedChunkColoredHighlightKeySet.get(i));
             if (feature != null) consumer.accept(feature);
@@ -119,7 +121,7 @@ public class DrawFeatureRegistry {
         }
     }
 
-    protected synchronized void forEachColoredLineDrawFeature(Consumer<ColoredLineDrawFeature> consumer) {
+    protected synchronized void forEachColoredLineDrawFeature(Consumer<MultiColorLineDrawFeature> consumer) {
         for (int i = 0; i < sortedColoredLineKeySet.size(); i++) {
             var feature = coloredLineDrawFeatures.get(sortedColoredLineKeySet.get(i));
             if (feature != null) consumer.accept(feature);

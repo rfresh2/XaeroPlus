@@ -5,13 +5,13 @@ import xaeroplus.Globals;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class DirectChunkColoredHighlightDrawFeature implements ChunkColoredHighlightDrawFeature {
+public class MultiColorDirectChunkHighlightDrawFeature implements MultiColorChunkHighlightDrawFeature {
     private final DirectChunkHighlightProvider highlightSupplier;
-    private final ColoredHighlightDrawBuffer drawBuffer = new ColoredHighlightDrawBuffer();
+    private final MultiColorHighlightDrawBuffer drawBuffer = new MultiColorHighlightDrawBuffer();
     private int lastRefreshedHighlightCount = 0;
     private final boolean refreshEveryTick;
 
-    public DirectChunkColoredHighlightDrawFeature(DirectChunkHighlightProvider highlightSupplier, boolean refreshEveryTick) {
+    public MultiColorDirectChunkHighlightDrawFeature(DirectChunkHighlightProvider highlightSupplier, boolean refreshEveryTick) {
         this.highlightSupplier = highlightSupplier;
         this.refreshEveryTick = refreshEveryTick;
     }

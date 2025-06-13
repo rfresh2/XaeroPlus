@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
 
-public class ColoredHighlightDrawBuffer {
+public class MultiColorHighlightDrawBuffer {
     private boolean stale = true;
     @Nullable private VertexBuffer vertexBuffer = null;
     private boolean flipped = false;

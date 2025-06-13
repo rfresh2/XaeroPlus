@@ -9,11 +9,11 @@ import xaeroplus.XaeroPlus;
 
 import java.io.IOException;
 
-public class ColoredHighlightShader extends ShaderInstance {
+public class MultiColorHighlightShader extends ShaderInstance {
     public final Uniform mapViewMatrix = getUniform("MapViewMatrix");
 
-    public ColoredHighlightShader(final ResourceProvider resourceProvider) throws IOException {
-        super(resourceProvider, "xaeroplus/colored_highlights", DefaultVertexFormat.POSITION_COLOR);
+    public MultiColorHighlightShader(final ResourceProvider resourceProvider) throws IOException {
+        super(resourceProvider, "xaeroplus/multi_color_highlights", DefaultVertexFormat.POSITION_COLOR);
     }
 
     public void setMapViewMatrix(Matrix4f transform) {

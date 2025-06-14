@@ -10,7 +10,7 @@ import static xaeroplus.util.ChunkUtils.chunkPosToLong;
 
 public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCache {
     public final Long2LongMap chunks = new Long2LongOpenHashMap();
-    Minecraft mc = Minecraft.getInstance();
+    public Minecraft mc = Minecraft.getInstance();
 
     public ChunkHighlightBaseCacheHandler() {
         this.chunks.defaultReturnValue(-1);

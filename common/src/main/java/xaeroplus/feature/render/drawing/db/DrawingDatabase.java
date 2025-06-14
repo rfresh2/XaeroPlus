@@ -6,12 +6,16 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import org.rfresh.sqlite.NativeLibraryNotFoundException;
 import org.rfresh.sqlite.SQLiteErrorCode;
 import xaero.map.WorldMap;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.render.Line;
 import xaeroplus.feature.render.db.DatabaseMigrator;
+import xaeroplus.module.ModuleManager;
+import xaeroplus.module.impl.TickTaskExecutor;
 import xaeroplus.util.ChunkUtils;
+import xaeroplus.util.NotificationUtil;
 
 import java.io.Closeable;
 import java.nio.file.Files;
@@ -37,6 +41,7 @@ public class DrawingDatabase implements Closeable {
         )
     );
     boolean recoveryAttempted = false;
+    static boolean nativeLibraryErrorSent = false;
 
     public DrawingDatabase(String worldId, String databaseName) {
         this.databaseName = databaseName;
@@ -50,6 +55,13 @@ public class DrawingDatabase implements Closeable {
             connection = DriverManager.getConnection("jdbc:rfresh_sqlite:" + dbPath);
             MIGRATOR.migrate(dbPath, databaseName, connection, init);
         } catch (Exception e) {
+            if (!nativeLibraryErrorSent && e.getCause() instanceof NativeLibraryNotFoundException nativeException) {
+                nativeLibraryErrorSent = true;
+                ModuleManager.getModule(TickTaskExecutor.class).execute(() -> {
+                    NotificationUtil.errorNotification("Error initializing Drawing database, Drawing features will not work.\n"
+                        + nativeException.getMessage());
+                });
+            }
             XaeroPlus.LOGGER.error("Error while creating drawing database: {} for worldId: {}", databaseName, worldId, e);
             throw new RuntimeException(e);
         }

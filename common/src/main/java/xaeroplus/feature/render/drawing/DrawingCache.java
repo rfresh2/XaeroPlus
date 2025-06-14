@@ -136,8 +136,10 @@ public class DrawingCache implements Closeable {
                     if (!cacheReady.get()) {
                         if (initializeWorld()) {
                             cacheReady.set(true);
-                            loadChunksInViewedDimension();
-                            loadLinesInViewedDimension();
+                            submitTickTask(() -> {
+                                loadChunksInViewedDimension();
+                                loadLinesInViewedDimension();
+                            });
                         }
                     } else {
                         XaeroPlus.LOGGER.warn("[{}] Entered world when cache was already initialized", databaseName);
@@ -443,8 +445,6 @@ public class DrawingCache implements Closeable {
             getCachesExceptDimensions(List.of(mapDimension, actualDimension))
                 .forEach(cache -> cache.setWindow(0, 0, 0));
         }
-//        getAllLinesCaches().forEach(DrawingLinesCacheDimensionHandler::writeStaleLinesToDatabase);
-//        loadLinesInViewedDimension();
     }
 
     @Override

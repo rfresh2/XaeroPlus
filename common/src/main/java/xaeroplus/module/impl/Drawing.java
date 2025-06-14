@@ -14,6 +14,7 @@ import xaeroplus.module.Module;
 import xaeroplus.util.ColorHelper;
 import xaeroplus.util.DrawingMode;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -125,6 +126,7 @@ public class Drawing extends Module {
         Line sqLine2 = new Line(x, z, x, maxZ);
         Line sqLine3 = new Line(maxX, z, maxX, maxZ);
         Line sqLine4 = new Line(x, maxZ, maxX, maxZ);
+        List<Line> toRemove = new ArrayList<>();
         // find lines which intersect with square (x, z, maxX, maxZ)
         var it = Object2IntMaps.fastIterator(lines);
         while (it.hasNext()) {
@@ -138,8 +140,11 @@ public class Drawing extends Module {
                 || linesIntersect(line, sqLine2)
                 || linesIntersect(line, sqLine3)
                 || linesIntersect(line, sqLine4)) {
-                it.remove();
+                toRemove.add(line);
             }
+        }
+        for (Line line : toRemove) {
+            drawingCache.removeLine(line, Globals.getCurrentDimensionId());
         }
     }
 

@@ -46,11 +46,11 @@ public class DrawingDatabase implements Closeable {
             var jdbcClass = org.rfresh.sqlite.JDBC.class;
 
             dbPath = WorldMap.saveFolder.toPath().resolve(worldId).resolve(databaseName + ".db");
-            boolean shouldRunMigrations = dbPath.toFile().exists();
+            boolean init = !dbPath.toFile().exists();
             connection = DriverManager.getConnection("jdbc:rfresh_sqlite:" + dbPath);
-            if (shouldRunMigrations) MIGRATOR.migrate(dbPath, databaseName, connection);
+            MIGRATOR.migrate(dbPath, databaseName, connection, init);
         } catch (Exception e) {
-            XaeroPlus.LOGGER.error("Error while creating chunk highlight database: {} for worldId: {}", databaseName, worldId, e);
+            XaeroPlus.LOGGER.error("Error while creating drawing database: {} for worldId: {}", databaseName, worldId, e);
             throw new RuntimeException(e);
         }
     }
@@ -74,7 +74,7 @@ public class DrawingDatabase implements Closeable {
     }
 
     private String getTableName(ResourceKey<Level> dimension, String type) {
-        return dimension.location().toString() + "_" + type;
+        return dimension.location().toString() + "-" + type;
     }
 
     // this can take an extremely long time for large databases
@@ -151,7 +151,7 @@ public class DrawingDatabase implements Closeable {
                 }
             }
         } catch (SQLException e) {
-            XaeroPlus.LOGGER.error("Error getting lines from {} database in dimension: {}, window: {}-{}, {}-{}", databaseName, dimension.location(), e);
+            XaeroPlus.LOGGER.error("Error getting lines from {} database in dimension: {}", databaseName, dimension.location(), e);
             if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
                 recoverCorruptDatabase();

@@ -47,8 +47,11 @@ public class DrawingLinesCacheDimensionHandler {
         if (!mc.isSameThread()) {
             throw new RuntimeException("removeLine must be called on the main thread!");
         }
-        lines.removeInt(line);
-        staleLines.remove(line);
+        if (lines.containsKey(line)) {
+            lines.removeInt(line);
+            staleLines.add(line);
+            dbExecutor.execute(() -> database.removeLine(line.x1(), line.z1(), line.x2(), line.z2(), dimension));
+        }
     }
 
     public Object2IntMap<Line> getLines() {

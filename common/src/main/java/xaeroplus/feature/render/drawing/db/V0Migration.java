@@ -13,7 +13,13 @@ public class V0Migration implements DatabaseMigration {
     @Override
     public boolean shouldMigrate(final String databaseName, final Connection connection) {
         try {
-            if (!tableExists("metadata", connection)) return false;
+            if (!tableExists("metadata", connection)) return true;
+            try (var statement = connection.createStatement()) {
+                ResultSet resultSet = statement.executeQuery("SELECT version FROM metadata where version = 0");
+                if (!resultSet.next()) {
+                    return true;
+                }
+            }
         } catch (Exception e) {
             XaeroPlus.LOGGER.error("Failed checking if {} database should migrate", databaseName, e);
         }
@@ -50,13 +56,13 @@ public class V0Migration implements DatabaseMigration {
     }
 
     private String getTableName(ResourceKey<Level> dimension, String type) {
-        return dimension.location().toString() + "_" + type;
+        return dimension.location().toString() + "-" + type;
     }
 
     private void createMetadataTable(String databaseName, Connection connection) {
         try (var statement = connection.createStatement()) {
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS metadata (id INTEGER PRIMARY KEY, version INTEGER)");
-            statement.executeUpdate("INSERT OR REPLACE INTO metadata (id, version) VALUES (0, 1)");
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS metadata (version INTEGER PRIMARY KEY, time DATETIME NOT NULL default CURRENT_TIMESTAMP)");
+            statement.executeUpdate("INSERT OR REPLACE INTO metadata (version) VALUES (0)");
         } catch (SQLException e) {
             XaeroPlus.LOGGER.error("Error creating metadata table for db: {}", databaseName, e);
             throw new RuntimeException(e);

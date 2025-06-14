@@ -14,13 +14,13 @@ public class DatabaseMigrator {
         this.migrations = migrations;
     }
 
-    public void migrate(Path dbPath, String databaseName, Connection connection) {
+    public void migrate(Path dbPath, String databaseName, Connection connection, final boolean init) {
         try {
             for (int i = 0; i < migrations.size(); i++) {
                 DatabaseMigration migration = migrations.get(i);
                 if (migration.shouldMigrate(databaseName, connection)) {
-                    XaeroPlus.LOGGER.info("Found database: {} that needs migration", databaseName);
-                    if (backupDatabase(dbPath, databaseName, connection)) {
+                    if (!init) XaeroPlus.LOGGER.info("Found database: {} that needs migration", databaseName);
+                    if (init || backupDatabase(dbPath, databaseName, connection)) {
                         try {
                             connection.setAutoCommit(false);
                             migration.doMigration(databaseName, connection);

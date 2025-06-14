@@ -101,6 +101,20 @@ public class DrawingCache implements Closeable {
         }
     }
 
+    public void removeLine(Line line, ResourceKey<Level> dimension) {
+        try {
+            DrawingLinesCacheDimensionHandler cacheForActualDimension = getLinesCacheForDimension(dimension, true);
+            if (cacheForActualDimension == null) {
+                // if the cache is not ready yet, queue the line to be removed
+                initializeTaskQueue.add(() -> removeLine(line, dimension));
+                return;
+            }
+            cacheForActualDimension.removeLine(line);
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.warn("Error removing line from {} disk cache: {}, {}", databaseName, line, e);
+        }
+    }
+
     public Long2LongMap getCacheMap(final ResourceKey<Level> dimensionId) {
         if (dimensionId == null) return Long2LongMaps.EMPTY_MAP;
         DrawingHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimensionId, false);
@@ -429,6 +443,7 @@ public class DrawingCache implements Closeable {
             getCachesExceptDimensions(List.of(mapDimension, actualDimension))
                 .forEach(cache -> cache.setWindow(0, 0, 0));
         }
+        getAllLinesCaches().forEach(DrawingLinesCacheDimensionHandler::writeStaleLinesToDatabase);
     }
 
     @Override

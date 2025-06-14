@@ -32,7 +32,7 @@ public class Drawing extends Module {
     @Override
     public void onEnable() {
         drawingCache.onEnable();
-        Globals.drawManager.registry().registerColoredLineProvider(
+        Globals.drawManager.registry().registerMultiColorLineProvider(
             this.getClass().getName() + "-saved",
             this::getSavedLines,
             () -> savedColorAlpha,
@@ -46,7 +46,7 @@ public class Drawing extends Module {
             () -> 0.5f,
             1
         );
-        Globals.drawManager.registry().registerDirectChunkColoredHighlightProvider(
+        Globals.drawManager.registry().registerDirectMultiColorChunkHighlightProvider(
             this.getClass().getName() + "-highlights",
             true,
             drawingCache::getCacheMap,

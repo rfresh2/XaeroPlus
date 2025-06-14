@@ -52,10 +52,10 @@ public class DrawManager {
         matrixStack.pushPose();
         matrixStack.scale(16f, 16f, 1f);
         drawChunkHighlights(matrixStack, false);
-        drawChunkColoredHighlights(matrixStack, false);
+        drawMultiColorChunkHighlights(matrixStack, false);
         matrixStack.popPose();
         drawMinimapLines(matrixStack, renderTypeBuffers);
-        drawMinimapColoredLines(matrixStack, renderTypeBuffers);
+        drawMinimapMultiColorLines(matrixStack, renderTypeBuffers);
         matrixStack.popPose();
     }
 
@@ -87,12 +87,12 @@ public class DrawManager {
         });
     }
 
-    public void drawMinimapColoredLines(
+    public void drawMinimapMultiColorLines(
         final PoseStack matrixStack,
         final MultiBufferSource.BufferSource renderTypeBuffers
     ) {
         MinimapShaders.ensureShaders();
-        registry.forEachColoredLineDrawFeature(feature -> {
+        registry.forEachMultiColorLineDrawFeature(feature -> {
             var a = feature.colorAlphaInt() / 255.0f;
             if (a == 0.0f) return;
             VertexConsumer lineBuffer = renderTypeBuffers.getBuffer(CustomRenderTypes.MAP_LINES);
@@ -130,10 +130,10 @@ public class DrawManager {
         matrixStack.pushPose();
         matrixStack.scale(16f, 16f, 1f);
         drawChunkHighlights(matrixStack, true);
-        drawChunkColoredHighlights(matrixStack, true);
+        drawMultiColorChunkHighlights(matrixStack, true);
         matrixStack.popPose();
         drawWorldMapLines(matrixStack, fboScale, renderTypeBuffers);
-        drawWorldMapColoredLines(matrixStack, fboScale, renderTypeBuffers);
+        drawWorldMapMultiColorLines(matrixStack, fboScale, renderTypeBuffers);
         matrixStack.popPose();
     }
 
@@ -168,7 +168,7 @@ public class DrawManager {
         });
     }
 
-    public void drawWorldMapColoredLines(
+    public void drawWorldMapMultiColorLines(
         final PoseStack matrixStack,
         final double fboScale,
         final MultiBufferSource.BufferSource renderTypeBuffers
@@ -176,7 +176,7 @@ public class DrawManager {
         MinimapShaders.ensureShaders();
         var mc = Minecraft.getInstance();
         MinimapShaders.FRAMEBUFFER_LINES.setFrameSize(mc.getWindow().getWidth(), mc.getWindow().getHeight());
-        registry.forEachColoredLineDrawFeature(feature -> {
+        registry.forEachMultiColorLineDrawFeature(feature -> {
             var a = feature.colorAlphaInt() / 255.0f;
             if (a == 0) return;
             VertexConsumer lineBuffer = renderTypeBuffers.getBuffer(CustomRenderTypes.MAP_LINES);
@@ -226,7 +226,7 @@ public class DrawManager {
         RenderSystem.disableBlend();
     }
 
-    public void drawChunkColoredHighlights(final PoseStack matrixStack, final boolean worldmap) {
+    public void drawMultiColorChunkHighlights(final PoseStack matrixStack, final boolean worldmap) {
         XaeroPlusShaders.ensureShaders();
         var shader = XaeroPlusShaders.COLOR_HIGHLIGHT_SHADER;
         if (shader == null) return;
@@ -238,7 +238,7 @@ public class DrawManager {
             GlStateManager.SourceFactor.ONE,
             GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA
         );
-        registry.forEachChunkColoredHighlightDrawFeature(feature -> {
+        registry.forEachMultiColorChunkHighlightDrawFeature(feature -> {
             feature.render(worldmap);
         });
         RenderSystem.disableBlend();

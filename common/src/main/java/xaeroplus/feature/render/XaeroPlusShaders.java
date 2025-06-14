@@ -15,10 +15,17 @@ public class XaeroPlusShaders {
         DefaultVertexFormat.POSITION,
         ShaderDefines.EMPTY
     );
+    public static final ShaderProgram MULTI_COLOR_HIGHLIGHT_SHADER_PROGRAM = new ShaderProgram(
+        ResourceLocation.fromNamespaceAndPath("xaeroplus", "multi_color_highlights"),
+        DefaultVertexFormat.POSITION_COLOR,
+        ShaderDefines.EMPTY
+    );
 
     private static CompiledShaderProgram CACHED_HIGHLIGHT_SHADER_PROGRAM;
+    private static CompiledShaderProgram CACHED_MULTI_COLOR_HIGHLIGHT_SHADER_PROGRAM;
     private static Uniform HIGHLIGHT_COLOR_UNIFORM;
     private static Uniform HIGHLIGHT_MAP_VIEW_MATRIX_UNIFORM;
+    private static Uniform MULTI_COLOR_HIGHLIGHT_MAP_VIEW_MATRIX_UNIFORM;
 
     public static void setHighlightColor(float r, float g, float b, float a) {
         CompiledShaderProgram currentProgram = Minecraft.getInstance().getShaderManager().getProgram(HIGHLIGHT_SHADER_PROGRAM);
@@ -40,5 +47,15 @@ public class XaeroPlusShaders {
         }
 
         HIGHLIGHT_MAP_VIEW_MATRIX_UNIFORM.set(matrix);
+    }
+
+    public static void setMultiColorMapViewMatrix(Matrix4f matrix) {
+        CompiledShaderProgram currentProgram = Minecraft.getInstance().getShaderManager().getProgram(MULTI_COLOR_HIGHLIGHT_SHADER_PROGRAM);
+        if (currentProgram != CACHED_MULTI_COLOR_HIGHLIGHT_SHADER_PROGRAM) {
+            CACHED_MULTI_COLOR_HIGHLIGHT_SHADER_PROGRAM = currentProgram;
+            MULTI_COLOR_HIGHLIGHT_MAP_VIEW_MATRIX_UNIFORM = currentProgram.getUniform("MapViewMatrix");
+        }
+
+        MULTI_COLOR_HIGHLIGHT_MAP_VIEW_MATRIX_UNIFORM.set(matrix);
     }
 }

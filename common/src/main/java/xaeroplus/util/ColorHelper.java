@@ -61,6 +61,15 @@ public class ColorHelper {
         public String getTranslationKey() {
             return translationKey;
         }
+
+        public static final HighlightColor[] VALUES = values();
+
+        public static HighlightColor fromIndex(int index) {
+            if (index < 0 || index >= VALUES.length) {
+                throw new IllegalArgumentException("Index out of bounds: " + index);
+            }
+            return VALUES[index];
+        }
     }
 
     public enum WaystoneColor implements TranslatableSettingEnum {

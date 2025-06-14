@@ -3,6 +3,7 @@ package xaeroplus.feature.render.highlights.db;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaeroplus.XaeroPlus;
+import xaeroplus.feature.render.db.DatabaseMigration;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

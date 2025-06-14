@@ -787,6 +787,14 @@ public final class Settings extends SettingRegistry {
             (b) -> ModuleManager.getModule(MapArtGrid.class).setRgbColor(b.getColor()),
             () -> ModuleManager.getModule(MapArtGrid.class).isEnabled()),
         SettingLocation.OVERLAYS);
+    public final DoubleSetting drawingOpacitySetting = register(
+        DoubleSetting.create(
+            "Drawing Opacity",
+            "xaeroplus.setting.drawing_opacity",
+            0, 255, 10,
+            150,
+            (b) -> ModuleManager.getModule(Drawing.class).setOpacity((int) b)),
+        SettingLocation.OVERLAYS);
 
     /**
      * Minimap Main

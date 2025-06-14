@@ -23,4 +23,16 @@ public class XaeroPlusShaders {
         .withUniform("HighlightColor", UniformType.VEC4)
         .withBlend(new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ONE_MINUS_SRC_ALPHA))
         .build();
+
+    public static final RenderPipeline MULTI_COLOR_HIGHLIGHT_PIPELINE = RenderPipeline.builder()
+        .withLocation(ResourceLocation.fromNamespaceAndPath("xaeroplus", "pipeline/multi_color_highlights"))
+        .withVertexShader(ResourceLocation.fromNamespaceAndPath("xaeroplus", "multi_color_highlights"))
+        .withFragmentShader(ResourceLocation.fromNamespaceAndPath("xaeroplus", "multi_color_highlights"))
+        .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
+        .withPolygonMode(PolygonMode.FILL)
+        .withUniform("ModelViewMat", UniformType.MATRIX4X4)
+        .withUniform("ProjMat", UniformType.MATRIX4X4)
+        .withUniform("MapViewMatrix", UniformType.MATRIX4X4)
+        .withBlend(new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ONE_MINUS_SRC_ALPHA))
+        .build();
 }

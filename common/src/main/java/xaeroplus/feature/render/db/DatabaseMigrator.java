@@ -1,4 +1,4 @@
-package xaeroplus.feature.render.highlights.db;
+package xaeroplus.feature.render.db;
 
 import xaeroplus.XaeroPlus;
 
@@ -8,17 +8,19 @@ import java.time.Instant;
 import java.util.List;
 
 public class DatabaseMigrator {
-    private final List<DatabaseMigration> migrations = List.of(
-        new V0ToV1Migration()
-    );
+    private final List<DatabaseMigration> migrations;
 
-    public void migrate(Path dbPath, String databaseName, Connection connection) {
+    public DatabaseMigrator(final List<DatabaseMigration> migrations) {
+        this.migrations = migrations;
+    }
+
+    public void migrate(Path dbPath, String databaseName, Connection connection, final boolean init) {
         try {
             for (int i = 0; i < migrations.size(); i++) {
                 DatabaseMigration migration = migrations.get(i);
                 if (migration.shouldMigrate(databaseName, connection)) {
-                    XaeroPlus.LOGGER.info("Found database: {} that needs migration", databaseName);
-                    if (backupDatabase(dbPath, databaseName, connection)) {
+                    if (!init) XaeroPlus.LOGGER.info("Found database: {} that needs migration", databaseName);
+                    if (init || backupDatabase(dbPath, databaseName, connection)) {
                         try {
                             connection.setAutoCommit(false);
                             migration.doMigration(databaseName, connection);

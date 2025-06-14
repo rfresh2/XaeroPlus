@@ -2,6 +2,9 @@ package xaeroplus.feature.render;
 
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMaps;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import xaeroplus.Globals;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.TickTaskExecutor;
@@ -14,11 +17,11 @@ import java.util.concurrent.TimeUnit;
 
 import static xaeroplus.util.GuiMapHelper.*;
 
-public class LineDrawFeature {
-    private final AsyncLoadingCache<Long, List<Line>> lineRenderCache;
-    private final LineProvider lineProvider;
+public class MultiColorLineDrawFeature {
+    private final AsyncLoadingCache<Long, Object2IntMap<Line>> lineRenderCache;
+    private final MultiColorLineProvider lineProvider;
 
-    public LineDrawFeature(LineProvider lineProvider, int refreshIntervalMs) {
+    public MultiColorLineDrawFeature(MultiColorLineProvider lineProvider, int refreshIntervalMs) {
         this.lineProvider = lineProvider;
         this.lineRenderCache = Caffeine.newBuilder()
             .expireAfterWrite(10, TimeUnit.SECONDS)
@@ -27,7 +30,7 @@ public class LineDrawFeature {
             .buildAsync(k -> loadLinesInWindow());
     }
 
-    private List<Line> loadLinesInWindow() {
+    private Object2IntMap<Line> loadLinesInWindow() {
         final int windowX, windowZ, windowSize;
         var guiMapOptional = getGuiMap();
         if (guiMapOptional.isPresent()) {
@@ -43,19 +46,22 @@ public class LineDrawFeature {
         return preProcessLines(lineProvider.lineSupplier().getLines(windowX, windowZ, windowSize, Globals.getCurrentDimensionId()));
     }
 
-    private List<Line> preProcessLines(List<Line> lines) {
+    private Object2IntMap<Line> preProcessLines(Object2IntMap<Line> lines) {
         if (lines.isEmpty()) return lines;
-        List<Line> out = new ArrayList<>(lines);
-        for (int i = 0; i < out.size(); i++) {
-            Line line = out.get(i);
+        Object2IntMap<Line> out = new Object2IntOpenHashMap<>();
+        var it = Object2IntMaps.fastIterator(lines);
+        while (it.hasNext()) {
+            var entry = it.next();
+            var line = entry.getKey();
             List<Line> newLines = ensureLength(line);
             if (!newLines.isEmpty()) {
-                out.remove(i);
-                out.addAll(i, newLines);
-                i += newLines.size() - 1;
+                for (var newLine : newLines) {
+                    out.put(ensureOrientation(newLine), entry.getIntValue());
+                }
+            } else {
+                out.put(ensureOrientation(line), entry.getIntValue());
             }
         }
-        out.replaceAll(this::ensureOrientation);
         return out;
     }
 
@@ -121,8 +127,8 @@ public class LineDrawFeature {
         return lines;
     }
 
-    public int colorInt() {
-        return lineProvider.colorSupplier().getAsInt();
+    public int colorAlphaInt() {
+        return lineProvider.colorAlphaSupplier().getAsInt();
     }
 
     public float lineWidth() {
@@ -133,7 +139,7 @@ public class LineDrawFeature {
         lineRenderCache.synchronous().invalidateAll();
     }
 
-    public List<Line> getLines() {
-        return lineRenderCache.get(0L).getNow(Collections.emptyList());
+    public Object2IntMap<Line> getLines() {
+        return lineRenderCache.get(0L).getNow(Object2IntMaps.emptyMap());
     }
 }

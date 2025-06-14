@@ -18,6 +18,7 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -43,12 +44,15 @@ import xaero.map.mods.SupportMods;
 import xaero.map.world.MapDimension;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
+import xaeroplus.feature.render.Line;
+import xaeroplus.feature.render.drawing.DrawingColorCyclerButton;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.*;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.BaritoneExecutor;
 import xaeroplus.util.BaritoneHelper;
 import xaeroplus.util.ChunkUtils;
+import xaeroplus.util.DrawingMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,6 +78,16 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Unique Button switchToNetherButton;
     @Unique Button switchToOverworldButton;
     @Unique Button switchToEndButton;
+    @Unique Button startDrawingButton;
+    @Unique Button drawLineSegmentButton;
+    @Unique Button drawInfiniteLineButton;
+    @Unique Button drawHighlightsButton;
+    @Unique Button drawColorCyclerButton;
+    @Unique boolean drawing = false;
+    @Unique BlockPos drawLinePos1 = null;
+    @Unique boolean drawingLeftClickDown = false;
+    @Unique boolean drawingRightClickDown = false;
+    @Unique DrawingMode drawingMode = DrawingMode.LINE_SEGMENT;
     @Unique List<Button> guiMapButtonTempList = new ArrayList<>();
     @Unique ResourceLocation xpGuiTextures = new ResourceLocation("xaeroplus", "gui/xpgui.png");
     @Shadow private double cameraX = 0.0;
@@ -112,19 +126,26 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         return Settings.REGISTRY.worldMapMinZoomSetting.get() / 10.0f;
     }
 
+    @Unique
+    private Component xaeroPlus$prefix(Component component) {
+        return Component.literal("[XP] ").append(component);
+    }
+
     @Inject(method = "init", at = @At(value = "RETURN"), remap = true)
     public void customInitGui(CallbackInfo ci) {
         // left side
-        followButton = new GuiTexturedButton(0, this.dimensionToggleButton.y - 20, 20, 20, this.follow ? 133 : 149, 16, 16, 16,
-                                             WorldMap.guiTextures,
-                                             this::onFollowButton,
-                                             () -> new CursorBox(Component.translatable("xaeroplus.gui.world_map.toggle_follow_mode")
-                                                                         .append(" " + I18n.get(this.follow ? "xaeroplus.gui.off" : "xaeroplus.gui.on"))));
+        followButton = new GuiTexturedButton(
+            0, this.dimensionToggleButton.y - 20, 20, 20, this.follow ? 133 : 149, 16, 16, 16,
+            WorldMap.guiTextures,
+            this::onFollowButton,
+            () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.toggle_follow_mode")
+                .append(" " + I18n.get(this.follow ? "xaeroplus.gui.off" : "xaeroplus.gui.on")))));
         addButton(followButton);
-        coordinateGotoButton = new GuiTexturedButton(0, followButton.y - 20 , 20, 20, 229, 16, 16, 16,
-                                                     WorldMap.guiTextures,
-                                                     this::onGotoCoordinatesButton,
-                                                     () -> new CursorBox(Component.translatable("xaeroplus.gui.world_map.go_to_coordinates")));
+        coordinateGotoButton = new GuiTexturedButton(
+            0, followButton.y - 20 , 20, 20, 229, 16, 16, 16,
+            WorldMap.guiTextures,
+            this::onGotoCoordinatesButton,
+            () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.go_to_coordinates"))));
         addButton(coordinateGotoButton);
         xTextEntryField = new EditBox(Minecraft.getInstance().font, 20, coordinateGotoButton.y - 10, 50, 20, Component.nullToEmpty("X:"));
         xTextEntryField.setVisible(false);
@@ -134,6 +155,35 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         zTextEntryField.setCursorPosition(0);
         this.addWidget(xTextEntryField);
         this.addWidget(zTextEntryField);
+        startDrawingButton = new GuiTexturedButton(
+            0, this.coordinateGotoButton.y - 20, 20, 20, 47, 0, 16, 16,
+            this.xpGuiTextures,
+            (button -> onToggleDrawingButton()),
+            () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.start_drawing"))));
+        addButton(startDrawingButton);
+        drawLineSegmentButton = new GuiTexturedButton(
+            startDrawingButton.x + 16, startDrawingButton.y, 20, 20, 65, 0, 16, 16,
+            this.xpGuiTextures,
+            (button -> drawingMode = DrawingMode.LINE_SEGMENT),
+            () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_line_segment"))));
+        drawLineSegmentButton.visible = false;
+        drawInfiniteLineButton = new GuiTexturedButton(
+            startDrawingButton.x + 16, drawLineSegmentButton.y + 20, 20, 20, 101, 0, 16, 16,
+            this.xpGuiTextures,
+            (button -> drawingMode = DrawingMode.INFINITE_LINE),
+            () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_infinite_line"))));
+        drawInfiniteLineButton.visible = false;
+        drawHighlightsButton = new GuiTexturedButton(
+            startDrawingButton.x + 16, drawInfiniteLineButton.y + 20, 20, 20, 82, 0, 16, 16,
+            this.xpGuiTextures,
+            (button -> drawingMode = DrawingMode.HIGHLIGHT),
+            () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_highlights"))));
+        drawHighlightsButton.visible = false;
+        drawColorCyclerButton = new DrawingColorCyclerButton(
+            startDrawingButton.x + 16, drawHighlightsButton.y + 20,
+            () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_color"))),
+            ModuleManager.getModule(Drawing.class).getDrawingColorCycler());
+        drawColorCyclerButton.visible = false;
         // right side
         if (!SupportMods.pac()) {  // remove useless button when pac is not installed
             this.removeWidget(this.claimsButton);
@@ -142,22 +192,45 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             this.zoomOutButton.y = this.keybindingsButton.y - 20;
             this.zoomInButton.y = this.zoomOutButton.y - 20;
         }
-        switchToEndButton = new GuiTexturedButton(this.width - 20, zoomInButton.y - 20, 20, 20, 31, 0, 16, 16,
-                                                  this.xpGuiTextures,
-                                                  (button -> onSwitchDimensionButton(END)),
-                                                  () -> new CursorBox(Component.translatable("xaeroplus.keybind.switch_to_end")));
-        switchToOverworldButton = new GuiTexturedButton(this.width - 20, this.switchToEndButton.y - 20, 20, 20, 16, 0, 16, 16,
-                                                        this.xpGuiTextures,
-                                                        (button -> onSwitchDimensionButton(OVERWORLD)),
-                                                        () -> new CursorBox(Component.translatable("xaeroplus.keybind.switch_to_overworld")));
-        switchToNetherButton = new GuiTexturedButton(this.width - 20, this.switchToOverworldButton.y - 20, 20, 20, 0, 0, 16, 16,
-                                                     this.xpGuiTextures,
-                                                     (button -> onSwitchDimensionButton(NETHER)),
-                                                     () -> new CursorBox(Component.translatable("xaeroplus.keybind.switch_to_nether")));
+        switchToEndButton = new GuiTexturedButton(
+            this.width - 20, zoomInButton.y - 20, 20, 20, 31, 0, 16, 16,
+            this.xpGuiTextures,
+            (button -> onSwitchDimensionButton(END)),
+            () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.keybind.switch_to_end"))));
+        switchToOverworldButton = new GuiTexturedButton(
+            this.width - 20, this.switchToEndButton.y - 20, 20, 20, 16, 0, 16, 16,
+            this.xpGuiTextures,
+            (button -> onSwitchDimensionButton(OVERWORLD)),
+            () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.keybind.switch_to_overworld"))));
+        switchToNetherButton = new GuiTexturedButton(
+            this.width - 20, this.switchToOverworldButton.y - 20, 20, 20, 0, 0, 16, 16,
+            this.xpGuiTextures,
+            (button -> onSwitchDimensionButton(NETHER)),
+            () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.keybind.switch_to_nether"))));
         addButton(switchToEndButton);
         addButton(switchToOverworldButton);
         addButton(switchToNetherButton);
         pan = false;
+        drawing = false;
+    }
+
+    @Unique
+    private void onToggleDrawingButton() {
+        var prevDrawing = drawing;
+        this.init(Minecraft.getInstance(), width, height);
+        drawing = !prevDrawing;
+        if (drawing) {
+            addButton(drawLineSegmentButton);
+            addButton(drawInfiniteLineButton);
+            addButton(drawHighlightsButton);
+            addButton(drawColorCyclerButton);
+            drawLineSegmentButton.visible = true;
+            drawInfiniteLineButton.visible = true;
+            drawHighlightsButton.visible = true;
+            drawColorCyclerButton.visible = true;
+        } else {
+            xaeroPlus$stopDrawing();
+        }
     }
 
     @Override
@@ -184,14 +257,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         ordinal = 0,
         shift = At.Shift.AFTER
     ), remap = true)
-    public void toggleRadarWhileDimensionSwitched(final PoseStack guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci, @Local(name = "currentFutureDim") MapDimension currentFutureDim) {
+    public void toggleRadarWhileDimensionSwitched(final CallbackInfo ci, @Local(name = "currentFutureDim") MapDimension currentFutureDim) {
         if (!Settings.REGISTRY.radarWhileDimensionSwitchedSetting.get()) {
             WorldMap.settings.minimapRadar = currentFutureDim.getDimId() == ChunkUtils.getActualDimension();
         }
     }
 
     @Redirect(method = "render", at = @At(value = "FIELD", target = "Lxaero/map/gui/GuiMap;cameraX:D", opcode = Opcodes.PUTFIELD, ordinal = 1), remap = true)
-    public void fixDimensionSwitchCameraCoordsX(GuiMap owner, double value , @Local(name = "playerDimDiv") double playerDimDiv) {
+    public void fixDimensionSwitchCameraCoordsX(GuiMap owner, double value, @Local(name = "playerDimDiv") double playerDimDiv) {
         this.cameraX *= prevPlayerDimDiv / playerDimDiv;
     }
 
@@ -201,7 +274,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     }
 
     @Inject(method = "render", at = @At(value = "FIELD", target = "Lxaero/map/gui/GuiMap;lastStartTime:J", opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER), remap = true)
-    public void injectFollowMode(final PoseStack guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci) {
+    public void injectFollowMode(final CallbackInfo ci) {
         if (follow && isNull(this.cameraDestination) && isNull(this.cameraDestinationAnimX) && isNull(this.cameraDestinationAnimZ)) {
             this.cameraDestination = new int[]{(int) getPlayerX(), (int) getPlayerZ()};
         }
@@ -230,7 +303,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             ordinal = 0
         ),
         remap = true)
-    public void drawWorldMapFeatures(final PoseStack guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci,
+    public void drawWorldMapFeatures(final CallbackInfo ci,
                                      @Local(name = "flooredCameraX") int flooredCameraX,
                                      @Local(name = "flooredCameraZ") int flooredCameraZ,
                                      @Local(name = "matrixStack") PoseStack matrixStack,
@@ -329,7 +402,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         value = "INVOKE",
         target = "Lxaero/map/gui/ScreenBase;render(Lcom/mojang/blaze3d/vertex/PoseStack;IIF)V"
     ), remap = true)
-    public void hideButtonsOnF1(final PoseStack guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci) {
+    public void hideButtonsOnF1(final CallbackInfo ci) {
         if (Minecraft.getInstance().options.hideGui) {
             List<Button> buttonList = getButtonList();
             if (!buttonList.isEmpty()) {
@@ -379,9 +452,155 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     public void onTick(final CallbackInfo ci) {
         xTextEntryField.tick();
         zTextEntryField.tick();
+        if (!drawing) return;
+        switch (drawingMode) {
+            case LINE_SEGMENT -> {
+                xaeroPlus$setFocus(startDrawingButton, false);
+                xaeroPlus$setFocus(drawLineSegmentButton, true);
+                xaeroPlus$setFocus(drawInfiniteLineButton, false);
+                xaeroPlus$setFocus(drawHighlightsButton, false);
+                xaeroPlus$setFocus(drawColorCyclerButton, false);
+            }
+            case INFINITE_LINE -> {
+                xaeroPlus$setFocus(startDrawingButton, false);
+                xaeroPlus$setFocus(drawLineSegmentButton, false);
+                xaeroPlus$setFocus(drawInfiniteLineButton, true);
+                xaeroPlus$setFocus(drawHighlightsButton, false);
+                xaeroPlus$setFocus(drawColorCyclerButton, false);
+            } case HIGHLIGHT -> {
+                xaeroPlus$setFocus(startDrawingButton, false);
+                xaeroPlus$setFocus(drawLineSegmentButton, false);
+                xaeroPlus$setFocus(drawInfiniteLineButton, false);
+                xaeroPlus$setFocus(drawHighlightsButton, true);
+                xaeroPlus$setFocus(drawColorCyclerButton, false);
+            }
+        }
     }
 
-    // todo: mixin on mouseClicked to close coord entry fields when clicking on something else
+    @Unique
+    private void xaeroPlus$setFocus(Button b, boolean focus) {
+        var bFocused = b.isFocused();
+        if (bFocused != focus) {
+            b.changeFocus(focus);
+        }
+    }
+
+    @Inject(method = "render", at = @At("RETURN"))
+    public void updateInProgressLine(CallbackInfo ci) {
+        if (drawing) {
+            switch (drawingMode) {
+                case LINE_SEGMENT, INFINITE_LINE -> {
+                    if (drawLinePos1 == null) {
+                        ModuleManager.getModule(Drawing.class).removeInProgressLine();
+                    } else {
+                        var inProgress = new Line(drawLinePos1.getX(), drawLinePos1.getZ(), mouseBlockPosX, mouseBlockPosZ);
+                        ModuleManager.getModule(Drawing.class).setInProgressLine(inProgress, drawingMode);
+                    }
+                }
+                case HIGHLIGHT -> {
+                    ModuleManager.getModule(Drawing.class).removeInProgressLine();
+                    if (drawingLeftClickDown) {
+                        ModuleManager.getModule(Drawing.class).addHighlight(ChunkUtils.posToChunkPos(mouseBlockPosX), ChunkUtils.posToChunkPos(mouseBlockPosZ));
+                    }
+                }
+            }
+            if (drawingRightClickDown) {
+                ModuleManager.getModule(Drawing.class).removeHighlight(ChunkUtils.posToChunkPos(mouseBlockPosX), ChunkUtils.posToChunkPos(mouseBlockPosZ));
+                ModuleManager.getModule(Drawing.class).removeLine(mouseBlockPosX, mouseBlockPosZ);
+            }
+        }
+    }
+
+    @Inject(method = "render", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/map/mods/SupportXaeroMinimap;getSubWorldNameToRender()Ljava/lang/String;"
+    ))
+    public void renderDrawingStatusText(final PoseStack guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci,
+                                        @Local (name = "backgroundVertexBuffer") VertexConsumer backgroundVertexBuffer) {
+        if (!drawing) return;
+        MapRenderHelper.drawCenteredStringWithBackground(
+            guiGraphics, Minecraft.getInstance().font,
+            "Drawing Enabled",
+            this.width / 2,
+            36,
+            -1,
+            0.0F, 0.0F, 0.0F, 0.4F,
+            backgroundVertexBuffer
+        );
+    }
+
+    @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true, remap = true)
+    public void cancelClicksWhileDrawing(final double par1, final double par2, final int par3, final CallbackInfoReturnable<Boolean> cir) {
+        if (!drawing) return;
+        boolean toReturn = super.mouseClicked(par1, par2, par3);
+        if (toReturn) {
+            cir.setReturnValue(true);
+            return;
+        }
+        if (par3 == 0) { // start drawing on left click
+            drawingLeftClickDown = true;
+            switch (drawingMode) {
+                case LINE_SEGMENT, INFINITE_LINE -> {
+                    if (drawLinePos1 == null) {
+                        drawLinePos1 = new BlockPos(mouseBlockPosX, 0, mouseBlockPosZ);
+                    }
+                }
+            }
+            cir.setReturnValue(true);
+        } else if (par3 == 1) {
+            drawingRightClickDown = true;
+            cir.setReturnValue(true);
+        }
+    }
+
+    @Inject(method = "mouseReleased", at = @At("HEAD"), cancellable = true, remap = true)
+    public void drawingClickReleasedHandler(final double par1, final double par2, final int par3, final CallbackInfoReturnable<Boolean> cir) {
+        if (!drawing) return;
+        boolean toReturn = super.mouseReleased(par1, par2, par3);
+        if (toReturn) {
+            cir.setReturnValue(true);
+            return;
+        }
+        if (par3 == 0) { // start drawing on left click
+            switch (drawingMode) {
+                case LINE_SEGMENT, INFINITE_LINE -> {
+                    if (drawLinePos1 != null) {
+                        Line line;
+                        line = new Line(drawLinePos1.getX(), drawLinePos1.getZ(), mouseBlockPosX, mouseBlockPosZ);
+                        switch (drawingMode) {
+                            case LINE_SEGMENT -> ModuleManager.getModule(Drawing.class).addLine(line);
+                            case INFINITE_LINE -> ModuleManager.getModule(Drawing.class).addInfiniteLine(line);
+                        }
+                        drawLinePos1 = null;
+                    }
+                }
+            }
+            drawingLeftClickDown = false;
+            cir.setReturnValue(true);
+        } else if (par3 == 1) { // clear drawing on right click
+            drawingRightClickDown = false;
+            if (drawLinePos1 != null) return;
+            ModuleManager.getModule(Drawing.class).removeLine(mouseBlockPosX, mouseBlockPosZ);
+            cir.setReturnValue(true);
+        }
+    }
+
+    @Unique
+    private void xaeroPlus$stopDrawing() {
+        drawing = false;
+        drawLinePos1 = null;
+        drawingLeftClickDown = false;
+        drawingRightClickDown = false;
+        removeWidget(drawLineSegmentButton);
+        removeWidget(drawInfiniteLineButton);
+        removeWidget(drawHighlightsButton);
+        removeWidget(drawColorCyclerButton);
+        drawLineSegmentButton.visible = false;
+        drawInfiniteLineButton.visible = false;
+        drawHighlightsButton.visible = false;
+        drawColorCyclerButton.visible = false;
+        this.init(Minecraft.getInstance(), width, height);
+    }
 
     @Inject(method = "onInputPress", at = @At("HEAD"))
     public void panMouseButtonClick(final InputConstants.Type type, final int code, final CallbackInfoReturnable<Boolean> cir) {
@@ -393,11 +612,23 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         panMouseStartY = Misc.getMouseY(mc, true);
     }
 
-    @Inject(method = "onInputRelease", at = @At("HEAD"))
+    @Inject(method = "onInputRelease", at = @At("HEAD"), cancellable = true)
     public void panMouseButtonRelease(final InputConstants.Type type, final int code, final CallbackInfoReturnable<Boolean> cir) {
+        if (drawing) {
+            if (type == InputConstants.Type.KEYSYM && code == GLFW_KEY_ESCAPE) {
+                xaeroPlus$stopDrawing();
+                cir.setReturnValue(true);
+                return;
+            }
+        }
         if (type != InputConstants.Type.MOUSE) return;
         if (code != GLFW_MOUSE_BUTTON_MIDDLE) return;
         pan = false;
+    }
+
+    @Override
+    public boolean shouldCloseOnEsc() {
+        return !drawing;
     }
 
     @Inject(method = "render", at = @At("HEAD"))
@@ -538,6 +769,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                         if (portals.isEnabled()) {
                             portals.portalsCache.get().removeHighlight(x, z, dim);
                         }
+                        ModuleManager.getModule(Drawing.class).removeHighlight(x, z);
+                        ModuleManager.getModule(Drawing.class).removeLine(ChunkUtils.chunkCoordToCoord(x), ChunkUtils.chunkCoordToCoord(z));
                     }
                 }
             }
@@ -554,6 +787,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         this.init(Minecraft.getInstance(), width, height);
     }
 
+    @Unique
     public void onGotoCoordinatesButton(final Button b) {
         if (xTextEntryField.isVisible() && zTextEntryField.isVisible()) {
             try {
@@ -566,9 +800,12 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             } catch (final NumberFormatException e) {
                 xTextEntryField.setValue("");
                 zTextEntryField.setValue("");
+                xTextEntryField.visible = false;
+                zTextEntryField.visible = false;
                 WorldMap.LOGGER.warn("Go to coordinates failed" , e);
             }
         } else {
+            this.init(Minecraft.getInstance(), width, height);
             xTextEntryField.setVisible(true);
             zTextEntryField.setVisible(true);
             // todo: this isn't setting the entry field active and available to type in for some reason

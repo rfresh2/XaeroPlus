@@ -1,4 +1,4 @@
-package xaeroplus.feature.render.highlights.db;
+package xaeroplus.feature.render.db;
 
 import java.sql.Connection;
 

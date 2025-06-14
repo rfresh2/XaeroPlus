@@ -7,7 +7,8 @@ import net.minecraft.world.level.Level;
 import org.rfresh.sqlite.SQLiteErrorCode;
 import xaero.map.WorldMap;
 import xaeroplus.XaeroPlus;
-import xaeroplus.feature.render.highlights.db.DatabaseMigrator;
+import xaeroplus.feature.render.db.DatabaseMigrator;
+import xaeroplus.feature.render.highlights.db.V0ToV1Migration;
 import xaeroplus.util.ChunkUtils;
 
 import java.io.Closeable;
@@ -17,6 +18,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import static xaeroplus.util.ChunkUtils.regionCoordToChunkCoord;
 
@@ -25,7 +27,11 @@ public class ChunkHighlightDatabase implements Closeable {
     private Connection connection;
     protected final String databaseName;
     protected final Path dbPath;
-    private static final DatabaseMigrator MIGRATOR = new DatabaseMigrator();
+    private static final DatabaseMigrator MIGRATOR = new DatabaseMigrator(
+        List.of(
+            new V0ToV1Migration()
+        )
+    );
     boolean recoveryAttempted = false;
 
     public ChunkHighlightDatabase(String worldId, String databaseName) {
@@ -36,9 +42,9 @@ public class ChunkHighlightDatabase implements Closeable {
             var jdbcClass = org.rfresh.sqlite.JDBC.class;
 
             dbPath = WorldMap.saveFolder.toPath().resolve(worldId).resolve(databaseName + ".db");
-            boolean shouldRunMigrations = dbPath.toFile().exists();
+            boolean init = !dbPath.toFile().exists();
             connection = DriverManager.getConnection("jdbc:rfresh_sqlite:" + dbPath);
-            if (shouldRunMigrations) MIGRATOR.migrate(dbPath, databaseName, connection);
+            MIGRATOR.migrate(dbPath, databaseName, connection, init);
             createMetadataTable();
         } catch (Exception e) {
             XaeroPlus.LOGGER.error("Error while creating chunk highlight database: {} for worldId: {}", databaseName, worldId, e);

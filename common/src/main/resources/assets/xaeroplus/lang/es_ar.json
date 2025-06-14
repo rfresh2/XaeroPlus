@@ -252,6 +252,11 @@
   "xaeroplus.gui.waystone_visibility_type.global": "Global",
   "xaeroplus.gui.waystone_visibility_type.world_map_local": "Mapa Mundial Loc.",
   "xaeroplus.gui.waystone_visibility_type.world_map_global": "Mapa Mundial Glob.",
-  "xaeroplus.setting.highlight_shader": "Sombreado de Resaltado",
-  "xaeroplus.setting.highlight_shader.tooltip": "Usa un sombreador para renderizar resaltados. Reduce el uso de memoria y descarga más trabajo a la GPU."
+  "xaeroplus.gui.world_map.start_drawing": "Comenzar a dibujar",
+  "xaeroplus.gui.world_map.draw_line_segment": "Segmento de línea",
+  "xaeroplus.gui.world_map.draw_infinite_line": "Línea infinita",
+  "xaeroplus.gui.world_map.draw_highlights": "Resaltado de fragmento",
+  "xaeroplus.gui.world_map.draw_color": "Color de dibujo",
+  "xaeroplus.setting.drawing_opacity": "Opacidad del dibujo",
+  "xaeroplus.setting.drawing_opacity.tooltip": "Establece la opacidad del color de los dibujos"
 }

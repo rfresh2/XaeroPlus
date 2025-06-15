@@ -8,6 +8,8 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
@@ -131,6 +133,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         return Component.literal("[XP] ").append(component);
     }
 
+    @Unique
+    private Component xaeroPlus$keybindPrefix(Component component, KeyMapping bind) {
+        return Component.empty()
+            .append(Component.literal(Misc.getKeyName(bind) + " ").withStyle(ChatFormatting.DARK_GREEN))
+            .append(component);
+    }
+
     @Inject(method = "init", at = @At(value = "RETURN"), remap = true)
     public void customInitGui(CallbackInfo ci) {
         // left side
@@ -159,7 +168,11 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             0, this.coordinateGotoButton.y - 20, 20, 20, 47, 0, 16, 16,
             this.xpGuiTextures,
             (button -> onToggleDrawingButton()),
-            () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.start_drawing"))));
+            () -> new CursorBox(
+                xaeroPlus$keybindPrefix(xaeroPlus$prefix(
+                    Component.translatable("xaeroplus.gui.world_map.start_drawing")
+                ), Settings.REGISTRY.worldMapToggleDrawingKeybindSetting.getKeyBinding()
+            )));
         addButton(startDrawingButton);
         drawLineSegmentButton = new GuiTexturedButton(
             startDrawingButton.x + 16, startDrawingButton.y, 20, 20, 65, 0, 16, 16,
@@ -196,17 +209,32 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             this.width - 20, zoomInButton.y - 20, 20, 20, 31, 0, 16, 16,
             this.xpGuiTextures,
             (button -> onSwitchDimensionButton(END)),
-            () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.keybind.switch_to_end"))));
+            () -> new CursorBox(
+                xaeroPlus$keybindPrefix(xaeroPlus$prefix(
+                    Component.translatable("xaeroplus.keybind.switch_to_end")
+                    ), Settings.REGISTRY.switchToEndSetting.getKeyBinding()
+                ))
+        );
         switchToOverworldButton = new GuiTexturedButton(
             this.width - 20, this.switchToEndButton.y - 20, 20, 20, 16, 0, 16, 16,
             this.xpGuiTextures,
             (button -> onSwitchDimensionButton(OVERWORLD)),
-            () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.keybind.switch_to_overworld"))));
+            () -> new CursorBox(
+                xaeroPlus$keybindPrefix(xaeroPlus$prefix(
+                    Component.translatable("xaeroplus.keybind.switch_to_overworld")
+                    ), Settings.REGISTRY.switchToOverworldSetting.getKeyBinding()
+                ))
+        );
         switchToNetherButton = new GuiTexturedButton(
             this.width - 20, this.switchToOverworldButton.y - 20, 20, 20, 0, 0, 16, 16,
             this.xpGuiTextures,
             (button -> onSwitchDimensionButton(NETHER)),
-            () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.keybind.switch_to_nether"))));
+            () -> new CursorBox(
+                xaeroPlus$keybindPrefix(xaeroPlus$prefix(
+                    Component.translatable("xaeroplus.keybind.switch_to_nether")
+                    ), Settings.REGISTRY.switchToNetherSetting.getKeyBinding()
+                ))
+            );
         addButton(switchToEndButton);
         addButton(switchToOverworldButton);
         addButton(switchToNetherButton);
@@ -520,9 +548,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if (!drawing) return;
         MapRenderHelper.drawCenteredStringWithBackground(
             guiGraphics, Minecraft.getInstance().font,
-            "Drawing Enabled",
+            "[XP] " + I18n.get("xaeroplus.gui.world_map.drawing_mode"),
             this.width / 2,
-            36,
+            24,
             -1,
             0.0F, 0.0F, 0.0F, 0.4F,
             backgroundVertexBuffer
@@ -694,6 +722,11 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 BaritoneExecutor.elytra(mouseBlockPosX, mouseBlockPosZ);
                 cir.setReturnValue(true);
             }
+        }
+        if (Settings.REGISTRY.worldMapToggleDrawingKeybindSetting.getKeyBinding().matches(code, scanCode)) {
+            onToggleDrawingButton();
+            cir.setReturnValue(true);
+            return;
         }
     }
 

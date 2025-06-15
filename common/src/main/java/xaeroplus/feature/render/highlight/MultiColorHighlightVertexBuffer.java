@@ -24,7 +24,7 @@ public class MultiColorHighlightVertexBuffer extends AbstractHighlightVertexBuff
         stale = false;
         lastRefreshed = System.currentTimeMillis();
         flipped = ctx.worldmap();
-        if (highlights.isEmpty()) {
+        if (highlights.isEmpty() || colorAlpha == 0) {
             close();
             return;
         }

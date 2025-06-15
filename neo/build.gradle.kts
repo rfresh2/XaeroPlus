@@ -48,9 +48,9 @@ dependencies {
     modCompileOnly(libs.embeddium)
     modRuntimeOnly(libs.immediatelyfast.neo)
     shadow(libs.sqlite)
-    forgeRuntimeLibrary(implementation(include(libs.caffeine.get())!!)!!)
+    forgeRuntimeLibrary(implementation(shadow(libs.caffeine.get())!!)!!)
     forgeRuntimeLibrary(implementation(shadow(libs.lambdaEvents.get())!!)!!)
-    implementation(include(libs.oldbiomes.get())!!)
+    forgeRuntimeLibrary(implementation(shadow(libs.oldbiomes.get())!!)!!)
     compileOnly(project(":common"))
 }
 
@@ -78,7 +78,13 @@ tasks {
 
     shadowJar {
         configurations = listOf(project.configurations.shadow.get())
-        relocate("net.lenni0451.lambdaevents", "xaeroplus.lambdaevents")
+        val shadePkg = "xaeroplus.shadow"
+        relocate("kaptainwutax", "$shadePkg.kaptainwutax")
+        relocate("net.lenni0451.lambdaevents", "$shadePkg.lambdaevents")
+        relocate("com.github.benmanes.caffeine", "$shadePkg.caffeine")
+        dependencies {
+            exclude(dependency("org.jspecify::"))
+        }
     }
 
     remapJar {

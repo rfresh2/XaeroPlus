@@ -21,7 +21,6 @@ loom {
 }
 
 val common: Configuration by configurations.creating
-val shadowCommon: Configuration by configurations.creating
 configurations.compileClasspath.get().extendsFrom(common)
 configurations.runtimeClasspath.get().extendsFrom(common)
 configurations.getByName("developmentFabric").extendsFrom(common)
@@ -43,7 +42,7 @@ val destArchiveClassifier = "WM${worldmap_version_fabric}-MM${minimap_version_fa
 dependencies {
 	modImplementation(libs.fabric.loader)
 	modApi(libs.fabric.api)
-	shadowCommon(libs.sqlite)
+	shadow(libs.sqlite)
 	implementation(libs.sqlite)
 	modImplementation(libs.worldmap.fabric)
 	modImplementation(libs.minimap.fabric)
@@ -58,15 +57,15 @@ dependencies {
 //	modRuntimeOnly(libs.cloth.config.fabric) {
 //		exclude(group = "net.fabricmc.fabric-api")
 //	}
-	implementation(include(libs.caffeine.get())!!)
-	implementation(include(libs.lambdaEvents.get())!!)
-	implementation(include(libs.oldbiomes.get())!!)
+    implementation(shadow(libs.caffeine.get())!!)
+    implementation(shadow(libs.lambdaEvents.get())!!)
+    implementation(shadow(libs.oldbiomes.get())!!)
 	productionRuntimeMods(libs.minimap.fabric)
 	productionRuntimeMods(libs.worldmap.fabric)
 	productionRuntimeMods(libs.fabric.api)
 
 	common(project(path = ":common", configuration = "namedElements")) { isTransitive = false }
-    shadowCommon(project(path = ":common", configuration = "transformProductionFabric")) { isTransitive = false }
+    shadow(project(path = ":common", configuration = "transformProductionFabric")) { isTransitive = false }
 }
 
 tasks {
@@ -81,8 +80,11 @@ tasks {
 	}
 
 	shadowJar {
-		configurations = listOf(shadowCommon)
+		configurations = listOf(project.configurations.shadow.get())
 		exclude("architectury.common.json")
+		dependencies {
+			exclude(dependency("org.jspecify::"))
+		}
 	}
 
 	remapJar {

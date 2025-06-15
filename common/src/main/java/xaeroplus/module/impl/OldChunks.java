@@ -16,7 +16,8 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.EmptyLevelChunk;
 import xaeroplus.Globals;
 import xaeroplus.event.ChunkDataEvent;
-import xaeroplus.feature.render.highlights.SavableHighlightCacheInstance;
+import xaeroplus.feature.highlights.SavableHighlightCacheInstance;
+import xaeroplus.feature.render.DrawFeatureFactory;
 import xaeroplus.module.Module;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkScanner;
@@ -96,10 +97,14 @@ public class OldChunks extends Module {
 
     @Override
     public void onEnable() {
-        Globals.drawManager.registry().registerDirectChunkHighlightProvider(
-            this.getClass().getName(),
-            this::getHighlightsState,
-            this::getOldChunksColor);
+        Globals.drawManager.registry().register(
+            DrawFeatureFactory.chunkHighlights(
+                this.getClass().getName(),
+                this::getHighlightsState,
+                this::getOldChunksColor,
+                250
+            )
+        );
         oldChunksCache.onEnable();
         modernChunksCache.onEnable();
         searchAllLoadedChunks();
@@ -125,7 +130,7 @@ public class OldChunks extends Module {
     public void onDisable() {
         oldChunksCache.onDisable();
         modernChunksCache.onDisable();
-        Globals.drawManager.registry().unregisterChunkHighlightProvider(this.getClass().getName());
+        Globals.drawManager.registry().unregister(this.getClass().getName());
     }
 
     public int getOldChunksColor() {

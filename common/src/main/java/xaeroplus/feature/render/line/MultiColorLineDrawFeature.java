@@ -66,7 +66,8 @@ public class MultiColorLineDrawFeature extends AbstractLineDrawFeature<Object2In
     @Override
     public void render(final DrawContext ctx) {
         int a = lineProvider.colorAlphaSupplier().getAsInt();
-        if (a == 0.0f) return;
+        if (a == 0) return;
+        preRender(ctx);
         VertexConsumer lineBuffer = ctx.renderTypeBuffers().getBuffer(CustomRenderTypes.MAP_LINES);
         var lines = getLines();
         var it = Object2IntMaps.fastIterator(lines);
@@ -87,10 +88,6 @@ public class MultiColorLineDrawFeature extends AbstractLineDrawFeature<Object2In
                 r, g, b, a
             );
         }
-    }
-
-    @Override
-    public void postRender(final DrawContext ctx) {
         ctx.renderTypeBuffers().endBatch(CustomRenderTypes.MAP_LINES);
     }
 }

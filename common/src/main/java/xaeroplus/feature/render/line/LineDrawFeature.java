@@ -64,6 +64,7 @@ public class LineDrawFeature extends AbstractLineDrawFeature<List<Line>> {
         int color = lineProvider.colorSupplier().getAsInt();
         var a = ColorHelper.getA(color);
         if (a == 0.0f) return;
+        preRender(ctx);
         VertexConsumer lineBuffer = ctx.renderTypeBuffers().getBuffer(CustomRenderTypes.MAP_LINES);
         var r = ColorHelper.getR(color);
         var g = ColorHelper.getG(color);
@@ -81,10 +82,6 @@ public class LineDrawFeature extends AbstractLineDrawFeature<List<Line>> {
                 r, g, b, a
             );
         }
-    }
-
-    @Override
-    public void postRender(final DrawContext ctx) {
         ctx.renderTypeBuffers().endBatch(CustomRenderTypes.MAP_LINES);
     }
 }

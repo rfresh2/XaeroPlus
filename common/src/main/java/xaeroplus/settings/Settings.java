@@ -1007,4 +1007,11 @@ public final class Settings extends SettingRegistry {
             false,
             true),
         SettingLocation.KEYBINDS);
+    public final BooleanSetting worldMapToggleDrawingKeybindSetting = register(
+        BooleanSetting.create(
+            "WorldMap Toggle Drawing",
+            "xaeroplus.gui.world_map.start_drawing",
+            false,
+            true),
+        SettingLocation.KEYBINDS);
 }

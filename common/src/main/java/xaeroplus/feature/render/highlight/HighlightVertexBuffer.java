@@ -31,7 +31,7 @@ public class HighlightVertexBuffer extends AbstractHighlightVertexBuffer {
         stale = false;
         lastRefreshed = System.currentTimeMillis();
         flipped = ctx.worldmap();
-        if (highlights.isEmpty()) {
+        if (highlights.isEmpty() || ColorHelper.getA(color) == 0.0f) {
             close();
             return;
         }

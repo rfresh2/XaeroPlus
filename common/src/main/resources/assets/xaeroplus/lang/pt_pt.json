@@ -252,6 +252,7 @@
   "xaeroplus.gui.waystone_visibility_type.global": "Global",
   "xaeroplus.gui.waystone_visibility_type.world_map_local": "Mapa Mundial Loc.",
   "xaeroplus.gui.waystone_visibility_type.world_map_global": "Mapa Mundial Glob.",
+  "xaeroplus.gui.world_map.drawing_mode": "Modo de desenho",
   "xaeroplus.gui.world_map.start_drawing": "Iniciar desenho",
   "xaeroplus.gui.world_map.draw_line_segment": "Segmento de linha",
   "xaeroplus.gui.world_map.draw_infinite_line": "Linha infinita",

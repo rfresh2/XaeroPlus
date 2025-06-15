@@ -3,7 +3,8 @@ package xaeroplus.module.impl;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaeroplus.Globals;
-import xaeroplus.feature.render.Line;
+import xaeroplus.feature.render.DrawFeatureFactory;
+import xaeroplus.feature.render.line.Line;
 import xaeroplus.module.Module;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
@@ -18,18 +19,20 @@ public class MapArtGrid extends Module {
 
     @Override
     public void onEnable() {
-        Globals.drawManager.registry().registerLineProvider(
-            getClass().getSimpleName(),
-            this::getLines,
-            this::getColor,
-            this::getLineWidth,
-            1000
+        Globals.drawManager.registry().register(
+            DrawFeatureFactory.lines(
+                getClass().getSimpleName(),
+                this::getLines,
+                this::getColor,
+                this::getLineWidth,
+                1000
+            )
         );
     }
 
     @Override
     public void onDisable() {
-        Globals.drawManager.registry().unregisterLineProvider(getClass().getSimpleName());
+        Globals.drawManager.registry().unregister(getClass().getSimpleName());
     }
 
     public List<Line> getLines(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {

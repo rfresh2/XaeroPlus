@@ -19,7 +19,8 @@ import xaeroplus.Globals;
 import xaeroplus.event.ChunkBlockUpdateEvent;
 import xaeroplus.event.ChunkBlocksUpdateEvent;
 import xaeroplus.event.ChunkDataEvent;
-import xaeroplus.feature.render.highlights.SavableHighlightCacheInstance;
+import xaeroplus.feature.highlights.SavableHighlightCacheInstance;
+import xaeroplus.feature.render.DrawFeatureFactory;
 import xaeroplus.module.Module;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkScanner;
@@ -44,10 +45,14 @@ public class Portals extends Module {
 
     @Override
     public void onEnable() {
-        Globals.drawManager.registry().registerDirectChunkHighlightProvider(
-            this.getClass().getName(),
-            this::getHighlightsState,
-            this::getPortalsColor);
+        Globals.drawManager.registry().register(
+            DrawFeatureFactory.chunkHighlights(
+                this.getClass().getName(),
+                this::getHighlightsState,
+                this::getPortalsColor,
+                250
+            )
+        );
         portalsCache.onEnable();
         searchAllLoadedChunks();
     }
@@ -55,7 +60,7 @@ public class Portals extends Module {
     @Override
     public void onDisable() {
         portalsCache.onDisable();
-        Globals.drawManager.registry().unregisterChunkHighlightProvider(this.getClass().getName());
+        Globals.drawManager.registry().unregister(this.getClass().getName());
     }
 
     @EventHandler

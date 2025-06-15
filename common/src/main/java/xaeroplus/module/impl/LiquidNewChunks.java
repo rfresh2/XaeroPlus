@@ -16,7 +16,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import xaeroplus.Globals;
 import xaeroplus.event.*;
-import xaeroplus.feature.render.highlights.SavableHighlightCacheInstance;
+import xaeroplus.feature.highlights.SavableHighlightCacheInstance;
+import xaeroplus.feature.render.DrawFeatureFactory;
 import xaeroplus.module.Module;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkScanner;
@@ -148,16 +149,20 @@ public class LiquidNewChunks extends Module {
         if (this.renderInverse && this.isEnabled()) {
             registerInverseChunkHighlightProvider();
         } else {
-            Globals.drawManager.registry().unregisterChunkHighlightProvider(inverseDrawFeatureId);
+            Globals.drawManager.registry().unregister(inverseDrawFeatureId);
         }
     }
 
     @Override
     public void onEnable() {
-        Globals.drawManager.registry().registerDirectChunkHighlightProvider(
-            this.getClass().getName(),
-            this::getNewChunkHighlightsState,
-            this::getNewChunksColor);
+        Globals.drawManager.registry().register(
+            DrawFeatureFactory.chunkHighlights(
+                this.getClass().getName(),
+                this::getNewChunkHighlightsState,
+                this::getNewChunksColor,
+                250
+            )
+        );
         if (renderInverse) {
             registerInverseChunkHighlightProvider();
         }
@@ -166,18 +171,22 @@ public class LiquidNewChunks extends Module {
     }
 
     private void registerInverseChunkHighlightProvider() {
-        Globals.drawManager.registry().registerDirectChunkHighlightProvider(
-            inverseDrawFeatureId,
-            this::getInverseNewChunkHighlightsState,
-            this::getInverseColor);
+        Globals.drawManager.registry().register(
+            DrawFeatureFactory.chunkHighlights(
+                inverseDrawFeatureId,
+                this::getInverseNewChunkHighlightsState,
+                this::getInverseColor,
+                250
+            )
+        );
     }
 
     @Override
     public void onDisable() {
         newChunksCache.onDisable();
         inverseNewChunksCache.onDisable();
-        Globals.drawManager.registry().unregisterChunkHighlightProvider(this.getClass().getName());
-        Globals.drawManager.registry().unregisterChunkHighlightProvider(inverseDrawFeatureId);
+        Globals.drawManager.registry().unregister(this.getClass().getName());
+        Globals.drawManager.registry().unregister(inverseDrawFeatureId);
     }
 
     public int getNewChunksColor() {

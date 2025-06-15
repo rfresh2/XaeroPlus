@@ -63,7 +63,6 @@ public abstract class AbstractLineDrawFeature<T> implements DrawFeature {
         return lineRenderCache.get(0L).getNow(emptyLines());
     }
 
-    @Override
     public void preRender(DrawContext ctx) {
         var mc = Minecraft.getInstance();
         if (ctx.worldmap()) {

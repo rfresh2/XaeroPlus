@@ -67,6 +67,8 @@ public class AsyncChunkHighlightDrawFeature extends AbstractChunkHighlightDrawFe
 
     @Override
     public void render(final DrawContext ctx) {
+        preRender(ctx);
         drawBuffer.render();
+        postRender(ctx);
     }
 }

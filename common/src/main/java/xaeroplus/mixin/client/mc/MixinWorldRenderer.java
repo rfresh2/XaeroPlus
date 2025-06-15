@@ -14,7 +14,7 @@ import xaero.common.HudMod;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.module.MinimapSession;
 import xaeroplus.XaeroPlus;
-import xaeroplus.feature.render.WaypointBeaconRenderer;
+import xaeroplus.feature.render.beacon.WaypointBeaconRenderer;
 import xaeroplus.settings.Settings;
 
 @Mixin(value = LevelRenderer.class)

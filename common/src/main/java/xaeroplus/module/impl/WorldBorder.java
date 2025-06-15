@@ -5,7 +5,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import xaeroplus.Globals;
-import xaeroplus.feature.render.Line;
+import xaeroplus.feature.render.DrawFeatureFactory;
+import xaeroplus.feature.render.line.Line;
 import xaeroplus.module.Module;
 import xaeroplus.util.ColorHelper;
 
@@ -17,18 +18,20 @@ public class WorldBorder extends Module {
 
     @Override
     public void onEnable() {
-        Globals.drawManager.registry().registerLineProvider(
-            this.getClass().getName(),
-            this::getLines,
-            this::getColor,
-            this::getLineWidth,
-            1000
+        Globals.drawManager.registry().register(
+            DrawFeatureFactory.lines(
+                this.getClass().getName(),
+                this::getLines,
+                this::getColor,
+                this::getLineWidth,
+                1000
+            )
         );
     }
 
     @Override
     public void onDisable() {
-        Globals.drawManager.registry().unregisterLineProvider(this.getClass().getName());
+        Globals.drawManager.registry().unregister(this.getClass().getName());
     }
 
     List<Line> getLines(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {

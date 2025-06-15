@@ -15,6 +15,7 @@ architectury {
 }
 
 val common = project(":common")
+val shadowCommon: Configuration by configurations.creating
 
 loom {
     accessWidenerPath = common.loom.accessWidenerPath
@@ -52,9 +53,9 @@ dependencies {
     modCompileOnly(libs.worldtools)
     modCompileOnly(libs.fabric.waystones)
     shadow(libs.sqlite)
-    forgeRuntimeLibrary(implementation(include(libs.oldbiomes.get())!!)!!)
-    forgeRuntimeLibrary(implementation(include(libs.caffeine.get())!!)!!)
-    forgeRuntimeLibrary(implementation(include(libs.lambdaEvents.get())!!)!!)
+    forgeRuntimeLibrary(implementation(shadow(libs.oldbiomes.get())!!)!!)
+    forgeRuntimeLibrary(implementation(shadow(libs.caffeine.get())!!)!!)
+    forgeRuntimeLibrary(implementation(shadow(libs.lambdaEvents.get())!!)!!)
     compileOnly(project(":common"))
 }
 
@@ -85,6 +86,13 @@ tasks {
 
     shadowJar {
         configurations = listOf(project.configurations.shadow.get())
+        val shadePkg = "xaeroplus.shadow"
+        relocate("kaptainwutax", "$shadePkg.kaptainwutax")
+        relocate("net.lenni0451.lambdaevents", "$shadePkg.lambdaevents")
+        relocate("com.github.benmanes.caffeine", "$shadePkg.caffeine")
+        dependencies {
+            exclude(dependency("org.jspecify::"))
+        }
     }
 
     remapJar {

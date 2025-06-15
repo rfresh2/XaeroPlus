@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import xaeroplus.feature.render.WaypointBeaconRenderer;
+import xaeroplus.feature.render.beacon.WaypointBeaconRenderer;
 
 @Mixin(value = LevelRenderer.class)
 public class MixinLevelRenderer {

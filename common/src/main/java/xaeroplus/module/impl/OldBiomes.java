@@ -17,7 +17,8 @@ import net.minecraft.world.level.chunk.PalettedContainer;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.ChunkDataEvent;
-import xaeroplus.feature.render.highlights.SavableHighlightCacheInstance;
+import xaeroplus.feature.highlights.SavableHighlightCacheInstance;
+import xaeroplus.feature.render.DrawFeatureFactory;
 import xaeroplus.module.Module;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
@@ -37,10 +38,14 @@ public class OldBiomes extends Module {
 
     @Override
     public void onEnable() {
-        Globals.drawManager.registry().registerDirectChunkHighlightProvider(
-            this.getClass().getName(),
-            this::getHighlightsState,
-            this::getOldBiomesColor);
+        Globals.drawManager.registry().register(
+            DrawFeatureFactory.chunkHighlights(
+                this.getClass().getName(),
+                this::getHighlightsState,
+                this::getOldBiomesColor,
+                250
+            )
+        );
         oldBiomesCache.onEnable();
         try {
             searchAllLoadedChunks();
@@ -52,7 +57,7 @@ public class OldBiomes extends Module {
     @Override
     public void onDisable() {
         oldBiomesCache.onDisable();
-        Globals.drawManager.registry().unregisterChunkHighlightProvider(this.getClass().getName());
+        Globals.drawManager.registry().unregister(this.getClass().getName());
     }
 
     @EventHandler

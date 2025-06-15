@@ -18,7 +18,8 @@ import xaeroplus.XaeroPlus;
 import xaeroplus.event.ClientTickEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.feature.extensions.SeenChunksTrackingMapTileChunk;
-import xaeroplus.feature.render.highlights.ChunkHighlightLocalCache;
+import xaeroplus.feature.highlights.ChunkHighlightLocalCache;
+import xaeroplus.feature.render.DrawFeatureFactory;
 import xaeroplus.module.Module;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.settings.Settings;
@@ -79,10 +80,14 @@ public class PortalSkipDetection extends Module {
 
     @Override
     public void onEnable() {
-        Globals.drawManager.registry().registerDirectChunkHighlightProvider(
-            this.getClass().getName(),
-            this::getHighlightsState,
-            this::getPortalSkipChunksColor);
+        Globals.drawManager.registry().register(
+            DrawFeatureFactory.chunkHighlights(
+                this.getClass().getName(),
+                this::getHighlightsState,
+                this::getPortalSkipChunksColor,
+                250
+            )
+        );
         ModuleManager.getModule(TickTaskExecutor.class).execute(() -> {
             reset();
             initializeWorld();
@@ -96,7 +101,7 @@ public class PortalSkipDetection extends Module {
         ModuleManager.getModule(TickTaskExecutor.class).execute(() -> {
             reset();
         });
-        Globals.drawManager.registry().unregisterChunkHighlightProvider(this.getClass().getName());
+        Globals.drawManager.registry().unregister(this.getClass().getName());
     }
 
     private void initializeWorld() {

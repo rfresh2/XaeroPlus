@@ -8,8 +8,9 @@ import net.minecraft.world.level.Level;
 import xaeroplus.Globals;
 import xaeroplus.event.ClientTickEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
-import xaeroplus.feature.render.Line;
-import xaeroplus.feature.render.drawing.DrawingCache;
+import xaeroplus.feature.drawing.DrawingCache;
+import xaeroplus.feature.render.DrawFeatureFactory;
+import xaeroplus.feature.render.line.Line;
 import xaeroplus.module.Module;
 import xaeroplus.util.ColorHelper;
 import xaeroplus.util.DrawingMode;
@@ -32,25 +33,31 @@ public class Drawing extends Module {
     @Override
     public void onEnable() {
         drawingCache.onEnable();
-        Globals.drawManager.registry().registerMultiColorLineProvider(
-            this.getClass().getName() + "-saved",
-            this::getSavedLines,
-            () -> savedColorAlpha,
-            () -> 0.5f,
-            50
+        Globals.drawManager.registry().register(
+            DrawFeatureFactory.multiColorLines(
+                this.getClass().getName() + "-saved",
+                this::getSavedLines,
+                () -> savedColorAlpha,
+                () -> 0.5f,
+                50
+            )
         );
-        Globals.drawManager.registry().registerLineProvider(
-            this.getClass().getName() + "-in-progress",
-            this::getInProgressLines,
-            () -> drawingColorCycler.getColorInt(inProgressColorAlpha),
-            () -> 0.5f,
-            1
+        Globals.drawManager.registry().register(
+            DrawFeatureFactory.lines(
+                this.getClass().getName() + "-in-progress",
+                this::getInProgressLines,
+                () -> drawingColorCycler.getColorInt(inProgressColorAlpha),
+                () -> 0.5f,
+                1
+            )
         );
-        Globals.drawManager.registry().registerDirectMultiColorChunkHighlightProvider(
-            this.getClass().getName() + "-highlights",
-            true,
-            drawingCache::getCacheMap,
-            () -> savedColorAlpha
+        Globals.drawManager.registry().register(
+            DrawFeatureFactory.multiColorChunkHighlights(
+                this.getClass().getName() + "-highlights",
+                drawingCache::getCacheMap,
+                () -> savedColorAlpha,
+                50
+            )
         );
     }
 

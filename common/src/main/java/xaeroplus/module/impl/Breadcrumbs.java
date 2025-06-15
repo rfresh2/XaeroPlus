@@ -6,7 +6,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaeroplus.Globals;
 import xaeroplus.event.ClientTickEvent;
-import xaeroplus.feature.render.highlights.SavableHighlightCacheInstance;
+import xaeroplus.feature.highlights.SavableHighlightCacheInstance;
+import xaeroplus.feature.render.DrawFeatureFactory;
 import xaeroplus.module.Module;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
@@ -38,10 +39,13 @@ public class Breadcrumbs extends Module {
 
     @Override
     public void onEnable() {
-        Globals.drawManager.registry().registerDirectChunkHighlightProvider(
-            this.getClass().getName(),
-            this::getHighlightsState,
-            this::getBreadcrumbsColor
+        Globals.drawManager.registry().register(
+            DrawFeatureFactory.chunkHighlights(
+                this.getClass().getName(),
+                this::getHighlightsState,
+                this::getBreadcrumbsColor,
+                50
+            )
         );
         breadcrumbsCache.onEnable();
     }
@@ -49,7 +53,7 @@ public class Breadcrumbs extends Module {
     @Override
     public void onDisable() {
         breadcrumbsCache.onDisable();
-        Globals.drawManager.registry().unregisterChunkHighlightProvider(
+        Globals.drawManager.registry().unregister(
             this.getClass().getName()
         );
     }

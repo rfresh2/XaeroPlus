@@ -3,7 +3,8 @@ package xaeroplus.module.impl;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaeroplus.Globals;
-import xaeroplus.feature.render.Line;
+import xaeroplus.feature.render.DrawFeatureFactory;
+import xaeroplus.feature.render.line.Line;
 import xaeroplus.module.Module;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
@@ -41,42 +42,50 @@ public abstract class SpawnChunksBase extends Module {
 
     @Override
     public void onEnable() {
-        Globals.drawManager.registry().registerLineProvider(
-            entityProcessingId,
-            this::entityProcessing,
-            this::entityProcessingColor,
-            this::getLineWidth,
-            50
+        Globals.drawManager.registry().register(
+            DrawFeatureFactory.lines(
+                entityProcessingId,
+                this::entityProcessing,
+                this::entityProcessingColor,
+                this::getLineWidth,
+                50
+            )
         );
-        Globals.drawManager.registry().registerLineProvider(
-            redstoneProcessingId,
-            this::redstoneProcessing,
-            this::redstoneProcessingColor,
-            this::getLineWidth,
-            50
+        Globals.drawManager.registry().register(
+            DrawFeatureFactory.lines(
+                redstoneProcessingId,
+                this::redstoneProcessing,
+                this::redstoneProcessingColor,
+                this::getLineWidth,
+                50
+            )
         );
-        Globals.drawManager.registry().registerLineProvider(
-            lazyChunkId,
-            this::lazyChunks,
-            this::lazyChunksColor,
-            this::getLineWidth,
-            50
+        Globals.drawManager.registry().register(
+            DrawFeatureFactory.lines(
+                lazyChunkId,
+                this::lazyChunks,
+                this::lazyChunksColor,
+                this::getLineWidth,
+                50
+            )
         );
-        Globals.drawManager.registry().registerLineProvider(
-            outerChunksId,
-            this::outerChunks,
-            this::outerChunksColor,
-            this::getLineWidth,
-            50
+        Globals.drawManager.registry().register(
+            DrawFeatureFactory.lines(
+                outerChunksId,
+                this::outerChunks,
+                this::outerChunksColor,
+                this::getLineWidth,
+                50
+            )
         );
     }
 
     @Override
     public void onDisable() {
-        Globals.drawManager.registry().unregisterLineProvider(entityProcessingId);
-        Globals.drawManager.registry().unregisterLineProvider(redstoneProcessingId);
-        Globals.drawManager.registry().unregisterLineProvider(lazyChunkId);
-        Globals.drawManager.registry().unregisterLineProvider(outerChunksId);
+        Globals.drawManager.registry().unregister(entityProcessingId);
+        Globals.drawManager.registry().unregister(redstoneProcessingId);
+        Globals.drawManager.registry().unregister(lazyChunkId);
+        Globals.drawManager.registry().unregister(outerChunksId);
     }
 
     public List<Line> entityProcessing(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, ResourceKey<Level> dimension) {

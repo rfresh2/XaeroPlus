@@ -4,7 +4,7 @@ import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.Unit;
 import net.minecraft.util.profiling.ProfilerFiller;
-import xaeroplus.feature.render.XaeroPlusShaders;
+import xaeroplus.feature.render.shaders.XaeroPlusShaders;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;

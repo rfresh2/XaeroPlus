@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.waste.of.time.storage.cache.HotCache;
 import xaeroplus.Globals;
+import xaeroplus.feature.render.DrawFeatureFactory;
 import xaeroplus.module.Module;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
@@ -20,16 +21,18 @@ public class WorldTools extends Module {
     @Override
     public void onEnable() {
         if (!WorldToolsHelper.isWorldToolsPresent()) return;
-        Globals.drawManager.registry().registerAsyncChunkHighlightProvider(
-            this.getClass().getName(),
-            this::getWindowedHighlightsSnapshot,
-            this::getWorldToolsColor
+        Globals.drawManager.registry().register(
+            DrawFeatureFactory.asyncChunkHighlights(
+                this.getClass().getName(),
+                this::getWindowedHighlightsSnapshot,
+                this::getWorldToolsColor
+            )
         );
     }
 
     @Override
     public void onDisable() {
-        Globals.drawManager.registry().unregisterChunkHighlightProvider(this.getClass().getName());
+        Globals.drawManager.registry().unregister(this.getClass().getName());
     }
 
     public boolean isChunkDownloaded(final int x, final int z, final ResourceKey<Level> dimension) {

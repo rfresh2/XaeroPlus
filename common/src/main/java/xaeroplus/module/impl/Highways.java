@@ -5,7 +5,8 @@ import kaptainwutax.mathutils.util.Mth;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaeroplus.Globals;
-import xaeroplus.feature.render.Line;
+import xaeroplus.feature.render.DrawFeatureFactory;
+import xaeroplus.feature.render.line.Line;
 import xaeroplus.module.Module;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.ColorHelper;
@@ -75,12 +76,14 @@ public class Highways extends Module {
 
     @Override
     public void onEnable() {
-        Globals.drawManager.registry().registerLineProvider(
-            this.getClass().getName(),
-            this::getHighwayLines,
-            this::getHighwayColor,
-            this::getLineWidth,
-            5000
+        Globals.drawManager.registry().register(
+            DrawFeatureFactory.lines(
+                this.getClass().getName(),
+                this::getHighwayLines,
+                this::getHighwayColor,
+                this::getLineWidth,
+                5000
+            )
         );
     }
 
@@ -158,7 +161,7 @@ public class Highways extends Module {
 
     @Override
     public void onDisable() {
-        Globals.drawManager.registry().unregisterLineProvider(this.getClass().getName());
+        Globals.drawManager.registry().unregister(this.getClass().getName());
     }
 
     public int getHighwayColor() {

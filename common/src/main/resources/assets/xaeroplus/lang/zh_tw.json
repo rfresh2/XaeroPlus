@@ -252,6 +252,7 @@
   "xaeroplus.gui.waystone_visibility_type.global": "全局",
   "xaeroplus.gui.waystone_visibility_type.world_map_local": "世界地圖本地",
   "xaeroplus.gui.waystone_visibility_type.world_map_global": "世界地圖全局",
+  "xaeroplus.gui.world_map.drawing_mode": "繪圖模式",
   "xaeroplus.gui.world_map.start_drawing": "開始繪製",
   "xaeroplus.gui.world_map.draw_line_segment": "線段",
   "xaeroplus.gui.world_map.draw_infinite_line": "無限線",

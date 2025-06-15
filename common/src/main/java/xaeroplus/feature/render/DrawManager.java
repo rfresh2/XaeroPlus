@@ -41,9 +41,7 @@ public class DrawManager {
             -(chunkZ * 64) - (tileZ * 16) - insideZ,
             0);
         registry.forEach(feature -> {
-            feature.preRender(ctx);
             feature.render(ctx);
-            feature.postRender(ctx);
         });
         matrixStack.popPose();
     }
@@ -60,9 +58,7 @@ public class DrawManager {
         matrixStack.pushPose();
         matrixStack.translate(-flooredCameraX, -flooredCameraZ, 1.0f);
         registry.forEach(feature -> {
-            feature.preRender(ctx);
             feature.render(ctx);
-            feature.postRender(ctx);
         });
         matrixStack.popPose();
     }

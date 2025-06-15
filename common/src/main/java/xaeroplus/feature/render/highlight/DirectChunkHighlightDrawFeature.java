@@ -54,6 +54,8 @@ public class DirectChunkHighlightDrawFeature extends AbstractChunkHighlightDrawF
 
     @Override
     public void render(final DrawContext ctx) {
+        preRender(ctx);
         drawBuffer.render();
+        postRender(ctx);
     }
 }

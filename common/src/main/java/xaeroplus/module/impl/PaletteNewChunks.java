@@ -18,7 +18,8 @@ import net.minecraft.world.level.chunk.*;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.ChunkDataEvent;
-import xaeroplus.feature.render.highlights.SavableHighlightCacheInstance;
+import xaeroplus.feature.highlights.SavableHighlightCacheInstance;
+import xaeroplus.feature.render.DrawFeatureFactory;
 import xaeroplus.module.Module;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
@@ -210,10 +211,14 @@ public class PaletteNewChunks extends Module {
 
     @Override
     public void onEnable() {
-        Globals.drawManager.registry().registerDirectChunkHighlightProvider(
-            this.getClass().getName(),
-            this::getHighlightsState,
-            this::getNewChunksColor);
+        Globals.drawManager.registry().register(
+            DrawFeatureFactory.chunkHighlights(
+                this.getClass().getName(),
+                this::getHighlightsState,
+                this::getNewChunksColor,
+                250
+            )
+        );
         newChunksCache.onEnable();
         newChunksInverseCache.onEnable();
     }
@@ -222,7 +227,7 @@ public class PaletteNewChunks extends Module {
     public void onDisable() {
         newChunksCache.onDisable();
         newChunksInverseCache.onDisable();
-        Globals.drawManager.registry().unregisterChunkHighlightProvider(this.getClass().getName());
+        Globals.drawManager.registry().unregister(this.getClass().getName());
     }
 
     public int getNewChunksColor() {

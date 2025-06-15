@@ -252,6 +252,7 @@
   "xaeroplus.gui.waystone_visibility_type.global": "Глобальная",
   "xaeroplus.gui.waystone_visibility_type.world_map_local": "Карта мира лок.",
   "xaeroplus.gui.waystone_visibility_type.world_map_global": "Карта мира глоб.",
+  "xaeroplus.gui.world_map.drawing_mode": "Режим рисования",
   "xaeroplus.gui.world_map.start_drawing": "Начать рисование",
   "xaeroplus.gui.world_map.draw_line_segment": "Отрезок линии",
   "xaeroplus.gui.world_map.draw_infinite_line": "Бесконечная линия",

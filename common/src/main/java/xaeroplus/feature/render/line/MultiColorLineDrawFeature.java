@@ -65,7 +65,7 @@ public class MultiColorLineDrawFeature extends AbstractLineDrawFeature<Object2In
 
     @Override
     public void render(final DrawContext ctx) {
-        int a = lineProvider.colorAlphaSupplier().getAsInt();
+        float a = lineProvider.colorAlphaSupplier().getAsInt() / 255.0f;
         if (a == 0) return;
         preRender(ctx);
         VertexConsumer lineBuffer = ctx.renderTypeBuffers().getBuffer(CustomRenderTypes.MAP_LINES);

@@ -37,9 +37,8 @@ public class BufferedComponent {
         .withVertexShader("core/position_tex")
         .withFragmentShader("core/position_tex")
         .withBlend(new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ONE_MINUS_SRC_ALPHA))
-        .withUniform("ModelViewMat", UniformType.MATRIX4X4)
-        .withUniform("ProjMat", UniformType.MATRIX4X4)
-        .withUniform("ColorModulator", UniformType.VEC4)
+        .withUniform("DynamicTransforms", UniformType.UNIFORM_BUFFER)
+        .withUniform("Projection", UniformType.UNIFORM_BUFFER)
         .withSampler("Sampler0")
         .withVertexFormat(DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.QUADS)
         .build();
@@ -117,14 +116,19 @@ public class BufferedComponent {
         var autoIndexBuffer = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
         var indexBuffer = autoIndexBuffer.getBuffer(model.getIndexCount());
         try (final RenderPass pass = RenderSystem.getDevice().createCommandEncoder()
-            .createRenderPass(mc.getMainRenderTarget().getColorTexture(), OptionalInt.empty())) {
+                .createRenderPass(() -> "XaeroPlus Fps Limiter Buffered", mc.getMainRenderTarget().getColorTextureView(), OptionalInt.empty())) {
             pass.setPipeline(bufferedPipeline);
-            pass.bindSampler("Sampler0", renderTarget.getColorTexture());
-            RenderSystem.setShaderTexture(0, renderTarget.getColorTexture());
+            pass.bindSampler("Sampler0", renderTarget.getColorTextureView());
+            RenderSystem.setShaderTexture(0, renderTarget.getColorTextureView());
             var modelViewMatrix = RenderSystem.getModelViewMatrix();
             modelViewMatrix.translate(0, 0, 399 + (float) Settings.REGISTRY.minimapRenderZOffsetSetting.get());
             var guiScale = (float) Math.max(1.0, mc.getWindow().getGuiScale());
             modelViewMatrix.scale(1.0f / guiScale);
+            // is this needed?
+//            RenderSystem.bindDefaultUniforms(pass);
+//            var dynamic = RenderSystem.getDynamicUniforms()
+//                .writeTransform(modelViewMatrix, new Vector4f(), new Vector3f(), new Matrix4f(), 0);
+//            pass.setUniform("DynamicTransforms", dynamic);
             model.draw(pass, indexBuffer, autoIndexBuffer.type());
         }
         RenderSystem.getModelViewMatrix().set(modelViewMatrixBackup);

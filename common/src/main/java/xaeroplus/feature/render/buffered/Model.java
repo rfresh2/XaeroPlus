@@ -1,7 +1,5 @@
 package xaeroplus.feature.render.buffered;
 
-import com.mojang.blaze3d.buffers.BufferType;
-import com.mojang.blaze3d.buffers.BufferUsage;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -28,7 +26,7 @@ public class Model {
             bufferbuilder.addVertex(pos.x(), pos.y(), pos.z()).setUv(uv.x(), uv.y());
         }
         try (var renderedBuffer = bufferbuilder.buildOrThrow()) {
-            this.vertexBuffer = RenderSystem.getDevice().createBuffer(() -> "XaeroPlus Buffered Minimap Model", BufferType.VERTICES, BufferUsage.STATIC_WRITE, renderedBuffer.vertexBuffer());
+            this.vertexBuffer = RenderSystem.getDevice().createBuffer(() -> "XaeroPlus Buffered Minimap Model", GpuBuffer.USAGE_VERTEX, renderedBuffer.vertexBuffer());
             indexCount = renderedBuffer.drawState().indexCount();
         }
     }
@@ -36,7 +34,7 @@ public class Model {
     public void draw(RenderPass renderPass, GpuBuffer indexBuffer, VertexFormat.IndexType indexType) {
         renderPass.setVertexBuffer(0, vertexBuffer);
         renderPass.setIndexBuffer(indexBuffer, indexType);
-        renderPass.drawIndexed(0, indexCount);
+        renderPass.drawIndexed(0, 0, indexCount, 1);
     }
 
     public void close() {

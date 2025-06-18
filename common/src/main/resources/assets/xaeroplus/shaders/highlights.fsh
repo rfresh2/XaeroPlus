@@ -1,6 +1,6 @@
 #version 150
 
-uniform vec4 HighlightColor;
+#moj_import <xaeroplus:highlights_include.glsl>
 
 out vec4 fragColor;
 

@@ -24,7 +24,7 @@ public class XaeroPlus {
 	public static final AtomicBoolean initialized = new AtomicBoolean(false);
 	public static final File configFile = Services.PLATFORM.getConfigDir().resolve("xaeroplus.txt").toFile();
 	public static String XP_VERSION = "2";
-	public static final String MC_VERSION = DetectedVersion.BUILT_IN.getName();
+	public static final String MC_VERSION = DetectedVersion.BUILT_IN.name();
 	public static final KeybindListener KEYBIND_LISTENER = new KeybindListener();
 
 	public static void initializeSettings() {

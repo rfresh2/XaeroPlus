@@ -1,7 +1,8 @@
 package xaeroplus.feature.render.highlight;
 
-import com.mojang.blaze3d.buffers.BufferType;
-import com.mojang.blaze3d.buffers.BufferUsage;
+import com.mojang.blaze3d.buffers.GpuBuffer;
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
+import com.mojang.blaze3d.buffers.Std140Builder;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
@@ -9,6 +10,9 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import net.minecraft.client.Minecraft;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import xaeroplus.feature.render.DrawContext;
 import xaeroplus.feature.render.shaders.XaeroPlusShaders;
 import xaeroplus.util.ChunkUtils;
@@ -49,7 +53,7 @@ public class MultiColorHighlightVertexBuffer extends AbstractHighlightVertexBuff
         }
         try (var meshData = bufferBuilder.buildOrThrow()) {
             close();
-            vertexBuffer = RenderSystem.getDevice().createBuffer(() -> "Multi Color Chunk Highlight Buffer", BufferType.VERTICES, BufferUsage.STATIC_WRITE, meshData.vertexBuffer());
+            vertexBuffer = RenderSystem.getDevice().createBuffer(() -> "Chunk Highlight Buffer", GpuBuffer.USAGE_VERTEX, meshData.vertexBuffer());
             indexCount = meshData.drawState().indexCount();
         }
     }
@@ -57,19 +61,26 @@ public class MultiColorHighlightVertexBuffer extends AbstractHighlightVertexBuff
     @Override
     public void render(DrawContext ctx, Long2LongMap highlights, int color) {
         if (vertexBuffer == null || vertexBuffer.isClosed()) return;
+        uniformBuffer.rotate();
+        try (var mappedView = RenderSystem.getDevice().createCommandEncoder().mapBuffer(uniformBuffer.currentBuffer(), false, true)) {
+            Std140Builder.intoBuffer(mappedView.data())
+                .putMat4f(ctx.matrixStack().last().pose());
+        }
         var autoIndexBuffer = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
         var indexType = autoIndexBuffer.type();
         var indexBuffer = autoIndexBuffer.getBuffer(indexCount);
         try (final RenderPass pass = RenderSystem.getDevice().createCommandEncoder()
-            .createRenderPass(Minecraft.getInstance().getMainRenderTarget().getColorTexture(),
-                OptionalInt.empty())) {
+            .createRenderPass(() -> "XaeroPlus Highlight Vertex Buffer", Minecraft.getInstance().getMainRenderTarget().getColorTextureView(), OptionalInt.empty())) {
             pass.setPipeline(XaeroPlusShaders.MULTI_COLOR_HIGHLIGHT_PIPELINE);
-            pass.setUniform("MapViewMatrix", ctx.matrixStack().last().pose());
-            pass.setUniform("ModelViewMat", RenderSystem.getModelViewMatrix());
-            pass.setUniform("ProjMat", RenderSystem.getProjectionMatrix());
+            RenderSystem.bindDefaultUniforms(pass); // Projection
+            GpuBufferSlice dynamic = RenderSystem.getDynamicUniforms()
+                // only need ModelViewMat
+                .writeTransform(RenderSystem.getModelViewMatrix(), new Vector4f(), new Vector3f(), new Matrix4f(), 0);
+            pass.setUniform("DynamicTransforms", dynamic);
+            pass.setUniform("MultiColorHighlightTransforms", uniformBuffer.currentBuffer());
             pass.setIndexBuffer(indexBuffer, indexType);
             pass.setVertexBuffer(0, vertexBuffer);
-            pass.drawIndexed(0, indexCount);
+            pass.drawIndexed(0, 0, indexCount, 1);
         }
     }
 }

@@ -1,5 +1,7 @@
 #version 150
 
+#moj_import <xaeroplus:multi_color_highlights_include.glsl>
+
 in vec4 vertexColor;
 
 out vec4 fragColor;

@@ -48,13 +48,14 @@ public class MixinMinimapRenderer {
         CallbackInfo ci,
         @Local(argsOnly = true) GuiGraphics guiGraphics
     ) {
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0, 0, Settings.REGISTRY.minimapRenderZOffsetSetting.get());
+        guiGraphics.pose().pushMatrix();
+        // todo: can we even shift z like this anymore???
+        guiGraphics.pose().translate(0, 0); // , Settings.REGISTRY.minimapRenderZOffsetSetting.get());
     }
 
     @Inject(method = "renderMinimap", at = @At("RETURN"))
     public void shiftRenderZPost(final MinimapSession minimapSession, final GuiGraphics guiGraphics, final MinimapProcessor minimap, final int x, final int y, final int width, final int height, final double scale, final int size, final float partial, final CustomVertexConsumers cvc, final CallbackInfo ci) {
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
     }
 
     @ModifyConstant(

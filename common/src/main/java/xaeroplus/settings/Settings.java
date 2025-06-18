@@ -848,7 +848,8 @@ public final class Settings extends SettingRegistry {
             "Minimap Render Z",
             "xaeroplus.setting.minimap_render_z_offset",
             -1000, 1000, 50,
-            0),
+            0,
+            () -> false),
         SettingLocation.MINIMAP_VIEW);
 
     /**

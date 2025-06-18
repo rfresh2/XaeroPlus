@@ -66,8 +66,7 @@ public abstract class MixinGuiWaypointsList {
     }
 
     @Inject(method = "drawWaypointSlot", at = @At(
-        value = "INVOKE",
-        target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endBatch()V"
+        value = "RETURN"
     ), remap = true)
     public void drawWaypointDistances(final GuiGraphics guiGraphics, final Waypoint w, final int x, final int y, final CallbackInfo ci) {
         if (Settings.REGISTRY.showWaypointDistances.get()) {

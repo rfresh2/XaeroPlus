@@ -10,7 +10,6 @@ import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -54,8 +53,8 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
     @Shadow
     private boolean loadedFBO;
 
-    public MixinMinimapFBORenderer(final IXaeroMinimap modMain, final Minecraft mc, final WaypointMapRenderer waypointsGuiRenderer, final Minimap minimap, final CompassRenderer compassRenderer) {
-        super(modMain, mc, waypointsGuiRenderer, minimap, compassRenderer);
+    public MixinMinimapFBORenderer(final IXaeroMinimap modMain, final Minecraft mc, final WaypointMapRenderer waypointsGuiRenderer, final Minimap minimap, final CompassRenderer compassRenderer, PoseStack matrixStack) {
+        super(modMain, mc, waypointsGuiRenderer, minimap, compassRenderer, matrixStack);
     }
 
     @ModifyConstant(method = "loadFrameBuffer", constant = @Constant(intValue = 512))
@@ -82,7 +81,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
 
     @ModifyArg(method = "renderChunks", at = @At(
         value = "INVOKE",
-        target = "Lxaero/common/minimap/render/MinimapFBORenderer;renderChunksToFBO(Lxaero/hud/minimap/module/MinimapSession;Lnet/minecraft/client/gui/GuiGraphics;Lxaero/common/minimap/MinimapProcessor;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/resources/ResourceKey;DIFIZZIDDZLxaero/common/graphics/CustomVertexConsumers;)V"
+        target = "Lxaero/common/minimap/render/MinimapFBORenderer;renderChunksToFBO(Lxaero/hud/minimap/module/MinimapSession;Lcom/mojang/blaze3d/vertex/PoseStack;Lxaero/common/minimap/MinimapProcessor;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/resources/ResourceKey;DIFIZZIDDZLxaero/common/graphics/CustomVertexConsumers;)V"
     ),
         index = 6,
         remap = true) // $REMAP
@@ -91,10 +90,9 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
     }
 
     @Inject(method = "renderChunksToFBO", at = @At(
-        value = "INVOKE",
-        target = "Lnet/minecraft/client/gui/GuiGraphics;pose()Lcom/mojang/blaze3d/vertex/PoseStack;"
+        value = "HEAD"
     ), remap = true)
-    public void modifyScaledSize(final MinimapSession minimapSession, final GuiGraphics guiGraphics, final MinimapProcessor minimap, final Vec3 renderPos, final ResourceKey<Level> mapDimension, final double mapDimensionScale, final int viewW, final float partial, final int level, final boolean useWorldMap, final boolean lockedNorth, final int shape, final double ps, final double pc, final boolean cave, final CustomVertexConsumers cvc, final CallbackInfo ci,
+    public void modifyScaledSize(final MinimapSession minimapSession, final PoseStack matrixStack, final MinimapProcessor minimap, final Vec3 renderPos, final ResourceKey<Level> mapDimension, final double mapDimensionScale, final int viewW, final float partial, final int level, final boolean useWorldMap, final boolean lockedNorth, final int shape, final double ps, final double pc, final boolean cave, final CustomVertexConsumers cvc, final CallbackInfo ci,
                                  @Share("scaledSize") LocalIntRef scaledSize) {
         int s = 256 * Globals.minimapScaleMultiplier * Globals.minimapSizeMultiplier;
         if (Globals.minimapSizeMultiplier > 1) {
@@ -164,7 +162,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             target = "Lxaero/common/graphics/ImprovedFramebuffer;bindRead()V"
         )
     ), remap = true)
-    public void correctPostRotationTranslationForSizeMult(final MinimapSession minimapSession, final GuiGraphics guiGraphics, final MinimapProcessor minimap, final Vec3 renderPos, final ResourceKey<Level> mapDimension, final double mapDimensionScale, final int viewW, final float partial, final int level, final boolean useWorldMap, final boolean lockedNorth, final int shape, final double ps, final double pc, final boolean cave, final CustomVertexConsumers cvc, final CallbackInfo ci,
+    public void correctPostRotationTranslationForSizeMult(final MinimapSession minimapSession, final PoseStack matrixStack, final MinimapProcessor minimap, final Vec3 renderPos, final ResourceKey<Level> mapDimension, final double mapDimensionScale, final int viewW, final float partial, final int level, final boolean useWorldMap, final boolean lockedNorth, final int shape, final double ps, final double pc, final boolean cave, final CustomVertexConsumers cvc, final CallbackInfo ci,
                                                           @Local(name = "halfWView") float halfWView,
                                                           @Local(name = "shaderMatrixStack") Matrix4fStack shaderMatrixStack) {
         float sizeMultTranslation = (halfWView / Globals.minimapSizeMultiplier) * (Globals.minimapSizeMultiplier - 1);

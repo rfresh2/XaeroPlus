@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -20,7 +21,6 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -60,7 +60,6 @@ import xaeroplus.util.DrawingMode;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
@@ -371,11 +370,11 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @WrapOperation(method = "render", at = @At(
         value = "INVOKE",
-        target = "Lxaero/map/element/MapElementRenderHandler;render(Lxaero/map/gui/GuiMap;Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;DDIIDDDDDFZLxaero/map/element/HoveredMapElementHolder;Lnet/minecraft/client/Minecraft;F)Lxaero/map/element/HoveredMapElementHolder;"
+        target = "Lxaero/map/element/MapElementRenderHandler;render(Lxaero/map/gui/GuiMap;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;DDIIDDDDDFZLxaero/map/element/HoveredMapElementHolder;Lnet/minecraft/client/Minecraft;F)Lxaero/map/element/HoveredMapElementHolder;"
     ), remap = true)
-    public HoveredMapElementHolder<?, ?> hideMapElementsOnF1(MapElementRenderHandler handler, GuiMap mapScreen, GuiGraphics guiGraphics, MultiBufferSource.BufferSource renderTypeBuffers, MultiTextureRenderTypeRendererProvider rendererProvider, double cameraX, double cameraZ, int width, int height, double screenSizeBasedScale, double scale, double playerDimDiv, double mouseX, double mouseZ, float brightness, boolean cave, HoveredMapElementHolder<?, ?> oldHovered, Minecraft mc, float partialTicks, Operation<HoveredMapElementHolder<?, ?>> original) {
+    public HoveredMapElementHolder<?, ?> hideMapElementsOnF1(MapElementRenderHandler handler, GuiMap mapScreen, MultiBufferSource.BufferSource renderTypeBuffers, MultiTextureRenderTypeRendererProvider rendererProvider, double cameraX, double cameraZ, int width, int height, double screenSizeBasedScale, double scale, double playerDimDiv, double mouseX, double mouseZ, float brightness, boolean cave, HoveredMapElementHolder<?, ?> oldHovered, Minecraft mc, float partialTicks, Operation<HoveredMapElementHolder<?, ?>> original) {
         if (!Minecraft.getInstance().options.hideGui) {
-            return original.call(handler, mapScreen, guiGraphics, renderTypeBuffers, rendererProvider, cameraX, cameraZ, width, height, screenSizeBasedScale, scale, playerDimDiv, mouseX, mouseZ, brightness, cave, oldHovered, mc, partialTicks);
+            return original.call(handler, mapScreen, renderTypeBuffers, rendererProvider, cameraX, cameraZ, width, height, screenSizeBasedScale, scale, playerDimDiv, mouseX, mouseZ, brightness, cave, oldHovered, mc, partialTicks);
         } else {
             return null;
         }
@@ -409,7 +408,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         ),
         at = @At(
             value = "INVOKE",
-            target = "Lxaero/map/graphics/MapRenderHelper;drawCenteredStringWithBackground(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIFFFFLcom/mojang/blaze3d/vertex/VertexConsumer;)V",
+            target = "Lxaero/map/graphics/MapRenderHelper;drawCenteredStringWithBackground(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIFFFF)V",
             ordinal = 0
     ), index = 2)
     public String renderCrossDimensionCursorCoordinates(final String original) {
@@ -426,17 +425,17 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @WrapWithCondition(method = "render", at = @At(
         value = "INVOKE",
-        target = "Lxaero/map/graphics/MapRenderHelper;drawCenteredStringWithBackground(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIFFFFLcom/mojang/blaze3d/vertex/VertexConsumer;)V"
+        target = "Lxaero/map/graphics/MapRenderHelper;drawCenteredStringWithBackground(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIFFFF)V"
     ), remap = true)
-    public boolean hideRenderedStringsOnF1(final GuiGraphics guiGraphics, final Font font, final String string, final int x, final int y, final int color, final float bgRed, final float bgGreen, final float bgBlue, final float bgAlpha, final VertexConsumer backgroundVertexBuffer) {
+    public boolean hideRenderedStringsOnF1(final GuiGraphics guiGraphics, final Font font, final String string, final int x, final int y, final int color, final float bgRed, final float bgGreen, final float bgBlue, final float bgAlpha) {
         return !Minecraft.getInstance().options.hideGui;
     }
 
     @WrapWithCondition(method = "render", at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Ljava/util/function/Function;Lnet/minecraft/resources/ResourceLocation;IIFFIIII)V"
+        target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/ResourceLocation;IIFFIIII)V"
     ), remap = true)
-    public boolean hideCompassOnF1(final GuiGraphics instance, final Function<ResourceLocation, RenderType> function, final ResourceLocation resourceLocation, final int i, final int j, final float f, final float g, final int k, final int l, final int m, final int n) {
+    public boolean hideCompassOnF1(final GuiGraphics instance, final RenderPipeline renderPipeline, final ResourceLocation arg, final int i, final int j, final float f, final float g, final int k, final int l, final int m, final int n) {
         return !Minecraft.getInstance().options.hideGui;
     }
 
@@ -477,9 +476,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @WrapWithCondition(method = "render", at = @At(
         value = "INVOKE",
-        target = "Lxaero/map/graphics/MapRenderHelper;drawCenteredStringWithBackground(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIFFFFLcom/mojang/blaze3d/vertex/VertexConsumer;)V"
+        target = "Lxaero/map/graphics/MapRenderHelper;drawCenteredStringWithBackground(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIFFFF)V"
     ), remap = true)
-    public boolean hideMoreRenderedStringsOnF1(final GuiGraphics guiGraphics, final Font font, final Component text, final int x, final int y, final int color, final float bgRed, final float bgGreen, final float bgBlue, final float bgAlpha, final VertexConsumer backgroundVertexBuffer) {
+    public boolean hideMoreRenderedStringsOnF1(final GuiGraphics guiGraphics, final Font font, final Component text, final int x, final int y, final int color, final float bgRed, final float bgGreen, final float bgBlue, final float bgAlpha) {
         return !Minecraft.getInstance().options.hideGui;
     }
 
@@ -549,8 +548,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         value = "INVOKE",
         target = "Lxaero/map/mods/SupportXaeroMinimap;getSubWorldNameToRender()Ljava/lang/String;"
     ))
-    public void renderDrawingStatusText(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci,
-                                        @Local (name = "backgroundVertexBuffer") VertexConsumer backgroundVertexBuffer) {
+    public void renderDrawingStatusText(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci) {
         if (!drawing) return;
         MapRenderHelper.drawCenteredStringWithBackground(
             guiGraphics, Minecraft.getInstance().font,
@@ -558,8 +556,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             this.width / 2,
             24,
             -1,
-            0.0F, 0.0F, 0.0F, 0.4F,
-            backgroundVertexBuffer
+            0.0F, 0.0F, 0.0F, 0.4F
         );
     }
 
@@ -690,8 +687,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         final int scaledMouseX,
         final int scaledMouseY,
         final float partialTicks,
-        final CallbackInfo ci,
-        @Local(name = "backgroundVertexBuffer") VertexConsumer backgroundVertexBuffer
+        final CallbackInfo ci
     ) {
         MapTileSelection selection = this.mapTileSelection;
         if (selection == null) return;
@@ -700,7 +696,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if (sideLen <= 1 && heightLen <= 1) return;
         // todo: it'd be better if we could render this directly on the highlight
         //  but we need a function for map -> screen coordinates translation
-        MapRenderHelper.drawCenteredStringWithBackground(guiGraphics, font, sideLen + " x " + heightLen, scaledMouseX, scaledMouseY - font.lineHeight, -1, 0.0f, 0.0f, 0.0f, 0.4f, backgroundVertexBuffer);
+        MapRenderHelper.drawCenteredStringWithBackground(guiGraphics, font, sideLen + " x " + heightLen, scaledMouseX, scaledMouseY - font.lineHeight, -1, 0.0f, 0.0f, 0.0f, 0.4f);
     }
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true, remap = true)

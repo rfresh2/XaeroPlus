@@ -8,6 +8,6 @@ in vec4 Color;
 out vec4 vertexColor;
 
 void main() {
-    gl_Position = Projection * ModelViewMat * MapViewMatrix * vec4(Position, 1.0);
+    gl_Position = ProjMat * ModelViewMat * MapViewMatrix * vec4(Position, 1.0);
     vertexColor = Color;
 }

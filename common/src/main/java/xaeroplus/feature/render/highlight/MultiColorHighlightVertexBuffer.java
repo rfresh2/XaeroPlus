@@ -21,7 +21,6 @@ import xaeroplus.util.ColorHelper;
 import java.util.OptionalInt;
 
 public class MultiColorHighlightVertexBuffer extends AbstractHighlightVertexBuffer {
-
     @Override
     public void preRender(final DrawContext ctx, final Long2LongMap highlights, final int color) {
         super.preRender(ctx, highlights, color);
@@ -60,12 +59,15 @@ public class MultiColorHighlightVertexBuffer extends AbstractHighlightVertexBuff
 
     @Override
     public void render(DrawContext ctx, Long2LongMap highlights, int color) {
-        if (vertexBuffer == null || vertexBuffer.isClosed()) return;
+        if (vertexBuffer == null || vertexBuffer.isClosed() || uniformBuffer == null) return;
         uniformBuffer.rotate();
         try (var mappedView = RenderSystem.getDevice().createCommandEncoder().mapBuffer(uniformBuffer.currentBuffer(), false, true)) {
             Std140Builder.intoBuffer(mappedView.data())
                 .putMat4f(ctx.matrixStack().last().pose());
         }
+        GpuBufferSlice dynamic = RenderSystem.getDynamicUniforms()
+            // only need ModelViewMat
+            .writeTransform(RenderSystem.getModelViewMatrix(), new Vector4f(), new Vector3f(), new Matrix4f(), 0);
         var autoIndexBuffer = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
         var indexType = autoIndexBuffer.type();
         var indexBuffer = autoIndexBuffer.getBuffer(indexCount);
@@ -73,9 +75,6 @@ public class MultiColorHighlightVertexBuffer extends AbstractHighlightVertexBuff
             .createRenderPass(() -> "XaeroPlus Highlight Vertex Buffer", Minecraft.getInstance().getMainRenderTarget().getColorTextureView(), OptionalInt.empty())) {
             pass.setPipeline(XaeroPlusShaders.MULTI_COLOR_HIGHLIGHT_PIPELINE);
             RenderSystem.bindDefaultUniforms(pass); // Projection
-            GpuBufferSlice dynamic = RenderSystem.getDynamicUniforms()
-                // only need ModelViewMat
-                .writeTransform(RenderSystem.getModelViewMatrix(), new Vector4f(), new Vector3f(), new Matrix4f(), 0);
             pass.setUniform("DynamicTransforms", dynamic);
             pass.setUniform("MultiColorHighlightTransforms", uniformBuffer.currentBuffer());
             pass.setIndexBuffer(indexBuffer, indexType);

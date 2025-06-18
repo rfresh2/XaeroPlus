@@ -39,7 +39,7 @@ public abstract class MixinRadarRenderer extends MinimapElementRenderer<Entity, 
         }
     }
 
-    @Inject(method = "renderElement(Lnet/minecraft/world/entity/Entity;ZZDFDDLxaero/hud/minimap/element/render/MinimapElementRenderInfo;Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)Z", at = @At("HEAD"),
+    @Inject(method = "renderElement(Lnet/minecraft/world/entity/Entity;ZZDFDDLxaero/hud/minimap/element/render/MinimapElementRenderInfo;Lxaero/hud/minimap/element/render/MinimapElementGraphics;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)Z", at = @At("HEAD"),
         remap = true) // $REMAP
     public void adjustElementScaleForMinimapScaling(final CallbackInfoReturnable<Boolean> cir, @Local(argsOnly = true) LocalRef<MinimapElementRenderInfo> renderInfoRef, @Local(argsOnly = true) LocalFloatRef optionalScaleRef) {
         if (renderInfoRef.get().location == MinimapElementRenderLocation.IN_MINIMAP) {

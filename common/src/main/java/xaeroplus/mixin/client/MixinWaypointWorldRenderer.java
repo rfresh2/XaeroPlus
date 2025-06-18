@@ -1,7 +1,6 @@
 package xaeroplus.mixin.client;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -13,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.hud.minimap.BuiltInHudModules;
+import xaero.hud.minimap.element.render.MinimapElementGraphics;
 import xaero.hud.minimap.element.render.MinimapElementRenderInfo;
 import xaero.hud.minimap.waypoint.WaypointPurpose;
 import xaero.hud.minimap.waypoint.render.world.WaypointWorldRenderer;
@@ -31,14 +31,14 @@ public class MixinWaypointWorldRenderer {
     @Shadow
     private double waypointsDistance;
 
-    @Inject(method = "renderElement(Lxaero/common/minimap/waypoints/Waypoint;ZZDFDDLxaero/hud/minimap/element/render/MinimapElementRenderInfo;Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)Z", at = @At(
+    @Inject(method = "renderElement(Lxaero/common/minimap/waypoints/Waypoint;ZZDFDDLxaero/hud/minimap/element/render/MinimapElementRenderInfo;Lxaero/hud/minimap/element/render/MinimapElementGraphics;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)Z", at = @At(
         value = "INVOKE",
         target = "Lxaero/common/minimap/waypoints/Waypoint;isDestination()Z",
         ordinal = 0
     ), cancellable = true,
         remap = true) // $REMAP
     public void limitDeathpointsRenderDistance(
-        final Waypoint w, final boolean highlighted, final boolean outOfBounds, final double optionalDepth, final float optionalScale, final double partialX, final double partialY, final MinimapElementRenderInfo renderInfo, final GuiGraphics guiGraphics, final MultiBufferSource.BufferSource vanillaBufferSource, final CallbackInfoReturnable<Boolean> cir,
+        final Waypoint w, final boolean highlighted, final boolean outOfBounds, final double optionalDepth, final float optionalScale, final double partialX, final double partialY, final MinimapElementRenderInfo renderInfo, final MinimapElementGraphics guiGraphics, final MultiBufferSource.BufferSource vanillaBufferSource, final CallbackInfoReturnable<Boolean> cir,
         @Local(name = "scaledDistance2D") double scaledDistance2D
     ) {
         var purpose = w.getPurpose();
@@ -49,7 +49,7 @@ public class MixinWaypointWorldRenderer {
         }
     }
 
-    @ModifyArg(method = "renderElement(Lxaero/common/minimap/waypoints/Waypoint;ZZDFDDLxaero/hud/minimap/element/render/MinimapElementRenderInfo;Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)Z", at = @At(
+    @ModifyArg(method = "renderElement(Lxaero/common/minimap/waypoints/Waypoint;ZZDFDDLxaero/hud/minimap/element/render/MinimapElementRenderInfo;Lxaero/hud/minimap/element/render/MinimapElementGraphics;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)Z", at = @At(
         value = "INVOKE",
         target = "Lxaero/hud/minimap/waypoint/render/world/WaypointWorldRenderer;renderIconWithLabels(Lxaero/common/minimap/waypoints/Waypoint;ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;FIILnet/minecraft/client/gui/Font;ILcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)V"),
         index = 4,
@@ -69,7 +69,7 @@ public class MixinWaypointWorldRenderer {
      * todo: separate out rendering so it is independent of when distance text is rendered
      *  and put it on its own line
      */
-    @ModifyArg(method = "renderElement(Lxaero/common/minimap/waypoints/Waypoint;ZZDFDDLxaero/hud/minimap/element/render/MinimapElementRenderInfo;Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)Z", at = @At(
+    @ModifyArg(method = "renderElement(Lxaero/common/minimap/waypoints/Waypoint;ZZDFDDLxaero/hud/minimap/element/render/MinimapElementRenderInfo;Lxaero/hud/minimap/element/render/MinimapElementGraphics;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)Z", at = @At(
         value = "INVOKE",
         target = "Lxaero/hud/minimap/waypoint/render/world/WaypointWorldRenderer;renderIconWithLabels(Lxaero/common/minimap/waypoints/Waypoint;ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;FIILnet/minecraft/client/gui/Font;ILcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)V"),
         index = 3,

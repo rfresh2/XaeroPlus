@@ -16,6 +16,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 import xaeroplus.settings.Settings;
 
 import java.util.OptionalInt;
@@ -113,6 +114,18 @@ public class BufferedComponent {
 
     private void renderBufferedTexture() {
         modelViewMatrixBackup.set(RenderSystem.getModelViewMatrix());
+        var modelViewMatrix = RenderSystem.getModelViewMatrix();
+        modelViewMatrix.translate(0, 0, 399 + (float) Settings.REGISTRY.minimapRenderZOffsetSetting.get());
+        var guiScale = (float) Math.max(1.0, mc.getWindow().getGuiScale());
+        modelViewMatrix.scale(1.0f / guiScale);
+        var dynamic = RenderSystem.getDynamicUniforms()
+            .writeTransform(
+                RenderSystem.getModelViewMatrix(),
+                new Vector4f(1.0F, 1.0F, 1.0F, 1.0F),
+                RenderSystem.getModelOffset(),
+                RenderSystem.getTextureMatrix(),
+                RenderSystem.getShaderLineWidth()
+            );
         var autoIndexBuffer = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
         var indexBuffer = autoIndexBuffer.getBuffer(model.getIndexCount());
         try (final RenderPass pass = RenderSystem.getDevice().createCommandEncoder()
@@ -120,15 +133,8 @@ public class BufferedComponent {
             pass.setPipeline(bufferedPipeline);
             pass.bindSampler("Sampler0", renderTarget.getColorTextureView());
             RenderSystem.setShaderTexture(0, renderTarget.getColorTextureView());
-            var modelViewMatrix = RenderSystem.getModelViewMatrix();
-            modelViewMatrix.translate(0, 0, 399 + (float) Settings.REGISTRY.minimapRenderZOffsetSetting.get());
-            var guiScale = (float) Math.max(1.0, mc.getWindow().getGuiScale());
-            modelViewMatrix.scale(1.0f / guiScale);
-            // is this needed?
-//            RenderSystem.bindDefaultUniforms(pass);
-//            var dynamic = RenderSystem.getDynamicUniforms()
-//                .writeTransform(modelViewMatrix, new Vector4f(), new Vector3f(), new Matrix4f(), 0);
-//            pass.setUniform("DynamicTransforms", dynamic);
+            RenderSystem.bindDefaultUniforms(pass);
+            pass.setUniform("DynamicTransforms", dynamic);
             model.draw(pass, indexBuffer, autoIndexBuffer.type());
         }
         RenderSystem.getModelViewMatrix().set(modelViewMatrixBackup);

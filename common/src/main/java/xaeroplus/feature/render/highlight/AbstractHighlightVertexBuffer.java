@@ -13,24 +13,27 @@ public abstract class AbstractHighlightVertexBuffer {
     protected boolean flipped = false;
     public long lastRefreshed = 0L;
     public int indexCount = 0;
-    public static final MappableRingBuffer uniformBuffer = new MappableRingBuffer(
-        () -> "XaeroPlus Highlight Uniform Buffer",
-        GpuBuffer.USAGE_MAP_WRITE,
-        new Std140SizeCalculator()
-            .putMat4f()
-            .putMat4f()
-            .putMat4f()
-            .putVec4()
-            .get()
-    );
+    public MappableRingBuffer uniformBuffer = null;
 
     public boolean needsRefresh(DrawContext ctx) {
-        return vertexBuffer == null || vertexBuffer.isClosed() || stale || flipped != ctx.worldmap();
+        return vertexBuffer == null || vertexBuffer.isClosed() || stale || flipped != ctx.worldmap() || uniformBuffer == null;
     }
 
     public void preRender(final DrawContext ctx, final Long2LongMap highlights, final int color) {
         if (needsRefresh(ctx)) {
             refresh(ctx, highlights, color);
+        }
+        if (uniformBuffer == null) {
+            uniformBuffer = new MappableRingBuffer(
+                () -> "XaeroPlus Highlight Uniform Buffer",
+                GpuBuffer.USAGE_MAP_WRITE,
+                new Std140SizeCalculator()
+                    .putMat4f()
+                    .putMat4f()
+                    .putMat4f()
+                    .putVec4()
+                    .get()
+            );
         }
     }
 
@@ -44,6 +47,10 @@ public abstract class AbstractHighlightVertexBuffer {
         if (vertexBuffer != null) {
             vertexBuffer.close();
             vertexBuffer = null;
+        }
+        if (uniformBuffer != null) {
+            uniformBuffer.close();
+            uniformBuffer = null;
         }
     }
 }

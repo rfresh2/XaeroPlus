@@ -3,21 +3,20 @@ package xaeroplus.mixin.client;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.Entity;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.IXaeroMinimap;
-import xaero.common.graphics.CustomVertexConsumers;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.render.MinimapFBORenderer;
 import xaero.common.minimap.render.MinimapRenderer;
 import xaero.hud.minimap.Minimap;
 import xaero.hud.minimap.element.render.over.MinimapElementOverMapRendererHandler;
-import xaero.hud.minimap.module.MinimapSession;
 import xaeroplus.Globals;
 import xaeroplus.feature.extensions.CustomMinimapFBORenderer;
 import xaeroplus.settings.Settings;
@@ -28,6 +27,8 @@ public class MixinMinimapRenderer {
     protected Minimap minimap;
     @Shadow
     protected IXaeroMinimap modMain;
+    @Final @Shadow
+    protected PoseStack matrixStack;
 
     @Inject(method = "renderMinimap", at = @At("HEAD"))
     public void resetFBOSize(
@@ -43,20 +44,20 @@ public class MixinMinimapRenderer {
         }
     }
 
-    @Inject(method = "renderMinimap", at = @At("HEAD"))
-    public void shiftRenderZHead(
-        CallbackInfo ci,
-        @Local(argsOnly = true) GuiGraphics guiGraphics
-    ) {
-        guiGraphics.pose().pushMatrix();
-        // todo: can we even shift z like this anymore???
-        guiGraphics.pose().translate(0, 0); // , Settings.REGISTRY.minimapRenderZOffsetSetting.get());
-    }
+//    @Inject(method = "renderMinimap", at = @At("HEAD"))
+//    public void shiftRenderZHead(
+//        CallbackInfo ci,
+//        @Local(argsOnly = true) GuiGraphics guiGraphics
+//    ) {
+//        guiGraphics.pose().pushMatrix();
+//        // todo: can we even shift z like this anymore???
+//        guiGraphics.pose().translate(0, 0); // , Settings.REGISTRY.minimapRenderZOffsetSetting.get());
+//    }
 
-    @Inject(method = "renderMinimap", at = @At("RETURN"))
-    public void shiftRenderZPost(final MinimapSession minimapSession, final GuiGraphics guiGraphics, final MinimapProcessor minimap, final int x, final int y, final int width, final int height, final double scale, final int size, final float partial, final CustomVertexConsumers cvc, final CallbackInfo ci) {
-        guiGraphics.pose().popMatrix();
-    }
+//    @Inject(method = "renderMinimap", at = @At("RETURN"))
+//    public void shiftRenderZPost(final MinimapSession minimapSession, final GuiGraphics guiGraphics, final MinimapProcessor minimap, final int x, final int y, final int width, final int height, final double scale, final int size, final float partial, final CustomVertexConsumers cvc, final CallbackInfo ci) {
+//        guiGraphics.pose().popMatrix();
+//    }
 
     @ModifyConstant(
         method = "renderMinimap",
@@ -66,7 +67,7 @@ public class MixinMinimapRenderer {
         slice = @Slice(
             from = @At(
                 value = "INVOKE",
-                target = "Lxaero/common/minimap/render/MinimapRenderer;renderChunks(Lxaero/hud/minimap/module/MinimapSession;Lnet/minecraft/client/gui/GuiGraphics;Lxaero/common/minimap/MinimapProcessor;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/resources/ResourceKey;DIIFFIZZIDDZZLxaero/common/settings/ModSettings;Lxaero/common/graphics/CustomVertexConsumers;)V"
+                target = "Lxaero/common/minimap/render/MinimapRenderer;renderChunks(Lxaero/hud/minimap/module/MinimapSession;Lxaero/common/minimap/MinimapProcessor;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/resources/ResourceKey;DIIFFIZZIDDZZLxaero/common/settings/ModSettings;Lxaero/common/graphics/CustomVertexConsumers;)V"
             )
         )
     )
@@ -87,7 +88,7 @@ public class MixinMinimapRenderer {
         slice = @Slice(
             from = @At(
                 value = "INVOKE",
-                target = "Lxaero/common/minimap/render/MinimapRenderer;renderChunks(Lxaero/hud/minimap/module/MinimapSession;Lnet/minecraft/client/gui/GuiGraphics;Lxaero/common/minimap/MinimapProcessor;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/resources/ResourceKey;DIIFFIZZIDDZZLxaero/common/settings/ModSettings;Lxaero/common/graphics/CustomVertexConsumers;)V"
+                target = "Lxaero/common/minimap/render/MinimapRenderer;renderChunks(Lxaero/hud/minimap/module/MinimapSession;Lxaero/common/minimap/MinimapProcessor;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/resources/ResourceKey;DIIFFIZZIDDZZLxaero/common/settings/ModSettings;Lxaero/common/graphics/CustomVertexConsumers;)V"
             )
         )
     )
@@ -108,7 +109,7 @@ public class MixinMinimapRenderer {
         slice = @Slice(
             from = @At(
                 value = "INVOKE",
-                target = "Lxaero/common/minimap/render/MinimapRenderer;renderChunks(Lxaero/hud/minimap/module/MinimapSession;Lnet/minecraft/client/gui/GuiGraphics;Lxaero/common/minimap/MinimapProcessor;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/resources/ResourceKey;DIIFFIZZIDDZZLxaero/common/settings/ModSettings;Lxaero/common/graphics/CustomVertexConsumers;)V"
+                target = "Lxaero/common/minimap/render/MinimapRenderer;renderChunks(Lxaero/hud/minimap/module/MinimapSession;Lxaero/common/minimap/MinimapProcessor;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/resources/ResourceKey;DIIFFIZZIDDZZLxaero/common/settings/ModSettings;Lxaero/common/graphics/CustomVertexConsumers;)V"
             )
         )
     )
@@ -122,8 +123,7 @@ public class MixinMinimapRenderer {
 
     @Redirect(method = "renderMinimap", at = @At(
         value = "INVOKE",
-        target = "Lxaero/hud/minimap/element/render/over/MinimapElementOverMapRendererHandler;prepareRender(DDDIIIIZF)V"),
-        remap = true) // $REMAP
+        target = "Lxaero/hud/minimap/element/render/over/MinimapElementOverMapRendererHandler;prepareRender(DDDIIIIZF)V"))
     public void editOvermapRender(
         final MinimapElementOverMapRendererHandler instance,
         final double ps,
@@ -158,10 +158,10 @@ public class MixinMinimapRenderer {
      */
     @WrapOperation(method = "renderMinimap", at = @At(
         value = "INVOKE",
-        target = "Lxaero/common/minimap/render/MinimapFBORenderer;renderMainEntityDot(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/entity/Entity;ZLnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)V"),
+        target = "Lxaero/common/minimap/render/MinimapFBORenderer;renderMainEntityDot(Lnet/minecraft/world/entity/Entity;ZLnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)V"),
         remap = true) // $REMAP
     public void redirectRenderMainEntityDot(
-        final MinimapFBORenderer instance, final GuiGraphics guiGraphics, final Entity renderEntity, final boolean cave, final MultiBufferSource.BufferSource renderTypeBuffers, final Operation<Void> original,
+        final MinimapFBORenderer instance, final Entity renderEntity, final boolean cave, final MultiBufferSource.BufferSource renderTypeBuffers, final Operation<Void> original,
         @Local(name = "lockedNorth") boolean lockedNorth
     ) {
         if (Settings.REGISTRY.fixMainEntityDot.get()) {
@@ -169,7 +169,7 @@ public class MixinMinimapRenderer {
                 return;
             }
         }
-        original.call(instance, guiGraphics, renderEntity, cave, renderTypeBuffers);
+        original.call(instance, renderEntity, cave, renderTypeBuffers);
     }
 
     @ModifyVariable(method = "drawArrow", name = "offsetY", ordinal = 0, at = @At(value = "STORE"))

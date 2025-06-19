@@ -44,6 +44,7 @@
     "MixinMapWorld",
     "MixinMapWriter",
     "MixinMinimap",
+    "MixinMinimapDepthTraceListener",
     "MixinMinimapFBORenderer",
     "MixinMinimapModSettings",
     "MixinMinimapOption",

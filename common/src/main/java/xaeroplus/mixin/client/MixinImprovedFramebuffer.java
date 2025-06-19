@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.graphics.ImprovedFramebuffer;
+import xaeroplus.settings.Settings;
 
 @Mixin(value = ImprovedFramebuffer.class, remap = false)
 public class MixinImprovedFramebuffer {
@@ -16,8 +17,8 @@ public class MixinImprovedFramebuffer {
 
     @Inject(method = "restoreMainRenderTarget", at = @At("RETURN"))
     private static void clearCachedMainRenderTarget(final CallbackInfo ci) {
-//        if (Settings.REGISTRY.minimapFpsLimiter.get()) {
-//            mainRenderTargetBackup = null;
-//        }
+        if (Settings.REGISTRY.minimapFpsLimiter.get()) {
+            mainRenderTargetBackup = null;
+        }
     }
 }

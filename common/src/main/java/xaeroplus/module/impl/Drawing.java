@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import xaeroplus.Globals;
 import xaeroplus.event.ClientTickEvent;
@@ -172,6 +173,38 @@ public class Drawing extends Module {
 
     public void setOpacity(final int opacity) {
         this.savedColorAlpha = opacity;
+    }
+
+    private static final int SNAP_THRESHOLD = 10;
+    public Line snap(int x1, int z1, int x2, int z2, double scale) {
+        double scalar = 1.0 / scale;
+        int threshold = Mth.clamp(Mth.floor(SNAP_THRESHOLD * scalar), 10, 1000);
+        int len = Mth.floor(Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(z2 - z1, 2)));
+        if (len <= threshold) {
+            return new Line(x1, z1, x2, z2);
+        }
+        int xDelta = Math.abs(x2 - x1);
+        int zDelta = Math.abs(z2 - z1);
+        // cardinals
+        if (xDelta < threshold) {
+            return new Line(x1, z1, x1, z2);
+        }
+        if (zDelta < threshold) {
+            return new Line(x1, z1, x2, z1);
+        }
+        // diagonals
+        int dDelta = Math.abs(xDelta - zDelta);
+        if (dDelta != 0 && dDelta < threshold) {
+            if (zDelta < xDelta) {
+                int xSignum = x2 - x1 >= 0 ? 1 : -1;
+                return new Line(x1, z1, x1 + zDelta * xSignum, z2);
+            } else if (xDelta < zDelta) {
+                int zSignum = z2 - z1 >= 0 ? 1 : -1;
+                return new Line(x1, z1, x2, z1 + zDelta * zSignum);
+            }
+        }
+
+        return new Line(x1, z1, x2, z2);
     }
 
     public static final class DrawingColorCycler {

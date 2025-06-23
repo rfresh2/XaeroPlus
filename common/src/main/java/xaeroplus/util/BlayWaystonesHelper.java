@@ -4,6 +4,7 @@ import net.blay09.mods.balm.api.Balm;
 import net.blay09.mods.waystones.api.Waystone;
 import net.blay09.mods.waystones.api.WaystoneTypes;
 import net.blay09.mods.waystones.api.event.WaystoneRemoveReceivedEvent;
+import net.blay09.mods.waystones.api.event.WaystoneRemovedEvent;
 import net.blay09.mods.waystones.api.event.WaystoneUpdateReceivedEvent;
 import net.blay09.mods.waystones.api.event.WaystonesListReceivedEvent;
 import net.minecraft.resources.ResourceLocation;
@@ -28,7 +29,22 @@ public class BlayWaystonesHelper {
         Balm.getEvents().onEvent(WaystonesListReceivedEvent.class, this::onWaystonesListReceivedEvent);
         Balm.getEvents().onEvent(WaystoneUpdateReceivedEvent.class, this::onWaystoneUpdateReceived);
         Balm.getEvents().onEvent(WaystoneRemoveReceivedEvent.class, this::onWaystoneRemoveReceived);
+        Balm.getEvents().onEvent(WaystoneRemovedEvent.class, this::onWaystoneRemoved);
         subscribed = true;
+    }
+
+    private void onWaystoneRemoved(WaystoneRemovedEvent event) {
+        if (isCompatibleWaystoneType(event.getWaystone().getWaystoneType())) {
+            synchronized (lock) {
+                ArrayList<Waystone> waystones = currentWaystoneTypeMap.get(event.getWaystone().getWaystoneType());
+                if (waystones == null) return;
+                waystones.removeIf(waystone -> waystone.getWaystoneUid().equals(event.getWaystone().getWaystoneUid()));
+                if (waystones.isEmpty()) {
+                    currentWaystoneTypeMap.remove(event.getWaystone().getWaystoneType());
+                }
+                shouldSync = true;
+            }
+        }
     }
 
     private void onWaystoneRemoveReceived(WaystoneRemoveReceivedEvent event) {

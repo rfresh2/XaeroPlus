@@ -81,7 +81,7 @@ public abstract class MixinGuiWaypointsList {
             final double distance = Math.sqrt(Math.pow(playerX - wpX, 2) + Math.pow(playerY - wpY, 2) + Math.pow(playerZ - wpZ, 2));
             final String text = NumberFormat.getIntegerInstance().format(distance) + "m";
             final Font fontRenderer = Minecraft.getInstance().font;
-            guiGraphics.drawString(fontRenderer, text, x + 250, y + 1, 0xFFFFFF);
+            guiGraphics.drawString(fontRenderer, text, x + 250, y + 1, -1);
         }
     }
 }

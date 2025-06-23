@@ -526,7 +526,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     if (drawLinePos1 == null) {
                         ModuleManager.getModule(Drawing.class).removeInProgressLine();
                     } else {
-                        var inProgress = new Line(drawLinePos1.getX(), drawLinePos1.getZ(), mouseBlockPosX, mouseBlockPosZ);
+                        var inProgress = ModuleManager.getModule(Drawing.class).snap(drawLinePos1.getX(), drawLinePos1.getZ(), mouseBlockPosX, mouseBlockPosZ, destScale);
                         ModuleManager.getModule(Drawing.class).setInProgressLine(inProgress, drawingMode);
                     }
                 }
@@ -597,7 +597,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 case LINE_SEGMENT, INFINITE_LINE -> {
                     if (drawLinePos1 != null) {
                         Line line;
-                        line = new Line(drawLinePos1.getX(), drawLinePos1.getZ(), mouseBlockPosX, mouseBlockPosZ);
+                        line = ModuleManager.getModule(Drawing.class).snap(drawLinePos1.getX(), drawLinePos1.getZ(), mouseBlockPosX, mouseBlockPosZ, destScale);
                         switch (drawingMode) {
                             case LINE_SEGMENT -> ModuleManager.getModule(Drawing.class).addLine(line);
                             case INFINITE_LINE -> ModuleManager.getModule(Drawing.class).addInfiniteLine(line);

@@ -69,7 +69,7 @@ public abstract class MixinGuiWaypointsList {
         value = "RETURN"
     ), remap = true)
     public void drawWaypointDistances(final GuiGraphics guiGraphics, final Waypoint w, final int x, final int y, final CallbackInfo ci) {
-        if (Settings.REGISTRY.showWaypointDistances.get()) {
+        if (Settings.REGISTRY.showWaypointDistances.get() && w != null) {
             Entity renderViewEntity = Minecraft.getInstance().getCameraEntity();
             final double playerX = renderViewEntity.getX();
             final double playerZ = renderViewEntity.getZ();

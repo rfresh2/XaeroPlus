@@ -28,7 +28,6 @@
     "MixinGuiMap",
     "MixinGuiMinimapMain",
     "MixinGuiSettingsWorldMap",
-    "MixinGuiUpdateAll",
     "MixinGuiWaypoints",
     "MixinGuiWaypointSettings",
     "MixinGuiWaypointsList",

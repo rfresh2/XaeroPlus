@@ -1,5 +1,7 @@
 package xaeroplus.feature.render.line;
 
+import net.minecraft.util.Mth;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,12 +32,26 @@ public class LinePreProcessor {
         int dx = line.x2() - line.x1();
         int dz = line.z2() - line.z1();
         if (dx == 0) { // vertical line
-            for (int z = Math.min(line.z1(), line.z2()); z < Math.max(line.z1(), line.z2()); z += MAX_LINE_LENGTH) {
-                lines.add(new Line(line.x1(), z, line.x2(), Math.min(z + MAX_LINE_LENGTH, line.z2())));
+            int x = line.x1();
+            int minZ = Math.min(line.z1(), line.z2());
+            int maxZ = Math.max(line.z1(), line.z2());
+            int z1 = minZ;
+            while (z1 < maxZ) {
+                int z2 = Mth.clamp(z1 + MAX_LINE_LENGTH, minZ, maxZ);
+                Line l = new Line(x, z1, x, z2);
+                lines.add(l);
+                z1 = z2;
             }
         } else if (dz == 0) { // horizontal line
-            for (int x = Math.min(line.x1(), line.x2()); x < Math.max(line.x1(), line.x2()); x += MAX_LINE_LENGTH) {
-                lines.add(new Line(x, line.z1(), Math.min(x + MAX_LINE_LENGTH, line.x2()), line.z2()));
+            int z = line.z1();
+            int minX = Math.min(line.x1(), line.x2());
+            int maxX = Math.max(line.x1(), line.x2());
+            int x1 = minX;
+            while (x1 < maxX) {
+                int x2 = Mth.clamp(x1 + MAX_LINE_LENGTH, minX, maxX);
+                Line l = new Line(x1, z, x2, z);
+                lines.add(l);
+                x1 = x2;
             }
         } else {
             double slope = (double) dz / dx;
@@ -44,24 +60,32 @@ public class LinePreProcessor {
             // and therefore need to increment z by 500k
             boolean positiveSlope = Math.abs(slope) > 1;
             if (positiveSlope) {
-                for (double z = Math.min(line.z1(), line.z2()); z < Math.max(line.z1(), line.z2()); z += MAX_LINE_LENGTH) {
-                    double x = (z - intercept) / slope;
-                    lines.add(new Line(
-                        (int) Math.round((z - MAX_LINE_LENGTH - intercept) / slope),
-                        (int) Math.round(z - MAX_LINE_LENGTH),
-                        (int) Math.round(x),
-                        (int) Math.round(z)
-                    ));
+                int minZ = Math.min(line.z1(), line.z2());
+                int maxZ = Math.max(line.z1(), line.z2());
+                int z1 = minZ;
+                while (z1 < maxZ) {
+                    double x1 = (z1 - intercept) / slope;
+                    int z2 = Mth.clamp(z1 + MAX_LINE_LENGTH, minZ, maxZ);
+                    double x2 = (z2 - intercept) / slope;
+                    int xx1 = (int) Math.round(x1);
+                    int xx2 = (int) Math.round(x2);
+                    Line l = new Line(xx1, z1, xx2, z2);
+                    lines.add(l);
+                    z1 = z2;
                 }
             } else {
-                for (double x = Math.min(line.x1(), line.x2()); x < Math.max(line.x1(), line.x2()); x += MAX_LINE_LENGTH) {
-                    double z = slope * x + intercept;
-                    lines.add(new Line(
-                        (int) Math.round(x - MAX_LINE_LENGTH),
-                        (int) Math.round(slope * (x - MAX_LINE_LENGTH) + intercept),
-                        (int) Math.round(x),
-                        (int) Math.round(z)
-                    ));
+                int minX = Math.min(line.x1(), line.x2());
+                int maxX = Math.max(line.x1(), line.x2());
+                int x1 = minX;
+                while (x1 < maxX) {
+                    double z1 = slope * x1 + intercept;
+                    int x2 = Mth.clamp(x1 + MAX_LINE_LENGTH, minX, maxX);
+                    double z2 = slope * x2 + intercept;
+                    int zz1 = (int) Math.round(z1);
+                    int zz2 = (int) Math.round(z2);
+                    Line l = new Line(x1, zz1, x2, zz2);
+                    lines.add(l);
+                    x1 = x2;
                 }
             }
         }

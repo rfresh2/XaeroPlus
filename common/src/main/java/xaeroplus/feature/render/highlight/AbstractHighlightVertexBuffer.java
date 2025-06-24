@@ -26,7 +26,7 @@ public abstract class AbstractHighlightVertexBuffer {
         if (uniformBuffer == null) {
             uniformBuffer = new MappableRingBuffer(
                 () -> "XaeroPlus Highlight Uniform Buffer",
-                GpuBuffer.USAGE_MAP_WRITE,
+                GpuBuffer.USAGE_UNIFORM | GpuBuffer.USAGE_MAP_WRITE,
                 new Std140SizeCalculator()
                     .putMat4f()
                     .putMat4f()

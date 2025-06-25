@@ -257,6 +257,7 @@
   "xaeroplus.gui.world_map.draw_line_segment": "Segmento de linha",
   "xaeroplus.gui.world_map.draw_infinite_line": "Linha infinita",
   "xaeroplus.gui.world_map.draw_highlights": "Destaque de chunk",
+  "xaeroplus.gui.world_map.draw_text": "Texto",
   "xaeroplus.gui.world_map.draw_color": "Cor do desenho",
   "xaeroplus.setting.drawing_opacity": "Opacidade do desenho",
   "xaeroplus.setting.drawing_opacity.tooltip": "Define a opacidade da cor dos desenhos"

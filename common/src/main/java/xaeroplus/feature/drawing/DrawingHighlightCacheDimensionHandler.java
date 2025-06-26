@@ -9,7 +9,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
-import xaeroplus.feature.db.DrawingDatabase;
+import xaeroplus.feature.drawing.db.DrawingDatabase;
 import xaeroplus.feature.highlights.ChunkHighlightBaseCacheHandler;
 import xaeroplus.util.ChunkUtils;
 

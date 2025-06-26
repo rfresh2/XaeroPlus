@@ -2,6 +2,8 @@ package xaeroplus.feature.render;
 
 import xaeroplus.feature.render.highlight.*;
 import xaeroplus.feature.render.line.*;
+import xaeroplus.feature.render.text.TextDrawFeature;
+import xaeroplus.feature.render.text.TextSupplier;
 import xaeroplus.util.FloatSupplier;
 
 import java.util.function.IntSupplier;
@@ -105,6 +107,16 @@ public interface DrawFeatureFactory {
                 lineWidthSupplier
             ),
             refreshIntervalMs
+        );
+    }
+
+    static DrawFeature text(
+        String id,
+        TextSupplier textSupplier
+    ) {
+        return new TextDrawFeature(
+            id,
+            textSupplier
         );
     }
 }

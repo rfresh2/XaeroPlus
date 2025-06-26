@@ -51,8 +51,7 @@ public class DrawManager {
         final int flooredCameraZ,
         final PoseStack matrixStack,
         final double fboScale,
-        final MultiBufferSource.BufferSource renderTypeBuffers
-    ) {
+        final MultiBufferSource.BufferSource renderTypeBuffers) {
         if (HudMod.INSTANCE.isFairPlay()) return;
         var ctx = new DrawContext(matrixStack, renderTypeBuffers, fboScale, true);
         matrixStack.pushPose();

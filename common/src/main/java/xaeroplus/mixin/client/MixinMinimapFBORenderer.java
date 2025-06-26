@@ -186,7 +186,8 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         target = "Lxaero/common/mods/SupportXaeroWorldmap;drawMinimap(Lxaero/hud/minimap/module/MinimapSession;Lcom/mojang/blaze3d/vertex/PoseStack;Lxaero/common/minimap/render/MinimapRendererHelper;IIIIIIZDDLcom/mojang/blaze3d/vertex/VertexConsumer;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;)V"),
         remap = true) // $REMAP
     public void drawMinimapFeatures(final SupportXaeroWorldmap instance, final MinimapSession minimapSession, final PoseStack matrixStack, final MinimapRendererHelper helper, final int xFloored, final int zFloored, final int minViewX, final int minViewZ, final int maxViewX, final int maxViewZ, final boolean zooming, final double zoom, final double mapDimensionScale, final VertexConsumer overlayBufferBuilder, final MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers, final Operation<Void> original,
-                                    @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers) {
+                                    @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers
+    ) {
         original.call(instance, minimapSession, matrixStack, helper, xFloored, zFloored, minViewX, minViewZ, maxViewX, maxViewZ, zooming, zoom, mapDimensionScale, overlayBufferBuilder, multiTextureRenderTypeRenderers);
         int mapX = xFloored >> 4;
         int mapZ = zFloored >> 4;
@@ -205,7 +206,8 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             insideX,
             insideZ,
             matrixStack,
-            renderTypeBuffers);
+            renderTypeBuffers
+        );
     }
 
     @WrapOperation(method = "renderChunksToFBO", at = @At(

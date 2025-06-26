@@ -31,6 +31,7 @@ public class Globals {
     public static boolean shouldResetFBO = false;
     public static boolean minimapSettingsInitialized = false;
     public static boolean switchingDimension = false;
+    public static boolean disableDrawCullingOverride = false;
     public static ResourceKey<Level> getCurrentDimensionId() {
         try {
             var dim = XaeroWorldMapCore.currentSession.getMapProcessor().getMapWorld().getCurrentDimensionId();

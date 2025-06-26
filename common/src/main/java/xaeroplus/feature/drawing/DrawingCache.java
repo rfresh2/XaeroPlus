@@ -5,6 +5,8 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.longs.Long2LongMaps;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import net.minecraft.client.Minecraft;
@@ -16,8 +18,9 @@ import xaero.map.gui.GuiMap;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
-import xaeroplus.feature.db.DrawingDatabase;
+import xaeroplus.feature.drawing.db.DrawingDatabase;
 import xaeroplus.feature.render.line.Line;
+import xaeroplus.feature.render.text.Text;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.TickTaskExecutor;
 import xaeroplus.util.ChunkUtils;
@@ -40,8 +43,9 @@ public class DrawingCache implements Closeable {
     private final String databaseName;
     private ListeningExecutorService dbExecutor;
     private final ListeningExecutorService parentExecutor;
-    private final Map<ResourceKey<Level>, DrawingHighlightCacheDimensionHandler> dimensionCacheMap = new ConcurrentHashMap<>(3);
+    private final Map<ResourceKey<Level>, DrawingHighlightCacheDimensionHandler> highlightsCacheMap = new ConcurrentHashMap<>(3);
     private final Map<ResourceKey<Level>, DrawingLinesCacheDimensionHandler> linesCacheMap = new ConcurrentHashMap<>(3);
+    private final Map<ResourceKey<Level>, DrawingTextCacheDimensionHandler> textsCacheMap = new ConcurrentHashMap<>(3);
     private final Queue<Runnable> initializeTaskQueue = new ConcurrentLinkedQueue<>();
     Minecraft mc = Minecraft.getInstance();
 
@@ -61,7 +65,7 @@ public class DrawingCache implements Closeable {
 
     public void addHighlight(final int x, final int z, final int color, final ResourceKey<Level> dimension) {
         try {
-            DrawingHighlightCacheDimensionHandler cacheForActualDimension = getCacheForDimension(dimension, true);
+            DrawingHighlightCacheDimensionHandler cacheForActualDimension = getHighlightCacheForDimension(dimension, true);
             if (cacheForActualDimension == null) {
                 // if the cache is not ready yet, queue the highlight to be added
                 initializeTaskQueue.add(() -> addHighlight(x, z, color, dimension));
@@ -87,9 +91,24 @@ public class DrawingCache implements Closeable {
         }
     }
 
+    public void addText(Text text, ResourceKey<Level> dimension) {
+        if (text.value().isBlank()) return;
+        try {
+            DrawingTextCacheDimensionHandler cacheForActualDimension = getTextCacheForDimension(dimension, true);
+            if (cacheForActualDimension == null) {
+                // if the cache is not ready yet, queue the line to be added
+                initializeTaskQueue.add(() -> addText(text, dimension));
+                return;
+            }
+            cacheForActualDimension.addText(text);
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.warn("Error adding text to {} disk cache: {}, {}", databaseName, text, e);
+        }
+    }
+
     public void removeHighlight(final int x, final int z, final ResourceKey<Level> dimension) {
         try {
-            DrawingHighlightCacheDimensionHandler cacheForActualDimension = getCacheForDimension(dimension, true);
+            DrawingHighlightCacheDimensionHandler cacheForActualDimension = getHighlightCacheForDimension(dimension, true);
             if (cacheForActualDimension == null) {
                 // if the cache is not ready yet, queue the highlight to be removed
                 initializeTaskQueue.add(() -> removeHighlight(x, z, dimension));
@@ -115,9 +134,23 @@ public class DrawingCache implements Closeable {
         }
     }
 
-    public Long2LongMap getCacheMap(final ResourceKey<Level> dimensionId) {
+    public void removeText(final int x, final int z, ResourceKey<Level> dimension) {
+        try {
+            DrawingTextCacheDimensionHandler cacheForActualDimension = getTextCacheForDimension(dimension, true);
+            if (cacheForActualDimension == null) {
+                // if the cache is not ready yet, queue the line to be removed
+                initializeTaskQueue.add(() -> removeText(x, z, dimension));
+                return;
+            }
+            cacheForActualDimension.removeText(x, z);
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.warn("Error removing text from {} disk cache: {}, {}", databaseName, x, z, e);
+        }
+    }
+
+    public Long2LongMap getHighlights(final ResourceKey<Level> dimensionId) {
         if (dimensionId == null) return Long2LongMaps.EMPTY_MAP;
-        DrawingHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimensionId, false);
+        DrawingHighlightCacheDimensionHandler cacheForDimension = getHighlightCacheForDimension(dimensionId, false);
         if (cacheForDimension == null) return Long2LongMaps.EMPTY_MAP;
         return cacheForDimension.getCacheMap(dimensionId);
     }
@@ -129,6 +162,13 @@ public class DrawingCache implements Closeable {
         return cacheForDimension.getLines();
     }
 
+    public Long2ObjectMap<Text> getTexts(final ResourceKey<Level> dimensionId) {
+        if (dimensionId == null) return Long2ObjectMaps.emptyMap();
+        var cacheForDimension = getTextCacheForDimension(dimensionId, false);
+        if (cacheForDimension == null) return Long2ObjectMaps.emptyMap();
+        return cacheForDimension.getTexts();
+    }
+
     public void handleWorldChange(final XaeroWorldChangeEvent event) {
         parentExecutor.execute(() -> {
             switch (event.worldChangeType()) {
@@ -137,8 +177,9 @@ public class DrawingCache implements Closeable {
                         if (initializeWorld()) {
                             cacheReady.set(true);
                             submitTickTask(() -> {
-                                loadChunksInViewedDimension();
+                                loadHighlightsInViewedDimension();
                                 loadLinesInViewedDimension();
+                                loadTextsInViewedDimension();
                             });
                         }
                     } else {
@@ -149,8 +190,11 @@ public class DrawingCache implements Closeable {
                     // make sure we mark as unready to prevent further mutations
                     if (cacheReady.compareAndSet(true, false)) {
                         try {
-                            CompletableFuture.allOf(flushAllChunks().toArray(new CompletableFuture[0])).get(30, TimeUnit.SECONDS);
-                            CompletableFuture.allOf(flushAllLines().toArray(new CompletableFuture[0])).get(30, TimeUnit.SECONDS);
+                            List<CompletableFuture<?>> tasks = new ArrayList<>();
+                            tasks.addAll(flushAllChunks());
+                            tasks.addAll(flushAllLines());
+                            tasks.addAll(flushAllTexts());
+                            CompletableFuture.allOf(tasks.toArray(new CompletableFuture[0])).get(30, TimeUnit.SECONDS);
                         } catch (final Exception e) {
                             XaeroPlus.LOGGER.error("Error saving all chunks before world change", e);
                         }
@@ -160,12 +204,14 @@ public class DrawingCache implements Closeable {
                     reset();
                 }
                 case VIEWED_DIMENSION_SWITCH -> {
-                    submitTickTask(this::loadChunksInViewedDimension);
+                    submitTickTask(this::loadHighlightsInViewedDimension);
                     submitTickTask(this::loadLinesInViewedDimension);
+                    submitTickTask(this::loadTextsInViewedDimension);
                 }
                 case ACTUAL_DIMENSION_SWITCH -> {
                     submitTickTask(this::loadChunksOnActualDimensionSwitch);
                     submitTickTask(this::loadLinesOnActualDimensionSwitch);
+                    submitTickTask(this::loadTextsOnActualDimensionSwitch);
                 }
             }
         });
@@ -193,8 +239,9 @@ public class DrawingCache implements Closeable {
         }
         if (this.database != null) this.database.close();
         // dimension cache instances will be GC'd, no need to explicitly clear them
-        this.dimensionCacheMap.clear();
+        this.highlightsCacheMap.clear();
         this.linesCacheMap.clear();
+        this.textsCacheMap.clear();
         this.database = null;
         this.initializeTaskQueue.clear();
     }
@@ -212,12 +259,23 @@ public class DrawingCache implements Closeable {
             .collect(Collectors.toList());
     }
 
-    public DrawingHighlightCacheDimensionHandler getCacheForActualDimension() {
-        if (!cacheReady.get()) return null;
-        return getCacheForDimension(ChunkUtils.getActualDimension(), true);
+    private List<CompletableFuture<?>> flushAllTexts() {
+        return getAllTextsCaches().stream()
+            .map(cache -> submitTickTask(cache::writeStaleTextsToDatabase))
+            .collect(Collectors.toList());
     }
 
-    private DrawingHighlightCacheDimensionHandler initializeDimensionCacheHandler(final ResourceKey<Level> dimension) {
+    public DrawingHighlightCacheDimensionHandler getHighlightCacheForActualDimension() {
+        if (!cacheReady.get()) return null;
+        return getHighlightCacheForDimension(ChunkUtils.getActualDimension(), true);
+    }
+
+    public DrawingTextCacheDimensionHandler getTextCacheForActualDimension() {
+        if (!cacheReady.get()) return null;
+        return getTextCacheForDimension(ChunkUtils.getActualDimension(), true);
+    }
+
+    private DrawingHighlightCacheDimensionHandler initializeHighlightDimensionCacheHandler(final ResourceKey<Level> dimension) {
         if (dimension == null) return null;
         var db = this.database;
         var executor = this.dbExecutor;
@@ -227,7 +285,7 @@ public class DrawingCache implements Closeable {
         }
         var cacheHandler = new DrawingHighlightCacheDimensionHandler(dimension, db, executor);
         db.initializeDimension(dimension);
-        this.dimensionCacheMap.put(dimension, cacheHandler);
+        this.highlightsCacheMap.put(dimension, cacheHandler);
         return cacheHandler;
     }
 
@@ -245,14 +303,40 @@ public class DrawingCache implements Closeable {
         return linesCacheHandler;
     }
 
-    public DrawingHighlightCacheDimensionHandler getCacheForDimension(final ResourceKey<Level> dimension, boolean create) {
+    private DrawingTextCacheDimensionHandler initializeTextDimensionCacheHandler(final ResourceKey<Level> dimension) {
+        if (dimension == null) return null;
+        var db = this.database;
+        var executor = this.dbExecutor;
+        if (db == null || executor == null) {
+            XaeroPlus.LOGGER.error("[{}] Unable to initialize {} disk cache handler for: {}, database: {} or executor: {} is null", Thread.currentThread().getName(), databaseName, dimension.location(), db, executor);
+            return null;
+        }
+        var cacheHandler = new DrawingTextCacheDimensionHandler(dimension, db, executor);
+        db.initializeDimension(dimension);
+        this.textsCacheMap.put(dimension, cacheHandler);
+        return cacheHandler;
+    }
+
+    public DrawingHighlightCacheDimensionHandler getHighlightCacheForDimension(final ResourceKey<Level> dimension, boolean create) {
         if (!cacheReady.get()) return null;
         if (dimension == null) return null;
-        var dimensionCache = dimensionCacheMap.get(dimension);
+        var dimensionCache = highlightsCacheMap.get(dimension);
         if (dimensionCache == null) {
             if (!create) return null;
             XaeroPlus.LOGGER.info("Initializing {} disk cache for dimension: {}", databaseName, dimension.location());
-            dimensionCache = initializeDimensionCacheHandler(dimension);
+            dimensionCache = initializeHighlightDimensionCacheHandler(dimension);
+        }
+        return dimensionCache;
+    }
+
+    public DrawingTextCacheDimensionHandler getTextCacheForDimension(final ResourceKey<Level> dimension, boolean create) {
+        if (!cacheReady.get()) return null;
+        if (dimension == null) return null;
+        var dimensionCache = textsCacheMap.get(dimension);
+        if (dimensionCache == null) {
+            if (!create) return null;
+            XaeroPlus.LOGGER.info("Initializing {} disk cache for dimension: {}", databaseName, dimension.location());
+            dimensionCache = initializeTextDimensionCacheHandler(dimension);
         }
         return dimensionCache;
     }
@@ -270,16 +354,20 @@ public class DrawingCache implements Closeable {
     }
 
     public List<DrawingHighlightCacheDimensionHandler> getAllCaches() {
-        return List.copyOf(dimensionCacheMap.values());
+        return List.copyOf(highlightsCacheMap.values());
     }
 
     public List<DrawingLinesCacheDimensionHandler> getAllLinesCaches() {
         return List.copyOf(linesCacheMap.values());
     }
 
-    public List<DrawingHighlightCacheDimensionHandler> getCachesExceptDimension(final ResourceKey<Level> dimension) {
-        var caches = new ArrayList<DrawingHighlightCacheDimensionHandler>(dimensionCacheMap.size());
-        for (var entry : dimensionCacheMap.entrySet()) {
+    public List<DrawingTextCacheDimensionHandler> getAllTextsCaches() {
+        return List.copyOf(textsCacheMap.values());
+    }
+
+    public List<DrawingHighlightCacheDimensionHandler> getHighlightCachesExceptDimension(final ResourceKey<Level> dimension) {
+        var caches = new ArrayList<DrawingHighlightCacheDimensionHandler>(highlightsCacheMap.size());
+        for (var entry : highlightsCacheMap.entrySet()) {
             if (!entry.getKey().equals(dimension)) {
                 caches.add(entry.getValue());
             }
@@ -287,9 +375,29 @@ public class DrawingCache implements Closeable {
         return caches;
     }
 
-    public List<DrawingHighlightCacheDimensionHandler> getCachesExceptDimensions(final List<ResourceKey<Level>> dimensions) {
-        var caches = new ArrayList<DrawingHighlightCacheDimensionHandler>(dimensionCacheMap.size());
-        for (var entry : dimensionCacheMap.entrySet()) {
+    public List<DrawingHighlightCacheDimensionHandler> getHighlightCachesExceptDimensions(final List<ResourceKey<Level>> dimensions) {
+        var caches = new ArrayList<DrawingHighlightCacheDimensionHandler>(highlightsCacheMap.size());
+        for (var entry : highlightsCacheMap.entrySet()) {
+            if (!dimensions.contains(entry.getKey())) {
+                caches.add(entry.getValue());
+            }
+        }
+        return caches;
+    }
+
+    public List<DrawingTextCacheDimensionHandler> getTextCachesExceptDimension(final ResourceKey<Level> dimension) {
+        var caches = new ArrayList<DrawingTextCacheDimensionHandler>(textsCacheMap.size());
+        for (var entry : textsCacheMap.entrySet()) {
+            if (!entry.getKey().equals(dimension)) {
+                caches.add(entry.getValue());
+            }
+        }
+        return caches;
+    }
+
+    public List<DrawingTextCacheDimensionHandler> getTextCachesExceptDimensions(final List<ResourceKey<Level>> dimensions) {
+        var caches = new ArrayList<DrawingTextCacheDimensionHandler>(textsCacheMap.size());
+        for (var entry : textsCacheMap.entrySet()) {
             if (!dimensions.contains(entry.getKey())) {
                 caches.add(entry.getValue());
             }
@@ -315,12 +423,15 @@ public class DrawingCache implements Closeable {
                         })
                         .build()));
             this.database = new DrawingDatabase(worldId, databaseName);
-            initializeDimensionCacheHandler(OVERWORLD);
-            initializeDimensionCacheHandler(NETHER);
-            initializeDimensionCacheHandler(END);
+            initializeHighlightDimensionCacheHandler(OVERWORLD);
+            initializeHighlightDimensionCacheHandler(NETHER);
+            initializeHighlightDimensionCacheHandler(END);
             initializeLinesCacheHandler(OVERWORLD);
             initializeLinesCacheHandler(NETHER);
             initializeLinesCacheHandler(END);
+            initializeTextDimensionCacheHandler(OVERWORLD);
+            initializeTextDimensionCacheHandler(NETHER);
+            initializeTextDimensionCacheHandler(END);
             if (!initializeTaskQueue.isEmpty()) XaeroPlus.LOGGER.info("[{}] Running {} queued tasks", databaseName, initializeTaskQueue.size());
             while (!this.initializeTaskQueue.isEmpty()) {
                 submitTickTask(this.initializeTaskQueue.poll());
@@ -334,7 +445,7 @@ public class DrawingCache implements Closeable {
     }
 
     private void loadChunksOnActualDimensionSwitch() {
-        var cacheForActualDimension = getCacheForActualDimension();
+        var cacheForActualDimension = getHighlightCacheForActualDimension();
         if (cacheForActualDimension == null) return;
         cacheForActualDimension
             .setWindow(ChunkUtils.actualPlayerRegionX(), ChunkUtils.actualPlayerRegionZ(), getMinimapRegionWindowSize());
@@ -346,9 +457,16 @@ public class DrawingCache implements Closeable {
         linesCacheForActualDimension.loadLines();
     }
 
-    private void loadChunksInViewedDimension() {
+    private void loadTextsOnActualDimensionSwitch() {
+        var cacheForActualDimension = getTextCacheForActualDimension();
+        if (cacheForActualDimension == null) return;
+        cacheForActualDimension
+            .setWindow(ChunkUtils.actualPlayerRegionX(), ChunkUtils.actualPlayerRegionZ(), getMinimapRegionWindowSize());
+    }
+
+    private void loadHighlightsInViewedDimension() {
         var viewedDim = Globals.getCurrentDimensionId();
-        var cacheForCurrentDimension = getCacheForDimension(viewedDim, true);
+        var cacheForCurrentDimension = getHighlightCacheForDimension(viewedDim, true);
         if (cacheForCurrentDimension == null) return;
         final int windowSize;
         final int windowCenterX;
@@ -375,6 +493,28 @@ public class DrawingCache implements Closeable {
         linesCacheForCurrentDimension.loadLines();
     }
 
+    private void loadTextsInViewedDimension() {
+        var viewedDim = Globals.getCurrentDimensionId();
+        var cacheForCurrentDimension = getTextCacheForDimension(viewedDim, true);
+        if (cacheForCurrentDimension == null) return;
+        final int windowSize;
+        final int windowCenterX;
+        final int windowCenterZ;
+        Optional<GuiMap> guiMapOptional = getGuiMap();
+        if (guiMapOptional.isPresent()) {
+            var guiMap = guiMapOptional.get();
+            windowSize = getGuiMapRegionSize(guiMap);
+            windowCenterX = getGuiMapCenterRegionX(guiMap);
+            windowCenterZ = getGuiMapCenterRegionZ(guiMap);
+        } else {
+            windowSize = getMinimapRegionWindowSize();
+            windowCenterX = ChunkUtils.getPlayerRegionX();
+            windowCenterZ = ChunkUtils.getPlayerRegionZ();
+        }
+        cacheForCurrentDimension
+            .setWindow(windowCenterX, windowCenterZ, windowSize);
+    }
+
     public void onEnable() {
         handleWorldChange(new XaeroWorldChangeEvent(ENTER_WORLD, null, ChunkUtils.getActualDimension()));
     }
@@ -383,10 +523,13 @@ public class DrawingCache implements Closeable {
         parentExecutor.execute(() -> {
             cacheReady.set(false);
             try {
-                CompletableFuture.allOf(flushAllChunks().toArray(new CompletableFuture[0])).get(30, TimeUnit.SECONDS);
-                CompletableFuture.allOf(flushAllLines().toArray(new CompletableFuture[0])).get(30, TimeUnit.SECONDS);
+                List<CompletableFuture<?>> tasks = new ArrayList<>();
+                tasks.addAll(flushAllChunks());
+                tasks.addAll(flushAllLines());
+                tasks.addAll(flushAllTexts());
+                CompletableFuture.allOf(tasks.toArray(new CompletableFuture[0])).get(30, TimeUnit.SECONDS);
             } catch (final Exception e) {
-                XaeroPlus.LOGGER.error("Error saving all chunks before disabling", e);
+                XaeroPlus.LOGGER.error("Error saving all drawing data before disabling", e);
             }
             reset();
         });
@@ -432,17 +575,27 @@ public class DrawingCache implements Closeable {
             windowCenterX = ChunkUtils.getPlayerRegionX();
             windowCenterZ = ChunkUtils.getPlayerRegionZ();
         }
-        var cacheForDimension = getCacheForDimension(mapDimension, true);
-        if (cacheForDimension != null) cacheForDimension.setWindow(windowCenterX, windowCenterZ, windowSize);
+        var highlightCacheForDimension = getHighlightCacheForDimension(mapDimension, true);
+        if (highlightCacheForDimension != null) highlightCacheForDimension.setWindow(windowCenterX, windowCenterZ, windowSize);
+        var textCacheForDimension = getTextCacheForDimension(mapDimension, true);
+        if (textCacheForDimension != null) textCacheForDimension.setWindow(windowCenterX, windowCenterZ, windowSize);
         if (mapDimension == actualDimension) {
-            getCachesExceptDimension(mapDimension)
+            getHighlightCachesExceptDimension(mapDimension)
+                .forEach(cache -> cache.setWindow(0, 0, 0));
+            getTextCachesExceptDimension(mapDimension)
                 .forEach(cache -> cache.setWindow(0, 0, 0));
         } else {
-            var actualDimCache = getCacheForDimension(actualDimension, true);
-            if (actualDimCache != null) {
-                actualDimCache.setWindow(actualPlayerRegionX, actualPlayerRegionZ, windowSize);
+            var actualDimHighlightCache = getHighlightCacheForDimension(actualDimension, true);
+            if (actualDimHighlightCache != null) {
+                actualDimHighlightCache.setWindow(actualPlayerRegionX, actualPlayerRegionZ, windowSize);
             }
-            getCachesExceptDimensions(List.of(mapDimension, actualDimension))
+            var actualDimTextCache = getTextCacheForDimension(actualDimension, true);
+            if (actualDimTextCache != null) {
+                actualDimTextCache.setWindow(actualPlayerRegionX, actualPlayerRegionZ, windowSize);
+            }
+            getHighlightCachesExceptDimensions(List.of(mapDimension, actualDimension))
+                .forEach(cache -> cache.setWindow(0, 0, 0));
+            getTextCachesExceptDimensions(List.of(mapDimension, actualDimension))
                 .forEach(cache -> cache.setWindow(0, 0, 0));
         }
     }

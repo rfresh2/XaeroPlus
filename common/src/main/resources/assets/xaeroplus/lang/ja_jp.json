@@ -255,6 +255,7 @@
     "xaeroplus.gui.world_map.draw_line_segment": "線分",
     "xaeroplus.gui.world_map.draw_infinite_line": "無限線",
     "xaeroplus.gui.world_map.draw_highlights": "チャンクのハイライト",
+    "xaeroplus.gui.world_map.draw_text": "文章",
     "xaeroplus.gui.world_map.draw_color": "描画色",
     "xaeroplus.setting.drawing_opacity": "描画の不透明度",
     "xaeroplus.setting.drawing_opacity.tooltip": "描画の色の不透明度を設定します"

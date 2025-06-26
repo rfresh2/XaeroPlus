@@ -26,6 +26,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
@@ -50,13 +51,11 @@ import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.drawing.DrawingColorCyclerButton;
 import xaeroplus.feature.render.line.Line;
+import xaeroplus.feature.render.text.Text;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.*;
 import xaeroplus.settings.Settings;
-import xaeroplus.util.BaritoneExecutor;
-import xaeroplus.util.BaritoneHelper;
-import xaeroplus.util.ChunkUtils;
-import xaeroplus.util.DrawingMode;
+import xaeroplus.util.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,12 +85,15 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Unique Button drawLineSegmentButton;
     @Unique Button drawInfiniteLineButton;
     @Unique Button drawHighlightsButton;
+    @Unique Button drawTextButton;
     @Unique Button drawColorCyclerButton;
     @Unique boolean drawing = false;
-    @Unique BlockPos drawLinePos1 = null;
+    @Unique BlockPos drawInProgressPos = null;
     @Unique boolean drawingLeftClickDown = false;
     @Unique boolean drawingRightClickDown = false;
+    @Unique boolean drawTextEntryActive = false;
     @Unique DrawingMode drawingMode = DrawingMode.LINE_SEGMENT;
+    @Unique EditBox drawTextEntryField;
     @Unique List<Button> guiMapButtonTempList = new ArrayList<>();
     @Unique ResourceLocation xpGuiTextures = ResourceLocation.fromNamespaceAndPath("xaeroplus", "gui/xpgui.png");
     @Shadow private double cameraX = 0.0;
@@ -114,6 +116,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Shadow private int mouseBlockPosZ;
     @Shadow private static double destScale;
     @Shadow private MapTileSelection mapTileSelection;
+    @Shadow private double scale;
 
     protected MixinGuiMap(final Screen parent, final Screen escape, final Component titleIn) {
         super(parent, escape, titleIn);
@@ -184,29 +187,40 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         drawLineSegmentButton = new GuiTexturedButton(
             startDrawingButton.getX() + 16, startDrawingButton.getY(), 20, 20, 65, 0, 16, 16,
             this.xpGuiTextures,
-            (button -> drawingMode = DrawingMode.LINE_SEGMENT),
+            button -> setDrawingMode(DrawingMode.LINE_SEGMENT),
             () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_line_segment"))),
             256, 256);
         drawLineSegmentButton.visible = false;
         drawInfiniteLineButton = new GuiTexturedButton(
             startDrawingButton.getX() + 16, drawLineSegmentButton.getY() + 20, 20, 20, 101, 0, 16, 16,
             this.xpGuiTextures,
-            (button -> drawingMode = DrawingMode.INFINITE_LINE),
+            button -> setDrawingMode(DrawingMode.INFINITE_LINE),
             () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_infinite_line"))),
             256, 256);
         drawInfiniteLineButton.visible = false;
         drawHighlightsButton = new GuiTexturedButton(
             startDrawingButton.getX() + 16, drawInfiniteLineButton.getY() + 20, 20, 20, 82, 0, 16, 16,
             this.xpGuiTextures,
-            (button -> drawingMode = DrawingMode.HIGHLIGHT),
+            button -> setDrawingMode(DrawingMode.HIGHLIGHT),
             () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_highlights"))),
             256, 256);
         drawHighlightsButton.visible = false;
+        drawTextButton = new GuiTexturedButton(
+            startDrawingButton.getX() + 16, drawHighlightsButton.getY() + 20, 20, 20, 118, 0, 16, 16,
+            this.xpGuiTextures,
+            button -> setDrawingMode(DrawingMode.TEXT),
+            () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_text"))),
+            256, 256);
+        drawTextButton.visible = false;
         drawColorCyclerButton = new DrawingColorCyclerButton(
-            startDrawingButton.getX() + 16, drawHighlightsButton.getY() + 20,
+            startDrawingButton.getX() + 16, drawTextButton.getY() + 20,
             () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_color"))),
             ModuleManager.getModule(Drawing.class).getDrawingColorCycler());
         drawColorCyclerButton.visible = false;
+        drawTextEntryField = new EditBox(Minecraft.getInstance().font, 0, 0, 150, 20, Component.nullToEmpty("Text:"));
+        drawTextEntryField.setVisible(false);
+        drawTextEntryField.setCursorPosition(0);
+        drawTextEntryField.setHint(Component.literal("Text:").withStyle(ChatFormatting.DARK_GRAY));
         // right side
         if (!SupportMods.pac()) {  // remove useless button when pac is not installed
             this.removeWidget(this.claimsButton);
@@ -256,6 +270,16 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     }
 
     @Unique
+    private void setDrawingMode(DrawingMode drawingMode) {
+        drawInProgressPos = null;
+        ModuleManager.getModule(Drawing.class).removeInProgressLine();
+        drawingLeftClickDown = false;
+        drawingRightClickDown = false;
+        drawTextEntryActive = false;
+        this.drawingMode = drawingMode;
+    }
+
+    @Unique
     private void onToggleDrawingButton() {
         var prevDrawing = drawing;
         this.init(Minecraft.getInstance(), width, height);
@@ -264,10 +288,12 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             addButton(drawLineSegmentButton);
             addButton(drawInfiniteLineButton);
             addButton(drawHighlightsButton);
+            addButton(drawTextButton);
             addButton(drawColorCyclerButton);
             drawLineSegmentButton.visible = true;
             drawInfiniteLineButton.visible = true;
             drawHighlightsButton.visible = true;
+            drawTextButton.visible = true;
             drawColorCyclerButton.visible = true;
         } else {
             xaeroPlus$stopDrawing();
@@ -349,7 +375,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                      @Local(name = "flooredCameraZ") int flooredCameraZ,
                                      @Local(name = "matrixStack") PoseStack matrixStack,
                                      @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers,
-                                     @Local(name = "fboScale") double fboScale) {
+                                     @Local(name = "fboScale") double fboScale
+    ) {
         if (Minecraft.getInstance().options.hideGui) return;
         Globals.drawManager.drawWorldMapFeatures(
             flooredCameraX,
@@ -468,9 +495,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     ), remap = true)
     public void renderCoordinatesGotoTextEntryFields(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.screen != null && mc.screen.getClass().equals(GuiMap.class) && xTextEntryField.isVisible() && zTextEntryField.isVisible()) {
-            xTextEntryField.render(guiGraphics, scaledMouseX, scaledMouseY, partialTicks);
-            zTextEntryField.render(guiGraphics, scaledMouseX, scaledMouseY, partialTicks);
+        if (mc.screen != null && mc.screen.getClass().equals(GuiMap.class)) {
+            if (xTextEntryField.isVisible() && zTextEntryField.isVisible()) {
+                xTextEntryField.render(guiGraphics, scaledMouseX, scaledMouseY, partialTicks);
+                zTextEntryField.render(guiGraphics, scaledMouseX, scaledMouseY, partialTicks);
+            }
+            if (drawing && drawTextEntryActive && drawingMode == DrawingMode.TEXT && drawTextEntryField.visible) {
+                drawTextEntryField.render(guiGraphics, scaledMouseX, scaledMouseY, partialTicks);
+            }
         }
     }
 
@@ -500,6 +532,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 drawLineSegmentButton.setFocused(true);
                 drawInfiniteLineButton.setFocused(false);
                 drawHighlightsButton.setFocused(false);
+                drawTextButton.setFocused(false);
                 drawColorCyclerButton.setFocused(false);
             }
             case INFINITE_LINE -> {
@@ -507,13 +540,27 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 drawLineSegmentButton.setFocused(false);
                 drawInfiniteLineButton.setFocused(true);
                 drawHighlightsButton.setFocused(false);
+                drawTextButton.setFocused(false);
                 drawColorCyclerButton.setFocused(false);
             } case HIGHLIGHT -> {
                 startDrawingButton.setFocused(false);
                 drawLineSegmentButton.setFocused(false);
                 drawInfiniteLineButton.setFocused(false);
                 drawHighlightsButton.setFocused(true);
+                drawTextButton.setFocused(false);
                 drawColorCyclerButton.setFocused(false);
+            } case TEXT -> {
+                startDrawingButton.setFocused(false);
+                drawLineSegmentButton.setFocused(false);
+                drawInfiniteLineButton.setFocused(false);
+                drawHighlightsButton.setFocused(false);
+                drawTextButton.setFocused(true);
+                drawColorCyclerButton.setFocused(false);
+                if (drawTextEntryActive) {
+                    drawTextEntryField.setEditable(true);
+                    drawTextEntryField.setFocused(true);
+                    setFocused(drawTextEntryField);
+                }
             }
         }
     }
@@ -523,10 +570,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if (drawing) {
             switch (drawingMode) {
                 case LINE_SEGMENT, INFINITE_LINE -> {
-                    if (drawLinePos1 == null) {
+                    if (drawInProgressPos == null) {
                         ModuleManager.getModule(Drawing.class).removeInProgressLine();
                     } else {
-                        var inProgress = ModuleManager.getModule(Drawing.class).snap(drawLinePos1.getX(), drawLinePos1.getZ(), mouseBlockPosX, mouseBlockPosZ, destScale);
+                        var inProgress = ModuleManager.getModule(Drawing.class).snap(drawInProgressPos.getX(), drawInProgressPos.getZ(), mouseBlockPosX, mouseBlockPosZ, destScale);
                         ModuleManager.getModule(Drawing.class).setInProgressLine(inProgress, drawingMode);
                     }
                 }
@@ -540,8 +587,20 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             if (drawingRightClickDown) {
                 ModuleManager.getModule(Drawing.class).removeHighlight(ChunkUtils.posToChunkPos(mouseBlockPosX), ChunkUtils.posToChunkPos(mouseBlockPosZ));
                 ModuleManager.getModule(Drawing.class).removeLine(mouseBlockPosX, mouseBlockPosZ);
+                ModuleManager.getModule(Drawing.class).removeText(mouseBlockPosX, mouseBlockPosZ, getFboScale());
             }
         }
+    }
+
+    @Unique
+    private float getFboScale() {
+        float fboScale;
+        if (this.scale >= 1.0) {
+            fboScale = (float) Math.max(1.0, Math.floor(this.scale));
+        } else {
+            fboScale = (float) this.scale;
+        }
+        return fboScale;
     }
 
     @Inject(method = "render", at = @At(
@@ -571,11 +630,21 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if (par3 == 0) { // start drawing on left click
             drawingLeftClickDown = true;
             switch (drawingMode) {
-                case LINE_SEGMENT, INFINITE_LINE -> {
-                    if (drawLinePos1 == null) {
-                        drawLinePos1 = new BlockPos(mouseBlockPosX, 0, mouseBlockPosZ);
+                case LINE_SEGMENT, INFINITE_LINE, TEXT -> {
+                    if (drawInProgressPos == null) {
+                        drawInProgressPos = new BlockPos(mouseBlockPosX, 0, mouseBlockPosZ);
                     }
                 }
+            }
+            if (drawingMode == DrawingMode.TEXT && !drawTextEntryActive) {
+                drawTextEntryActive = true;
+                drawTextEntryField.setX(Mth.clamp((int) par1 - (drawTextEntryField.getWidth() / 2), 5, width - drawTextEntryField.getWidth() - 5));
+                drawTextEntryField.setY(Mth.clamp((int) par2 - (drawTextEntryField.getHeight() / 2), 5, height - drawTextEntryField.getHeight() - 5));
+                addWidget(drawTextEntryField);
+                drawTextEntryField.setVisible(true);
+                drawTextEntryField.setCursorPosition(0);
+                drawTextEntryField.setHint(Component.literal("Text:").withStyle(ChatFormatting.DARK_GRAY));
+                setFocused(drawTextEntryField);
             }
             cir.setReturnValue(true);
         } else if (par3 == 1) {
@@ -595,14 +664,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if (par3 == 0) { // start drawing on left click
             switch (drawingMode) {
                 case LINE_SEGMENT, INFINITE_LINE -> {
-                    if (drawLinePos1 != null) {
+                    if (drawInProgressPos != null) {
                         Line line;
-                        line = ModuleManager.getModule(Drawing.class).snap(drawLinePos1.getX(), drawLinePos1.getZ(), mouseBlockPosX, mouseBlockPosZ, destScale);
+                        line = ModuleManager.getModule(Drawing.class).snap(drawInProgressPos.getX(), drawInProgressPos.getZ(), mouseBlockPosX, mouseBlockPosZ, destScale);
                         switch (drawingMode) {
                             case LINE_SEGMENT -> ModuleManager.getModule(Drawing.class).addLine(line);
                             case INFINITE_LINE -> ModuleManager.getModule(Drawing.class).addInfiniteLine(line);
                         }
-                        drawLinePos1 = null;
+                        drawInProgressPos = null;
                     }
                 }
             }
@@ -610,8 +679,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             cir.setReturnValue(true);
         } else if (par3 == 1) { // clear drawing on right click
             drawingRightClickDown = false;
-            if (drawLinePos1 != null) return;
+            if (drawInProgressPos != null) return;
             ModuleManager.getModule(Drawing.class).removeLine(mouseBlockPosX, mouseBlockPosZ);
+            ModuleManager.getModule(Drawing.class).removeText(mouseBlockPosX, mouseBlockPosZ, getFboScale());
             cir.setReturnValue(true);
         }
     }
@@ -619,17 +689,23 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Unique
     private void xaeroPlus$stopDrawing() {
         drawing = false;
-        drawLinePos1 = null;
+        drawInProgressPos = null;
+        ModuleManager.getModule(Drawing.class).removeInProgressLine();
         drawingLeftClickDown = false;
         drawingRightClickDown = false;
+        drawTextEntryActive = false;
         removeWidget(drawLineSegmentButton);
         removeWidget(drawInfiniteLineButton);
         removeWidget(drawHighlightsButton);
+        removeWidget(drawTextButton);
         removeWidget(drawColorCyclerButton);
+        removeWidget(drawTextEntryField);
         drawLineSegmentButton.visible = false;
         drawInfiniteLineButton.visible = false;
         drawHighlightsButton.visible = false;
+        drawTextButton.visible = false;
         drawColorCyclerButton.visible = false;
+        drawTextEntryField.visible = false;
         this.init(Minecraft.getInstance(), width, height);
     }
 
@@ -650,6 +726,18 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 xaeroPlus$stopDrawing();
                 cir.setReturnValue(true);
                 return;
+            }
+            if (drawTextEntryActive) {
+                if (type == InputConstants.Type.KEYSYM && code == GLFW_KEY_ENTER) {
+                    String value = drawTextEntryField.getValue();
+                    if (!value.isEmpty()) {
+                        var text = new Text(value, drawInProgressPos.getX(), drawInProgressPos.getZ(), ColorHelper.getColor(255, 255, 255, 255), 1f);
+                        ModuleManager.getModule(Drawing.class).addText(text);
+                        xaeroPlus$stopDrawing();
+                        cir.setReturnValue(true);
+                        return;
+                    }
+                }
             }
         }
         if (type != InputConstants.Type.MOUSE) return;
@@ -806,6 +894,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                         }
                         ModuleManager.getModule(Drawing.class).removeHighlight(x, z);
                         ModuleManager.getModule(Drawing.class).removeLine(ChunkUtils.chunkCoordToCoord(x), ChunkUtils.chunkCoordToCoord(z));
+                        ModuleManager.getModule(Drawing.class).removeText(ChunkUtils.chunkCoordToCoord(x), ChunkUtils.chunkCoordToCoord(z), 1);
                     }
                 }
             }
@@ -837,7 +926,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 zTextEntryField.setValue("");
                 xTextEntryField.visible = false;
                 zTextEntryField.visible = false;
-                WorldMap.LOGGER.warn("Go to coordinates failed" , e);
             }
         } else {
             this.init(Minecraft.getInstance(), width, height);

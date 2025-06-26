@@ -68,6 +68,7 @@
     "MixinWorldMapModSettings",
     "MixinWorldMapOption",
     "mc.MixinClientPlayNetworkHandler",
-    "mc.MixinMinecraftClient"
+    "mc.MixinMinecraftClient",
+    "mc.MixinRenderPipeline"
   ]
 }

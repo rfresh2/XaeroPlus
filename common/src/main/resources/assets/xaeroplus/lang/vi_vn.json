@@ -257,6 +257,7 @@
     "xaeroplus.gui.world_map.draw_line_segment": "Đoạn thẳng",
     "xaeroplus.gui.world_map.draw_infinite_line": "Đường vô hạn",
     "xaeroplus.gui.world_map.draw_highlights": "Đánh dấu vùng chunk",
+    "xaeroplus.gui.world_map.draw_text": "Chữ",
     "xaeroplus.gui.world_map.draw_color": "Màu vẽ",
     "xaeroplus.setting.drawing_opacity": "Độ mờ của bản vẽ",
     "xaeroplus.setting.drawing_opacity.tooltip": "Thiết lập độ mờ màu của bản vẽ"

@@ -1,5 +1,6 @@
 package xaeroplus.module.impl;
 
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import net.lenni0451.lambdaevents.EventHandler;
@@ -12,6 +13,7 @@ import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.feature.drawing.DrawingCache;
 import xaeroplus.feature.render.DrawFeatureFactory;
 import xaeroplus.feature.render.line.Line;
+import xaeroplus.feature.render.text.Text;
 import xaeroplus.module.Module;
 import xaeroplus.util.ColorHelper;
 import xaeroplus.util.DrawingMode;
@@ -55,11 +57,21 @@ public class Drawing extends Module {
         Globals.drawManager.registry().register(
             DrawFeatureFactory.multiColorChunkHighlights(
                 this.getClass().getName() + "-highlights",
-                drawingCache::getCacheMap,
+                drawingCache::getHighlights,
                 () -> savedColorAlpha,
                 50
             )
         );
+        Globals.drawManager.registry().register(
+            DrawFeatureFactory.text(
+                this.getClass().getName() + "-text",
+                this::getTexts
+            )
+        );
+    }
+
+    private Long2ObjectMap<Text> getTexts(int windowRegionX, int windowRegionZ, int windowSize, ResourceKey<Level> dim) {
+        return drawingCache.getTexts(dim);
     }
 
     @EventHandler
@@ -113,6 +125,38 @@ public class Drawing extends Module {
 
     public void removeHighlight(final int chunkX, final int chunkZ) {
         drawingCache.removeHighlight(chunkX, chunkZ, Globals.getCurrentDimensionId());
+    }
+
+    public void addText(final Text text) {
+        drawingCache.addText(text, Globals.getCurrentDimensionId());
+    }
+
+    public void removeText(int x, int z, float viewScale) {
+        // todo: search within certain range bound
+        var texts = drawingCache.getTexts(Globals.getCurrentDimensionId());
+        List<Text> toRemove =  new ArrayList<>();
+        for (var text : texts.values()) {
+            int textX = text.x();
+            int textZ = text.z();
+            String value = text.value();
+            int valueFontWidth = mc.font.width(value);
+            int valueHeight = mc.font.lineHeight;
+            float textScale = text.scale() * 2.0f * Mth.clamp(
+              1f / viewScale,
+              1f,
+              1000f
+            );
+            int textMinX = Mth.floor(textX - ((valueFontWidth / 2.0f) * textScale));
+            int textMaxX = Mth.floor(textX + ((valueFontWidth / 2.0f) * textScale));
+            int textMinZ = Mth.floor(textZ - ((valueHeight / 2.0f) * textScale));
+            int textMaxZ = Mth.floor(textZ + ((valueHeight / 2.0f) * textScale));
+            if (x >= textMinX && x <= textMaxX && z >= textMinZ && z <= textMaxZ) {
+                toRemove.add(text);
+            }
+        }
+        for (Text text : toRemove) {
+            drawingCache.removeText(text.x(), text.z(), Globals.getCurrentDimensionId());
+        }
     }
 
     public void setInProgressLine(final Line inProgressLine, final DrawingMode drawingMode) {

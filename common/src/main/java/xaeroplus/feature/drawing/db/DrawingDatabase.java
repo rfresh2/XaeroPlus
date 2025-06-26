@@ -1,7 +1,9 @@
-package xaeroplus.feature.db;
+package xaeroplus.feature.drawing.db;
 
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.longs.Long2LongMaps;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import net.minecraft.resources.ResourceKey;
@@ -10,7 +12,9 @@ import org.rfresh.sqlite.NativeLibraryNotFoundException;
 import org.rfresh.sqlite.SQLiteErrorCode;
 import xaero.map.WorldMap;
 import xaeroplus.XaeroPlus;
+import xaeroplus.feature.db.DatabaseMigrator;
 import xaeroplus.feature.render.line.Line;
+import xaeroplus.feature.render.text.Text;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.TickTaskExecutor;
 import xaeroplus.util.ChunkUtils;
@@ -24,13 +28,16 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static xaeroplus.util.ChunkUtils.regionCoordToChunkCoord;
+import static xaeroplus.util.ChunkUtils.regionCoordToCoord;
 
 public class DrawingDatabase implements Closeable {
     public static final int MAX_HIGHLIGHTS_LIST = 25000;
     public static final String HIGHLIGHTS_TABLE = "highlights";
     public static final String LINES_TABLE = "lines";
+    public static final String TEXTS_TABLE = "texts";
     private Connection connection;
     public final String databaseName;
     protected final Path dbPath;
@@ -80,6 +87,15 @@ public class DrawingDatabase implements Closeable {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS \"" + getTableName(dimension, LINES_TABLE) + "\" (x1 INTEGER, z1 INTEGER, x2 INTEGER, z2 INTEGER, color INTEGER, PRIMARY KEY (x1, z1, x2, z2))");
         } catch (SQLException e) {
             XaeroPlus.LOGGER.error("Error creating lines table for db: {}", databaseName, e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void createTextsTable(final String databaseName, final Connection connection, ResourceKey<Level> dimension) {
+        try (var statement = connection.createStatement()) {
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS \"" + getTableName(dimension, TEXTS_TABLE) + "\" (value TEXT, x INTEGER, z INTEGER, color INTEGER, scale REAL, PRIMARY KEY (x, z))");
+        } catch (SQLException e) {
+            XaeroPlus.LOGGER.error("Error creating texts table for db: {}", databaseName, e);
             throw new RuntimeException(e);
         }
     }
@@ -137,6 +153,7 @@ public class DrawingDatabase implements Closeable {
     public void initializeDimension(final ResourceKey<Level> dimension) {
         createHighlightsTable(databaseName, connection, dimension);
         createLinesTable(databaseName, connection, dimension);
+        createTextsTable(databaseName, connection, dimension);
     }
 
     @FunctionalInterface
@@ -163,6 +180,37 @@ public class DrawingDatabase implements Closeable {
             }
         } catch (SQLException e) {
             XaeroPlus.LOGGER.error("Error getting lines from {} database in dimension: {}", databaseName, dimension.location(), e);
+            if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
+                XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
+                recoverCorruptDatabase();
+            }
+        }
+    }
+
+    public void getTextsInWindow(
+        final ResourceKey<Level> dimension,
+        final int regionXMin, final int regionXMax,
+        final int regionZMin, final int regionZMax,
+        Consumer<Text> consumer
+    ) {
+        try (var statement = connection.createStatement()) {
+            try (ResultSet resultSet = statement.executeQuery(
+                "SELECT * FROM \"" + getTableName(dimension, TEXTS_TABLE) + "\" "
+                    + "WHERE x >= " + regionCoordToCoord(regionXMin) + " AND x <= " + regionCoordToCoord(regionXMax)
+                    + " AND z >= " + regionCoordToCoord(regionZMin) + " AND z <= " + regionCoordToCoord(regionZMax))) {
+                while (resultSet.next()) {
+                    var text = new Text(
+                        resultSet.getString("value"),
+                        resultSet.getInt("x"),
+                        resultSet.getInt("z"),
+                        resultSet.getInt("color"),
+                        resultSet.getFloat("scale")
+                    );
+                    consumer.accept(text);
+                }
+            }
+        } catch (SQLException e) {
+            XaeroPlus.LOGGER.error("Error getting texts from {} database in dimension: {}", databaseName, dimension.location(), e);
             if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
                 recoverCorruptDatabase();
@@ -215,7 +263,7 @@ public class DrawingDatabase implements Closeable {
             var it = Object2IntMaps.fastIterator(lines);
             while (it.hasNext()) {
                 sb.setLength(0);
-                sb.append("INSERT OR IGNORE INTO \"").append(getTableName(dimension, LINES_TABLE)).append("\" VALUES ");
+                sb.append("INSERT OR REPLACE INTO \"").append(getTableName(dimension, LINES_TABLE)).append("\" VALUES ");
                 boolean trailingComma = false;
                 for (int i = 0; i < batchSize && it.hasNext(); i++) {
                     var entry = it.next();
@@ -250,7 +298,7 @@ public class DrawingDatabase implements Closeable {
             StringBuilder sb = new StringBuilder(50 * Math.min(batchSize, chunks.size()) + 75);
             while (it.hasNext()) {
                 sb.setLength(0);
-                sb.append("INSERT OR IGNORE INTO \"").append(getTableName(dimension, HIGHLIGHTS_TABLE)).append("\" VALUES ");
+                sb.append("INSERT OR REPLACE INTO \"").append(getTableName(dimension, HIGHLIGHTS_TABLE)).append("\" VALUES ");
                 boolean trailingComma = false;
                 for (int i = 0; i < batchSize && it.hasNext(); i++) {
                     var entry = it.next();
@@ -276,6 +324,47 @@ public class DrawingDatabase implements Closeable {
         }
     }
 
+    public void insertTextsList(final Long2ObjectMap<Text> texts, final ResourceKey<Level> dimension) {
+        if (texts.isEmpty()) return;
+        try {
+            // Prepared statements is orders of magnitude slower than single insert like this
+            // batches even slower
+            // only issue is gc spam from string allocations
+            int batchSize = MAX_HIGHLIGHTS_LIST;
+            var it = Long2ObjectMaps.fastIterator(texts);
+            // iterate over entry set, inserting in batches of at most 25000
+            StringBuilder sb = new StringBuilder(50 * Math.min(batchSize, texts.size()) + 75);
+            while (it.hasNext()) {
+                sb.setLength(0);
+                sb.append("INSERT OR REPLACE INTO \"").append(getTableName(dimension, TEXTS_TABLE)).append("\" VALUES ");
+                boolean trailingComma = false;
+                for (int i = 0; i < batchSize && it.hasNext(); i++) {
+                    var entry = it.next().getValue();
+                    sb
+                        .append("(")
+                        .append("'").append(entry.value()).append("', ")
+                        .append(entry.x()).append(", ")
+                        .append(entry.z()).append(", ")
+                        .append(entry.color()).append(", ")
+                        .append(entry.scale())
+                        .append(")");
+                    sb.append(", ");
+                    trailingComma = true;
+                }
+                if (trailingComma) sb.replace(sb.length() - 2, sb.length(), "");
+                try (var stmt = connection.createStatement()) {
+                    stmt.executeUpdate(sb.toString());
+                }
+            }
+        } catch (SQLException e) {
+            XaeroPlus.LOGGER.error("Error inserting {} texts into {} database in dimension: {}", texts.size(), databaseName, dimension.location(), e);
+            if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
+                XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
+                recoverCorruptDatabase();
+            }
+        }
+    }
+
     public void removeLine(final int x1, final int z1, final int x2, final int z2, final ResourceKey<Level> dimension) {
         try (var statement = connection.createStatement()) {
             statement.executeUpdate("DELETE FROM \"" + getTableName(dimension, LINES_TABLE) + "\" WHERE x1 = " + x1 + " AND z1 = " + z1 + " AND x2 = " + x2 + " AND z2 = " + z2);
@@ -293,6 +382,18 @@ public class DrawingDatabase implements Closeable {
             statement.executeUpdate("DELETE FROM \"" + getTableName(dimension, HIGHLIGHTS_TABLE) + "\" WHERE x = " + x + " AND z = " + z);
         } catch (SQLException e) {
             XaeroPlus.LOGGER.error("Error while removing highlight from {} database in dimension: {}, at {}, {}", databaseName, dimension.location(), x, z, e);
+            if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
+                XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
+                recoverCorruptDatabase();
+            }
+        }
+    }
+
+    public void removeText(final int x, final int z, final ResourceKey<Level> dimension) {
+        try (var statement = connection.createStatement()) {
+            statement.executeUpdate("DELETE FROM \"" + getTableName(dimension, TEXTS_TABLE) + "\" WHERE x = " + x + " AND z = " + z);
+        } catch (SQLException e) {
+            XaeroPlus.LOGGER.error("Error while removing text from {} database in dimension: {}, at {}, {}", databaseName, dimension.location(), x, z, e);
             if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
                 recoverCorruptDatabase();

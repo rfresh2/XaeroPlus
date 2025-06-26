@@ -257,6 +257,7 @@
   "xaeroplus.gui.world_map.draw_line_segment": "线段",
   "xaeroplus.gui.world_map.draw_infinite_line": "无限线",
   "xaeroplus.gui.world_map.draw_highlights": "区块高亮",
+  "xaeroplus.gui.world_map.draw_text": "文本",
   "xaeroplus.gui.world_map.draw_color": "绘图颜色",
   "xaeroplus.setting.drawing_opacity": "绘图不透明度",
   "xaeroplus.setting.drawing_opacity.tooltip": "设置绘图颜色的不透明度"

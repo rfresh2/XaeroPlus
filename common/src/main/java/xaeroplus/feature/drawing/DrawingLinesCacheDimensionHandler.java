@@ -11,7 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaeroplus.XaeroPlus;
-import xaeroplus.feature.db.DrawingDatabase;
+import xaeroplus.feature.drawing.db.DrawingDatabase;
 import xaeroplus.feature.render.line.Line;
 
 import java.util.HashSet;

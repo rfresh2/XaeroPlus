@@ -1,8 +1,9 @@
-package xaeroplus.feature.db;
+package xaeroplus.feature.drawing.db;
 
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaeroplus.XaeroPlus;
+import xaeroplus.feature.db.DatabaseMigration;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -34,6 +35,9 @@ public class V0Migration implements DatabaseMigration {
         createHighlightsTable(databaseName, connection, Level.OVERWORLD);
         createHighlightsTable(databaseName, connection, Level.NETHER);
         createHighlightsTable(databaseName, connection, Level.END);
+        createTextsTable(databaseName, connection, Level.OVERWORLD);
+        createTextsTable(databaseName, connection, Level.NETHER);
+        createTextsTable(databaseName, connection, Level.END);
     }
 
     private void createHighlightsTable(final String databaseName, final Connection connection, final ResourceKey<Level> dimension) {
@@ -50,6 +54,15 @@ public class V0Migration implements DatabaseMigration {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS \"" + getTableName(dimension, "lines") + "\" (x1 INTEGER, z1 INTEGER, x2 INTEGER, z2 INTEGER, color INTEGER, PRIMARY KEY (x1, z1, x2, z2))");
         } catch (SQLException e) {
             XaeroPlus.LOGGER.error("Error creating lines table for db: {}", databaseName, e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void createTextsTable(final String databaseName, final Connection connection, ResourceKey<Level> dimension) {
+        try (var statement = connection.createStatement()) {
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS \"" + getTableName(dimension, "texts") + "\" (value TEXT, x INTEGER, z INTEGER, color INTEGER, scale REAL, PRIMARY KEY (x, z))");
+        } catch (SQLException e) {
+            XaeroPlus.LOGGER.error("Error creating texts table for db: {}", databaseName, e);
             throw new RuntimeException(e);
         }
     }

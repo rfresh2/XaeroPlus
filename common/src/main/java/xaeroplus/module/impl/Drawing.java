@@ -1,8 +1,10 @@
 package xaeroplus.module.impl;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.LongArraySet;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
+import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
@@ -15,6 +17,7 @@ import xaeroplus.feature.render.DrawFeatureFactory;
 import xaeroplus.feature.render.line.Line;
 import xaeroplus.feature.render.text.Text;
 import xaeroplus.module.Module;
+import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
 import xaeroplus.util.DrawingMode;
 
@@ -249,6 +252,31 @@ public class Drawing extends Module {
         }
 
         return new Line(x1, z1, x2, z2);
+    }
+
+    public void clearAll() {
+        drawingCache.getAllHighlightCaches().forEach(c -> {
+            var keySet = new LongArraySet(c.chunks.keySet());
+            for (var key : keySet) {
+                var x = ChunkUtils.longToChunkX(key);
+                var z = ChunkUtils.longToChunkZ(key);
+                c.removeHighlight(x, z);
+            }
+        });
+        drawingCache.getAllLinesCaches().forEach(c -> {
+            var lineSet = new ObjectArraySet<>(c.getLines().keySet());
+            for (var line : lineSet) {
+                c.removeLine(line);
+            }
+        });
+        drawingCache.getAllTextsCaches().forEach(c -> {
+            var keySet = new LongArraySet(c.getTexts().keySet());
+            for (var key : keySet) {
+                var x = ChunkUtils.longToChunkX(key);
+                var z = ChunkUtils.longToChunkZ(key);
+                c.removeText(x, z);
+            }
+        });
     }
 
     public static final class DrawingColorCycler {

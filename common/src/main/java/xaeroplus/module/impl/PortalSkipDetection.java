@@ -72,7 +72,7 @@ public class PortalSkipDetection extends Module {
 
     @EventHandler
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
-        ModuleManager.getModule(TickTaskExecutor.class).execute(() -> {
+        TickTaskExecutor.INSTANCE.execute(() -> {
             reset();
             initializeWorld();
         });
@@ -88,7 +88,7 @@ public class PortalSkipDetection extends Module {
                 250
             )
         );
-        ModuleManager.getModule(TickTaskExecutor.class).execute(() -> {
+        TickTaskExecutor.INSTANCE.execute(() -> {
             reset();
             initializeWorld();
         });
@@ -98,7 +98,7 @@ public class PortalSkipDetection extends Module {
 
     @Override
     public void onDisable() {
-        ModuleManager.getModule(TickTaskExecutor.class).execute(() -> {
+        TickTaskExecutor.INSTANCE.execute(() -> {
             reset();
         });
         Globals.drawManager.registry().unregister(this.getClass().getName());

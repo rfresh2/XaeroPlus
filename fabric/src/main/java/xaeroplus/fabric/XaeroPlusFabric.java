@@ -1,7 +1,7 @@
 package xaeroplus.fabric;
 
+import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -10,22 +10,13 @@ import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.Version;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.Component;
-import xaero.hud.minimap.BuiltInHudModules;
-import xaero.hud.minimap.waypoint.set.WaypointSet;
 import xaeroplus.XaeroPlus;
+import xaeroplus.commands.XPClientCommandSource;
 import xaeroplus.fabric.util.FabricWaystonesHelperInit;
 import xaeroplus.fabric.util.compat.IncompatibleMinimapWarningScreen;
 import xaeroplus.fabric.util.compat.XaeroPlusMinimapCompatibilityChecker;
-import xaeroplus.feature.waypoint.WaypointAPI;
-import xaeroplus.module.ModuleManager;
-import xaeroplus.module.impl.TickTaskExecutor;
 import xaeroplus.settings.Settings;
-import xaeroplus.util.AtlasWaypointImport;
-import xaeroplus.util.DataFolderResolveUtil;
 import xaeroplus.util.XaeroPlusGameTest;
-
-import java.util.Optional;
 
 import static xaeroplus.fabric.util.compat.XaeroPlusMinimapCompatibilityChecker.versionCheckResult;
 
@@ -67,37 +58,7 @@ public class XaeroPlusFabric implements ClientModInitializer {
 				new IncompatibleMinimapWarningScreen(anyPresentVersion, versionCheckResult.expectedVersion()));
 		});
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-			dispatcher.register(ClientCommandManager.literal("xaeroDataDir").executes(c -> {
-				c.getSource().sendFeedback(DataFolderResolveUtil.getCurrentDataDirPath());
-				return 1;
-			}));
-			dispatcher.register(ClientCommandManager.literal("xaeroWaypointDir").executes(c -> {
-				c.getSource().sendFeedback(DataFolderResolveUtil.getCurrentWaypointDataDirPath());
-				return 1;
-			}));
-			dispatcher.register(ClientCommandManager.literal("xaero2b2tAtlasImport").executes(c -> {
-				c.getSource().sendFeedback(Component.literal("Atlas import started..."));
-				AtlasWaypointImport.importAtlasWaypoints()
-					.whenCompleteAsync((addedCount, e) -> {
-						if (e != null) {
-							XaeroPlus.LOGGER.error("Atlas import failed", e);
-							c.getSource().sendFeedback(Component.literal("Atlas import failed! Check log for details."));
-						} else {
-							c.getSource().sendFeedback(Component.literal(addedCount + " waypoints imported to the \"atlas\" waypoint set!"));
-							var session = BuiltInHudModules.MINIMAP.getCurrentSession();
-							boolean allSetsEnabled = session.getModMain().getSettings().renderAllSets;
-							boolean isAtlasSetActive = Optional.ofNullable(WaypointAPI.getCurrentWaypointSet())
-								.map(WaypointSet::getName)
-								.filter(n -> n.equals("atlas"))
-								.isPresent();
-							if (!allSetsEnabled && !isAtlasSetActive) {
-								c.getSource().sendFeedback(Component.literal("To see the waypoints, enable rendering all waypoint sets or switch to the \"atlas\" set."));
-							}
-						}
-						c.getSource().sendFeedback(Component.literal("Atlas Import Complete!"));
-					}, ModuleManager.getModule(TickTaskExecutor.class));
-				return 1;
-			}));
+			XaeroPlus.registerCommands((CommandDispatcher<XPClientCommandSource>) ((CommandDispatcher<?>) dispatcher), registryAccess);
 		});
 	}
 }

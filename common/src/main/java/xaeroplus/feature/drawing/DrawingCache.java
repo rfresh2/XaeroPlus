@@ -21,7 +21,6 @@ import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.feature.drawing.db.DrawingDatabase;
 import xaeroplus.feature.render.line.Line;
 import xaeroplus.feature.render.text.Text;
-import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.TickTaskExecutor;
 import xaeroplus.util.ChunkUtils;
 
@@ -218,7 +217,7 @@ public class DrawingCache implements Closeable {
     }
 
     private CompletableFuture<?> submitTickTask(final Runnable runnable) {
-        return ModuleManager.getModule(TickTaskExecutor.class).submit(runnable);
+        return TickTaskExecutor.INSTANCE.submit(runnable);
     }
 
     private synchronized void reset() {

@@ -58,11 +58,11 @@ public class XPCommandManager {
                         }
                     }
                     c.getSource().xaeroplus$sendSuccess(Component.literal("Atlas Import Complete!"));
-                }, ModuleManager.getModule(TickTaskExecutor.class));
+                }, TickTaskExecutor.INSTANCE);
             return 1;
         }));
         dispatcher.register(literal("xaeroplus:clearDrawings").executes(c -> {
-            ModuleManager.getModule(TickTaskExecutor.class).submit(() -> {
+            TickTaskExecutor.INSTANCE.submit(() -> {
                 ModuleManager.getModule(Drawing.class).clearAll();
                 c.getSource().xaeroplus$sendSuccess(Component.literal("All Drawings cleared!"));
             });

@@ -16,6 +16,8 @@ out
 # gradle
 build
 .gradle
+.kotlin
+.architectury-transformer
 
 # other
 eclipse

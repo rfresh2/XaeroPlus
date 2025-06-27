@@ -127,10 +127,10 @@ public class Portals extends Module {
     private void searchAllLoadedChunks() {
         if (mc.level == null) return;
         final int renderDist = mc.options.renderDistance().get();
-        final int xMin = ChunkUtils.getPlayerChunkX() - renderDist;
-        final int xMax = ChunkUtils.getPlayerChunkX() + renderDist;
-        final int zMin = ChunkUtils.getPlayerChunkZ() - renderDist;
-        final int zMax = ChunkUtils.getPlayerChunkZ() + renderDist;
+        final int xMin = ChunkUtils.actualPlayerChunkX() - renderDist;
+        final int xMax = ChunkUtils.actualPlayerChunkX() + renderDist;
+        final int zMin = ChunkUtils.actualPlayerChunkZ() - renderDist;
+        final int zMax = ChunkUtils.actualPlayerChunkZ() + renderDist;
         for (int x = xMin; x <= xMax; x++) {
             for (int z = zMin; z <= zMax; z++) {
                 ChunkAccess chunk = mc.level.getChunkSource().getChunk(x, z, false);

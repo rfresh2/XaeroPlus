@@ -10,7 +10,6 @@ import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.loading.FMLLoader;
 import xaero.map.gui.GuiWorldMapSettings;
 import xaeroplus.XaeroPlus;
@@ -21,7 +20,6 @@ import xaeroplus.util.XaeroPlusGameTest;
 
 public class XaeroPlusForgeClient {
     public void init(final IEventBus modEventBus, final IEventBus forgeEventBus) {
-        modEventBus.addListener(this::onInitialize);
         modEventBus.addListener(this::onRegisterKeyMappingsEvent);
         modEventBus.addListener(this::onRegisterClientResourceReloadListeners);
         forgeEventBus.addListener(this::onRegisterClientCommandsEvent);
@@ -33,20 +31,16 @@ public class XaeroPlusForgeClient {
             ConfigScreenHandler.ConfigScreenFactory.class,
             () -> new ConfigScreenHandler.ConfigScreenFactory((mc, screen) -> new GuiXaeroPlusWorldMapSettings(new GuiWorldMapSettings(screen), screen))
         );
-    }
-
-    public void onInitialize(FMLClientSetupEvent event) {
-        // this is called after RegisterKeyMappingsEvent for some reason
-    }
-
-    public void onRegisterKeyMappingsEvent(final RegisterKeyMappingsEvent event) {
         if (XaeroPlus.initialized.compareAndSet(false, true)) {
             XaeroPlus.XP_VERSION = FMLLoader.getLoadingModList().getModFileById("xaeroplus").versionString();
             XaeroPlus.initializeSettings();
-            Settings.REGISTRY.getKeybindings().forEach(event::register);
             if (System.getenv("XP_CI_TEST") != null)
                 Minecraft.getInstance().execute(XaeroPlusGameTest::applyMixinsTest);
         }
+    }
+
+    public void onRegisterKeyMappingsEvent(final RegisterKeyMappingsEvent event) {
+        Settings.REGISTRY.getKeybindings().forEach(event::register);
     }
 
     public void onRegisterClientCommandsEvent(final RegisterClientCommandsEvent event) {

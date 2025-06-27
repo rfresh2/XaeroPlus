@@ -11,7 +11,6 @@ import xaero.common.graphics.shader.MinimapShaders;
 import xaeroplus.Globals;
 import xaeroplus.feature.render.DrawContext;
 import xaeroplus.feature.render.DrawFeature;
-import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.TickTaskExecutor;
 import xaeroplus.util.ChunkUtils;
 
@@ -26,7 +25,7 @@ public abstract class AbstractLineDrawFeature<T> implements DrawFeature {
         this.lineRenderCache = Caffeine.newBuilder()
             .expireAfterWrite(10, TimeUnit.SECONDS)
             .refreshAfterWrite(refreshIntervalMs, TimeUnit.MILLISECONDS)
-            .executor(ModuleManager.getModule(TickTaskExecutor.class))
+            .executor(TickTaskExecutor.INSTANCE)
             .buildAsync(k -> loadLinesInWindow());
     }
 

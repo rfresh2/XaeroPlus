@@ -16,7 +16,6 @@ import xaero.hud.minimap.world.MinimapWorld;
 import xaero.map.mods.SupportMods;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.waypoint.WaypointAPI;
-import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.TickTaskExecutor;
 
 import java.net.URI;
@@ -39,7 +38,7 @@ public final class AtlasWaypointImport {
                 int addedWaypoints = importAtlasWaypoints(atlasWaypoints);
                 XaeroPlus.LOGGER.info("Imported {} Atlas waypoints", addedWaypoints);
                 return addedWaypoints;
-            }, ModuleManager.getModule(TickTaskExecutor.class));
+            }, TickTaskExecutor.INSTANCE);
     }
 
     private static int importAtlasWaypoints(List<AtlasWaypoint> atlasWaypoints) {

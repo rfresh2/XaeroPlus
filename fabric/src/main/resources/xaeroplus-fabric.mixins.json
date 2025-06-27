@@ -13,6 +13,7 @@
     "MixinSodiumOptionsGUI",
     "MixinWorldMap",
     "MixinWorldMapFabric",
+    "fabric.MixinFabricClientCommandSource",
     "mc.MixinMinecraftClientFabric"
   ]
 }

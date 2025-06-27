@@ -1,14 +1,13 @@
 package xaeroplus.neo;
 
 import com.github.benmanes.caffeine.cache.RemovalCause;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
@@ -17,8 +16,8 @@ import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
 import xaeroplus.XaeroPlus;
+import xaeroplus.commands.XPClientCommandSource;
 import xaeroplus.settings.Settings;
-import xaeroplus.util.DataFolderResolveUtil;
 import xaeroplus.util.XaeroPlusGameTest;
 
 @Mod(value = "xaeroplus", dist = Dist.CLIENT)
@@ -26,7 +25,6 @@ public class XaeroPlusNeo {
     public static final IEventBus FORGE_EVENT_BUS = NeoForge.EVENT_BUS;
     public XaeroPlusNeo(IEventBus modEventBus) {
         if (FMLEnvironment.dist.isClient()) {
-            modEventBus.addListener(this::onInitialize);
             modEventBus.addListener(this::onRegisterKeyMappingsEvent);
             modEventBus.addListener(this::onRegisterClientResourceReloadListeners);
             FORGE_EVENT_BUS.addListener(this::onRegisterClientCommandsEvent);
@@ -38,32 +36,21 @@ public class XaeroPlusNeo {
                 IConfigScreenFactory.class,
                 XaeroPlusConfigScreenFactory::new
             );
+            if (XaeroPlus.initialized.compareAndSet(false, true)) {
+                XaeroPlus.XP_VERSION = FMLLoader.getLoadingModList().getModFileById("xaeroplus").versionString();
+                XaeroPlus.initializeSettings();
+                if (System.getenv("XP_CI_TEST") != null)
+                    Minecraft.getInstance().execute(XaeroPlusGameTest::applyMixinsTest);
+            }
         }
-    }
-
-    public void onInitialize(FMLClientSetupEvent event) {
-        // this is called after RegisterKeyMappingsEvent for some reason
     }
 
     public void onRegisterKeyMappingsEvent(final RegisterKeyMappingsEvent event) {
-        if (XaeroPlus.initialized.compareAndSet(false, true)) {
-            XaeroPlus.XP_VERSION = FMLLoader.getLoadingModList().getModFileById("xaeroplus").versionString();
-            XaeroPlus.initializeSettings();
-            Settings.REGISTRY.getKeybindings().forEach(event::register);
-            if (System.getenv("XP_CI_TEST") != null)
-                Minecraft.getInstance().execute(XaeroPlusGameTest::applyMixinsTest);
-        }
+        Settings.REGISTRY.getKeybindings().forEach(event::register);
     }
 
     public void onRegisterClientCommandsEvent(final RegisterClientCommandsEvent event) {
-        event.getDispatcher().register(LiteralArgumentBuilder.<CommandSourceStack>literal("xaeroDataDir").executes(c -> {
-            c.getSource().sendSuccess(DataFolderResolveUtil::getCurrentDataDirPath, false);
-            return 1;
-        }));
-        event.getDispatcher().register(LiteralArgumentBuilder.<CommandSourceStack>literal("xaeroWaypointDir").executes(c -> {
-            c.getSource().sendSuccess(DataFolderResolveUtil::getCurrentWaypointDataDirPath, false);
-            return 1;
-        }));
+        XaeroPlus.registerCommands((CommandDispatcher<XPClientCommandSource>) (CommandDispatcher<?>) event.getDispatcher(), event.getBuildContext());
     }
 
     public void onRegisterClientResourceReloadListeners(RegisterClientReloadListenersEvent event) {

@@ -1,8 +1,10 @@
 package xaeroplus;
 
+import com.mojang.brigadier.CommandDispatcher;
 import net.lenni0451.lambdaevents.LambdaManager;
 import net.lenni0451.lambdaevents.generator.LambdaMetaFactoryGenerator;
 import net.minecraft.DetectedVersion;
+import net.minecraft.commands.CommandBuildContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xaero.map.platform.Services;
@@ -12,6 +14,8 @@ import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.Drawing;
 import xaeroplus.settings.Settings;
 import xaeroplus.settings.XaeroPlusSetting;
+import xaeroplus.util.commands.XPClientCommandSource;
+import xaeroplus.util.commands.XPCommandManager;
 
 import java.io.File;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -38,5 +42,9 @@ public class XaeroPlus {
 			Globals.initSyncedSettings();
 		}, MinimapInitCompletedEvent.class);
 		XaeroPlus.EVENT_BUS.register(KEYBIND_LISTENER);
+	}
+
+	public static void registerCommands(CommandDispatcher<XPClientCommandSource> dispatcher, CommandBuildContext context) {
+		XPCommandManager.registerCommands(dispatcher, context);
 	}
 }

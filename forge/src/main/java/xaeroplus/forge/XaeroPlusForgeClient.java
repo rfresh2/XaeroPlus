@@ -1,9 +1,8 @@
 package xaeroplus.forge;
 
 import com.github.benmanes.caffeine.cache.RemovalCause;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.client.Minecraft;
-import net.minecraft.commands.CommandSourceStack;
 import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
@@ -15,8 +14,8 @@ import xaero.map.gui.GuiWorldMapSettings;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.extensions.GuiXaeroPlusWorldMapSettings;
 import xaeroplus.settings.Settings;
-import xaeroplus.util.DataFolderResolveUtil;
 import xaeroplus.util.XaeroPlusGameTest;
+import xaeroplus.util.commands.XPClientCommandSource;
 
 public class XaeroPlusForgeClient {
     public void init(final IEventBus modEventBus, final IEventBus forgeEventBus) {
@@ -44,14 +43,7 @@ public class XaeroPlusForgeClient {
     }
 
     public void onRegisterClientCommandsEvent(final RegisterClientCommandsEvent event) {
-        event.getDispatcher().register(LiteralArgumentBuilder.<CommandSourceStack>literal("xaeroDataDir").executes(c -> {
-            c.getSource().sendSuccess(DataFolderResolveUtil::getCurrentDataDirPath, false);
-            return 1;
-        }));
-        event.getDispatcher().register(LiteralArgumentBuilder.<CommandSourceStack>literal("xaeroWaypointDir").executes(c -> {
-            c.getSource().sendSuccess(DataFolderResolveUtil::getCurrentWaypointDataDirPath, false);
-            return 1;
-        }));
+        XaeroPlus.registerCommands((CommandDispatcher<XPClientCommandSource>) (CommandDispatcher<?>) event.getDispatcher(), event.getBuildContext());
     }
 
     public void onRegisterClientResourceReloadListeners(RegisterClientReloadListenersEvent event) {

@@ -7,5 +7,6 @@
     "defaultRequire": 1
   },
   "client": [
+    "MixinCommandSourceStack"
   ]
 }

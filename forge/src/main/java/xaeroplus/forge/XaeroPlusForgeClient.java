@@ -12,10 +12,10 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.loading.FMLLoader;
 import xaero.map.gui.GuiWorldMapSettings;
 import xaeroplus.XaeroPlus;
+import xaeroplus.commands.XPClientCommandSource;
 import xaeroplus.feature.extensions.GuiXaeroPlusWorldMapSettings;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.XaeroPlusGameTest;
-import xaeroplus.util.commands.XPClientCommandSource;
 
 public class XaeroPlusForgeClient {
     public void init(final IEventBus modEventBus, final IEventBus forgeEventBus) {

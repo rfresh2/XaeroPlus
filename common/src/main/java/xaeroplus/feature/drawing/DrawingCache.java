@@ -248,7 +248,7 @@ public class DrawingCache implements Closeable {
 
     // note: writes occur on the worker thread
     private List<CompletableFuture<?>> flushAllChunks() {
-        return getAllCaches().stream()
+        return getAllHighlightCaches().stream()
             .map(cache -> submitTickTask(cache::writeStaleHighlightsToDatabase))
             .collect(Collectors.toList());
     }
@@ -353,7 +353,7 @@ public class DrawingCache implements Closeable {
         return linesCache;
     }
 
-    public List<DrawingHighlightCacheDimensionHandler> getAllCaches() {
+    public List<DrawingHighlightCacheDimensionHandler> getAllHighlightCaches() {
         return List.copyOf(highlightsCacheMap.values());
     }
 

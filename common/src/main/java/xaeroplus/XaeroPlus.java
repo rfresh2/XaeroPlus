@@ -8,14 +8,14 @@ import net.minecraft.commands.CommandBuildContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xaero.map.platform.Services;
+import xaeroplus.commands.XPClientCommandSource;
+import xaeroplus.commands.XPCommandManager;
 import xaeroplus.event.MinimapInitCompletedEvent;
 import xaeroplus.feature.keybind.KeybindListener;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.Drawing;
 import xaeroplus.settings.Settings;
 import xaeroplus.settings.XaeroPlusSetting;
-import xaeroplus.util.commands.XPClientCommandSource;
-import xaeroplus.util.commands.XPCommandManager;
 
 import java.io.File;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -24,7 +24,7 @@ import static xaeroplus.settings.SettingHooks.loadXPSettings;
 
 public class XaeroPlus {
 	public static final Logger LOGGER = LoggerFactory.getLogger("XaeroPlus");
-	public static final LambdaManager EVENT_BUS = LambdaManager.basic(new LambdaMetaFactoryGenerator());
+	public static final LambdaManager EVENT_BUS = LambdaManager.threadSafe(new LambdaMetaFactoryGenerator());
 	public static final AtomicBoolean initialized = new AtomicBoolean(false);
 	public static final File configFile = Services.PLATFORM.getConfigDir().resolve("xaeroplus.txt").toFile();
 	public static String XP_VERSION = "2";

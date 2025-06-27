@@ -1,4 +1,4 @@
-package xaeroplus.util.commands;
+package xaeroplus.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.ArgumentType;
@@ -11,6 +11,7 @@ import xaero.hud.minimap.waypoint.set.WaypointSet;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.waypoint.WaypointAPI;
 import xaeroplus.module.ModuleManager;
+import xaeroplus.module.impl.Drawing;
 import xaeroplus.module.impl.TickTaskExecutor;
 import xaeroplus.util.AtlasWaypointImport;
 import xaeroplus.util.DataFolderResolveUtil;
@@ -58,6 +59,13 @@ public class XPCommandManager {
                     }
                     c.getSource().xaeroplus$sendSuccess(Component.literal("Atlas Import Complete!"));
                 }, ModuleManager.getModule(TickTaskExecutor.class));
+            return 1;
+        }));
+        dispatcher.register(literal("xaeroplus:clearDrawings").executes(c -> {
+            ModuleManager.getModule(TickTaskExecutor.class).submit(() -> {
+                ModuleManager.getModule(Drawing.class).clearAll();
+                c.getSource().xaeroplus$sendSuccess(Component.literal("All Drawings cleared!"));
+            });
             return 1;
         }));
     }

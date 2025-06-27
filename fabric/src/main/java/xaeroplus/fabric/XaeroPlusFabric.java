@@ -13,13 +13,13 @@ import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.PackType;
 import xaeroplus.XaeroPlus;
+import xaeroplus.commands.XPClientCommandSource;
 import xaeroplus.fabric.util.FabricWaystonesHelperInit;
 import xaeroplus.fabric.util.XPShaderResourceReloadListener;
 import xaeroplus.fabric.util.compat.IncompatibleMinimapWarningScreen;
 import xaeroplus.fabric.util.compat.XaeroPlusMinimapCompatibilityChecker;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.XaeroPlusGameTest;
-import xaeroplus.util.commands.XPClientCommandSource;
 
 import static xaeroplus.fabric.util.compat.XaeroPlusMinimapCompatibilityChecker.versionCheckResult;
 

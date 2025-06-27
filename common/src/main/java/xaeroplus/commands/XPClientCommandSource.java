@@ -1,4 +1,4 @@
-package xaeroplus.util.commands;
+package xaeroplus.commands;
 
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;

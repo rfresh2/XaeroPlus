@@ -3,7 +3,7 @@ package xaeroplus.forge.mixin.client;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
-import xaeroplus.util.commands.XPClientCommandSource;
+import xaeroplus.commands.XPClientCommandSource;
 
 @Mixin(CommandSourceStack.class)
 public abstract class MixinCommandSourceStack implements XPClientCommandSource {

@@ -4,7 +4,6 @@ import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaeroplus.event.XaeroWorldChangeEvent;
-import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.TickTaskExecutor;
 
 import java.util.concurrent.CompletableFuture;
@@ -42,9 +41,9 @@ public interface ChunkHighlightCache {
     void onEnable();
     void onDisable();
     default <V> CompletableFuture<V> submitTickTask(final Supplier<V> task) {
-        return ModuleManager.getModule(TickTaskExecutor.class).submit(task);
+        return TickTaskExecutor.INSTANCE.submit(task);
     }
     default CompletableFuture<Void> submitTickTask(final Runnable task) {
-        return ModuleManager.getModule(TickTaskExecutor.class).submit(task);
+        return TickTaskExecutor.INSTANCE.submit(task);
     }
 }

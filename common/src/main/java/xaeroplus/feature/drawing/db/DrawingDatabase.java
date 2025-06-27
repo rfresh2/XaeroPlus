@@ -15,7 +15,6 @@ import xaeroplus.XaeroPlus;
 import xaeroplus.feature.db.DatabaseMigrator;
 import xaeroplus.feature.render.line.Line;
 import xaeroplus.feature.render.text.Text;
-import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.TickTaskExecutor;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.NotificationUtil;
@@ -63,7 +62,7 @@ public class DrawingDatabase implements Closeable {
         } catch (Exception e) {
             if (!nativeLibraryErrorSent && e.getCause() instanceof NativeLibraryNotFoundException nativeException) {
                 nativeLibraryErrorSent = true;
-                ModuleManager.getModule(TickTaskExecutor.class).execute(() -> {
+                TickTaskExecutor.INSTANCE.execute(() -> {
                     NotificationUtil.errorNotification("Error initializing Drawing database, Drawing features will not work.\n"
                         + nativeException.getMessage());
                 });

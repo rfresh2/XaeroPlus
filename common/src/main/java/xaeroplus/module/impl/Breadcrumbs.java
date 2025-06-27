@@ -25,8 +25,8 @@ public class Breadcrumbs extends Module {
     @EventHandler
     public void onTick(ClientTickEvent.Post event) {
         var dim = ChunkUtils.getActualDimension();
-        var playerChunkX = ChunkUtils.getPlayerChunkX();
-        var playerChunkZ = ChunkUtils.getPlayerChunkZ();
+        var playerChunkX = ChunkUtils.actualPlayerChunkX();
+        var playerChunkZ = ChunkUtils.actualPlayerChunkZ();
 
         for (int x = playerChunkX - chunkRadius; x <= playerChunkX + chunkRadius; x++) {
             for (int z = playerChunkZ - chunkRadius; z <= playerChunkZ + chunkRadius; z++) {

@@ -11,6 +11,7 @@
     "MixinHudMod",
     "MixinSodium6OptionsGUI",
     "MixinWorldMap",
+    "fabric.MixinFabricClientCommandSource",
     "mc.MixinLevelRenderer",
     "mc.MixinMinecraftClientFabric"
   ]

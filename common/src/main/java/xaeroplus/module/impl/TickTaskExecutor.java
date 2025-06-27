@@ -21,9 +21,11 @@ import java.util.function.Supplier;
  * Same as Minecraft.class executor, but we never drop tasks on disconnect
  */
 public class TickTaskExecutor extends Module implements Executor {
+    public static TickTaskExecutor INSTANCE;
     private final Queue<Runnable> tasks = new ConcurrentLinkedQueue<>();
 
     public TickTaskExecutor() {
+        INSTANCE = this;
         enable();
     }
 

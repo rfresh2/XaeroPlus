@@ -15,9 +15,9 @@ public class GuiXaeroPlusChunkHighlightSettings extends GuiSettings {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int par1, int par2, float par3) {
-        this.renderEscapeScreen(guiGraphics, par1, par2, par3);
-        super.render(guiGraphics, par1, par2, par3);
+    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+        this.renderEscapeScreen(guiGraphics, 0, 0, f);
+        super.renderBackground(guiGraphics, i, j, f);
     }
 
     public static ScreenSwitchSettingEntry getScreenSwitchSettingEntry(Screen parent) {

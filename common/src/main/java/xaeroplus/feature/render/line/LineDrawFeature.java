@@ -82,6 +82,8 @@ public class LineDrawFeature extends AbstractLineDrawFeature<List<Line>> {
                 r, g, b, a
             );
         }
-        ctx.renderTypeBuffers().endBatch(CustomRenderTypes.MAP_LINES);
+        if (!lines.isEmpty()) {
+            ctx.renderTypeBuffers().endBatch(CustomRenderTypes.MAP_LINES);
+        }
     }
 }

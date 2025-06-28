@@ -73,7 +73,7 @@ public class TextDrawFeature implements DrawFeature {
                 0,
                 0,
                 text.color(),
-                true,
+                false,
                 ctx.matrixStack().last().pose(),
                 ctx.renderTypeBuffers(),
                 Font.DisplayMode.NORMAL,

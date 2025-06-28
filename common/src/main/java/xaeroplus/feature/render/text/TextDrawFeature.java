@@ -65,7 +65,7 @@ public class TextDrawFeature implements DrawFeature {
             ctx.matrixStack().translate(
                 -width / 2,
                 -font.lineHeight / 2.0f,
-                500
+                0
             );
             font.drawInBatch(
                 text.value(),

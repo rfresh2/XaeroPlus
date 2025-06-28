@@ -356,27 +356,32 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         return original && !Minecraft.getInstance().options.hideGui;
     }
 
-    @Inject(method = "render",
+    @WrapOperation(method = "render",
         slice = @Slice(
             from = @At(
                 value = "FIELD",
                 target = "Lxaero/map/gui/GuiMap;prevLoadingLeaves:Z",
                 opcode = Opcodes.PUTFIELD
+            ),
+            to = @At(
+                value = "INVOKE",
+                target = "Lxaero/map/graphics/ImprovedFramebuffer;bindDefaultFramebuffer(Lnet/minecraft/client/Minecraft;)V"
             )
         ),
         at = @At(
             value = "INVOKE",
-            target = "Lxaero/map/graphics/MapRenderHelper;renderDynamicHighlight(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;IIIIIIFFFFFFFF)V",
+            target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endBatch()V",
             ordinal = 0
         ),
         remap = true)
-    public void drawWorldMapFeatures(final CallbackInfo ci,
+    public void drawWorldMapFeatures(final MultiBufferSource.BufferSource instance, final Operation<Void> original,
                                      @Local(name = "flooredCameraX") int flooredCameraX,
                                      @Local(name = "flooredCameraZ") int flooredCameraZ,
                                      @Local(name = "matrixStack") PoseStack matrixStack,
                                      @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers,
                                      @Local(name = "fboScale") double fboScale
     ) {
+        original.call(instance);
         if (Minecraft.getInstance().options.hideGui) return;
         Globals.drawManager.drawWorldMapFeatures(
             flooredCameraX,

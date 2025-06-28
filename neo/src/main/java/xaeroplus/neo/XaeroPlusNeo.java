@@ -37,13 +37,13 @@ public class XaeroPlusNeo {
         if (XaeroPlus.initialized.compareAndSet(false, true)) {
             XaeroPlus.XP_VERSION = FMLLoader.getLoadingModList().getModFileById("xaeroplus").versionString();
             XaeroPlus.initializeSettings();
+            Settings.REGISTRY.getKeybindings().forEach(event::register);
             if (System.getenv("XP_CI_TEST") != null)
                 Minecraft.getInstance().execute(() -> {
                     XaeroPlusGameTest.applyMixinsTest();
                     System.exit(0);
                 });
         }
-        Settings.REGISTRY.getKeybindings().forEach(event::register);
     }
 
     public void onRegisterClientCommandsEvent(final RegisterClientCommandsEvent event) {

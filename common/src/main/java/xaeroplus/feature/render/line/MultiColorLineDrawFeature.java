@@ -88,6 +88,8 @@ public class MultiColorLineDrawFeature extends AbstractLineDrawFeature<Object2In
                 r, g, b, a
             );
         }
-        ctx.renderTypeBuffers().endBatch(CustomRenderTypes.MAP_LINES);
+        if (!lines.isEmpty()) {
+            ctx.renderTypeBuffers().endBatch(CustomRenderTypes.MAP_LINES);
+        }
     }
 }

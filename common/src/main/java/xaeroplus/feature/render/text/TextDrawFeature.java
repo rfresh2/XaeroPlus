@@ -1,5 +1,6 @@
 package xaeroplus.feature.render.text;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
 import net.minecraft.client.Minecraft;
@@ -81,6 +82,10 @@ public class TextDrawFeature implements DrawFeature {
                 font.isBidirectional()
             );
             ctx.matrixStack().popPose();
+        }
+        if (!texts.isEmpty()) {
+            RenderSystem.disableCull();
+            ctx.renderTypeBuffers().endLastBatch();
         }
     }
 

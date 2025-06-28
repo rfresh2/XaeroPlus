@@ -3,7 +3,6 @@ package xaeroplus.neo;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.client.Minecraft;
-import net.minecraft.commands.CommandSourceStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModLoadingContext;
@@ -31,19 +30,19 @@ public class XaeroPlusNeo {
                 IConfigScreenFactory.class,
                 XaeroPlusConfigScreenFactory::new
             );
-            if (XaeroPlus.initialized.compareAndSet(false, true)) {
-                XaeroPlus.XP_VERSION = FMLLoader.getLoadingModList().getModFileById("xaeroplus").versionString();
-                XaeroPlus.initializeSettings();
-                if (System.getenv("XP_CI_TEST") != null)
-                    Minecraft.getInstance().execute(() -> {
-                        XaeroPlusGameTest.applyMixinsTest();
-                        System.exit(0);
-                    });
-            }
         }
     }
 
     public void onRegisterKeyMappingsEvent(final RegisterKeyMappingsEvent event) {
+        if (XaeroPlus.initialized.compareAndSet(false, true)) {
+            XaeroPlus.XP_VERSION = FMLLoader.getLoadingModList().getModFileById("xaeroplus").versionString();
+            XaeroPlus.initializeSettings();
+            if (System.getenv("XP_CI_TEST") != null)
+                Minecraft.getInstance().execute(() -> {
+                    XaeroPlusGameTest.applyMixinsTest();
+                    System.exit(0);
+                });
+        }
         Settings.REGISTRY.getKeybindings().forEach(event::register);
     }
 

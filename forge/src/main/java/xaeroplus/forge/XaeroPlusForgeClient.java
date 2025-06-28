@@ -28,16 +28,16 @@ public class XaeroPlusForgeClient {
             ConfigScreenHandler.ConfigScreenFactory.class,
             () -> new ConfigScreenHandler.ConfigScreenFactory((mc, screen) -> new GuiXaeroPlusWorldMapSettings(new GuiWorldMapSettings(screen), screen))
         );
-        if (XaeroPlus.initialized.compareAndSet(false, true)) {
-            XaeroPlus.XP_VERSION = FMLLoader.getLoadingModList().getModFileById("xaeroplus").versionString();
-            XaeroPlus.initializeSettings();
-            if (System.getenv("XP_CI_TEST") != null)
-                Minecraft.getInstance().execute(XaeroPlusGameTest::applyMixinsTest);
-        }
     }
 
     public void onRegisterKeyMappingsEvent(final RegisterKeyMappingsEvent event) {
-        Settings.REGISTRY.getKeybindings().forEach(event::register);
+        if (XaeroPlus.initialized.compareAndSet(false, true)) {
+            XaeroPlus.XP_VERSION = FMLLoader.getLoadingModList().getModFileById("xaeroplus").versionString();
+            XaeroPlus.initializeSettings();
+            Settings.REGISTRY.getKeybindings().forEach(event::register);
+            if (System.getenv("XP_CI_TEST") != null)
+                Minecraft.getInstance().execute(XaeroPlusGameTest::applyMixinsTest);
+        }
     }
 
     public void onRegisterClientCommandsEvent(final RegisterClientCommandsEvent event) {

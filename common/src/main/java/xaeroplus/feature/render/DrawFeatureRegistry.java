@@ -2,6 +2,7 @@ package xaeroplus.feature.render;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
+import xaeroplus.XaeroPlus;
 import xaeroplus.settings.Settings;
 
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class DrawFeatureRegistry {
     private final Int2ObjectRBTreeMap<DrawFeature> features = new Int2ObjectRBTreeMap<>(Comparator.naturalOrder());
@@ -51,5 +53,21 @@ public class DrawFeatureRegistry {
         String[] featureIds = setting.split(",");
         drawOrder.clear();
         drawOrder.addAll(Arrays.asList(featureIds));
+        var featuresCopy = new ArrayList<DrawFeature>(featureIds.length);
+        featuresCopy.addAll(features.values());
+        features.clear();
+        for (int i = 0; i < drawOrder.size(); i++) {
+            var entryId = drawOrder.get(i);
+            for (var feature : featuresCopy) {
+                if (entryId.equals(feature.id())) {
+                    features.put(i, feature);
+                    featuresCopy.remove(feature);
+                    break;
+                }
+            }
+        }
+        if (!featuresCopy.isEmpty()) {
+            XaeroPlus.LOGGER.error("Unknown draw features removed after reordering: {}", featuresCopy.stream().map(DrawFeature::id).collect(Collectors.joining(", ")));
+        }
     }
 }

@@ -33,6 +33,7 @@
     "MixinGuiWaypointsList",
     "MixinGuiWaypointsOptions",
     "MixinGuiWorldMapSettings",
+    "MixinHudMinimapRenderer",
     "MixinHudMod",
     "MixinLeveledRegion",
     "MixinMapPixel",

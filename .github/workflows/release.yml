@@ -238,7 +238,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: "${{ needs.build.outputs.xp_version }}"
-          commit: 1.20.1
+          commit: 1.21.7
           artifacts: "artifacts/*.jar"
           allowUpdates: true
           makeLatest: true

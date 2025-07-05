@@ -99,7 +99,7 @@ public class OldChunks extends Module {
     public void onEnable() {
         Globals.drawManager.registry().register(
             DrawFeatureFactory.chunkHighlights(
-                this.getClass().getName(),
+                "OldChunks",
                 this::getHighlightsState,
                 this::getOldChunksColor,
                 250

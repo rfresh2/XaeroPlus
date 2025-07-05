@@ -213,7 +213,7 @@ public class PaletteNewChunks extends Module {
     public void onEnable() {
         Globals.drawManager.registry().register(
             DrawFeatureFactory.chunkHighlights(
-                this.getClass().getName(),
+                "PaletteNewChunks",
                 this::getHighlightsState,
                 this::getNewChunksColor,
                 250

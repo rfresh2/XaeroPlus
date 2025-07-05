@@ -236,7 +236,6 @@
   "xaeroplus.gui.world_map.baritone_goal_here": "§2%s§r [XP] Cel Baritone Tutaj",
   "xaeroplus.gui.world_map.baritone_path_here": "§2%s§r [XP] Ścieżka Baritone Tutaj",
   "xaeroplus.gui.world_map.baritone_elytra_here": "§2%s§r [XP] Elytra Baritone Tutaj",
-  "xaeroplus.gui.check_github_button": "Udaj się na Github XaeroPlus po aktualizacje",
   "xaeroplus.gui.waypoints.toggle_enable_all": "Włącz Wszystko",
   "xaeroplus.setting.waystones_sync": "Synchronizuj Kamienie Nawigacyjne",
   "xaeroplus.setting.waystones_sync.tooltip": "Synchronizuj Kamienie Nawigacyjne jako Punkty Nawigacyjne.",
@@ -258,5 +257,7 @@
   "xaeroplus.gui.world_map.draw_text": "Tekst",
   "xaeroplus.gui.world_map.draw_color": "Kolor rysunku",
   "xaeroplus.setting.drawing_opacity": "Przezroczystość rysunku",
-  "xaeroplus.setting.drawing_opacity.tooltip": "Ustawia przezroczystość koloru rysunków"
+  "xaeroplus.setting.drawing_opacity.tooltip": "Ustawia przezroczystość koloru rysunków",
+  "xaeroplus.gui.draw_order.title": "Kolejność Rysowania XaeroPlus",
+  "xaeroplus.gui.draw_order.subtitle": "Kliknij i przeciągnij, aby zmienić kolejność"
 }

@@ -41,7 +41,7 @@ public class Breadcrumbs extends Module {
     public void onEnable() {
         Globals.drawManager.registry().register(
             DrawFeatureFactory.chunkHighlights(
-                this.getClass().getName(),
+                "Breadcrumbs",
                 this::getHighlightsState,
                 this::getBreadcrumbsColor,
                 50

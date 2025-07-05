@@ -238,7 +238,6 @@
     "xaeroplus.gui.world_map.baritone_goal_here": "§2%s§r [XP] Mục Tiêu Baritone Tại Đây",
     "xaeroplus.gui.world_map.baritone_path_here": "§2%s§r [XP] Đường Đi Baritone Tại Đây",
     "xaeroplus.gui.world_map.baritone_elytra_here": "§2%s§r [XP] Baritone Elytra Tại Đây",
-    "xaeroplus.gui.check_github_button": "Đi Đến Github XaeroPlus để cập nhật",
     "xaeroplus.gui.waypoints.toggle_enable_all": "Chuyển Đổi Kích Hoạt Tất Cả",
     "xaeroplus.setting.waystones_sync": "Đồng Bộ Hóa Waystones",
     "xaeroplus.setting.waystones_sync.tooltip": "Đồng bộ hóa Waystones như điểm đến.",
@@ -260,5 +259,7 @@
     "xaeroplus.gui.world_map.draw_text": "Chữ",
     "xaeroplus.gui.world_map.draw_color": "Màu vẽ",
     "xaeroplus.setting.drawing_opacity": "Độ mờ của bản vẽ",
-    "xaeroplus.setting.drawing_opacity.tooltip": "Thiết lập độ mờ màu của bản vẽ"
+    "xaeroplus.setting.drawing_opacity.tooltip": "Thiết lập độ mờ màu của bản vẽ",
+    "xaeroplus.gui.draw_order.title": "Thứ Tự Vẽ XaeroPlus",
+    "xaeroplus.gui.draw_order.subtitle": "Nhấp và kéo để thay đổi thứ tự"
 }

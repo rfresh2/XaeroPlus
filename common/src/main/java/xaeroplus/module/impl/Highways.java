@@ -78,7 +78,7 @@ public class Highways extends Module {
     public void onEnable() {
         Globals.drawManager.registry().register(
             DrawFeatureFactory.lines(
-                this.getClass().getName(),
+                "Highways",
                 this::getHighwayLines,
                 this::getHighwayColor,
                 this::getLineWidth,

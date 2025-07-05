@@ -47,7 +47,7 @@ public class Portals extends Module {
     public void onEnable() {
         Globals.drawManager.registry().register(
             DrawFeatureFactory.chunkHighlights(
-                this.getClass().getName(),
+                "Portals",
                 this::getHighlightsState,
                 this::getPortalsColor,
                 250

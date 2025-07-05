@@ -94,7 +94,7 @@ public class DrawOrderScreen extends Screen {
         DrawOrderScreen drawOrderScreen;
 
         public DrawFeatureList(DrawOrderScreen drawOrderScreen) {
-            super(mc, drawOrderScreen.width, drawOrderScreen.height, 30, 24);
+            super(mc, drawOrderScreen.width, drawOrderScreen.height - 91, 30, 24);
             this.drawOrderScreen = drawOrderScreen;
             this.dragged = -1;
             createEntries().forEach(this::addEntry);
@@ -173,7 +173,7 @@ public class DrawOrderScreen extends Screen {
         }
 
         public void renderBackdrop(GuiGraphics guiGraphics) {
-            guiGraphics.fill(0, 0, width, height, ColorHelper.getColor(0, 0, 0, 100));
+            guiGraphics.fill(0, 0, drawOrderScreen.width, drawOrderScreen.height, ColorHelper.getColor(0, 0, 0, 100));
         }
 
         @Override

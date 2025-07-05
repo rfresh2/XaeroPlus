@@ -9,6 +9,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import xaeroplus.util.ColorHelper;
 
 import java.util.Optional;
 
@@ -71,8 +72,8 @@ public class IncompatibleMinimapWarningScreen extends Screen {
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.drawCenteredString(this.font, titleComponent, this.width / 2, 50, 16777215);
+        guiGraphics.drawCenteredString(this.font, titleComponent, this.width / 2, 50, ColorHelper.getColor(255, 255, 255, 255));
         int i = this.width / 2 - this.message.getWidth() / 2;
-        this.message.renderLeftAligned(guiGraphics, i, 75, 18, 16777215);
+        this.message.renderLeftAligned(guiGraphics, i, 75, 18, ColorHelper.getColor(255, 255, 255, 255));
     }
 }

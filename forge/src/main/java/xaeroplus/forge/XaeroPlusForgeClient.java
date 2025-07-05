@@ -6,7 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLLoader;
 import xaero.map.gui.GuiWorldMapSettings;
@@ -17,10 +17,9 @@ import xaeroplus.settings.Settings;
 import xaeroplus.util.XaeroPlusGameTest;
 
 public class XaeroPlusForgeClient {
-    public void init(final FMLJavaModLoadingContext context, final IEventBus modEventBus, final IEventBus forgeEventBus) {
-        modEventBus.addListener(this::onRegisterKeyMappingsEvent);
-        forgeEventBus.addListener(this::onRegisterClientCommandsEvent);
-        forgeEventBus.register(modEventBus);
+    public void init(final FMLJavaModLoadingContext context, BusGroup modBusGroup) {
+        RegisterKeyMappingsEvent.getBus(modBusGroup).addListener(this::onRegisterKeyMappingsEvent);
+        RegisterClientCommandsEvent.BUS.addListener(this::onRegisterClientCommandsEvent);
         RemovalCause explicit = RemovalCause.EXPLICIT; // force class load to stop forge shitting itself at runtime??
         context.registerExtensionPoint(
             ConfigScreenHandler.ConfigScreenFactory.class,

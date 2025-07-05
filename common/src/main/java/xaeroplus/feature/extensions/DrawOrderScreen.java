@@ -11,9 +11,9 @@ import org.lwjgl.glfw.GLFW;
 import xaero.map.gui.ScreenSwitchSettingEntry;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.ColorHelper;
+import xaeroplus.util.DrawOrderHelper;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class DrawOrderScreen extends Screen {
@@ -64,14 +64,11 @@ public class DrawOrderScreen extends Screen {
     }
 
     public List<String> loadEntries() {
-        String[] drawOrderIds = Settings.REGISTRY.drawOrderSetting.getSerializedValue().split(",");
-        List<String> entries = new ArrayList<>(Arrays.asList(drawOrderIds));
-        return entries;
+        return DrawOrderHelper.load();
     }
 
     public void saveEntries(List<String> entries) {
-        var serialized = String.join(",", entries);
-        Settings.REGISTRY.drawOrderSetting.setValue(serialized);
+        Settings.REGISTRY.drawOrderSetting.setValue(DrawOrderHelper.serialize(entries));
     }
 
     public static ScreenSwitchSettingEntry getScreenSwitchSettingEntry() {

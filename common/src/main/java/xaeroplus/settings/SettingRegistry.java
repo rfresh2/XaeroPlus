@@ -81,7 +81,7 @@ public abstract class SettingRegistry {
             for (int i = 0; i < settingList.size(); i++) {
                 final XaeroPlusSetting xaeroPlusSetting = settingList.get(i);
                 var entry = xaeroPlusSetting.toWorldmapConfigSettingEntry();
-                entries.add(entry);
+                if (entry != null) entries.add(entry);
             }
             return entries.toArray(new xaero.map.gui.ConfigSettingEntry[0]);
         }

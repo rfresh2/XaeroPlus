@@ -35,17 +35,17 @@ public class LiquidNewChunks extends Module {
     // chunks where liquid was already flowing or flowed when we loaded it
     public final SavableHighlightCacheInstance inverseNewChunksCache = new SavableHighlightCacheInstance("XaeroPlusNewChunksLiquidInverse");
     private final Cache<Long, Byte> seenChunksCache = Caffeine.newBuilder()
-            .maximumSize(1000)
-            .executor(Globals.cacheRefreshExecutorService.get())
-            .expireAfterAccess(Duration.ofMinutes(5))
-            .build();
+        .maximumSize(1000)
+        .executor(Globals.cacheRefreshExecutorService.get())
+        .expireAfterAccess(Duration.ofMinutes(5))
+        .build();
     private boolean renderInverse = false;
     private int newChunksColor = getColor(255, 0, 0, 100);
     private int inverseColor = getColor(0, 255, 0, 100);
     private static final Direction[] searchDirs = new Direction[] { Direction.EAST, Direction.NORTH, Direction.WEST, Direction.SOUTH, Direction.UP };
     private static final ReferenceSet<Block> liquidBlockTypeFilter = ReferenceOpenHashSet.of(
-            Blocks.WATER,
-            Blocks.LAVA
+        Blocks.WATER,
+        Blocks.LAVA
     );
     private static final String inverseDrawFeatureId = "LiquidNewChunksInverse";
 
@@ -133,6 +133,7 @@ public class LiquidNewChunks extends Module {
                     return true;
                 }
             }
+
             // added this conditional block for nether specific inverse logic that wouldn't trigger under the default logic above
             if (mc.level.dimension().location().toString().toLowerCase().contains("nether")) {
                 if (state.getBlock() == Blocks.LAVA) {
@@ -163,6 +164,7 @@ public class LiquidNewChunks extends Module {
                 : level.getMinBuildHeight());
     }
 
+
     @EventHandler
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
         seenChunksCache.invalidateAll(); // side effect - switching dimensions resets our state
@@ -180,12 +182,12 @@ public class LiquidNewChunks extends Module {
     @Override
     public void onEnable() {
         Globals.drawManager.registry().register(
-                DrawFeatureFactory.chunkHighlights(
-                        this.getClass().getName(),
-                        this::getNewChunkHighlightsState,
-                        this::getNewChunksColor,
-                        250
-                )
+            DrawFeatureFactory.chunkHighlights(
+                this.getClass().getName(),
+                this::getNewChunkHighlightsState,
+                this::getNewChunksColor,
+                250
+            )
         );
         if (renderInverse) {
             registerInverseChunkHighlightProvider();
@@ -196,12 +198,12 @@ public class LiquidNewChunks extends Module {
 
     private void registerInverseChunkHighlightProvider() {
         Globals.drawManager.registry().register(
-                DrawFeatureFactory.chunkHighlights(
-                        inverseDrawFeatureId,
-                        this::getInverseNewChunkHighlightsState,
-                        this::getInverseColor,
-                        250
-                )
+            DrawFeatureFactory.chunkHighlights(
+                inverseDrawFeatureId,
+                this::getInverseNewChunkHighlightsState,
+                this::getInverseColor,
+                250
+            )
         );
     }
 

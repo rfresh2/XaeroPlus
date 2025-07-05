@@ -15,10 +15,10 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class SpawnChunksBase extends Module {
-    final String entityProcessingId = getClass().getName() + "$EntityProcessing";
-    final String redstoneProcessingId = getClass().getName() + "$RedstoneProcessing";
-    final String lazyChunkId = getClass().getName() + "$LazyChunk";
-    final String outerChunksId = getClass().getName() + "$OuterChunks";
+    final String entityProcessingId = getClass().getSimpleName() + "-EntityProcessing";
+    final String redstoneProcessingId = getClass().getSimpleName() + "-RedstoneProcessing";
+    final String lazyChunkId = getClass().getSimpleName() + "-LazyChunk";
+    final String outerChunksId = getClass().getSimpleName() + "-OuterChunks";
     final List<Line> entityProcessingCache = new ArrayList<>();
     final List<Line> redstoneProcessingCache = new ArrayList<>();
     final List<Line> lazyChunksCache = new ArrayList<>();

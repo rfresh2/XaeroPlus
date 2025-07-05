@@ -2,6 +2,7 @@ package xaeroplus.settings;
 
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.resources.language.I18n;
+import xaero.map.settings.ModOptions;
 
 import java.util.function.BooleanSupplier;
 
@@ -85,10 +86,18 @@ public abstract class XaeroPlusSetting {
     }
 
     public xaero.common.gui.ConfigSettingEntry toMinimapConfigSettingEntry() {
-        return new xaero.common.gui.ConfigSettingEntry(toMinimapModOptions());
+        xaero.common.settings.ModOptions minimapModOptions = toMinimapModOptions();
+        if (minimapModOptions == null) {
+            return null;
+        }
+        return new xaero.common.gui.ConfigSettingEntry(minimapModOptions);
     }
 
     public xaero.map.gui.ConfigSettingEntry toWorldmapConfigSettingEntry() {
-        return new xaero.map.gui.ConfigSettingEntry(toWorldMapModOptions());
+        ModOptions worldMapModOptions = toWorldMapModOptions();
+        if (worldMapModOptions == null) {
+            return null;
+        }
+        return new xaero.map.gui.ConfigSettingEntry(worldMapModOptions);
     }
 }

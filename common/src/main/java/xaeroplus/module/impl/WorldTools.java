@@ -23,7 +23,7 @@ public class WorldTools extends Module {
         if (!WorldToolsHelper.isWorldToolsPresent()) return;
         Globals.drawManager.registry().register(
             DrawFeatureFactory.asyncChunkHighlights(
-                this.getClass().getName(),
+                "WorldTools",
                 this::getWindowedHighlightsSnapshot,
                 this::getWorldToolsColor
             )

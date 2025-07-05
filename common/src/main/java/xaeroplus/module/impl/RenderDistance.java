@@ -24,7 +24,7 @@ public class RenderDistance extends Module {
     public void onEnable() {
         Globals.drawManager.registry().register(
             DrawFeatureFactory.lines(
-                this.getClass().getName(),
+                "RenderDistance",
                 this::getLines,
                 this::getColor,
                 this::getLineWidth,

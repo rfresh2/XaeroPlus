@@ -41,7 +41,7 @@ public class Drawing extends Module {
         drawingCache.onEnable();
         Globals.drawManager.registry().register(
             DrawFeatureFactory.multiColorLines(
-                this.getClass().getName() + "-saved",
+                "Drawing-lines-saved",
                 this::getSavedLines,
                 () -> savedColorAlpha,
                 () -> 0.5f,
@@ -50,7 +50,7 @@ public class Drawing extends Module {
         );
         Globals.drawManager.registry().register(
             DrawFeatureFactory.lines(
-                this.getClass().getName() + "-in-progress",
+                "Drawing-lines-in-progress",
                 this::getInProgressLines,
                 () -> drawingColorCycler.getColorInt(inProgressColorAlpha),
                 () -> 0.5f,
@@ -59,7 +59,7 @@ public class Drawing extends Module {
         );
         Globals.drawManager.registry().register(
             DrawFeatureFactory.multiColorChunkHighlights(
-                this.getClass().getName() + "-highlights",
+                "Drawing-highlights",
                 drawingCache::getHighlights,
                 () -> savedColorAlpha,
                 50
@@ -67,7 +67,7 @@ public class Drawing extends Module {
         );
         Globals.drawManager.registry().register(
             DrawFeatureFactory.text(
-                this.getClass().getName() + "-text",
+                "Drawing-text",
                 this::getTexts
             )
         );

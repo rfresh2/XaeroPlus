@@ -238,7 +238,6 @@
   "xaeroplus.gui.world_map.baritone_goal_here": "§2%s§r [XP] Objetivo Baritone Aca",
   "xaeroplus.gui.world_map.baritone_path_here": "§2%s§r [XP] Camino Baritone Aca",
   "xaeroplus.gui.world_map.baritone_elytra_here": "§2%s§r [XP] Elytra Baritone Aca",
-  "xaeroplus.gui.check_github_button": "Ir al Github de XaeroPlus para ver actualizaciones",
   "xaeroplus.gui.waypoints.toggle_enable_all": "Alternar Habilitar Todo",
   "xaeroplus.setting.waystones_sync": "Sincronizar Waypoint de Waystones",
   "xaeroplus.setting.waystones_sync.tooltip": "Sincroniza los Waystones como waypoints.",
@@ -260,5 +259,7 @@
   "xaeroplus.gui.world_map.draw_text": "Texto",
   "xaeroplus.gui.world_map.draw_color": "Color de dibujo",
   "xaeroplus.setting.drawing_opacity": "Opacidad del dibujo",
-  "xaeroplus.setting.drawing_opacity.tooltip": "Establece la opacidad del color de los dibujos"
+  "xaeroplus.setting.drawing_opacity.tooltip": "Establece la opacidad del color de los dibujos",
+  "xaeroplus.gui.draw_order.title": "Orden de Dibujo de XaeroPlus",
+  "xaeroplus.gui.draw_order.subtitle": "Haz clic y arrastra para cambiar el orden"
 }

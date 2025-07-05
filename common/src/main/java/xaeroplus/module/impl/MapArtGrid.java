@@ -21,7 +21,7 @@ public class MapArtGrid extends Module {
     public void onEnable() {
         Globals.drawManager.registry().register(
             DrawFeatureFactory.lines(
-                getClass().getSimpleName(),
+                "MapArtGrid",
                 this::getLines,
                 this::getColor,
                 this::getLineWidth,

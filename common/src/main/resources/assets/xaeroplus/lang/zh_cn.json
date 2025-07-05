@@ -238,7 +238,6 @@
   "xaeroplus.gui.world_map.baritone_goal_here": "§2%s§r [XP] 设置 Baritone 目标点",
   "xaeroplus.gui.world_map.baritone_path_here": "§2%s§r [XP] 通过 Baritone 寻路至此处",
   "xaeroplus.gui.world_map.baritone_elytra_here": "§2%s§r [XP] 通过 Baritone 使用鞘翅寻路至此处",
-  "xaeroplus.gui.check_github_button": "前往 XaeroPlus Github 获取更新",
   "xaeroplus.gui.waypoints.toggle_enable_all": "切换全部启用",
   "xaeroplus.setting.waystones_sync": "指路石同步",
   "xaeroplus.setting.waystones_sync.tooltip": "将指路石同步为路径点。",
@@ -260,5 +259,7 @@
   "xaeroplus.gui.world_map.draw_text": "文本",
   "xaeroplus.gui.world_map.draw_color": "绘图颜色",
   "xaeroplus.setting.drawing_opacity": "绘图不透明度",
-  "xaeroplus.setting.drawing_opacity.tooltip": "设置绘图颜色的不透明度"
+  "xaeroplus.setting.drawing_opacity.tooltip": "设置绘图颜色的不透明度",
+  "xaeroplus.gui.draw_order.title": "XaeroPlus 绘制顺序",
+  "xaeroplus.gui.draw_order.subtitle": "点击并拖动以更改顺序"
 }

@@ -236,7 +236,6 @@
     "xaeroplus.gui.world_map.baritone_goal_here": "§2%s§r [XP] Baritoneのゴール",
     "xaeroplus.gui.world_map.baritone_path_here": "§2%s§r [XP] Baritoneのルート",
     "xaeroplus.gui.world_map.baritone_elytra_here": "§2%s§r [XP] Baritoneのエリトラ",
-    "xaeroplus.gui.check_github_button": "XaeroPlusのupdateを見にGithubに行く",
     "xaeroplus.gui.waypoints.toggle_enable_all": "すべてを有効にする",
     "xaeroplus.setting.waystones_sync": "Waystones Sync",
     "xaeroplus.setting.waystones_sync.tooltip": "ウェイストーンをウェイポイントとして同期する。",
@@ -258,5 +257,7 @@
     "xaeroplus.gui.world_map.draw_text": "文章",
     "xaeroplus.gui.world_map.draw_color": "描画色",
     "xaeroplus.setting.drawing_opacity": "描画の不透明度",
-    "xaeroplus.setting.drawing_opacity.tooltip": "描画の色の不透明度を設定します"
+    "xaeroplus.setting.drawing_opacity.tooltip": "描画の色の不透明度を設定します",
+    "xaeroplus.gui.draw_order.title": "XaeroPlus 描画順",
+    "xaeroplus.gui.draw_order.subtitle": "順番を変更するにはクリックしてドラッグしてください"
 }

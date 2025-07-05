@@ -133,7 +133,6 @@ public class LiquidNewChunks extends Module {
                     return true;
                 }
             }
-
             // added this conditional block for nether specific inverse logic that wouldn't trigger under the default logic above
             if (mc.level.dimension().location().toString().toLowerCase().contains("nether")) {
                 if (state.getBlock() == Blocks.LAVA) {

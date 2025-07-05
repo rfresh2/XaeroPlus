@@ -238,7 +238,6 @@
   "xaeroplus.gui.world_map.baritone_goal_here": "§2%s§r [XP] Задать Baritone Goal",
   "xaeroplus.gui.world_map.baritone_path_here": "§2%s§r [XP] Задать Baritone Path",
   "xaeroplus.gui.world_map.baritone_elytra_here": "§2%s§r [XP] Задать Baritone Elytra",
-  "xaeroplus.gui.check_github_button": "Проверить обновления на GitHub XaeroPlus",
   "xaeroplus.gui.waypoints.toggle_enable_all": "Включить/выключить все",
   "xaeroplus.setting.waystones_sync": "Синхронизация Waystones",
   "xaeroplus.setting.waystones_sync.tooltip": "Синхронизирует Waystones как вейпоинты",
@@ -260,5 +259,7 @@
   "xaeroplus.gui.world_map.draw_text": "Текст",
   "xaeroplus.gui.world_map.draw_color": "Цвет рисования",
   "xaeroplus.setting.drawing_opacity": "Прозрачность рисования",
-  "xaeroplus.setting.drawing_opacity.tooltip": "Устанавливает прозрачность цвета рисунков"
+  "xaeroplus.setting.drawing_opacity.tooltip": "Устанавливает прозрачность цвета рисунков",
+  "xaeroplus.gui.draw_order.title": "Порядок Отрисовки XaeroPlus",
+  "xaeroplus.gui.draw_order.subtitle": "Щёлкните и перетащите, чтобы изменить порядок"
 }

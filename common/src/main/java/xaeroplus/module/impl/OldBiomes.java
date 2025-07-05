@@ -40,7 +40,7 @@ public class OldBiomes extends Module {
     public void onEnable() {
         Globals.drawManager.registry().register(
             DrawFeatureFactory.chunkHighlights(
-                this.getClass().getName(),
+                "OldBiomes",
                 this::getHighlightsState,
                 this::getOldBiomesColor,
                 250

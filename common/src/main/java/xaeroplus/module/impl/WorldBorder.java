@@ -20,7 +20,7 @@ public class WorldBorder extends Module {
     public void onEnable() {
         Globals.drawManager.registry().register(
             DrawFeatureFactory.lines(
-                this.getClass().getName(),
+                "WorldBorder",
                 this::getLines,
                 this::getColor,
                 this::getLineWidth,

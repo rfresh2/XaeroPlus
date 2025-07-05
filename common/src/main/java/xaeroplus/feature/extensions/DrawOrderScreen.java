@@ -24,7 +24,7 @@ public class DrawOrderScreen extends Screen {
     int selected;
 
     public DrawOrderScreen(Screen parent, Screen escapeScreen) {
-        super(Component.literal("XaeroPlus Draw Order"));
+        super(Component.translatable("xaeroplus.gui.draw_order.title"));
         this.parent = parent;
         this.drawFeatureIdOrder = new ArrayList<>();
         this.selected = -1;
@@ -59,7 +59,7 @@ public class DrawOrderScreen extends Screen {
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         drawFeatureList.render(guiGraphics, mouseX, mouseY, partialTick);
         guiGraphics.drawCenteredString(mc.font, title, width / 2, 5, -1);
-        guiGraphics.drawCenteredString(mc.font, Component.literal("Click and drag the elements to change the order"), width / 2, height - 52, -1);
+        guiGraphics.drawCenteredString(mc.font, Component.translatable("xaeroplus.gui.draw_order.subtitle"), width / 2, height - 52, -1);
         super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
@@ -199,7 +199,7 @@ public class DrawOrderScreen extends Screen {
 
         @Override
         public Component getNarration() {
-            return Component.literal("Not implemented yet sorry");
+            return Component.empty();
         }
 
         @Override
@@ -219,7 +219,7 @@ public class DrawOrderScreen extends Screen {
         ) {
             if (drawFeatureList.getSelected() != this) {
                 guiGraphics.fill(left - 2, top, left - 2 + width, top + height, ColorHelper.getColor(0, 0, 0, 150));
-                guiGraphics.renderOutline(left - 2, top, width, height, -12303292);
+                guiGraphics.renderOutline(left - 2, top, width, height, ColorHelper.getColor(68, 68, 68, 255));
             }
         }
 

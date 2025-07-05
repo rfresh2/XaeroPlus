@@ -39,11 +39,11 @@ jobs:
     - name: Get Minimap Version Fabric
       run: echo "MINIMAP_VERSION_FABRIC=$(./gradlew -q printMinimapVersionFabric)" >> $GITHUB_ENV
 
-#    - name: Get WorldMap Version Forge
-#      run: echo "WORLDMAP_VERSION_FORGE=$(./gradlew -q printWorldMapVersionForge)" >> $GITHUB_ENV
-#
-#    - name: Get Minimap Version Forge
-#      run: echo "MINIMAP_VERSION_FORGE=$(./gradlew -q printMinimapVersionForge)" >> $GITHUB_ENV
+    - name: Get WorldMap Version Forge
+      run: echo "WORLDMAP_VERSION_FORGE=$(./gradlew -q printWorldMapVersionForge)" >> $GITHUB_ENV
+
+    - name: Get Minimap Version Forge
+      run: echo "MINIMAP_VERSION_FORGE=$(./gradlew -q printMinimapVersionForge)" >> $GITHUB_ENV
 
     - name: Get WorldMap Version NeoForge
       run: |
@@ -59,8 +59,8 @@ jobs:
     - name: Get Fabric Jar Filename
       run: echo "XP_FABRIC=XaeroPlus-${{ env.XP_VERSION }}+fabric-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FABRIC }}-MM${{ env.MINIMAP_VERSION_FABRIC }}" >> $GITHUB_ENV
 
-#    - name: Get Forge Jar Filename
-#      run: echo "XP_FORGE=XaeroPlus-${{ env.XP_VERSION }}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
+    - name: Get Forge Jar Filename
+      run: echo "XP_FORGE=XaeroPlus-${{ env.XP_VERSION }}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
 
     - name: Get Neo Jar Filename
       run: |
@@ -75,11 +75,11 @@ jobs:
     - name: Append Commit Hash To Fabric Jar Name
       run: mv fabric/build/libs/${{ env.XP_FABRIC }}.jar fabric/build/libs/${{ env.XP_FABRIC_OUT }}.jar
 
-#    - name: Get Forge Jar Result Filename
-#      run: echo "XP_FORGE_OUT=XaeroPlus-${{ env.XP_VERSION }}-DEV-${{ env.COMMIT_HASH }}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
-#
-#    - name: Append Commit Hash To Forge Jar Name
-#      run: mv forge/build/libs/${{ env.XP_FORGE }}.jar forge/build/libs/${{ env.XP_FORGE_OUT }}.jar
+    - name: Get Forge Jar Result Filename
+      run: echo "XP_FORGE_OUT=XaeroPlus-${{ env.XP_VERSION }}-DEV-${{ env.COMMIT_HASH }}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
+
+    - name: Append Commit Hash To Forge Jar Name
+      run: mv forge/build/libs/${{ env.XP_FORGE }}.jar forge/build/libs/${{ env.XP_FORGE_OUT }}.jar
 
     - name: Get NeoForge Jar Result Filename
       run: echo "XP_NEO_OUT=XaeroPlus-${{ env.XP_VERSION }}-DEV-${{ env.COMMIT_HASH }}+neoforge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_NEO }}-MM${{ env.MINIMAP_VERSION_NEO }}" >> $GITHUB_ENV
@@ -94,12 +94,12 @@ jobs:
         path: fabric/build/libs/${{ env.XP_FABRIC_OUT }}.jar
         if-no-files-found: error
 
-#    - name: Upload Forge Artifact
-#      uses: actions/upload-artifact@v4
-#      with:
-#        name: ${{ env.XP_FORGE_OUT }}
-#        path: forge/build/libs/${{ env.XP_FORGE_OUT }}.jar
-#        if-no-files-found: error
+    - name: Upload Forge Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.XP_FORGE_OUT }}
+        path: forge/build/libs/${{ env.XP_FORGE_OUT }}.jar
+        if-no-files-found: error
 
     - name: Upload NeoForge Artifact
       uses: actions/upload-artifact@v4
@@ -109,13 +109,13 @@ jobs:
         if-no-files-found: error
     outputs:
       worldmap_version_fabric: ${{ env.WORLDMAP_VERSION_FABRIC }}
-#      worldmap_version_forge: ${{ env.WORLDMAP_VERSION_FORGE }}
+      worldmap_version_forge: ${{ env.WORLDMAP_VERSION_FORGE }}
       worldmap_version_neo: ${{ env.WORLDMAP_VERSION_NEO }}
       minimap_version_fabric: ${{ env.MINIMAP_VERSION_FABRIC }}
-#      minimap_version_forge: ${{ env.MINIMAP_VERSION_FORGE }}
+      minimap_version_forge: ${{ env.MINIMAP_VERSION_FORGE }}
       minimap_version_neo: ${{ env.MINIMAP_VERSION_NEO }}
       xp_fabric: ${{ env.XP_FABRIC_OUT }}
-#      xp_forge: ${{ env.XP_FORGE_OUT }}
+      xp_forge: ${{ env.XP_FORGE_OUT }}
       xp_neo: ${{ env.XP_NEO_OUT }}
 
 #  test-fabric:

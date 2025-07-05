@@ -16,10 +16,12 @@ public class GuiXaeroPlusWorldMapSettings extends GuiSettings {
         var mainSettingsEntries = Settings.REGISTRY.getWorldmapConfigSettingEntries(SettingLocation.WORLD_MAP_MAIN);
         var chunkHighlightSettingSwitchEntry = GuiXaeroPlusChunkHighlightSettings.getScreenSwitchSettingEntry(parent);
         var overlaySettingSwitchEntry = GuiXaeroPlusOverlaySettings.getScreenSwitchSettingEntry(parent);
-        this.entries = new ISettingEntry[mainSettingsEntries.length + 2];
+        var drawOrderSettingSwitchEntry = DrawOrderScreen.getScreenSwitchSettingEntry();
+        this.entries = new ISettingEntry[mainSettingsEntries.length + 3];
         this.entries[0] = chunkHighlightSettingSwitchEntry;
         this.entries[1] = overlaySettingSwitchEntry;
-        System.arraycopy(mainSettingsEntries, 0, this.entries, 2, mainSettingsEntries.length);
+        this.entries[2] = drawOrderSettingSwitchEntry;
+        System.arraycopy(mainSettingsEntries, 0, this.entries, 3, mainSettingsEntries.length);
     }
 
     @Override

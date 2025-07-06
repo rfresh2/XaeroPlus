@@ -67,10 +67,6 @@ public class StringSetting extends XaeroPlusSetting {
 
     public void setValue(final String value) {
         this.value = value;
-        String[] split = value.split(",");
-        if (split.length > 0 && split[0].isBlank()) {
-            XaeroPlus.LOGGER.error("HUH");
-        }
         if (nonNull(getSettingChangeConsumer())) {
             try {
                 getSettingChangeConsumer().accept(value);

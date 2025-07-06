@@ -107,6 +107,10 @@ jobs:
         name: ${{ env.XP_NEO_OUT }}
         path: neo/build/libs/${{ env.XP_NEO_OUT }}.jar
         if-no-files-found: error
+
+    - name: test fabric
+      run: ./gradlew fabric:runProdTest
+
     outputs:
       worldmap_version_fabric: ${{ env.WORLDMAP_VERSION_FABRIC }}
       worldmap_version_forge: ${{ env.WORLDMAP_VERSION_FORGE }}
@@ -117,6 +121,7 @@ jobs:
       xp_fabric: ${{ env.XP_FABRIC_OUT }}
       xp_forge: ${{ env.XP_FORGE_OUT }}
       xp_neo: ${{ env.XP_NEO_OUT }}
+
 
 #  test-fabric:
 #    runs-on: ubuntu-latest

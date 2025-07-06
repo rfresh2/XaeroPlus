@@ -24,7 +24,7 @@ dependencyResolutionManagement {
 			library("forge", "net.minecraftforge:forge:1.21.7-57.0.2")
 			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.128.2+${minecraft_version}")
 			library("neoforge", "net.neoforged:neoforge:21.7.4-beta")
-			library("worldmap-fabric", "maven.modrinth:xaeros-world-map:${worldmap_version_fabric}_Fabric_1.21.6")
+			library("worldmap-fabric", "maven.modrinth:xaeros-world-map:${worldmap_version_fabric}_Fabric_${minecraft_version}")
 			library("worldmap-forge", "maven.modrinth:xaeros-world-map:${worldmap_version_forge}_Forge_${minecraft_version}")
 			library("worldmap-neo", "maven.modrinth:xaeros-world-map:${worldmap_version_neo}_NeoForge_${minecraft_version}")
 			library("minimap-fabric", "maven.modrinth:xaeros-minimap:${minimap_version_fabric}_Fabric_${minecraft_version}")

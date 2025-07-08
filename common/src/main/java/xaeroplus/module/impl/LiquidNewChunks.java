@@ -116,9 +116,7 @@ public class LiquidNewChunks extends Module {
 
             var fluid = state.getFluidState();
             if (!fluid.isEmpty() && !fluid.isSource()) {
-                // remove check for single lava source blocks in nether (my only change to core logic, sorry! only for nether.)
-                boolean isInNether = mc.level.dimension().location().toString().toLowerCase().contains("nether");
-                if ((fluid.getAmount() < 2 && !isInNether) || (isInNether && fluid.getAmount() < 1)) {
+                if (fluid.getAmount() < 2) {
                     inverseNewChunksCache.get().addHighlight(c.getPos().x, chunk.getPos().z);
                     return true;
                 }

@@ -136,29 +136,6 @@ public class LiquidNewChunks extends Module {
                     return true;
                 }
             }
-            // added this conditional block for nether specific inverse logic that wouldn't trigger under the default logic above
-            if (mc.level.dimension().location().toString().toLowerCase().contains("nether")) {
-                if (state.getBlock() == Blocks.LAVA) {
-                    int columnHeight = 1;
-                    // check columns ≥16 blocks
-                    for (int i = 1; i <= 16; i++) {
-                        var aboveFluid = chunk.getFluidState(
-                                ChunkUtils.chunkCoordToCoord(c.getPos().x) + relX,
-                                y + i,
-                                ChunkUtils.chunkCoordToCoord(c.getPos().z) + relZ
-                        );
-                        if (!aboveFluid.isEmpty() && !aboveFluid.isSource()) {
-                            columnHeight++;
-                        } else {
-                            break;
-                        }
-                    }
-                    if (columnHeight >= 12) {
-                        inverseNewChunksCache.get().addHighlight(c.getPos().x, c.getPos().z);
-                        return true;
-                    }
-                }
-            }
             return false;
         }, Settings.REGISTRY.liquidNewChunksOnlyAboveY0Setting.get()
             ? Math.max(1, level.getMinBuildHeight())

@@ -481,6 +481,15 @@ public final class Settings extends SettingRegistry {
             (b) -> ModuleManager.getModule(LiquidNewChunks.class).setInverseRgbColor(b.getColor()),
             () -> ModuleManager.getModule(LiquidNewChunks.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
+    public final DoubleSetting liquidNewChunksInverseThresholdSetting = register(
+        DoubleSetting.create(
+            "New Chunks Inverse Threshold",
+            "xaeroplus.setting.liquidNewChunksInverseThreshold",
+            3, 20, 1,
+            5,
+            (val) -> ModuleManager.getModule(LiquidNewChunks.class).setInverseThreshold((int) val),
+            () -> ModuleManager.getModule(LiquidNewChunks.class).isEnabled()),
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting liquidNewChunksOnlyAboveY0Setting = register(
         BooleanSetting.create(
             "Liquid NewChunks Only Y > 0",

@@ -116,12 +116,15 @@ public class LiquidNewChunks extends Module {
 
             var fluid = state.getFluidState();
             if (!fluid.isEmpty() && !fluid.isSource()) {
-                if (fluid.getAmount() < 2) {
+                // remove check for single lava source blocks in nether (my only change to core logic, sorry! only for nether.)
+                boolean isInNether = mc.level.dimension().location().toString().toLowerCase().contains("nether");
+                if ((fluid.getAmount() < 2 && !isInNether) || (isInNether && fluid.getAmount() < 1)) {
                     inverseNewChunksCache.get().addHighlight(c.getPos().x, chunk.getPos().z);
                     return true;
                 }
                 boolean foundColumn = true;
-                for (int i = 1; i <= 5; i++) {
+                int threshold = this.inverseThreshold;
+                for (int i = 1; i <= threshold; i++) {
                     var aboveState = chunk.getFluidState(x, y + i, z);
                     if (aboveState.isEmpty() || aboveState.isSource()) {
                         foundColumn = false;
@@ -195,6 +198,12 @@ public class LiquidNewChunks extends Module {
 
     private int getInverseColor() {
         return this.inverseColor;
+    }
+
+    private int inverseThreshold = 5;
+
+    public void setInverseThreshold(int threshold) {
+        this.inverseThreshold = threshold;
     }
 
     public void setRgbColor(final int color) {

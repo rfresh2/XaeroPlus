@@ -13,7 +13,7 @@ public class MixinHudMinimapRenderer {
     @Redirect(method = "render(Lxaero/hud/minimap/module/MinimapSession;Lxaero/hud/render/module/ModuleRenderContext;Lnet/minecraft/client/gui/GuiGraphics;F)V", at = @At(
         value = "INVOKE",
         target = "Lxaero/hud/minimap/module/MinimapSession;getHideMinimapUnderScreen()Z"
-    ))
+    ), remap = true) // $REMAP
     public boolean allowMinimapRenderOnTopOf(final MinimapSession instance) {
         var original = instance.getHideMinimapUnderScreen();
         if (!original) return original;

@@ -82,7 +82,7 @@ public class PortalSkipDetection extends Module {
     public void onEnable() {
         Globals.drawManager.registry().register(
             DrawFeatureFactory.chunkHighlights(
-                this.getClass().getName(),
+                "PortalSkips",
                 this::getHighlightsState,
                 this::getPortalSkipChunksColor,
                 250

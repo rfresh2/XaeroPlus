@@ -1015,4 +1015,16 @@ public final class Settings extends SettingRegistry {
             false,
             true),
         SettingLocation.KEYBINDS);
+
+    /**
+     * Special String Settings (not shown in regular settings UI)
+     */
+
+    public final StringSetting drawOrderSetting = register(
+        StringSetting.create(
+            "Draw Order",
+            "xaeroplus.setting.draw_order",
+            "",
+            (s) -> Globals.drawManager.registry().loadOrder(s)),
+        SettingLocation.CHUNK_HIGHLIGHTS);
 }

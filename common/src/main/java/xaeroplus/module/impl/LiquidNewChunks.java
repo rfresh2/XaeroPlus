@@ -157,7 +157,7 @@ public class LiquidNewChunks extends Module {
     public void onEnable() {
         Globals.drawManager.registry().register(
             DrawFeatureFactory.chunkHighlights(
-                this.getClass().getName(),
+                "LiquidNewChunks",
                 this::getNewChunkHighlightsState,
                 this::getNewChunksColor,
                 250

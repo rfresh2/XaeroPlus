@@ -43,17 +43,17 @@ public class SettingHooks {
         try(BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String s;
             while ((s = reader.readLine()) != null) {
-                String[] args = s.split(":");
-                if (args.length != 2) {
-                    XaeroPlus.LOGGER.warn("Invalid setting line: {}", s);
-                    continue;
-                }
-                var setting = Settings.REGISTRY.getSettingByName(args[0]);
+                int colonIndex = s.indexOf(':');
+                if (colonIndex == -1) continue;
+                String settingName = s.substring(0, colonIndex);
+                if (settingName.isBlank()) continue;
+                String settingValue = s.substring(colonIndex + 1);
+                var setting = Settings.REGISTRY.getSettingByName(settingName);
                 if (setting == null) {
-                    XaeroPlus.LOGGER.warn("Setting not found: {}", args[0]);
+                    XaeroPlus.LOGGER.warn("Setting not found: {}", settingName);
                     continue;
                 }
-                setting.deserializeValue(args[1]);
+                setting.deserializeValue(settingValue);
             }
         }
     }

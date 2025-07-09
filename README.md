@@ -23,7 +23,7 @@
   <img src="https://img.shields.io/badge/MC-1.21.3-brightgreen.svg" alt="Minecraft"/>
   <img src="https://img.shields.io/badge/MC-1.21.4-brightgreen.svg" alt="Minecraft"/>
   <img src="https://img.shields.io/badge/MC-1.21.5-brightgreen.svg" alt="Minecraft"/>
-  <img src="https://img.shields.io/badge/MC-1.21.6-brightgreen.svg" alt="Minecraft"/>
+  <img src="https://img.shields.io/badge/MC-1.21.7-brightgreen.svg" alt="Minecraft"/>
   <img src="https://img.shields.io/github/languages/code-size/rfresh2/XaeroPlus.svg" alt="Code size"/>
   <img src="https://img.shields.io/github/repo-size/rfresh2/XaeroPlus.svg" alt="GitHub repo size"/>
   <img src="https://tokei.rs/b1/github/rfresh2/XaeroPlus?category=code&style=flat" alt="Lines of Code"/>
@@ -130,6 +130,5 @@ Submit PR's targeting the `1.20.1` branch only. Changes will be merged to all th
 * 2b2t Atlas Waypoints to Xaero: [JMWaypointsToXaero/atlas](https://github.com/rfresh2/JMWaypointsToXaero/tree/atlas)
 * Convert MC Region Files to Xaero: [JMToXaero/Region-Scripts](https://github.com/Entropy5/JMtoXaero/blob/Region-Scripts/src/main/java/com/github/entropy5/RegionToXaero.java)
 * 2b2t 256k WDL Xaero Map (20GB): [mc-archive](https://data.mc-archive.org/s/eFDEy2XKof83Kez)
-* Xaero World
-  Merger: [JMToXaero/Region-Scripts](https://github.com/Entropy5/JMtoXaero/blob/Region-Scripts/src/main/java/com/github/entropy5/XaeroRegionMerger.java)
+* Xaero World Merger: [JMToXaero/Region-Scripts](https://github.com/Entropy5/JMtoXaero/blob/Region-Scripts/src/main/java/com/github/entropy5/XaeroRegionMerger.java)
   * Can be used to merge 256k WDL into an existing world. With optional darkening only on tiles from 256K

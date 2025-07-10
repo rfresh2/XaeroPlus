@@ -159,6 +159,8 @@
   "xaeroplus.setting.ow_auto_waypoint_dimension.tooltip": "在下界时，优先创建和显示主世界路径点。",
   "xaeroplus.setting.show_waypoint_distances": "显示路径点距离",
   "xaeroplus.setting.show_waypoint_distances.tooltip": "在完整路径点菜单中显示到每个路径点的距离。",
+  "xaeroplus.setting.show_coords_in_right_click_options": "在右键菜单中显示坐标",
+  "xaeroplus.setting.show_coords_in_right_click_options.tooltip": "切换是否在世界地图的右键菜单中显示坐标",
   "xaeroplus.setting.show_render_distance": "显示渲染距离",
   "xaeroplus.setting.show_render_distance.tooltip": "显示服务器端的渲染距离（实际上只是另一个设置）",
   "xaeroplus.setting.show_world_border": "显示世界边界",

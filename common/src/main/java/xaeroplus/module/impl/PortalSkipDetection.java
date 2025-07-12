@@ -101,7 +101,7 @@ public class PortalSkipDetection extends Module {
         TickTaskExecutor.INSTANCE.execute(() -> {
             reset();
         });
-        Globals.drawManager.registry().unregister(this.getClass().getName());
+        Globals.drawManager.registry().unregister("PortalSkips");
     }
 
     private void initializeWorld() {

@@ -905,6 +905,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if (Settings.REGISTRY.disableWaypointSharing.get()) {
             options.removeIf(option -> ((AccessorRightClickOption) option).getName().equals("gui.xaero_right_click_map_share_location"));
         }
+
+        if (!Settings.REGISTRY.showCoordsInRightClickOptions.get()) {
+            options.removeIf(option -> {
+                var name = ((AccessorRightClickOption) option).getName();
+                return name.startsWith("C: (") || name.startsWith("X: ");
+            });
+        }
     }
 
     @Unique

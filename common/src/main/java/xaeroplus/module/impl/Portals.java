@@ -60,7 +60,7 @@ public class Portals extends Module {
     @Override
     public void onDisable() {
         portalsCache.onDisable();
-        Globals.drawManager.registry().unregister(this.getClass().getName());
+        Globals.drawManager.registry().unregister("Portals");
     }
 
     @EventHandler

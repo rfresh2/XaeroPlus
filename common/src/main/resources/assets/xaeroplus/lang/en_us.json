@@ -159,6 +159,8 @@
   "xaeroplus.setting.ow_auto_waypoint_dimension.tooltip": "Prefer creating and viewing Overworld waypoints when in the nether.",
   "xaeroplus.setting.show_waypoint_distances": "Show Waypoint Distances",
   "xaeroplus.setting.show_waypoint_distances.tooltip": "Display the distance to every waypoint in the full waypoint menu.",
+  "xaeroplus.setting.show_coords_in_right_click_options": "Coords in Right Click Options",
+  "xaeroplus.setting.show_coords_in_right_click_options.tooltip": "Toggles whether coordinates are shown in the right click options menu on the WorldMap",
   "xaeroplus.setting.show_render_distance": "Show Render Distance",
   "xaeroplus.setting.show_render_distance.tooltip": "Show server side render distance (actually just another setting).",
   "xaeroplus.setting.show_world_border": "Show World Border",

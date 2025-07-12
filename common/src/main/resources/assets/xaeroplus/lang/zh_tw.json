@@ -159,6 +159,8 @@
   "xaeroplus.setting.ow_auto_waypoint_dimension.tooltip": "在地獄中時偏好建立和查看主世界定位點。",
   "xaeroplus.setting.show_waypoint_distances": "顯示定位點距離",
   "xaeroplus.setting.show_waypoint_distances.tooltip": "在完整定位點選單中顯示到每個定位點的距離。",
+  "xaeroplus.setting.show_coords_in_right_click_options": "在右鍵選單中顯示座標",
+  "xaeroplus.setting.show_coords_in_right_click_options.tooltip": "切換是否在世界地圖的右鍵選單中顯示座標",
   "xaeroplus.setting.show_render_distance": "顯示渲染距離",
   "xaeroplus.setting.show_render_distance.tooltip": "顯示伺服器端渲染距離（實際上只是另一個設定）。",
   "xaeroplus.setting.show_world_border": "顯示世界邊界",

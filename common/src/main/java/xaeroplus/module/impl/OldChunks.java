@@ -130,7 +130,7 @@ public class OldChunks extends Module {
     public void onDisable() {
         oldChunksCache.onDisable();
         modernChunksCache.onDisable();
-        Globals.drawManager.registry().unregister(this.getClass().getName());
+        Globals.drawManager.registry().unregister("OldChunks");
     }
 
     public int getOldChunksColor() {

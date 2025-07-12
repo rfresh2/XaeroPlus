@@ -57,7 +57,7 @@ public class OldBiomes extends Module {
     @Override
     public void onDisable() {
         oldBiomesCache.onDisable();
-        Globals.drawManager.registry().unregister(this.getClass().getName());
+        Globals.drawManager.registry().unregister("OldBiomes");
     }
 
     @EventHandler

@@ -35,7 +35,7 @@ public class RenderDistance extends Module {
 
     @Override
     public void onDisable() {
-        Globals.drawManager.registry().unregister(this.getClass().getName());
+        Globals.drawManager.registry().unregister("RenderDistance");
     }
 
     List<Line> getLines(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {

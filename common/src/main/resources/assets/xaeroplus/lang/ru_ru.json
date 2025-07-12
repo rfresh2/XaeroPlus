@@ -159,6 +159,8 @@
   "xaeroplus.setting.ow_auto_waypoint_dimension.tooltip": "Создает и показывает вейпоинты Верхнего мира, находясь в Незере",
   "xaeroplus.setting.show_waypoint_distances": "Показывать расстояние до точек",
   "xaeroplus.setting.show_waypoint_distances.tooltip": "Отображает расстояние до каждой точки в меню вейпоинтов",
+  "xaeroplus.setting.show_coords_in_right_click_options": "Показ координат в меню правого клика",
+  "xaeroplus.setting.show_coords_in_right_click_options.tooltip": "Переключает отображение координат в меню параметров по правому клику на Карте Мира",
   "xaeroplus.setting.show_render_distance": "Показать дистанцию прорисовки",
   "xaeroplus.setting.show_render_distance.tooltip": "Показывает серверную дистанцию прорисовки вокруг игрока",
   "xaeroplus.setting.show_world_border": "Показать границу мира",

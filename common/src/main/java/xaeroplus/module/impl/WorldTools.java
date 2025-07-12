@@ -32,7 +32,7 @@ public class WorldTools extends Module {
 
     @Override
     public void onDisable() {
-        Globals.drawManager.registry().unregister(this.getClass().getName());
+        Globals.drawManager.registry().unregister("WorldTools");
     }
 
     public boolean isChunkDownloaded(final int x, final int z, final ResourceKey<Level> dimension) {

@@ -161,7 +161,7 @@ public class Highways extends Module {
 
     @Override
     public void onDisable() {
-        Globals.drawManager.registry().unregister(this.getClass().getName());
+        Globals.drawManager.registry().unregister("Highways");
     }
 
     public int getHighwayColor() {

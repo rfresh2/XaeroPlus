@@ -185,7 +185,7 @@ public class LiquidNewChunks extends Module {
     public void onDisable() {
         newChunksCache.onDisable();
         inverseNewChunksCache.onDisable();
-        Globals.drawManager.registry().unregister(this.getClass().getName());
+        Globals.drawManager.registry().unregister("LiquidNewChunks");
         Globals.drawManager.registry().unregister(inverseDrawFeatureId);
     }
 

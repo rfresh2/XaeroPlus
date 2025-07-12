@@ -210,6 +210,12 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.show_waypoint_distances",
             true),
         SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting showCoordsInRightClickOptions = register(
+        BooleanSetting.create(
+            "Show Coords In Right Click Options",
+            "xaeroplus.setting.show_coords_in_right_click_options",
+            true),
+        SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting nullOverworldDimensionFolder = register(
         BooleanSetting.create(
             "null OW Dim Dir",

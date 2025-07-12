@@ -32,7 +32,7 @@ public class MapArtGrid extends Module {
 
     @Override
     public void onDisable() {
-        Globals.drawManager.registry().unregister(getClass().getSimpleName());
+        Globals.drawManager.registry().unregister("MapArtGrid");
     }
 
     public List<Line> getLines(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {

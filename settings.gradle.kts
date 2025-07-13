@@ -47,7 +47,7 @@ dependencyResolutionManagement {
 			library("immediatelyfast-neo", "maven.modrinth:immediatelyfast:1.3.0+1.20.6-neoforge")
 			library("modmenu", "maven.modrinth:modmenu:10.0.0")
 			library("sodium", "maven.modrinth:sodium:mc1.20.6-0.5.11")
-			library("fpsdisplay", "maven.modrinth:fpsdisplay:3.1.0+1.20.x")
+			library("fpsdisplay", "maven.modrinth:fpsdisplay:4.1.1+1.20.6")
 			library("cloth-config-fabric", "me.shedaniel.cloth:cloth-config-fabric:14.0.126")
             library("embeddium", "maven.modrinth:embeddium:0.3.19+mc1.20.6")
 			library("embeddium-forge", "maven.modrinth:embeddium:0.3.20+mc1.20.6")

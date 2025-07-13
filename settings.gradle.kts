@@ -39,7 +39,7 @@ dependencyResolutionManagement {
 			library("modmenu", "maven.modrinth:modmenu:7.2.2")
 			library("sodium", "maven.modrinth:sodium:mc1.20.1-0.5.13-fabric")
 			library("embeddium", "maven.modrinth:embeddium:0.3.31+mc1.20.1")
-			library("fpsdisplay", "maven.modrinth:fpsdisplay:3.1.0+1.20.x")
+			library("fpsdisplay", "maven.modrinth:fpsdisplay:3.1.0+1.20.1")
 			library("cloth-config-fabric", "me.shedaniel.cloth:cloth-config-fabric:11.1.136")
 			library("opac-fabric", "maven.modrinth:open-parties-and-claims:fabric-1.20.1-0.24.0")
 			library("forge-config-api-port", "maven.modrinth:forge-config-api-port:v8.0.1-1.20.1-Fabric")

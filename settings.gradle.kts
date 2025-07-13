@@ -46,7 +46,7 @@ dependencyResolutionManagement {
 			library("modmenu", "maven.modrinth:modmenu:8.0.1")
 			library("sodium", "maven.modrinth:sodium:mc1.20.2-0.5.5")
             library("embeddium", "maven.modrinth:embeddium:0.2.12+mc1.20.2")
-            library("fpsdisplay", "maven.modrinth:fpsdisplay:3.1.0+1.20.x")
+            library("fpsdisplay", "maven.modrinth:fpsdisplay:3.1.0+1.20.2")
 			library("cloth-config-fabric", "me.shedaniel.cloth:cloth-config-fabric:12.0.111")
             library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")
 			library("baritone-fabric", "com.github.rfresh2:baritone-fabric:${minecraft_version}-SNAPSHOT")

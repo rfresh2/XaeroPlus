@@ -37,8 +37,18 @@ public class DrawFeatureRegistry {
                 return;
             }
         }
-        drawOrder.add(id);
-        features.put(drawOrder.indexOf(id), feature);
+        // insert new entry alphabetically
+        int insertIndex = drawOrder.size();
+        for (int i = 0; i < drawOrder.size(); i++) {
+            String entryId = drawOrder.get(i);
+            if (entryId.compareTo(id) > 0) {
+                insertIndex = i;
+                break;
+            }
+        }
+        drawOrder.add(insertIndex, id);
+        // setting change listener will reload features and insert it into correct position
+        features.put(features.isEmpty() ? 0 : features.lastIntKey() + 1, feature);
         String serialized = DrawOrderHelper.serialize(drawOrder);
         Settings.REGISTRY.drawOrderSetting.setValue(serialized);
     }

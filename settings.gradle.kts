@@ -45,7 +45,7 @@ dependencyResolutionManagement {
             library("immediatelyfast", "maven.modrinth:immediatelyfast:1.5.0+1.20.4-fabric")
 			library("modmenu", "maven.modrinth:modmenu:9.0.0")
 			library("sodium", "maven.modrinth:sodium:mc1.20.4-0.5.8")
-			library("fpsdisplay", "maven.modrinth:fpsdisplay:4.0.0+1.20.4")
+			library("fpsdisplay", "maven.modrinth:fpsdisplay:4.0.1+1.20.4")
 			library("cloth-config-fabric", "me.shedaniel.cloth:cloth-config-fabric:13.0.121")
             library("embeddium", "maven.modrinth:embeddium:0.3.25+mc1.20.4")
             library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")

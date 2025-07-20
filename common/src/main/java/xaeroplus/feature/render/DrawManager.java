@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import xaero.common.HudMod;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
+import xaeroplus.module.impl.TickTaskExecutor;
 
 public class DrawManager {
     private final DrawFeatureRegistry registry = new DrawFeatureRegistry();
@@ -20,7 +21,9 @@ public class DrawManager {
 
     @EventHandler
     public void onXaeroWorldChange(XaeroWorldChangeEvent event) {
-        registry.forEach(DrawFeature::invalidateCache);
+        TickTaskExecutor.INSTANCE.execute(() -> {
+            registry.forEach(DrawFeature::invalidateCache);
+        });
     }
 
     public void drawMinimapFeatures(

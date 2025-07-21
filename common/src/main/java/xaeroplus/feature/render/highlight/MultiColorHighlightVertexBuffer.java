@@ -9,9 +9,13 @@ import net.minecraft.client.renderer.ShaderInstance;
 import xaeroplus.feature.render.DrawContext;
 import xaeroplus.feature.render.shaders.XaeroPlusShaders;
 import xaeroplus.util.ChunkUtils;
-import xaeroplus.util.ColorHelper;
 
 public class MultiColorHighlightVertexBuffer extends AbstractHighlightVertexBuffer {
+    private final MultiColorHighlightColorFunction colorFunction;
+
+    public MultiColorHighlightVertexBuffer(final MultiColorHighlightColorFunction colorFunction) {
+        this.colorFunction = colorFunction;
+    }
 
     @Override
     public void preRender(final DrawContext ctx, final Long2LongMap highlights, final int color) {
@@ -24,17 +28,18 @@ public class MultiColorHighlightVertexBuffer extends AbstractHighlightVertexBuff
         stale = false;
         lastRefreshed = System.currentTimeMillis();
         flipped = ctx.worldmap();
-        if (highlights.isEmpty() || colorAlpha == 0) {
+        if (highlights.isEmpty()) {
             close();
             return;
         }
         var bufferBuilder = Tesselator.getInstance().getBuilder();
         bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
         for (var entry : highlights.long2LongEntrySet()) {
-            var highlight = entry.getLongKey();
-            int color = ColorHelper.getColorWithAlpha((int) entry.getLongValue(), colorAlpha);
-            var chunkPosX = ChunkUtils.longToChunkX(highlight);
-            var chunkPosZ = ChunkUtils.longToChunkZ(highlight);
+            var pos = entry.getLongKey();
+            long foundTime = entry.getLongValue();
+            int color = colorFunction.getColor(pos, foundTime);
+            var chunkPosX = ChunkUtils.longToChunkX(pos);
+            var chunkPosZ = ChunkUtils.longToChunkZ(pos);
             float x1 = chunkPosX;
             float x2 = chunkPosX + 1;
             float y1 = flipped ? chunkPosZ + 1 : chunkPosZ;

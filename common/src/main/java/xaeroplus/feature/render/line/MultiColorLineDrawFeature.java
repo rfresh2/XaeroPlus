@@ -65,8 +65,6 @@ public class MultiColorLineDrawFeature extends AbstractLineDrawFeature<Object2In
 
     @Override
     public void render(final DrawContext ctx) {
-        float a = lineProvider.colorAlphaSupplier().getAsInt() / 255.0f;
-        if (a == 0) return;
         preRender(ctx);
         VertexConsumer lineBuffer = ctx.renderTypeBuffers().getBuffer(CustomRenderTypes.MAP_LINES);
         var lines = getLines();
@@ -74,10 +72,11 @@ public class MultiColorLineDrawFeature extends AbstractLineDrawFeature<Object2In
         while (it.hasNext()) {
             var entry = it.next();
             var line = entry.getKey();
-            var color = entry.getIntValue();
+            var color = lineProvider.colorFunction().getColor(line, entry.getIntValue());
             var r = ColorHelper.getR(color);
             var g = ColorHelper.getG(color);
             var b = ColorHelper.getB(color);
+            var a = ColorHelper.getA(color);
             int x1 = ctx.worldmap() ? line.x2() : line.x1();
             int z1 = ctx.worldmap() ? line.z2() : line.z1();
             int x2 = ctx.worldmap() ? line.x1() : line.x2();

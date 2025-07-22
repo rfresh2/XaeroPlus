@@ -150,9 +150,8 @@ jobs:
           mc: ${{ env.MINECRAFT_VERSION }}
           modloader: fabric
           regex: .*fabric.*
-#        mc-runtime-test: fabric
-          mc-runtime-test: none
-          fabric-api: 0.121.0
+          mc-runtime-test: fabric
+          fabric-api: 0.125.3
           java: 21
           xvfb: false
           headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
@@ -190,8 +189,7 @@ jobs:
           mc: ${{ env.MINECRAFT_VERSION }}
           modloader: forge
           regex: .*forge.*
-#        mc-runtime-test: lexforge
-          mc-runtime-test: none
+          mc-runtime-test: lexforge
           java: 21
           xvfb: false
           headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
@@ -229,8 +227,7 @@ jobs:
           mc: ${{ env.MINECRAFT_VERSION }}
           modloader: neoforge
           regex: .*neoforge.*
-#        mc-runtime-test: neoforge
-          mc-runtime-test: none
+          mc-runtime-test: neoforge
           java: 21
           xvfb: false
           headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true

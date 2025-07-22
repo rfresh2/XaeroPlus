@@ -69,6 +69,7 @@ public class MultiColorLineDrawFeature extends AbstractLineDrawFeature<Object2In
         VertexConsumer lineBuffer = ctx.renderTypeBuffers().getBuffer(CustomRenderTypes.MAP_LINES);
         var lines = getLines();
         var it = Object2IntMaps.fastIterator(lines);
+        boolean hasLines = false;
         while (it.hasNext()) {
             var entry = it.next();
             var line = entry.getKey();
@@ -77,6 +78,7 @@ public class MultiColorLineDrawFeature extends AbstractLineDrawFeature<Object2In
             var g = ColorHelper.getG(color);
             var b = ColorHelper.getB(color);
             var a = ColorHelper.getA(color);
+            if (a == 0) continue;
             int x1 = ctx.worldmap() ? line.x2() : line.x1();
             int z1 = ctx.worldmap() ? line.z2() : line.z1();
             int x2 = ctx.worldmap() ? line.x1() : line.x2();
@@ -86,8 +88,9 @@ public class MultiColorLineDrawFeature extends AbstractLineDrawFeature<Object2In
                 x1, z1, x2, z2,
                 r, g, b, a
             );
+            hasLines = true;
         }
-        if (!lines.isEmpty()) {
+        if (hasLines) {
             ctx.renderTypeBuffers().endBatch(CustomRenderTypes.MAP_LINES);
         }
     }

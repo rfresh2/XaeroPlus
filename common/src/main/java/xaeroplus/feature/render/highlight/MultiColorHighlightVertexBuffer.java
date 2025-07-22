@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.ShaderInstance;
 import xaeroplus.feature.render.DrawContext;
 import xaeroplus.feature.render.shaders.XaeroPlusShaders;
 import xaeroplus.util.ChunkUtils;
+import xaeroplus.util.ColorHelper;
 
 public class MultiColorHighlightVertexBuffer extends AbstractHighlightVertexBuffer {
     private final MultiColorHighlightColorFunction colorFunction;
@@ -34,10 +35,13 @@ public class MultiColorHighlightVertexBuffer extends AbstractHighlightVertexBuff
         }
         var bufferBuilder = Tesselator.getInstance().getBuilder();
         bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        boolean hasEntries = false;
         for (var entry : highlights.long2LongEntrySet()) {
             var pos = entry.getLongKey();
             long foundTime = entry.getLongValue();
             int color = colorFunction.getColor(pos, foundTime);
+            int alpha = ColorHelper.getIntA(color);
+            if (alpha == 0) continue;
             var chunkPosX = ChunkUtils.longToChunkX(pos);
             var chunkPosZ = ChunkUtils.longToChunkZ(pos);
             float x1 = chunkPosX;
@@ -48,6 +52,11 @@ public class MultiColorHighlightVertexBuffer extends AbstractHighlightVertexBuff
             bufferBuilder.vertex(x2, y2, 0F).color(color).endVertex();
             bufferBuilder.vertex(x2, y1, 0F).color(color).endVertex();
             bufferBuilder.vertex(x1, y1, 0F).color(color).endVertex();
+            hasEntries = true;
+        }
+        if (!hasEntries) {
+            close();
+            return;
         }
         if (vertexBuffer == null || vertexBuffer.isInvalid()) {
             close();

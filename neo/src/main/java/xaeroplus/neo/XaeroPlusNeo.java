@@ -18,6 +18,8 @@ import xaeroplus.commands.XPClientCommandSource;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.XaeroPlusGameTest;
 
+import java.util.concurrent.ForkJoinPool;
+
 @Mod(value = "xaeroplus", dist = Dist.CLIENT)
 public class XaeroPlusNeo {
     public static final IEventBus FORGE_EVENT_BUS = NeoForge.EVENT_BUS;
@@ -39,9 +41,16 @@ public class XaeroPlusNeo {
             XaeroPlus.initializeSettings();
             Settings.REGISTRY.getKeybindings().forEach(event::register);
             if (System.getenv("XP_CI_TEST") != null)
-                Minecraft.getInstance().execute(() -> {
-                    XaeroPlusGameTest.applyMixinsTest();
-                    System.exit(0);
+                ForkJoinPool.commonPool().execute(() -> {
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    Minecraft.getInstance().execute(() -> {
+                        XaeroPlusGameTest.applyMixinsTest();
+                        System.exit(0);
+                    });
                 });
         }
     }

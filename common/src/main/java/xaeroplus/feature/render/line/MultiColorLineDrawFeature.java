@@ -9,6 +9,7 @@ import net.minecraft.world.level.Level;
 import xaero.common.graphics.CustomRenderTypes;
 import xaeroplus.feature.render.DrawContext;
 import xaeroplus.feature.render.DrawHelper;
+import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
 
 import java.util.List;
@@ -34,13 +35,18 @@ public class MultiColorLineDrawFeature extends AbstractLineDrawFeature<Object2In
     }
 
     @Override
-    public Object2IntMap<Line> preProcessLines(final Object2IntMap<Line> lines) {
+    public Object2IntMap<Line> preProcessLines(final Object2IntMap<Line> lines, final int windowX, final int windowZ, final int windowSize) {
         if (lines.isEmpty()) return Object2IntMaps.emptyMap();
         Object2IntMap<Line> out = new Object2IntOpenHashMap<>(lines.size());
+        int windowXMin = ChunkUtils.regionCoordToCoord(windowX - windowSize);
+        int windowZMin = ChunkUtils.regionCoordToCoord(windowZ - windowSize);
+        int windowXMax = ChunkUtils.regionCoordToCoord(windowX + windowSize);
+        int windowZMax = ChunkUtils.regionCoordToCoord(windowZ + windowSize);
         var it = Object2IntMaps.fastIterator(lines);
         while (it.hasNext()) {
             var entry = it.next();
             Line line = entry.getKey();
+            if (!line.lineClip(windowXMin, windowXMax, windowZMin, windowZMax)) continue;
             List<Line> newLines = LinePreProcessor.ensureLength(line);
             if (!newLines.isEmpty()) {
                 for (Line newLine : newLines) {

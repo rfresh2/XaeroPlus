@@ -30,15 +30,15 @@ public interface DrawFeatureFactory {
     static DrawFeature multiColorChunkHighlights(
         String id,
         DirectChunkHighlightSupplier chunkHighlightSupplier,
-        IntSupplier colorSupplier,
+        MultiColorHighlightColorFunction colorFunction,
         int refreshIntervalMs
     ) {
         return new DirectChunkHighlightDrawFeature(
             id,
-            new MultiColorHighlightVertexBuffer(),
+            new MultiColorHighlightVertexBuffer(colorFunction),
             new DirectChunkHighlightProvider(
                 chunkHighlightSupplier,
-                colorSupplier
+                () -> 0
             ),
             refreshIntervalMs
         );
@@ -62,14 +62,14 @@ public interface DrawFeatureFactory {
     static DrawFeature multiColorAsyncChunkHighlights(
         String id,
         AsyncChunkHighlightSupplier chunkHighlightSupplier,
-        IntSupplier colorSupplier
+        MultiColorHighlightColorFunction colorFunction
     ) {
         return new AsyncChunkHighlightDrawFeature(
             id,
-            new MultiColorHighlightVertexBuffer(),
+            new MultiColorHighlightVertexBuffer(colorFunction),
             new AsyncChunkHighlightProvider(
                 chunkHighlightSupplier,
-                colorSupplier
+                () -> 0
             )
         );
     }
@@ -95,7 +95,7 @@ public interface DrawFeatureFactory {
     static DrawFeature multiColorLines(
         String id,
         MultiColorLineSupplier lineSupplier,
-        IntSupplier colorSupplier,
+        MultiColorLineColorFunction colorFunction,
         FloatSupplier lineWidthSupplier,
         int refreshIntervalMs
     ) {
@@ -103,7 +103,7 @@ public interface DrawFeatureFactory {
             id,
             new MultiColorLineProvider(
                 lineSupplier,
-                colorSupplier,
+                colorFunction,
                 lineWidthSupplier
             ),
             refreshIntervalMs

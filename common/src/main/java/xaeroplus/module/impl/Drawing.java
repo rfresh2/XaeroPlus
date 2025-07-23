@@ -43,7 +43,7 @@ public class Drawing extends Module {
             DrawFeatureFactory.multiColorLines(
                 "Drawing-lines-saved",
                 this::getSavedLines,
-                () -> savedColorAlpha,
+                (line, v) -> ColorHelper.getColorWithAlpha(v, savedColorAlpha),
                 () -> 0.5f,
                 50
             )
@@ -61,7 +61,7 @@ public class Drawing extends Module {
             DrawFeatureFactory.multiColorChunkHighlights(
                 "Drawing-highlights",
                 drawingCache::getHighlights,
-                () -> savedColorAlpha,
+                (pos, t) -> ColorHelper.getColorWithAlpha((int) t, savedColorAlpha),
                 50
             )
         );

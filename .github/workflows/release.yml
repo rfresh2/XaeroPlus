@@ -4,25 +4,43 @@ on:
   workflow_dispatch:
     inputs:
       fabric:
-        description: "Fabric Release"
+        description: "Fabric"
         required: true
+        default: true
         type: boolean
       forge:
-        description: "Forge Release"
+        description: "Forge"
         required: true
+        default: true
         type: boolean
       neo:
-        description: "Neo Release"
+        description: "Neo"
         required: true
+        default: true
         type: boolean
       baseRef:
-        description: "Base ref for changelog generator"
+        description: "BaseRef"
         required: true
         type: string
       headRef:
-        description: "Head ref for changelog generator"
+        description: "HeadRef"
         required: true
         type: string
+      modrinth:
+        description: "Modrinth"
+        required: true
+        default: true
+        type: boolean
+      curseforge:
+        description: "Curseforge"
+        required: true
+        default: true
+        type: boolean
+      githubRelease:
+        description: "Github"
+        required: true
+        default: true
+        type: boolean
 
 env:
   MINECRAFT_VERSION: "1.19.4"
@@ -33,9 +51,6 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-
-      - name: Gradle Wrapper Verification
-        uses: gradle/actions/wrapper-validation@v4
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -122,8 +137,8 @@ jobs:
           merge-multiple: true
           path: artifacts/
 
-      - name: Release Fabric CurseForge and Modrinth
-        if: ${{ inputs.fabric }}
+      - name: Release Fabric CurseForge
+        if: ${{ inputs.fabric && inputs.curseforge }}
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           changelog: ${{ needs.build.outputs.changelog }}
@@ -152,8 +167,38 @@ jobs:
           fail-mode: warn
           modrinth-retry-attempts: 0
 
-      - name: Release Forge CurseForge and Modrinth
-        if: ${{ inputs.forge }}
+      - name: Release Fabric Modrinth
+        if: ${{ inputs.fabric && inputs.modrinth }}
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          changelog: ${{ needs.build.outputs.changelog }}
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          curseforge-id: 866084
+
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          modrinth-id: EnPUzSTg
+
+          files: |
+            artifacts/${{ needs.build.outputs.xp_fabric }}.jar
+          name: ${{ needs.build.outputs.xp_version }} (Fabric) (WM${{ needs.build.outputs.worldmap_version_fabric }} MM${{ needs.build.outputs.minimap_version_fabric }})
+          version: ${{ needs.build.outputs.xp_version }}+fabric-${{ env.MINECRAFT_VERSION }}
+          loaders: |
+            fabric
+            quilt
+          game-versions: |
+            ${{ env.MINECRAFT_VERSION }}
+          dependencies: |
+            xaerominimap@${{ needs.build.outputs.minimap_version_fabric }}(required){modrinth:1bokaNcj}{curseforge:263420}
+            xaeroworldmap@${{ needs.build.outputs.worldmap_version_fabric }}(required){modrinth:NcUtCpym}{curseforge:317780}
+            fabric-api(required){modrinth:P7dR8mSH}{curseforge:306612}
+            worldtools(optional){modrinth:FlFKBOIX}{curseforge:909868}
+            waystones(optional){modrinth:LOpKHB2A}{curseforge:245755}
+            fwaystones(optional){modrinth:sTZr7NVo}{curseforge:410902}
+          fail-mode: warn
+          modrinth-retry-attempts: 0
+
+      - name: Release Forge CurseForge
+        if: ${{ inputs.forge && inputs.curseforge }}
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           changelog: ${{ needs.build.outputs.changelog }}
@@ -179,13 +224,58 @@ jobs:
           fail-mode: warn
           modrinth-retry-attempts: 0
 
-      - name: Github Release
-        if: ${{ inputs.fabric }} || ${{ inputs.forge }}
+      - name: Release Forge Modrinth
+        if: ${{ inputs.forge && inputs.modrinth }}
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          changelog: ${{ needs.build.outputs.changelog }}
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          curseforge-id: 866084
+
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          modrinth-id: EnPUzSTg
+
+          files: |
+            artifacts/${{ needs.build.outputs.xp_forge }}.jar
+          name: ${{ needs.build.outputs.xp_version }} (Forge) (WM${{ needs.build.outputs.worldmap_version_forge }} MM${{ needs.build.outputs.minimap_version_forge }})
+          version: ${{ needs.build.outputs.xp_version }}+forge-${{ env.MINECRAFT_VERSION }}
+          loaders: |
+            forge
+            neoforge
+          game-versions: |
+            ${{ env.MINECRAFT_VERSION }}
+          dependencies: |
+            xaerominimap@${{ needs.build.outputs.minimap_version_forge }}(required){modrinth:1bokaNcj}{curseforge:263420}
+            xaeroworldmap@${{ needs.build.outputs.worldmap_version_forge }}(required){modrinth:NcUtCpym}{curseforge:317780}
+            worldtools(optional){modrinth:FlFKBOIX}{curseforge:909868}
+            waystones(optional){modrinth:LOpKHB2A}{curseforge:245755}
+          fail-mode: warn
+          modrinth-retry-attempts: 0
+
+      - name: Github Release Fabric
+        if: ${{ inputs.githubRelease && inputs.fabric }}
         uses: ncipollo/release-action@v1
         with:
           tag: "${{ needs.build.outputs.xp_version }}"
           commit: 1.20.1
-          artifacts: "artifacts/*.jar"
+          artifacts: artifacts/${{ needs.build.outputs.xp_fabric }}.jar
+          allowUpdates: true
+          makeLatest: true
+          body: |
+            For WorldMap and Minimap Versions:
+            * Fabric: WM${{ needs.build.outputs.worldmap_version_fabric }} MM${{ needs.build.outputs.minimap_version_fabric }}
+            * Forge: WM${{ needs.build.outputs.worldmap_version_forge }} MM${{ needs.build.outputs.minimap_version_forge }}
+            
+            ${{ needs.build.outputs.changelog }}
+          omitBodyDuringUpdate: true
+
+      - name: Github Release Forge
+        if: ${{ inputs.githubRelease && inputs.forge }}
+        uses: ncipollo/release-action@v1
+        with:
+          tag: "${{ needs.build.outputs.xp_version }}"
+          commit: 1.20.1
+          artifacts: artifacts/${{ needs.build.outputs.xp_forge }}.jar
           allowUpdates: true
           makeLatest: true
           body: |

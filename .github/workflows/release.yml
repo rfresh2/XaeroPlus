@@ -145,9 +145,6 @@ jobs:
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           curseforge-id: 866084
 
-          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-          modrinth-id: EnPUzSTg
-
           files: |
             artifacts/${{ needs.build.outputs.xp_fabric }}.jar
           name: ${{ needs.build.outputs.xp_version }} (Fabric) (WM${{ needs.build.outputs.worldmap_version_fabric }} MM${{ needs.build.outputs.minimap_version_fabric }})
@@ -172,8 +169,6 @@ jobs:
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           changelog: ${{ needs.build.outputs.changelog }}
-          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
-          curseforge-id: 866084
 
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
           modrinth-id: EnPUzSTg
@@ -205,9 +200,6 @@ jobs:
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           curseforge-id: 866084
 
-          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-          modrinth-id: EnPUzSTg
-
           files: |
             artifacts/${{ needs.build.outputs.xp_forge }}.jar
           name: ${{ needs.build.outputs.xp_version }} (Forge) (WM${{ needs.build.outputs.worldmap_version_forge }} MM${{ needs.build.outputs.minimap_version_forge }})
@@ -229,8 +221,6 @@ jobs:
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           changelog: ${{ needs.build.outputs.changelog }}
-          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
-          curseforge-id: 866084
 
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
           modrinth-id: EnPUzSTg

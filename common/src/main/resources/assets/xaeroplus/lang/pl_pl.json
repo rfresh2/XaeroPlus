@@ -261,5 +261,6 @@
   "xaeroplus.setting.drawing_opacity": "Przezroczystość rysunku",
   "xaeroplus.setting.drawing_opacity.tooltip": "Ustawia przezroczystość koloru rysunków",
   "xaeroplus.gui.draw_order.title": "Kolejność Rysowania XaeroPlus",
-  "xaeroplus.gui.draw_order.subtitle": "Kliknij i przeciągnij, aby zmienić kolejność"
+  "xaeroplus.gui.draw_order.subtitle": "Kliknij i przeciągnij, aby zmienić kolejność",
+  "xaeroplus.gui.draw_order.reset": "Nastawić"
 }

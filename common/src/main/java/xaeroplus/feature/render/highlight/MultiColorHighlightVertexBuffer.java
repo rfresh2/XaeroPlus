@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexBuffer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
+import it.unimi.dsi.fastutil.longs.Long2LongMaps;
 import net.minecraft.client.renderer.ShaderInstance;
 import xaeroplus.feature.render.DrawContext;
 import xaeroplus.feature.render.shaders.XaeroPlusShaders;
@@ -35,8 +36,9 @@ public class MultiColorHighlightVertexBuffer extends AbstractHighlightVertexBuff
         }
         var bufferBuilder = Tesselator.getInstance().getBuilder();
         bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        boolean hasEntries = false;
-        for (var entry : highlights.long2LongEntrySet()) {
+        var it = Long2LongMaps.fastIterator(highlights);
+        while (it.hasNext()) {
+            var entry = it.next();
             var pos = entry.getLongKey();
             long foundTime = entry.getLongValue();
             int color = colorFunction.getColor(pos, foundTime);
@@ -52,11 +54,6 @@ public class MultiColorHighlightVertexBuffer extends AbstractHighlightVertexBuff
             bufferBuilder.vertex(x2, y2, 0F).color(color).endVertex();
             bufferBuilder.vertex(x2, y1, 0F).color(color).endVertex();
             bufferBuilder.vertex(x1, y1, 0F).color(color).endVertex();
-            hasEntries = true;
-        }
-        if (!hasEntries) {
-            close();
-            return;
         }
         if (vertexBuffer == null || vertexBuffer.isInvalid()) {
             close();

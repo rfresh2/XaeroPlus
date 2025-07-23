@@ -263,5 +263,6 @@
   "xaeroplus.setting.drawing_opacity": "繪圖不透明度",
   "xaeroplus.setting.drawing_opacity.tooltip": "設定繪圖顏色的不透明度",
   "xaeroplus.gui.draw_order.title": "XaeroPlus 繪製順序",
-  "xaeroplus.gui.draw_order.subtitle": "點擊並拖動以更改順序"
+  "xaeroplus.gui.draw_order.subtitle": "點擊並拖動以更改順序",
+  "xaeroplus.gui.draw_order.reset": "重置"
 }

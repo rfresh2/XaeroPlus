@@ -6,6 +6,7 @@ import net.minecraft.world.level.Level;
 import xaero.common.graphics.CustomRenderTypes;
 import xaeroplus.feature.render.DrawContext;
 import xaeroplus.feature.render.DrawHelper;
+import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
 
 import java.util.ArrayList;
@@ -33,9 +34,14 @@ public class LineDrawFeature extends AbstractLineDrawFeature<List<Line>> {
     }
 
     @Override
-    public List<Line> preProcessLines(final List<Line> lines) {
+    public List<Line> preProcessLines(final List<Line> lines, final int windowX, final int windowZ, final int windowSize) {
         if (lines.isEmpty()) return lines;
         List<Line> out = new ArrayList<>(lines);
+        int windowXMin = ChunkUtils.regionCoordToCoord(windowX - windowSize);
+        int windowZMin = ChunkUtils.regionCoordToCoord(windowZ - windowSize);
+        int windowXMax = ChunkUtils.regionCoordToCoord(windowX + windowSize);
+        int windowZMax = ChunkUtils.regionCoordToCoord(windowZ + windowSize);
+        out.removeIf(l -> !l.lineClip(windowXMin, windowXMax, windowZMin, windowZMax));
         for (int i = 0; i < out.size(); i++) {
             Line line = out.get(i);
             var newLines = LinePreProcessor.ensureLength(line);

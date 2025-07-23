@@ -36,6 +36,22 @@ public class ColorHelper {
         return ((color >> 24) & 255) / 255.0f;
     }
 
+    public static int getIntR(final int color) {
+        return (color >> 16) & 255;
+    }
+
+    public static int getIntG(final int color) {
+        return (color >> 8) & 255;
+    }
+
+    public static int getIntB(final int color) {
+        return color & 255;
+    }
+
+    public static int getIntA(final int color) {
+        return (color >> 24) & 255;
+    }
+
     public enum HighlightColor implements TranslatableSettingEnum {
         RED(ColorHelper.getColor(255, 0, 0, 100), "gui.xaero_red"),
         GREEN(ColorHelper.getColor(0, 255, 0, 100), "gui.xaero_green"),

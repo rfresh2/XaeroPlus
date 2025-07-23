@@ -82,7 +82,7 @@ public class Highways extends Module {
                 this::getHighwayLines,
                 this::getHighwayColor,
                 this::getLineWidth,
-                5000
+                50
             )
         );
     }

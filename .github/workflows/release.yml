@@ -321,7 +321,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: "${{ needs.build.outputs.xp_version }}"
-          commit: 1.20.1
+          commit: 1.21.8
           artifacts: artifacts/${{ needs.build.outputs.xp_fabric }}.jar
           allowUpdates: true
           makeLatest: true
@@ -338,7 +338,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: "${{ needs.build.outputs.xp_version }}"
-          commit: 1.20.1
+          commit: 1.21.8
           artifacts: artifacts/${{ needs.build.outputs.xp_forge }}.jar
           allowUpdates: true
           makeLatest: true
@@ -355,7 +355,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: "${{ needs.build.outputs.xp_version }}"
-          commit: 1.20.1
+          commit: 1.21.8
           artifacts: artifacts/${{ needs.build.outputs.xp_neo }}.jar
           allowUpdates: true
           makeLatest: true

@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 import xaero.map.gui.ScreenSwitchSettingEntry;
+import xaeroplus.module.impl.TickTaskExecutor;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.ColorHelper;
 import xaeroplus.util.DrawOrderHelper;
@@ -40,6 +41,17 @@ public class DrawOrderScreen extends Screen {
                 200, 20,
                 Component.translatable("gui.done"),
                 b -> mc.setScreen(parent)
+            )
+        );
+        addRenderableWidget(
+            new Button(
+                this.width - 82, 2,
+                80, 20,
+                Component.translatable("xaeroplus.gui.draw_order.reset"),
+                b -> TickTaskExecutor.INSTANCE.execute(() -> {
+                    Settings.REGISTRY.drawOrderSetting.setValue("");
+                    init(mc, width, height);
+                })
             )
         );
     }

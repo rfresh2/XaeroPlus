@@ -9,6 +9,7 @@ import net.minecraft.world.level.Level;
 import xaero.common.graphics.CustomRenderTypes;
 import xaeroplus.feature.render.DrawContext;
 import xaeroplus.feature.render.DrawHelper;
+import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
 
 import java.util.List;
@@ -34,13 +35,18 @@ public class MultiColorLineDrawFeature extends AbstractLineDrawFeature<Object2In
     }
 
     @Override
-    public Object2IntMap<Line> preProcessLines(final Object2IntMap<Line> lines) {
+    public Object2IntMap<Line> preProcessLines(final Object2IntMap<Line> lines, final int windowX, final int windowZ, final int windowSize) {
         if (lines.isEmpty()) return Object2IntMaps.emptyMap();
         Object2IntMap<Line> out = new Object2IntOpenHashMap<>(lines.size());
+        int windowXMin = ChunkUtils.regionCoordToCoord(windowX - windowSize);
+        int windowZMin = ChunkUtils.regionCoordToCoord(windowZ - windowSize);
+        int windowXMax = ChunkUtils.regionCoordToCoord(windowX + windowSize);
+        int windowZMax = ChunkUtils.regionCoordToCoord(windowZ + windowSize);
         var it = Object2IntMaps.fastIterator(lines);
         while (it.hasNext()) {
             var entry = it.next();
             Line line = entry.getKey();
+            if (!line.lineClip(windowXMin, windowXMax, windowZMin, windowZMax)) continue;
             List<Line> newLines = LinePreProcessor.ensureLength(line);
             if (!newLines.isEmpty()) {
                 for (Line newLine : newLines) {
@@ -65,19 +71,20 @@ public class MultiColorLineDrawFeature extends AbstractLineDrawFeature<Object2In
 
     @Override
     public void render(final DrawContext ctx) {
-        float a = lineProvider.colorAlphaSupplier().getAsInt() / 255.0f;
-        if (a == 0) return;
         preRender(ctx);
         VertexConsumer lineBuffer = ctx.renderTypeBuffers().getBuffer(CustomRenderTypes.MAP_LINES);
         var lines = getLines();
         var it = Object2IntMaps.fastIterator(lines);
+        boolean hasLines = false;
         while (it.hasNext()) {
             var entry = it.next();
             var line = entry.getKey();
-            var color = entry.getIntValue();
+            var color = lineProvider.colorFunction().getColor(line, entry.getIntValue());
             var r = ColorHelper.getR(color);
             var g = ColorHelper.getG(color);
             var b = ColorHelper.getB(color);
+            var a = ColorHelper.getA(color);
+            if (a == 0) continue;
             int x1 = ctx.worldmap() ? line.x2() : line.x1();
             int z1 = ctx.worldmap() ? line.z2() : line.z1();
             int x2 = ctx.worldmap() ? line.x1() : line.x2();
@@ -87,8 +94,9 @@ public class MultiColorLineDrawFeature extends AbstractLineDrawFeature<Object2In
                 x1, z1, x2, z2,
                 r, g, b, a
             );
+            hasLines = true;
         }
-        if (!lines.isEmpty()) {
+        if (hasLines) {
             ctx.renderTypeBuffers().endBatch(CustomRenderTypes.MAP_LINES);
         }
     }

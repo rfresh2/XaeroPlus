@@ -4,7 +4,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
 import net.minecraft.client.Minecraft;
 import xaeroplus.Globals;
-import xaeroplus.XaeroPlus;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.DrawOrderHelper;
 
@@ -13,7 +12,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class DrawFeatureRegistry {
     private final Int2ObjectRBTreeMap<DrawFeature> features = new Int2ObjectRBTreeMap<>(Comparator.naturalOrder());
@@ -90,8 +88,8 @@ public class DrawFeatureRegistry {
                 }
             }
         }
-        if (!featuresCopy.isEmpty()) {
-            XaeroPlus.LOGGER.error("Unknown draw features removed after reordering: {}", featuresCopy.stream().map(DrawFeature::id).collect(Collectors.joining(", ")));
+        for (var feature : featuresCopy) {
+            register(feature);
         }
     }
 

@@ -404,6 +404,26 @@ public class DrawingCache implements Closeable {
         return caches;
     }
 
+    public List<DrawingLinesCacheDimensionHandler> getLineCachesExceptDimension(final ResourceKey<Level> dimension) {
+        var caches = new ArrayList<DrawingLinesCacheDimensionHandler>(linesCacheMap.size());
+        for (var entry : linesCacheMap.entrySet()) {
+            if (!entry.getKey().equals(dimension)) {
+                caches.add(entry.getValue());
+            }
+        }
+        return caches;
+    }
+
+    public List<DrawingLinesCacheDimensionHandler> getLineCachesExceptDimensions(final List<ResourceKey<Level>> dimensions) {
+        var caches = new ArrayList<DrawingLinesCacheDimensionHandler>(linesCacheMap.size());
+        for (var entry : linesCacheMap.entrySet()) {
+            if (!dimensions.contains(entry.getKey())) {
+                caches.add(entry.getValue());
+            }
+        }
+        return caches;
+    }
+
     // returns false if we were not able to get to a ready state
     // will happen if we are disconnecting from a server where the mc world is not loaded
     private synchronized boolean initializeWorld() {
@@ -453,7 +473,8 @@ public class DrawingCache implements Closeable {
     private void loadLinesOnActualDimensionSwitch() {
         var linesCacheForActualDimension = getLinesCacheForDimension(ChunkUtils.getActualDimension(), true);
         if (linesCacheForActualDimension == null) return;
-        linesCacheForActualDimension.loadLines();
+        linesCacheForActualDimension
+            .setWindow(ChunkUtils.actualPlayerRegionX(), ChunkUtils.actualPlayerRegionZ(), getMinimapRegionWindowSize());
     }
 
     private void loadTextsOnActualDimensionSwitch() {
@@ -489,7 +510,21 @@ public class DrawingCache implements Closeable {
         var viewedDim = Globals.getCurrentDimensionId();
         var linesCacheForCurrentDimension = getLinesCacheForDimension(viewedDim, true);
         if (linesCacheForCurrentDimension == null) return;
-        linesCacheForCurrentDimension.loadLines();
+        final int windowSize;
+        final int windowCenterX;
+        final int windowCenterZ;
+        Optional<GuiMap> guiMapOptional = getGuiMap();
+        if (guiMapOptional.isPresent()) {
+            var guiMap = guiMapOptional.get();
+            windowSize = getGuiMapRegionSize(guiMap);
+            windowCenterX = getGuiMapCenterRegionX(guiMap);
+            windowCenterZ = getGuiMapCenterRegionZ(guiMap);
+        } else {
+            windowSize = getMinimapRegionWindowSize();
+            windowCenterX = ChunkUtils.getPlayerRegionX();
+            windowCenterZ = ChunkUtils.getPlayerRegionZ();
+        }
+        linesCacheForCurrentDimension.setWindow(windowCenterX, windowCenterZ, windowSize);
     }
 
     private void loadTextsInViewedDimension() {
@@ -578,10 +613,14 @@ public class DrawingCache implements Closeable {
         if (highlightCacheForDimension != null) highlightCacheForDimension.setWindow(windowCenterX, windowCenterZ, windowSize);
         var textCacheForDimension = getTextCacheForDimension(mapDimension, true);
         if (textCacheForDimension != null) textCacheForDimension.setWindow(windowCenterX, windowCenterZ, windowSize);
+        var lineCacheForDimension = getLinesCacheForDimension(mapDimension, true);
+        if (lineCacheForDimension != null) lineCacheForDimension.setWindow(windowCenterX, windowCenterZ, windowSize);
         if (mapDimension == actualDimension) {
             getHighlightCachesExceptDimension(mapDimension)
                 .forEach(cache -> cache.setWindow(0, 0, 0));
             getTextCachesExceptDimension(mapDimension)
+                .forEach(cache -> cache.setWindow(0, 0, 0));
+            getLineCachesExceptDimension(mapDimension)
                 .forEach(cache -> cache.setWindow(0, 0, 0));
         } else {
             var actualDimHighlightCache = getHighlightCacheForDimension(actualDimension, true);
@@ -592,10 +631,16 @@ public class DrawingCache implements Closeable {
             if (actualDimTextCache != null) {
                 actualDimTextCache.setWindow(actualPlayerRegionX, actualPlayerRegionZ, windowSize);
             }
+            var actualDimLinesCache = getLinesCacheForDimension(actualDimension, true);
+            if (actualDimLinesCache != null) {
+                actualDimLinesCache.setWindow(actualPlayerRegionX, actualPlayerRegionZ, windowSize);
+            }
             getHighlightCachesExceptDimensions(List.of(mapDimension, actualDimension))
                 .forEach(cache -> cache.setWindow(0, 0, 0));
             getTextCachesExceptDimensions(List.of(mapDimension, actualDimension))
                 .forEach(cache -> cache.setWindow(0, 0, 0));
+            getLineCachesExceptDimensions(List.of(mapDimension, actualDimension))
+                .forEach((cache -> cache.setWindow(0, 0, 0)));
         }
     }
 

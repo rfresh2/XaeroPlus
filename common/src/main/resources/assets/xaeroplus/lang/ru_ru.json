@@ -263,5 +263,6 @@
   "xaeroplus.setting.drawing_opacity": "Прозрачность рисования",
   "xaeroplus.setting.drawing_opacity.tooltip": "Устанавливает прозрачность цвета рисунков",
   "xaeroplus.gui.draw_order.title": "Порядок Отрисовки XaeroPlus",
-  "xaeroplus.gui.draw_order.subtitle": "Щёлкните и перетащите, чтобы изменить порядок"
+  "xaeroplus.gui.draw_order.subtitle": "Щёлкните и перетащите, чтобы изменить порядок",
+  "xaeroplus.gui.draw_order.reset": "Перезагрузить"
 }

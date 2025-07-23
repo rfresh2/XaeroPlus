@@ -2,11 +2,9 @@ package xaeroplus.feature.render.line;
 
 import xaeroplus.util.FloatSupplier;
 
-import java.util.function.IntSupplier;
-
 public record MultiColorLineProvider(
     MultiColorLineSupplier lineSupplier,
-    IntSupplier colorAlphaSupplier,
+    MultiColorLineColorFunction colorFunction,
     FloatSupplier lineWidthSupplier
 ) {
 }

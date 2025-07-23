@@ -49,12 +49,12 @@ public abstract class AbstractLineDrawFeature<T> implements DrawFeature {
             windowZ = ChunkUtils.getPlayerRegionZ();
             windowSize = Math.max(3, Globals.minimapScaleMultiplier);
         }
-        return preProcessLines(provideLinesInWindow(windowX, windowZ, windowSize, Globals.getCurrentDimensionId()));
+        return preProcessLines(provideLinesInWindow(windowX, windowZ, windowSize, Globals.getCurrentDimensionId()), windowX, windowZ, windowSize);
     }
 
     public abstract T provideLinesInWindow(int windowX, int windowZ, int windowSize, ResourceKey<Level> dimension);
 
-    public abstract T preProcessLines(T lines);
+    public abstract T preProcessLines(T lines, final int windowX, final int windowZ, final int windowSize);
 
     public abstract T emptyLines();
 

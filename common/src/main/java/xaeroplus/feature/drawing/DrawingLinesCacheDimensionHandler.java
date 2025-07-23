@@ -13,16 +13,21 @@ import net.minecraft.world.level.Level;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.drawing.db.DrawingDatabase;
 import xaeroplus.feature.render.line.Line;
+import xaeroplus.util.ChunkUtils;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class DrawingLinesCacheDimensionHandler {
     private final ResourceKey<Level> dimension;
+    private int windowRegionX = 0;
+    private int windowRegionZ = 0;
+    private int windowRegionSize = 0;
     private final DrawingDatabase database;
     private final ListeningExecutorService dbExecutor;
     private final Object2IntMap<Line> lines = new Object2IntOpenHashMap<>();
     public final Set<Line> staleLines = new HashSet<>();
+    ListenableFuture<?> windowMoveFuture = Futures.immediateVoidFuture();
     Minecraft mc = Minecraft.getInstance();
 
     public DrawingLinesCacheDimensionHandler(
@@ -59,19 +64,72 @@ public class DrawingLinesCacheDimensionHandler {
         return lines;
     }
 
-    protected ListenableFuture<?> loadLines() {
-        ListenableFuture<Object2IntMap<Line>> loadDataFuture = dbExecutor.submit(this::loadLinesFromDatabase);
-        Futures.addCallback(loadDataFuture, new LineDataLoadFutureCallback(), mc);
-        return loadDataFuture;
+    public synchronized void setWindow(int regionX, int regionZ, int regionSize) {
+        boolean windowChanged = regionX != windowRegionX || regionZ != windowRegionZ || regionSize != windowRegionSize;
+        if (windowChanged
+            && !windowMoveFuture.isDone()
+            && (regionX != 0 || regionZ != 0 || regionSize != 0) // queue window change if we are clearing it (setting size to 0)
+        ) {
+            XaeroPlus.LOGGER.debug("Rejecting window move to: [{} {} {}] from: [{} {} {}]", regionX, regionZ, regionSize, windowRegionX, windowRegionZ, windowRegionSize);
+            return;
+        }
+        int prevWindowRegionX = windowRegionX;
+        int prevWindowRegionZ = windowRegionZ;
+        int prevWindowRegionSize = windowRegionSize;
+        this.windowRegionX = regionX;
+        this.windowRegionZ = regionZ;
+        this.windowRegionSize = regionSize;
+        if (windowChanged) {
+            try {
+                windowMoveFuture = moveWindow0(regionX, regionZ, regionSize);
+            } catch (final Exception e) {
+                XaeroPlus.LOGGER.error("Failed submitting move window task for {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
+            }
+        }
     }
 
-    private Object2IntMap<Line> loadLinesFromDatabase() {
+    protected ListenableFuture<?> moveWindow0(final int windowRegionX, final int windowRegionZ, final int windowRegionSize) {
+        ListenableFuture<Object2IntMap<Line>> loadDataFuture = dbExecutor.submit(() -> loadLinesFromDatabase(windowRegionX, windowRegionZ, windowRegionSize));
+        Futures.addCallback(loadDataFuture, new LineDataLoadFutureCallback(), mc);
+        ListenableFuture<?> removeDataFuture = flushLinesOutsideWindow(windowRegionX, windowRegionZ, windowRegionSize);
+        return Futures.allAsList(loadDataFuture, removeDataFuture);
+    }
+
+    private Object2IntMap<Line> loadLinesFromDatabase(final int windowRegionX, final int windowRegionZ, final int windowRegionSize) {
         Object2IntMap<Line> dataBuf = new Object2IntOpenHashMap<>();
+        int windowXMin = ChunkUtils.regionCoordToCoord(windowRegionX - windowRegionSize);
+        int windowZMin = ChunkUtils.regionCoordToCoord(windowRegionZ - windowRegionSize);
+        int windowXMax = ChunkUtils.regionCoordToCoord(windowRegionX + windowRegionSize);
+        int windowZMax = ChunkUtils.regionCoordToCoord(windowRegionZ + windowRegionSize);
         database.getLinesInDimension(dimension, (x1, z1, x2, z2, color) -> {
             Line line = new Line(x1, z1, x2, z2);
-            dataBuf.put(line, color);
+            if (line.lineClip(windowXMin, windowXMax, windowZMin, windowZMax)) {
+                dataBuf.put(line, color);
+            }
         });
         return dataBuf;
+    }
+
+    private ListenableFuture<?> flushLinesOutsideWindow(final int windowRegionX, final int windowRegionZ, final int windowRegionSize) {
+        if (!mc.isSameThread()) {
+            throw new RuntimeException("removeChunksOutsideWindow must be called on the main thread");
+        }
+        Object2IntMap<Line> dataBuf = new Object2IntOpenHashMap<>();
+        // write to db and remove data from local cache outside window
+        int windowXMin = ChunkUtils.regionCoordToCoord(windowRegionX - windowRegionSize);
+        int windowZMin = ChunkUtils.regionCoordToCoord(windowRegionZ - windowRegionSize);
+        int windowXMax = ChunkUtils.regionCoordToCoord(windowRegionX + windowRegionSize);
+        int windowZMax = ChunkUtils.regionCoordToCoord(windowRegionZ + windowRegionSize);
+        for (var it = lines.keySet().iterator(); it.hasNext(); ) {
+            var line = it.next();
+            if (!line.lineClip(windowXMin, windowXMax, windowZMin, windowZMax)) {
+                if (staleLines.contains(line)) {
+                    dataBuf.put(line, lines.getInt(line));
+                }
+                it.remove();
+            }
+        }
+        return dbExecutor.submit(() -> database.insertLinesList(dataBuf, dimension));
     }
 
     // does not remove from local cache

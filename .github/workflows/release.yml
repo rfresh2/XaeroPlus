@@ -4,26 +4,26 @@ on:
   workflow_dispatch:
     inputs:
       fabric:
-        description: "Fabric Release"
+        description: "Fabric"
         required: true
         default: true
         type: boolean
       forge:
-        description: "Forge Release"
+        description: "Forge"
         required: true
         default: true
         type: boolean
       neo:
-        description: "Neo Release"
+        description: "Neo"
         required: true
         default: true
         type: boolean
       baseRef:
-        description: "Base ref for changelog generator"
+        description: "BaseRef"
         required: true
         type: string
       headRef:
-        description: "Head ref for changelog generator"
+        description: "HeadRef"
         required: true
         type: string
       modrinth:

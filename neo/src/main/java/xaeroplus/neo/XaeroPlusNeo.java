@@ -11,14 +11,13 @@ import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.lifecycle.ClientStartedEvent;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
 import xaeroplus.XaeroPlus;
 import xaeroplus.commands.XPClientCommandSource;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.XaeroPlusGameTest;
-
-import java.util.concurrent.ForkJoinPool;
 
 @Mod(value = "xaeroplus", dist = Dist.CLIENT)
 public class XaeroPlusNeo {
@@ -27,6 +26,7 @@ public class XaeroPlusNeo {
         if (FMLEnvironment.dist.isClient()) {
             modEventBus.addListener(this::onRegisterKeyMappingsEvent);
             FORGE_EVENT_BUS.addListener(this::onRegisterClientCommandsEvent);
+            FORGE_EVENT_BUS.addListener(this::onClientStartedEvent);
             RemovalCause explicit = RemovalCause.EXPLICIT; // force class load to stop forge shitting itself at runtime??
             ModLoadingContext.get().registerExtensionPoint(
                 IConfigScreenFactory.class,
@@ -40,18 +40,12 @@ public class XaeroPlusNeo {
             XaeroPlus.XP_VERSION = FMLLoader.getLoadingModList().getModFileById("xaeroplus").versionString();
             XaeroPlus.initializeSettings();
             Settings.REGISTRY.getKeybindings().forEach(event::register);
-            if (System.getenv("XP_CI_TEST") != null)
-                ForkJoinPool.commonPool().execute(() -> {
-                    try {
-                        Thread.sleep(10000);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    Minecraft.getInstance().execute(() -> {
-                        XaeroPlusGameTest.applyMixinsTest();
-                        System.exit(0);
-                    });
-                });
+        }
+    }
+
+    public void onClientStartedEvent(final ClientStartedEvent event) {
+        if (System.getenv("XP_CI_TEST") != null) {
+            Minecraft.getInstance().execute(XaeroPlusGameTest::applyMixinsTest);
         }
     }
 

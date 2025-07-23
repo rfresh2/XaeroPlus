@@ -3,7 +3,6 @@ package xaeroplus.neo;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.client.Minecraft;
-import net.minecraft.commands.CommandSourceStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModLoadingContext;
@@ -40,10 +39,7 @@ public class XaeroPlusNeo {
             XaeroPlus.initializeSettings();
             Settings.REGISTRY.getKeybindings().forEach(event::register);
             if (System.getenv("XP_CI_TEST") != null)
-                Minecraft.getInstance().execute(() -> {
-                    XaeroPlusGameTest.applyMixinsTest();
-                    System.exit(0);
-                });
+                Minecraft.getInstance().execute(XaeroPlusGameTest::applyMixinsTest);
         }
     }
 

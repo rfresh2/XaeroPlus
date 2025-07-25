@@ -12,6 +12,9 @@ version = project.properties["mod_version"].toString()
 group = "xaeroplus"
 
 repositories {
+    maven("https://maven.neoforged.net/releases/") {
+        name = "NeoForge"
+    }
     maven("https://api.modrinth.com/maven") {
         name = "Modrinth"
     }

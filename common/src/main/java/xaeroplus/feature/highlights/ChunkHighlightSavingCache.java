@@ -76,6 +76,21 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     }
 
     @Override
+    public void addHighlight(final int x, final int z, final long foundTime) {
+        try {
+            ChunkHighlightCacheDimensionHandler cacheForActualDimension = getCacheForDimension(ChunkUtils.getActualDimension(), true);
+            if (cacheForActualDimension == null) {
+                // if the cache is not ready yet, queue the highlight to be added
+                initializeTaskQueue.add(() -> addHighlight(x, z, foundTime));
+                return;
+            }
+            cacheForActualDimension.addHighlight(x, z, foundTime);
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.warn("Error adding highlight to {} disk cache: {}, {}", databaseName, x, z, e);
+        }
+    }
+
+    @Override
     public void removeHighlight(final int x, final int z) {
         removeHighlight(x, z, ChunkUtils.getActualDimension());
     }

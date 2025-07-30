@@ -103,7 +103,7 @@ public class DataFolderResolveUtil {
     }
 
     public static String sanitizeDataFolderName(final String in) {
-        final String invalidChars = "[<>:\"/\\|?*]";
+        final String invalidChars = "[<>:\"/\\\\|?*]";
         // Replace invalid characters with underscores
         return in.replaceAll(invalidChars, "_").trim();
     }

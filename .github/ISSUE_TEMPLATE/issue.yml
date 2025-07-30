@@ -1,0 +1,46 @@
+name: Bug or Crash
+description: File a bug report
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## BEFORE YOU SUBMIT
+        
+        ### Update to the latest version of XaeroPlus, then verify the issue is still present
+        
+        Not sure if you found a bug? Ask in #xaeroplus : https://discord.gg/nJZrSaRKtb
+  - type: input
+    id: mc-version
+    attributes:
+      label: "Minecraft Version"
+      description: "Minecraft Version, e.g. 1.20.1"
+  - type: dropdown
+    id: loader
+    attributes:
+      label: "Mod Loader"
+      description: "Mod Loader, e.g. Fabric"
+      options:
+        - Fabric
+        - Forge
+        - NeoForge
+  - type: markdown
+    attributes:
+      value: |
+        Logs are located at: `.minecraft/log/latest.log`
+        Crash reports are located in: `.minecraft/crash-reports`
+        
+        Upload your log(s) to: https://mclo.gs/ and paste the link here
+  - type: input
+    id: logs
+    attributes:
+      label: "MC Log"
+      description: "https://mclo.gs/12341234"
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: >-
+        Explain the bug, when it occurs, and what you have tried. 
+        
+        More information and context will get your issue resolved faster. 

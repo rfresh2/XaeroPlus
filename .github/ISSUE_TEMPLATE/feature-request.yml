@@ -1,0 +1,18 @@
+name: Feature Request
+description: Submit a Feature Request
+title: "[Feature Request] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        I prefer feature requests to be submitted on discord: https://discord.gg/nJZrSaRKtb
+        
+        Only submit this feature request on Github if you cannot use discord.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: >-
+        Explain the feature request and why it should be built 
+        
+        More information and context will make it more likely to be fulfilled. 

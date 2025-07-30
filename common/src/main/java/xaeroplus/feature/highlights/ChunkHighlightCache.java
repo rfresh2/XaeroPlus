@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 public interface ChunkHighlightCache {
     void addHighlight(final int x, final int z);
     void addHighlight(final int x, final int z, ResourceKey<Level> dimensionId);
+    void addHighlight(final int x, final int z, long foundTime);
     void removeHighlight(final int x, final int z);
     void removeHighlight(final int x, final int z, ResourceKey<Level> dimensionId);
     boolean isHighlighted(final int x, final int z, ResourceKey<Level> dimensionId);

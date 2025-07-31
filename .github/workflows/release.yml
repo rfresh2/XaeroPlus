@@ -41,6 +41,11 @@ on:
         required: true
         default: true
         type: boolean
+      githubReleaseRef:
+        description: "Github Release Ref"
+        required: true
+        default: "1.20.1"
+        type: string
 
 env:
   MINECRAFT_VERSION: "1.21.8"
@@ -321,7 +326,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: "${{ needs.build.outputs.xp_version }}"
-          commit: 1.21.8
+          commit: ${{ inputs.githubReleaseRef }}
           artifacts: artifacts/${{ needs.build.outputs.xp_fabric }}.jar
           allowUpdates: true
           makeLatest: true
@@ -338,7 +343,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: "${{ needs.build.outputs.xp_version }}"
-          commit: 1.21.8
+          commit: ${{ inputs.githubReleaseRef }}
           artifacts: artifacts/${{ needs.build.outputs.xp_forge }}.jar
           allowUpdates: true
           makeLatest: true
@@ -355,7 +360,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: "${{ needs.build.outputs.xp_version }}"
-          commit: 1.21.8
+          commit: 1.20.1
           artifacts: artifacts/${{ needs.build.outputs.xp_neo }}.jar
           allowUpdates: true
           makeLatest: true

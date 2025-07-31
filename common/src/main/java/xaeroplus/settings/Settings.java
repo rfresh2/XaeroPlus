@@ -402,6 +402,58 @@ public final class Settings extends SettingRegistry {
             (b) -> ModuleManager.getModule(Portals.class).setRgbColor(b.getColor()),
             () -> ModuleManager.getModule(Portals.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
+    public final BooleanSetting lavaColumnsEnabledSetting = register(
+        BooleanSetting.create(
+            "Lava Columns",
+            "xaeroplus.setting.lava_columns",
+            false,
+            true,
+            (b) -> ModuleManager.getModule(LavaColumns.class).setEnabled(b)),
+        SettingLocation.CHUNK_HIGHLIGHTS);
+    public final DoubleSetting lavaColumnsMinHeight = register(
+        DoubleSetting.create(
+            "Min Lava Column Height",
+            "xaeroplus.setting.lava_columns_min_height",
+            0, 20, 1,
+            5,
+            (b) -> ModuleManager.getModule(LavaColumns.class).setMinColumnHeight((int) b),
+            () -> ModuleManager.getModule(LavaColumns.class).isEnabled()),
+        SettingLocation.CHUNK_HIGHLIGHTS);
+    public final DoubleSetting lavaColumnsAlphaShift = register(
+        DoubleSetting.create(
+            "Lava Columns Base Alpha Shift",
+            "xaeroplus.setting.lava_columns_alpha_shift",
+            -200, 200, 1,
+            0,
+            (b) -> ModuleManager.getModule(LavaColumns.class).setAlphaShift((int) b),
+            () -> ModuleManager.getModule(LavaColumns.class).isEnabled()),
+        SettingLocation.CHUNK_HIGHLIGHTS);
+    public final DoubleSetting lavaColumnsAlphaStep = register(
+        DoubleSetting.create(
+            "Lava Columns Alpha Step",
+            "xaeroplus.setting.lava_columns_alpha_step",
+            1, 30, 1,
+            8,
+            (b) -> ModuleManager.getModule(LavaColumns.class).setAlphaStep((int) b),
+            () -> ModuleManager.getModule(LavaColumns.class).isEnabled()),
+        SettingLocation.CHUNK_HIGHLIGHTS);
+    public final EnumSetting<ColorHelper.HighlightColor> lavaColumnsColor = register(
+        EnumSetting.create(
+            "Lava Columns Color",
+            "xaeroplus.setting.lava_columns_color",
+            ColorHelper.HighlightColor.values(),
+            ColorHelper.HighlightColor.GREEN,
+            (b) -> ModuleManager.getModule(LavaColumns.class).setRgbColor(b.getColor()),
+            () -> ModuleManager.getModule(LavaColumns.class).isEnabled()),
+        SettingLocation.CHUNK_HIGHLIGHTS);
+    public final BooleanSetting lavaColumnsSaveLoadToDisk = register(
+        BooleanSetting.create(
+            "Save/Load Lava Columns to Disk",
+            "xaeroplus.setting.lava_columns_save_load_to_disk",
+            true,
+            (b) -> ModuleManager.getModule(LavaColumns.class).setDiskCache(b),
+            () -> ModuleManager.getModule(LavaColumns.class).isEnabled()),
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting oldBiomesSetting = register(
         BooleanSetting.create(
             "Old Biomes",

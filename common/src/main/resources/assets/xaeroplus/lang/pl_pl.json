@@ -15,6 +15,8 @@
   "xaeroplus.setting.region_write_while_dimension_switched.tooltip": "Naprawia WorldMap, aby zapisywał/ładował kawałki, które ładujesz, oglądając inny wymiar.",
   "xaeroplus.setting.baritone_waypoint": "Punkt nawigacyjny Celu Baritone",
   "xaeroplus.setting.baritone_waypoint.tooltip": "Synchronizuje cele Baritone jako tymczasowe punkty orientacyjne.",
+  "xaeroplus.setting.spawn_point_waypoint": "Punkt Drogi Punktu Odrodzenia",
+  "xaeroplus.setting.spawn_point_waypoint.tooltip": "Ustawia punkt drogi w ostatnim ustawionym punkcie odrodzenia. \n Śledzi punkty odrodzenia tylko wtedy, gdy to ustawienie jest włączone. \n Obsługuje tylko śledzenie interakcji z łóżkiem lub kotwicą odrodzenia",
   "xaeroplus.setting.disable_waypoint_sharing": "Wyłącz udostępnianie punktów trasy",
   "xaeroplus.setting.disable_waypoint_sharing.tooltip": "Wyłącza udostępnianie punktów trasy innym graczom.",
   "xaeroplus.setting.plain_waypoint_sharing": "Proste Udostępnianie Punktów Kontrolnych",

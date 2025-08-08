@@ -49,11 +49,11 @@ public abstract class MixinCommonGuiSettings extends ScreenBase {
         this.entriesPerPage = 12; // fills height = 240
         if (Settings.REGISTRY.expandSettingEntries.get()) {
             if (this.height > 350) {
-                int extraRows = Math.min((height - 240) / 50, 6);
+                int extraRows = Math.min((height - 240) / 50, 8);
                 this.entriesPerPage = 12 + (2 * extraRows);
             }
             if (this.width > 800) {
-                xaeroPlus$settingEntryWidth = 250;
+                xaeroPlus$settingEntryWidth = 300;
             }
         }
     }

@@ -13,6 +13,6 @@ body:
     attributes:
       label: Description
       description: >-
-        Explain the feature request and why it should be built 
-        
+        Explain the feature request and why it should be built.
+        \n
         More information and context will make it more likely to be fulfilled. 

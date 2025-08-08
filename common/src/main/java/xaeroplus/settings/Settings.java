@@ -129,6 +129,14 @@ public final class Settings extends SettingRegistry {
             return translationKey;
         }
     }
+    public final BooleanSetting spawnPointSetting = register(
+        BooleanSetting.create(
+            "Spawn Point Waypoint",
+            "xaeroplus.setting.spawn_point_waypoint",
+            false,
+            (b) -> ModuleManager.getModule(SpawnPoint.class).setEnabled(b)
+        ),
+        SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting persistMapDimensionSwitchSetting = register(
         BooleanSetting.create(
             "Persist Dim Switch",

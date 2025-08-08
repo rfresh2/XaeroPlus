@@ -15,6 +15,8 @@
   "xaeroplus.setting.region_write_while_dimension_switched.tooltip": "Fixes Xaero's WorldMap not writing/loading chunks you load while viewing another dimension.",
   "xaeroplus.setting.baritone_waypoint": "Baritone Goal Waypoint",
   "xaeroplus.setting.baritone_waypoint.tooltip": "Syncs Baritone goals as temporary waypoints.",
+  "xaeroplus.setting.spawn_point_waypoint": "Spawn Point Waypoint",
+  "xaeroplus.setting.spawn_point_waypoint.tooltip": "Sets a waypoint at the last set respawn point. \n Only tracks spawn points while this setting is enabled. \n Only supports tracking bed or respawn anchor interacts",
   "xaeroplus.setting.disable_waypoint_sharing": "Disable Waypoint Sharing",
   "xaeroplus.setting.disable_waypoint_sharing.tooltip": "Disables waypoint sharing with other players.",
   "xaeroplus.setting.plain_waypoint_sharing": "Plain Waypoint Sharing",

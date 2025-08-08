@@ -35,12 +35,12 @@ body:
     id: logs
     attributes:
       label: "MC Log"
-      description: "https://mclo.gs/12341234"
+      description: "Example: https://mclo.gs/12341234"
   - type: textarea
     id: description
     attributes:
       label: Description
       description: >-
         Explain the bug, when it occurs, and what you have tried. 
-        
+        \n
         More information and context will get your issue resolved faster. 

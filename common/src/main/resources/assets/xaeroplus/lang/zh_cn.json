@@ -15,6 +15,8 @@
   "xaeroplus.setting.region_write_while_dimension_switched.tooltip": "修复 WorldMap 在查看另一个维度时不会写入/加载您加载的区块的问题。",
   "xaeroplus.setting.baritone_waypoint": "Baritone 目标路径点",
   "xaeroplus.setting.baritone_waypoint.tooltip": "将 Baritone 的目标点同步为临时路径点。",
+  "xaeroplus.setting.spawn_point_waypoint": "重生点航路点",
+  "xaeroplus.setting.spawn_point_waypoint.tooltip": "在最后设置的重生点放置一个航路点。 \n 仅在此设置启用时追踪重生点。 \n 仅支持追踪床或重生锚的交互",
   "xaeroplus.setting.disable_waypoint_sharing": "禁用航点共享",
   "xaeroplus.setting.disable_waypoint_sharing.tooltip": "禁用与其他玩家共享航点。",
   "xaeroplus.setting.plain_waypoint_sharing": "简单的航点共享",

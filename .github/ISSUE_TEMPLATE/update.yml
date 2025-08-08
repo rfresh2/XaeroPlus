@@ -1,0 +1,14 @@
+name: Minecraft or WorldMap/Minimap Update
+description: Update for new Minecraft or WorldMap/Minimap version
+title: "[Update] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # PLEASE DO NOT SUBMIT THIS ISSUE
+        
+        ### I am aware of all MC and WorldMap/Minimap updates, I get pinged by a discord bot
+        
+        I try to release updates as quickly as possible
+        
+        But sometimes life gets in the way, so be patient

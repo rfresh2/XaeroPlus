@@ -66,8 +66,10 @@
     "MixinWorldMapMisc",
     "MixinWorldMapModSettings",
     "MixinWorldMapOption",
+    "mc.MixinBedBlock",
     "mc.MixinClientPlayNetworkHandler",
     "mc.MixinMinecraftClient",
+    "mc.MixinRespawnAnchor",
     "mc.MixinWorldRenderer"
   ]
 }

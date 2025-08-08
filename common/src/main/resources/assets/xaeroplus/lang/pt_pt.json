@@ -15,6 +15,8 @@
   "xaeroplus.setting.region_write_while_dimension_switched.tooltip": "Corrige o WorldMap para escrever/carregar os pedaços que você carrega enquanto visualiza outra dimensão.",
   "xaeroplus.setting.baritone_waypoint": "Loc. de Destino do Baritone",
   "xaeroplus.setting.baritone_waypoint.tooltip": "Sincroniza os destinos do Baritone como localizações temporárias.",
+  "xaeroplus.setting.spawn_point_waypoint": "Ponto de Referência de Ressurgimento",
+  "xaeroplus.setting.spawn_point_waypoint.tooltip": "Define um ponto de referência no último ponto de ressurgimento definido. \n Apenas rastreia pontos de ressurgimento enquanto esta configuração estiver ativada. \n Suporta apenas o rastreamento de interações com cama ou âncora de ressurgimento",
   "xaeroplus.setting.disable_waypoint_sharing": "Desativar Partilha de Localizações",
   "xaeroplus.setting.disable_waypoint_sharing.tooltip": "Desativa a partilha de localizações com outros jogadores.",
   "xaeroplus.setting.plain_waypoint_sharing": "Compartilhamento Simples de Pontos de Referência",

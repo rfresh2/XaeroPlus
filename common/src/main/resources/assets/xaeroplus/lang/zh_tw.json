@@ -15,6 +15,8 @@
   "xaeroplus.setting.region_write_while_dimension_switched.tooltip": "修復 Xaero 的世界地圖在查看其他維度時未寫入／載入您載入的區塊的問題。",
   "xaeroplus.setting.baritone_waypoint": "Baritone 目標定位點",
   "xaeroplus.setting.baritone_waypoint.tooltip": "將 Baritone 目標同步為臨時定位點。",
+  "xaeroplus.setting.spawn_point_waypoint": "重生點航路點",
+  "xaeroplus.setting.spawn_point_waypoint.tooltip": "在最後設定的重生點放置一個航路點。 \n 僅在此設定啟用時追蹤重生點。 \n 僅支援追蹤床或重生錨的互動",
   "xaeroplus.setting.disable_waypoint_sharing": "停用定位點共享",
   "xaeroplus.setting.disable_waypoint_sharing.tooltip": "停用與其他玩家共享定位點。",
   "xaeroplus.setting.plain_waypoint_sharing": "純文字定位點分享",

@@ -12,6 +12,7 @@ import xaeroplus.XaeroPlus;
 import xaeroplus.feature.waypoint.WaypointAPI;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.Drawing;
+import xaeroplus.module.impl.SpawnPoint;
 import xaeroplus.module.impl.TickTaskExecutor;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.AtlasWaypointImport;
@@ -73,6 +74,14 @@ public class XPCommandManager {
             TickTaskExecutor.INSTANCE.submit(() -> {
                 Settings.REGISTRY.drawOrderSetting.setValue("");
                 c.getSource().xaeroplus$sendSuccess(Component.literal("Draw order reset!"));
+            });
+            return 1;
+        }));
+        dispatcher.register(literal("xaeroplus:clearSpawnPoints").executes(c -> {
+            TickTaskExecutor.INSTANCE.submit(() -> {
+                ModuleManager.getModule(SpawnPoint.class).getLoadedSpawnPositions().clear();
+                ModuleManager.getModule(SpawnPoint.class).saveRespawnPoints();
+                c.getSource().xaeroplus$sendSuccess(Component.literal("All spawn points cleared!"));
             });
             return 1;
         }));

@@ -27,6 +27,7 @@ public class ModuleManager {
             new RenderDistance(),
             new SpawnChunks(),
             new SpawnChunksPlayer(),
+            new SpawnPoint(),
             new TickTaskExecutor(),
             new WaystoneSync(),
             new WorldBorder(),

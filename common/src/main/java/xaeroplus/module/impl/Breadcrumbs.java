@@ -53,9 +53,7 @@ public class Breadcrumbs extends Module {
     @Override
     public void onDisable() {
         breadcrumbsCache.onDisable();
-        Globals.drawManager.registry().unregister(
-            this.getClass().getName()
-        );
+        Globals.drawManager.registry().unregister("Breadcrumbs");
     }
 
     public Long2LongMap getHighlightsState(final ResourceKey<Level> dimension) {

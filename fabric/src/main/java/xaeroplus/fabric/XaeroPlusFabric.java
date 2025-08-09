@@ -38,14 +38,16 @@ public class XaeroPlusFabric implements ClientModInitializer {
 			FabricWaystonesHelperInit.doInit();
 			XaeroPlus.initializeSettings();
 			Settings.REGISTRY.getKeybindings().forEach(KeyBindingHelper::registerKeyBinding);
-			if (System.getenv("XP_CI_TEST") != null || System.getProperty("XP_CI_TEST") != null)
-				Minecraft.getInstance().execute(XaeroPlusGameTest::applyMixinsTest);
         }
 	}
 
 	@Override
 	public void onInitializeClient() {
 		initialize();
+        ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
+            if (System.getenv("XP_CI_TEST") != null || System.getProperty("XP_CI_TEST") != null)
+                Minecraft.getInstance().execute(XaeroPlusGameTest::applyMixinsTest);
+        });
 		ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
 			// needed as we can either accept Xaero's Minimap or BetterPVP but can't describe this in the fabric.mod.json
 			var versionCheckResult = XaeroPlusMinimapCompatibilityChecker.versionCheckResult;

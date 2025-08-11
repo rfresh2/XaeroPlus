@@ -16,6 +16,6 @@ repositories {
 dependencies {
     implementation("architectury-plugin:architectury-plugin.gradle.plugin:3.4-SNAPSHOT")
     implementation("dev.architectury:architectury-loom:1.10-SNAPSHOT")
-    implementation("com.gradleup.shadow:shadow-gradle-plugin:8.3.8")
+    implementation("com.gradleup.shadow:shadow-gradle-plugin:9.0.1")
 }
 

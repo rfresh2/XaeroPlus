@@ -19,7 +19,6 @@ import xaero.hud.minimap.world.MinimapWorld;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMap;
 import xaero.map.core.XaeroWorldMapCore;
-import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.ClientTickEvent;
 import xaeroplus.event.RespawnPointSetEvent;
@@ -28,6 +27,7 @@ import xaeroplus.feature.waypoint.WaypointAPI;
 import xaeroplus.module.Module;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
+import xaeroplus.util.FileUtil;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinPool;
 
 import static net.minecraft.world.level.Level.*;
 
@@ -186,16 +187,16 @@ public class SpawnPoint extends Module {
     }
 
     public void saveRespawnPointsAsync() {
-        Globals.cacheRefreshExecutorService.get().execute(this::saveRespawnPoints);
+        ForkJoinPool.commonPool().execute(this::saveRespawnPoints);
     }
 
     public synchronized void saveRespawnPoints() {
         try {
             var saveFile = getSaveFile();
             if (saveFile == null) return;
-            try (var writer = Files.newBufferedWriter(saveFile.toPath())) {
+            FileUtil.safeSave(saveFile, writer -> {
                 gson.toJson(respawnPoints, new TypeToken<Map<UUID, SpawnPosition>>() {}.getType(), writer);
-            }
+            });
         } catch (Exception e) {
             XaeroPlus.LOGGER.error("[SpawnPoint] Failed to write respawn points file", e);
         }

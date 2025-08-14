@@ -280,6 +280,20 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.sodium_embeddium_integration",
             true),
         SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting worldMapUIAdditions = register(
+        BooleanSetting.create(
+            "WorldMap UI Additions",
+            "xaeroplus.setting.world_map_ui_additions",
+            true,
+            false),
+        SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting waypointsListUIAdditions = register(
+        BooleanSetting.create(
+            "Waypoints List UI Additions",
+            "xaeroplus.setting.waypoints_list_ui_additions",
+            true,
+            false),
+        SettingLocation.WORLD_MAP_MAIN);
 
     /**
      * Chunk Highlights

@@ -70,6 +70,7 @@ public abstract class MixinGuiWaypointsList {
         target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endBatch()V"
     ), remap = true)
     public void drawWaypointDistances(final GuiGraphics guiGraphics, final Waypoint w, final int x, final int y, final CallbackInfo ci) {
+        if (!Settings.REGISTRY.waypointsListUIAdditions.get()) return;
         if (Settings.REGISTRY.showWaypointDistances.get() && w != null) {
             Entity renderViewEntity = Minecraft.getInstance().getCameraEntity();
             final double playerX = renderViewEntity.getX();

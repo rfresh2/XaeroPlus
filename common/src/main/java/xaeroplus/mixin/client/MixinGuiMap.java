@@ -153,13 +153,11 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             this::onFollowButton,
             () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.toggle_follow_mode")
                 .append(" " + I18n.get(this.follow ? "xaeroplus.gui.off" : "xaeroplus.gui.on")))));
-        addButton(followButton);
         coordinateGotoButton = new GuiTexturedButton(
             0, followButton.getY() - 20 , 20, 20, 229, 16, 16, 16,
             WorldMap.guiTextures,
             this::onGotoCoordinatesButton,
             () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.go_to_coordinates"))));
-        addButton(coordinateGotoButton);
         xTextEntryField = new EditBox(Minecraft.getInstance().font, 20, coordinateGotoButton.getY() - 10, 50, 20, Component.nullToEmpty("X:"));
         xTextEntryField.setVisible(false);
         xTextEntryField.setCursorPosition(0);
@@ -168,8 +166,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         zTextEntryField.setVisible(false);
         zTextEntryField.setCursorPosition(0);
         zTextEntryField.setHint(Component.literal("Z:").withStyle(ChatFormatting.DARK_GRAY));
-        this.addWidget(xTextEntryField);
-        this.addWidget(zTextEntryField);
         startDrawingButton = new GuiTexturedButton(
             0, this.coordinateGotoButton.getY() - 20, 20, 20, 47, 0, 16, 16,
             this.xpGuiTextures,
@@ -179,7 +175,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     Component.translatable("xaeroplus.gui.world_map.start_drawing")
                 ), Settings.REGISTRY.worldMapToggleDrawingKeybindSetting.getKeyBinding()
             )));
-        addButton(startDrawingButton);
         drawLineSegmentButton = new GuiTexturedButton(
             startDrawingButton.getX() + 16, startDrawingButton.getY(), 20, 20, 65, 0, 16, 16,
             this.xpGuiTextures,
@@ -214,13 +209,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         drawTextEntryField.setCursorPosition(0);
         drawTextEntryField.setHint(Component.literal("Text:").withStyle(ChatFormatting.DARK_GRAY));
         // right side
-        if (!SupportMods.pac()) {  // remove useless button when pac is not installed
-            this.removeWidget(this.claimsButton);
-            this.exportButton.setY(this.claimsButton.getY());
-            this.keybindingsButton.setY(this.claimsButton.getY() - 20);
-            this.zoomOutButton.setY(this.keybindingsButton.getY() - 20);
-            this.zoomInButton.setY(this.zoomOutButton.getY() - 20);
-        }
         switchToEndButton = new GuiTexturedButton(
             this.width - 20, zoomInButton.getY() - 20, 20, 20, 31, 0, 16, 16,
             this.xpGuiTextures,
@@ -251,11 +239,26 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     ), Settings.REGISTRY.switchToNetherSetting.getKeyBinding()
                 ))
             );
+        pan = false;
+        drawing = false;
+
+        if (!Settings.REGISTRY.worldMapUIAdditions.get()) return;
+
+        if (!SupportMods.pac()) {  // remove useless button when pac is not installed
+            this.removeWidget(this.claimsButton);
+            this.exportButton.setY(this.claimsButton.getY());
+            this.keybindingsButton.setY(this.claimsButton.getY() - 20);
+            this.zoomOutButton.setY(this.keybindingsButton.getY() - 20);
+            this.zoomInButton.setY(this.zoomOutButton.getY() - 20);
+        }
+        addButton(followButton);
+        addButton(coordinateGotoButton);
+        addWidget(xTextEntryField);
+        addWidget(zTextEntryField);
+        addButton(startDrawingButton);
         addButton(switchToEndButton);
         addButton(switchToOverworldButton);
         addButton(switchToNetherButton);
-        pan = false;
-        drawing = false;
     }
 
     @Unique
@@ -488,6 +491,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         target = "Lxaero/map/graphics/MapRenderHelper;restoreDefaultShaderBlendState()V"
     ), remap = true)
     public void renderCoordinatesGotoTextEntryFields(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci) {
+        if (!Settings.REGISTRY.worldMapUIAdditions.get()) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.screen != null && mc.screen.getClass().equals(GuiMap.class)) {
             if (xTextEntryField.isVisible() && zTextEntryField.isVisible()) {
@@ -517,6 +521,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "tick", at = @At("RETURN"), remap = true)
     public void onTick(final CallbackInfo ci) {
+        if (!Settings.REGISTRY.worldMapUIAdditions.get()) return;
         xTextEntryField.tick();
         zTextEntryField.tick();
         drawTextEntryField.tick();
@@ -775,6 +780,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         final CallbackInfo ci,
         @Local(name = "backgroundVertexBuffer") VertexConsumer backgroundVertexBuffer
     ) {
+        if (!Settings.REGISTRY.worldMapUIAdditions.get()) return;
         MapTileSelection selection = this.mapTileSelection;
         if (selection == null) return;
         var sideLen = Math.abs(selection.getRight() - selection.getLeft())+1;
@@ -820,6 +826,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "getRightClickOptions", at = @At(value = "RETURN"), remap = false)
     public void getRightClickOptionsInject(final CallbackInfoReturnable<ArrayList<RightClickOption>> cir) {
+        if (!Settings.REGISTRY.worldMapUIAdditions.get()) return;
         final ArrayList<RightClickOption> options = cir.getReturnValue();
         int index = 3;
         options.add(index++, new RightClickOption("xaeroplus.gui.world_map.copy_coordinates", options.size(), this) {

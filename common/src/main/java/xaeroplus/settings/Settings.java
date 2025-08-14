@@ -137,6 +137,13 @@ public final class Settings extends SettingRegistry {
             (b) -> ModuleManager.getModule(SpawnPoint.class).setEnabled(b)
         ),
         SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting pearlWaypointsSetting = register(
+        BooleanSetting.create(
+            "Pearl Waypoints",
+            "xaeroplus.setting.pearl_waypoints",
+            false,
+            (b) -> ModuleManager.getModule(Pearls.class).setEnabled(b)),
+        SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting persistMapDimensionSwitchSetting = register(
         BooleanSetting.create(
             "Persist Dim Switch",

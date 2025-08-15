@@ -86,6 +86,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Unique Button drawHighlightsButton;
     @Unique Button drawTextButton;
     @Unique Button drawColorCyclerButton;
+    @Unique Button drawMeasurementToolButton;
     @Unique boolean drawing = false;
     @Unique BlockPos drawInProgressPos = null;
     @Unique boolean drawingLeftClickDown = false;
@@ -204,6 +205,12 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_color"))),
             ModuleManager.getModule(Drawing.class).getDrawingColorCycler());
         drawColorCyclerButton.visible = false;
+        drawMeasurementToolButton = new GuiTexturedButton(
+            startDrawingButton.getX() + 16, drawColorCyclerButton.getY() + 20, 20, 20, 135, 0, 16, 16,
+            this.xpGuiTextures,
+            button -> setDrawingMode(DrawingMode.MEASUREMENT),
+            () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_measurement_tool"))));
+        drawMeasurementToolButton.visible = false;
         drawTextEntryField = new EditBox(Minecraft.getInstance().font, 0, 0, 150, 20, Component.nullToEmpty("Text:"));
         drawTextEntryField.setVisible(false);
         drawTextEntryField.setCursorPosition(0);
@@ -282,11 +289,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             addButton(drawHighlightsButton);
             addButton(drawTextButton);
             addButton(drawColorCyclerButton);
+            addButton(drawMeasurementToolButton);
             drawLineSegmentButton.visible = true;
             drawInfiniteLineButton.visible = true;
             drawHighlightsButton.visible = true;
             drawTextButton.visible = true;
             drawColorCyclerButton.visible = true;
+            drawMeasurementToolButton.visible = true;
         } else {
             xaeroPlus$stopDrawing();
         }
@@ -534,6 +543,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 drawHighlightsButton.setFocused(false);
                 drawTextButton.setFocused(false);
                 drawColorCyclerButton.setFocused(false);
+                drawMeasurementToolButton.setFocused(false);
             }
             case INFINITE_LINE -> {
                 startDrawingButton.setFocused(false);
@@ -542,6 +552,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 drawHighlightsButton.setFocused(false);
                 drawTextButton.setFocused(false);
                 drawColorCyclerButton.setFocused(false);
+                drawMeasurementToolButton.setFocused(false);
             } case HIGHLIGHT -> {
                 startDrawingButton.setFocused(false);
                 drawLineSegmentButton.setFocused(false);
@@ -549,6 +560,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 drawHighlightsButton.setFocused(true);
                 drawTextButton.setFocused(false);
                 drawColorCyclerButton.setFocused(false);
+                drawMeasurementToolButton.setFocused(false);
             } case TEXT -> {
                 startDrawingButton.setFocused(false);
                 drawLineSegmentButton.setFocused(false);
@@ -556,11 +568,20 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 drawHighlightsButton.setFocused(false);
                 drawTextButton.setFocused(true);
                 drawColorCyclerButton.setFocused(false);
+                drawMeasurementToolButton.setFocused(false);
                 if (drawTextEntryActive) {
                     drawTextEntryField.setEditable(true);
                     drawTextEntryField.setFocused(true);
                     setFocused(drawTextEntryField);
                 }
+            } case MEASUREMENT -> {
+                startDrawingButton.setFocused(false);
+                drawLineSegmentButton.setFocused(false);
+                drawInfiniteLineButton.setFocused(false);
+                drawHighlightsButton.setFocused(false);
+                drawTextButton.setFocused(false);
+                drawColorCyclerButton.setFocused(false);
+                drawMeasurementToolButton.setFocused(true);
             }
         }
     }
@@ -582,6 +603,12 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     if (drawingLeftClickDown) {
                         ModuleManager.getModule(Drawing.class).addHighlight(ChunkUtils.posToChunkPos(mouseBlockPosX), ChunkUtils.posToChunkPos(mouseBlockPosZ));
                     }
+                } case MEASUREMENT -> {
+                    if (drawInProgressPos == null) {
+                        ModuleManager.getModule(Drawing.class).removeInProgressLine();
+                    } else {
+                        ModuleManager.getModule(Drawing.class).setInProgressLine(new Line(drawInProgressPos.getX(), drawInProgressPos.getZ(), mouseBlockPosX, mouseBlockPosZ), drawingMode);
+                    }
                 }
             }
             if (drawingRightClickDown) {
@@ -590,6 +617,33 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 ModuleManager.getModule(Drawing.class).removeText(mouseBlockPosX, mouseBlockPosZ, getFboScale());
             }
         }
+    }
+
+    @Inject(method = "render", at = @At(
+        value = "FIELD",
+        target = "Lxaero/map/settings/ModSettings;coordinates:Z",
+        opcode = Opcodes.GETFIELD,
+        ordinal = 0
+    ), remap = true)
+    public void renderMeasurmentToolText(
+        final GuiGraphics guiGraphics,
+        final int scaledMouseX,
+        final int scaledMouseY,
+        final float partialTicks,
+        final CallbackInfo ci,
+        @Local(name = "backgroundVertexBuffer") VertexConsumer backgroundVertexBuffer
+    ) {
+        if (!drawing) return;
+        if (drawingMode != DrawingMode.MEASUREMENT) return;
+        if (drawInProgressPos == null) return;
+        var line = ModuleManager.getModule(Drawing.class).getInProgressLine();
+        if (line == null) return;
+        int len = Mth.floor(line.length());
+        int dx = line.x2() - line.x1();
+        int dz = line.z2() - line.z1();
+        MapRenderHelper.drawCenteredStringWithBackground(guiGraphics, font, len + " blocks [" + dx + " x " + dz + "]", scaledMouseX, scaledMouseY - font.lineHeight, -1, 0.0f, 0.0f, 0.0f, 0.4f, backgroundVertexBuffer);
+        var degreeStr = String.format("%.2f", line.angle());
+        MapRenderHelper.drawCenteredStringWithBackground(guiGraphics, font, degreeStr + "°", scaledMouseX, scaledMouseY + font.lineHeight, -1, 0.0f, 0.0f, 0.0f, 0.4f, backgroundVertexBuffer);
     }
 
     @Unique
@@ -632,7 +686,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if (par3 == 0) { // start drawing on left click
             drawingLeftClickDown = true;
             switch (drawingMode) {
-                case LINE_SEGMENT, INFINITE_LINE, TEXT -> {
+                case LINE_SEGMENT, INFINITE_LINE, TEXT, MEASUREMENT -> {
                     if (drawInProgressPos == null) {
                         drawInProgressPos = new BlockPos(mouseBlockPosX, 0, mouseBlockPosZ);
                     }
@@ -675,6 +729,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                         }
                         drawInProgressPos = null;
                     }
+                } case MEASUREMENT -> {
+                    drawInProgressPos = null;
                 }
             }
             drawingLeftClickDown = false;
@@ -702,12 +758,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         removeWidget(drawTextButton);
         removeWidget(drawColorCyclerButton);
         removeWidget(drawTextEntryField);
+        removeWidget(drawMeasurementToolButton);
         drawLineSegmentButton.visible = false;
         drawInfiniteLineButton.visible = false;
         drawHighlightsButton.visible = false;
         drawTextButton.visible = false;
         drawColorCyclerButton.visible = false;
         drawTextEntryField.visible = false;
+        drawMeasurementToolButton.visible = false;
         this.init(Minecraft.getInstance(), width, height);
     }
 

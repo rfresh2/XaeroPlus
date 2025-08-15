@@ -282,6 +282,7 @@
   "xaeroplus.gui.world_map.draw_highlights": "Resaltado de fragmento",
   "xaeroplus.gui.world_map.draw_text": "Texto",
   "xaeroplus.gui.world_map.draw_color": "Color de dibujo",
+  "xaeroplus.gui.world_map.draw_measurement_tool": "Herramienta de medición",
   "xaeroplus.setting.drawing_opacity": "Opacidad del dibujo",
   "xaeroplus.setting.drawing_opacity.tooltip": "Establece la opacidad del color de los dibujos",
   "xaeroplus.gui.draw_order.title": "Orden de Dibujo de XaeroPlus",

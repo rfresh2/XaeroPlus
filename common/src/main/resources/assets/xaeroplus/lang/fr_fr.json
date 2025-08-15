@@ -282,6 +282,7 @@
   "xaeroplus.gui.world_map.draw_highlights": "Surlignage de chunk",
   "xaeroplus.gui.world_map.draw_text": "Texte",
   "xaeroplus.gui.world_map.draw_color": "Couleur de dessin",
+  "xaeroplus.gui.world_map.draw_measurement_tool": "Outil de mesure",
   "xaeroplus.setting.drawing_opacity": "Opacité du dessin",
   "xaeroplus.setting.drawing_opacity.tooltip": "Définit l'opacité des couleurs des dessins",
   "xaeroplus.gui.draw_order.title": "Ordre de Dessin XaeroPlus",

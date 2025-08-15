@@ -282,6 +282,7 @@
   "xaeroplus.gui.world_map.draw_highlights": "Выделение чанка",
   "xaeroplus.gui.world_map.draw_text": "Текст",
   "xaeroplus.gui.world_map.draw_color": "Цвет рисования",
+  "xaeroplus.gui.world_map.draw_measurement_tool": "Инструмент измерения",
   "xaeroplus.setting.drawing_opacity": "Прозрачность рисования",
   "xaeroplus.setting.drawing_opacity.tooltip": "Устанавливает прозрачность цвета рисунков",
   "xaeroplus.gui.draw_order.title": "Порядок Отрисовки XaeroPlus",

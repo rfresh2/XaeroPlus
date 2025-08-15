@@ -280,6 +280,7 @@
   "xaeroplus.gui.world_map.draw_highlights": "Podświetlenie chunków",
   "xaeroplus.gui.world_map.draw_text": "Tekst",
   "xaeroplus.gui.world_map.draw_color": "Kolor rysunku",
+  "xaeroplus.gui.world_map.draw_measurement_tool": "Narzędzie pomiarowe",
   "xaeroplus.setting.drawing_opacity": "Przezroczystość rysunku",
   "xaeroplus.setting.drawing_opacity.tooltip": "Ustawia przezroczystość koloru rysunków",
   "xaeroplus.gui.draw_order.title": "Kolejność Rysowania XaeroPlus",

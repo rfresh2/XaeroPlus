@@ -282,6 +282,7 @@
   "xaeroplus.gui.world_map.draw_highlights": "区块高亮",
   "xaeroplus.gui.world_map.draw_text": "文本",
   "xaeroplus.gui.world_map.draw_color": "绘图颜色",
+  "xaeroplus.gui.world_map.draw_measurement_tool": "测量工具",
   "xaeroplus.setting.drawing_opacity": "绘图不透明度",
   "xaeroplus.setting.drawing_opacity.tooltip": "设置绘图颜色的不透明度",
   "xaeroplus.gui.draw_order.title": "XaeroPlus 绘制顺序",

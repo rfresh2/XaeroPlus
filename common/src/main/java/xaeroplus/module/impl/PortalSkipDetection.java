@@ -25,6 +25,8 @@ import xaeroplus.module.ModuleManager;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
+import xaeroplus.util.timer.Timer;
+import xaeroplus.util.timer.Timers;
 
 import java.util.Optional;
 import java.util.concurrent.Future;
@@ -42,21 +44,19 @@ public class PortalSkipDetection extends Module {
     private static final int defaultRegionWindowSize = 2; // when we are only viewing the minimap
     private boolean worldCacheInitialized = false;
     private int searchDelayTicks = 0;
-    private int tickCounter = 10000;
     private int portalRadius = 15;
     private boolean oldChunksInverse = false;
     private boolean newChunks = false;
     private OldChunks oldChunksModule;
     private PaletteNewChunks newChunksModule;
+    private final Timer tickTimer = Timers.tickTimer();
 
     @EventHandler
     public void onClientTickEvent(final ClientTickEvent.Post event) {
         if (!worldCacheInitialized
             || portalSkipDetectionSearchFuture != null
             && !portalSkipDetectionSearchFuture.isDone()) return;
-        tickCounter++;
-        if (tickCounter >= searchDelayTicks) {
-            tickCounter = 0;
+        if (tickTimer.tick(searchDelayTicks)) {
             Optional<GuiMap> guiMapOptional = getGuiMap();
             if (guiMapOptional.isPresent()) {
                 final GuiMap guiMap = guiMapOptional.get();

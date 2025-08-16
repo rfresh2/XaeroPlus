@@ -158,11 +158,11 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             WorldMap.guiTextures,
             this::onGotoCoordinatesButton,
             () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.go_to_coordinates"))));
-        xTextEntryField = new EditBox(Minecraft.getInstance().font, 20, coordinateGotoButton.getY() - 10, 50, 20, Component.nullToEmpty("X:"));
+        xTextEntryField = new EditBox(Minecraft.getInstance().font, 20, coordinateGotoButton.getY() - 10, 75, 20, Component.nullToEmpty("X:"));
         xTextEntryField.setVisible(false);
         xTextEntryField.setCursorPosition(0);
         xTextEntryField.setHint(Component.literal("X:").withStyle(ChatFormatting.DARK_GRAY));
-        zTextEntryField = new EditBox(Minecraft.getInstance().font, 20, xTextEntryField.getY() + 20, 50, 20, Component.nullToEmpty("Z:"));
+        zTextEntryField = new EditBox(Minecraft.getInstance().font, 20, xTextEntryField.getY() + 20, 75, 20, Component.nullToEmpty("Z:"));
         zTextEntryField.setVisible(false);
         zTextEntryField.setCursorPosition(0);
         zTextEntryField.setHint(Component.literal("Z:").withStyle(ChatFormatting.DARK_GRAY));
@@ -801,6 +801,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if ((xTextEntryField.isVisible() && zTextEntryField.isVisible()) && (xTextEntryField.isFocused() || zTextEntryField.isFocused())) {
             if (code == GLFW_KEY_ENTER) {
                 onGotoCoordinatesButton(null);
+                cir.setReturnValue(true);
+                return;
+            } else if (code == GLFW_KEY_TAB) {
+                if (xTextEntryField.isFocused()) {
+                    setFocused(zTextEntryField);
+                } else if (zTextEntryField.isFocused()) {
+                    setFocused(xTextEntryField);
+                }
                 cir.setReturnValue(true);
                 return;
             }

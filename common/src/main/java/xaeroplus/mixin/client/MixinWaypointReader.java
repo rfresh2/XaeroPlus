@@ -26,6 +26,7 @@ public class MixinWaypointReader {
     @Inject(method = "getRightClickOptions(Lxaero/map/mods/gui/Waypoint;Lxaero/map/gui/IRightClickableElement;)Ljava/util/ArrayList;",
         at = @At("RETURN"))
     public void getRightClickOptionsReturn(final Waypoint element, final IRightClickableElement target, final CallbackInfoReturnable<ArrayList<RightClickOption>> cir) {
+        if (!Settings.REGISTRY.worldMapUIAdditions.get()) return;
         final ArrayList<RightClickOption> options = cir.getReturnValue();
         int index = 3;
         options.add(index++, new RightClickOption("xaeroplus.gui.world_map.copy_coordinates", options.size(), target) {

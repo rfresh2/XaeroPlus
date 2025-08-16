@@ -28,12 +28,12 @@ public class DrawingColorCyclerButton extends TooltipButton {
     @Override
     public void renderButton(PoseStack guiGraphics, int mouseX, int mouseY, float partialTick) {
         int minX = this.x + 6;
-        int minY = this.y + 4;
+        int minY = this.y + 6;
         if (this.isActive() && this.isHovered) {
             minY--;
         }
-        int maxX = minX + 9;
-        int maxY = minY + 9;
+        int maxX = minX + 10;
+        int maxY = minY + 10;
         fill(guiGraphics, minX, minY, maxX, maxY, drawingColorCycler.getColorInt(alphaSupplier.getAsInt()));
     }
 }

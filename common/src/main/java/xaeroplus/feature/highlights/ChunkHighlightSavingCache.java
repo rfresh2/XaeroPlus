@@ -17,6 +17,8 @@ import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.util.ChunkUtils;
+import xaeroplus.util.timer.Timer;
+import xaeroplus.util.timer.Timers;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -340,7 +342,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         return Math.max(3, Globals.minimapScaleMultiplier);
     }
 
-    int tickCounter = 0;
+    final Timer tickTimer = Timers.tickTimer();
 
     @Override
     public void handleTick() {
@@ -352,10 +354,9 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         // this does make the update interval setting kind of a lie, but its for the best
         int jitter = ThreadLocalRandom.current().nextInt(0, 10);
         // only update window on an interval
-        if (++tickCounter < 10 + jitter) {
+        if (!tickTimer.tick(10 + jitter)) {
             return;
         }
-        tickCounter = 0;
 
         final ResourceKey<Level> mapDimension = Globals.getCurrentDimensionId();
         final ResourceKey<Level> actualDimension = ChunkUtils.getActualDimension();

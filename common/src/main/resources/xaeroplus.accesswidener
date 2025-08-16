@@ -4,3 +4,4 @@ accessible field net/minecraft/world/level/chunk/PalettedContainer data Lnet/min
 accessible field net/minecraft/client/Options serverRenderDistance I
 accessible field net/minecraft/client/renderer/LevelRenderer cullingFrustum Lnet/minecraft/client/renderer/culling/Frustum;
 accessible field net/minecraft/client/renderer/LevelRenderer viewArea Lnet/minecraft/client/renderer/ViewArea;
+accessible field net/minecraft/client/multiplayer/ClientLevel entityStorage Lnet/minecraft/world/level/entity/TransientEntitySectionManager;

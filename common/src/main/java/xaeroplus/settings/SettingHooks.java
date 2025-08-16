@@ -2,10 +2,9 @@ package xaeroplus.settings;
 
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaeroplus.XaeroPlus;
+import xaeroplus.util.FileUtil;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
 
 public class SettingHooks {
@@ -18,16 +17,15 @@ public class SettingHooks {
     }
 
     public static synchronized void saveXPSettings() throws IOException {
-        File tempFile = new File(XaeroPlus.configFile.getAbsolutePath() + ".tmp");
-        if (tempFile.exists()) tempFile.delete();
-        try (PrintWriter writer = new PrintWriter(new FileWriter(tempFile, true))) {
-            var allSettings = Settings.REGISTRY.getAllSettings().stream().sorted(Comparator.comparing(XaeroPlusSetting::getSettingName)).toList();
-            for (int i = 0; i < allSettings.size(); i++) {
-                final XaeroPlusSetting setting = allSettings.get(i);
-                writer.println(setting.getSettingName() + ":" + setting.getSerializedValue());
+        FileUtil.safeSave(XaeroPlus.configFile, w -> {
+            try (PrintWriter writer = new PrintWriter(w)) {
+                var allSettings = Settings.REGISTRY.getAllSettings().stream().sorted(Comparator.comparing(XaeroPlusSetting::getSettingName)).toList();
+                for (int i = 0; i < allSettings.size(); i++) {
+                    final XaeroPlusSetting setting = allSettings.get(i);
+                    writer.println(setting.getSettingName() + ":" + setting.getSerializedValue());
+                }
             }
-        }
-        Files.move(tempFile.toPath(), XaeroPlus.configFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        });
     }
 
     public static synchronized void loadXPSettings() {
@@ -40,7 +38,7 @@ public class SettingHooks {
     }
 
     public static synchronized void loadXPSettingsFromFile(File file) throws IOException {
-        try(BufferedReader reader = new BufferedReader(new FileReader(file))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String s;
             while ((s = reader.readLine()) != null) {
                 int colonIndex = s.indexOf(':');

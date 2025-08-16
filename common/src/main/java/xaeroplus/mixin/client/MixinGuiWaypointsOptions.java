@@ -32,6 +32,7 @@ public abstract class MixinGuiWaypointsOptions extends ScreenBase {
         remap = true
     )
     public void injectShowWaypointDistancesButton(final CallbackInfo ci) {
+        if (!Settings.REGISTRY.waypointsListUIAdditions.get()) return;
         int prevButtonY = this.children().stream()
             .filter(c -> c instanceof MyBigButton)
             .map(c -> (MyBigButton) c)

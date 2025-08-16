@@ -12,6 +12,7 @@ import xaeroplus.XaeroPlus;
 import xaeroplus.feature.waypoint.WaypointAPI;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.Drawing;
+import xaeroplus.module.impl.Pearls;
 import xaeroplus.module.impl.SpawnPoint;
 import xaeroplus.module.impl.TickTaskExecutor;
 import xaeroplus.settings.Settings;
@@ -82,6 +83,14 @@ public class XPCommandManager {
                 ModuleManager.getModule(SpawnPoint.class).getLoadedSpawnPositions().clear();
                 ModuleManager.getModule(SpawnPoint.class).saveRespawnPoints();
                 c.getSource().xaeroplus$sendSuccess(Component.literal("All spawn points cleared!"));
+            });
+            return 1;
+        }));
+        dispatcher.register(literal("xaeroplus:clearPearls").executes(c -> {
+            TickTaskExecutor.INSTANCE.submit(() -> {
+                ModuleManager.getModule(Pearls.class).getLoadedPearls().clear();
+                ModuleManager.getModule(Pearls.class).savePearls();
+                c.getSource().xaeroplus$sendSuccess(Component.literal("All pearls cleared!"));
             });
             return 1;
         }));

@@ -22,6 +22,7 @@ public class ModuleManager {
             new OldChunks(),
             new OldBiomes(),
             new PaletteNewChunks(),
+            new Pearls(),
             new Portals(),
             new PortalSkipDetection(),
             new RenderDistance(),

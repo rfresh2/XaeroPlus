@@ -91,6 +91,10 @@ public class Drawing extends Module {
         return drawingCache.getLines(dimension);
     }
 
+    public Line getInProgressLine() {
+        return inProgressLine;
+    }
+
     private List<Line> getInProgressLines(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
         var l = inProgressLine;
         if (inProgressLine != null) {
@@ -164,7 +168,7 @@ public class Drawing extends Module {
 
     public void setInProgressLine(final Line inProgressLine, final DrawingMode drawingMode) {
         switch (drawingMode) {
-            case LINE_SEGMENT -> this.inProgressLine = inProgressLine;
+            case LINE_SEGMENT, MEASUREMENT -> this.inProgressLine = inProgressLine;
             case INFINITE_LINE -> this.inProgressLine = inProgressLine.extrapolateToWorldBorder();
         }
     }

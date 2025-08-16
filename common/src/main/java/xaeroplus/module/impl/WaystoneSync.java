@@ -10,13 +10,13 @@ import xaero.common.minimap.waypoints.WaypointVisibilityType;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.waypoint.WaypointColor;
-import xaero.hud.minimap.waypoint.WaypointPurpose;
 import xaero.hud.minimap.waypoint.set.WaypointSet;
 import xaero.hud.minimap.world.MinimapWorld;
 import xaero.hud.minimap.world.MinimapWorldManager;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.ClientTickEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
+import xaeroplus.feature.extensions.SyncedWaypoint;
 import xaeroplus.feature.waypoint.WaypointAPI;
 import xaeroplus.module.Module;
 import xaeroplus.settings.Settings;
@@ -120,7 +120,7 @@ public class WaystoneSync extends Module {
     }
 
     private void waypointsListSync(final Waystone waystone, final WaypointSet waypointsList) {
-        Waypoint waystoneWp = new Waypoint(
+        var waystoneWp = SyncedWaypoint.create(
             waystone.x(),
             waystone.y(),
             waystone.z(),
@@ -128,9 +128,7 @@ public class WaystoneSync extends Module {
             waystone.name().isEmpty()
                 ? "W"
                 : waystone.name().substring(0, 1).toUpperCase(Locale.ROOT),
-            getWaystoneColor(waystone),
-            WaypointPurpose.NORMAL,
-            true
+            getWaystoneColor(waystone)
         );
         waystoneWp.setVisibility(visibilityType);
         waypointsList.add(waystoneWp);

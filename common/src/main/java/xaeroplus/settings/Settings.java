@@ -137,6 +137,13 @@ public final class Settings extends SettingRegistry {
             (b) -> ModuleManager.getModule(SpawnPoint.class).setEnabled(b)
         ),
         SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting pearlWaypointsSetting = register(
+        BooleanSetting.create(
+            "Pearl Waypoints",
+            "xaeroplus.setting.pearl_waypoints",
+            false,
+            (b) -> ModuleManager.getModule(Pearls.class).setEnabled(b)),
+        SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting persistMapDimensionSwitchSetting = register(
         BooleanSetting.create(
             "Persist Dim Switch",
@@ -279,6 +286,20 @@ public final class Settings extends SettingRegistry {
             "Sodium/Embeddium Setting Integration",
             "xaeroplus.setting.sodium_embeddium_integration",
             true),
+        SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting worldMapUIAdditions = register(
+        BooleanSetting.create(
+            "WorldMap UI Additions",
+            "xaeroplus.setting.world_map_ui_additions",
+            true,
+            false),
+        SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting waypointsListUIAdditions = register(
+        BooleanSetting.create(
+            "Waypoints List UI Additions",
+            "xaeroplus.setting.waypoints_list_ui_additions",
+            true,
+            false),
         SettingLocation.WORLD_MAP_MAIN);
 
     /**

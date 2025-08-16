@@ -262,6 +262,7 @@
   "xaeroplus.gui.world_map.baritone_path_here": "§2%s§r [XP] Baritone Path Here",
   "xaeroplus.gui.world_map.baritone_elytra_here": "§2%s§r [XP] Baritone Elytra Here",
   "xaeroplus.gui.waypoints.toggle_enable_all": "Toggle Enable All",
+  "xaeroplus.gui.waypoints.synced_waypoint": "synced",
   "xaeroplus.setting.waystones_sync": "Waystones Sync",
   "xaeroplus.setting.waystones_sync.tooltip": "Syncs Waystones as waypoints.",
   "xaeroplus.setting.waystone_color": "Waystone Waypoint Color",

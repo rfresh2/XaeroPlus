@@ -260,6 +260,7 @@
   "xaeroplus.gui.world_map.baritone_path_here": "§2%s§r [XP] Ścieżka Baritone Tutaj",
   "xaeroplus.gui.world_map.baritone_elytra_here": "§2%s§r [XP] Elytra Baritone Tutaj",
   "xaeroplus.gui.waypoints.toggle_enable_all": "Włącz Wszystko",
+  "xaeroplus.gui.waypoints.synced_waypoint": "zsynchronizowany",
   "xaeroplus.setting.waystones_sync": "Synchronizuj Kamienie Nawigacyjne",
   "xaeroplus.setting.waystones_sync.tooltip": "Synchronizuj Kamienie Nawigacyjne jako Punkty Nawigacyjne.",
   "xaeroplus.setting.waystone_color": "Kolor punktu orientacyjnego Waystone",

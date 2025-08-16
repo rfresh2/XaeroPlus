@@ -1,5 +1,6 @@
 package xaeroplus.mixin.client;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import net.minecraft.client.Minecraft;
@@ -17,6 +18,7 @@ import xaero.common.gui.GuiWaypoints;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.hud.minimap.waypoint.set.WaypointSet;
 import xaero.hud.minimap.world.MinimapWorld;
+import xaeroplus.feature.extensions.SyncedWaypoint;
 import xaeroplus.settings.Settings;
 
 import java.text.NumberFormat;
@@ -62,7 +64,20 @@ public abstract class MixinGuiWaypointsList {
     ), remap = false)
     public void shiftIconsLeft(final GuiGraphics guiGraphics, final Waypoint w, final int x, final int y, final CallbackInfo ci,
                                @Local(name = "rectX") LocalIntRef rectX) {
+        if (!Settings.REGISTRY.waypointsListUIAdditions.get()) return;
         rectX.set(rectX.get() - 30);
+    }
+
+    @ModifyExpressionValue(method = "drawWaypointSlot",
+        at = @At(
+            value = "CONSTANT",
+            args = "stringValue=gui.xaero_temporary"))
+    public String syncedWaypointTranslationKey(final String original, @Local(argsOnly = true) Waypoint wp) {
+        if (!Settings.REGISTRY.waypointsListUIAdditions.get()) return original;
+        if (wp instanceof SyncedWaypoint) {
+            return "xaeroplus.gui.waypoints.synced_waypoint";
+        }
+        return original;
     }
 
     @Inject(method = "drawWaypointSlot", at = @At(

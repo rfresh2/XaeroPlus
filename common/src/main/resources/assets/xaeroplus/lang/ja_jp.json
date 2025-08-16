@@ -260,6 +260,7 @@
   "xaeroplus.gui.world_map.baritone_path_here": "§2%s§r [XP] Baritoneのルート",
   "xaeroplus.gui.world_map.baritone_elytra_here": "§2%s§r [XP] Baritoneのエリトラ",
   "xaeroplus.gui.waypoints.toggle_enable_all": "すべてを有効にする",
+  "xaeroplus.gui.waypoints.synced_waypoint": "同期済み",
   "xaeroplus.setting.waystones_sync": "Waystones Sync",
   "xaeroplus.setting.waystones_sync.tooltip": "ウェイストーンをウェイポイントとして同期する。",
   "xaeroplus.setting.waystone_color": "Waystone Waypoint Color",

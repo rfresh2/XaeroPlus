@@ -13,7 +13,6 @@ import xaero.common.minimap.waypoints.Waypoint;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.waypoint.WaypointColor;
-import xaero.hud.minimap.waypoint.WaypointPurpose;
 import xaero.hud.minimap.waypoint.set.WaypointSet;
 import xaero.hud.minimap.world.MinimapWorld;
 import xaero.map.MapProcessor;
@@ -23,6 +22,7 @@ import xaeroplus.XaeroPlus;
 import xaeroplus.event.ClientTickEvent;
 import xaeroplus.event.RespawnPointSetEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
+import xaeroplus.feature.extensions.SyncedWaypoint;
 import xaeroplus.feature.waypoint.WaypointAPI;
 import xaeroplus.module.Module;
 import xaeroplus.settings.Settings;
@@ -129,15 +129,13 @@ public class SpawnPoint extends Module {
         if (!Objects.equals(wpSpawnPoint, spawnPoint) || wpSetRef.get() == null || wpRef.get() == null) {
             clearWpAndState();
             wpSetRef = new WeakReference<>(waypointSet);
-            Waypoint wp = new Waypoint(
+            Waypoint wp = SyncedWaypoint.create(
                 spawnPoint.x(),
                 spawnPoint.y(),
                 spawnPoint.z(),
                 "Spawn Point",
                 "SP",
-                WaypointColor.AQUA,
-                WaypointPurpose.NORMAL,
-                true
+                WaypointColor.AQUA
             );
             waypointSet.add(wp);
             wpRef = new WeakReference<>(wp);

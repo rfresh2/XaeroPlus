@@ -10,11 +10,9 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.projectile.ThrownEnderpearl;
 import net.minecraft.world.level.Level;
-import xaero.common.minimap.waypoints.Waypoint;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.waypoint.WaypointColor;
-import xaero.hud.minimap.waypoint.WaypointPurpose;
 import xaero.hud.minimap.world.MinimapWorld;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMap;
@@ -22,6 +20,7 @@ import xaero.map.core.XaeroWorldMapCore;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.ClientTickEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
+import xaeroplus.feature.extensions.SyncedWaypoint;
 import xaeroplus.feature.waypoint.WaypointAPI;
 import xaeroplus.module.Module;
 import xaeroplus.util.FileUtil;
@@ -174,15 +173,13 @@ public class Pearls extends Module {
             var minimapWorld = WaypointAPI.getMinimapWorld(pearlDim);
             if (minimapWorld == null) return;
             var wpSet = WaypointAPI.getOrCreateWaypointSetInWorld(minimapWorld, PEARL_WP_SET_ID);
-            var wp = new Waypoint(
+            var wp = SyncedWaypoint.create(
                 pearl.x(),
                 pearl.y(),
                 pearl.z(),
                 "Pearl",
                 "P",
-                getPearlWaypointColor(pearl),
-                WaypointPurpose.NORMAL,
-                true
+                getPearlWaypointColor(pearl)
             );
             wpSet.add(wp);
         }

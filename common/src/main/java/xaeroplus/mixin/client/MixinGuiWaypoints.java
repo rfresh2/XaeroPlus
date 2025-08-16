@@ -58,28 +58,26 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
     @Inject(method = "init", at = @At("RETURN"), remap = true)
     public void initGui(CallbackInfo ci) {
         this.waypointsSearchFilter = "";
-        if (!Settings.REGISTRY.waypointsListUIAdditions.get()) return;
         this.searchField = new EditBox(this.font, this.width / 2 - 297, 32, 80, 20, Component.literal("Search"));
         this.searchField.setValue("");
-        this.searchField.setFocused(true);
         this.searchField.moveCursorTo(0);
         this.searchField.setCursorPosition(0);
+        // todo: this button is a bit larger than i want but cba to figure out exact size rn
+        this.toggleAllButton = new MySmallButton(
+            TOGGLE_ALL_ID,
+            this.width / 2 + 213,
+            this.height - 53,
+            Component.translatable("xaeroplus.gui.waypoints.toggle_enable_all"),
+            b -> {
+                waypointsSorted.stream().findFirst().ifPresent(firstWaypoint -> {
+                    boolean firstIsEnabled = firstWaypoint.isDisabled();
+                    waypointsSorted.forEach(waypoint -> waypoint.setDisabled(!firstIsEnabled));
+                });
+            });
+        if (!Settings.REGISTRY.waypointsListUIAdditions.get()) return;
         this.addWidget(searchField);
         this.setFocused(this.searchField);
-
-        // todo: this button is a bit larger than i want but cba to figure out exact size rn
-        this.addRenderableWidget(
-                this.toggleAllButton = new MySmallButton(
-                        TOGGLE_ALL_ID,
-                        this.width / 2 + 213,
-                        this.height - 53,
-                        Component.translatable("xaeroplus.gui.waypoints.toggle_enable_all"),
-                        b -> {
-                            waypointsSorted.stream().findFirst().ifPresent(firstWaypoint -> {
-                                boolean firstIsEnabled = firstWaypoint.isDisabled();
-                                waypointsSorted.forEach(waypoint -> waypoint.setDisabled(!firstIsEnabled));
-                            });
-                        }));
+        this.addRenderableWidget(toggleAllButton);
     }
 
     @Inject(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lxaero/common/gui/ScreenBase;mouseClicked(DDI)Z", shift = At.Shift.AFTER), remap = true)

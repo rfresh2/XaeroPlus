@@ -66,6 +66,28 @@ public class WaypointAPI {
         }
     }
 
+    public static void forEachMinimapWorld(Consumer<MinimapWorld> consumer) {
+        MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
+        if (minimapSession == null) return;
+        var rootContainer = minimapSession.getWorldManager().getCurrentRootContainer();
+        for (MinimapWorld world : rootContainer.getWorlds()) {
+            consumer.accept(world);
+        }
+        for (var subContainer : rootContainer.getSubContainers()) {
+            for (MinimapWorld world : subContainer.getWorlds()) {
+                consumer.accept(world);
+            }
+        }
+    }
+
+    public static void forEachWaypointSetInAllMinimapWorlds(Consumer<WaypointSet> consumer) {
+        forEachMinimapWorld(world -> {
+            for (WaypointSet set : world.getIterableWaypointSets()) {
+                consumer.accept(set);
+            }
+        });
+    }
+
     public static WaypointSet getCurrentWaypointSet() {
         MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
         if (minimapSession == null) return null;

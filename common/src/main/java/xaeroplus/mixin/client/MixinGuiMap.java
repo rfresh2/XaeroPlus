@@ -661,8 +661,11 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         value = "INVOKE",
         target = "Lxaero/map/mods/SupportXaeroMinimap;getSubWorldNameToRender()Ljava/lang/String;"
     ))
-    public void renderDrawingStatusText(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci,
-                                        @Local (name = "backgroundVertexBuffer") VertexConsumer backgroundVertexBuffer) {
+    public void renderDrawingStatusText(
+        final CallbackInfo ci,
+        @Local(argsOnly = true) final GuiGraphics guiGraphics,
+        @Local (name = "backgroundVertexBuffer") VertexConsumer backgroundVertexBuffer
+    ) {
         if (!drawing) return;
         MapRenderHelper.drawCenteredStringWithBackground(
             guiGraphics, Minecraft.getInstance().font,
@@ -811,7 +814,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     }
 
     @Inject(method = "render", at = @At("HEAD"))
-    public void panMapOnRender(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci) {
+    public void panMapOnRender(
+        final CallbackInfo ci,
+        @Local(argsOnly = true) final float partialTicks
+    ) {
         if (!pan) return;
         Minecraft mc = Minecraft.getInstance();
         double mouseX = Misc.getMouseX(mc, true);

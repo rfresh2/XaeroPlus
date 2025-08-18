@@ -58,6 +58,7 @@ import xaeroplus.util.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -1056,12 +1057,15 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             }
         } else {
             this.init(Minecraft.getInstance(), width, height);
-            xTextEntryField.setVisible(true);
-            zTextEntryField.setVisible(true);
-            // todo: this isn't setting the entry field active and available to type in for some reason
-            this.setFocused(xTextEntryField);
-            xTextEntryField.setEditable(true);
-            xTextEntryField.setFocused(true);
+            // on current tick, after this method, mouseClicked event is fired, triggering focus onto goto coords button
+            // so we schedule text box focus on following tick
+            ForkJoinPool.commonPool().execute(() -> {
+                Minecraft.getInstance().execute(() -> {
+                    xTextEntryField.setVisible(true);
+                    zTextEntryField.setVisible(true);
+                    setFocused(xTextEntryField);
+                });
+            });
         }
     }
 

@@ -22,7 +22,7 @@ public abstract class MixinMinimapViewSettings extends GuiSettings {
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    public void init(final IXaeroMinimap modMain, final Screen backScreen, final Screen escScreen, final CallbackInfo ci) {
+    public void init(final CallbackInfo ci) {
         final ConfigSettingEntry[] configSettingEntries = Settings.REGISTRY.getMinimapConfigSettingEntries(SettingLocation.MINIMAP_VIEW);
         final int oldLen = this.entries.length;
         final int newLen = configSettingEntries.length;

@@ -878,7 +878,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 return;
             } else if (Screen.isPaste(code) && xTextEntryField.isFocused()) {
                 var pasteText = Minecraft.getInstance().keyboardHandler.getClipboard().trim();
-                var xyzSpaces = Pattern.compile("(\\d+)\\s(\\d+)\\s(\\d+)").matcher(pasteText);
+                var xyzSpaces = Pattern.compile("(-?\\d+)\\s(-?\\d+)\\s(-?\\d+)").matcher(pasteText);
                 if (xyzSpaces.matches()) {
                     String xText = xyzSpaces.group(1);
                     String zText = xyzSpaces.group(3);
@@ -887,7 +887,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     cir.setReturnValue(true);
                     return;
                 }
-                var xyzCommaSpaces = Pattern.compile("(\\d+),\\s(\\d+),\\s(\\d+)").matcher(pasteText);
+                var xyzCommaSpaces = Pattern.compile("(-?\\d+),\\s(-?\\d+),\\s(-?\\d+)").matcher(pasteText);
                 if (xyzCommaSpaces.matches()) {
                     String xText = xyzCommaSpaces.group(1);
                     String zText = xyzCommaSpaces.group(3);
@@ -896,7 +896,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     cir.setReturnValue(true);
                     return;
                 }
-                var xzSpaces = Pattern.compile("(\\d+)\\s(\\d+)").matcher(pasteText);
+                var xzSpaces = Pattern.compile("(-?\\d+)\\s(-?\\d+)").matcher(pasteText);
                 if (xzSpaces.matches()) {
                     String xText = xzSpaces.group(1);
                     String zText = xzSpaces.group(2);
@@ -905,7 +905,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     cir.setReturnValue(true);
                     return;
                 }
-                var xzCommaSpaces = Pattern.compile("(\\d+),\\s(\\d+)").matcher(pasteText);
+                var xzCommaSpaces = Pattern.compile("(-?\\d+),\\s(-?\\d+)").matcher(pasteText);
                 if (xzCommaSpaces.matches()) {
                     String xText = xzCommaSpaces.group(1);
                     String zText = xzCommaSpaces.group(2);

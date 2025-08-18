@@ -212,7 +212,9 @@ public class Pearls extends Module {
     }
 
     private File getSaveFile() {
-        MapProcessor mapProcessor = XaeroWorldMapCore.currentSession.getMapProcessor();
+        var currentSession = XaeroWorldMapCore.currentSession;
+        if (currentSession == null) return null;
+        MapProcessor mapProcessor = currentSession.getMapProcessor();
         if (mapProcessor == null) return null;
         final String worldId = mapProcessor.getCurrentWorldId();
         if (worldId == null) return null;

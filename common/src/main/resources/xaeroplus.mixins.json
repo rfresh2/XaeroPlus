@@ -52,7 +52,6 @@
     "MixinMinimapViewSettings",
     "MixinMinimapWorldStateUpdater",
     "MixinMinimapWriter",
-    "MixinModClientEvents",
     "MixinPatreon",
     "MixinRadarRenderer",
     "MixinSupportXaeroMinimap",

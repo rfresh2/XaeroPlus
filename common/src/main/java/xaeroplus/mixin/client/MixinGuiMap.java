@@ -59,6 +59,8 @@ import xaeroplus.util.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
@@ -671,7 +673,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         value = "INVOKE",
         target = "Lxaero/map/mods/SupportXaeroMinimap;getSubWorldNameToRender()Ljava/lang/String;"
     ))
-    public void renderDrawingStatusText(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci) {
+    public void renderDrawingStatusText(
+        final CallbackInfo ci,
+        @Local(argsOnly = true) final GuiGraphics guiGraphics
+    ) {
         if (!drawing) return;
         MapRenderHelper.drawCenteredStringWithBackground(
             guiGraphics, Minecraft.getInstance().font,
@@ -819,7 +824,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     }
 
     @Inject(method = "render", at = @At("HEAD"))
-    public void panMapOnRender(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci) {
+    public void panMapOnRender(
+        final CallbackInfo ci,
+        @Local(argsOnly = true) final float partialTicks
+    ) {
         if (!pan) return;
         Minecraft mc = Minecraft.getInstance();
         double mouseX = Misc.getMouseX(mc, true);
@@ -876,6 +884,44 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 }
                 cir.setReturnValue(true);
                 return;
+            } else if (Screen.isPaste(code) && xTextEntryField.isFocused()) {
+                var pasteText = Minecraft.getInstance().keyboardHandler.getClipboard().trim();
+                var xyzSpaces = Pattern.compile("(-?\\d+)\\s(-?\\d+)\\s(-?\\d+)").matcher(pasteText);
+                if (xyzSpaces.matches()) {
+                    String xText = xyzSpaces.group(1);
+                    String zText = xyzSpaces.group(3);
+                    xTextEntryField.setValue(xText);
+                    zTextEntryField.setValue(zText);
+                    cir.setReturnValue(true);
+                    return;
+                }
+                var xyzCommaSpaces = Pattern.compile("(-?\\d+),\\s(-?\\d+),\\s(-?\\d+)").matcher(pasteText);
+                if (xyzCommaSpaces.matches()) {
+                    String xText = xyzCommaSpaces.group(1);
+                    String zText = xyzCommaSpaces.group(3);
+                    xTextEntryField.setValue(xText);
+                    zTextEntryField.setValue(zText);
+                    cir.setReturnValue(true);
+                    return;
+                }
+                var xzSpaces = Pattern.compile("(-?\\d+)\\s(-?\\d+)").matcher(pasteText);
+                if (xzSpaces.matches()) {
+                    String xText = xzSpaces.group(1);
+                    String zText = xzSpaces.group(2);
+                    xTextEntryField.setValue(xText);
+                    zTextEntryField.setValue(zText);
+                    cir.setReturnValue(true);
+                    return;
+                }
+                var xzCommaSpaces = Pattern.compile("(-?\\d+),\\s(-?\\d+)").matcher(pasteText);
+                if (xzCommaSpaces.matches()) {
+                    String xText = xzCommaSpaces.group(1);
+                    String zText = xzCommaSpaces.group(2);
+                    xTextEntryField.setValue(xText);
+                    zTextEntryField.setValue(zText);
+                    cir.setReturnValue(true);
+                    return;
+                }
             }
         }
         if (BaritoneHelper.isBaritonePresent()) {
@@ -1018,12 +1064,15 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             }
         } else {
             this.init(Minecraft.getInstance(), width, height);
-            xTextEntryField.setVisible(true);
-            zTextEntryField.setVisible(true);
-            // todo: this isn't setting the entry field active and available to type in for some reason
-            this.setFocused(xTextEntryField);
-            xTextEntryField.setEditable(true);
-            xTextEntryField.setFocused(true);
+            // on current tick, after this method, mouseClicked event is fired, triggering focus onto goto coords button
+            // so we schedule text box focus on following tick
+            ForkJoinPool.commonPool().execute(() -> {
+                Minecraft.getInstance().execute(() -> {
+                    xTextEntryField.setVisible(true);
+                    zTextEntryField.setVisible(true);
+                    setFocused(xTextEntryField);
+                });
+            });
         }
     }
 

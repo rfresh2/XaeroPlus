@@ -62,8 +62,10 @@ public abstract class MixinGuiWaypointsList {
         value = "INVOKE",
         target = "Lxaero/common/minimap/waypoints/Waypoint;isGlobal()Z"
     ), remap = false)
-    public void shiftIconsLeft(final GuiGraphics guiGraphics, final Waypoint w, final int x, final int y, final CallbackInfo ci,
-                               @Local(name = "rectX") LocalIntRef rectX) {
+    public void shiftIconsLeft(
+        final CallbackInfo ci,
+        @Local(name = "rectX") LocalIntRef rectX
+    ) {
         if (!Settings.REGISTRY.waypointsListUIAdditions.get()) return;
         rectX.set(rectX.get() - 30);
     }

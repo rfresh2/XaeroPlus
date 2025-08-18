@@ -10,7 +10,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.map.WorldMap;
 import xaero.map.file.MapSaveLoad;
-import xaero.map.region.MapRegion;
 import xaeroplus.Globals;
 import xaeroplus.settings.Settings;
 
@@ -51,8 +50,10 @@ public abstract class MixinMapSaveLoad {
         value = "INVOKE",
         target = "Ljava/util/zip/ZipOutputStream;closeEntry()V"
     ))
-    public void saveRegionWriteZipOutputStream(final MapRegion region, final int extraAttempts, final CallbackInfoReturnable<Boolean> cir,
-                                               @Local(name = "zipOut") final ZipOutputStream zipOut) throws IOException {
+    public void saveRegionWriteZipOutputStream(
+        final CallbackInfoReturnable<Boolean> cir,
+        @Local(name = "zipOut") final ZipOutputStream zipOut
+    ) throws IOException {
         if (!Settings.REGISTRY.fastZipWrite.get()) return;
         Globals.zipFastByteBuffer.writeTo(zipOut);
         Globals.zipFastByteBuffer.reset();
@@ -62,8 +63,9 @@ public abstract class MixinMapSaveLoad {
         value = "INVOKE",
         target = "Ljava/io/DataOutputStream;close()V"
     ))
-    public void closeZipOutputStream(final MapRegion region, final int extraAttempts, final CallbackInfoReturnable<Boolean> cir,
-                                     @Share("zipOutShare") final LocalRef<ZipOutputStream> zipOutShare
+    public void closeZipOutputStream(
+        final CallbackInfoReturnable<Boolean> cir,
+        @Share("zipOutShare") final LocalRef<ZipOutputStream> zipOutShare
     ) throws IOException {
         if (!Settings.REGISTRY.fastZipWrite.get()) return;
         try {

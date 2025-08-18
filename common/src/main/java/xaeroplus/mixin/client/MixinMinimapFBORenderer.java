@@ -11,9 +11,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,12 +18,10 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.IXaeroMinimap;
-import xaero.common.graphics.CustomVertexConsumers;
 import xaero.common.graphics.ImprovedFramebuffer;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRenderer;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
 import xaero.common.graphics.shader.FramebufferLinesShaderHelper;
-import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.render.MinimapFBORenderer;
 import xaero.common.minimap.render.MinimapRenderer;
 import xaero.common.minimap.render.MinimapRendererHelper;
@@ -92,8 +87,10 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
     @Inject(method = "renderChunksToFBO", at = @At(
         value = "HEAD"
     ), remap = true)
-    public void modifyScaledSize(final MinimapSession minimapSession, final PoseStack matrixStack, final MinimapProcessor minimap, final Vec3 renderPos, final ResourceKey<Level> mapDimension, final double mapDimensionScale, final int viewW, final float partial, final int level, final boolean useWorldMap, final boolean lockedNorth, final int shape, final double ps, final double pc, final boolean cave, final CustomVertexConsumers cvc, final CallbackInfo ci,
-                                 @Share("scaledSize") LocalIntRef scaledSize) {
+    public void modifyScaledSize(
+        final CallbackInfo ci,
+        @Share("scaledSize") LocalIntRef scaledSize
+    ) {
         int s = 256 * Globals.minimapScaleMultiplier * Globals.minimapSizeMultiplier;
         if (Globals.minimapSizeMultiplier > 1) {
             int f = (Globals.minimapSizeMultiplier - 1) * Globals.minimapScaleMultiplier;
@@ -162,9 +159,11 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             target = "Lxaero/common/graphics/ImprovedFramebuffer;bindRead()V"
         )
     ), remap = true)
-    public void correctPostRotationTranslationForSizeMult(final MinimapSession minimapSession, final PoseStack matrixStack, final MinimapProcessor minimap, final Vec3 renderPos, final ResourceKey<Level> mapDimension, final double mapDimensionScale, final int viewW, final float partial, final int level, final boolean useWorldMap, final boolean lockedNorth, final int shape, final double ps, final double pc, final boolean cave, final CustomVertexConsumers cvc, final CallbackInfo ci,
-                                                          @Local(name = "halfWView") float halfWView,
-                                                          @Local(name = "shaderMatrixStack") Matrix4fStack shaderMatrixStack) {
+    public void correctPostRotationTranslationForSizeMult(
+        final CallbackInfo ci,
+        @Local(name = "halfWView") float halfWView,
+        @Local(name = "shaderMatrixStack") Matrix4fStack shaderMatrixStack
+    ) {
         float sizeMultTranslation = (halfWView / Globals.minimapSizeMultiplier) * (Globals.minimapSizeMultiplier - 1);
         shaderMatrixStack.translate(sizeMultTranslation, sizeMultTranslation, 0f);
     }

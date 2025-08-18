@@ -11,13 +11,11 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.IXaeroMinimap;
-import xaero.common.graphics.CustomVertexConsumers;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.render.MinimapFBORenderer;
 import xaero.common.minimap.render.MinimapRenderer;
 import xaero.hud.minimap.Minimap;
 import xaero.hud.minimap.element.render.over.MinimapElementOverMapRendererHandler;
-import xaero.hud.minimap.module.MinimapSession;
 import xaeroplus.Globals;
 import xaeroplus.feature.extensions.CustomMinimapFBORenderer;
 import xaeroplus.settings.Settings;
@@ -53,7 +51,10 @@ public class MixinMinimapRenderer {
     }
 
     @Inject(method = "renderMinimap", at = @At("RETURN"))
-    public void shiftRenderZPost(final MinimapSession minimapSession, final GuiGraphics guiGraphics, final MinimapProcessor minimap, final int x, final int y, final int width, final int height, final double scale, final int size, final float partial, final CustomVertexConsumers cvc, final CallbackInfo ci) {
+    public void shiftRenderZPost(
+        final CallbackInfo ci,
+        @Local(argsOnly = true) GuiGraphics guiGraphics
+    ) {
         guiGraphics.pose().popPose();
     }
 

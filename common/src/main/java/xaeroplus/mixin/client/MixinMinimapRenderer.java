@@ -54,7 +54,7 @@ public class MixinMinimapRenderer {
 
     @Inject(method = "renderMinimap", at = @At("RETURN"))
     public void shiftRenderZPost(
-        CallbackInfo ci,
+        final CallbackInfo ci,
         @Local(argsOnly = true) PoseStack guiGraphics
     ) {
         guiGraphics.popPose();

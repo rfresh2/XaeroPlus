@@ -1,15 +1,12 @@
 package xaeroplus.mixin.client;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.MultiBufferSource;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.common.minimap.waypoints.Waypoint;
-import xaero.hud.minimap.element.render.MinimapElementRenderInfo;
 import xaero.hud.minimap.waypoint.WaypointPurpose;
 import xaero.hud.minimap.waypoint.render.WaypointMapRenderer;
 import xaeroplus.settings.Settings;
@@ -27,7 +24,8 @@ public class MixinWaypointMapRenderer {
     ), cancellable = true,
         remap = true) // $REMAP
     public void limitDeathpointsRenderDistance(
-        final Waypoint w, final boolean highlighted, final boolean outOfBounds, final double optionalDepth, final float optionalScale, final double partialX, final double partialY, final MinimapElementRenderInfo renderInfo, final PoseStack guiGraphics, final MultiBufferSource.BufferSource vanillaBufferSource, final CallbackInfoReturnable<Boolean> cir,
+        final CallbackInfoReturnable<Boolean> cir,
+        @Local(argsOnly = true) Waypoint w,
         @Local(name = "scaledDistance2D") double scaledDistance2D
     ) {
         if (Settings.REGISTRY.limitDeathpointsRenderDistance.get()) {

@@ -878,7 +878,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 cir.setReturnValue(true);
                 return;
             } else if (Screen.isPaste(code) && xTextEntryField.isFocused()) {
-                var pasteText = Minecraft.getInstance().keyboardHandler.getClipboard();
+                var pasteText = Minecraft.getInstance().keyboardHandler.getClipboard().trim();
                 var xyzSpaces = Pattern.compile("(\\d+)\\s(\\d+)\\s(\\d+)").matcher(pasteText);
                 if (xyzSpaces.matches()) {
                     String xText = xyzSpaces.group(1);

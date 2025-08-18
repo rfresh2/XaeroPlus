@@ -52,7 +52,7 @@ public abstract class MixinMinimapWorldStateUpdater {
     }
 
     @Inject(method = "getAutoRootContainerPath(I)Lxaero/hud/path/XaeroPath;", at = @At("HEAD"), cancellable = true)
-    public void customDataFolderResolve(final int version, final CallbackInfoReturnable<XaeroPath> cir) {
+    public void customDataFolderResolve(final CallbackInfoReturnable<XaeroPath> cir) {
         var customCir = new CallbackInfoReturnable<String>("a", true);
         DataFolderResolveUtil.resolveDataFolder(connection, customCir);
         if (customCir.isCancelled()) {

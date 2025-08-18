@@ -28,7 +28,7 @@ public abstract class MixinGuiMinimapMain extends GuiSettings {
     @Inject(method = "<init>(Lxaero/common/IXaeroMinimap;Lnet/minecraft/client/gui/screens/Screen;Lnet/minecraft/client/gui/screens/Screen;)V",
         at = @At("RETURN"),
         remap = true) // $REMAP
-    public void init(final IXaeroMinimap modMain, final Screen par1GuiScreen, final Screen escScreen, final CallbackInfo ci) {
+    public void init(final CallbackInfo ci) {
         final ConfigSettingEntry[] configSettingEntries = Settings.REGISTRY.getMinimapConfigSettingEntries(SettingLocation.MINIMAP_MAIN);
         final int oldLen = this.mainEntries.length;
         final int newLen = configSettingEntries.length;

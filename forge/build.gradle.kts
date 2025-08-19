@@ -91,9 +91,6 @@ tasks {
         relocate("kaptainwutax", "$shadePkg.kaptainwutax")
         relocate("net.lenni0451.lambdaevents", "$shadePkg.lambdaevents")
         relocate("com.github.benmanes.caffeine", "$shadePkg.caffeine")
-        dependencies {
-            exclude(dependency("org.jspecify::"))
-        }
     }
 
     remapJar {

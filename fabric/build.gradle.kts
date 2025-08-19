@@ -81,10 +81,6 @@ tasks {
 
 	shadowJar {
 		configurations = listOf(project.configurations.shadow.get())
-		exclude("architectury.common.json")
-		dependencies {
-			exclude(dependency("org.jspecify::"))
-		}
 	}
 
 	remapJar {

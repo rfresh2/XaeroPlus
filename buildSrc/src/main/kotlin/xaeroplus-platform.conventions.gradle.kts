@@ -29,9 +29,12 @@ dependencies {
 tasks {
     shadowJar {
         archiveClassifier.set("shadow")
-        exclude("com/google/**")
-        exclude("org/objectweb/**")
-        exclude("org/checkerframework/**")
+        dependencies {
+            exclude(dependency("com.google.errorprone:.*:.*"))
+            exclude(dependency("org.jspecify:.*:.*"))
+            exclude(dependency("org.ow2.asm:.*:.*"))
+            exclude(dependency("org.slf4j:.*:.*"))
+        }
         exclude("org/rfresh/sqlite/native/FreeBSD/**")
         exclude("org/rfresh/sqlite/native/Linux-Android/**")
         exclude("org/rfresh/sqlite/native/Linux-Musl/**")
@@ -42,6 +45,5 @@ tasks {
         exclude("org/rfresh/sqlite/native/Linux/ppc64/**")
         exclude("org/rfresh/sqlite/native/Linux/riscv64/**")
         exclude("org/rfresh/sqlite/native/Windows/armv7/**")
-        exclude("org/slf4j/**")
     }
 }

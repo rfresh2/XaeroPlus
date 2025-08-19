@@ -8,6 +8,10 @@ pluginManagement {
 	}
 }
 
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention").version("1.0.0")
+}
+
 val minecraft_version: String by ext.properties
 val worldmap_version_fabric: String by ext.properties
 val minimap_version_fabric: String by ext.properties

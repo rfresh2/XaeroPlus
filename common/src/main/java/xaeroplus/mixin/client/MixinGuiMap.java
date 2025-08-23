@@ -971,10 +971,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             }
         }
         boolean tileSelPresent = this.mapTileSelection != null;
-        final int delHighlightMinX = tileSelPresent ? mapTileSelection.getStartX() : rightClickX;
-        final int delHighlightMaxX = tileSelPresent ? mapTileSelection.getEndX() : rightClickX;
-        final int delHighlightMinZ = tileSelPresent ? mapTileSelection.getStartZ() : rightClickZ;
-        final int delHighlightMaxZ = tileSelPresent ? mapTileSelection.getEndZ() : rightClickZ;
+        final int delHighlightMinX = tileSelPresent ? mapTileSelection.getLeft() : rightClickX;
+        final int delHighlightMaxX = tileSelPresent ? mapTileSelection.getRight() : rightClickX;
+        final int delHighlightMinZ = tileSelPresent ? mapTileSelection.getTop() : rightClickZ;
+        final int delHighlightMaxZ = tileSelPresent ? mapTileSelection.getBottom() : rightClickZ;
         options.add(index++, new RightClickOption("xaeroplus.gui.world_map.delete_highlights", options.size(), this) {
             @Override
             public void onAction(final Screen screen) {

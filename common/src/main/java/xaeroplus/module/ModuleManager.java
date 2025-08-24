@@ -25,6 +25,7 @@ public class ModuleManager {
             new Pearls(),
             new Portals(),
             new PortalSkipDetection(),
+            new RegionGrid(),
             new RenderDistance(),
             new SpawnChunks(),
             new SpawnChunksPlayer(),

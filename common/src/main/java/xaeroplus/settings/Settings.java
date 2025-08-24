@@ -874,6 +874,32 @@ public final class Settings extends SettingRegistry {
             (b) -> ModuleManager.getModule(MapArtGrid.class).setRgbColor(b.getColor()),
             () -> ModuleManager.getModule(MapArtGrid.class).isEnabled()),
         SettingLocation.OVERLAYS);
+    public final BooleanSetting regionGridEnabledSetting = register(
+        BooleanSetting.create(
+            "Region Grid",
+            "xaeroplus.setting.region_grid",
+            false,
+            true,
+            (b) -> ModuleManager.getModule(RegionGrid.class).setEnabled(b)),
+        SettingLocation.OVERLAYS);
+    public final EnumSetting<ColorHelper.HighlightColor> regionGridColorSetting = register(
+        EnumSetting.create(
+            "Region Grid Color",
+            "xaeroplus.setting.region_grid_color",
+            ColorHelper.HighlightColor.values(),
+            ColorHelper.HighlightColor.RED,
+            (b) -> ModuleManager.getModule(RegionGrid.class).setRgbColor(b.getColor()),
+            () -> ModuleManager.getModule(RegionGrid.class).isEnabled()),
+        SettingLocation.OVERLAYS);
+    public final BooleanSetting regionGridTextSetting = register(
+        BooleanSetting.create(
+            "Region Grid Text",
+            "xaeroplus.setting.region_grid_text",
+            false,
+            false,
+            (b) -> ModuleManager.getModule(RegionGrid.class).setTextEnabled(b),
+            () -> ModuleManager.getModule(RegionGrid.class).isEnabled()),
+        SettingLocation.OVERLAYS);
     public final DoubleSetting drawingOpacitySetting = register(
         DoubleSetting.create(
             "Drawing Opacity",

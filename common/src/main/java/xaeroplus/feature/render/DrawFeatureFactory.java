@@ -2,7 +2,8 @@ package xaeroplus.feature.render;
 
 import xaeroplus.feature.render.highlight.*;
 import xaeroplus.feature.render.line.*;
-import xaeroplus.feature.render.text.TextDrawFeature;
+import xaeroplus.feature.render.text.AsyncTextDrawFeature;
+import xaeroplus.feature.render.text.DirectTextDrawFeature;
 import xaeroplus.feature.render.text.TextSupplier;
 import xaeroplus.util.FloatSupplier;
 
@@ -114,9 +115,21 @@ public interface DrawFeatureFactory {
         String id,
         TextSupplier textSupplier
     ) {
-        return new TextDrawFeature(
+        return new DirectTextDrawFeature(
             id,
             textSupplier
+        );
+    }
+
+    static DrawFeature text(
+        String id,
+        TextSupplier textSupplier,
+        int refreshIntervalMs
+    ) {
+        return new AsyncTextDrawFeature(
+            id,
+            textSupplier,
+            refreshIntervalMs
         );
     }
 }

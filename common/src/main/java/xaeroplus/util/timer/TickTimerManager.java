@@ -1,6 +1,7 @@
 package xaeroplus.util.timer;
 
 import net.lenni0451.lambdaevents.EventHandler;
+import xaeroplus.XaeroPlus;
 import xaeroplus.event.ClientTickEvent;
 
 public final class TickTimerManager {
@@ -10,14 +11,16 @@ public final class TickTimerManager {
 
     private volatile long tickTime = 0;
 
-    private TickTimerManager() {}
+    private TickTimerManager() {
+        XaeroPlus.EVENT_BUS.register(this);
+    }
 
     public long getTickTime() {
         return tickTime;
     }
 
     @EventHandler(priority = TICK_PRIORITY)
-    private void onClientTick(ClientTickEvent.Pre event) {
+    public void onClientTick(ClientTickEvent.Pre event) {
         tickTime++;
     }
 }

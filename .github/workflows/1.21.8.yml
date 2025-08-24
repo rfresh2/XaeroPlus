@@ -158,7 +158,7 @@ jobs:
           regex: .*fabric.*
 #        mc-runtime-test: fabric
           mc-runtime-test: none
-          fabric-api: 0.130.0
+          fabric-api: 0.132.0
           java: 21
           xvfb: true
           headlessmc-command: --jvm -Djava.awt.headless=true

@@ -5,9 +5,13 @@ import xaero.common.HudMod;
 import xaero.map.WorldMapSession;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
+import xaeroplus.feature.waypoint.eta.WaypointEtaManager;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.*;
-import xaeroplus.util.*;
+import xaeroplus.util.BaritoneHelper;
+import xaeroplus.util.ColorHelper;
+import xaeroplus.util.WaystonesHelper;
+import xaeroplus.util.WorldToolsHelper;
 
 import java.io.ByteArrayOutputStream;
 
@@ -1032,15 +1036,15 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.waypoint_eta",
             false),
         SettingLocation.MINIMAP_WAYPOINTS);
-    public final DoubleSetting waypointEtaTickBuffer = register(
+    public final DoubleSetting waypointEtaMeasurementInterval = register(
         DoubleSetting.create(
-            "Waypoint ETA Tick Buffer",
-            "xaeroplus.setting.waypoint_eta_time_buffer",
-            2, 100, 1,
+            "Waypoint ETA Measurement Interval",
+            "xaeroplus.setting.waypoint_eta_measurement_interval",
+            0, 120, 2,
             10,
-            WaypointEtaCalculator.INSTANCE::updateBufferLen,
-            waypointEta::get),
-        SettingLocation.MINIMAP_WAYPOINTS);
+            (v) -> WaypointEtaManager.INSTANCE.updateMeasurementInterval((int) v),
+            waypointEta::get
+        ), SettingLocation.MINIMAP_WAYPOINTS);
     public final BooleanSetting longWaypointInitials = register(
         BooleanSetting.create(
             "Long Waypoint Initials",

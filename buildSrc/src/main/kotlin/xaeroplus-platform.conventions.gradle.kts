@@ -36,7 +36,8 @@ tasks {
             exclude(dependency("org.slf4j:.*:.*"))
         }
         exclude("org/rfresh/sqlite/native/FreeBSD/**")
-        exclude("org/rfresh/sqlite/native/Linux-Android/**")
+        exclude("org/rfresh/sqlite/native/Linux-Android/x86/**")
+        exclude("org/rfresh/sqlite/native/Linux-Android/x86_64/**")
         exclude("org/rfresh/sqlite/native/Linux-Musl/**")
         exclude("org/rfresh/sqlite/native/Linux/arm/**")
         exclude("org/rfresh/sqlite/native/Linux/armv6/**")

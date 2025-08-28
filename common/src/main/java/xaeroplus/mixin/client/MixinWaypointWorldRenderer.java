@@ -13,9 +13,9 @@ import xaero.common.minimap.waypoints.Waypoint;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.waypoint.WaypointPurpose;
 import xaero.hud.minimap.waypoint.render.world.WaypointWorldRenderer;
+import xaeroplus.feature.waypoint.eta.WaypointEtaManager;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
-import xaeroplus.util.WaypointEtaCalculator;
 
 import static net.minecraft.world.level.Level.NETHER;
 import static net.minecraft.world.level.Level.OVERWORLD;
@@ -75,7 +75,7 @@ public class MixinWaypointWorldRenderer {
     public String modifyDistanceText(final String text, @Local(argsOnly = true) Waypoint waypoint) {
         if (!Settings.REGISTRY.waypointEta.get()) return text;
         if (text == null || text.isBlank()) return text;
-        var etaText = WaypointEtaCalculator.INSTANCE.getEtaTextSuffix(waypoint);
+        var etaText = WaypointEtaManager.INSTANCE.getEtaTextSuffix(waypoint);
         return text + etaText;
     }
 }

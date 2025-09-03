@@ -12,6 +12,10 @@ import xaeroplus.feature.render.DrawManager;
 import xaeroplus.settings.Settings;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Supplier;
@@ -32,6 +36,7 @@ public class Globals {
     public static boolean minimapSettingsInitialized = false;
     public static boolean switchingDimension = false;
     public static boolean disableDrawCullingOverride = false;
+    public static final boolean atomicMoveAvailable = testAtomicMoveAvailable();
     public static ResourceKey<Level> getCurrentDimensionId() {
         try {
             var dim = XaeroWorldMapCore.currentSession.getMapProcessor().getMapWorld().getCurrentDimensionId();
@@ -117,6 +122,24 @@ public class Globals {
             Globals.dataFolderResolutionMode = mode;
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Failed setting data folder resolution mode", e);
+        }
+    }
+
+    private static boolean testAtomicMoveAvailable() {
+        try {
+            var tempFile = File.createTempFile("xp-atomic-move-test", "test");
+            tempFile.deleteOnExit();
+            var tempFile2 = File.createTempFile("xp-atomic-move-test", "test");
+            tempFile2.deleteOnExit();
+            Files.move(tempFile.toPath(), tempFile2.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+            XaeroPlus.LOGGER.debug("Atomic move supported");
+            return true;
+        } catch (AtomicMoveNotSupportedException e) {
+            XaeroPlus.LOGGER.debug("Atomic move not supported", e);
+            return false;
+        } catch (Exception e) {
+            XaeroPlus.LOGGER.debug("Failed testing atomic move support", e);
+            return false;
         }
     }
 }

@@ -308,8 +308,15 @@ public final class Settings extends SettingRegistry {
     public final BooleanSetting fixWaypointLoad = register(
         BooleanSetting.create(
             "Fix Waypoint Load Bug",
-            "[Test] Fix Waypoint Load Bug",
-            false,
+            "Fix Waypoint Load Bug",
+            true,
+            false),
+        SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting atomicMoveAndReplace = register(
+        BooleanSetting.create(
+            "Atomic File Move And Replace",
+            "Atomic File Move And Replace",
+            true,
             false),
         SettingLocation.WORLD_MAP_MAIN);
 

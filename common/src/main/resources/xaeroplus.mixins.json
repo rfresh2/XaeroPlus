@@ -50,6 +50,7 @@
     "MixinMinimapOption",
     "MixinMinimapRenderer",
     "MixinMinimapViewSettings",
+    "MixinMinimapWorldManagerIO",
     "MixinMinimapWorldStateUpdater",
     "MixinMinimapWriter",
     "MixinPatreon",

@@ -305,6 +305,13 @@ public final class Settings extends SettingRegistry {
             true,
             false),
         SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting fixWaypointLoad = register(
+        BooleanSetting.create(
+            "Fix Waypoint Load Bug",
+            "[Test] Fix Waypoint Load Bug",
+            false,
+            false),
+        SettingLocation.WORLD_MAP_MAIN);
 
     /**
      * Chunk Highlights

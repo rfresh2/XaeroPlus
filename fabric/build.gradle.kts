@@ -99,8 +99,3 @@ tasks {
 
 	}
 }
-
-val javaComponent = components.findByName("java") as AdhocComponentWithVariants
-javaComponent.withVariantsFromConfiguration(project.configurations.getByName("shadowRuntimeElements")) {
-	skip()
-}

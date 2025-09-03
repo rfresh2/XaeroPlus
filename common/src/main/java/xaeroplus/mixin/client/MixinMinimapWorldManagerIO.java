@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import xaero.hud.minimap.world.io.MinimapWorldManagerIO;
 
 import java.nio.file.Path;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Mixin(value = MinimapWorldManagerIO.class, remap = false)
 public class MixinMinimapWorldManagerIO {
@@ -17,6 +18,6 @@ public class MixinMinimapWorldManagerIO {
     ))
     public Path reduceChanceOfFileNameCollisions(final Path instance, final String other, final Operation<Path> original) {
         // reduce chance of file name collisions from concurrent mc instances
-        return original.call(instance, other + System.nanoTime());
+        return original.call(instance, other + "-xp-" + ThreadLocalRandom.current().nextInt(0, 2_000_000_000));
     }
 }

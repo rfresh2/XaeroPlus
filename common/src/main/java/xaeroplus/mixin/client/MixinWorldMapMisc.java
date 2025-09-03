@@ -1,6 +1,7 @@
 package xaeroplus.mixin.client;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -9,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.map.misc.Misc;
 import xaeroplus.Globals;
+import xaeroplus.XaeroPlus;
 import xaeroplus.settings.Settings;
 
 import java.io.IOException;
@@ -27,14 +29,14 @@ public class MixinWorldMapMisc {
         return "";
     }
 
-    @ModifyExpressionValue(method = "quickFileBackupMove", at = @At(
-        value = "CONSTANT",
-        args = "intValue=0",
+    @WrapOperation(method = "quickFileBackupMove", at = @At(
+        value = "INVOKE",
+        target = "Ljava/nio/file/Path;resolveSibling(Ljava/lang/String;)Ljava/nio/file/Path;",
         ordinal = 0
     ))
-    private static int randomizeBackupNumber(int original) {
-        // Randomize the backup number to reduce chance of concurrent backups choosing the same file name
-        return ThreadLocalRandom.current().nextInt(1, 2_000_000_000);
+    private static Path randomizeBackupPath(final Path instance, final String pathArg, final Operation<Path> original) {
+        // reduce chance of file name collisions from concurrent mc instances
+        return original.call(instance, pathArg + "-xp-" + ThreadLocalRandom.current().nextInt(0, 2_000_000_000));
     }
 
     @Inject(method = "safeMoveAndReplace", at = @At("HEAD"), cancellable = true)
@@ -44,7 +46,9 @@ public class MixinWorldMapMisc {
         try {
             Files.move(from, to, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
-            return; // try to fallback to normal xaero logic
+            XaeroPlus.LOGGER.debug("Failed atomic move, falling back to normal xaero logic", e);
+            Settings.REGISTRY.atomicMoveAndReplace.setValue(false);
+            // fall through to normal xaero logic
         }
         ci.cancel();
     }

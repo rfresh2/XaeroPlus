@@ -127,8 +127,7 @@ Submit PR's targeting the `1.20.1` branch only. Changes will be merged to all th
 
 * Convert JourneyMap World Files to Xaero: [JMToXaero](https://github.com/Entropy5/JMtoXaero)
 * Convert JourneyMap Waypoints to Xaero: [JMWaypointsToXaero](https://github.com/rfresh2/JMWaypointsToXaero)
-* 2b2t Atlas Waypoints to Xaero: [JMWaypointsToXaero/atlas](https://github.com/rfresh2/JMWaypointsToXaero/tree/atlas)
-* Convert MC Region Files to Xaero: [JMToXaero/Region-Scripts](https://github.com/Entropy5/JMtoXaero/blob/Region-Scripts/src/main/java/com/github/entropy5/RegionToXaero.java)
-* 2b2t 256k WDL Xaero Map (20GB): [mc-archive](https://data.mc-archive.org/s/eFDEy2XKof83Kez)
-* Xaero World Merger: [JMToXaero/Region-Scripts](https://github.com/Entropy5/JMtoXaero/blob/Region-Scripts/src/main/java/com/github/entropy5/XaeroRegionMerger.java)
-  * Can be used to merge 256k WDL into an existing world. With optional darkening only on tiles from 256K
+* 2b2t World Download Xaero Maps:
+  * 2025 100k^2 (6GB): https://data.mc-archive.org/s/6XJqdEtxkqwSGrs
+    * Cache (15GB): https://data.mc-archive.org/s/HSB3aEatWDFwG4Z 
+  * 2022 256k^2 (20GB): https://data.mc-archive.org/s/eFDEy2XKof83Kez

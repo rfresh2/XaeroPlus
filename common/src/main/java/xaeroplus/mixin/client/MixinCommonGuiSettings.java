@@ -119,7 +119,11 @@ public abstract class MixinCommonGuiSettings extends ScreenBase {
     public AbstractWidget adjustSettingEntryWidth(final ISettingEntry instance, final int x, final int y, final int w, final boolean canEditIngameSettings, final Operation<AbstractWidget> original,
                                                   @Local(name = "i") int i) {
         if (!Settings.REGISTRY.expandSettingEntries.get()) return original.call(instance, x, y, w, canEditIngameSettings);
-        int xOffset = ((i % 2 == 0) ? -1 : 1) * ((xaeroPlus$settingEntryWidth - 200) / 2);
-        return original.call(instance, x + xOffset, y, xaeroPlus$settingEntryWidth, canEditIngameSettings);
+        var halfW = this.width / 2;
+        var halfMargin = 5;
+        var adjustedX = i % 2 == 0
+            ? halfW - xaeroPlus$settingEntryWidth - halfMargin
+            : halfW + halfMargin;
+        return original.call(instance, adjustedX, y, xaeroPlus$settingEntryWidth, canEditIngameSettings);
     }
 }

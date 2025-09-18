@@ -16,7 +16,7 @@ public class MixinWaypointSharingHandler {
 
     @Shadow private Waypoint sharedWaypoint;
 
-    @Inject(method = "shareWaypoint(Lnet/minecraft/client/gui/screens/Screen;Lxaero/common/minimap/waypoints/Waypoint;Lxaero/hud/minimap/world/MinimapWorld;)V",
+    @Inject(method = "shareWaypoint",
         at = @At("HEAD"),
         cancellable = true,
         remap = true) // $REMAP

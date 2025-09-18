@@ -5,6 +5,7 @@ import xaero.common.HudMod;
 import xaero.map.WorldMapSession;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
+import xaeroplus.feature.waypoint.WaypointAPI;
 import xaeroplus.feature.waypoint.eta.WaypointEtaManager;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.*;
@@ -1116,6 +1117,30 @@ public final class Settings extends SettingRegistry {
             false,
             true,
             (b) -> Globals.switchToDimension(END)),
+        SettingLocation.KEYBINDS);
+    public final BooleanSetting switchWaypointsToNetherSetting = register(
+        BooleanSetting.create(
+            "Switch Waypoints to Nether",
+            "xaeroplus.keybind.switch_waypoints_to_nether",
+            false,
+            true,
+            (b) -> WaypointAPI.switchWaypointDimension(NETHER)),
+        SettingLocation.KEYBINDS);
+    public final BooleanSetting switchWaypointsToOverworldSetting = register(
+        BooleanSetting.create(
+            "Switch Waypoints to Overworld",
+            "xaeroplus.keybind.switch_waypoints_to_overworld",
+            false,
+            true,
+            (b) -> WaypointAPI.switchWaypointDimension(OVERWORLD)),
+        SettingLocation.KEYBINDS);
+    public final BooleanSetting switchWaypointsToEndSetting = register(
+        BooleanSetting.create(
+            "Switch Waypoints to End",
+            "xaeroplus.keybind.switch_waypoints_to_end",
+            false,
+            true,
+            (b) -> WaypointAPI.switchWaypointDimension(END)),
         SettingLocation.KEYBINDS);
     public final BooleanSetting worldMapBaritoneGoalHereKeybindSetting = register(
         BooleanSetting.create(

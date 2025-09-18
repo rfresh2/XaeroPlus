@@ -103,6 +103,7 @@ public class Globals {
         }
     }
 
+
     public static void setNullOverworldDimFolderIfAble(final boolean b) {
         try {
             var currentWMSession = XaeroWorldMapCore.currentSession;

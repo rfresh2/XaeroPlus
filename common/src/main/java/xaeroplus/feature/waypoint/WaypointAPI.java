@@ -8,6 +8,7 @@ import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.waypoint.set.WaypointSet;
 import xaero.hud.minimap.world.MinimapWorld;
 import xaero.hud.path.XaeroPath;
+import xaeroplus.XaeroPlus;
 import xaeroplus.mixin.client.AccessorWaypointSet;
 
 import java.util.List;
@@ -29,13 +30,13 @@ public class WaypointAPI {
                 return world;
             }
         }
-        String waystoneDimensionDirectoryName = minimapSession.getDimensionHelper().getDimensionDirectoryName(dim);
-        String waystoneWpWorldNode = minimapSession.getWorldStateUpdater().getPotentialWorldNode(dim, true);
-        XaeroPath waystoneWpContainerPath = minimapSession.getWorldState()
+        String dimensionDirectoryName = minimapSession.getDimensionHelper().getDimensionDirectoryName(dim);
+        String worldNode = minimapSession.getWorldStateUpdater().getPotentialWorldNode(dim, true);
+        XaeroPath containerPath = minimapSession.getWorldState()
             .getAutoRootContainerPath()
-            .resolve(waystoneDimensionDirectoryName)
-            .resolve(waystoneWpWorldNode);
-        return minimapSession.getWorldManager().getWorld(waystoneWpContainerPath);
+            .resolve(dimensionDirectoryName)
+            .resolve(worldNode);
+        return minimapSession.getWorldManager().getWorld(containerPath);
     }
 
     public static WaypointSet getOrCreateWaypointSetInWorld(MinimapWorld minimapWorld, String setName) {
@@ -94,5 +95,29 @@ public class WaypointAPI {
         MinimapWorld currentWorld = minimapSession.getWorldManager().getCurrentWorld();
         if (currentWorld == null) return null;
         return currentWorld.getCurrentWaypointSet();
+    }
+
+    public static void switchWaypointDimension(final ResourceKey<Level> dimension) {
+        if (dimension == null) return;
+        try {
+            var minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
+            if (minimapSession == null) return;
+            var worldManager = minimapSession.getWorldManager();
+            if (worldManager == null) return;
+            var currentWorld = worldManager.getCurrentWorld();
+            if (currentWorld == null) return;
+            if (currentWorld.getDimId() == dimension) return;
+            var minimapWorld = getMinimapWorld(dimension);
+            if (minimapWorld == null) return;
+            if (minimapWorld.getFullPath() == null) return;
+            var autoWorld = worldManager.getAutoWorld();
+            if (autoWorld != null && autoWorld == minimapWorld) {
+                minimapSession.getWorldState().setCustomWorldPath(null);
+            } else {
+                minimapSession.getWorldState().setCustomWorldPath(minimapWorld.getFullPath());
+            }
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Failed switching waypoint dimension: {}", dimension, e);
+        }
     }
 }

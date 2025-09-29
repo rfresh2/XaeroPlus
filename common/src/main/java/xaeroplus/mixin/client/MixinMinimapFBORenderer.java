@@ -194,7 +194,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         int tileZ = mapZ & 3;
         int insideX = xFloored & 15;
         int insideZ = zFloored & 15;
-        FramebufferLinesShaderHelper.setFrameSize((float)this.scalingFramebuffer.viewWidth, (float)this.scalingFramebuffer.viewHeight);
+        FramebufferLinesShaderHelper.setFrameSize((float)this.scalingFramebuffer.width, (float)this.scalingFramebuffer.height);
         Globals.drawManager.drawMinimapFeatures(
             chunkX,
             chunkZ,
@@ -218,7 +218,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
                                             @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers
     ) {
         original.call(instance, renderer);
-        FramebufferLinesShaderHelper.setFrameSize((float)this.scalingFramebuffer.viewWidth, (float)this.scalingFramebuffer.viewHeight);
+        FramebufferLinesShaderHelper.setFrameSize((float)this.scalingFramebuffer.width, (float)this.scalingFramebuffer.height);
         int mapX = xFloored >> 4;
         int mapZ = zFloored >> 4;
         int chunkX = mapX >> 2;

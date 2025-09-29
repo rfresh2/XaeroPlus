@@ -48,7 +48,7 @@ on:
         type: string
 
 env:
-  MINECRAFT_VERSION: "1.21.8"
+  MINECRAFT_VERSION: "1.21.9"
 
 jobs:
   build:

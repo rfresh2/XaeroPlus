@@ -67,7 +67,7 @@ public class SpawnPoint extends Module {
     public void onRespawnPointSet(RespawnPointSetEvent event) {
         var con = mc.getConnection();
         if (con == null) return;
-        UUID activeUUID = con.getLocalGameProfile().getId();
+        UUID activeUUID = con.getLocalGameProfile().id();
         respawnPoints.put(activeUUID, new SpawnPosition(
             ChunkUtils.getActualDimension().location().toString(),
             event.pos().getX(), event.pos().getY(), event.pos().getZ()
@@ -99,7 +99,7 @@ public class SpawnPoint extends Module {
         if (currentWorld == null) return;
         var con = mc.getConnection();
         if (con == null) return;
-        var uuid = con.getLocalGameProfile().getId();
+        var uuid = con.getLocalGameProfile().id();
         var spawnPoint = respawnPoints.get(uuid);
         if (spawnPoint == null) {
             clearWpAndState();

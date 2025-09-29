@@ -58,7 +58,7 @@ public class OldChunks extends Module {
         Blocks.CRIMSON_NYLIUM,
         Blocks.WARPED_NYLIUM,
         Blocks.NETHER_GOLD_ORE,
-        Blocks.CHAIN
+        Blocks.IRON_CHAIN
     );
 
     public void setDiskCache(boolean disk) {

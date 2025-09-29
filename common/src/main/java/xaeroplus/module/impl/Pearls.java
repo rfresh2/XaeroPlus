@@ -65,7 +65,7 @@ public class Pearls extends Module {
         if (level == null) return;
         var con = mc.getConnection();
         if (con == null) return;
-        var selfUuid = con.getLocalGameProfile().getId();
+        var selfUuid = con.getLocalGameProfile().id();
         if (selfUuid == null) return;
         boolean updated = false;
         for (var entity : level.entitiesForRendering()) {
@@ -112,7 +112,7 @@ public class Pearls extends Module {
         if (level == null) return;
         var con = mc.getConnection();
         if (con == null) return;
-        var selfUuid = con.getLocalGameProfile().getId();
+        var selfUuid = con.getLocalGameProfile().id();
         if (selfUuid == null) return;
         var player = mc.player;
         if (player == null) return;
@@ -161,7 +161,7 @@ public class Pearls extends Module {
         if (currentWorld == null) return;
         var con = mc.getConnection();
         if (con == null) return;
-        var selfUuid = con.getLocalGameProfile().getId();
+        var selfUuid = con.getLocalGameProfile().id();
         if (selfUuid == null) return;
 
         clearAllPearlWaypoints();

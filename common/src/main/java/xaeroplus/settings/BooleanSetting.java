@@ -2,6 +2,7 @@ package xaeroplus.settings;
 
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.resources.ResourceLocation;
 import xaero.common.settings.ModOptions;
 import xaero.map.gui.CursorBox;
 import xaeroplus.XaeroPlus;
@@ -14,7 +15,7 @@ import java.util.function.Consumer;
 import static java.util.Objects.nonNull;
 
 public class BooleanSetting extends XaeroPlusSetting {
-
+    private static final KeyMapping.Category KEYBIND_CATEGORY = KeyMapping.Category.register(ResourceLocation.fromNamespaceAndPath("xaeroplus", "keybindings"));
     private boolean value;
     private BooleanConsumer settingChangeConsumer;
 
@@ -45,7 +46,7 @@ public class BooleanSetting extends XaeroPlusSetting {
             SETTING_PREFIX + settingName,
             settingNameTranslationKey,
             buildTooltipTranslationKey(settingNameTranslationKey),
-            keybind ? new KeyMapping(settingNameTranslationKey, -1, "XaeroPlus") : null,
+            keybind ? new KeyMapping(settingNameTranslationKey, -1, KEYBIND_CATEGORY) : null,
             defaultValue,
             null, null
         );
@@ -67,7 +68,7 @@ public class BooleanSetting extends XaeroPlusSetting {
             SETTING_PREFIX + settingName,
             settingNameTranslationKey,
             buildTooltipTranslationKey(settingNameTranslationKey),
-            keybind ? new KeyMapping(settingNameTranslationKey, -1, "XaeroPlus") : null,
+            keybind ? new KeyMapping(settingNameTranslationKey, -1, KEYBIND_CATEGORY) : null,
             defaultValue,
             settingChangeConsumer, null
         );
@@ -90,7 +91,7 @@ public class BooleanSetting extends XaeroPlusSetting {
             SETTING_PREFIX + settingName,
             settingNameTranslationKey,
             buildTooltipTranslationKey(settingNameTranslationKey),
-            keybind ? new KeyMapping(settingNameTranslationKey, -1, "XaeroPlus") : null,
+            keybind ? new KeyMapping(settingNameTranslationKey, -1, KEYBIND_CATEGORY) : null,
             defaultValue,
             null, visibilitySupplier
         );
@@ -115,7 +116,7 @@ public class BooleanSetting extends XaeroPlusSetting {
             SETTING_PREFIX + settingName,
             settingNameTranslationKey,
             buildTooltipTranslationKey(settingNameTranslationKey),
-            keybind ? new KeyMapping(settingNameTranslationKey, -1, "XaeroPlus") : null,
+            keybind ? new KeyMapping(settingNameTranslationKey, -1, KEYBIND_CATEGORY) : null,
             defaultValue,
             settingChangeConsumer, visibilitySupplier
         );

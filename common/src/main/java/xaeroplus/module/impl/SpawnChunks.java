@@ -40,8 +40,8 @@ public class SpawnChunks extends SpawnChunksBase {
         if (level == null) return ChunkUtils.chunkPosToLong(0, 0);
         ClientLevel.ClientLevelData levelData = level.getLevelData();
         if (levelData == null) return ChunkUtils.chunkPosToLong(0, 0);
-        int spawnBlockX = levelData.getSpawnPos().getX();
-        int spawnBlockZ = levelData.getSpawnPos().getZ();
+        int spawnBlockX = levelData.getRespawnData().pos().getX();
+        int spawnBlockZ = levelData.getRespawnData().pos().getZ();
         int spawnChunkX = ChunkUtils.posToChunkPos(spawnBlockX);
         int spawnChunkZ = ChunkUtils.posToChunkPos(spawnBlockZ);
         return ChunkUtils.chunkPosToLong(spawnChunkX, spawnChunkZ);

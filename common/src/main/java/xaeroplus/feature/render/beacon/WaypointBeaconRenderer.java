@@ -14,9 +14,9 @@ import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.settings.ModSettings;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.waypoint.WaypointPurpose;
 import xaero.hud.minimap.waypoint.WaypointVisibilityType;
 import xaeroplus.XaeroPlus;
-import xaero.hud.minimap.waypoint.WaypointPurpose;
 import xaeroplus.settings.Settings;
 
 import java.util.ArrayList;
@@ -75,8 +75,8 @@ public class WaypointBeaconRenderer {
         }
         var dimDiv = session.getDimensionHelper().getDimensionDivision(currentWorld);
         var mc = Minecraft.getInstance();
-        if (mc.level == null || mc.cameraEntity == null) return;
-        var cameraPos = mc.cameraEntity.position();
+        if (mc.level == null || mc.getCameraEntity() == null) return;
+        var cameraPos = mc.getCameraEntity().position();
         double distanceScale = settings.dimensionScaledMaxWaypointDistance ? mc.level.dimensionType().coordinateScale() : 1.0;
         double waypointsDistance = settings.getMaxWaypointsDistance();
         double waypointsDistanceMin = settings.waypointsDistanceMin;
@@ -108,8 +108,8 @@ public class WaypointBeaconRenderer {
 
     public void renderWaypointBeacon(final Waypoint waypoint, final double dimDiv, float tickDelta, PoseStack matrixStack) {
         final Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null || mc.cameraEntity == null) return;
-        final Vec3 playerVec = mc.cameraEntity.position();
+        if (mc.level == null || mc.getCameraEntity() == null) return;
+        final Vec3 playerVec = mc.getCameraEntity().position();
         Vec3 waypointVec = new Vec3(waypoint.getX(dimDiv), playerVec.y, waypoint.getZ(dimDiv));
         final double xzDistance = playerVec.distanceTo(waypointVec);
         if (xzDistance < Settings.REGISTRY.waypointBeaconDistanceMin.getAsInt()) return;
@@ -121,7 +121,7 @@ public class WaypointBeaconRenderer {
         }
         final EntityRenderDispatcher entityRenderDispatcher = mc.getEntityRenderDispatcher();
         final Camera camera = entityRenderDispatcher.camera;
-        final Frustum frustum = mc.levelRenderer.cullingFrustum;
+        final Frustum frustum = mc.levelRenderer.getCapturedFrustum();
         if (camera == null || frustum == null) return;
         final double viewX = camera.getPosition().x();
         final double viewZ = camera.getPosition().z();

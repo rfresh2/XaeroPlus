@@ -1,12 +1,12 @@
-name: 1.21.8 Build
+name: 1.21.9 Build
 
 on:
   pull_request:
   push:
     branches:
-      - "1.21.8"
+      - "1.21.9"
 env:
-  MINECRAFT_VERSION: "1.21.8"
+  MINECRAFT_VERSION: "1.21.9"
 
 jobs:
   build:
@@ -148,7 +148,7 @@ jobs:
 
       - name: Bootstrap Test Mod
         run: |
-          wget https://cdn.2b2t.vc/mc-runtime-test-1.21.8-3.1.1-fabric-release.jar -P run/mods
+          wget https://cdn.2b2t.vc/mc-runtime-test-1.21.9-3.1.1-fabric-release.jar -P run/mods
 
       - name: Fabric Test
         uses: headlesshq/mc-runtime-test@3.1.1
@@ -192,7 +192,7 @@ jobs:
 
       - name: Bootstrap Test Mod
         run: |
-          wget https://cdn.2b2t.vc/mc-runtime-test-1.21.8-3.1.1-lexforge-release.jar -P run/mods
+          wget https://cdn.2b2t.vc/mc-runtime-test-1.21.9-3.1.1-lexforge-release.jar -P run/mods
 
       - name: Forge Test
         uses: headlesshq/mc-runtime-test@3.1.1
@@ -235,7 +235,7 @@ jobs:
 
       - name: Bootstrap Test Mod
         run: |
-          wget https://cdn.2b2t.vc/mc-runtime-test-1.21.8-3.1.1-neoforge-release.jar -P run/mods
+          wget https://cdn.2b2t.vc/mc-runtime-test-1.21.9-3.1.1-neoforge-release.jar -P run/mods
 
       - name: Neo Test
         uses: headlesshq/mc-runtime-test@3.1.1

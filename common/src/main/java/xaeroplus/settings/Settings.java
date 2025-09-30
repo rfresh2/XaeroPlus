@@ -937,14 +937,16 @@ public final class Settings extends SettingRegistry {
             "Minimap FPS Limiter",
             "xaeroplus.setting.fps_limiter",
             false,
-            (b) -> ModuleManager.getModule(FpsLimiter.class).setEnabled(b)),
+            (b) -> ModuleManager.getModule(FpsLimiter.class).setEnabled(b),
+            () -> false),
         SettingLocation.MINIMAP_MAIN);
     public final DoubleSetting minimapFpsLimit = register(
         DoubleSetting.create(
             "Minimap FPS Limit",
             "xaeroplus.setting.fps_limiter_limit",
             5, 120, 5,
-            60),
+            60,
+            () -> false),
         SettingLocation.MINIMAP_MAIN);
 
     /**

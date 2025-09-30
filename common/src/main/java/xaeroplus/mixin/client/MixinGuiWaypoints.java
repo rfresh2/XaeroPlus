@@ -4,6 +4,9 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
@@ -73,12 +76,12 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         this.addRenderableWidget(toggleAllButton);
     }
 
-    @Inject(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lxaero/common/gui/ScreenBase;mouseClicked(DDI)Z", shift = At.Shift.AFTER), remap = true)
-    public void mouseClickedInject(final double x, final double y, final int button, final CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lxaero/common/gui/ScreenBase;mouseClicked(Lnet/minecraft/client/input/MouseButtonEvent;Z)Z", shift = At.Shift.AFTER), remap = true)
+    public void mouseClickedInject(final MouseButtonEvent event, final boolean doubleClick, final CallbackInfoReturnable<Boolean> cir) {
         if (!Settings.REGISTRY.waypointsListUIAdditions.get()) return;
         boolean dropDownClosed = this.openDropdown == null;
         if (dropDownClosed) {
-            if (this.searchField.mouseClicked(x, y, button)) {
+            if (this.searchField.mouseClicked(event, doubleClick)) {
                 this.searchField.setFocused(true);
                 this.searchField.moveCursorToEnd(false);
                 this.searchField.setEditable(true);
@@ -88,8 +91,8 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         }
     }
 
-    @Inject(method = "keyPressed", at = @At(value = "INVOKE", target = "Lxaero/common/gui/ScreenBase;keyPressed(III)Z", shift = At.Shift.AFTER), remap = true, cancellable = true)
-    public void keyTypedInject(final int keycode, final int scanCode, final int modifiers, final CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "keyPressed", at = @At(value = "INVOKE", target = "Lxaero/common/gui/ScreenBase;keyPressed(Lnet/minecraft/client/input/KeyEvent;)Z", shift = At.Shift.AFTER), remap = true, cancellable = true)
+    public void keyTypedInject(final KeyEvent event, final CallbackInfoReturnable<Boolean> cir) {
         if (!Settings.REGISTRY.waypointsListUIAdditions.get()) return;
         if (searchField.isFocused()) {
             updateSearch();
@@ -98,8 +101,8 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
     }
 
     @Override
-    public boolean charTyped(char c, int i) {
-        boolean result = super.charTyped(c, i);
+    public boolean charTyped(CharacterEvent event) {
+        boolean result = super.charTyped(event);
         if (!Settings.REGISTRY.waypointsListUIAdditions.get()) return result;
         updateSearch();
         return result;

@@ -74,6 +74,6 @@ public class IncompatibleMinimapWarningScreen extends Screen {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         guiGraphics.drawCenteredString(this.font, titleComponent, this.width / 2, 50, ColorHelper.getColor(255, 255, 255, 255));
         int i = this.width / 2 - this.message.getWidth() / 2;
-        this.message.renderLeftAligned(guiGraphics, i, 75, 18, ColorHelper.getColor(255, 255, 255, 255));
+        this.message.render(guiGraphics, MultiLineLabel.Align.LEFT, i, 75, 18, true, ColorHelper.getColor(255, 255, 255, 255));
     }
 }

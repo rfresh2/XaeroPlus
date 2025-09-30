@@ -3,11 +3,11 @@ package xaeroplus.feature.render.beacon;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.blockentity.BeaconRenderer;
-import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.world.phys.AABB;
+import net.minecraft.client.renderer.state.LevelRenderState;
 import net.minecraft.world.phys.Vec3;
 import xaero.common.HudMod;
 import xaero.common.minimap.waypoints.Waypoint;
@@ -30,7 +30,8 @@ public class WaypointBeaconRenderer {
     private long lastWaypointRenderListUpdate = -1L;
 
     private int errorCount = 0;
-    public void renderHook(final PoseStack matrix, final float tickDelta) {
+
+    public void renderHook(final PoseStack poseStack, final LevelRenderState levelRenderState, final SubmitNodeStorage submitNodeStorage) {
         if (!Settings.REGISTRY.waypointBeacons.get()) return;
         var hudMod = HudMod.INSTANCE;
         if (hudMod == null) return;
@@ -41,27 +42,13 @@ public class WaypointBeaconRenderer {
         MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
         if (minimapSession == null) return;
         try {
-            WaypointBeaconRenderer.INSTANCE.renderWaypointBeacons(tickDelta, matrix);
+            WaypointBeaconRenderer.INSTANCE.renderWaypointBeacons(poseStack, levelRenderState, submitNodeStorage);
         } catch (final Exception e) {
             if (errorCount++ < 2) XaeroPlus.LOGGER.error("Error rendering waypoints", e);
         }
     }
 
-    public void updateWaypointRenderList(final MinimapSession session, final ModSettings settings) {
-        waypointList.clear();
-        session.getWaypointSession().getCollector().collect(waypointList);
-        waypointList.removeIf(w -> {
-            if (w.isDisabled()
-                || w.getVisibility() == WaypointVisibilityType.WORLD_MAP_LOCAL
-                || w.getVisibility() == WaypointVisibilityType.WORLD_MAP_GLOBAL) {
-                return true;
-            }
-            return !settings.getDeathpoints() && w.getPurpose().isDeath();
-        });
-        waypointList.sort(Waypoint::compareTo);
-    }
-
-    public void renderWaypointBeacons(float tickDelta, PoseStack matrixStack) {
+    private void renderWaypointBeacons(final PoseStack matrixStack, final LevelRenderState levelRenderState, final SubmitNodeStorage submitNodeStorage) {
         var session = BuiltInHudModules.MINIMAP.getCurrentSession();
         if (session == null) return;
         var settings = HudMod.INSTANCE.getSettings();
@@ -96,17 +83,31 @@ public class WaypointBeaconRenderer {
             }
             var shouldRender = w.isDestination()
                 || (w.getPurpose().isDeath()
-                    || w.isGlobal()
-                    || w.isTemporary() && settings.temporaryWaypointsGlobal
-                    || waypointsDistance == 0.0
-                    || !(distance2D > waypointsDistance)
+                || w.isGlobal()
+                || w.isTemporary() && settings.temporaryWaypointsGlobal
+                || waypointsDistance == 0.0
+                || !(distance2D > waypointsDistance)
             ) && (waypointsDistanceMin == 0.0 || !(unscaledDistance2D < waypointsDistanceMin));;
             if (shouldRender)
-                renderWaypointBeacon(w, dimDiv, tickDelta, matrixStack);
+                renderWaypointBeacon(w, dimDiv, matrixStack, levelRenderState, submitNodeStorage);
         }
     }
 
-    public void renderWaypointBeacon(final Waypoint waypoint, final double dimDiv, float tickDelta, PoseStack matrixStack) {
+    public void updateWaypointRenderList(final MinimapSession session, final ModSettings settings) {
+        waypointList.clear();
+        session.getWaypointSession().getCollector().collect(waypointList);
+        waypointList.removeIf(w -> {
+            if (w.isDisabled()
+                || w.getVisibility() == WaypointVisibilityType.WORLD_MAP_LOCAL
+                || w.getVisibility() == WaypointVisibilityType.WORLD_MAP_GLOBAL) {
+                return true;
+            }
+            return !settings.getDeathpoints() && w.getPurpose().isDeath();
+        });
+        waypointList.sort(Waypoint::compareTo);
+    }
+
+    public void renderWaypointBeacon(final Waypoint waypoint, final double dimDiv, PoseStack matrixStack, LevelRenderState levelRenderState, SubmitNodeCollector submitNodeCollector) {
         final Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.getCameraEntity() == null) return;
         final Vec3 playerVec = mc.getCameraEntity().position();
@@ -121,21 +122,23 @@ public class WaypointBeaconRenderer {
         }
         final EntityRenderDispatcher entityRenderDispatcher = mc.getEntityRenderDispatcher();
         final Camera camera = entityRenderDispatcher.camera;
-        final Frustum frustum = mc.levelRenderer.getCapturedFrustum();
-        if (camera == null || frustum == null) return;
+        // todo: fix
+//        final Frustum frustum = mc.levelRenderer.getCapturedFrustum();
+        if (camera == null
+//            || frustum == null
+        ) return;
         final double viewX = camera.getPosition().x();
         final double viewZ = camera.getPosition().z();
         final double x = waypointVec.x - viewX;
         final double z = waypointVec.z - viewZ;
         final double y = -100;
-        if (!frustum.isVisible(new AABB(waypointVec.x-1, -100, waypointVec.z-1, waypointVec.x+1, 500, waypointVec.z+1))) return;
+//        if (!frustum.isVisible(new AABB(waypointVec.x-1, -100, waypointVec.z-1, waypointVec.x+1, 500, waypointVec.z+1))) return;
         final int color = waypoint.getWaypointColor().getHex();
-        final MultiBufferSource.BufferSource entityVertexConsumers = mc.renderBuffers().bufferSource();
         final long time = mc.level.getGameTime();
         matrixStack.pushPose();
         matrixStack.translate(x, y, z);
-        BeaconRenderer.renderBeaconBeam(
-            matrixStack, entityVertexConsumers, BEAM_LOCATION, tickDelta, 1.0f, time, 0, 355,
+        BeaconRenderer.submitBeaconBeam(
+            matrixStack, submitNodeCollector, BEAM_LOCATION, 1.0f, 1.0f, 0, 355,
             color, 0.2f, 0.25f);
         matrixStack.popPose();
     }

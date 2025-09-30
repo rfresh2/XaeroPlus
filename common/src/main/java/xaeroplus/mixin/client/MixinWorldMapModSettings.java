@@ -1,11 +1,13 @@
 package xaeroplus.mixin.client;
 
+import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import xaero.map.gui.GuiSettings;
 import xaero.map.settings.ModOptions;
 import xaero.map.settings.ModSettings;
 import xaeroplus.settings.SettingHooks;
@@ -36,6 +38,13 @@ public class MixinWorldMapModSettings {
     @Inject(method = "setOptionValue", at = @At("HEAD"))
     public void setOptionValue(ModOptions o, Object value, final CallbackInfo ci) {
         SettingHooks.setOptionValue(o.getEnumString(), value);
+    }
+
+    @Inject(method = "setOptionValue", at = @At("RETURN"))
+    public void setOptionValueReturn(CallbackInfo ci) {
+        if (Minecraft.getInstance().screen instanceof GuiSettings) {
+            Minecraft.getInstance().setScreen(Minecraft.getInstance().screen);
+        }
     }
 
     @Inject(method = "getOptionValue", at = @At("HEAD"), cancellable = true)

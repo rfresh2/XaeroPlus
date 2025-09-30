@@ -114,6 +114,17 @@ public class DrawOrderScreen extends Screen {
             }
         }
 
+        public DrawFeatureEntry getEntry(int index) {
+            if (index < 0 || index >= children().size()) {
+                return null;
+            }
+            return children().get(index);
+        }
+
+        public DrawFeatureEntry getFirstElement() {
+            return getEntry(0);
+        }
+
         @Override
         public boolean isFocused() {
             return drawOrderScreen.getFocused() == this;
@@ -220,36 +231,32 @@ public class DrawOrderScreen extends Screen {
             return Component.empty();
         }
 
+
         @Override
-        public void render(final GuiGraphics guiGraphics, final int index, final int y, final int x, final int width, final int height, final int mouseX, final int mouseY, final boolean hovering, final float partialTick) {
-            lastRenderX = x;
-            lastRenderY = y;
+        public void renderContent(GuiGraphics guiGraphics, int mouseX, int mouseY, boolean isMouseOver, float partialTicks) {
+            if (drawFeatureList.getSelected() != this) {
+                // todo: fix
+//                guiGraphics.fill(getContentX() - 2, getContentHeight(), getContentRight(), getContentBottom(), ColorHelper.getColor(0, 0, 0, 150));
+                guiGraphics.submitOutline(getContentX() - 2, getContentY(), getContentWidth(), getContentHeight(), ColorHelper.getColor(68, 68, 68, 255));
+            }
+            lastRenderX = getX();
+            lastRenderY = getY();
             lastMouseX = mouseX;
             lastMouseY = mouseY;
             if (!drawFeatureList.dragging || drawFeatureList.dragged != index) {
-                renderEntryText(guiGraphics, x, y);
+                renderEntryText(guiGraphics, getX(), getY() + 2);
             }
         }
 
         @Override
-        public void renderBack(
-            GuiGraphics guiGraphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean isMouseOver, float partialTick
-        ) {
-            if (drawFeatureList.getSelected() != this) {
-                guiGraphics.fill(left - 2, top, left - 2 + width, top + height, ColorHelper.getColor(0, 0, 0, 150));
-                guiGraphics.renderOutline(left - 2, top, width, height, ColorHelper.getColor(68, 68, 68, 255));
-            }
-        }
-
-        @Override
-        public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+        public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+            if (event.button() == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
                 drawFeatureList.dragging = false;
                 drawFeatureList.dragged = index;
-                drawFeatureList.draggedOffsetX = (int) (lastRenderX - mouseX);
-                drawFeatureList.draggedOffsetY = (int) (lastRenderY - mouseY);
-                drawFeatureList.dragStartX = (int) mouseX;
-                drawFeatureList.dragStartY = (int) mouseY;
+                drawFeatureList.draggedOffsetX = (int) (lastRenderX - event.x());
+                drawFeatureList.draggedOffsetY = (int) (lastRenderY - event.y());
+                drawFeatureList.dragStartX = (int) event.x();
+                drawFeatureList.dragStartY = (int) event.y();
                 if (drawFeatureList.getSelected() != this) {
                     return true;
                 }
@@ -257,7 +264,7 @@ public class DrawOrderScreen extends Screen {
             } else {
                 drawFeatureList.setFocused(null);
             }
-            return super.mouseClicked(mouseX, mouseY, button);
+            return super.mouseClicked(event, doubleClick);
         }
 
         @Override
@@ -268,10 +275,10 @@ public class DrawOrderScreen extends Screen {
         }
 
         @Override
-        public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-            lastMouseX = (int) mouseX;
-            lastMouseY = (int) mouseY;
-            return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+        public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
+            lastMouseX = (int) event.x();
+            lastMouseY = (int) event.y();
+            return super.mouseDragged(event, dragX, dragY);
         }
     }
 }

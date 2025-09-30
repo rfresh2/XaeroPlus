@@ -20,6 +20,8 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
@@ -689,14 +691,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     }
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true, remap = true)
-    public void cancelClicksWhileDrawing(final double par1, final double par2, final int par3, final CallbackInfoReturnable<Boolean> cir) {
+    public void cancelClicksWhileDrawing(final MouseButtonEvent event, final boolean doubleClick, final CallbackInfoReturnable<Boolean> cir) {
         if (!drawing) return;
-        boolean toReturn = super.mouseClicked(par1, par2, par3);
+        boolean toReturn = super.mouseClicked(event, doubleClick);
         if (toReturn) {
             cir.setReturnValue(true);
             return;
         }
-        if (par3 == 0) { // start drawing on left click
+        if (event.button() == 0) { // start drawing on left click
             drawingLeftClickDown = true;
             switch (drawingMode) {
                 case LINE_SEGMENT, INFINITE_LINE, TEXT, MEASUREMENT -> {
@@ -707,8 +709,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             }
             if (drawingMode == DrawingMode.TEXT && !drawTextEntryActive) {
                 drawTextEntryActive = true;
-                drawTextEntryField.setX(Mth.clamp((int) par1 - (drawTextEntryField.getWidth() / 2), 5, width - drawTextEntryField.getWidth() - 5));
-                drawTextEntryField.setY(Mth.clamp((int) par2 - (drawTextEntryField.getHeight() / 2), 5, height - drawTextEntryField.getHeight() - 5));
+                drawTextEntryField.setX(Mth.clamp((int) event.x() - (drawTextEntryField.getWidth() / 2), 5, width - drawTextEntryField.getWidth() - 5));
+                drawTextEntryField.setY(Mth.clamp((int) event.y() - (drawTextEntryField.getHeight() / 2), 5, height - drawTextEntryField.getHeight() - 5));
                 addWidget(drawTextEntryField);
                 drawTextEntryField.setVisible(true);
                 drawTextEntryField.setCursorPosition(0);
@@ -716,21 +718,21 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 setFocused(drawTextEntryField);
             }
             cir.setReturnValue(true);
-        } else if (par3 == 1) {
+        } else if (event.button() == 1) {
             drawingRightClickDown = true;
             cir.setReturnValue(true);
         }
     }
 
     @Inject(method = "mouseReleased", at = @At("HEAD"), cancellable = true, remap = true)
-    public void drawingClickReleasedHandler(final double par1, final double par2, final int par3, final CallbackInfoReturnable<Boolean> cir) {
+    public void drawingClickReleasedHandler(final MouseButtonEvent event, final CallbackInfoReturnable<Boolean> cir) {
         if (!drawing) return;
-        boolean toReturn = super.mouseReleased(par1, par2, par3);
+        boolean toReturn = super.mouseReleased(event);
         if (toReturn) {
             cir.setReturnValue(true);
             return;
         }
-        if (par3 == 0) { // start drawing on left click
+        if (event.button() == 0) { // start drawing on left click
             switch (drawingMode) {
                 case LINE_SEGMENT, INFINITE_LINE -> {
                     if (drawInProgressPos != null) {
@@ -748,7 +750,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             }
             drawingLeftClickDown = false;
             cir.setReturnValue(true);
-        } else if (par3 == 1) { // clear drawing on right click
+        } else if (event.button() == 1) { // clear drawing on right click
             drawingRightClickDown = false;
             if (drawInProgressPos != null) return;
             ModuleManager.getModule(Drawing.class).removeLine(mouseBlockPosX, mouseBlockPosZ);
@@ -865,18 +867,18 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     }
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true, remap = true)
-    public void onInputPress(final int code, final int scanCode, final int modifiers, final CallbackInfoReturnable<Boolean> cir) {
-        if (code == GLFW_KEY_F1) {
+    public void onInputPress(final KeyEvent event, final CallbackInfoReturnable<Boolean> cir) {
+        if (event.key() == GLFW_KEY_F1) {
             Minecraft.getInstance().options.hideGui = !Minecraft.getInstance().options.hideGui;
             cir.setReturnValue(true);
             return;
         }
         if ((xTextEntryField.isVisible() && zTextEntryField.isVisible()) && (xTextEntryField.isFocused() || zTextEntryField.isFocused())) {
-            if (code == GLFW_KEY_ENTER) {
+            if (event.key() == GLFW_KEY_ENTER) {
                 onGotoCoordinatesButton(null);
                 cir.setReturnValue(true);
                 return;
-            } else if (code == GLFW_KEY_TAB) {
+            } else if (event.key() == GLFW_KEY_TAB) {
                 if (xTextEntryField.isFocused()) {
                     setFocused(zTextEntryField);
                 } else if (zTextEntryField.isFocused()) {
@@ -884,7 +886,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 }
                 cir.setReturnValue(true);
                 return;
-            } else if (Screen.isPaste(code) && xTextEntryField.isFocused()) {
+            } else if (event.isPaste() && xTextEntryField.isFocused()) {
                 var pasteText = Minecraft.getInstance().keyboardHandler.getClipboard().trim();
                 var xyzSpaces = Pattern.compile("(-?\\d+)\\s(-?\\d+)\\s(-?\\d+)").matcher(pasteText);
                 if (xyzSpaces.matches()) {
@@ -925,18 +927,18 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             }
         }
         if (BaritoneHelper.isBaritonePresent()) {
-            if (Settings.REGISTRY.worldMapBaritoneGoalHereKeybindSetting.getKeyBinding().matches(code, scanCode)) {
+            if (Settings.REGISTRY.worldMapBaritoneGoalHereKeybindSetting.getKeyBinding().matches(event)) {
                 BaritoneExecutor.goal(mouseBlockPosX, mouseBlockPosZ);
                 cir.setReturnValue(true);
-            } else if (Settings.REGISTRY.worldMapBaritonePathHereKeybindSetting.getKeyBinding().matches(code, scanCode)) {
+            } else if (Settings.REGISTRY.worldMapBaritonePathHereKeybindSetting.getKeyBinding().matches(event)) {
                 BaritoneExecutor.path(mouseBlockPosX, mouseBlockPosZ);
                 cir.setReturnValue(true);
-            } else if (BaritoneHelper.isBaritoneElytraPresent() && Settings.REGISTRY.worldMapBaritoneElytraHereKeybindSetting.getKeyBinding().matches(code, scanCode)) {
+            } else if (BaritoneHelper.isBaritoneElytraPresent() && Settings.REGISTRY.worldMapBaritoneElytraHereKeybindSetting.getKeyBinding().matches(event)) {
                 BaritoneExecutor.elytra(mouseBlockPosX, mouseBlockPosZ);
                 cir.setReturnValue(true);
             }
         }
-        if (Settings.REGISTRY.worldMapToggleDrawingKeybindSetting.getKeyBinding().matches(code, scanCode)) {
+        if (Settings.REGISTRY.worldMapToggleDrawingKeybindSetting.getKeyBinding().matches(event)) {
             onToggleDrawingButton();
             cir.setReturnValue(true);
             return;

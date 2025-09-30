@@ -36,19 +36,19 @@ jobs:
     - name: Get Minimap Version Fabric
       run: echo "MINIMAP_VERSION_FABRIC=$(./gradlew -q printMinimapVersionFabric)" >> $GITHUB_ENV
 
-    - name: Get WorldMap Version Forge
-      run: echo "WORLDMAP_VERSION_FORGE=$(./gradlew -q printWorldMapVersionForge)" >> $GITHUB_ENV
-
-    - name: Get Minimap Version Forge
-      run: echo "MINIMAP_VERSION_FORGE=$(./gradlew -q printMinimapVersionForge)" >> $GITHUB_ENV
-
-    - name: Get WorldMap Version NeoForge
-      run: |
-        echo "WORLDMAP_VERSION_NEO=$(./gradlew -q printWorldMapVersionNeo)" >> $GITHUB_ENV
-
-    - name: Get Minimap Version NeoForge
-      run: |
-        echo "MINIMAP_VERSION_NEO=$(./gradlew -q printMinimapVersionNeo)" >> $GITHUB_ENV
+#    - name: Get WorldMap Version Forge
+#      run: echo "WORLDMAP_VERSION_FORGE=$(./gradlew -q printWorldMapVersionForge)" >> $GITHUB_ENV
+#
+#    - name: Get Minimap Version Forge
+#      run: echo "MINIMAP_VERSION_FORGE=$(./gradlew -q printMinimapVersionForge)" >> $GITHUB_ENV
+#
+#    - name: Get WorldMap Version NeoForge
+#      run: |
+#        echo "WORLDMAP_VERSION_NEO=$(./gradlew -q printWorldMapVersionNeo)" >> $GITHUB_ENV
+#
+#    - name: Get Minimap Version NeoForge
+#      run: |
+#        echo "MINIMAP_VERSION_NEO=$(./gradlew -q printMinimapVersionNeo)" >> $GITHUB_ENV
 
     - name: Get XaeroPlus Version
       run: echo "XP_VERSION=$(./gradlew -q printXaeroPlusVersion)" >> $GITHUB_ENV
@@ -56,12 +56,12 @@ jobs:
     - name: Get Fabric Jar Filename
       run: echo "XP_FABRIC=XaeroPlus-${{ env.XP_VERSION }}+fabric-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FABRIC }}-MM${{ env.MINIMAP_VERSION_FABRIC }}" >> $GITHUB_ENV
 
-    - name: Get Forge Jar Filename
-      run: echo "XP_FORGE=XaeroPlus-${{ env.XP_VERSION }}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
-
-    - name: Get Neo Jar Filename
-      run: |
-        echo "XP_NEO=XaeroPlus-${{ env.XP_VERSION}}+neoforge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_NEO }}-MM${{ env.MINIMAP_VERSION_NEO }}" >> $GITHUB_ENV
+#    - name: Get Forge Jar Filename
+#      run: echo "XP_FORGE=XaeroPlus-${{ env.XP_VERSION }}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
+#
+#    - name: Get Neo Jar Filename
+#      run: |
+#        echo "XP_NEO=XaeroPlus-${{ env.XP_VERSION}}+neoforge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_NEO }}-MM${{ env.MINIMAP_VERSION_NEO }}" >> $GITHUB_ENV
 
     - name: Get Commit Hash
       run: echo "COMMIT_HASH=$(git rev-parse --short=8 HEAD)" >> $GITHUB_ENV
@@ -72,17 +72,17 @@ jobs:
     - name: Append Commit Hash To Fabric Jar Name
       run: mv fabric/build/libs/${{ env.XP_FABRIC }}.jar fabric/build/libs/${{ env.XP_FABRIC_OUT }}.jar
 
-    - name: Get Forge Jar Result Filename
-      run: echo "XP_FORGE_OUT=XaeroPlus-${{ env.XP_VERSION }}-DEV-${{ env.COMMIT_HASH }}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
-
-    - name: Append Commit Hash To Forge Jar Name
-      run: mv forge/build/libs/${{ env.XP_FORGE }}.jar forge/build/libs/${{ env.XP_FORGE_OUT }}.jar
-
-    - name: Get NeoForge Jar Result Filename
-      run: echo "XP_NEO_OUT=XaeroPlus-${{ env.XP_VERSION }}-DEV-${{ env.COMMIT_HASH }}+neoforge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_NEO }}-MM${{ env.MINIMAP_VERSION_NEO }}" >> $GITHUB_ENV
-
-    - name: Append Commit Hash To NeoForge Jar Name
-      run: mv neo/build/libs/${{ env.XP_NEO }}.jar neo/build/libs/${{ env.XP_NEO_OUT }}.jar
+#    - name: Get Forge Jar Result Filename
+#      run: echo "XP_FORGE_OUT=XaeroPlus-${{ env.XP_VERSION }}-DEV-${{ env.COMMIT_HASH }}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
+#
+#    - name: Append Commit Hash To Forge Jar Name
+#      run: mv forge/build/libs/${{ env.XP_FORGE }}.jar forge/build/libs/${{ env.XP_FORGE_OUT }}.jar
+#
+#    - name: Get NeoForge Jar Result Filename
+#      run: echo "XP_NEO_OUT=XaeroPlus-${{ env.XP_VERSION }}-DEV-${{ env.COMMIT_HASH }}+neoforge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_NEO }}-MM${{ env.MINIMAP_VERSION_NEO }}" >> $GITHUB_ENV
+#
+#    - name: Append Commit Hash To NeoForge Jar Name
+#      run: mv neo/build/libs/${{ env.XP_NEO }}.jar neo/build/libs/${{ env.XP_NEO_OUT }}.jar
 
     - name: Upload Fabric Artifact
       uses: actions/upload-artifact@v4
@@ -91,33 +91,33 @@ jobs:
         path: fabric/build/libs/${{ env.XP_FABRIC_OUT }}.jar
         if-no-files-found: error
 
-    - name: Upload Forge Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ env.XP_FORGE_OUT }}
-        path: forge/build/libs/${{ env.XP_FORGE_OUT }}.jar
-        if-no-files-found: error
-
-    - name: Upload NeoForge Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ env.XP_NEO_OUT }}
-        path: neo/build/libs/${{ env.XP_NEO_OUT }}.jar
-        if-no-files-found: error
+#    - name: Upload Forge Artifact
+#      uses: actions/upload-artifact@v4
+#      with:
+#        name: ${{ env.XP_FORGE_OUT }}
+#        path: forge/build/libs/${{ env.XP_FORGE_OUT }}.jar
+#        if-no-files-found: error
+#
+#    - name: Upload NeoForge Artifact
+#      uses: actions/upload-artifact@v4
+#      with:
+#        name: ${{ env.XP_NEO_OUT }}
+#        path: neo/build/libs/${{ env.XP_NEO_OUT }}.jar
+#        if-no-files-found: error
 
 #    - name: test fabric
 #      run: ./gradlew fabric:runProdTest
 
     outputs:
       worldmap_version_fabric: ${{ env.WORLDMAP_VERSION_FABRIC }}
-      worldmap_version_forge: ${{ env.WORLDMAP_VERSION_FORGE }}
-      worldmap_version_neo: ${{ env.WORLDMAP_VERSION_NEO }}
+#      worldmap_version_forge: ${{ env.WORLDMAP_VERSION_FORGE }}
+#      worldmap_version_neo: ${{ env.WORLDMAP_VERSION_NEO }}
       minimap_version_fabric: ${{ env.MINIMAP_VERSION_FABRIC }}
-      minimap_version_forge: ${{ env.MINIMAP_VERSION_FORGE }}
-      minimap_version_neo: ${{ env.MINIMAP_VERSION_NEO }}
+#      minimap_version_forge: ${{ env.MINIMAP_VERSION_FORGE }}
+#      minimap_version_neo: ${{ env.MINIMAP_VERSION_NEO }}
       xp_fabric: ${{ env.XP_FABRIC_OUT }}
-      xp_forge: ${{ env.XP_FORGE_OUT }}
-      xp_neo: ${{ env.XP_NEO_OUT }}
+#      xp_forge: ${{ env.XP_FORGE_OUT }}
+#      xp_neo: ${{ env.XP_NEO_OUT }}
 
 
   test-fabric:
@@ -164,88 +164,88 @@ jobs:
           headlessmc-command: --jvm -Djava.awt.headless=true
           cache-mc: true
 
-  test-forge:
-    runs-on: ubuntu-latest
-    needs:
-      - build
-    steps:
-      - name: Set up JDK 21
-        uses: actions/setup-java@v5
-        with:
-          java-version: '21'
-          distribution: 'temurin'
+#  test-forge:
+#    runs-on: ubuntu-latest
+#    needs:
+#      - build
+#    steps:
+#      - name: Set up JDK 21
+#        uses: actions/setup-java@v5
+#        with:
+#          java-version: '21'
+#          distribution: 'temurin'
+#
+#      - name: Download job artifacts
+#        uses: actions/download-artifact@v5
+#        with:
+#          merge-multiple: true
+#          path: artifacts/
+#
+#      - name: Set CI Test Env Var
+#        run: echo "XP_CI_TEST=true" >> $GITHUB_ENV
+#
+#      - name: Setup Forge Test
+#        run: |
+#          mkdir -p run/mods && cp artifacts/${{ needs.build.outputs.xp_forge }}.jar run/mods \
+#          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ needs.build.outputs.minimap_version_forge }}_Forge_${{ env.MINECRAFT_VERSION }}/xaeros-minimap-${{ needs.build.outputs.minimap_version_forge }}_Forge_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/ \
+#          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ needs.build.outputs.worldmap_version_forge }}_Forge_${{ env.MINECRAFT_VERSION }}/xaeros-world-map-${{ needs.build.outputs.worldmap_version_forge }}_Forge_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/
+#
+#      - name: Bootstrap Test Mod
+#        run: |
+#          wget https://cdn.2b2t.vc/mc-runtime-test-1.21.9-3.1.1-lexforge-release.jar -P run/mods
+#
+#      - name: Forge Test
+#        uses: headlesshq/mc-runtime-test@3.1.1
+#        with:
+#          mc: ${{ env.MINECRAFT_VERSION }}
+#          modloader: forge
+#          regex: .*forge.*
+##        mc-runtime-test: lexforge
+#          mc-runtime-test: none
+#          java: 21
+#          xvfb: true
+#          headlessmc-command: --jvm -Djava.awt.headless=true
+#          cache-mc: true
 
-      - name: Download job artifacts
-        uses: actions/download-artifact@v5
-        with:
-          merge-multiple: true
-          path: artifacts/
-
-      - name: Set CI Test Env Var
-        run: echo "XP_CI_TEST=true" >> $GITHUB_ENV
-
-      - name: Setup Forge Test
-        run: |
-          mkdir -p run/mods && cp artifacts/${{ needs.build.outputs.xp_forge }}.jar run/mods \
-          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ needs.build.outputs.minimap_version_forge }}_Forge_${{ env.MINECRAFT_VERSION }}/xaeros-minimap-${{ needs.build.outputs.minimap_version_forge }}_Forge_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/ \
-          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ needs.build.outputs.worldmap_version_forge }}_Forge_${{ env.MINECRAFT_VERSION }}/xaeros-world-map-${{ needs.build.outputs.worldmap_version_forge }}_Forge_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/
-
-      - name: Bootstrap Test Mod
-        run: |
-          wget https://cdn.2b2t.vc/mc-runtime-test-1.21.9-3.1.1-lexforge-release.jar -P run/mods
-
-      - name: Forge Test
-        uses: headlesshq/mc-runtime-test@3.1.1
-        with:
-          mc: ${{ env.MINECRAFT_VERSION }}
-          modloader: forge
-          regex: .*forge.*
-#        mc-runtime-test: lexforge
-          mc-runtime-test: none
-          java: 21
-          xvfb: true
-          headlessmc-command: --jvm -Djava.awt.headless=true
-          cache-mc: true
-
-  test-neo:
-    runs-on: ubuntu-latest
-    needs:
-      - build
-    steps:
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-
-      - name: Download job artifacts
-        uses: actions/download-artifact@v4
-        with:
-          merge-multiple: true
-          path: artifacts/
-
-      - name: Set CI Test Env Var
-        run: echo "XP_CI_TEST=true" >> $GITHUB_ENV
-
-      - name: Setup Neo Test
-        run: |
-          mkdir -p run/mods && cp artifacts/${{ needs.build.outputs.xp_neo }}.jar run/mods \
-          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ needs.build.outputs.minimap_version_neo}}_NeoForge_${{ env.MINECRAFT_VERSION }}/xaeros-minimap-${{ needs.build.outputs.minimap_version_neo }}_NeoForge_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/ \
-          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ needs.build.outputs.worldmap_version_neo }}_NeoForge_${{ env.MINECRAFT_VERSION }}/xaeros-world-map-${{ needs.build.outputs.worldmap_version_neo }}_NeoForge_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/
-
-      - name: Bootstrap Test Mod
-        run: |
-          wget https://cdn.2b2t.vc/mc-runtime-test-1.21.9-3.1.1-neoforge-release.jar -P run/mods
-
-      - name: Neo Test
-        uses: headlesshq/mc-runtime-test@3.1.1
-        with:
-          mc: ${{ env.MINECRAFT_VERSION }}
-          modloader: neoforge
-          regex: .*neoforge.*
-#        mc-runtime-test: neoforge
-          mc-runtime-test: none
-          java: 21
-          xvfb: true
-          headlessmc-command: --jvm -Djava.awt.headless=true
-          cache-mc: true
+#  test-neo:
+#    runs-on: ubuntu-latest
+#    needs:
+#      - build
+#    steps:
+#      - name: Set up JDK 21
+#        uses: actions/setup-java@v4
+#        with:
+#          java-version: '21'
+#          distribution: 'temurin'
+#
+#      - name: Download job artifacts
+#        uses: actions/download-artifact@v4
+#        with:
+#          merge-multiple: true
+#          path: artifacts/
+#
+#      - name: Set CI Test Env Var
+#        run: echo "XP_CI_TEST=true" >> $GITHUB_ENV
+#
+#      - name: Setup Neo Test
+#        run: |
+#          mkdir -p run/mods && cp artifacts/${{ needs.build.outputs.xp_neo }}.jar run/mods \
+#          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ needs.build.outputs.minimap_version_neo}}_NeoForge_${{ env.MINECRAFT_VERSION }}/xaeros-minimap-${{ needs.build.outputs.minimap_version_neo }}_NeoForge_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/ \
+#          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ needs.build.outputs.worldmap_version_neo }}_NeoForge_${{ env.MINECRAFT_VERSION }}/xaeros-world-map-${{ needs.build.outputs.worldmap_version_neo }}_NeoForge_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/
+#
+#      - name: Bootstrap Test Mod
+#        run: |
+#          wget https://cdn.2b2t.vc/mc-runtime-test-1.21.9-3.1.1-neoforge-release.jar -P run/mods
+#
+#      - name: Neo Test
+#        uses: headlesshq/mc-runtime-test@3.1.1
+#        with:
+#          mc: ${{ env.MINECRAFT_VERSION }}
+#          modloader: neoforge
+#          regex: .*neoforge.*
+##        mc-runtime-test: neoforge
+#          mc-runtime-test: none
+#          java: 21
+#          xvfb: true
+#          headlessmc-command: --jvm -Djava.awt.headless=true
+#          cache-mc: true

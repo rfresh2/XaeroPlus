@@ -50,7 +50,7 @@ dependencies {
     modImplementation(libs.waystones.fabric)
     modImplementation(libs.balm.fabric)
 	modCompileOnly(libs.fabric.waystones)
-//	modRuntimeOnly(libs.immediatelyfast)
+	modRuntimeOnly(libs.immediatelyfast)
     modCompileOnly(libs.modmenu)
     modImplementation(libs.sodium.fabric)
 //	modRuntimeOnly(libs.fpsdisplay)

@@ -41,14 +41,14 @@ jobs:
 #
 #    - name: Get Minimap Version Forge
 #      run: echo "MINIMAP_VERSION_FORGE=$(./gradlew -q printMinimapVersionForge)" >> $GITHUB_ENV
-#
-#    - name: Get WorldMap Version NeoForge
-#      run: |
-#        echo "WORLDMAP_VERSION_NEO=$(./gradlew -q printWorldMapVersionNeo)" >> $GITHUB_ENV
-#
-#    - name: Get Minimap Version NeoForge
-#      run: |
-#        echo "MINIMAP_VERSION_NEO=$(./gradlew -q printMinimapVersionNeo)" >> $GITHUB_ENV
+
+    - name: Get WorldMap Version NeoForge
+      run: |
+        echo "WORLDMAP_VERSION_NEO=$(./gradlew -q printWorldMapVersionNeo)" >> $GITHUB_ENV
+
+    - name: Get Minimap Version NeoForge
+      run: |
+        echo "MINIMAP_VERSION_NEO=$(./gradlew -q printMinimapVersionNeo)" >> $GITHUB_ENV
 
     - name: Get XaeroPlus Version
       run: echo "XP_VERSION=$(./gradlew -q printXaeroPlusVersion)" >> $GITHUB_ENV
@@ -58,10 +58,10 @@ jobs:
 
 #    - name: Get Forge Jar Filename
 #      run: echo "XP_FORGE=XaeroPlus-${{ env.XP_VERSION }}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
-#
-#    - name: Get Neo Jar Filename
-#      run: |
-#        echo "XP_NEO=XaeroPlus-${{ env.XP_VERSION}}+neoforge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_NEO }}-MM${{ env.MINIMAP_VERSION_NEO }}" >> $GITHUB_ENV
+
+    - name: Get Neo Jar Filename
+      run: |
+        echo "XP_NEO=XaeroPlus-${{ env.XP_VERSION}}+neoforge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_NEO }}-MM${{ env.MINIMAP_VERSION_NEO }}" >> $GITHUB_ENV
 
     - name: Get Commit Hash
       run: echo "COMMIT_HASH=$(git rev-parse --short=8 HEAD)" >> $GITHUB_ENV
@@ -77,12 +77,12 @@ jobs:
 #
 #    - name: Append Commit Hash To Forge Jar Name
 #      run: mv forge/build/libs/${{ env.XP_FORGE }}.jar forge/build/libs/${{ env.XP_FORGE_OUT }}.jar
-#
-#    - name: Get NeoForge Jar Result Filename
-#      run: echo "XP_NEO_OUT=XaeroPlus-${{ env.XP_VERSION }}-DEV-${{ env.COMMIT_HASH }}+neoforge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_NEO }}-MM${{ env.MINIMAP_VERSION_NEO }}" >> $GITHUB_ENV
-#
-#    - name: Append Commit Hash To NeoForge Jar Name
-#      run: mv neo/build/libs/${{ env.XP_NEO }}.jar neo/build/libs/${{ env.XP_NEO_OUT }}.jar
+
+    - name: Get NeoForge Jar Result Filename
+      run: echo "XP_NEO_OUT=XaeroPlus-${{ env.XP_VERSION }}-DEV-${{ env.COMMIT_HASH }}+neoforge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_NEO }}-MM${{ env.MINIMAP_VERSION_NEO }}" >> $GITHUB_ENV
+
+    - name: Append Commit Hash To NeoForge Jar Name
+      run: mv neo/build/libs/${{ env.XP_NEO }}.jar neo/build/libs/${{ env.XP_NEO_OUT }}.jar
 
     - name: Upload Fabric Artifact
       uses: actions/upload-artifact@v4
@@ -111,13 +111,13 @@ jobs:
     outputs:
       worldmap_version_fabric: ${{ env.WORLDMAP_VERSION_FABRIC }}
 #      worldmap_version_forge: ${{ env.WORLDMAP_VERSION_FORGE }}
-#      worldmap_version_neo: ${{ env.WORLDMAP_VERSION_NEO }}
+      worldmap_version_neo: ${{ env.WORLDMAP_VERSION_NEO }}
       minimap_version_fabric: ${{ env.MINIMAP_VERSION_FABRIC }}
 #      minimap_version_forge: ${{ env.MINIMAP_VERSION_FORGE }}
-#      minimap_version_neo: ${{ env.MINIMAP_VERSION_NEO }}
+      minimap_version_neo: ${{ env.MINIMAP_VERSION_NEO }}
       xp_fabric: ${{ env.XP_FABRIC_OUT }}
 #      xp_forge: ${{ env.XP_FORGE_OUT }}
-#      xp_neo: ${{ env.XP_NEO_OUT }}
+      xp_neo: ${{ env.XP_NEO_OUT }}
 
 
   test-fabric:

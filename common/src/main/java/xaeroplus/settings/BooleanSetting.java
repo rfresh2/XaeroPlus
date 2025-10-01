@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 import static java.util.Objects.nonNull;
 
 public class BooleanSetting extends XaeroPlusSetting {
-    private static final KeyMapping.Category KEYBIND_CATEGORY = KeyMapping.Category.register(ResourceLocation.fromNamespaceAndPath("xaeroplus", "keybindings"));
+    public static final KeyMapping.Category KEYBIND_CATEGORY = KeyMapping.Category.register(ResourceLocation.fromNamespaceAndPath("xaeroplus", "keybindings"));
     private boolean value;
     private BooleanConsumer settingChangeConsumer;
 

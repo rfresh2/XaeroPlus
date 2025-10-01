@@ -1,9 +1,9 @@
 package xaeroplus.neo.mixin.client.mc;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeStorage;
+import net.minecraft.client.renderer.state.LevelRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -14,10 +14,10 @@ import xaeroplus.feature.render.beacon.WaypointBeaconRenderer;
 public class MixinLevelRenderer {
 
     @Inject(
-        method = "renderBlockEntities",
+        method = "submitBlockEntities",
         at = @At("HEAD")
     )
-    public void renderBlockEntitiesInject(final PoseStack matrix, final MultiBufferSource.BufferSource bufferSource, final MultiBufferSource.BufferSource bufferSource2, final Camera camera, final float tickDelta, final CallbackInfo ci) {
-        WaypointBeaconRenderer.INSTANCE.renderHook(matrix, tickDelta);
+    public void renderBlockEntitiesInject(final PoseStack poseStack, final LevelRenderState levelRenderState, final SubmitNodeStorage submitNodeStorage, final CallbackInfo ci) {
+        WaypointBeaconRenderer.INSTANCE.renderHook(poseStack, levelRenderState, submitNodeStorage);
     }
 }

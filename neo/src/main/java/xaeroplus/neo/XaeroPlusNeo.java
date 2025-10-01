@@ -16,6 +16,7 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
 import xaeroplus.XaeroPlus;
 import xaeroplus.commands.XPClientCommandSource;
+import xaeroplus.settings.BooleanSetting;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.XaeroPlusGameTest;
 
@@ -23,7 +24,7 @@ import xaeroplus.util.XaeroPlusGameTest;
 public class XaeroPlusNeo {
     public static final IEventBus FORGE_EVENT_BUS = NeoForge.EVENT_BUS;
     public XaeroPlusNeo(IEventBus modEventBus) {
-        if (FMLEnvironment.dist.isClient()) {
+        if (FMLEnvironment.getDist().isClient()) {
             modEventBus.addListener(this::onRegisterKeyMappingsEvent);
             FORGE_EVENT_BUS.addListener(this::onRegisterClientCommandsEvent);
             FORGE_EVENT_BUS.addListener(this::onClientStartedEvent);
@@ -37,8 +38,9 @@ public class XaeroPlusNeo {
 
     public void onRegisterKeyMappingsEvent(final RegisterKeyMappingsEvent event) {
         if (XaeroPlus.initialized.compareAndSet(false, true)) {
-            XaeroPlus.XP_VERSION = FMLLoader.getLoadingModList().getModFileById("xaeroplus").versionString();
+            XaeroPlus.XP_VERSION = FMLLoader.getCurrent().getLoadingModList().getModFileById("xaeroplus").versionString();
             XaeroPlus.initializeSettings();
+            event.registerCategory(BooleanSetting.KEYBIND_CATEGORY);
             Settings.REGISTRY.getKeybindings().forEach(event::register);
         }
     }

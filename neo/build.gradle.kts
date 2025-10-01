@@ -40,7 +40,7 @@ dependencies {
     neoForge(libs.neoforge)
     modImplementation(libs.worldmap.neo)
     modImplementation(libs.minimap.neo)
-    modImplementation(libs.baritone.neoforge)
+    modCompileOnly(libs.baritone.neoforge)
     modCompileOnly(libs.waystones.neoforge)
     modCompileOnly(libs.balm.neoforge)
     modCompileOnly(libs.worldtools)

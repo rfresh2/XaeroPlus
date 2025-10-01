@@ -98,12 +98,12 @@ jobs:
 #        path: forge/build/libs/${{ env.XP_FORGE_OUT }}.jar
 #        if-no-files-found: error
 #
-#    - name: Upload NeoForge Artifact
-#      uses: actions/upload-artifact@v4
-#      with:
-#        name: ${{ env.XP_NEO_OUT }}
-#        path: neo/build/libs/${{ env.XP_NEO_OUT }}.jar
-#        if-no-files-found: error
+    - name: Upload NeoForge Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.XP_NEO_OUT }}
+        path: neo/build/libs/${{ env.XP_NEO_OUT }}.jar
+        if-no-files-found: error
 
 #    - name: test fabric
 #      run: ./gradlew fabric:runProdTest

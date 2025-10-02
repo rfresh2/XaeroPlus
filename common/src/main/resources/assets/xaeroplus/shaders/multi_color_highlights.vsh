@@ -1,4 +1,4 @@
-#version 150
+#version 330
 
 #moj_import <xaeroplus:multi_color_highlights_include.glsl>
 

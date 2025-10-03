@@ -89,6 +89,9 @@ public abstract class MixinGuiWaypointsList {
         if (!Settings.REGISTRY.waypointsListUIAdditions.get()) return;
         if (Settings.REGISTRY.showWaypointDistances.get() && w != null) {
             Entity renderViewEntity = Minecraft.getInstance().getCameraEntity();
+            if (renderViewEntity == null) {
+                renderViewEntity = Minecraft.getInstance().player;
+            }
             final double playerX = renderViewEntity.getX();
             final double playerZ = renderViewEntity.getZ();
             final double playerY = renderViewEntity.getY();

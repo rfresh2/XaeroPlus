@@ -246,6 +246,6 @@ jobs:
 #        mc-runtime-test: neoforge
           mc-runtime-test: none
           java: 21
-          xvfb: true
+          xvfb: false
           headlessmc-command: --jvm -Djava.awt.headless=true
           cache-mc: true

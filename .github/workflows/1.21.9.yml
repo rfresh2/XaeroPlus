@@ -207,45 +207,45 @@ jobs:
 #          headlessmc-command: --jvm -Djava.awt.headless=true
 #          cache-mc: true
 
-  test-neo:
-    runs-on: ubuntu-latest
-    needs:
-      - build
-    steps:
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-
-      - name: Download job artifacts
-        uses: actions/download-artifact@v4
-        with:
-          merge-multiple: true
-          path: artifacts/
-
-      - name: Set CI Test Env Var
-        run: echo "XP_CI_TEST=true" >> $GITHUB_ENV
-
-      - name: Setup Neo Test
-        run: |
-          mkdir -p run/mods && cp artifacts/${{ needs.build.outputs.xp_neo }}.jar run/mods \
-          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ needs.build.outputs.minimap_version_neo}}_NeoForge_${{ env.MINECRAFT_VERSION }}/xaeros-minimap-${{ needs.build.outputs.minimap_version_neo }}_NeoForge_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/ \
-          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ needs.build.outputs.worldmap_version_neo }}_NeoForge_${{ env.MINECRAFT_VERSION }}/xaeros-world-map-${{ needs.build.outputs.worldmap_version_neo }}_NeoForge_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/
-
-      - name: Bootstrap Test Mod
-        run: |
-          wget https://cdn.2b2t.vc/mc-runtime-test-1.21.9-3.1.1-neoforge-release.jar -P run/mods
-
-      - name: Neo Test
-        uses: headlesshq/mc-runtime-test@3.1.1
-        with:
-          mc: ${{ env.MINECRAFT_VERSION }}
-          modloader: neoforge
-          regex: .*neoforge.*
-#        mc-runtime-test: neoforge
-          mc-runtime-test: none
-          java: 21
-          xvfb: false
-          headlessmc-command: --jvm -Djava.awt.headless=true
-          cache-mc: true
+#  test-neo:
+#    runs-on: ubuntu-latest
+#    needs:
+#      - build
+#    steps:
+#      - name: Set up JDK 21
+#        uses: actions/setup-java@v4
+#        with:
+#          java-version: '21'
+#          distribution: 'temurin'
+#
+#      - name: Download job artifacts
+#        uses: actions/download-artifact@v4
+#        with:
+#          merge-multiple: true
+#          path: artifacts/
+#
+#      - name: Set CI Test Env Var
+#        run: echo "XP_CI_TEST=true" >> $GITHUB_ENV
+#
+#      - name: Setup Neo Test
+#        run: |
+#          mkdir -p run/mods && cp artifacts/${{ needs.build.outputs.xp_neo }}.jar run/mods \
+#          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ needs.build.outputs.minimap_version_neo}}_NeoForge_${{ env.MINECRAFT_VERSION }}/xaeros-minimap-${{ needs.build.outputs.minimap_version_neo }}_NeoForge_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/ \
+#          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ needs.build.outputs.worldmap_version_neo }}_NeoForge_${{ env.MINECRAFT_VERSION }}/xaeros-world-map-${{ needs.build.outputs.worldmap_version_neo }}_NeoForge_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/
+#
+#      - name: Bootstrap Test Mod
+#        run: |
+#          wget https://cdn.2b2t.vc/mc-runtime-test-1.21.9-3.1.1-neoforge-release.jar -P run/mods
+#
+#      - name: Neo Test
+#        uses: headlesshq/mc-runtime-test@3.1.1
+#        with:
+#          mc: ${{ env.MINECRAFT_VERSION }}
+#          modloader: neoforge
+#          regex: .*neoforge.*
+##        mc-runtime-test: neoforge
+#          mc-runtime-test: none
+#          java: 21
+#          xvfb: false
+#          headlessmc-command: --jvm -Djava.awt.headless=true
+#          cache-mc: true

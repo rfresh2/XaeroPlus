@@ -297,5 +297,6 @@
   "xaeroplus.setting.drawing_opacity.tooltip": "描画の色の不透明度を設定します",
   "xaeroplus.gui.draw_order.title": "XaeroPlus 描画順",
   "xaeroplus.gui.draw_order.subtitle": "順番を変更するにはクリックしてドラッグしてください",
-  "xaeroplus.gui.draw_order.reset": "リセット"
+  "xaeroplus.gui.draw_order.reset": "リセット",
+  "key.category.xaeroplus.keybindings": "XaeroPlus"
 }

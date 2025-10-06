@@ -67,7 +67,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Build Mods
         run: ./gradlew build

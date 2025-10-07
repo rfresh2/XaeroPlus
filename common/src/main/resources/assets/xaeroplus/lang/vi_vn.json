@@ -299,5 +299,6 @@
   "xaeroplus.setting.drawing_opacity.tooltip": "Thiết lập độ mờ màu của bản vẽ",
   "xaeroplus.gui.draw_order.title": "Thứ Tự Vẽ XaeroPlus",
   "xaeroplus.gui.draw_order.subtitle": "Nhấp và kéo để thay đổi thứ tự",
-  "xaeroplus.gui.draw_order.reset": "Cài lại"
+  "xaeroplus.gui.draw_order.reset": "Cài lại",
+  "key.category.xaeroplus.keybindings": "XaeroPlus"
 }

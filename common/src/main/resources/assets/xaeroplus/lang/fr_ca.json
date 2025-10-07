@@ -293,5 +293,6 @@
   "xaeroplus.setting.drawing_opacity.tooltip": "Définit l'opacité des couleurs des dessins",
   "xaeroplus.gui.draw_order.title": "Ordre de Dessin XaeroPlus",
   "xaeroplus.gui.draw_order.subtitle": "Cliquez et faites glisser pour changer l'ordre",
-  "xaeroplus.gui.draw_order.reset": "Réinitialiser"
+  "xaeroplus.gui.draw_order.reset": "Réinitialiser",
+  "key.category.xaeroplus.keybindings": "XaeroPlus"
 }

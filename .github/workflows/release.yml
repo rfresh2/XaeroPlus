@@ -183,6 +183,7 @@ jobs:
             quilt
           game-versions: |
             ${{ env.MINECRAFT_VERSION }}
+            1.21.10
           dependencies: |
             xaerominimap@${{ needs.build.outputs.minimap_version_fabric }}(required){modrinth:1bokaNcj}{curseforge:263420}
             xaeroworldmap@${{ needs.build.outputs.worldmap_version_fabric }}(required){modrinth:NcUtCpym}{curseforge:317780}
@@ -211,6 +212,7 @@ jobs:
             quilt
           game-versions: |
             ${{ env.MINECRAFT_VERSION }}
+            1.21.10
           dependencies: |
             xaerominimap@${{ needs.build.outputs.minimap_version_fabric }}(required){modrinth:1bokaNcj}{curseforge:263420}
             xaeroworldmap@${{ needs.build.outputs.worldmap_version_fabric }}(required){modrinth:NcUtCpym}{curseforge:317780}
@@ -238,6 +240,7 @@ jobs:
             neoforge
           game-versions: |
             ${{ env.MINECRAFT_VERSION }}
+            1.21.10
           dependencies: |
             xaerominimap@${{ needs.build.outputs.minimap_version_forge }}(required){modrinth:1bokaNcj}{curseforge:263420}
             xaeroworldmap@${{ needs.build.outputs.worldmap_version_forge }}(required){modrinth:NcUtCpym}{curseforge:317780}
@@ -263,6 +266,7 @@ jobs:
             forge
           game-versions: |
             ${{ env.MINECRAFT_VERSION }}
+            1.21.10
           dependencies: |
             xaerominimap@${{ needs.build.outputs.minimap_version_forge }}(required){modrinth:1bokaNcj}{curseforge:263420}
             xaeroworldmap@${{ needs.build.outputs.worldmap_version_forge }}(required){modrinth:NcUtCpym}{curseforge:317780}
@@ -287,6 +291,7 @@ jobs:
             neoforge
           game-versions: |
             ${{ env.MINECRAFT_VERSION }}
+            1.21.10
           dependencies: |
             xaerominimap@${{ needs.build.outputs.minimap_version_neo }}(required){modrinth:1bokaNcj}{curseforge:263420}
             xaeroworldmap@${{ needs.build.outputs.worldmap_version_neo }}(required){modrinth:NcUtCpym}{curseforge:317780}
@@ -312,6 +317,7 @@ jobs:
             neoforge
           game-versions: |
             ${{ env.MINECRAFT_VERSION }}
+            1.21.10
           dependencies: |
             xaerominimap@${{ needs.build.outputs.minimap_version_neo }}(required){modrinth:1bokaNcj}{curseforge:263420}
             xaeroworldmap@${{ needs.build.outputs.worldmap_version_neo }}(required){modrinth:NcUtCpym}{curseforge:317780}

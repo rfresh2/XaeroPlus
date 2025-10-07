@@ -343,6 +343,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     }
 
     final Timer tickTimer = Timers.tickTimer();
+    final Timer flushTimer = Timers.tickTimer();
 
     @Override
     public void handleTick() {
@@ -353,6 +354,12 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         // which can be expensive if there are thousands of cache entries
         // this does make the update interval setting kind of a lie, but its for the best
         int jitter = ThreadLocalRandom.current().nextInt(0, 10);
+
+        if (flushTimer.tick(600 + jitter)) {
+            // periodically flush stale chunks to db
+            // in case player is not moving, so window is not changing
+            flushAllChunks();
+        }
         // only update window on an interval
         if (!tickTimer.tick(10 + jitter)) {
             return;

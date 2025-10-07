@@ -44,7 +44,6 @@
     "MixinMapWorld",
     "MixinMapWriter",
     "MixinMinimap",
-    "MixinMinimapDepthTraceListener",
     "MixinMinimapFBORenderer",
     "MixinMinimapModSettings",
     "MixinMinimapOption",
@@ -72,6 +71,7 @@
     "mc.MixinBedBlock",
     "mc.MixinClientPlayNetworkHandler",
     "mc.MixinMinecraftClient",
+    "mc.MixinPictureInPictureRenderer",
     "mc.MixinRenderPipeline",
     "mc.MixinRespawnAnchor"
   ]

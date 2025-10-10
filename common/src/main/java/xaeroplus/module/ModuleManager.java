@@ -30,6 +30,7 @@ public class ModuleManager {
             new SpawnChunks(),
             new SpawnChunksPlayer(),
             new SpawnPoint(),
+            new TeleportFailNotifier(),
             new TickTaskExecutor(),
             new WaystoneSync(),
             new WorldBorder(),

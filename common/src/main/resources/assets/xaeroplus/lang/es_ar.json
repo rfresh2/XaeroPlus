@@ -295,10 +295,16 @@
   "xaeroplus.gui.world_map.draw_text": "Texto",
   "xaeroplus.gui.world_map.draw_color": "Color de dibujo",
   "xaeroplus.gui.world_map.draw_measurement_tool": "Herramienta de medición",
+  "xaeroplus.gui.world_map.drawing_mode_controls": "Clic izquierdo -> Dibujar \n Clic derecho -> Borrar \n Clic medio -> Mover",
   "xaeroplus.setting.drawing_opacity": "Opacidad del dibujo",
   "xaeroplus.setting.drawing_opacity.tooltip": "Establece la opacidad del color de los dibujos",
   "xaeroplus.gui.draw_order.title": "Orden de Dibujo de XaeroPlus",
   "xaeroplus.gui.draw_order.subtitle": "Haz clic y arrastra para cambiar el orden",
   "xaeroplus.gui.draw_order.reset": "Reiniciar",
-  "key.category.xaeroplus.keybindings": "XaeroPlus"
+  "key.category.xaeroplus.keybindings": "XaeroPlus",
+  "xaeroplus.setting.teleport_fail_notifier": "Notificador de Fallo de Teletransporte",
+  "xaeroplus.setting.teleport_fail_notifier.tooltip": "Envía una notificación en el chat cuando un teletransporte de xaero falla, normalmente por falta de permisos del servidor",
+  "xaeroplus.setting.teleport_fail_notifier_delay": "Tiempos de Espera del Fallo de Teletransporte",
+  "xaeroplus.setting.teleport_fail_notifier_delay.tooltip": "Número de ticks a esperar para que ocurra un intento de teletransporte de xaero",
+  "xaeroplus.gui.teleport_fail_notifier.message": "Parece que tu intento de teletransporte falló :( \n Probablemente no tengas permisos del servidor para usar los comandos /tp. \n ¡Pide ayuda al administrador del servidor!"
 }

@@ -678,6 +678,18 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             0.0F, 0.0F, 0.0F, 0.4F,
             backgroundVertexBuffer
         );
+        var lines = I18n.get("xaeroplus.gui.world_map.drawing_mode_controls").split("\n");
+        for (int i = 0; i < lines.length; i++) {
+            MapRenderHelper.drawStringWithBackground(
+                guiGraphics, Minecraft.getInstance().font,
+                lines[i].trim(),
+                40,
+                this.height - 2 - (lines.length * (Minecraft.getInstance().font.lineHeight + 1)) + (i * (Minecraft.getInstance().font.lineHeight + 1)),
+                -1,
+                0.0F, 0.0F, 0.0F, 0.4F,
+                backgroundVertexBuffer
+            );
+        }
     }
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true, remap = true)
@@ -786,7 +798,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "keyPressed", at = @At("RETURN"), remap = true)
     public void xaeroplus$drawingModeUndo(final int code, final int scanCode, final int modifiers, final CallbackInfoReturnable<Boolean> cir) {
-        if (!drawing) return;
         if (Screen.hasControlDown() && code == GLFW_KEY_Z) {
             ModuleManager.getModule(Drawing.class).undoLastOperation();
         }

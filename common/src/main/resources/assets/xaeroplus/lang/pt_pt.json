@@ -295,6 +295,7 @@
   "xaeroplus.gui.world_map.draw_text": "Texto",
   "xaeroplus.gui.world_map.draw_color": "Cor do desenho",
   "xaeroplus.gui.world_map.draw_measurement_tool": "Ferramenta de medição",
+  "xaeroplus.gui.world_map.drawing_mode_controls": "Clique esquerdo -> Desenhar \n Clique direito -> Apagar \n Clique do meio -> Mover",
   "xaeroplus.setting.drawing_opacity": "Opacidade do desenho",
   "xaeroplus.setting.drawing_opacity.tooltip": "Define a opacidade da cor dos desenhos",
   "xaeroplus.gui.draw_order.title": "Ordem de Desenho do XaeroPlus",

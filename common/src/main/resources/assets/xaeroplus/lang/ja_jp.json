@@ -293,6 +293,7 @@
   "xaeroplus.gui.world_map.draw_text": "文章",
   "xaeroplus.gui.world_map.draw_color": "描画色",
   "xaeroplus.gui.world_map.draw_measurement_tool": "測定ツール",
+  "xaeroplus.gui.world_map.drawing_mode_controls": "左クリック -> 描く \n 右クリック -> 消す \n 中クリック -> 移動",
   "xaeroplus.setting.drawing_opacity": "描画の不透明度",
   "xaeroplus.setting.drawing_opacity.tooltip": "描画の色の不透明度を設定します",
   "xaeroplus.gui.draw_order.title": "XaeroPlus 描画順",

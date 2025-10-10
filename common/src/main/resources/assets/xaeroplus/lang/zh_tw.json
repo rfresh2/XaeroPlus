@@ -295,6 +295,7 @@
   "xaeroplus.gui.world_map.draw_text": "文字",
   "xaeroplus.gui.world_map.draw_color": "繪圖顏色",
   "xaeroplus.gui.world_map.draw_measurement_tool": "測量工具",
+  "xaeroplus.gui.world_map.drawing_mode_controls": "左鍵 -> 繪製 \n 右鍵 -> 擦除 \n 中鍵 -> 平移",
   "xaeroplus.setting.drawing_opacity": "繪圖不透明度",
   "xaeroplus.setting.drawing_opacity.tooltip": "設定繪圖顏色的不透明度",
   "xaeroplus.gui.draw_order.title": "XaeroPlus 繪製順序",

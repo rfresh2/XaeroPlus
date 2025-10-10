@@ -295,10 +295,16 @@
   "xaeroplus.gui.world_map.draw_text": "Chữ",
   "xaeroplus.gui.world_map.draw_color": "Màu vẽ",
   "xaeroplus.gui.world_map.draw_measurement_tool": "Công cụ đo lường",
+  "xaeroplus.gui.world_map.drawing_mode_controls": "Nhấp chuột trái -> Vẽ \n Nhấp chuột phải -> Xóa \n Nhấp chuột giữa -> Di chuyển",
   "xaeroplus.setting.drawing_opacity": "Độ mờ của bản vẽ",
   "xaeroplus.setting.drawing_opacity.tooltip": "Thiết lập độ mờ màu của bản vẽ",
   "xaeroplus.gui.draw_order.title": "Thứ Tự Vẽ XaeroPlus",
   "xaeroplus.gui.draw_order.subtitle": "Nhấp và kéo để thay đổi thứ tự",
   "xaeroplus.gui.draw_order.reset": "Cài lại",
-  "key.category.xaeroplus.keybindings": "XaeroPlus"
+  "key.category.xaeroplus.keybindings": "XaeroPlus",
+  "xaeroplus.setting.teleport_fail_notifier": "Thông Báo Dịch Chuyển Thất Bại",
+  "xaeroplus.setting.teleport_fail_notifier.tooltip": "Gửi thông báo trong chat khi dịch chuyển xaero thất bại — thường do thiếu quyền máy chủ",
+  "xaeroplus.setting.teleport_fail_notifier_delay": "Số Tick Chờ Dịch Chuyển Thất Bại",
+  "xaeroplus.setting.teleport_fail_notifier_delay.tooltip": "Số tick cần chờ để thử dịch chuyển xaero xảy ra",
+  "xaeroplus.gui.teleport_fail_notifier.message": "Có vẻ như lần dịch chuyển của bạn đã thất bại :( \n Có thể bạn không có quyền dùng lệnh /tp trên máy chủ. \n Hãy nhờ quản trị viên máy chủ giúp đỡ!"
 }

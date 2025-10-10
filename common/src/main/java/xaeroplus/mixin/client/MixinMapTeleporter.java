@@ -13,7 +13,7 @@ public class MixinMapTeleporter {
 
     @Inject(method = "teleport", at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;sendUnsignedCommand(Ljava/lang/String;)Z"
+        target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;sendCommand(Ljava/lang/String;)V"
     ), remap = true)
     public void onTeleportAttemptA(CallbackInfo ci) {
         XaeroPlus.EVENT_BUS.call(XaeroTeleportAttemptEvent.INSTANCE);

@@ -18,7 +18,8 @@ $branches = @(
     "1.21.3",
     "1.21.4",
     "1.21.5",
-    "1.21.8"
+    "1.21.8",
+    "1.21.9
 )
 
 gh workflow run $workflow --repo $repo --ref $mainBranch -f headRef=$headRef -f baseRef=$baseRef -f githubReleaseRef=$mainBranch

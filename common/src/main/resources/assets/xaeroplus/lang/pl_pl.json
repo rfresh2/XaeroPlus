@@ -293,10 +293,16 @@
   "xaeroplus.gui.world_map.draw_text": "Tekst",
   "xaeroplus.gui.world_map.draw_color": "Kolor rysunku",
   "xaeroplus.gui.world_map.draw_measurement_tool": "Narzędzie pomiarowe",
+  "xaeroplus.gui.world_map.drawing_mode_controls": "Lewy przycisk -> Rysuj \n Prawy przycisk -> Usuń \n Środkowy przycisk -> Przesuń",
   "xaeroplus.setting.drawing_opacity": "Przezroczystość rysunku",
   "xaeroplus.setting.drawing_opacity.tooltip": "Ustawia przezroczystość koloru rysunków",
   "xaeroplus.gui.draw_order.title": "Kolejność Rysowania XaeroPlus",
   "xaeroplus.gui.draw_order.subtitle": "Kliknij i przeciągnij, aby zmienić kolejność",
   "xaeroplus.gui.draw_order.reset": "Nastawić",
-  "key.category.xaeroplus.keybindings": "XaeroPlus"
+  "key.category.xaeroplus.keybindings": "XaeroPlus",
+  "xaeroplus.setting.teleport_fail_notifier": "Powiadomienie o Nieudanym Teleporcie",
+  "xaeroplus.setting.teleport_fail_notifier.tooltip": "Wysyła powiadomienie na czacie, gdy teleport Xaero się nie powiedzie — zwykle z powodu braku uprawnień serwera",
+  "xaeroplus.setting.teleport_fail_notifier_delay": "Czas Oczekiwania na Nieudany Teleport",
+  "xaeroplus.setting.teleport_fail_notifier_delay.tooltip": "Liczba ticków oczekiwania na próbę teleportu Xaero",
+  "xaeroplus.gui.teleport_fail_notifier.message": "Wygląda na to, że twoja próba teleportacji się nie powiodła :( \n Prawdopodobnie nie masz uprawnień serwera do używania komend /tp. \n Poproś administratora serwera o pomoc!"
 }

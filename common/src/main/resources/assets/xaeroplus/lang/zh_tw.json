@@ -295,10 +295,16 @@
   "xaeroplus.gui.world_map.draw_text": "文字",
   "xaeroplus.gui.world_map.draw_color": "繪圖顏色",
   "xaeroplus.gui.world_map.draw_measurement_tool": "測量工具",
+  "xaeroplus.gui.world_map.drawing_mode_controls": "左鍵 -> 繪製 \n 右鍵 -> 擦除 \n 中鍵 -> 平移",
   "xaeroplus.setting.drawing_opacity": "繪圖不透明度",
   "xaeroplus.setting.drawing_opacity.tooltip": "設定繪圖顏色的不透明度",
   "xaeroplus.gui.draw_order.title": "XaeroPlus 繪製順序",
   "xaeroplus.gui.draw_order.subtitle": "點擊並拖動以更改順序",
   "xaeroplus.gui.draw_order.reset": "重設",
-  "key.category.xaeroplus.keybindings": "XaeroPlus"
+  "key.category.xaeroplus.keybindings": "XaeroPlus",
+  "xaeroplus.setting.teleport_fail_notifier": "傳送失敗通知",
+  "xaeroplus.setting.teleport_fail_notifier.tooltip": "當Xaero傳送失敗時在聊天中發送通知，通常是因為缺少伺服器權限",
+  "xaeroplus.setting.teleport_fail_notifier_delay": "傳送失敗等待刻數",
+  "xaeroplus.setting.teleport_fail_notifier_delay.tooltip": "等待Xaero傳送嘗試的刻數",
+  "xaeroplus.gui.teleport_fail_notifier.message": "看起來你的傳送嘗試失敗了 :( \n 你可能沒有使用 /tp 指令的伺服器權限。 \n 請聯繫伺服器管理員！"
 }

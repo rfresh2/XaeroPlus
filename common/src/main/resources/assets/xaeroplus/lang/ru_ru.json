@@ -300,5 +300,10 @@
   "xaeroplus.gui.draw_order.title": "Порядок Отрисовки XaeroPlus",
   "xaeroplus.gui.draw_order.subtitle": "Щёлкните и перетащите, чтобы изменить порядок",
   "xaeroplus.gui.draw_order.reset": "Перезагрузить",
-  "key.category.xaeroplus.keybindings": "XaeroPlus"
+  "key.category.xaeroplus.keybindings": "XaeroPlus",
+  "xaeroplus.setting.teleport_fail_notifier": "Уведомление о Неудачном Телепорте",
+  "xaeroplus.setting.teleport_fail_notifier.tooltip": "Отправляет сообщение в чат, когда телепорт Xaero не срабатывает — обычно из-за отсутствия прав на сервере",
+  "xaeroplus.setting.teleport_fail_notifier_delay": "Задержка Ожидания Ошибки Телепорта",
+  "xaeroplus.setting.teleport_fail_notifier_delay.tooltip": "Количество тиков ожидания попытки телепорта Xaero",
+  "xaeroplus.gui.teleport_fail_notifier.message": "Похоже, ваша попытка телепортации не удалась :( \n Скорее всего, у вас нет прав на использование команд /tp на сервере. \n Обратитесь к администратору сервера!"
 }

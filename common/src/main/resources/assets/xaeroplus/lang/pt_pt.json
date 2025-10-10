@@ -300,5 +300,10 @@
   "xaeroplus.gui.draw_order.title": "Ordem de Desenho do XaeroPlus",
   "xaeroplus.gui.draw_order.subtitle": "Clique e arraste para alterar a ordem",
   "xaeroplus.gui.draw_order.reset": "Reiniciar",
-  "key.category.xaeroplus.keybindings": "XaeroPlus"
+  "key.category.xaeroplus.keybindings": "XaeroPlus",
+  "xaeroplus.setting.teleport_fail_notifier": "Notificador de Falha de Teleporte",
+  "xaeroplus.setting.teleport_fail_notifier.tooltip": "Envia uma notificação no chat quando um teleporte xaero falha — geralmente por falta de permissões do servidor",
+  "xaeroplus.setting.teleport_fail_notifier_delay": "Atraso de Espera de Falha de Teleporte",
+  "xaeroplus.setting.teleport_fail_notifier_delay.tooltip": "Número de ticks para esperar por uma tentativa de teleporte xaero",
+  "xaeroplus.gui.teleport_fail_notifier.message": "Parece que sua tentativa de teleporte falhou :( \n Provavelmente você não tem permissão do servidor para usar os comandos /tp. \n Peça ajuda ao administrador do servidor!"
 }

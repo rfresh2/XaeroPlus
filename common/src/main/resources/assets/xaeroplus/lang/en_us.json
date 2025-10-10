@@ -295,10 +295,16 @@
   "xaeroplus.gui.world_map.draw_text": "Text",
   "xaeroplus.gui.world_map.draw_color": "Drawing Color",
   "xaeroplus.gui.world_map.draw_measurement_tool": "Measurement Tool",
+  "xaeroplus.gui.world_map.drawing_mode_controls": "Left Click -> Draw \n Right Click -> Erase \n Middle Click -> Pan",
   "xaeroplus.setting.drawing_opacity": "Drawing Opacity",
   "xaeroplus.setting.drawing_opacity.tooltip": "Sets the color opacity of drawings",
   "xaeroplus.gui.draw_order.title": "XaeroPlus Draw Order",
   "xaeroplus.gui.draw_order.subtitle": "Click and drag to change the order",
   "xaeroplus.gui.draw_order.reset": "Reset",
-  "key.category.xaeroplus.keybindings": "XaeroPlus"
+  "key.category.xaeroplus.keybindings": "XaeroPlus",
+  "xaeroplus.setting.teleport_fail_notifier": "Teleport Fail Notifier",
+  "xaeroplus.setting.teleport_fail_notifier.tooltip": "Sends a notification in chat when a xaero teleport is attempted and fails - most commonly due to lacking server permissions",
+  "xaeroplus.setting.teleport_fail_notifier_delay": "Teleport Fail Wait Ticks",
+  "xaeroplus.setting.teleport_fail_notifier_delay.tooltip": "Number of ticks to wait for an attempted xaero teleport to occur",
+  "xaeroplus.gui.teleport_fail_notifier.message": "Looks like your teleport attempt failed :( \n Most likely you don't have permissions from the server to use /tp commands. \n Ask your server owner for help!"
 }

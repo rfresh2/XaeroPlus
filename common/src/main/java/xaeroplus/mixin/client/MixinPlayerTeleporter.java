@@ -14,7 +14,7 @@ public class MixinPlayerTeleporter {
     @Inject(method = "teleport", at = @At(
         value = "INVOKE",
         target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;sendUnsignedCommand(Ljava/lang/String;)Z"
-    ))
+    ), remap = true)
     public void onTeleportAttemptA(CallbackInfo ci) {
         XaeroPlus.EVENT_BUS.call(XaeroTeleportAttemptEvent.INSTANCE);
     }
@@ -22,7 +22,7 @@ public class MixinPlayerTeleporter {
     @Inject(method = "teleport", at = @At(
         value = "INVOKE",
         target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;sendChat(Ljava/lang/String;)V"
-    ))
+    ), remap = true)
     public void onTeleportAttemptB(CallbackInfo ci) {
         XaeroPlus.EVENT_BUS.call(XaeroTeleportAttemptEvent.INSTANCE);
     }

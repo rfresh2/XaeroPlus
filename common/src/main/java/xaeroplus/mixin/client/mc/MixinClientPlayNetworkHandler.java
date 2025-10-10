@@ -79,4 +79,9 @@ public class MixinClientPlayNetworkHandler {
     public void onClientSessionClose(final CallbackInfo ci) {
         XaeroPlus.EVENT_BUS.call(ClientPlaySessionFinalizedEvent.INSTANCE);
     }
+
+    @Inject(method = "handleMovePlayer", at = @At("RETURN"))
+    public void onTeleport(CallbackInfo ci) {
+        XaeroPlus.EVENT_BUS.call(ClientTeleportEvent.INSTANCE);
+    }
 }

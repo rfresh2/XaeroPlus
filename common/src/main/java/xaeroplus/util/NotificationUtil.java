@@ -8,20 +8,19 @@ public class NotificationUtil {
     public static void inGameNotification(String message) {
         var mc = Minecraft.getInstance();
         if (mc.player != null) {
-            mc.player.displayClientMessage(Component.literal("[XaeroPlus] ").append(Component.literal(message)), false);
+            mc.gui.getChat().addMessage(Component.literal("[XaeroPlus] ").append(Component.literal(message)));
         }
     }
 
     public static void errorNotification(String message) {
         var mc = Minecraft.getInstance();
         if (mc.player != null) {
-            mc.player.displayClientMessage(Component
+            mc.gui.getChat().addMessage(Component
                 .literal("[XaeroPlus] ")
                 .withStyle(ChatFormatting.RED)
                 .append(Component
                     .literal(message)
-                    .withStyle(ChatFormatting.WHITE)),
-                false);
+                    .withStyle(ChatFormatting.WHITE)));
         }
     }
 }

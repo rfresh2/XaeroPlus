@@ -1,7 +1,9 @@
 package xaeroplus.module.impl;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
+import it.unimi.dsi.fastutil.longs.LongList;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
@@ -20,10 +22,13 @@ import xaeroplus.module.Module;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
 import xaeroplus.util.DrawingMode;
+import xaeroplus.util.GuiMapHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingDeque;
 
 public class Drawing extends Module {
     public final DrawingCache drawingCache = new DrawingCache("XaeroPlusDrawing");
@@ -31,9 +36,31 @@ public class Drawing extends Module {
     private int savedColorAlpha = 150;
     private final DrawingColorCycler drawingColorCycler = new DrawingColorCycler();
     private final int inProgressColorAlpha = 80;
-
+    private final Deque<DrawingOperation> operationStack = new LinkedBlockingDeque<>();
+    private DrawingOperationCollector operationCollector = null;
     public DrawingColorCycler getDrawingColorCycler() {
         return drawingColorCycler;
+    }
+
+    public void startOperation(ResourceKey<Level> dimension, boolean erase) {
+        operationCollector = new DrawingOperationCollector(dimension, erase);
+    }
+
+    public void endOperation() {
+        if (operationCollector != null) {
+            var op = operationCollector.collect();
+            if (op != null) {
+                operationStack.push(op);
+            }
+            operationCollector = null;
+        }
+    }
+
+    public void undoLastOperation() {
+        if (!operationStack.isEmpty()) {
+            var op = operationStack.pop();
+            op.revert(this);
+        }
     }
 
     @Override
@@ -71,6 +98,7 @@ public class Drawing extends Module {
                 this::getTexts
             )
         );
+        operationStack.clear();
     }
 
     private Long2ObjectMap<Text> getTexts(int windowRegionX, int windowRegionZ, int windowSize, ResourceKey<Level> dim) {
@@ -80,6 +108,10 @@ public class Drawing extends Module {
     @EventHandler
     public void onTick(final ClientTickEvent.Post event) {
         drawingCache.handleTick();
+        if (GuiMapHelper.getGuiMap().isEmpty()) {
+            operationStack.clear();
+            operationCollector = null;
+        }
     }
 
     @EventHandler
@@ -107,6 +139,9 @@ public class Drawing extends Module {
     public void addLine(final Line line, int color) {
         if (line.length() < 2) return;
         drawingCache.addLine(line, color, Globals.getCurrentDimensionId());
+        if (operationCollector != null) {
+            operationCollector.addLine(line);
+        }
     }
 
     public void addLine(final Line line) {
@@ -115,7 +150,11 @@ public class Drawing extends Module {
 
     public void addInfiniteLine(final Line line, int color) {
         if (line.length() < 2) return;
-        drawingCache.addLine(line.extrapolateToWorldBorder(), color, Globals.getCurrentDimensionId());
+        var infLine = line.extrapolateToWorldBorder();
+        drawingCache.addLine(infLine, color, Globals.getCurrentDimensionId());
+        if (operationCollector != null) {
+            operationCollector.addLine(infLine);
+        }
     }
 
     public void addInfiniteLine(final Line line) {
@@ -124,6 +163,9 @@ public class Drawing extends Module {
 
     public void addHighlight(int chunkX, int chunkZ, int color) {
         drawingCache.addHighlight(chunkX, chunkZ, color, Globals.getCurrentDimensionId());
+        if (operationCollector != null) {
+            operationCollector.addHighlight(chunkX, chunkZ);
+        }
     }
 
     public void addHighlight(int chunkX, int chunkZ) {
@@ -132,10 +174,16 @@ public class Drawing extends Module {
 
     public void removeHighlight(final int chunkX, final int chunkZ) {
         drawingCache.removeHighlight(chunkX, chunkZ, Globals.getCurrentDimensionId());
+        if (operationCollector != null) {
+            operationCollector.addHighlight(chunkX, chunkZ);
+        }
     }
 
     public void addText(final Text text) {
         drawingCache.addText(text, Globals.getCurrentDimensionId());
+        if (operationCollector != null) {
+            operationCollector.addText(text);
+        }
     }
 
     public void removeText(int x, int z, float viewScale) {
@@ -163,6 +211,9 @@ public class Drawing extends Module {
         }
         for (Text text : toRemove) {
             drawingCache.removeText(text.x(), text.z(), Globals.getCurrentDimensionId());
+            if (operationCollector != null) {
+                operationCollector.addText(text);
+            }
         }
     }
 
@@ -281,6 +332,96 @@ public class Drawing extends Module {
                 c.removeText(x, z);
             }
         });
+        operationCollector = null;
+        operationStack.clear();
+    }
+
+    public interface DrawingOperation {
+        void revert(Drawing drawing);
+    }
+
+    public record HighlightDrawingOperation(LongList chunks, ResourceKey<Level> dimension) implements DrawingOperation {
+        @Override
+        public void revert(Drawing drawing) {
+            for (var chunkLong : chunks) {
+                var chunkX = ChunkUtils.longToChunkX(chunkLong);
+                var chunkZ = ChunkUtils.longToChunkZ(chunkLong);
+                drawing.drawingCache.removeHighlight(chunkX, chunkZ, dimension);
+            }
+        }
+    }
+
+    public record LineDrawingOperation(Line line, ResourceKey<Level> dimension) implements DrawingOperation {
+        @Override
+        public void revert(Drawing drawing) {
+            drawing.drawingCache.removeLine(line, dimension);
+        }
+    }
+
+    public record TextDrawingOperation(Text text, ResourceKey<Level> dimension) implements DrawingOperation {
+        @Override
+        public void revert(Drawing drawing) {
+            drawing.drawingCache.removeText(text.x(), text.z(), dimension);
+        }
+    }
+
+    public record EraseOperation(LongList chunks, List<Line> lines, List<Text> texts, ResourceKey<Level> dimension) implements DrawingOperation {
+        @Override
+        public void revert(Drawing drawing) {
+            for (var chunkLong : chunks) {
+                var chunkX = ChunkUtils.longToChunkX(chunkLong);
+                var chunkZ = ChunkUtils.longToChunkZ(chunkLong);
+                drawing.drawingCache.addHighlight(chunkX, chunkZ, drawing.drawingColorCycler.getColor().getColor(), dimension);
+            }
+            for (var line : lines) {
+                drawing.drawingCache.addLine(line, drawing.drawingColorCycler.getColorInt(150), dimension);
+            }
+            for (var text : texts) {
+                drawing.drawingCache.addText(text, dimension);
+            }
+        }
+    }
+
+    public static class DrawingOperationCollector {
+        private final LongList chunks = new LongArrayList();
+        private final List<Line> lines = new ArrayList<>();
+        private final List<Text> texts = new ArrayList<>();
+        private final ResourceKey<Level> dimension;
+        public boolean erase;
+
+        public DrawingOperationCollector(ResourceKey<Level> dimension, boolean erase) {
+            this.dimension = dimension;
+            this.erase = erase;
+        }
+
+        public void addHighlight(int chunkX, int chunkZ) {
+            long chunkLong = ChunkUtils.chunkPosToLong(chunkX, chunkZ);
+            chunks.add(chunkLong);
+        }
+
+        public void addLine(Line line) {
+            lines.add(line);
+        }
+
+        public void addText(Text text) {
+            texts.add(text);
+        }
+
+        public DrawingOperation collect() {
+            if (erase) {
+                return new EraseOperation(chunks, lines, texts, dimension);
+            }
+            if (!chunks.isEmpty()) {
+                return new HighlightDrawingOperation(chunks, dimension);
+            } else if (!lines.isEmpty()) {
+                // only one line at a time
+                return new LineDrawingOperation(lines.get(0), dimension);
+            } else if (!texts.isEmpty()) {
+                // only one text at a time
+                return new TextDrawingOperation(texts.get(0), dimension);
+            }
+            return null;
+        }
     }
 
     public static final class DrawingColorCycler {

@@ -640,7 +640,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         opcode = Opcodes.GETFIELD,
         ordinal = 0
     ), remap = true)
-    public void renderMeasurmentToolText(
+    public void renderMeasurementToolText(
         final GuiGraphics guiGraphics,
         final int scaledMouseX,
         final int scaledMouseY,
@@ -688,6 +688,17 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             -1,
             0.0F, 0.0F, 0.0F, 0.4F
         );
+        var lines = I18n.get("xaeroplus.gui.world_map.drawing_mode_controls").split("\n");
+        for (int i = 0; i < lines.length; i++) {
+            MapRenderHelper.drawStringWithBackground(
+                guiGraphics, Minecraft.getInstance().font,
+                lines[i].trim(),
+                40,
+                this.height - 2 - (lines.length * (Minecraft.getInstance().font.lineHeight + 1)) + (i * (Minecraft.getInstance().font.lineHeight + 1)),
+                -1,
+                0.0F, 0.0F, 0.0F, 0.4F
+            );
+        }
     }
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true, remap = true)
@@ -702,13 +713,18 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             drawingLeftClickDown = true;
             switch (drawingMode) {
                 case LINE_SEGMENT, INFINITE_LINE, TEXT, MEASUREMENT -> {
-                    if (drawInProgressPos == null) {
-                        drawInProgressPos = new BlockPos(mouseBlockPosX, 0, mouseBlockPosZ);
-                    }
+                    drawInProgressPos = new BlockPos(mouseBlockPosX, 0, mouseBlockPosZ);
                 }
             }
-            if (drawingMode == DrawingMode.TEXT && !drawTextEntryActive) {
+            if (drawingMode == DrawingMode.TEXT) {
+                if (drawTextEntryActive) {
+                    if (drawTextEntryField.isMouseOver(event.x(), event.y())) {
+                        return;
+                    }
+                    removeWidget(drawTextEntryField);
+                }
                 drawTextEntryActive = true;
+                ModuleManager.getModule(Drawing.class).startOperation(Globals.getCurrentDimensionId(), false);
                 drawTextEntryField.setX(Mth.clamp((int) event.x() - (drawTextEntryField.getWidth() / 2), 5, width - drawTextEntryField.getWidth() - 5));
                 drawTextEntryField.setY(Mth.clamp((int) event.y() - (drawTextEntryField.getHeight() / 2), 5, height - drawTextEntryField.getHeight() - 5));
                 addWidget(drawTextEntryField);
@@ -717,9 +733,11 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 drawTextEntryField.setHint(Component.literal("Text:").withStyle(ChatFormatting.DARK_GRAY));
                 setFocused(drawTextEntryField);
             }
+            ModuleManager.getModule(Drawing.class).startOperation(Globals.getCurrentDimensionId(), false);
             cir.setReturnValue(true);
         } else if (event.button() == 1) {
             drawingRightClickDown = true;
+            ModuleManager.getModule(Drawing.class).startOperation(Globals.getCurrentDimensionId(), true);
             cir.setReturnValue(true);
         }
     }
@@ -732,7 +750,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             cir.setReturnValue(true);
             return;
         }
-        if (event.button() == 0) { // start drawing on left click
+        if (event.button() == 0) { // stop drawing on left click release
             switch (drawingMode) {
                 case LINE_SEGMENT, INFINITE_LINE -> {
                     if (drawInProgressPos != null) {
@@ -749,12 +767,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 }
             }
             drawingLeftClickDown = false;
+            ModuleManager.getModule(Drawing.class).endOperation();
             cir.setReturnValue(true);
         } else if (event.button() == 1) { // clear drawing on right click
             drawingRightClickDown = false;
             if (drawInProgressPos != null) return;
             ModuleManager.getModule(Drawing.class).removeLine(mouseBlockPosX, mouseBlockPosZ);
             ModuleManager.getModule(Drawing.class).removeText(mouseBlockPosX, mouseBlockPosZ, getFboScale());
+            ModuleManager.getModule(Drawing.class).endOperation();
             cir.setReturnValue(true);
         }
     }
@@ -763,6 +783,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     private void xaeroPlus$stopDrawing() {
         drawing = false;
         drawInProgressPos = null;
+        ModuleManager.getModule(Drawing.class).endOperation();
         ModuleManager.getModule(Drawing.class).removeInProgressLine();
         drawingLeftClickDown = false;
         drawingRightClickDown = false;
@@ -782,6 +803,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         drawTextEntryField.visible = false;
         drawMeasurementToolButton.visible = false;
         this.init(Minecraft.getInstance(), width, height);
+    }
+
+    @Inject(method = "keyPressed", at = @At("RETURN"), remap = true)
+    public void xaeroplus$drawingModeUndo(final KeyEvent event, final CallbackInfoReturnable<Boolean> cir) {
+        if (event.hasControlDown() && event.key() == GLFW_KEY_Z) {
+            ModuleManager.getModule(Drawing.class).undoLastOperation();
+        }
     }
 
     @Inject(method = "onInputPress", at = @At("HEAD"))
@@ -809,6 +837,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                         var text = new Text(value, drawInProgressPos.getX(), drawInProgressPos.getZ(), ColorHelper.getColor(255, 255, 255, 255), 1f);
                         ModuleManager.getModule(Drawing.class).addText(text);
                         xaeroPlus$stopDrawing();
+                        onToggleDrawingButton(); // re-enable
                         cir.setReturnValue(true);
                         return;
                     }

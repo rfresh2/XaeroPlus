@@ -1,12 +1,12 @@
-name: 1.21.9 Build
+name: 1.21.10 Build
 
 on:
   pull_request:
   push:
     branches:
-      - "1.21.9"
+      - "1.21.10"
 env:
-  MINECRAFT_VERSION: "1.21.9"
+  MINECRAFT_VERSION: "1.21.10"
 
 jobs:
   build:
@@ -143,8 +143,8 @@ jobs:
       - name: Setup Fabric Test Mods
         run: |
           mkdir -p run/mods && cp artifacts/${{ needs.build.outputs.xp_fabric }}.jar run/mods \
-          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ needs.build.outputs.minimap_version_fabric }}_Fabric_${{ env.MINECRAFT_VERSION }}/xaeros-minimap-${{ needs.build.outputs.minimap_version_fabric }}_Fabric_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/ \
-          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ needs.build.outputs.worldmap_version_fabric }}_Fabric_${{ env.MINECRAFT_VERSION }}/xaeros-world-map-${{ needs.build.outputs.worldmap_version_fabric }}_Fabric_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/
+          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ needs.build.outputs.minimap_version_fabric }}_Fabric_1.21.9/xaeros-minimap-${{ needs.build.outputs.minimap_version_fabric }}_Fabric_1.21.9.jar -P run/mods/ \
+          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ needs.build.outputs.worldmap_version_fabric }}_Fabric_1.21.9/xaeros-world-map-${{ needs.build.outputs.worldmap_version_fabric }}_Fabric_1.21.9.jar -P run/mods/
 
       - name: Bootstrap Test Mod
         run: |
@@ -158,7 +158,7 @@ jobs:
           regex: .*fabric.*
 #        mc-runtime-test: fabric
           mc-runtime-test: none
-          fabric-api: 0.134.0
+          fabric-api: 0.135.0
           java: 21
           xvfb: true
           headlessmc-command: --jvm -Djava.awt.headless=true
@@ -187,8 +187,8 @@ jobs:
       - name: Setup Forge Test
         run: |
           mkdir -p run/mods && cp artifacts/${{ needs.build.outputs.xp_forge }}.jar run/mods \
-          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ needs.build.outputs.minimap_version_forge }}_Forge_${{ env.MINECRAFT_VERSION }}/xaeros-minimap-${{ needs.build.outputs.minimap_version_forge }}_Forge_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/ \
-          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ needs.build.outputs.worldmap_version_forge }}_Forge_${{ env.MINECRAFT_VERSION }}/xaeros-world-map-${{ needs.build.outputs.worldmap_version_forge }}_Forge_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/
+          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ needs.build.outputs.minimap_version_forge }}_Forge_1.21.9/xaeros-minimap-${{ needs.build.outputs.minimap_version_forge }}_Forge_1.21.9.jar -P run/mods/ \
+          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ needs.build.outputs.worldmap_version_forge }}_Forge_1.21.9/xaeros-world-map-${{ needs.build.outputs.worldmap_version_forge }}_Forge_1.21.9.jar -P run/mods/
 
       - name: Bootstrap Test Mod
         run: |
@@ -230,8 +230,8 @@ jobs:
       - name: Setup Neo Test
         run: |
           mkdir -p run/mods && cp artifacts/${{ needs.build.outputs.xp_neo }}.jar run/mods \
-          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ needs.build.outputs.minimap_version_neo}}_NeoForge_${{ env.MINECRAFT_VERSION }}/xaeros-minimap-${{ needs.build.outputs.minimap_version_neo }}_NeoForge_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/ \
-          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ needs.build.outputs.worldmap_version_neo }}_NeoForge_${{ env.MINECRAFT_VERSION }}/xaeros-world-map-${{ needs.build.outputs.worldmap_version_neo }}_NeoForge_${{ env.MINECRAFT_VERSION }}.jar -P run/mods/
+          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ needs.build.outputs.minimap_version_neo}}_NeoForge_1.21.9/xaeros-minimap-${{ needs.build.outputs.minimap_version_neo }}_NeoForge_1.21.9.jar -P run/mods/ \
+          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ needs.build.outputs.worldmap_version_neo }}_NeoForge_1.21.9/xaeros-world-map-${{ needs.build.outputs.worldmap_version_neo }}_NeoForge_1.21.9.jar -P run/mods/
 #
 #      - name: Bootstrap Test Mod
 #        run: |

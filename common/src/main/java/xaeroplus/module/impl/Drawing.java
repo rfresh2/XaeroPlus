@@ -173,6 +173,7 @@ public class Drawing extends Module {
     }
 
     public void removeHighlight(final int chunkX, final int chunkZ) {
+        if (!drawingCache.getHighlights(Globals.getCurrentDimensionId()).containsKey(ChunkUtils.chunkPosToLong(chunkX, chunkZ))) return;
         drawingCache.removeHighlight(chunkX, chunkZ, Globals.getCurrentDimensionId());
         if (operationCollector != null) {
             operationCollector.addHighlight(chunkX, chunkZ);

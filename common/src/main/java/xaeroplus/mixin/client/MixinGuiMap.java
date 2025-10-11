@@ -715,7 +715,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     removeWidget(drawTextEntryField);
                 }
                 drawTextEntryActive = true;
-                ModuleManager.getModule(Drawing.class).startOperation(Globals.getCurrentDimensionId(), false);
                 drawTextEntryField.setX(Mth.clamp((int) mouseX - (drawTextEntryField.getWidth() / 2), 5, width - drawTextEntryField.getWidth() - 5));
                 drawTextEntryField.setY(Mth.clamp((int) mouseY - (drawTextEntryField.getHeight() / 2), 5, height - drawTextEntryField.getHeight() - 5));
                 addWidget(drawTextEntryField);
@@ -752,13 +751,17 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                             case INFINITE_LINE -> ModuleManager.getModule(Drawing.class).addInfiniteLine(line);
                         }
                         drawInProgressPos = null;
+                        ModuleManager.getModule(Drawing.class).endOperation();
                     }
-                } case MEASUREMENT -> {
+                }
+                case MEASUREMENT -> {
                     drawInProgressPos = null;
+                }
+                case HIGHLIGHT -> {
+                    ModuleManager.getModule(Drawing.class).endOperation();
                 }
             }
             drawingLeftClickDown = false;
-            ModuleManager.getModule(Drawing.class).endOperation();
             cir.setReturnValue(true);
         } else if (par3 == 1) { // clear drawing on right click
             drawingRightClickDown = false;

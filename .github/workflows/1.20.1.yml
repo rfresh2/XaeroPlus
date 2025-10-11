@@ -27,8 +27,7 @@ jobs:
       with:
         path: |
           "**/.gradle/loom-cache"
-          "**/.gradle/architectury-cache"
-          "**/.gradle/architectury"
+          "**/.gradle/architectury*"
         key: "${{ env.MINECRAFT_VERSION }}-loom-${{ hashFiles('settings.gradle.kts', 'gradle.properties', '**/gradle-wrapper.properties', 'buildSrc/build.gradle.kts', 'buildSrc/**/*.gradle.kts', '**/*.accesswidener') }}"
 
     - name: Elevate wrapper permissions

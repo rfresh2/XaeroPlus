@@ -80,5 +80,8 @@ tasks {
             }
         }
     }
+    shadowJar {
+        enabled = false
+    }
 }
 

@@ -22,6 +22,12 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
+    - name: Loom Cache
+      uses: actions/cache@v4
+      with:
+        path: "**/.gradle/loom-cache"
+        key: "${{ env.MINECRAFT_VERSION }}-loom-${{ hashFiles('settings.gradle.kts', 'gradle.properties', '**/gradle-wrapper.properties', 'buildSrc/build.gradle.kts', 'buildSrc/**/*.gradle.kts', '**/*.accesswidener') }}"
+
     - name: Elevate wrapper permissions
       run: chmod +x ./gradlew
 

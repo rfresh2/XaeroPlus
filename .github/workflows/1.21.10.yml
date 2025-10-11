@@ -24,10 +24,7 @@ jobs:
     - name: Loom Cache
       uses: actions/cache@v4
       with:
-        path: |
-          "**/.gradle/loom-cache"
-          "**/.gradle/architectury-cache"
-          "**/.gradle/architectury"
+        path: "**/.gradle/loom-cache"
         key: "${{ env.MINECRAFT_VERSION }}-loom-${{ hashFiles('settings.gradle.kts', 'gradle.properties', '**/gradle-wrapper.properties', 'buildSrc/build.gradle.kts', 'buildSrc/**/*.gradle.kts', '**/*.accesswidener') }}"
 
     - name: Elevate wrapper permissions
@@ -35,6 +32,9 @@ jobs:
 
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v5
+      with:
+        # read only on pull requests, otherwise allow writes
+        cache-read-only: ${{ github.event_name == 'pull_request' }}
 
     - name: Build Mods
       run: ./gradlew build

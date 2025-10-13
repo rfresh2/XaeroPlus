@@ -157,7 +157,7 @@ jobs:
 
       - name: Bootstrap Test Mod
         run: |
-          wget https://cdn.2b2t.vc/mc-runtime-test-1.21.9-3.1.1-fabric-release.jar -P run/mods
+          wget https://cdn.2b2t.vc/mc-runtime-test-1.21.10-3.1.1-fabric-release.jar -P run/mods
 
       - name: Fabric Test
         uses: headlesshq/mc-runtime-test@3.1.1
@@ -201,7 +201,7 @@ jobs:
 
       - name: Bootstrap Test Mod
         run: |
-          wget https://cdn.2b2t.vc/mc-runtime-test-1.21.9-3.1.1-lexforge-release.jar -P run/mods
+          wget https://cdn.2b2t.vc/mc-runtime-test-1.21.10-3.1.1-lexforge-release.jar -P run/mods
 
       - name: Forge Test
         uses: headlesshq/mc-runtime-test@3.1.1
@@ -241,10 +241,10 @@ jobs:
           mkdir -p run/mods && cp artifacts/${{ needs.build.outputs.xp_neo }}.jar run/mods \
           && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ needs.build.outputs.minimap_version_neo}}_NeoForge_1.21.9/xaeros-minimap-${{ needs.build.outputs.minimap_version_neo }}_NeoForge_1.21.9.jar -P run/mods/ \
           && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ needs.build.outputs.worldmap_version_neo }}_NeoForge_1.21.9/xaeros-world-map-${{ needs.build.outputs.worldmap_version_neo }}_NeoForge_1.21.9.jar -P run/mods/
-#
-#      - name: Bootstrap Test Mod
-#        run: |
-#          wget https://cdn.2b2t.vc/mc-runtime-test-1.21.9-3.1.1-neoforge-release.jar -P run/mods
+
+      - name: Bootstrap Test Mod
+        run: |
+          wget https://cdn.2b2t.vc/mc-runtime-test-1.21.10-3.1.1-neoforge-release.jar -P run/mods
 
       - name: Neo Test
         uses: headlesshq/mc-runtime-test@3.1.1

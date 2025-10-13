@@ -20,9 +20,6 @@ import xaeroplus.settings.BooleanSetting;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.XaeroPlusGameTest;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
 @Mod(value = "xaeroplus", dist = Dist.CLIENT)
 public class XaeroPlusNeo {
     public static final IEventBus FORGE_EVENT_BUS = NeoForge.EVENT_BUS;
@@ -51,9 +48,6 @@ public class XaeroPlusNeo {
     public void onClientStartedEvent(final ClientStartedEvent event) {
         if (System.getenv("XP_CI_TEST") != null) {
             Minecraft.getInstance().execute(XaeroPlusGameTest::applyMixinsTest);
-            Executors.newSingleThreadScheduledExecutor().schedule(() -> {
-                Minecraft.getInstance().stop();
-            }, 20L, TimeUnit.SECONDS);
         }
     }
 

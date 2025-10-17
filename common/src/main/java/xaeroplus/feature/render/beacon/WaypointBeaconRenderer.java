@@ -134,11 +134,11 @@ public class WaypointBeaconRenderer {
         final double y = -100;
 //        if (!frustum.isVisible(new AABB(waypointVec.x-1, -100, waypointVec.z-1, waypointVec.x+1, 500, waypointVec.z+1))) return;
         final int color = waypoint.getWaypointColor().getHex();
-        final long time = mc.level.getGameTime();
+        var animationTime = Math.floorMod(mc.level.getGameTime(), 40);
         matrixStack.pushPose();
         matrixStack.translate(x, y, z);
         BeaconRenderer.submitBeaconBeam(
-            matrixStack, submitNodeCollector, BEAM_LOCATION, 1.0f, 1.0f, 0, 355,
+            matrixStack, submitNodeCollector, BEAM_LOCATION, 1.0f, animationTime, 0, 355,
             color, 0.2f, 0.25f);
         matrixStack.popPose();
     }

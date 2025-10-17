@@ -19,7 +19,7 @@
   <img src="https://img.shields.io/badge/MC-1.20.2-brightgreen.svg" alt="Minecraft"/>
   <img src="https://img.shields.io/badge/MC-1.20.4-brightgreen.svg" alt="Minecraft"/>
   <img src="https://img.shields.io/badge/MC-1.20.6-brightgreen.svg" alt="Minecraft"/>
-  <img src="https://img.shields.io/badge/MC-1.21-brightgreen.svg" alt="Minecraft"/>
+  <img src="https://img.shields.io/badge/MC-1.21.1-brightgreen.svg" alt="Minecraft"/>
   <img src="https://img.shields.io/badge/MC-1.21.3-brightgreen.svg" alt="Minecraft"/>
   <img src="https://img.shields.io/badge/MC-1.21.4-brightgreen.svg" alt="Minecraft"/>
   <img src="https://img.shields.io/badge/MC-1.21.5-brightgreen.svg" alt="Minecraft"/>
@@ -53,16 +53,13 @@ Available on:
 
 # Xaero Versions
 
-Each XaeroPlus release is only compatible with a specific version of Xaero's WorldMap and Minimap.
-Xaero's Minimap can be swapped out for [BetterPVP](https://chocolateminecraft.com/betterpvp2.php)
+Each XaeroPlus release is only compatible with a specific version of Xaero's WorldMap and Minimap (or [BetterPVP](https://chocolateminecraft.com/betterpvp2.php)).
 
 Download and include these mods **in addition** to `XaeroPlus-*.jar` (3 jars total).
 
 You can find download links to Xaero's mods here:
-* https://modrinth.com/mod/xaeros-world-map/versions?g=1.20.1
-* https://modrinth.com/mod/xaeros-minimap/versions?g=1.20.1
-
-Or a modpack zip with these jars is included in the Github releases.
+* https://modrinth.com/mod/xaeros-world-map/versions
+* https://modrinth.com/mod/xaeros-minimap/versions
 
 # Modifications
 

@@ -299,6 +299,7 @@
   "xaeroplus.gui.draw_order.title": "Kolejność Rysowania XaeroPlus",
   "xaeroplus.gui.draw_order.subtitle": "Kliknij i przeciągnij, aby zmienić kolejność",
   "xaeroplus.gui.draw_order.reset": "Nastawić",
+  "xaeroplus.gui.world_map.exit": "Wyjście",
   "key.category.xaeroplus.keybindings": "XaeroPlus",
   "xaeroplus.setting.teleport_fail_notifier": "Powiadomienie o Nieudanym Teleporcie",
   "xaeroplus.setting.teleport_fail_notifier.tooltip": "Wysyła powiadomienie na czacie, gdy teleport Xaero się nie powiedzie — zwykle z powodu braku uprawnień serwera",

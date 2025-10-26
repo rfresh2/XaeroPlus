@@ -301,6 +301,7 @@
   "xaeroplus.gui.draw_order.title": "Thứ Tự Vẽ XaeroPlus",
   "xaeroplus.gui.draw_order.subtitle": "Nhấp và kéo để thay đổi thứ tự",
   "xaeroplus.gui.draw_order.reset": "Cài lại",
+  "xaeroplus.gui.world_map.exit": "Ra",
   "key.category.xaeroplus.keybindings": "XaeroPlus",
   "xaeroplus.setting.teleport_fail_notifier": "Thông Báo Dịch Chuyển Thất Bại",
   "xaeroplus.setting.teleport_fail_notifier.tooltip": "Gửi thông báo trong chat khi dịch chuyển xaero thất bại — thường do thiếu quyền máy chủ",

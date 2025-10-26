@@ -301,6 +301,7 @@
   "xaeroplus.gui.draw_order.title": "Orden de Dibujo de XaeroPlus",
   "xaeroplus.gui.draw_order.subtitle": "Haz clic y arrastra para cambiar el orden",
   "xaeroplus.gui.draw_order.reset": "Reiniciar",
+  "xaeroplus.gui.world_map.exit": "Salida",
   "key.category.xaeroplus.keybindings": "XaeroPlus",
   "xaeroplus.setting.teleport_fail_notifier": "Notificador de Fallo de Teletransporte",
   "xaeroplus.setting.teleport_fail_notifier.tooltip": "Envía una notificación en el chat cuando un teletransporte de xaero falla, normalmente por falta de permisos del servidor",

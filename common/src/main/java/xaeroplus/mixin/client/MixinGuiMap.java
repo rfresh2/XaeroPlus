@@ -59,8 +59,8 @@ import xaeroplus.util.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 import java.util.concurrent.ForkJoinPool;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -91,6 +91,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Unique Button drawTextButton;
     @Unique Button drawColorCyclerButton;
     @Unique Button drawMeasurementToolButton;
+    @Unique Button exitButton;
     @Unique boolean drawing = false;
     @Unique BlockPos drawInProgressPos = null;
     @Unique boolean drawingLeftClickDown = false;
@@ -261,6 +262,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 )),
             256, 256
             );
+        exitButton = new GuiTexturedButton(
+            // invisible button on the compass
+            this.width - 34, 2, 32, 32, 0, 0, 0, 0,
+            this.xpGuiTextures,
+            (button -> onClose()),
+            () -> new CursorBox("Exit"),
+            256, 256
+        );
         pan = false;
         drawing = false;
 
@@ -281,6 +290,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         addButton(switchToEndButton);
         addButton(switchToOverworldButton);
         addButton(switchToNetherButton);
+        addButton(exitButton);
     }
 
     @Unique

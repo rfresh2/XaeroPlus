@@ -88,6 +88,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Unique Button drawTextButton;
     @Unique Button drawColorCyclerButton;
     @Unique Button drawMeasurementToolButton;
+    @Unique Button exitButton;
     @Unique boolean drawing = false;
     @Unique BlockPos drawInProgressPos = null;
     @Unique boolean drawingLeftClickDown = false;
@@ -247,6 +248,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     ), Settings.REGISTRY.switchToNetherSetting.getKeyBinding()
                 ))
             );
+        exitButton = new GuiTexturedButton(
+            // invisible button on the compass
+            this.width - 34, 2, 32, 32, 0, 0, 0, 0,
+            this.xpGuiTextures,
+            (button -> onClose()),
+            () -> new CursorBox("Exit")
+        );
         pan = false;
         drawing = false;
 
@@ -267,6 +275,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         addButton(switchToEndButton);
         addButton(switchToOverworldButton);
         addButton(switchToNetherButton);
+        addButton(exitButton);
     }
 
     @Unique

@@ -301,6 +301,7 @@
   "xaeroplus.gui.draw_order.title": "Порядок Отрисовки XaeroPlus",
   "xaeroplus.gui.draw_order.subtitle": "Щёлкните и перетащите, чтобы изменить порядок",
   "xaeroplus.gui.draw_order.reset": "Перезагрузить",
+  "xaeroplus.gui.world_map.exit": "Выход",
   "key.category.xaeroplus.keybindings": "XaeroPlus",
   "xaeroplus.setting.teleport_fail_notifier": "Уведомление о Неудачном Телепорте",
   "xaeroplus.setting.teleport_fail_notifier.tooltip": "Отправляет сообщение в чат, когда телепорт Xaero не срабатывает — обычно из-за отсутствия прав на сервере",

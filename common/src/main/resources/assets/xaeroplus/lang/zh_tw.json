@@ -301,6 +301,7 @@
   "xaeroplus.gui.draw_order.title": "XaeroPlus 繪製順序",
   "xaeroplus.gui.draw_order.subtitle": "點擊並拖動以更改順序",
   "xaeroplus.gui.draw_order.reset": "重設",
+  "xaeroplus.gui.world_map.exit": "出口",
   "key.category.xaeroplus.keybindings": "XaeroPlus",
   "xaeroplus.setting.teleport_fail_notifier": "傳送失敗通知",
   "xaeroplus.setting.teleport_fail_notifier.tooltip": "當Xaero傳送失敗時在聊天中發送通知，通常是因為缺少伺服器權限",

@@ -301,6 +301,7 @@
   "xaeroplus.gui.draw_order.title": "XaeroPlus Draw Order",
   "xaeroplus.gui.draw_order.subtitle": "Click and drag to change the order",
   "xaeroplus.gui.draw_order.reset": "Reset",
+  "xaeroplus.gui.world_map.exit": "Exit",
   "key.category.xaeroplus.keybindings": "XaeroPlus",
   "xaeroplus.setting.teleport_fail_notifier": "Teleport Fail Notifier",
   "xaeroplus.setting.teleport_fail_notifier.tooltip": "Sends a notification in chat when a xaero teleport is attempted and fails - most commonly due to lacking server permissions",

@@ -77,14 +77,14 @@ jobs:
       run: mv forge/build/libs/${{ env.XP_FORGE }}.jar forge/build/libs/${{ env.XP_FORGE_OUT }}.jar
 
     - name: Upload Fabric Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: ${{ env.XP_FABRIC_OUT }}
         path: fabric/build/libs/${{ env.XP_FABRIC_OUT }}.jar
         if-no-files-found: error
 
     - name: Upload Forge Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: ${{ env.XP_FORGE_OUT }}
         path: forge/build/libs/${{ env.XP_FORGE_OUT }}.jar

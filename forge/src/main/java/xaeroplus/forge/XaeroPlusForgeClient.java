@@ -18,7 +18,7 @@ import xaeroplus.util.XaeroPlusGameTest;
 
 public class XaeroPlusForgeClient {
     public void init(final FMLJavaModLoadingContext context, BusGroup modBusGroup) {
-        RegisterKeyMappingsEvent.getBus(modBusGroup).addListener(this::onRegisterKeyMappingsEvent);
+        RegisterKeyMappingsEvent.BUS.addListener(this::onRegisterKeyMappingsEvent);
         RegisterClientCommandsEvent.BUS.addListener(this::onRegisterClientCommandsEvent);
         RemovalCause explicit = RemovalCause.EXPLICIT; // force class load to stop forge shitting itself at runtime??
         context.registerExtensionPoint(

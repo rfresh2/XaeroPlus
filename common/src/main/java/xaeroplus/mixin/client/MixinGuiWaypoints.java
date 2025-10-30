@@ -16,15 +16,19 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.common.IXaeroMinimap;
+import xaero.common.graphics.CursorBox;
 import xaero.common.gui.GuiWaypoints;
-import xaero.common.gui.MySmallButton;
 import xaero.common.gui.ScreenBase;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.minimap.waypoints.WaypointsSort;
 import xaero.common.misc.KeySortableByOther;
+import xaero.common.misc.Misc;
 import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.world.MinimapWorld;
+import xaeroplus.Globals;
+import xaeroplus.feature.extensions.MinimapGuiTexturedButton;
 import xaeroplus.settings.Settings;
+import xaeroplus.util.ColorHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,8 +38,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 @Mixin(value = GuiWaypoints.class, remap = false)
 public abstract class MixinGuiWaypoints extends ScreenBase {
     @Unique private EditBox searchField;
-    @Unique private final int TOGGLE_ALL_ID = 69;
-    @Unique private MySmallButton toggleAllButton;
+    @Unique private MinimapGuiTexturedButton toggleAllButton;
     @Unique private String waypointsSearchFilter = "";
 
     @Shadow private MinimapWorld displayedWorld;
@@ -55,26 +58,36 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         this.searchField.tick();
     }
 
-    @Inject(method = "init", at = @At("RETURN"), remap = true)
+    @Inject(method = "init", at = @At("HEAD"), remap = true)
     public void initGui(CallbackInfo ci) {
         this.waypointsSearchFilter = "";
-        this.searchField = new EditBox(this.font, this.width / 2 - 297, 32, 80, 20, Component.literal("Search"));
+        this.searchField = new EditBox(this.font,
+            this.width / 2 - 208, 64, 50, 20,
+            Component.translatable("xaeroplus.gui.waypoints.search"));
         this.searchField.setValue("");
         this.searchField.moveCursorTo(0);
         this.searchField.setCursorPosition(0);
-        // todo: this button is a bit larger than i want but cba to figure out exact size rn
-        this.toggleAllButton = new MySmallButton(
-            TOGGLE_ALL_ID,
-            this.width / 2 + 213,
-            this.height - 53,
-            Component.translatable("xaeroplus.gui.waypoints.toggle_enable_all"),
-            b -> {
+        this.toggleAllButton = new MinimapGuiTexturedButton(
+            this.width / 2 + 182, this.height - 29,
+            20, 20,
+            2, 18,
+            17, 17,
+            Globals.guiTextures,
+            (b) -> {
                 waypointsSorted.stream().findFirst().ifPresent(firstWaypoint -> {
                     boolean firstIsEnabled = firstWaypoint.isDisabled();
                     waypointsSorted.forEach(waypoint -> waypoint.setDisabled(!firstIsEnabled));
                 });
-            });
+                updateSortedList();
+            },
+            () -> new CursorBox(Component.literal("[XP] ").append(Component.translatable("xaeroplus.gui.waypoints.toggle_enable_all")))
+    );
         if (!Settings.REGISTRY.waypointsListUIAdditions.get()) return;
+        if (this.width > 590) {
+            this.searchField.setX(this.width / 2 - 280);
+            this.searchField.setWidth(64);
+            this.searchField.setY(32);
+        }
         this.addWidget(searchField);
         this.setFocused(this.searchField);
         this.addRenderableWidget(toggleAllButton);
@@ -86,7 +99,7 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         boolean dropDownClosed = this.openDropdown == null;
         if (dropDownClosed) {
             if (this.searchField.mouseClicked(x, y, button)) {
-                this.searchField.setFocused(true);
+                setFocused(this.searchField);
                 this.searchField.moveCursorToEnd();
                 this.searchField.setEditable(true);
             } else {
@@ -98,7 +111,7 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
     @Inject(method = "keyPressed", at = @At(value = "INVOKE", target = "Lxaero/common/gui/ScreenBase;keyPressed(III)Z", shift = At.Shift.AFTER), remap = true, cancellable = true)
     public void keyTypedInject(final int keycode, final int scanCode, final int modifiers, final CallbackInfoReturnable<Boolean> cir) {
         if (!Settings.REGISTRY.waypointsListUIAdditions.get()) return;
-        if (searchField.isFocused()) {
+        if (searchField.isFocused() && searchField.isVisible()) {
             updateSearch();
             cir.setReturnValue(true);
         }
@@ -116,13 +129,14 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
     public void drawScreenInject(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partial, final CallbackInfo ci) {
         if (!Settings.REGISTRY.waypointsListUIAdditions.get()) return;
         if (!this.searchField.isFocused() && this.searchField.getValue().isEmpty()) {
-            xaero.map.misc.Misc.setFieldText(this.searchField, I18n.get("gui.xaero_settings_search_placeholder", new Object[0]), -11184811);
+            Misc.setFieldText(this.searchField, I18n.get("gui.xaero_settings_search_placeholder", new Object[0]), ColorHelper.getColor(85, 85, 85, 255));
             this.searchField.moveCursorToStart();
         }
         this.searchField.render(guiGraphics, mouseX, mouseY, partial);
         if (!this.searchField.isFocused()) {
-            xaero.map.misc.Misc.setFieldText(this.searchField, this.waypointsSearchFilter);
+            Misc.setFieldText(this.searchField, this.waypointsSearchFilter);
         }
+        super.renderTooltips(guiGraphics, mouseX, mouseY, partial);
     }
 
     @Redirect(method = "updateButtons", at = @At(value = "INVOKE", target = "Lxaero/common/gui/GuiWaypoints;isOneSelected()Z"))
@@ -133,13 +147,11 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
 
     @Unique
     private void updateSearch() {
-        if (this.searchField.isFocused()) {
-            String newValue = this.searchField.getValue();
-            if (!this.waypointsSearchFilter.equals(newValue)) {
-                this.waypointsSearchFilter = this.searchField.getValue();
-                selectedListSet.clear();
-                updateSortedList();
-            }
+        String newValue = this.searchField.getValue();
+        if (!this.waypointsSearchFilter.equals(newValue)) {
+            this.waypointsSearchFilter = this.searchField.getValue();
+            selectedListSet.clear();
+            updateSortedList();
         }
     }
 

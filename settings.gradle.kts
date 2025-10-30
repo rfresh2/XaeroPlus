@@ -24,10 +24,10 @@ val minimap_version_neo: String by ext.properties
 dependencyResolutionManagement {
 	versionCatalogs {
 		create("libs") {
-			library("fabric-loader", "net.fabricmc:fabric-loader:0.17.2")
+			library("fabric-loader", "net.fabricmc:fabric-loader:0.17.3")
 			library("forge", "net.minecraftforge:forge:1.21.8-58.1.7")
-			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.134.0+${minecraft_version}")
-			library("neoforge", "net.neoforged:neoforge:21.8.47")
+			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.136.0+${minecraft_version}")
+			library("neoforge", "net.neoforged:neoforge:21.8.49")
 			library("worldmap-fabric", "maven.modrinth:xaeros-world-map:${worldmap_version_fabric}_Fabric_${minecraft_version}")
 			library("worldmap-forge", "maven.modrinth:xaeros-world-map:${worldmap_version_forge}_Forge_${minecraft_version}")
 			library("worldmap-neo", "maven.modrinth:xaeros-world-map:${worldmap_version_neo}_NeoForge_${minecraft_version}")
@@ -47,11 +47,11 @@ dependencyResolutionManagement {
 			library("fabric-waystones", "maven.modrinth:fwaystones:3.3.5+mc1.21.4")
 			library("worldtools", "maven.modrinth:worldtools:1.2.8+1.21.4")
             library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.50.3.1") // relocated xerial sqlite to avoid conflicts with other mods
-			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.12.1+1.21.8-fabric")
-			library("immediatelyfast-neo", "maven.modrinth:immediatelyfast:1.12.1+1.21.8-neoforge")
+			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.12.2+1.21.8-fabric")
+			library("immediatelyfast-neo", "maven.modrinth:immediatelyfast:1.12.2+1.21.8-neoforge")
 			library("modmenu", "maven.modrinth:modmenu:15.0.0")
-			library("sodium-fabric", "maven.modrinth:sodium:mc1.21.8-0.7.0-fabric")
-			library("sodium-neoforge", "maven.modrinth:sodium:mc1.21.8-0.7.0-neoforge")
+			library("sodium-fabric", "maven.modrinth:sodium:mc1.21.8-0.7.2-fabric")
+			library("sodium-neoforge", "maven.modrinth:sodium:mc1.21.8-0.7.2-neoforge")
 //			library("fpsdisplay", "maven.modrinth:fpsdisplay:3.1.0+1.20.x")
 			library("cloth-config-fabric", "me.shedaniel.cloth:cloth-config-fabric:17.0.144")
             library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")

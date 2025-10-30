@@ -2,7 +2,7 @@ package xaeroplus.feature.extensions;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import xaero.common.graphics.CursorBox;
@@ -52,6 +52,6 @@ public class MinimapGuiTexturedButton extends TooltipButton {
             }
         }
 
-        guiGraphics.blit(RenderType::guiTextured, this.texture, iconX, iconY, (float)this.textureX, (float)this.textureY, this.textureW, this.textureH, this.factorW, this.factorH, color);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, this.texture, iconX, iconY, (float)this.textureX, (float)this.textureY, this.textureW, this.textureH, this.factorW, this.factorH, color);
     }
 }

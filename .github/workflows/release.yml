@@ -116,7 +116,7 @@ jobs:
 
       - name: Upload Fabric Artifact
         if: ${{ inputs.fabric }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ env.XP_FABRIC }}
           path: fabric/build/libs/${{ env.XP_FABRIC }}.jar
@@ -124,7 +124,7 @@ jobs:
 
       - name: Upload Forge Artifact
         if: ${{ inputs.forge }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ env.XP_FORGE }}
           path: forge/build/libs/${{ env.XP_FORGE }}.jar
@@ -169,7 +169,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Download job artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           merge-multiple: true
           path: artifacts/

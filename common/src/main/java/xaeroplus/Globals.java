@@ -3,6 +3,7 @@ package xaeroplus;
 import com.google.common.base.Suppliers;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import xaero.common.HudMod;
 import xaero.hud.HudSession;
@@ -27,6 +28,7 @@ import static net.minecraft.world.level.Level.OVERWORLD;
  */
 public class Globals {
     public static final DrawManager drawManager = new DrawManager();
+    public static final ResourceLocation guiTextures = ResourceLocation.fromNamespaceAndPath("xaeroplus", "gui/xpgui.png");
     // cache and only update this on new world loads
     public static boolean nullOverworldDimensionFolder = false;
     public static Settings.DataFolderResolutionMode dataFolderResolutionMode = Settings.DataFolderResolutionMode.IP;

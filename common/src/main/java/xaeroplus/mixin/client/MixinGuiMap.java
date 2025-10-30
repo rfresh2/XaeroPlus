@@ -102,7 +102,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Unique DrawingMode drawingMode = DrawingMode.LINE_SEGMENT;
     @Unique EditBox drawTextEntryField;
     @Unique List<Button> guiMapButtonTempList = new ArrayList<>();
-    @Unique ResourceLocation xpGuiTextures = ResourceLocation.fromNamespaceAndPath("xaeroplus", "gui/xpgui.png");
     @Shadow private double cameraX = 0.0;
     @Shadow private double cameraZ = 0.0;
     @Shadow private int[] cameraDestination = null;
@@ -178,7 +177,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         zTextEntryField.setHint(Component.literal("Z:").withStyle(ChatFormatting.DARK_GRAY));
         startDrawingButton = new GuiTexturedButton(
             0, this.coordinateGotoButton.getY() - 20, 20, 20, 47, 0, 16, 16,
-            this.xpGuiTextures,
+            Globals.guiTextures,
             (button -> onToggleDrawingButton()),
             () -> new CursorBox(
                 xaeroPlus$keybindPrefix(xaeroPlus$prefix(
@@ -188,28 +187,28 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             256, 256);
         drawLineSegmentButton = new GuiTexturedButton(
             startDrawingButton.getX() + 16, startDrawingButton.getY(), 20, 20, 65, 0, 16, 16,
-            this.xpGuiTextures,
+            Globals.guiTextures,
             button -> setDrawingMode(DrawingMode.LINE_SEGMENT),
             () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_line_segment"))),
             256, 256);
         drawLineSegmentButton.visible = false;
         drawInfiniteLineButton = new GuiTexturedButton(
             startDrawingButton.getX() + 16, drawLineSegmentButton.getY() + 20, 20, 20, 101, 0, 16, 16,
-            this.xpGuiTextures,
+            Globals.guiTextures,
             button -> setDrawingMode(DrawingMode.INFINITE_LINE),
             () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_infinite_line"))),
             256, 256);
         drawInfiniteLineButton.visible = false;
         drawHighlightsButton = new GuiTexturedButton(
             startDrawingButton.getX() + 16, drawInfiniteLineButton.getY() + 20, 20, 20, 82, 0, 16, 16,
-            this.xpGuiTextures,
+            Globals.guiTextures,
             button -> setDrawingMode(DrawingMode.HIGHLIGHT),
             () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_highlights"))),
             256, 256);
         drawHighlightsButton.visible = false;
         drawTextButton = new GuiTexturedButton(
             startDrawingButton.getX() + 16, drawHighlightsButton.getY() + 20, 20, 20, 118, 0, 16, 16,
-            this.xpGuiTextures,
+            Globals.guiTextures,
             button -> setDrawingMode(DrawingMode.TEXT),
             () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_text"))),
             256, 256);
@@ -221,7 +220,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         drawColorCyclerButton.visible = false;
         drawMeasurementToolButton = new GuiTexturedButton(
             startDrawingButton.getX() + 16, drawColorCyclerButton.getY() + 20, 20, 20, 135, 0, 16, 16,
-            this.xpGuiTextures,
+            Globals.guiTextures,
             button -> setDrawingMode(DrawingMode.MEASUREMENT),
             () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_measurement_tool"))),
             256, 256);
@@ -233,7 +232,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         // right side
         switchToEndButton = new GuiTexturedButton(
             this.width - 20, zoomInButton.getY() - 20, 20, 20, 31, 0, 16, 16,
-            this.xpGuiTextures,
+            Globals.guiTextures,
             (button -> onSwitchDimensionButton(END)),
             () -> new CursorBox(
                 xaeroPlus$keybindPrefix(xaeroPlus$prefix(
@@ -244,7 +243,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         );
         switchToOverworldButton = new GuiTexturedButton(
             this.width - 20, this.switchToEndButton.getY() - 20, 20, 20, 16, 0, 16, 16,
-            this.xpGuiTextures,
+            Globals.guiTextures,
             (button -> onSwitchDimensionButton(OVERWORLD)),
             () -> new CursorBox(
                 xaeroPlus$keybindPrefix(xaeroPlus$prefix(
@@ -255,7 +254,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         );
         switchToNetherButton = new GuiTexturedButton(
             this.width - 20, this.switchToOverworldButton.getY() - 20, 20, 20, 0, 0, 16, 16,
-            this.xpGuiTextures,
+            Globals.guiTextures,
             (button -> onSwitchDimensionButton(NETHER)),
             () -> new CursorBox(
                 xaeroPlus$keybindPrefix(xaeroPlus$prefix(
@@ -267,9 +266,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         exitButton = new GuiTexturedButton(
             // invisible button on the compass
             this.width - 34, 2, 32, 32, 0, 0, 0, 0,
-            this.xpGuiTextures,
+            Globals.guiTextures,
             (button -> onClose()),
-            () -> new CursorBox("Exit"),
+            () -> new CursorBox(Component.translatable("xaeroplus.gui.world_map.exit")),
             256, 256
         );
         pan = false;

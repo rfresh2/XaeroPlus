@@ -1,0 +1,57 @@
+package xaeroplus.feature.extensions;
+
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import xaero.common.graphics.CursorBox;
+import xaero.common.gui.TooltipButton;
+import xaeroplus.util.ColorHelper;
+
+import java.util.function.Supplier;
+
+public class MinimapGuiTexturedButton extends TooltipButton {
+    public final int textureX;
+    public final int textureY;
+    public final int textureW;
+    public final int textureH;
+    protected final int factorW;
+    protected final int factorH;
+    public final ResourceLocation texture;
+
+    public MinimapGuiTexturedButton(int x, int y, int w, int h, int textureX, int textureY, int textureW, int textureH, ResourceLocation texture, Button.OnPress onPress, Supplier<CursorBox> tooltip, int factorW, int factorH) {
+        super(x, y, w, h, Component.empty(), onPress, tooltip);
+        this.textureX = textureX;
+        this.textureY = textureY;
+        this.textureW = textureW;
+        this.textureH = textureH;
+        this.texture = texture;
+        this.factorW = factorW;
+        this.factorH = factorH;
+    }
+
+    @Override
+    public Component getMessage() {
+        return this.getXaero_tooltip() != null
+            ? Component.literal((this.getXaero_tooltip().get()).getPlainText())
+            : super.getMessage();
+    }
+
+    @Override
+    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        int iconX = this.getX() + this.width / 2 - this.textureW / 2;
+        int iconY = this.getY() + this.height / 2 - this.textureH / 2;
+        int color = ColorHelper.getColor(64, 64, 64, 255);
+        if (this.active) {
+            if (this.isHovered) {
+                --iconY;
+                color = ColorHelper.getColor(230, 230, 230, 255);
+            } else {
+                color = ColorHelper.getColor(252, 252, 252, 255);
+            }
+        }
+
+        guiGraphics.blit(RenderType::guiTextured, this.texture, iconX, iconY, (float)this.textureX, (float)this.textureY, this.textureW, this.textureH, this.factorW, this.factorH, color);
+    }
+}

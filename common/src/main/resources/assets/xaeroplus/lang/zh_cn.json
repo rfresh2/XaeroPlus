@@ -274,6 +274,7 @@
   "xaeroplus.gui.world_map.baritone_path_here": "§2%s§r [XP] 通过 Baritone 寻路至此处",
   "xaeroplus.gui.world_map.baritone_elytra_here": "§2%s§r [XP] 通过 Baritone 使用鞘翅寻路至此处",
   "xaeroplus.gui.waypoints.toggle_enable_all": "切换全部启用",
+  "xaeroplus.gui.waypoints.search": "搜索",
   "xaeroplus.gui.waypoints.synced_waypoint": "已同步",
   "xaeroplus.setting.waystones_sync": "指路石同步",
   "xaeroplus.setting.waystones_sync.tooltip": "将指路石同步为路径点。",

@@ -274,6 +274,7 @@
   "xaeroplus.gui.world_map.baritone_path_here": "§2%s§r [XP] Caminho Baritone Aqui",
   "xaeroplus.gui.world_map.baritone_elytra_here": "§2%s§r [XP] Elytra Baritone Aqui",
   "xaeroplus.gui.waypoints.toggle_enable_all": "Alternar Ligar Todos",
+  "xaeroplus.gui.waypoints.search": "Pesquisa",
   "xaeroplus.gui.waypoints.synced_waypoint": "sincronizada",
   "xaeroplus.setting.waystones_sync": "Sincronizar Waystones",
   "xaeroplus.setting.waystones_sync.tooltip": "Sincroniza Waystones como localizações.",

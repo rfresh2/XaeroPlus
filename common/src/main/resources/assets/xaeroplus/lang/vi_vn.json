@@ -274,6 +274,7 @@
   "xaeroplus.gui.world_map.baritone_path_here": "§2%s§r [XP] Đường Đi Baritone Tại Đây",
   "xaeroplus.gui.world_map.baritone_elytra_here": "§2%s§r [XP] Baritone Elytra Tại Đây",
   "xaeroplus.gui.waypoints.toggle_enable_all": "Chuyển Đổi Kích Hoạt Tất Cả",
+  "xaeroplus.gui.waypoints.search": "Tìm kiếm",
   "xaeroplus.gui.waypoints.synced_waypoint": "đã đồng bộ hóa",
   "xaeroplus.setting.waystones_sync": "Đồng Bộ Hóa Waystones",
   "xaeroplus.setting.waystones_sync.tooltip": "Đồng bộ hóa Waystones như điểm đến.",

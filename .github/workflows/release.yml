@@ -132,7 +132,7 @@ jobs:
 
       - name: Upload Neo Artifact
         if: ${{ inputs.neo }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ env.XP_NEO }}
           path: neo/build/libs/${{ env.XP_NEO }}.jar

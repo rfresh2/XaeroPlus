@@ -1,5 +1,6 @@
 package xaeroplus.mixin.client;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -55,7 +56,13 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         super(modMain, mc, waypointsGuiRenderer, minimap, compassRenderer);
     }
 
-    @ModifyConstant(method = "loadFrameBuffer", constant = @Constant(intValue = 512))
+    @ModifyExpressionValue(
+        method = "loadFrameBuffer",
+        at = @At(
+            value = "CONSTANT",
+            args = "intValue=512"
+        )
+    )
     public int overrideFrameBufferSize(int size) {
         return Globals.minimapScaleMultiplier * 512;
     }

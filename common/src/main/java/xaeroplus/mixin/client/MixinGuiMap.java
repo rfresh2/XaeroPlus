@@ -266,7 +266,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             this.width - 34, 2, 32, 32, 0, 0, 0, 0,
             Globals.guiTextures,
             (button -> onClose()),
-            () -> new CursorBox(Component.translatable("xaeroplus.gui.world_map.exit")),
+            () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.exit"))),
             256, 256
         );
         pan = false;

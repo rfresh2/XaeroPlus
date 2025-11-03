@@ -151,14 +151,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     public void customInitGui(CallbackInfo ci) {
         // left side
         followButton = new GuiTexturedButton(
-            0, this.dimensionToggleButton.y - 20, 20, 20, this.follow ? 133 : 149, 16, 16, 16,
-            WorldMap.guiTextures,
+            0, this.dimensionToggleButton.y - 20, 20, 20, this.follow ? 61 : 42, 19, 16, 16,
+            Globals.guiTextures,
             this::onFollowButton,
             () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.toggle_follow_mode")
                 .append(" " + I18n.get(this.follow ? "xaeroplus.gui.off" : "xaeroplus.gui.on")))));
         coordinateGotoButton = new GuiTexturedButton(
-            0, followButton.y - 20 , 20, 20, 229, 16, 16, 16,
-            WorldMap.guiTextures,
+            0, followButton.y - 20 , 20, 20, 23, 19, 16, 16,
+            Globals.guiTextures,
             this::onGotoCoordinatesButton,
             () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.go_to_coordinates"))));
         xTextEntryField = new EditBox(Minecraft.getInstance().font, 20, coordinateGotoButton.y - 10, 75, 20, Component.nullToEmpty("X:"));
@@ -223,7 +223,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             this.zoomInButton.y = this.zoomOutButton.y - 20;
         }
         switchToEndButton = new GuiTexturedButton(
-            this.width - 20, zoomInButton.y - 20, 20, 20, 31, 0, 16, 16,
+            this.width - 20, zoomInButton.y - 20, 20, 20, 117, 19, 16, 16,
             Globals.guiTextures,
             (button -> onSwitchDimensionButton(END)),
             () -> new CursorBox(
@@ -233,7 +233,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 ))
         );
         switchToOverworldButton = new GuiTexturedButton(
-            this.width - 20, this.switchToEndButton.y - 20, 20, 20, 16, 0, 16, 16,
+            this.width - 20, this.switchToEndButton.y - 20, 20, 20, 98, 18, 16, 16,
             Globals.guiTextures,
             (button -> onSwitchDimensionButton(OVERWORLD)),
             () -> new CursorBox(
@@ -243,7 +243,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 ))
         );
         switchToNetherButton = new GuiTexturedButton(
-            this.width - 20, this.switchToOverworldButton.y - 20, 20, 20, 0, 0, 16, 16,
+            this.width - 20, this.switchToOverworldButton.y - 20, 20, 20, 79, 19, 16, 16,
             Globals.guiTextures,
             (button -> onSwitchDimensionButton(NETHER)),
             () -> new CursorBox(

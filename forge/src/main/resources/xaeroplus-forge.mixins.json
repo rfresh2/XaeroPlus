@@ -1,6 +1,5 @@
 {
   "required": true,
-  "plugin": "xaeroplus.forge.mixin.XPForgeMixinPlugin",
   "package": "xaeroplus.forge.mixin.client",
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",

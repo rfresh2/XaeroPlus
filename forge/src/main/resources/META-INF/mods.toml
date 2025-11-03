@@ -18,7 +18,7 @@ clientSideOnly = true
 [[dependencies.xaeroplus]]
 modId = "forge"
 mandatory = true
-versionRange = "[51,)"
+versionRange = "[60.0.15,)"
 ordering = "NONE"
 side = "CLIENT"
 

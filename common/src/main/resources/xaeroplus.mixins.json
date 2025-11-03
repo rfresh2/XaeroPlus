@@ -23,7 +23,6 @@
     "MixinCommonInternet",
     "MixinCommonMisc",
     "MixinCrashHandler",
-    "MixinDimensionHighlighterHandler",
     "MixinGuiAddWaypoint",
     "MixinGuiEntityRadarSettings",
     "MixinGuiMap",

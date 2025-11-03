@@ -110,7 +110,7 @@ public class PaletteNewChunks extends Module {
     private boolean checkNewChunkBlockStatePalette(LevelChunk chunk) {
         var sections = chunk.getSections();
         if (sections.length == 0) return false;
-        for (int i = 0; i < Math.min(sections.length, 8); i++) {
+        for (int i = 0; i < Math.min(sections.length, 12); i++) {
             var section = sections[i];
             var paletteContainerData = section.getStates().data;
             var palette = paletteContainerData.palette();

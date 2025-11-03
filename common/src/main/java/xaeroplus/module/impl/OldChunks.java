@@ -76,17 +76,21 @@ public class OldChunks extends Module {
         ResourceKey<Level> actualDimension = ChunkUtils.getActualDimension();
         var x = chunk.getPos().x;
         var z = chunk.getPos().z;
+        if (modernChunksCache.get().isHighlighted(x, z, actualDimension)) return;
+        if (oldChunksCache.get().isHighlighted(x, z, actualDimension)) return;
         if (actualDimension == OVERWORLD || actualDimension == NETHER) {
-            if (ChunkScanner.chunkContainsBlocks(chunk, actualDimension == OVERWORLD ? OVERWORLD_BLOCKS : NETHER_BLOCKS, 5))
+            if (ChunkScanner.chunkContainsBlocks(chunk, actualDimension == OVERWORLD ? OVERWORLD_BLOCKS : NETHER_BLOCKS, 5)) {
                 modernChunksCache.get().addHighlight(x, z);
-            else
+            } else {
                 oldChunksCache.get().addHighlight(x, z);
+            }
         } else if (actualDimension == END) {
             Holder<Biome> biomeHolder = mc.level.getBiome(new BlockPos(ChunkUtils.chunkCoordToCoord(x) + 8, 64, ChunkUtils.chunkCoordToCoord(z) + 8));
-            if (biomeHolder.unwrapKey().filter(biome -> biome.equals(Biomes.THE_END)).isEmpty())
+            if (biomeHolder.unwrapKey().filter(biome -> biome.equals(Biomes.THE_END)).isEmpty()) {
                 modernChunksCache.get().addHighlight(x, z);
-            else
+            } else {
                 oldChunksCache.get().addHighlight(x, z);
+            }
         }
     }
 

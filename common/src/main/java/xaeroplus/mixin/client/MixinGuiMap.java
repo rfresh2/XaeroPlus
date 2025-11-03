@@ -270,6 +270,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             this.keybindingsButton.y = this.claimsButton.y - 20;
             this.zoomOutButton.y = this.keybindingsButton.y - 20;
             this.zoomInButton.y = this.zoomOutButton.y - 20;
+            this.switchToEndButton.y = this.zoomInButton.y - 20;
+            this.switchToOverworldButton.y = this.switchToEndButton.y - 20;
+            this.switchToNetherButton.y = this.switchToOverworldButton.y - 20;
         }
         addButton(followButton);
         addButton(coordinateGotoButton);

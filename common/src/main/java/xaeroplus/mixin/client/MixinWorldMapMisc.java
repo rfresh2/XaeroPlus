@@ -1,12 +1,11 @@
 package xaeroplus.mixin.client;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.map.misc.Misc;
 import xaeroplus.Globals;
@@ -21,9 +20,12 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Mixin(value = Misc.class, remap = false)
 public class MixinWorldMapMisc {
-    @ModifyConstant(
+    @ModifyExpressionValue(
         method = "getKeyName",
-        constant = @Constant(stringValue = "(unset)")
+        at = @At(
+            value = "CONSTANT",
+            args = "stringValue=(unset)"
+        )
     )
     private static String unsetKeybindText(String original) {
         return "";

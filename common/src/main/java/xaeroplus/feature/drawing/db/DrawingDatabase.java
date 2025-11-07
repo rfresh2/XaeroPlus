@@ -9,6 +9,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.rfresh.sqlite.NativeLibraryNotFoundException;
+import org.rfresh.sqlite.SQLiteConnection;
 import org.rfresh.sqlite.SQLiteErrorCode;
 import xaero.map.WorldMap;
 import xaeroplus.XaeroPlus;
@@ -18,6 +19,7 @@ import xaeroplus.feature.render.text.Text;
 import xaeroplus.module.impl.TickTaskExecutor;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.NotificationUtil;
+import xaeroplus.util.Wait;
 
 import java.io.Closeable;
 import java.nio.file.Files;
@@ -47,6 +49,7 @@ public class DrawingDatabase implements Closeable {
     );
     boolean recoveryAttempted = false;
     static boolean nativeLibraryErrorSent = false;
+    private static final int MAX_RETRIES = 3;
 
     public DrawingDatabase(String worldId, String databaseName) {
         this.databaseName = databaseName;
@@ -58,6 +61,7 @@ public class DrawingDatabase implements Closeable {
             dbPath = WorldMap.saveFolder.toPath().resolve(worldId).resolve(databaseName + ".db");
             boolean init = !dbPath.toFile().exists();
             connection = DriverManager.getConnection("jdbc:rfresh_sqlite:" + dbPath);
+            ((SQLiteConnection) connection).setBusyTimeout(5000);
             MIGRATOR.migrate(dbPath, databaseName, connection, init);
         } catch (Exception e) {
             if (!nativeLibraryErrorSent && e.getCause() instanceof NativeLibraryNotFoundException nativeException) {
@@ -73,30 +77,69 @@ public class DrawingDatabase implements Closeable {
     }
 
     private void createHighlightsTable(final String databaseName, final Connection connection, final ResourceKey<Level> dimension) {
+        int tryCount = 0;
+        while (tryCount++ < MAX_RETRIES) {
+            if (createHighlightsTable0(databaseName, connection, dimension)) {
+                return;
+            }
+            XaeroPlus.LOGGER.info("Retrying creating highlights table for db: {} (attempt {}/{})", databaseName, tryCount, MAX_RETRIES);
+            Wait.waitMs(50);
+        }
+        throw new RuntimeException("Failed to create highlights table for db: " + databaseName);
+    }
+
+    private boolean createHighlightsTable0(final String databaseName, final Connection connection, final ResourceKey<Level> dimension) {
         try (var statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS \"" + getTableName(dimension, HIGHLIGHTS_TABLE) + "\" (x INTEGER, z INTEGER, color INTEGER, PRIMARY KEY (x, z))");
         } catch (SQLException e) {
             XaeroPlus.LOGGER.error("Error creating highlights table for db: {}", databaseName, e);
-            throw new RuntimeException(e);
+            return false;
         }
+        return true;
     }
 
     private void createLinesTable(final String databaseName, final Connection connection, ResourceKey<Level> dimension) {
+        int tryCount = 0;
+        while (tryCount++ < MAX_RETRIES) {
+            if (createLinesTable0(databaseName, connection, dimension)) {
+                return;
+            }
+            XaeroPlus.LOGGER.info("Retrying creating lines table for db: {} (attempt {}/{})", databaseName, tryCount, MAX_RETRIES);
+            Wait.waitMs(50);
+        }
+        throw new RuntimeException("Failed to create lines table for db: " + databaseName);
+    }
+
+    private boolean createLinesTable0(final String databaseName, final Connection connection, ResourceKey<Level> dimension) {
         try (var statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS \"" + getTableName(dimension, LINES_TABLE) + "\" (x1 INTEGER, z1 INTEGER, x2 INTEGER, z2 INTEGER, color INTEGER, PRIMARY KEY (x1, z1, x2, z2))");
         } catch (SQLException e) {
             XaeroPlus.LOGGER.error("Error creating lines table for db: {}", databaseName, e);
-            throw new RuntimeException(e);
+            return false;
         }
+        return true;
     }
 
     private void createTextsTable(final String databaseName, final Connection connection, ResourceKey<Level> dimension) {
+        int tryCount = 0;
+        while (tryCount++ < MAX_RETRIES) {
+            if (createTextsTable0(databaseName, connection, dimension)) {
+                return;
+            }
+            XaeroPlus.LOGGER.info("Retrying creating texts table for db: {} (attempt {}/{})", databaseName, tryCount, MAX_RETRIES);
+            Wait.waitMs(50);
+        }
+        throw new RuntimeException("Failed to create texts table for db: " + databaseName);
+    }
+
+    private boolean createTextsTable0(final String databaseName, final Connection connection, ResourceKey<Level> dimension) {
         try (var statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS \"" + getTableName(dimension, TEXTS_TABLE) + "\" (value TEXT, x INTEGER, z INTEGER, color INTEGER, scale REAL, PRIMARY KEY (x, z))");
         } catch (SQLException e) {
             XaeroPlus.LOGGER.error("Error creating texts table for db: {}", databaseName, e);
-            throw new RuntimeException(e);
+            return false;
         }
+        return true;
     }
 
     private String getTableName(ResourceKey<Level> dimension, String type) {
@@ -164,6 +207,20 @@ public class DrawingDatabase implements Closeable {
         final ResourceKey<Level> dimension,
         LineConsumer consumer
     ) {
+        int tryCount = 0;
+        while (tryCount++ < MAX_RETRIES) {
+            if (getLinesInDimension0(dimension, consumer)) {
+                return;
+            }
+            XaeroPlus.LOGGER.info("Retrying getting lines from {} database in dimension: {} (attempt {}/{})", databaseName, dimension.location(), tryCount, MAX_RETRIES);
+            Wait.waitMs(50);
+        }
+    }
+
+    private boolean getLinesInDimension0(
+        final ResourceKey<Level> dimension,
+        LineConsumer consumer
+    ) {
         try (var statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery(
                 "SELECT * FROM \"" + getTableName(dimension, LINES_TABLE) + "\"")) {
@@ -183,10 +240,28 @@ public class DrawingDatabase implements Closeable {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
                 recoverCorruptDatabase();
             }
+            return false;
         }
+        return true;
     }
 
     public void getTextsInWindow(
+        final ResourceKey<Level> dimension,
+        final int regionXMin, final int regionXMax,
+        final int regionZMin, final int regionZMax,
+        Consumer<Text> consumer
+    ) {
+        int tryCount = 0;
+        while (tryCount++ < MAX_RETRIES) {
+            if (getTextsInWindow0(dimension, regionXMin, regionXMax, regionZMin, regionZMax, consumer)) {
+                return;
+            }
+            XaeroPlus.LOGGER.info("Retrying getting texts from {} database in dimension: {} (attempt {}/{})", databaseName, dimension.location(), tryCount, MAX_RETRIES);
+            Wait.waitMs(50);
+        }
+    }
+
+    private boolean getTextsInWindow0(
         final ResourceKey<Level> dimension,
         final int regionXMin, final int regionXMax,
         final int regionZMin, final int regionZMax,
@@ -214,7 +289,9 @@ public class DrawingDatabase implements Closeable {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
                 recoverCorruptDatabase();
             }
+            return false;
         }
+        return true;
     }
 
     @FunctionalInterface
@@ -223,6 +300,22 @@ public class DrawingDatabase implements Closeable {
     }
 
     public void getHighlightsInWindow(
+        final ResourceKey<Level> dimension,
+        final int regionXMin, final int regionXMax,
+        final int regionZMin, final int regionZMax,
+        HighlightConsumer consumer
+    ) {
+        int tryCount = 0;
+        while (tryCount++ < MAX_RETRIES) {
+            if (getHighlightsInWindow0(dimension, regionXMin, regionXMax, regionZMin, regionZMax, consumer)) {
+                return;
+            }
+            XaeroPlus.LOGGER.info("Retrying getting highlights from {} database in dimension: {} (attempt {}/{})", databaseName, dimension.location(), tryCount, MAX_RETRIES);
+            Wait.waitMs(50);
+        }
+    }
+
+    private boolean getHighlightsInWindow0(
         final ResourceKey<Level> dimension,
         final int regionXMin, final int regionXMax,
         final int regionZMin, final int regionZMax,
@@ -247,11 +340,24 @@ public class DrawingDatabase implements Closeable {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
                 recoverCorruptDatabase();
             }
+            return false;
         }
+        return true;
     }
 
     public void insertLinesList(final Object2IntMap<Line> lines, final ResourceKey<Level> dimension) {
-        if (lines.isEmpty()) return;
+        int tryCount = 0;
+        while (tryCount++ < MAX_RETRIES) {
+            if (insertLinesList0(lines, dimension)) {
+                return;
+            }
+            XaeroPlus.LOGGER.info("Retrying inserting {} lines into {} database in dimension: {} (attempt {}/{})", lines.size(), databaseName, dimension.location(), tryCount, MAX_RETRIES);
+            Wait.waitMs(50);
+        }
+    }
+
+    private boolean insertLinesList0(final Object2IntMap<Line> lines, final ResourceKey<Level> dimension) {
+        if (lines.isEmpty()) return true;
         try {
             createLinesTable(databaseName, connection, dimension);
             // Prepared statements is orders of magnitude slower than single insert like this
@@ -282,11 +388,24 @@ public class DrawingDatabase implements Closeable {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
                 recoverCorruptDatabase();
             }
+            return false;
         }
+        return true;
     }
 
     public void insertHighlightList(final Long2LongMap chunks, final ResourceKey<Level> dimension) {
-        if (chunks.isEmpty()) return;
+        int tryCount = 0;
+        while (tryCount++ < MAX_RETRIES) {
+            if (insertHighlightList0(chunks, dimension)) {
+                return;
+            }
+            XaeroPlus.LOGGER.info("Retrying inserting {} chunks into {} database in dimension: {} (attempt {}/{})", chunks.size(), databaseName, dimension.location(), tryCount, MAX_RETRIES);
+            Wait.waitMs(50);
+        }
+    }
+
+    private boolean insertHighlightList0(final Long2LongMap chunks, final ResourceKey<Level> dimension) {
+        if (chunks.isEmpty()) return true;
         try {
             // Prepared statements is orders of magnitude slower than single insert like this
             // batches even slower
@@ -320,11 +439,24 @@ public class DrawingDatabase implements Closeable {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
                 recoverCorruptDatabase();
             }
+            return false;
         }
+        return true;
     }
 
     public void insertTextsList(final Long2ObjectMap<Text> texts, final ResourceKey<Level> dimension) {
-        if (texts.isEmpty()) return;
+        int tryCount = 0;
+        while (tryCount++ < MAX_RETRIES) {
+            if (insertTextsList0(texts, dimension)) {
+                return;
+            }
+            XaeroPlus.LOGGER.info("Retrying inserting {} texts into {} database in dimension: {} (attempt {}/{})", texts.size(), databaseName, dimension.location(), tryCount, MAX_RETRIES);
+            Wait.waitMs(50);
+        }
+    }
+
+    private boolean insertTextsList0(final Long2ObjectMap<Text> texts, final ResourceKey<Level> dimension) {
+        if (texts.isEmpty()) return true;
         try {
             // Prepared statements is orders of magnitude slower than single insert like this
             // batches even slower
@@ -361,22 +493,48 @@ public class DrawingDatabase implements Closeable {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
                 recoverCorruptDatabase();
             }
+            return false;
         }
+        return true;
     }
 
     public void removeLine(final int x1, final int z1, final int x2, final int z2, final ResourceKey<Level> dimension) {
+        int tryCount = 0;
+        while (tryCount++ < MAX_RETRIES) {
+            if (removeLine0(x1, z1, x2, z2, dimension)) {
+                return;
+            }
+            XaeroPlus.LOGGER.info("Retrying removing line from {} database in dimension: {}, from ({}, {}) to ({}, {}) (attempt {}/{})", databaseName, dimension.location(), x1, z1, x2, z2, tryCount, MAX_RETRIES);
+            Wait.waitMs(50);
+        }
+    }
+
+    private boolean removeLine0(final int x1, final int z1, final int x2, final int z2, final ResourceKey<Level> dimension) {
         try (var statement = connection.createStatement()) {
             statement.executeUpdate("DELETE FROM \"" + getTableName(dimension, LINES_TABLE) + "\" WHERE x1 = " + x1 + " AND z1 = " + z1 + " AND x2 = " + x2 + " AND z2 = " + z2);
         } catch (SQLException e) {
-            XaeroPlus.LOGGER.error("Error while removing line from {} database in dimension: {}, from ({}, {}) to ({}, {})", databaseName, dimension.location(), x1, z1, x2, z2, e);
+            XaeroPlus.LOGGER.error("Error while removing line from {} database in dimension: {}", databaseName, dimension.location(), e);
             if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
                 recoverCorruptDatabase();
             }
+            return false;
         }
+        return true;
     }
 
     public void removeHighlight(final int x, final int z, final ResourceKey<Level> dimension) {
+        int tryCount = 0;
+        while (tryCount++ < MAX_RETRIES) {
+            if (removeHighlight0(x, z, dimension)) {
+                return;
+            }
+            XaeroPlus.LOGGER.info("Retrying removing highlight from {} database in dimension: {} (attempt {}/{})", databaseName, dimension.location(), tryCount, MAX_RETRIES);
+            Wait.waitMs(50);
+        }
+    }
+
+    private boolean removeHighlight0(final int x, final int z, final ResourceKey<Level> dimension) {
         try (var statement = connection.createStatement()) {
             statement.executeUpdate("DELETE FROM \"" + getTableName(dimension, HIGHLIGHTS_TABLE) + "\" WHERE x = " + x + " AND z = " + z);
         } catch (SQLException e) {
@@ -385,10 +543,23 @@ public class DrawingDatabase implements Closeable {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
                 recoverCorruptDatabase();
             }
+            return false;
         }
+        return true;
     }
 
     public void removeText(final int x, final int z, final ResourceKey<Level> dimension) {
+        int tryCount = 0;
+        while (tryCount++ < MAX_RETRIES) {
+            if (removeText0(x, z, dimension)) {
+                return;
+            }
+            XaeroPlus.LOGGER.info("Retrying removing text from {} database in dimension: {}, at {}, {} (attempt {}/{})", databaseName, dimension.location(), x, z, tryCount, MAX_RETRIES);
+            Wait.waitMs(50);
+        }
+    }
+
+    private boolean removeText0(final int x, final int z, final ResourceKey<Level> dimension) {
         try (var statement = connection.createStatement()) {
             statement.executeUpdate("DELETE FROM \"" + getTableName(dimension, TEXTS_TABLE) + "\" WHERE x = " + x + " AND z = " + z);
         } catch (SQLException e) {
@@ -397,7 +568,9 @@ public class DrawingDatabase implements Closeable {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
                 recoverCorruptDatabase();
             }
+            return false;
         }
+        return true;
     }
 
     @Override

@@ -4,12 +4,14 @@ import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.longs.Long2LongMaps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import org.rfresh.sqlite.SQLiteConnection;
 import org.rfresh.sqlite.SQLiteErrorCode;
 import xaero.map.WorldMap;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.db.DatabaseMigrator;
 import xaeroplus.feature.highlights.db.V0ToV1Migration;
 import xaeroplus.util.ChunkUtils;
+import xaeroplus.util.Wait;
 
 import java.io.Closeable;
 import java.nio.file.Files;
@@ -33,6 +35,7 @@ public class ChunkHighlightDatabase implements Closeable {
         )
     );
     boolean recoveryAttempted = false;
+    private static final int MAX_RETRIES = 3;
 
     public ChunkHighlightDatabase(String worldId, String databaseName) {
         this.databaseName = databaseName;
@@ -44,6 +47,7 @@ public class ChunkHighlightDatabase implements Closeable {
             dbPath = WorldMap.saveFolder.toPath().resolve(worldId).resolve(databaseName + ".db");
             boolean init = !dbPath.toFile().exists();
             connection = DriverManager.getConnection("jdbc:rfresh_sqlite:" + dbPath);
+            ((SQLiteConnection) connection).setBusyTimeout(5000);
             MIGRATOR.migrate(dbPath, databaseName, connection, init);
             createMetadataTable();
         } catch (Exception e) {
@@ -61,6 +65,18 @@ public class ChunkHighlightDatabase implements Closeable {
     }
 
     private void createMetadataTable() {
+        int tryCount = 0;
+        while (tryCount++ < MAX_RETRIES) {
+            if (createMetadataTable0()) {
+                return;
+            }
+            XaeroPlus.LOGGER.info("Retrying creation of metadata table in {} database (attempt {}/{})", databaseName, tryCount, 3);
+            Wait.waitMs(50);
+        }
+        throw new RuntimeException("Failed to create metadata table");
+    }
+
+    private boolean createMetadataTable0() {
         try (var statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS metadata (id INTEGER PRIMARY KEY, version INTEGER)");
             statement.executeUpdate("INSERT OR REPLACE INTO metadata (id, version) VALUES (0, 1)");
@@ -69,10 +85,10 @@ public class ChunkHighlightDatabase implements Closeable {
             if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
                 recoverCorruptDatabase();
-            } else {
-                throw new RuntimeException(e);
             }
+            return false;
         }
+        return true;
     }
 
     // this can take an extremely long time for large databases
@@ -122,6 +138,17 @@ public class ChunkHighlightDatabase implements Closeable {
     }
 
     private void createHighlightsTableIfNotExists(ResourceKey<Level> dimension) {
+        int tryCount = 0;
+        while (tryCount++ < MAX_RETRIES) {
+            if (createHighlightsTableIfNotExists0(dimension)) {
+                return;
+            }
+            XaeroPlus.LOGGER.info("Retrying creation of highlights table in {} database in dimension: {} (attempt {}/{})", databaseName, dimension.location(), tryCount, 3);
+            Wait.waitMs(50);
+        }
+    }
+
+    private boolean createHighlightsTableIfNotExists0(ResourceKey<Level> dimension) {
         try (var statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS \"" + getTableName(dimension) + "\" (x INTEGER, z INTEGER, foundTime INTEGER)");
             statement.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS \"unique_xz_" + getTableName(dimension) + "\" ON \"" + getTableName(dimension) + "\" (x, z)");
@@ -130,14 +157,25 @@ public class ChunkHighlightDatabase implements Closeable {
             if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
                 recoverCorruptDatabase();
-            } else {
-                throw new RuntimeException(e);
             }
+            return false;
         }
+        return true;
     }
 
     public void insertHighlightList(final Long2LongMap chunks, final ResourceKey<Level> dimension) {
-        if (chunks.isEmpty()) return;
+        int tryCount = 0;
+        while (tryCount++ < MAX_RETRIES) {
+            if (insertHighlightList0(chunks, dimension)) {
+                return;
+            }
+            XaeroPlus.LOGGER.info("Retrying insert of {} chunks into {} database in dimension: {} (attempt {}/{})", chunks.size(), databaseName, dimension.location(), tryCount, 3);
+            Wait.waitMs(50);
+        }
+    }
+
+    private boolean insertHighlightList0(final Long2LongMap chunks, final ResourceKey<Level> dimension) {
+        if (chunks.isEmpty()) return true;
         try {
             // Prepared statements is orders of magnitude slower than single insert like this
             // batches even slower
@@ -171,7 +209,9 @@ public class ChunkHighlightDatabase implements Closeable {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
                 recoverCorruptDatabase();
             }
+            return false;
         }
+        return true;
     }
 
     @FunctionalInterface
@@ -181,6 +221,22 @@ public class ChunkHighlightDatabase implements Closeable {
 
     // avoids instantiating the intermediary list
     public void getHighlightsInWindow(
+        final ResourceKey<Level> dimension,
+        final int regionXMin, final int regionXMax,
+        final int regionZMin, final int regionZMax,
+        HighlightConsumer consumer
+    ) {
+        int tryCount = 0;
+        while (tryCount++ < MAX_RETRIES) {
+            if (getHighlightsInWindow0(dimension, regionXMin, regionXMax, regionZMin, regionZMax, consumer)) {
+                return;
+            }
+            XaeroPlus.LOGGER.info("Retrying get highlights from {} database in dimension: {}, (attempt {}/{})", databaseName, dimension.location(), tryCount, 3);
+            Wait.waitMs(50);
+        }
+    }
+
+    private boolean getHighlightsInWindow0(
         final ResourceKey<Level> dimension,
         final int regionXMin, final int regionXMax,
         final int regionZMin, final int regionZMax,
@@ -205,11 +261,31 @@ public class ChunkHighlightDatabase implements Closeable {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
                 recoverCorruptDatabase();
             }
+            return false;
         }
+        return true;
     }
 
     // avoids instantiating the intermediary list
     public void getHighlightsInWindowAndOutsidePrevWindow(
+        final ResourceKey<Level> dimension,
+        final int regionXMin, final int regionXMax,
+        final int regionZMin, final int regionZMax,
+        final int prevRegionXMin, final int prevRegionXMax,
+        final int prevRegionZMin, final int prevRegionZMax,
+        HighlightConsumer consumer
+    ) {
+        int tryCount = 0;
+        while (tryCount++ < MAX_RETRIES) {
+            if (getHighlightsInWindowAndOutsidePrevWindow0(dimension, regionXMin, regionXMax, regionZMin, regionZMax, prevRegionXMin, prevRegionXMax, prevRegionZMin, prevRegionZMax, consumer)) {
+                return;
+            }
+            XaeroPlus.LOGGER.info("Retrying get of highlights from {} database in dimension: {}, (attempt {}/{})", databaseName, dimension.location(), tryCount, 3);
+            Wait.waitMs(50);
+        }
+    }
+
+    private boolean getHighlightsInWindowAndOutsidePrevWindow0(
         final ResourceKey<Level> dimension,
         final int regionXMin, final int regionXMax,
         final int regionZMin, final int regionZMax,
@@ -246,11 +322,23 @@ public class ChunkHighlightDatabase implements Closeable {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
                 recoverCorruptDatabase();
             }
-            // fall through
+            return false;
         }
+        return true;
     }
 
     public void removeHighlight(final int x, final int z, final ResourceKey<Level> dimension) {
+        int tryCount = 0;
+        while (tryCount++ < 3) {
+            if (removeHighlight0(x, z, dimension)) {
+                return;
+            }
+            XaeroPlus.LOGGER.info("Retrying removal of highlight from {} database in dimension: {} (attempt {}/{})", databaseName, dimension.location(), tryCount, 3);
+            Wait.waitMs(50);
+        }
+    }
+
+    private boolean removeHighlight0(final int x, final int z, final ResourceKey<Level> dimension) {
         try (var statement = connection.createStatement()) {
             statement.executeUpdate("DELETE FROM \"" + getTableName(dimension) + "\" WHERE x = " + x + " AND z = " + z);
         } catch (SQLException e) {
@@ -259,7 +347,9 @@ public class ChunkHighlightDatabase implements Closeable {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
                 recoverCorruptDatabase();
             }
+            return false;
         }
+        return true;
     }
 
     @Override

@@ -25,9 +25,9 @@ dependencyResolutionManagement {
 	versionCatalogs {
 		create("libs") {
 			library("fabric-loader", "net.fabricmc:fabric-loader:0.17.3")
-			library("forge", "net.minecraftforge:forge:1.21.10-60.0.15")
-			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.137.0+${minecraft_version}")
-			library("neoforge", "net.neoforged:neoforge:21.10.47-beta")
+			library("forge", "net.minecraftforge:forge:1.21.10-60.0.19")
+			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.138.3+${minecraft_version}")
+			library("neoforge", "net.neoforged:neoforge:21.10.51-beta")
 			library("worldmap-fabric", "maven.modrinth:xaeros-world-map:${worldmap_version_fabric}_Fabric_1.21.9")
 			library("worldmap-forge", "maven.modrinth:xaeros-world-map:${worldmap_version_forge}_Forge_1.21.9")
 			library("worldmap-neo", "maven.modrinth:xaeros-world-map:${worldmap_version_neo}_NeoForge_1.21.9")
@@ -50,8 +50,8 @@ dependencyResolutionManagement {
 			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.13.2+${minecraft_version}-fabric")
 			library("immediatelyfast-neo", "maven.modrinth:immediatelyfast:1.13.2+${minecraft_version}-neoforge")
 			library("modmenu", "maven.modrinth:modmenu:16.0.0-rc.1")
-			library("sodium-fabric", "maven.modrinth:sodium:mc${minecraft_version}-0.7.2-fabric")
-            library("sodium-neoforge", "maven.modrinth:sodium:mc1.21.8-0.7.2-neoforge")
+			library("sodium-fabric", "maven.modrinth:sodium:mc${minecraft_version}-0.7.3-fabric")
+            library("sodium-neoforge", "maven.modrinth:sodium:mc1.21.8-0.7.3-neoforge")
 //			library("fpsdisplay", "maven.modrinth:fpsdisplay:3.1.0+1.20.x")
 			library("cloth-config-fabric", "me.shedaniel.cloth:cloth-config-fabric:17.0.144")
             library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")

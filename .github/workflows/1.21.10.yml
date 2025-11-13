@@ -106,17 +106,13 @@ jobs:
         name: ${{ env.XP_FORGE_OUT }}
         path: forge/build/libs/${{ env.XP_FORGE_OUT }}.jar
         if-no-files-found: error
-#
+
     - name: Upload NeoForge Artifact
       uses: actions/upload-artifact@v5
       with:
         name: ${{ env.XP_NEO_OUT }}
         path: neo/build/libs/${{ env.XP_NEO_OUT }}.jar
         if-no-files-found: error
-
-#    - name: test fabric
-#      run: ./gradlew fabric:runProdTest
-
     outputs:
       worldmap_version_fabric: ${{ env.WORLDMAP_VERSION_FABRIC }}
       worldmap_version_forge: ${{ env.WORLDMAP_VERSION_FORGE }}
@@ -127,7 +123,6 @@ jobs:
       xp_fabric: ${{ env.XP_FABRIC_OUT }}
       xp_forge: ${{ env.XP_FORGE_OUT }}
       xp_neo: ${{ env.XP_NEO_OUT }}
-
 
   test-fabric:
     runs-on: ubuntu-latest
@@ -155,23 +150,18 @@ jobs:
           && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ needs.build.outputs.minimap_version_fabric }}_Fabric_1.21.9/xaeros-minimap-${{ needs.build.outputs.minimap_version_fabric }}_Fabric_1.21.9.jar -P run/mods/ \
           && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ needs.build.outputs.worldmap_version_fabric }}_Fabric_1.21.9/xaeros-world-map-${{ needs.build.outputs.worldmap_version_fabric }}_Fabric_1.21.9.jar -P run/mods/
 
-      - name: Bootstrap Test Mod
-        run: |
-          wget https://cdn.2b2t.vc/mc-runtime-test-1.21.10-3.1.1-fabric-release.jar -P run/mods
-
       - name: Fabric Test
-        uses: headlesshq/mc-runtime-test@3.1.1
+        uses: headlesshq/mc-runtime-test@4.1.0
         with:
           mc: ${{ env.MINECRAFT_VERSION }}
           modloader: fabric
           regex: .*fabric.*
-#        mc-runtime-test: fabric
-          mc-runtime-test: none
+          mc-runtime-test: fabric
           fabric-api: 0.137.0
           java: 21
-          xvfb: true
-          headlessmc-command: --jvm -Djava.awt.headless=true
-          cache-mc: true
+          xvfb: false
+          headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
+          cache-mc: github
 
   test-forge:
     runs-on: ubuntu-latest
@@ -199,22 +189,17 @@ jobs:
           && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ needs.build.outputs.minimap_version_forge }}_Forge_1.21.9/xaeros-minimap-${{ needs.build.outputs.minimap_version_forge }}_Forge_1.21.9.jar -P run/mods/ \
           && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ needs.build.outputs.worldmap_version_forge }}_Forge_1.21.9/xaeros-world-map-${{ needs.build.outputs.worldmap_version_forge }}_Forge_1.21.9.jar -P run/mods/
 
-      - name: Bootstrap Test Mod
-        run: |
-          wget https://cdn.2b2t.vc/mc-runtime-test-1.21.10-3.1.1-lexforge-release.jar -P run/mods
-
       - name: Forge Test
-        uses: headlesshq/mc-runtime-test@3.1.1
+        uses: headlesshq/mc-runtime-test@4.1.0
         with:
           mc: ${{ env.MINECRAFT_VERSION }}
           modloader: forge
           regex: .*forge.*
-#        mc-runtime-test: lexforge
-          mc-runtime-test: none
+          mc-runtime-test: lexforge
           java: 21
-          xvfb: true
-          headlessmc-command: --jvm -Djava.awt.headless=true
-          cache-mc: true
+          xvfb: false
+          headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
+          cache-mc: github
 
   test-neo:
     runs-on: ubuntu-latest
@@ -242,19 +227,14 @@ jobs:
           && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ needs.build.outputs.minimap_version_neo}}_NeoForge_1.21.9/xaeros-minimap-${{ needs.build.outputs.minimap_version_neo }}_NeoForge_1.21.9.jar -P run/mods/ \
           && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ needs.build.outputs.worldmap_version_neo }}_NeoForge_1.21.9/xaeros-world-map-${{ needs.build.outputs.worldmap_version_neo }}_NeoForge_1.21.9.jar -P run/mods/
 
-      - name: Bootstrap Test Mod
-        run: |
-          wget https://cdn.2b2t.vc/mc-runtime-test-1.21.10-3.1.1-neoforge-release.jar -P run/mods
-
       - name: Neo Test
-        uses: headlesshq/mc-runtime-test@3.1.1
+        uses: headlesshq/mc-runtime-test@4.1.0
         with:
           mc: ${{ env.MINECRAFT_VERSION }}
           modloader: neoforge
           regex: .*neoforge.*
-#        mc-runtime-test: neoforge
-          mc-runtime-test: none
+          mc-runtime-test: neoforge
           java: 21
-          xvfb: true
-          headlessmc-command: --jvm -Djava.awt.headless=true
-          cache-mc: true
+          xvfb: false
+          headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
+          cache-mc: github

@@ -63,6 +63,7 @@ public class DrawingDatabase implements Closeable {
             connection = DriverManager.getConnection("jdbc:rfresh_sqlite:" + dbPath);
             ((SQLiteConnection) connection).setBusyTimeout(5000);
             MIGRATOR.migrate(dbPath, databaseName, connection, init);
+            setPragmas();
         } catch (Exception e) {
             if (!nativeLibraryErrorSent && e.getCause() instanceof NativeLibraryNotFoundException nativeException) {
                 nativeLibraryErrorSent = true;
@@ -73,6 +74,15 @@ public class DrawingDatabase implements Closeable {
             }
             XaeroPlus.LOGGER.error("Error while creating drawing database: {} for worldId: {}", databaseName, worldId, e);
             throw new RuntimeException(e);
+        }
+    }
+
+    private void setPragmas() {
+        try (var statement = connection.createStatement()) {
+            statement.executeUpdate("pragma journal_mode = WAL;");
+            statement.executeUpdate("pragma synchronous = NORMAL;");
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to set sqlite pragmas", e);
         }
     }
 

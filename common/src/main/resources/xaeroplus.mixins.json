@@ -57,6 +57,7 @@
     "MixinPatreon",
     "MixinPlayerTeleporter",
     "MixinRadarRenderer",
+    "MixinRootConfig",
     "MixinSupportXaeroMinimap",
     "MixinSupportXaeroWorldmap",
     "MixinWaypointMapRenderer",

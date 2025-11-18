@@ -308,5 +308,7 @@
   "xaeroplus.setting.teleport_fail_notifier.tooltip": "當Xaero傳送失敗時在聊天中發送通知，通常是因為缺少伺服器權限",
   "xaeroplus.setting.teleport_fail_notifier_delay": "傳送失敗等待刻數",
   "xaeroplus.setting.teleport_fail_notifier_delay.tooltip": "等待Xaero傳送嘗試的刻數",
-  "xaeroplus.gui.teleport_fail_notifier.message": "看起來你的傳送嘗試失敗了 :( \n 你可能沒有使用 /tp 指令的伺服器權限。 \n 請聯繫伺服器管理員！"
+  "xaeroplus.gui.teleport_fail_notifier.message": "看起來你的傳送嘗試失敗了 :( \n 你可能沒有使用 /tp 指令的伺服器權限。 \n 請聯繫伺服器管理員！",
+  "xaeroplus.setting.disable_teleportation": "停用傳送",
+  "xaeroplus.setting.disable_teleportation.tooltip": "全域禁用傳送按鈕"
 }

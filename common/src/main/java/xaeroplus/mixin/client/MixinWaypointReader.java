@@ -64,7 +64,7 @@ public class MixinWaypointReader {
         }
 
         if (Settings.REGISTRY.disableWaypointSharing.get()) {
-            cir.getReturnValue().removeIf(option -> ((AccessorRightClickOption) option).getName().equals("xaeroplus.gui.xaero_right_click_waypoint_share"));
+            options.removeIf(option -> ((AccessorRightClickOption) option).getName().equals("gui.xaero_right_click_waypoint_share"));
         }
 
         if (!Settings.REGISTRY.showCoordsInRightClickOptions.get()) {
@@ -72,6 +72,10 @@ public class MixinWaypointReader {
                 var name = ((AccessorRightClickOption) option).getName();
                 return name.startsWith("X: ");
             });
+        }
+
+        if (Settings.REGISTRY.disableTeleportation.get()) {
+            options.removeIf(option -> ((AccessorRightClickOption) option).getName().equals("gui.xaero_right_click_waypoint_teleport"));
         }
     }
 }

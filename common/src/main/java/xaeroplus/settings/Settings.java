@@ -296,10 +296,17 @@ public final class Settings extends SettingRegistry {
     public final DoubleSetting teleportFailNotifierDelay = register(
         DoubleSetting.create(
             "Teleport Fail Delay",
-            "xaeroplus.setting.teleport_fail_delay",
+            "xaeroplus.setting.teleport_fail_notifier_delay",
             1, 120, 1,
-            30 // 1.5 seconds
+            30, // 1.5 seconds
+            () -> ModuleManager.getModule(TeleportFailNotifier.class).isEnabled()
         ), SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting disableTeleportation = register(
+        BooleanSetting.create(
+            "Disable Teleportation",
+            "xaeroplus.setting.disable_teleportation",
+            false),
+        SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting sodiumSettingIntegration = register(
         BooleanSetting.create(
             "Sodium/Embeddium Setting Integration",

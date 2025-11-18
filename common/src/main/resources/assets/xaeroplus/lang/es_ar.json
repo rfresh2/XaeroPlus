@@ -308,5 +308,7 @@
   "xaeroplus.setting.teleport_fail_notifier.tooltip": "Envía una notificación en el chat cuando un teletransporte de xaero falla, normalmente por falta de permisos del servidor",
   "xaeroplus.setting.teleport_fail_notifier_delay": "Tiempos de Espera del Fallo de Teletransporte",
   "xaeroplus.setting.teleport_fail_notifier_delay.tooltip": "Número de ticks a esperar para que ocurra un intento de teletransporte de xaero",
-  "xaeroplus.gui.teleport_fail_notifier.message": "Parece que tu intento de teletransporte falló :( \n Probablemente no tengas permisos del servidor para usar los comandos /tp. \n ¡Pide ayuda al administrador del servidor!"
+  "xaeroplus.gui.teleport_fail_notifier.message": "Parece que tu intento de teletransporte falló :( \n Probablemente no tengas permisos del servidor para usar los comandos /tp. \n ¡Pide ayuda al administrador del servidor!",
+  "xaeroplus.setting.disable_teleportation": "Desactivar la teletransportación",
+  "xaeroplus.setting.disable_teleportation.tooltip": "Desactiva los botones de teletransportación globalmente."
 }

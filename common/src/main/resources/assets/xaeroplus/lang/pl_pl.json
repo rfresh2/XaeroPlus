@@ -306,5 +306,7 @@
   "xaeroplus.setting.teleport_fail_notifier.tooltip": "Wysyła powiadomienie na czacie, gdy teleport Xaero się nie powiedzie — zwykle z powodu braku uprawnień serwera",
   "xaeroplus.setting.teleport_fail_notifier_delay": "Czas Oczekiwania na Nieudany Teleport",
   "xaeroplus.setting.teleport_fail_notifier_delay.tooltip": "Liczba ticków oczekiwania na próbę teleportu Xaero",
-  "xaeroplus.gui.teleport_fail_notifier.message": "Wygląda na to, że twoja próba teleportacji się nie powiodła :( \n Prawdopodobnie nie masz uprawnień serwera do używania komend /tp. \n Poproś administratora serwera o pomoc!"
+  "xaeroplus.gui.teleport_fail_notifier.message": "Wygląda na to, że twoja próba teleportacji się nie powiodła :( \n Prawdopodobnie nie masz uprawnień serwera do używania komend /tp. \n Poproś administratora serwera o pomoc!",
+  "xaeroplus.setting.disable_teleportation": "Wyłącz teleportację",
+  "xaeroplus.setting.disable_teleportation.tooltip": "Globalnie wyłącza przyciski teleportacji"
 }

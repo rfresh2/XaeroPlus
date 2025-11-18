@@ -308,5 +308,7 @@
   "xaeroplus.setting.teleport_fail_notifier.tooltip": "Отправляет сообщение в чат, когда телепорт Xaero не срабатывает — обычно из-за отсутствия прав на сервере",
   "xaeroplus.setting.teleport_fail_notifier_delay": "Задержка Ожидания Ошибки Телепорта",
   "xaeroplus.setting.teleport_fail_notifier_delay.tooltip": "Количество тиков ожидания попытки телепорта Xaero",
-  "xaeroplus.gui.teleport_fail_notifier.message": "Похоже, ваша попытка телепортации не удалась :( \n Скорее всего, у вас нет прав на использование команд /tp на сервере. \n Обратитесь к администратору сервера!"
+  "xaeroplus.gui.teleport_fail_notifier.message": "Похоже, ваша попытка телепортации не удалась :( \n Скорее всего, у вас нет прав на использование команд /tp на сервере. \n Обратитесь к администратору сервера!",
+  "xaeroplus.setting.disable_teleportation": "Отключить телепортацию",
+  "xaeroplus.setting.disable_teleportation.tooltip": "Глобально отключает кнопки телепортации."
 }

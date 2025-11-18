@@ -308,5 +308,7 @@
   "xaeroplus.setting.teleport_fail_notifier.tooltip": "Gửi thông báo trong chat khi dịch chuyển xaero thất bại — thường do thiếu quyền máy chủ",
   "xaeroplus.setting.teleport_fail_notifier_delay": "Số Tick Chờ Dịch Chuyển Thất Bại",
   "xaeroplus.setting.teleport_fail_notifier_delay.tooltip": "Số tick cần chờ để thử dịch chuyển xaero xảy ra",
-  "xaeroplus.gui.teleport_fail_notifier.message": "Có vẻ như lần dịch chuyển của bạn đã thất bại :( \n Có thể bạn không có quyền dùng lệnh /tp trên máy chủ. \n Hãy nhờ quản trị viên máy chủ giúp đỡ!"
+  "xaeroplus.gui.teleport_fail_notifier.message": "Có vẻ như lần dịch chuyển của bạn đã thất bại :( \n Có thể bạn không có quyền dùng lệnh /tp trên máy chủ. \n Hãy nhờ quản trị viên máy chủ giúp đỡ!",
+  "xaeroplus.setting.disable_teleportation": "Tắt dịch chuyển tức thời",
+  "xaeroplus.setting.disable_teleportation.tooltip": "Tắt các nút dịch chuyển tức thời trên toàn hệ thống"
 }

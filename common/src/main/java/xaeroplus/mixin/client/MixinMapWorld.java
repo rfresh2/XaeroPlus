@@ -10,8 +10,11 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.map.world.MapDimension;
 import xaero.map.world.MapWorld;
+import xaeroplus.settings.Settings;
 
 import java.lang.ref.WeakReference;
 
@@ -44,5 +47,12 @@ public abstract class MixinMapWorld {
         if (dimId == null) return null;
         if (ref != null) return ref;
         return this.getDimension(dimId);
+    }
+
+    @Inject(method = "isTeleportAllowed", at = @At("HEAD"), cancellable = true)
+    public void checkTeleportGloballyDisabled(final CallbackInfoReturnable<Boolean> cir) {
+        if (Settings.REGISTRY.disableTeleportation.get()) {
+            cir.setReturnValue(false);
+        }
     }
 }

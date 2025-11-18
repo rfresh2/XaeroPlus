@@ -302,5 +302,7 @@
   "xaeroplus.setting.teleport_fail_notifier.tooltip": "Envoie une notification dans le chat lorsqu'une téléportation xaero échoue, généralement à cause d'un manque d'autorisations sur le serveur",
   "xaeroplus.setting.teleport_fail_notifier_delay": "Ticks d'Attente d'Échec de Téléportation",
   "xaeroplus.setting.teleport_fail_notifier_delay.tooltip": "Nombre de ticks à attendre pour qu'une tentative de téléportation xaero se produise",
-  "xaeroplus.gui.teleport_fail_notifier.message": "Il semble que votre tentative de téléportation ait échoué :( \n Vous n'avez probablement pas les permissions du serveur pour utiliser les commandes /tp. \n Demandez de l'aide à l'administrateur du serveur !"
+  "xaeroplus.gui.teleport_fail_notifier.message": "Il semble que votre tentative de téléportation ait échoué :( \n Vous n'avez probablement pas les permissions du serveur pour utiliser les commandes /tp. \n Demandez de l'aide à l'administrateur du serveur !",
+  "xaeroplus.setting.disable_teleportation": "Désactiver la téléportation",
+  "xaeroplus.setting.disable_teleportation.tooltip": "Désactive les boutons de téléportation pour l'ensemble du système."
 }

@@ -308,5 +308,7 @@
   "xaeroplus.setting.teleport_fail_notifier.tooltip": "Sends a notification in chat when a xaero teleport is attempted and fails - most commonly due to lacking server permissions",
   "xaeroplus.setting.teleport_fail_notifier_delay": "Teleport Fail Wait Ticks",
   "xaeroplus.setting.teleport_fail_notifier_delay.tooltip": "Number of ticks to wait for an attempted xaero teleport to occur",
-  "xaeroplus.gui.teleport_fail_notifier.message": "Looks like your teleport attempt failed :( \n Most likely you don't have permissions from the server to use /tp commands. \n Ask your server owner for help!"
+  "xaeroplus.gui.teleport_fail_notifier.message": "Looks like your teleport attempt failed :( \n Most likely you don't have permissions from the server to use /tp commands. \n Ask your server owner for help!",
+  "xaeroplus.setting.disable_teleportation": "Disable Teleportation",
+  "xaeroplus.setting.disable_teleportation.tooltip": "Disables Teleportation buttons globally"
 }

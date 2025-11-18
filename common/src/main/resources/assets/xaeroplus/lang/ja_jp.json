@@ -306,5 +306,7 @@
   "xaeroplus.setting.teleport_fail_notifier.tooltip": "Xaeroのテレポートが失敗したときにチャットで通知します。主にサーバー権限が不足している場合に発生します",
   "xaeroplus.setting.teleport_fail_notifier_delay": "テレポート失敗待機ティック",
   "xaeroplus.setting.teleport_fail_notifier_delay.tooltip": "Xaeroのテレポート試行を待機するティック数",
-  "xaeroplus.gui.teleport_fail_notifier.message": "テレポートが失敗したようです :( \n サーバーで /tp コマンドを使う権限がない可能性があります。 \n サーバー管理者に問い合わせてください！"
+  "xaeroplus.gui.teleport_fail_notifier.message": "テレポートが失敗したようです :( \n サーバーで /tp コマンドを使う権限がない可能性があります。 \n サーバー管理者に問い合わせてください！",
+  "xaeroplus.setting.disable_teleportation": "テレポートを無効にする",
+  "xaeroplus.setting.disable_teleportation.tooltip": "テレポートボタンをグローバルに無効にします\n"
 }

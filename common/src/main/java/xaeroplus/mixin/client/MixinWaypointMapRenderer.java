@@ -39,7 +39,7 @@ public class MixinWaypointMapRenderer {
         }
     }
 
-    @Inject(method = "drawSetChange(Lxaero/hud/minimap/module/MinimapSession;Lnet/minecraft/client/gui/GuiGraphics;Lcom/mojang/blaze3d/platform/Window;)V",
+    @Inject(method = "drawSetChange(Lxaero/hud/minimap/module/MinimapSession;Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/platform/Window;)V",
         at = @At("HEAD"),
         cancellable = true,
         remap = true) // $REMAP

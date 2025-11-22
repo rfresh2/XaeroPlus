@@ -76,6 +76,7 @@ public class WaypointBeaconRenderer {
         var dimDiv = session.getDimensionHelper().getDimensionDivision(currentWorld);
         var mc = Minecraft.getInstance();
         if (mc.level == null || mc.cameraEntity == null) return;
+        if (mc.player.level() != mc.level) return;
         var cameraPos = mc.cameraEntity.position();
         double distanceScale = settings.dimensionScaledMaxWaypointDistance ? mc.level.dimensionType().coordinateScale() : 1.0;
         double waypointsDistance = settings.getMaxWaypointsDistance();

@@ -28,6 +28,8 @@
   "xaeroplus.setting.disable_receiving_waypoints.tooltip": "他のプレイヤーからのウェイポイント受信を無効にする。",
   "xaeroplus.setting.deathpoints_render_distance": "デスポイントの表示距離",
   "xaeroplus.setting.deathpoints_render_distance.tooltip": "デスポイントにウェイポイントの表示距離制限を適用する",
+  "xaeroplus.setting.waypoint_set_change_tooltip": "WPセット変更ツールチップを無効化",
+  "xaeroplus.setting.waypoint_set_change_tooltip.tooltip": "ウェイポイントセットを切り替えた際に表示される画面上のテキストを無効化します",
   "xaeroplus.setting.persist_dimension_switch": "Persist WM Dimension Switch",
   "xaeroplus.setting.persist_dimension_switch.tooltip": "有効にすると、WorldMapを閉じたときにディメンジョンが現在のディメンジョンに戻らなくなる。",
   "xaeroplus.setting.radar_while_dimension_switched": "Radar While Dim Switched",

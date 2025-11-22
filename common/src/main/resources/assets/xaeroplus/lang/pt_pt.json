@@ -28,6 +28,8 @@
   "xaeroplus.setting.disable_receiving_waypoints.tooltip": "Desativa a possibilidade de receber localizações de outros jogadores.",
   "xaeroplus.setting.deathpoints_render_distance": "Distância de Renderização dos Pontos de Morte",
   "xaeroplus.setting.deathpoints_render_distance.tooltip": "Aplicar limites de distância de renderização dos pontos de referência aos Pontos de Morte",
+  "xaeroplus.setting.waypoint_set_change_tooltip": "Desativar dica de alteração do conjunto WP",
+  "xaeroplus.setting.waypoint_set_change_tooltip.tooltip": "Desativa o texto exibido no ecrã quando o conjunto Waypoint é alterado.",
   "xaeroplus.setting.persist_dimension_switch": "Dimensão do MM Persistente",
   "xaeroplus.setting.persist_dimension_switch.tooltip": "Se ativo, a dimensão não mudará para a atual quando o GUI do mapa-mundo for fechado.",
   "xaeroplus.setting.radar_while_dimension_switched": "Radar Enquanto Dim. Diferente",

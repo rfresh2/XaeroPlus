@@ -28,6 +28,8 @@
   "xaeroplus.setting.disable_receiving_waypoints.tooltip": "停用從其他玩家接收定位點。",
   "xaeroplus.setting.deathpoints_render_distance": "死亡點渲染距離",
   "xaeroplus.setting.deathpoints_render_distance.tooltip": "將路標的渲染距離限制應用於死亡點",
+  "xaeroplus.setting.waypoint_set_change_tooltip": "停用航點集切換提示文字",
+  "xaeroplus.setting.waypoint_set_change_tooltip.tooltip": "停用切換航點集時顯示的螢幕文字",
   "xaeroplus.setting.persist_dimension_switch": "持續世界地圖維度切換",
   "xaeroplus.setting.persist_dimension_switch.tooltip": "如果啟用，則在關閉世界地圖介面時，維度將不會切換回當前維度。",
   "xaeroplus.setting.radar_while_dimension_switched": "切換維度時顯示雷達",

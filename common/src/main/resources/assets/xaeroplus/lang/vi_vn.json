@@ -28,6 +28,8 @@
   "xaeroplus.setting.disable_receiving_waypoints.tooltip": "Vô hiệu hóa việc nhận điểm đến từ người chơi khác.",
   "xaeroplus.setting.deathpoints_render_distance": "Khoảng Cách Hiển Thị Điểm Chết",
   "xaeroplus.setting.deathpoints_render_distance.tooltip": "Áp dụng giới hạn khoảng cách hiển thị điểm đánh dấu cho Điểm Chết",
+  "xaeroplus.setting.waypoint_set_change_tooltip": "Vô hiệu hóa công cụ hiển thị chú giải khi thay đổi bộ điểm định vị",
+  "xaeroplus.setting.waypoint_set_change_tooltip.tooltip": "Vô hiệu hóa văn bản hiển thị trên màn hình khi chuyển đổi bộ điểm định vị.",
   "xaeroplus.setting.persist_dimension_switch": "Giữ Nguyên Chuyển Đổi Kích Thước WM",
   "xaeroplus.setting.persist_dimension_switch.tooltip": "Nếu được kích hoạt, kích thước sẽ không được chuyển đổi trở lại hiện tại khi giao diện WorldMap được đóng lại.",
   "xaeroplus.setting.radar_while_dimension_switched": "Radar Khi Chuyển Kích Thước",

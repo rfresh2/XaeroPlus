@@ -1111,6 +1111,12 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.deathpoints_render_distance",
             false),
         SettingLocation.MINIMAP_WAYPOINTS);
+    public final BooleanSetting disableWaypointSetChangeTooltip = register(
+        BooleanSetting.create(
+            "Disable Waypoint Set Change Tooltip",
+            "xaeroplus.setting.waypoint_set_change_tooltip",
+            false),
+        SettingLocation.MINIMAP_WAYPOINTS);
 
     /**
      * Keybinds (hidden toggles)

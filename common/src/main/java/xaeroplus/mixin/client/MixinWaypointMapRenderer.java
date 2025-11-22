@@ -5,6 +5,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.hud.minimap.waypoint.WaypointPurpose;
@@ -35,6 +36,16 @@ public class MixinWaypointMapRenderer {
             ) {
                 cir.setReturnValue(false);
             }
+        }
+    }
+
+    @Inject(method = "drawSetChange(Lxaero/hud/minimap/module/MinimapSession;Lnet/minecraft/client/gui/GuiGraphics;Lcom/mojang/blaze3d/platform/Window;)V",
+        at = @At("HEAD"),
+        cancellable = true,
+        remap = true) // $REMAP
+    public void cancelWaypointSetChangeTooltip(final CallbackInfo ci) {
+        if (Settings.REGISTRY.disableWaypointSetChangeTooltip.get()) {
+            ci.cancel();
         }
     }
 }

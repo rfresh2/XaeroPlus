@@ -28,6 +28,8 @@
   "xaeroplus.setting.disable_receiving_waypoints.tooltip": "Wyłącza otrzymywanie punktów trasy od innych graczy.",
   "xaeroplus.setting.deathpoints_render_distance": "Dystans Renderowania Punktów Śmierci",
   "xaeroplus.setting.deathpoints_render_distance.tooltip": "Zastosuj ograniczenia dystansu renderowania punktów orientacyjnych do Punktów Śmierci",
+  "xaeroplus.setting.waypoint_set_change_tooltip": "Wyłącz narzędzie podpowiedzi zmiany zestawu WP",
+  "xaeroplus.setting.waypoint_set_change_tooltip.tooltip": "Wyłącza tekst wyświetlany na ekranie po przełączeniu zestawu punktów trasy.",
   "xaeroplus.setting.persist_dimension_switch": "Trwała Zmiana Wymiarów Mapy Świata",
   "xaeroplus.setting.persist_dimension_switch.tooltip": "Jeśli aktywne, wymiar nie zostanie przywrócony do aktualnego jeśli GUI Mapy Świata jest zamknięte.",
   "xaeroplus.setting.radar_while_dimension_switched": "Radar podczas przełączania wymiaru",

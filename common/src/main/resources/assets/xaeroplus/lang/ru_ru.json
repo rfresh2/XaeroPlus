@@ -28,6 +28,8 @@
   "xaeroplus.setting.disable_receiving_waypoints.tooltip": "Отключает получение вейпоинтов от других игроков",
   "xaeroplus.setting.deathpoints_render_distance": "Дальность Отображения Точек Смерти",
   "xaeroplus.setting.deathpoints_render_distance.tooltip": "Применить ограничения дальности отображения путевых точек к Точкам Смерти",
+  "xaeroplus.setting.waypoint_set_change_tooltip": "Отключить всплывающую подсказку WP Set",
+  "xaeroplus.setting.waypoint_set_change_tooltip.tooltip": "Отключает отображение текста на экране при переключении набора путевых точек.",
   "xaeroplus.setting.persist_dimension_switch": "Сохранять выбранное измерение",
   "xaeroplus.setting.persist_dimension_switch.tooltip": "Если включено, измерение карты мира не сбрасывается на то, в котором находится игрок после закрытия интерфейса карты",
   "xaeroplus.setting.radar_while_dimension_switched": "Радар при смене измерения",

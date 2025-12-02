@@ -158,7 +158,9 @@ public class ChunkHighlightDatabase implements Closeable {
         try {
             // remove the corrupted backup
             Files.delete(corruptedBackDbPath);
-            Files.delete(corruptedBackJournalDbPath);
+            if (corruptedBackJournalDbPath.toFile().exists()) {
+                Files.delete(corruptedBackJournalDbPath);
+            }
             XaeroPlus.LOGGER.info("Deleted corrupted database backup: {}" , corruptedBackDbPath);
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error deleting corrupted backup database: {}", databaseName, e);

@@ -7,6 +7,7 @@ import net.minecraft.world.level.Level;
 import org.rfresh.sqlite.SQLiteConnection;
 import org.rfresh.sqlite.SQLiteErrorCode;
 import xaero.map.WorldMap;
+import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.db.DatabaseMigrator;
 import xaeroplus.feature.highlights.db.V0ToV1Migration;
@@ -14,8 +15,10 @@ import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.Wait;
 
 import java.io.Closeable;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -124,12 +127,27 @@ public class ChunkHighlightDatabase implements Closeable {
             XaeroPlus.LOGGER.error("Error closing connection to corrupt database: {}", databaseName, e);
             throw new RuntimeException(e);
         }
+        Path originalJournalDbPath = dbPath.getParent().resolve(dbPath.getFileName() + "-journal");
+        Path recoveredJournalDbPath = recoveredDbPath.getParent().resolve(recoveredDbPath.getFileName() + "-journal");
         // replace the corrupt database with the recovered one
         // then reopen the connection
         Path corruptedBackDbPath = dbPath.getParent().resolve("corrupted_" + databaseName + "-" + System.currentTimeMillis() + ".db");
+        Path corruptedBackJournalDbPath = corruptedBackDbPath.getParent().resolve(corruptedBackDbPath.getFileName() + "-journal");
+        CopyOption[] copyOptions;
+        if (Globals.atomicMoveAvailable) {
+            copyOptions = new CopyOption[]{StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE};
+        } else {
+            copyOptions = new CopyOption[]{StandardCopyOption.REPLACE_EXISTING};
+        }
         try {
-            Files.move(dbPath, corruptedBackDbPath);
-            Files.move(recoveredDbPath, dbPath);
+            Files.move(dbPath, corruptedBackDbPath, copyOptions);
+            if (originalJournalDbPath.toFile().exists()) {
+                Files.move(originalJournalDbPath, corruptedBackJournalDbPath, copyOptions);
+            }
+            Files.move(recoveredDbPath, dbPath, copyOptions);
+            if (recoveredJournalDbPath.toFile().exists()) {
+                Files.move(recoveredJournalDbPath, originalJournalDbPath, copyOptions);
+            }
             XaeroPlus.LOGGER.info("Replaced corrupt database with recovered: {}", databaseName);
             connection = DriverManager.getConnection("jdbc:rfresh_sqlite:" + dbPath);
             XaeroPlus.LOGGER.info("Opened DB connection to recovered database: {}", databaseName);
@@ -140,6 +158,7 @@ public class ChunkHighlightDatabase implements Closeable {
         try {
             // remove the corrupted backup
             Files.delete(corruptedBackDbPath);
+            Files.delete(corruptedBackJournalDbPath);
             XaeroPlus.LOGGER.info("Deleted corrupted database backup: {}" , corruptedBackDbPath);
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error deleting corrupted backup database: {}", databaseName, e);

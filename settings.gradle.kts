@@ -24,10 +24,10 @@ val minimap_version_neo: String by ext.properties
 dependencyResolutionManagement {
 	versionCatalogs {
 		create("libs") {
-			library("fabric-loader", "net.fabricmc:fabric-loader:0.17.3")
-			library("forge", "net.minecraftforge:forge:1.21.10-60.0.19")
+			library("fabric-loader", "net.fabricmc:fabric-loader:0.18.1")
+			library("forge", "net.minecraftforge:forge:1.21.10-60.1.4")
 			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.138.3+${minecraft_version}")
-			library("neoforge", "net.neoforged:neoforge:21.10.51-beta")
+			library("neoforge", "net.neoforged:neoforge:21.10.64")
 			library("worldmap-fabric", "maven.modrinth:xaeros-world-map:${worldmap_version_fabric}_Fabric_1.21.9")
 			library("worldmap-forge", "maven.modrinth:xaeros-world-map:${worldmap_version_forge}_Forge_1.21.9")
 			library("worldmap-neo", "maven.modrinth:xaeros-world-map:${worldmap_version_neo}_NeoForge_1.21.9")
@@ -38,12 +38,12 @@ dependencyResolutionManagement {
             library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.5.0")
 			library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.0")
 			library("lambdaEvents", "net.lenni0451:LambdaEvents:2.4.2")
-			library("waystones-fabric", "maven.modrinth:waystones:21.10.3+fabric-${minecraft_version}")
-			library("waystones-forge", "maven.modrinth:waystones:21.10.3+forge-${minecraft_version}")
-			library("waystones-neoforge", "maven.modrinth:waystones:21.10.3+neoforge-${minecraft_version}")
-			library("balm-fabric", "maven.modrinth:balm:21.10.6+fabric-${minecraft_version}")
-			library("balm-forge", "maven.modrinth:balm:21.10.6+forge-${minecraft_version}")
-			library("balm-neoforge", "maven.modrinth:balm:21.10.6+neoforge-${minecraft_version}")
+			library("waystones-fabric", "maven.modrinth:waystones:21.10.4+fabric-${minecraft_version}")
+			library("waystones-forge", "maven.modrinth:waystones:21.10.4+forge-${minecraft_version}")
+			library("waystones-neoforge", "maven.modrinth:waystones:21.10.4+neoforge-${minecraft_version}")
+			library("balm-fabric", "maven.modrinth:balm:21.10.8+fabric-${minecraft_version}")
+			library("balm-forge", "maven.modrinth:balm:21.10.8+forge-${minecraft_version}")
+			library("balm-neoforge", "maven.modrinth:balm:21.10.8+neoforge-${minecraft_version}")
 			library("fabric-waystones", "maven.modrinth:fwaystones:3.3.5+mc1.21.4")
 			library("worldtools", "maven.modrinth:worldtools:1.2.8+1.21.4")
             library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.50.3.1") // relocated xerial sqlite to avoid conflicts with other mods

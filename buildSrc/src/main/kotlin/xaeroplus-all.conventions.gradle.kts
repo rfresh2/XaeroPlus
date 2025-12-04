@@ -28,7 +28,9 @@ repositories {
         name = "Lenni0451"
     }
     maven("https://maven.shedaniel.me/")
-    maven("https://maven.terraformersmc.com/releases/")
+    maven("https://maven.caffeinemc.net/snapshots/") {
+        content { includeGroup("net.caffeinemc") }
+    }
     mavenLocal()
 }
 

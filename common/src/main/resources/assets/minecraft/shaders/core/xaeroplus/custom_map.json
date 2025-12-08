@@ -1,0 +1,25 @@
+{
+  "blend": {
+    "func": "add",
+    "srcrgb": "1",
+    "dstrgb": "0",
+    "srcalpha": "0",
+    "dstalpha": "1"
+  },
+  "vertex": "xaeroplus/custom_map",
+  "fragment": "xaeroplus/custom_map",
+  "attributes": [
+    "Position",
+    "UV0"
+  ],
+  "samplers": [
+    { "name": "Sampler0" }
+  ],
+  "uniforms": [
+    { "name": "ModelViewMat", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+    { "name": "ProjMat", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+    { "name": "Brightness", "type": "float", "count": 1, "values": [ 1.0 ] },
+    { "name": "WithLight", "type": "int", "count": 1, "values": [ 0 ] },
+    { "name": "TransparentBackground", "type": "int", "count": 1, "values": [ 0 ]}
+  ]
+}

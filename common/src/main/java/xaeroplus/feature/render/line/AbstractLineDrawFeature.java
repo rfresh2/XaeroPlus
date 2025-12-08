@@ -2,18 +2,22 @@ package xaeroplus.feature.render.line;
 
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.MeshData;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
-import xaero.lib.client.graphics.shader.FramebufferLinesShaderHelper;
 import xaeroplus.Globals;
 import xaeroplus.feature.render.DrawContext;
 import xaeroplus.feature.render.DrawFeature;
+import xaeroplus.feature.render.shaders.XaeroPlusShaders;
 import xaeroplus.module.impl.TickTaskExecutor;
 import xaeroplus.util.ChunkUtils;
 
+import java.util.OptionalInt;
 import java.util.concurrent.TimeUnit;
 
 import static xaeroplus.util.GuiMapHelper.*;
@@ -63,17 +67,46 @@ public abstract class AbstractLineDrawFeature<T> implements DrawFeature {
     }
 
     public void preRender(DrawContext ctx) {
-        var mc = Minecraft.getInstance();
         if (ctx.worldmap()) {
-            FramebufferLinesShaderHelper.setFrameSize(mc.getWindow().getWidth(), mc.getWindow().getHeight());
+            XaeroPlusShaders.setLinesFrameSize(Minecraft.getInstance().getWindow().getWidth(), Minecraft.getInstance().getWindow().getHeight());
         }
-        float lineWidthScale = 16f * (float) Mth.clamp(
-            lineWidth() * ctx.fboScale(),
-            0.1f * (ctx.worldmap() ? 1.0f : Globals.minimapScaleMultiplier),
-            1000.0f
-        );
-        RenderSystem.lineWidth(lineWidthScale);
     }
+
+    void drawLines(DrawContext ctx, MeshData meshData) {
+        VertexFormat.IndexType indexType;
+        GpuBuffer indexBuffer;
+        GpuBuffer vertexBuffer;
+        try (meshData) {
+            if (meshData.indexBuffer() == null) {
+                RenderSystem.AutoStorageIndexBuffer autoStorageIndexBuffer = RenderSystem.getSequentialBuffer(meshData.drawState().mode());
+                indexBuffer = autoStorageIndexBuffer.getBuffer(meshData.drawState().indexCount());
+                indexType = autoStorageIndexBuffer.type();
+            } else {
+                indexBuffer = XaeroPlusShaders.LINES_PIPELINE.getVertexFormat().uploadImmediateIndexBuffer(meshData.indexBuffer());
+                indexType = meshData.drawState().indexType();
+            }
+            vertexBuffer = XaeroPlusShaders.LINES_PIPELINE.getVertexFormat().uploadImmediateVertexBuffer(meshData.vertexBuffer());
+        }
+        try (var pass = RenderSystem.getDevice().createCommandEncoder()
+            .createRenderPass(Minecraft.getInstance().getMainRenderTarget().getColorTexture(), OptionalInt.empty())) {
+            pass.setPipeline(XaeroPlusShaders.LINES_PIPELINE);
+            pass.setUniform("ModelViewMatrix", RenderSystem.getModelViewMatrix());
+            pass.setUniform("ProjMat", RenderSystem.getProjectionMatrix());
+            pass.setUniform("FrameSize", XaeroPlusShaders.LINES_FRAME_SIZE);
+            pass.setUniform("ColorModulator", RenderSystem.getShaderColor());
+            float lineWidthScale = 16f * (float) Mth.clamp(
+                lineWidth() * ctx.fboScale(),
+                0.1f * (ctx.worldmap() ? 1.0f : Globals.minimapScaleMultiplier),
+                1000.0f
+            );
+            pass.setUniform("LineWidth", lineWidthScale);
+            pass.setIndexBuffer(indexBuffer, indexType);
+            pass.setVertexBuffer(0, vertexBuffer);
+            pass.drawIndexed(0, meshData.drawState().indexCount());
+        }
+    }
+
+    public void postRender(DrawContext ctx) {}
 
     @Override
     public void close() {

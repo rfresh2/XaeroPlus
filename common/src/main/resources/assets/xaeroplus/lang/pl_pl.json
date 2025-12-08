@@ -1,4 +1,6 @@
 {
+  "xaeroplus.setting.transparent_worldmap_background": "Przezroczyste tło mapy świata",
+  "xaeroplus.setting.transparent_worldmap_background.tooltip": "Renderuje przezroczyste tło mapy świata zamiast czarnego",
   "xaeroplus.setting.fps_limiter": "Ogranicznik FPS minimapy",
   "xaeroplus.setting.fps_limiter.tooltip": "Renderuje minimapę w ograniczonym tempie, zmniejszając jej wpływ na liczbę klatek na sekundę w grze",
   "xaeroplus.setting.fps_limiter_limit": "Limit FPS na minimapie",

@@ -375,7 +375,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Inject(method = "render", at = @At(value = "FIELD", target = "Lxaero/map/gui/GuiMap;lastStartTime:J", opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER), remap = true)
     public void injectFollowMode(final CallbackInfo ci) {
         if (follow && isNull(this.cameraDestination) && isNull(this.cameraDestinationAnimX) && isNull(this.cameraDestinationAnimZ)) {
-            this.cameraDestination = new int[]{(int) getPlayerX(), (int) getPlayerZ()};
+            this.cameraDestinationAnimX = new SlowingAnimation(this.cameraX, getPlayerX(), 0.15, 0.5);
+            this.cameraDestinationAnimZ = new SlowingAnimation(this.cameraZ, getPlayerZ(), 0.15, 0.5);
         }
     }
 

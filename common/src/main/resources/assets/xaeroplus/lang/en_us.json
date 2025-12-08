@@ -1,4 +1,6 @@
 {
+  "xaeroplus.setting.transparent_worldmap_background": "Transparent Background",
+  "xaeroplus.setting.transparent_worldmap_background.tooltip": "Renders a transparent background on the WorldMap instead of black",
   "xaeroplus.setting.fps_limiter": "Minimap FPS Limiter",
   "xaeroplus.setting.fps_limiter.tooltip": "Renders the minimap at a limited rate, reducing its impact on the game's FPS.",
   "xaeroplus.setting.fps_limiter_limit": "Minimap FPS Limit",

@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.ShaderDefines;
 import net.minecraft.client.renderer.ShaderProgram;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Matrix4f;
+import xaero.map.graphics.shader.MapShaders;
 
 public class XaeroPlusShaders {
     public static final ShaderProgram HIGHLIGHT_SHADER_PROGRAM = new ShaderProgram(
@@ -23,9 +24,11 @@ public class XaeroPlusShaders {
 
     private static CompiledShaderProgram CACHED_HIGHLIGHT_SHADER_PROGRAM;
     private static CompiledShaderProgram CACHED_MULTI_COLOR_HIGHLIGHT_SHADER_PROGRAM;
+    private static CompiledShaderProgram CACHED_CUSTOM_MAP_SHADER_PROGRAM;
     private static Uniform HIGHLIGHT_COLOR_UNIFORM;
     private static Uniform HIGHLIGHT_MAP_VIEW_MATRIX_UNIFORM;
     private static Uniform MULTI_COLOR_HIGHLIGHT_MAP_VIEW_MATRIX_UNIFORM;
+    private static Uniform TRANSPARENT_BACKGROUND_UNIFORM;
 
     public static void setHighlightColor(float r, float g, float b, float a) {
         CompiledShaderProgram currentProgram = Minecraft.getInstance().getShaderManager().getProgram(HIGHLIGHT_SHADER_PROGRAM);
@@ -57,5 +60,19 @@ public class XaeroPlusShaders {
         }
 
         MULTI_COLOR_HIGHLIGHT_MAP_VIEW_MATRIX_UNIFORM.set(matrix);
+    }
+
+    public static void ensureTransparentBackgroundUniforms() {
+        CompiledShaderProgram currentProgram = Minecraft.getInstance().getShaderManager().getProgram(MapShaders.WORLD_MAP);
+        if (currentProgram != CACHED_CUSTOM_MAP_SHADER_PROGRAM) {
+            CACHED_CUSTOM_MAP_SHADER_PROGRAM = currentProgram;
+            TRANSPARENT_BACKGROUND_UNIFORM = currentProgram.getUniform("TransparentBackground");
+        }
+    }
+
+    public static void setTransparentBackground(boolean value) {
+        ensureTransparentBackgroundUniforms();
+        final int intValue = value ? 1 : 0;
+        TRANSPARENT_BACKGROUND_UNIFORM.set(intValue);
     }
 }

@@ -10,6 +10,8 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.ResourceLocation;
+import xaero.map.graphics.shader.BuiltInCustomUniformValueTypes;
+import xaero.map.graphics.shader.CustomUniform;
 
 public class XaeroPlusShaders {
     public static final RenderPipeline HIGHLIGHT_PIPELINE = RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET)
@@ -31,4 +33,17 @@ public class XaeroPlusShaders {
         .withUniform("MultiColorHighlightTransforms", UniformType.UNIFORM_BUFFER)
         .withBlend(new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ONE_MINUS_SRC_ALPHA))
         .build();
+
+    public static Integer cachedTransparentBackground = null;
+    public static final CustomUniform<Integer> TRANSPARENT_WM_BACKGROUND_UNIFORM = new CustomUniform<>(
+        new RenderPipeline.UniformDescription("TransparentBackgroundBlock", UniformType.UNIFORM_BUFFER),
+        BuiltInCustomUniformValueTypes.INT, 32
+    );
+    public static void setTransparentWMBackground(boolean value) {
+        int intValue = value ? 1 : 0;
+        if (cachedTransparentBackground == null || cachedTransparentBackground != intValue) {
+            cachedTransparentBackground = intValue;
+            TRANSPARENT_WM_BACKGROUND_UNIFORM.setValue(intValue);
+        }
+    }
 }

@@ -1,4 +1,6 @@
 {
+  "xaeroplus.setting.transparent_worldmap_background": "Fundo transparente no mapa-mundo",
+  "xaeroplus.setting.transparent_worldmap_background.tooltip": "Apresenta um fundo transparente no mapa-mundo em vez de preto",
   "xaeroplus.setting.fps_limiter": "Limitador de FPS do mini-mapa",
   "xaeroplus.setting.fps_limiter.tooltip": "Renderiza o mini-mapa com uma velocidade limitada reduzindo o impacto nos FPS do jogo.",
   "xaeroplus.setting.fps_limiter_limit": "Limite de FPS do mini-mapa",

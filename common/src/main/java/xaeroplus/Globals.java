@@ -38,6 +38,8 @@ public class Globals {
     public static boolean minimapSettingsInitialized = false;
     public static boolean switchingDimension = false;
     public static final boolean atomicMoveAvailable = testAtomicMoveAvailable();
+    public static boolean transparentWmBgApplyMapBlend = false;
+    public static boolean transparentWmBgApplyGuiBilinearBlend = false;
     public static ResourceKey<Level> getCurrentDimensionId() {
         try {
             var dim = XaeroWorldMapCore.currentSession.getMapProcessor().getMapWorld().getCurrentDimensionId();

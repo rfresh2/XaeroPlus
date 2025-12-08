@@ -1,4 +1,6 @@
 {
+  "xaeroplus.setting.transparent_worldmap_background": "透明世界地图背景",
+  "xaeroplus.setting.transparent_worldmap_background.tooltip": "在世界地图上渲染透明背景而不是黑色背景",
   "xaeroplus.setting.fps_limiter": "小地图 FPS 限制器",
   "xaeroplus.setting.fps_limiter.tooltip": "以有限的速率渲染小地图，减少对游戏 FPS 的影响",
   "xaeroplus.setting.fps_limiter_limit": "小地图 FPS 限制",

@@ -1,4 +1,6 @@
 {
+  "xaeroplus.setting.transparent_worldmap_background": "透明なワールドマップ背景",
+  "xaeroplus.setting.transparent_worldmap_background.tooltip": "ワールドマップの背景を黒ではなく透明にします",
   "xaeroplus.setting.fps_limiter": "Minimap FPS Limiter",
   "xaeroplus.setting.fps_limiter.tooltip": "ミニマップのレンダリング速度を制限し、ゲームのFPSへの影響を軽減します。",
   "xaeroplus.setting.fps_limiter_limit": "Minimap FPS Limit",

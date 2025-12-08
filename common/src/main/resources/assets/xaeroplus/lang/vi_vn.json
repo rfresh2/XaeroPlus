@@ -1,4 +1,6 @@
 {
+  "xaeroplus.setting.transparent_worldmap_background": "Nền Bản đồ Thế giới Trong suốt",
+  "xaeroplus.setting.transparent_worldmap_background.tooltip": "Hiển thị nền trong suốt trên Bản đồ Thế giới thay vì nền đen",
   "xaeroplus.setting.fps_limiter": "Giới Hạn FPS Minimap",
   "xaeroplus.setting.fps_limiter.tooltip": "Hiển thị minimap với tốc độ giới hạn, giảm ảnh hưởng đến FPS của trò chơi",
   "xaeroplus.setting.fps_limiter_limit": "Giới Hạn FPS Minimap",

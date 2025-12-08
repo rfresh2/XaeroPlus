@@ -11,6 +11,9 @@ loom {
             programArgs("--username", "rfresh2")
         }
     }
+//    mixin {
+//        useLegacyMixinAp = true
+//    }
 }
 
 val minecraft_version: String by project.properties

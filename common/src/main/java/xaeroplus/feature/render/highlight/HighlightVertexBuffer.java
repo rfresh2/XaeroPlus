@@ -71,7 +71,7 @@ public class HighlightVertexBuffer extends AbstractHighlightVertexBuffer {
         }
         GpuBufferSlice dynamic = RenderSystem.getDynamicUniforms()
             // only need ModelViewMat
-            .writeTransform(RenderSystem.getModelViewMatrix(), new Vector4f(), new Vector3f(), new Matrix4f(), 0);
+            .writeTransform(RenderSystem.getModelViewMatrix(), new Vector4f(), new Vector3f(), new Matrix4f());
         var autoIndexBuffer = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
         var indexType = autoIndexBuffer.type();
         var indexBuffer = autoIndexBuffer.getBuffer(indexCount);

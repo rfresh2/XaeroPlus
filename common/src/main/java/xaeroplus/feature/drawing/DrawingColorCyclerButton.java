@@ -26,7 +26,7 @@ public class DrawingColorCyclerButton extends TooltipButton {
     }
 
     @Override
-    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         int minX = this.getX() + 6;
         int minY = this.getY() + 6;
         if (this.isActive() && this.isHovered()) {

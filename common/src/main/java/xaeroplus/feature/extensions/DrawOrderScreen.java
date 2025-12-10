@@ -46,7 +46,7 @@ public class DrawOrderScreen extends Screen {
             Button.builder(Component.translatable("xaeroplus.gui.draw_order.reset"),
                 b -> TickTaskExecutor.INSTANCE.execute(() -> {
                     Settings.REGISTRY.drawOrderSetting.setValue("");
-                    init(mc, width, height);
+                    init(width, height);
                 }))
                 .bounds(this.width - 82, 2, 80, 20)
                 .build()
@@ -237,7 +237,7 @@ public class DrawOrderScreen extends Screen {
             if (drawFeatureList.getSelected() != this) {
                 // todo: fix
 //                guiGraphics.fill(getContentX() - 2, getContentHeight(), getContentRight(), getContentBottom(), ColorHelper.getColor(0, 0, 0, 150));
-                guiGraphics.submitOutline(getContentX() - 2, getContentY(), getContentWidth(), getContentHeight(), ColorHelper.getColor(68, 68, 68, 255));
+                guiGraphics.renderOutline(getContentX() - 2, getContentY(), getContentWidth(), getContentHeight(), ColorHelper.getColor(68, 68, 68, 255));
             }
             lastRenderX = getX();
             lastRenderY = getY();

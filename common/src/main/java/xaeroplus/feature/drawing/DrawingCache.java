@@ -281,7 +281,7 @@ public class DrawingCache implements Closeable {
         var db = this.database;
         var executor = this.dbExecutor;
         if (db == null || executor == null) {
-            XaeroPlus.LOGGER.error("[{}] Unable to initialize {} disk cache handler for: {}, database: {} or executor: {} is null", Thread.currentThread().getName(), databaseName, dimension.location(), db, executor);
+            XaeroPlus.LOGGER.error("[{}] Unable to initialize {} disk cache handler for: {}, database: {} or executor: {} is null", Thread.currentThread().getName(), databaseName, dimension.identifier(), db, executor);
             return null;
         }
         var cacheHandler = new DrawingHighlightCacheDimensionHandler(dimension, db, executor);
@@ -295,7 +295,7 @@ public class DrawingCache implements Closeable {
         var db = this.database;
         var executor = this.dbExecutor;
         if (db == null || executor == null) {
-            XaeroPlus.LOGGER.error("[{}] Unable to initialize {} disk lines cache handler for: {}, database: {} or executor: {} is null", Thread.currentThread().getName(), databaseName, dimension.location(), db, executor);
+            XaeroPlus.LOGGER.error("[{}] Unable to initialize {} disk lines cache handler for: {}, database: {} or executor: {} is null", Thread.currentThread().getName(), databaseName, dimension.identifier(), db, executor);
             return null;
         }
         var linesCacheHandler = new DrawingLinesCacheDimensionHandler(dimension, db, executor);
@@ -309,7 +309,7 @@ public class DrawingCache implements Closeable {
         var db = this.database;
         var executor = this.dbExecutor;
         if (db == null || executor == null) {
-            XaeroPlus.LOGGER.error("[{}] Unable to initialize {} disk cache handler for: {}, database: {} or executor: {} is null", Thread.currentThread().getName(), databaseName, dimension.location(), db, executor);
+            XaeroPlus.LOGGER.error("[{}] Unable to initialize {} disk cache handler for: {}, database: {} or executor: {} is null", Thread.currentThread().getName(), databaseName, dimension.identifier(), db, executor);
             return null;
         }
         var cacheHandler = new DrawingTextCacheDimensionHandler(dimension, db, executor);
@@ -324,7 +324,7 @@ public class DrawingCache implements Closeable {
         var dimensionCache = highlightsCacheMap.get(dimension);
         if (dimensionCache == null) {
             if (!create) return null;
-            XaeroPlus.LOGGER.info("Initializing {} disk cache for dimension: {}", databaseName, dimension.location());
+            XaeroPlus.LOGGER.info("Initializing {} disk cache for dimension: {}", databaseName, dimension.identifier());
             dimensionCache = initializeHighlightDimensionCacheHandler(dimension);
         }
         return dimensionCache;
@@ -336,7 +336,7 @@ public class DrawingCache implements Closeable {
         var dimensionCache = textsCacheMap.get(dimension);
         if (dimensionCache == null) {
             if (!create) return null;
-            XaeroPlus.LOGGER.info("Initializing {} disk cache for dimension: {}", databaseName, dimension.location());
+            XaeroPlus.LOGGER.info("Initializing {} disk cache for dimension: {}", databaseName, dimension.identifier());
             dimensionCache = initializeTextDimensionCacheHandler(dimension);
         }
         return dimensionCache;
@@ -348,7 +348,7 @@ public class DrawingCache implements Closeable {
         var linesCache = linesCacheMap.get(dimension);
         if (linesCache == null) {
             if (!create) return null;
-            XaeroPlus.LOGGER.info("Initializing {} disk lines cache for dimension: {}", databaseName, dimension.location());
+            XaeroPlus.LOGGER.info("Initializing {} disk lines cache for dimension: {}", databaseName, dimension.identifier());
             linesCache = initializeLinesCacheHandler(dimension);
         }
         return linesCache;

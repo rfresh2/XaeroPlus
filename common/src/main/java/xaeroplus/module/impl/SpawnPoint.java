@@ -6,8 +6,8 @@ import com.google.gson.reflect.TypeToken;
 import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.hud.minimap.BuiltInHudModules;
@@ -69,7 +69,7 @@ public class SpawnPoint extends Module {
         if (con == null) return;
         UUID activeUUID = con.getLocalGameProfile().id();
         respawnPoints.put(activeUUID, new SpawnPosition(
-            ChunkUtils.getActualDimension().location().toString(),
+            ChunkUtils.getActualDimension().identifier().toString(),
             event.pos().getX(), event.pos().getY(), event.pos().getZ()
         ));
         saveRespawnPointsAsync();
@@ -115,7 +115,7 @@ public class SpawnPoint extends Module {
         if (Settings.REGISTRY.owAutoWaypointDimension.get() && spawnPointDimension == NETHER) {
             spawnPointDimension = OVERWORLD;
             spawnPoint = new SpawnPosition(
-                OVERWORLD.location().toString(),
+                OVERWORLD.identifier().toString(),
                 spawnPoint.x() * 8, spawnPoint.y(), spawnPoint.z() * 8
             );
         }
@@ -208,16 +208,16 @@ public class SpawnPoint extends Module {
 
     public record SpawnPosition(String dimensionKey, int x, int y, int z) {
 
-        public ResourceLocation dimensionLocation() {
-            return ResourceLocation.tryParse(dimensionKey);
+        public Identifier dimensionLocation() {
+            return Identifier.tryParse(dimensionKey);
         }
 
         public ResourceKey<Level> dimension() {
             var dimensionLocation = dimensionLocation();
             if (dimensionLocation == null) return null;
-            var ow = OVERWORLD.location();
-            var nether = NETHER.location();
-            var end = END.location();
+            var ow = OVERWORLD.identifier();
+            var nether = NETHER.identifier();
+            var end = END.identifier();
             if (dimensionLocation.equals(ow)) {
                 return OVERWORLD;
             } else if (dimensionLocation.equals(nether)) {
@@ -227,7 +227,7 @@ public class SpawnPoint extends Module {
             }
             var level = Minecraft.getInstance().level;
             if (level != null) {
-                if (level.dimension().location().equals(dimensionLocation)) {
+                if (level.dimension().identifier().equals(dimensionLocation)) {
                     return level.dimension();
                 }
             }

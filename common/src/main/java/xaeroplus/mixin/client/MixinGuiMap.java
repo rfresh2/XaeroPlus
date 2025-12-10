@@ -27,8 +27,8 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import org.joml.Matrix4f;
@@ -66,7 +66,6 @@ import xaeroplus.util.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -314,7 +313,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Unique
     private void onToggleDrawingButton() {
         var prevDrawing = drawing;
-        this.init(Minecraft.getInstance(), width, height);
+        this.init(width, height);
         drawing = !prevDrawing;
         if (drawing) {
             addButton(drawLineSegmentButton);
@@ -500,9 +499,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @WrapWithCondition(method = "render", at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/ResourceLocation;IIFFIIII)V"
+        target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIFFIIII)V"
     ), remap = true)
-    public boolean hideCompassOnF1(final GuiGraphics instance, final RenderPipeline renderPipeline, final ResourceLocation arg, final int i, final int j, final float f, final float g, final int k, final int l, final int m, final int n) {
+    public boolean hideCompassOnF1(final GuiGraphics instance, final RenderPipeline renderPipeline, final Identifier arg, final int i, final int j, final float f, final float g, final int k, final int l, final int m, final int n) {
         return !Minecraft.getInstance().options.hideGui;
     }
 
@@ -935,7 +934,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         drawColorCyclerButton.visible = false;
         drawTextEntryField.visible = false;
         drawMeasurementToolButton.visible = false;
-        this.init(Minecraft.getInstance(), width, height);
+        this.init(width, height);
     }
 
     @Inject(method = "keyPressed", at = @At("RETURN"), remap = true)
@@ -1211,7 +1210,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Unique
     public void onFollowButton(final Button b) {
         follow = !follow;
-        this.init(Minecraft.getInstance(), width, height);
+        this.init(width, height);
     }
 
     @Unique
@@ -1223,7 +1222,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 cameraX = x;
                 cameraZ = z;
                 follow = false;
-                this.init(Minecraft.getInstance(), width, height);
+                this.init(width, height);
             } catch (final NumberFormatException e) {
                 xTextEntryField.setValue("");
                 zTextEntryField.setValue("");
@@ -1231,7 +1230,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 zTextEntryField.visible = false;
             }
         } else {
-            this.init(Minecraft.getInstance(), width, height);
+            this.init(width, height);
             // on current tick, after this method, mouseClicked event is fired, triggering focus onto goto coords button
             // so we schedule text box focus on following tick
             ForkJoinPool.commonPool().execute(() -> {

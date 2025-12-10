@@ -59,6 +59,9 @@ side = "CLIENT"
 [mods."lithium:options"]
 "mixin.chunk.palette" = false
 
+[modproperties.xaeroplus]
+"sodium_config_api_user" = "xaeroplus.neo.XaeroPlusSodiumConfigBuilder"
+
 [[mixins]]
 config = "xaeroplus.mixins.json"
 

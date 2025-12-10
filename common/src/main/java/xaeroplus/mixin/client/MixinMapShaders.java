@@ -1,7 +1,7 @@
 package xaeroplus.mixin.client;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import xaero.map.graphics.shader.MapShaders;
@@ -10,11 +10,11 @@ import xaero.map.graphics.shader.MapShaders;
 public class MixinMapShaders {
     @ModifyExpressionValue(method = "<clinit>", at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/resources/ResourceLocation;fromNamespaceAndPath(Ljava/lang/String;Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;"
+        target = "Lnet/minecraft/resources/Identifier;fromNamespaceAndPath(Ljava/lang/String;Ljava/lang/String;)Lnet/minecraft/resources/Identifier;"
     ))
-    private static ResourceLocation editShader(final ResourceLocation original) {
+    private static Identifier editShader(final Identifier original) {
         if (original.getPath().equals("core/map")) {
-            return ResourceLocation.fromNamespaceAndPath("xaeroplus", "custom_map");
+            return Identifier.fromNamespaceAndPath("xaeroplus", "custom_map");
         }
         return original;
     }

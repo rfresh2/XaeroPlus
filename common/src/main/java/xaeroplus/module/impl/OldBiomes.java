@@ -5,8 +5,8 @@ import kaptainwutax.biomeutils.source.OverworldBiomeSource;
 import kaptainwutax.mcutils.version.MCVersion;
 import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.core.Holder;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.datafix.fixes.BiomeFix;
 import net.minecraft.util.datafix.fixes.CavesAndCliffsRenames;
 import net.minecraft.world.level.Level;
@@ -99,8 +99,8 @@ public class OldBiomes extends Module {
                 if (containsBiome.get()) return;
                 var holder = palettedContainer.data.palette().valueFor(i);
                 var match = holder.unwrapKey()
-                    .map(ResourceKey::location)
-                    .map(ResourceLocation::getPath)
+                    .map(ResourceKey::identifier)
+                    .map(Identifier::getPath)
                     .filter(path -> path.equals(oldBiomeFixup))
                     .isPresent();
                 containsBiome.set(match);

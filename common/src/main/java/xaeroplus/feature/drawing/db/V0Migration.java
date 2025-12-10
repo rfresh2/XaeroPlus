@@ -68,7 +68,7 @@ public class V0Migration implements DatabaseMigration {
     }
 
     private String getTableName(ResourceKey<Level> dimension, String type) {
-        return dimension.location().toString() + "-" + type;
+        return dimension.identifier().toString() + "-" + type;
     }
 
     private void createMetadataTable(String databaseName, Connection connection) {

@@ -55,7 +55,7 @@ public class V0ToV1Migration implements DatabaseMigration {
     }
 
     private String getTableName(ResourceKey<Level> dimension) {
-        return dimension.location().toString();
+        return dimension.identifier().toString();
     }
 
     private boolean tableExists(String tableName, Connection connection) throws SQLException {

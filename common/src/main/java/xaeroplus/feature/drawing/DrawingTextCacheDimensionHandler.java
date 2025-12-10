@@ -82,7 +82,7 @@ public class DrawingTextCacheDimensionHandler {
             try {
                 windowMoveFuture = moveWindow0(regionX, regionZ, regionSize, prevWindowRegionX, prevWindowRegionZ, prevWindowRegionSize);
             } catch (final Exception e) {
-                XaeroPlus.LOGGER.error("Failed submitting move window task for {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
+                XaeroPlus.LOGGER.error("Failed submitting move window task for {} disk cache dimension: {}", database.databaseName, dimension.identifier(), e);
             }
         }
     }
@@ -157,7 +157,7 @@ public class DrawingTextCacheDimensionHandler {
         try {
             return dbExecutor.submit(() -> database.insertTextsList(toWrite, dimension));
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Failed to submit db write task for {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
+            XaeroPlus.LOGGER.error("Failed to submit db write task for {} disk cache dimension: {}", database.databaseName, dimension.identifier(), e);
             return Futures.immediateFailedFuture(e);
         }
     }
@@ -187,7 +187,7 @@ public class DrawingTextCacheDimensionHandler {
         public void onFailure(Throwable t) {
             XaeroPlus.LOGGER.error("Error while moving window for {} disk cache dimension: {}",
                 database.databaseName,
-                dimension.location(),
+                dimension.identifier(),
                 t);
         }
     }

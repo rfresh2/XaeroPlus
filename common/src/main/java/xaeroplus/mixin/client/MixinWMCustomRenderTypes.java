@@ -21,7 +21,7 @@ public class MixinWMCustomRenderTypes {
         slice = @Slice(
             from = @At(
                 value = "FIELD",
-                target = "Lxaero/map/graphics/shader/MapShaders;WORLD_MAP:Lnet/minecraft/resources/ResourceLocation;",
+                target = "Lxaero/map/graphics/shader/MapShaders;WORLD_MAP:Lnet/minecraft/resources/Identifier;",
                 opcode = Opcodes.GETSTATIC
             )
         )

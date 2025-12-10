@@ -1,13 +1,12 @@
 package xaeroplus.util;
 
-import net.blay09.mods.balm.api.Balm;
 import net.blay09.mods.waystones.api.Waystone;
 import net.blay09.mods.waystones.api.WaystoneTypes;
 import net.blay09.mods.waystones.api.event.WaystoneRemoveReceivedEvent;
 import net.blay09.mods.waystones.api.event.WaystoneRemovedEvent;
 import net.blay09.mods.waystones.api.event.WaystoneUpdateReceivedEvent;
 import net.blay09.mods.waystones.api.event.WaystonesListReceivedEvent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.DyeColor;
 import xaero.hud.minimap.waypoint.WaypointColor;
 import xaeroplus.module.impl.WaystoneSync;
@@ -19,28 +18,28 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class BlayWaystonesHelper {
-    public Map<ResourceLocation, ArrayList<Waystone>> currentWaystoneTypeMap = new ConcurrentHashMap<>();
+    public Map<Identifier, ArrayList<Waystone>> currentWaystoneTypeMap = new ConcurrentHashMap<>();
     public boolean shouldSync = false;
     private boolean subscribed = false;
     public final Object lock = new Object();
 
     public void subscribeWaystonesEvent() {
         if (subscribed) return;
-        Balm.getEvents().onEvent(WaystonesListReceivedEvent.class, this::onWaystonesListReceivedEvent);
-        Balm.getEvents().onEvent(WaystoneUpdateReceivedEvent.class, this::onWaystoneUpdateReceived);
-        Balm.getEvents().onEvent(WaystoneRemoveReceivedEvent.class, this::onWaystoneRemoveReceived);
-        Balm.getEvents().onEvent(WaystoneRemovedEvent.class, this::onWaystoneRemoved);
+        WaystonesListReceivedEvent.EVENT.register(this::onWaystonesListReceivedEvent);
+        WaystoneUpdateReceivedEvent.EVENT.register(this::onWaystoneUpdateReceived);
+        WaystoneRemoveReceivedEvent.EVENT.register(this::onWaystoneRemoveReceived);
+        WaystoneRemovedEvent.EVENT.register(this::onWaystoneRemoved);
         subscribed = true;
     }
 
     private void onWaystoneRemoved(WaystoneRemovedEvent event) {
-        if (isCompatibleWaystoneType(event.getWaystone().getWaystoneType())) {
+        if (isCompatibleWaystoneType(event.waystone().getWaystoneType())) {
             synchronized (lock) {
-                ArrayList<Waystone> waystones = currentWaystoneTypeMap.get(event.getWaystone().getWaystoneType());
+                ArrayList<Waystone> waystones = currentWaystoneTypeMap.get(event.waystone().getWaystoneType());
                 if (waystones == null) return;
-                waystones.removeIf(waystone -> waystone.getWaystoneUid().equals(event.getWaystone().getWaystoneUid()));
+                waystones.removeIf(waystone -> waystone.getWaystoneUid().equals(event.waystone().getWaystoneUid()));
                 if (waystones.isEmpty()) {
-                    currentWaystoneTypeMap.remove(event.getWaystone().getWaystoneType());
+                    currentWaystoneTypeMap.remove(event.waystone().getWaystoneType());
                 }
                 shouldSync = true;
             }
@@ -48,13 +47,13 @@ public class BlayWaystonesHelper {
     }
 
     private void onWaystoneRemoveReceived(WaystoneRemoveReceivedEvent event) {
-        if (isCompatibleWaystoneType(event.getWaystoneType())) {
+        if (isCompatibleWaystoneType(event.waystoneType())) {
             synchronized (lock) {
-                ArrayList<Waystone> waystones = currentWaystoneTypeMap.get(event.getWaystoneType());
+                ArrayList<Waystone> waystones = currentWaystoneTypeMap.get(event.waystoneType());
                 if (waystones == null) return;
-                waystones.removeIf(waystone -> waystone.getWaystoneUid().equals(event.getWaystoneId()));
+                waystones.removeIf(waystone -> waystone.getWaystoneUid().equals(event.waystoneId()));
                 if (waystones.isEmpty()) {
-                    currentWaystoneTypeMap.remove(event.getWaystoneType());
+                    currentWaystoneTypeMap.remove(event.waystoneType());
                 }
                 shouldSync = true;
             }
@@ -62,25 +61,25 @@ public class BlayWaystonesHelper {
     }
 
     private void onWaystoneUpdateReceived(WaystoneUpdateReceivedEvent event) {
-        if (isCompatibleWaystoneType(event.getWaystone().getWaystoneType())) {
+        if (isCompatibleWaystoneType(event.waystone().getWaystoneType())) {
             synchronized (lock) {
-                ArrayList<Waystone> waystones = currentWaystoneTypeMap.get(event.getWaystone().getWaystoneType());
+                ArrayList<Waystone> waystones = currentWaystoneTypeMap.get(event.waystone().getWaystoneType());
                 if (waystones == null) return;
-                waystones.removeIf(waystone -> waystone.getWaystoneUid().equals(event.getWaystone().getWaystoneUid()));
-                waystones.add(event.getWaystone());
+                waystones.removeIf(waystone -> waystone.getWaystoneUid().equals(event.waystone().getWaystoneUid()));
+                waystones.add(event.waystone());
                 shouldSync = true;
             }
         }
     }
 
-    private boolean isCompatibleWaystoneType(final ResourceLocation waystoneType) {
+    private boolean isCompatibleWaystoneType(final Identifier waystoneType) {
         return waystoneType.equals(WaystoneTypes.WAYSTONE) || WaystoneTypes.isSharestone(waystoneType);
     }
 
     public void onWaystonesListReceivedEvent(final WaystonesListReceivedEvent event) {
-        if (isCompatibleWaystoneType(event.getWaystoneType())) {
+        if (isCompatibleWaystoneType(event.waystoneType())) {
             synchronized (lock) {
-                currentWaystoneTypeMap.put(event.getWaystoneType(), new ArrayList<>(event.getWaystones()));
+                currentWaystoneTypeMap.put(event.waystoneType(), new ArrayList<>(event.waystones()));
                 shouldSync = true;
             }
         }

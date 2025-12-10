@@ -128,8 +128,8 @@ public class WaypointBeaconRenderer {
         if (camera == null
 //            || frustum == null
         ) return;
-        final double viewX = camera.getPosition().x();
-        final double viewZ = camera.getPosition().z();
+        final double viewX = camera.position().x();
+        final double viewZ = camera.position().z();
         final double x = waypointVec.x - viewX;
         final double z = waypointVec.z - viewZ;
         final double y = -100;

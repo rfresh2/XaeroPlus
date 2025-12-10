@@ -65,7 +65,7 @@ public class ChunkHighlightDatabase implements Closeable {
     }
 
     private String getTableName(ResourceKey<Level> dimension) {
-        return dimension.location().toString();
+        return dimension.identifier().toString();
     }
 
     private void setPragmas() {
@@ -174,7 +174,7 @@ public class ChunkHighlightDatabase implements Closeable {
             if (createHighlightsTableIfNotExists0(dimension)) {
                 return;
             }
-            XaeroPlus.LOGGER.info("Retrying creation of highlights table in {} database in dimension: {} (attempt {}/{})", databaseName, dimension.location(), tryCount, 3);
+            XaeroPlus.LOGGER.info("Retrying creation of highlights table in {} database in dimension: {} (attempt {}/{})", databaseName, dimension.identifier(), tryCount, 3);
             Wait.waitMs(50);
         }
     }
@@ -184,7 +184,7 @@ public class ChunkHighlightDatabase implements Closeable {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS \"" + getTableName(dimension) + "\" (x INTEGER, z INTEGER, foundTime INTEGER)");
             statement.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS \"unique_xz_" + getTableName(dimension) + "\" ON \"" + getTableName(dimension) + "\" (x, z)");
         } catch (SQLException e) {
-            XaeroPlus.LOGGER.error("Error creating highlights table for db: {} in dimension: {}", databaseName, dimension.location(), e);
+            XaeroPlus.LOGGER.error("Error creating highlights table for db: {} in dimension: {}", databaseName, dimension.identifier(), e);
             if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
                 recoverCorruptDatabase();
@@ -200,7 +200,7 @@ public class ChunkHighlightDatabase implements Closeable {
             if (insertHighlightList0(chunks, dimension)) {
                 return;
             }
-            XaeroPlus.LOGGER.info("Retrying insert of {} chunks into {} database in dimension: {} (attempt {}/{})", chunks.size(), databaseName, dimension.location(), tryCount, 3);
+            XaeroPlus.LOGGER.info("Retrying insert of {} chunks into {} database in dimension: {} (attempt {}/{})", chunks.size(), databaseName, dimension.identifier(), tryCount, 3);
             Wait.waitMs(50);
         }
     }
@@ -235,7 +235,7 @@ public class ChunkHighlightDatabase implements Closeable {
                 }
             }
         } catch (SQLException e) {
-            XaeroPlus.LOGGER.error("Error inserting {} chunks into {} database in dimension: {}", chunks.size(), databaseName, dimension.location(), e);
+            XaeroPlus.LOGGER.error("Error inserting {} chunks into {} database in dimension: {}", chunks.size(), databaseName, dimension.identifier(), e);
             if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
                 recoverCorruptDatabase();
@@ -262,7 +262,7 @@ public class ChunkHighlightDatabase implements Closeable {
             if (getHighlightsInWindow0(dimension, regionXMin, regionXMax, regionZMin, regionZMax, consumer)) {
                 return;
             }
-            XaeroPlus.LOGGER.info("Retrying get highlights from {} database in dimension: {}, (attempt {}/{})", databaseName, dimension.location(), tryCount, 3);
+            XaeroPlus.LOGGER.info("Retrying get highlights from {} database in dimension: {}, (attempt {}/{})", databaseName, dimension.identifier(), tryCount, 3);
             Wait.waitMs(50);
         }
     }
@@ -287,7 +287,7 @@ public class ChunkHighlightDatabase implements Closeable {
                 }
             }
         } catch (SQLException e) {
-            XaeroPlus.LOGGER.error("Error getting chunks from {} database in dimension: {}, window: {}-{}, {}-{}", databaseName, dimension.location(), regionXMin, regionXMax, regionZMin, regionZMax, e);
+            XaeroPlus.LOGGER.error("Error getting chunks from {} database in dimension: {}, window: {}-{}, {}-{}", databaseName, dimension.identifier(), regionXMin, regionXMax, regionZMin, regionZMax, e);
             if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
                 recoverCorruptDatabase();
@@ -311,7 +311,7 @@ public class ChunkHighlightDatabase implements Closeable {
             if (getHighlightsInWindowAndOutsidePrevWindow0(dimension, regionXMin, regionXMax, regionZMin, regionZMax, prevRegionXMin, prevRegionXMax, prevRegionZMin, prevRegionZMax, consumer)) {
                 return;
             }
-            XaeroPlus.LOGGER.info("Retrying get of highlights from {} database in dimension: {}, (attempt {}/{})", databaseName, dimension.location(), tryCount, 3);
+            XaeroPlus.LOGGER.info("Retrying get of highlights from {} database in dimension: {}, (attempt {}/{})", databaseName, dimension.identifier(), tryCount, 3);
             Wait.waitMs(50);
         }
     }
@@ -348,7 +348,7 @@ public class ChunkHighlightDatabase implements Closeable {
                 }
             }
         } catch (SQLException e) {
-            XaeroPlus.LOGGER.error("Error getting chunks from {} database in dimension: {}, window: {}-{}, {}-{}", databaseName, dimension.location(), regionXMin, regionXMax, regionZMin, regionZMax, e);
+            XaeroPlus.LOGGER.error("Error getting chunks from {} database in dimension: {}, window: {}-{}, {}-{}", databaseName, dimension.identifier(), regionXMin, regionXMax, regionZMin, regionZMax, e);
             if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
                 recoverCorruptDatabase();
@@ -364,7 +364,7 @@ public class ChunkHighlightDatabase implements Closeable {
             if (removeHighlight0(x, z, dimension)) {
                 return;
             }
-            XaeroPlus.LOGGER.info("Retrying removal of highlight from {} database in dimension: {} (attempt {}/{})", databaseName, dimension.location(), tryCount, 3);
+            XaeroPlus.LOGGER.info("Retrying removal of highlight from {} database in dimension: {} (attempt {}/{})", databaseName, dimension.identifier(), tryCount, 3);
             Wait.waitMs(50);
         }
     }
@@ -373,7 +373,7 @@ public class ChunkHighlightDatabase implements Closeable {
         try (var statement = connection.createStatement()) {
             statement.executeUpdate("DELETE FROM \"" + getTableName(dimension) + "\" WHERE x = " + x + " AND z = " + z);
         } catch (SQLException e) {
-            XaeroPlus.LOGGER.error("Error while removing highlight from {} database in dimension: {}, at {}, {}", databaseName, dimension.location(), x, z, e);
+            XaeroPlus.LOGGER.error("Error while removing highlight from {} database in dimension: {}, at {}, {}", databaseName, dimension.identifier(), x, z, e);
             if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
                 recoverCorruptDatabase();

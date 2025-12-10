@@ -1,8 +1,8 @@
 package xaeroplus.fabric.util;
 
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import wraith.fwaystones.FabricWaystones;
 import wraith.fwaystones.access.WaystoneValue;
 import wraith.fwaystones.integration.event.WaystoneEvents;
@@ -37,7 +37,7 @@ public class FabricWaystonesHelperInit {
         return waystones.values().stream()
             .map(waystone -> new WaystoneSync.Waystone(
                 waystone.getWaystoneName(),
-                ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(waystone.getWorldName())),
+                ResourceKey.create(Registries.DIMENSION, Identifier.parse(waystone.getWorldName())),
                 waystone.way_getPos().getX(),
                 waystone.way_getPos().getY() + 1,// avoid teleporting directly into the waystone
                 waystone.way_getPos().getZ()

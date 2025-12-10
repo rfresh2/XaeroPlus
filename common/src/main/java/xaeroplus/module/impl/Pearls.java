@@ -6,9 +6,9 @@ import com.google.gson.reflect.TypeToken;
 import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.projectile.ThrownEnderpearl;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownEnderpearl;
 import net.minecraft.world.level.Level;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.module.MinimapSession;
@@ -92,7 +92,7 @@ public class Pearls extends Module {
             if (existingPearl == null || thrownPearlEntity.distanceToSqr(existingPearl.x(), existingPearl.y(), existingPearl.z()) > 1.0) {
                 pearls.put(pearlUUID, new Pearl(
                     pearlUUID,
-                    level.dimension().location().toString(),
+                    level.dimension().identifier().toString(),
                     thrownPearlEntity.blockPosition().getX(),
                     thrownPearlEntity.blockPosition().getY(),
                     thrownPearlEntity.blockPosition().getZ()
@@ -275,16 +275,16 @@ public class Pearls extends Module {
         int y,
         int z
     ) {
-        public ResourceLocation dimensionLocation() {
-            return ResourceLocation.tryParse(dimensionKey);
+        public Identifier dimensionLocation() {
+            return Identifier.tryParse(dimensionKey);
         }
 
         public ResourceKey<Level> dimension() {
             var dimensionLocation = dimensionLocation();
             if (dimensionLocation == null) return null;
-            var ow = OVERWORLD.location();
-            var nether = NETHER.location();
-            var end = END.location();
+            var ow = OVERWORLD.identifier();
+            var nether = NETHER.identifier();
+            var end = END.identifier();
             if (dimensionLocation.equals(ow)) {
                 return OVERWORLD;
             } else if (dimensionLocation.equals(nether)) {
@@ -294,7 +294,7 @@ public class Pearls extends Module {
             }
             var level = Minecraft.getInstance().level;
             if (level != null) {
-                if (level.dimension().location().equals(dimensionLocation)) {
+                if (level.dimension().identifier().equals(dimensionLocation)) {
                     return level.dimension();
                 }
             }

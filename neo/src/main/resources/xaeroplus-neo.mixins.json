@@ -7,7 +7,6 @@
   },
   "client": [
     "MixinCommandSourceStack",
-    "MixinSodium6OptionsGUI",
     "mc.MixinLevelRenderer"
   ]
 }

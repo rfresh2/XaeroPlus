@@ -5,8 +5,10 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import xaero.common.graphics.CustomRenderTypes;
+import xaeroplus.Globals;
 import xaeroplus.feature.render.DrawContext;
 import xaeroplus.feature.render.DrawHelper;
 import xaeroplus.util.ChunkUtils;
@@ -73,6 +75,12 @@ public class MultiColorLineDrawFeature extends AbstractLineDrawFeature<Object2In
     public void render(final DrawContext ctx) {
         preRender(ctx);
         VertexConsumer lineBuffer = ctx.renderTypeBuffers().getBuffer(CustomRenderTypes.MAP_LINES);
+        float lineWidthScale = 16f * (float) Mth.clamp(
+            lineWidth() * ctx.fboScale(),
+            0.1f * (ctx.worldmap() ? 1.0f : Globals.minimapScaleMultiplier),
+            1000.0f
+        );
+        lineBuffer.setLineWidth(lineWidthScale);
         var lines = getLines();
         var it = Object2IntMaps.fastIterator(lines);
         boolean hasLines = false;

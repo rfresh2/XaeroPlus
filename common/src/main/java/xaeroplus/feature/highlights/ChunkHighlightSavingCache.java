@@ -212,7 +212,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         var db = this.database;
         var executor = this.dbExecutor;
         if (db == null || executor == null) {
-            XaeroPlus.LOGGER.error("[{}] Unable to initialize {} disk cache handler for: {}, database: {} or executor: {} is null", Thread.currentThread().getName(), databaseName, dimension.location(), db, executor);
+            XaeroPlus.LOGGER.error("[{}] Unable to initialize {} disk cache handler for: {}, database: {} or executor: {} is null", Thread.currentThread().getName(), databaseName, dimension.identifier(), db, executor);
             return null;
         }
         var cacheHandler = new ChunkHighlightCacheDimensionHandler(dimension, db, executor);
@@ -227,7 +227,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         var dimensionCache = dimensionCacheMap.get(dimension);
         if (dimensionCache == null) {
             if (!create) return null;
-            XaeroPlus.LOGGER.info("Initializing {} disk cache for dimension: {}", databaseName, dimension.location());
+            XaeroPlus.LOGGER.info("Initializing {} disk cache for dimension: {}", databaseName, dimension.identifier());
             dimensionCache = initializeDimensionCacheHandler(dimension);
         }
         return dimensionCache;

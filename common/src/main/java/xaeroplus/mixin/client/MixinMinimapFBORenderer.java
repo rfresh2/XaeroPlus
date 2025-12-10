@@ -7,7 +7,6 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
@@ -76,7 +75,8 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             final int scaledSize = Globals.minimapScaleMultiplier * 512;
             this.scalingFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, true);
             this.rotationFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, true);
-            this.rotationFramebuffer.setFilterMode(FilterMode.LINEAR);
+            // todo: fix?
+//            this.rotationFramebuffer.setFilterMode(FilterMode.LINEAR);
             this.loadedFBO = this.scalingFramebuffer.getColorTexture() != null;
         }
     }

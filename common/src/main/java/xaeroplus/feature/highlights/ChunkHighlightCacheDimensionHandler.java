@@ -60,7 +60,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
             try {
                 windowMoveFuture = moveWindow0(regionX, regionZ, regionSize, prevWindowRegionX, prevWindowRegionZ, prevWindowRegionSize);
             } catch (final Exception e) {
-                XaeroPlus.LOGGER.error("Failed submitting move window task for {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
+                XaeroPlus.LOGGER.error("Failed submitting move window task for {} disk cache dimension: {}", database.databaseName, dimension.identifier(), e);
             }
         }
     }
@@ -139,7 +139,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
         try {
             return dbExecutor.submit(() -> database.insertHighlightList(toWrite, dimension));
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Failed to submit db write task for {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
+            XaeroPlus.LOGGER.error("Failed to submit db write task for {} disk cache dimension: {}", database.databaseName, dimension.identifier(), e);
             return Futures.immediateFailedFuture(e);
         }
     }
@@ -201,7 +201,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
                 } catch (final Exception e) {
                     XaeroPlus.LOGGER.error("Failed to load highlights in custom window for {} disk cache dimension: {}",
                                            database.databaseName,
-                                           this.dimension.location(),
+                                           this.dimension.identifier(),
                                            e);
                 }
                 return Long2LongMaps.EMPTY_MAP;
@@ -235,7 +235,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
         public void onFailure(Throwable t) {
             XaeroPlus.LOGGER.error("Error while moving window for {} disk cache dimension: {}",
                                    database.databaseName,
-                                   dimension.location(),
+                                   dimension.identifier(),
                                    t);
         }
     }

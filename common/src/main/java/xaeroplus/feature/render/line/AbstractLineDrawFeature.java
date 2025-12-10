@@ -2,10 +2,8 @@ package xaeroplus.feature.render.line;
 
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import xaero.common.graphics.shader.FramebufferLinesShaderHelper;
 import xaeroplus.Globals;
@@ -67,12 +65,6 @@ public abstract class AbstractLineDrawFeature<T> implements DrawFeature {
         if (ctx.worldmap()) {
             FramebufferLinesShaderHelper.setFrameSize(mc.getWindow().getWidth(), mc.getWindow().getHeight());
         }
-        float lineWidthScale = 16f * (float) Mth.clamp(
-            lineWidth() * ctx.fboScale(),
-            0.1f * (ctx.worldmap() ? 1.0f : Globals.minimapScaleMultiplier),
-            1000.0f
-        );
-        RenderSystem.lineWidth(lineWidthScale);
     }
 
     @Override

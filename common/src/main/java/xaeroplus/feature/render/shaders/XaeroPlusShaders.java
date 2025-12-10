@@ -9,15 +9,15 @@ import com.mojang.blaze3d.shaders.UniformType;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import xaero.map.graphics.shader.BuiltInCustomUniformValueTypes;
 import xaero.map.graphics.shader.CustomUniform;
 
 public class XaeroPlusShaders {
     public static final RenderPipeline HIGHLIGHT_PIPELINE = RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET)
-        .withLocation(ResourceLocation.fromNamespaceAndPath("xaeroplus", "pipeline/highlights"))
-        .withVertexShader(ResourceLocation.fromNamespaceAndPath("xaeroplus", "highlights"))
-        .withFragmentShader(ResourceLocation.fromNamespaceAndPath("xaeroplus", "highlights"))
+        .withLocation(Identifier.fromNamespaceAndPath("xaeroplus", "pipeline/highlights"))
+        .withVertexShader(Identifier.fromNamespaceAndPath("xaeroplus", "highlights"))
+        .withFragmentShader(Identifier.fromNamespaceAndPath("xaeroplus", "highlights"))
         .withVertexFormat(DefaultVertexFormat.POSITION, VertexFormat.Mode.QUADS)
         .withPolygonMode(PolygonMode.FILL)
         .withUniform("HighlightTransforms", UniformType.UNIFORM_BUFFER)
@@ -25,9 +25,9 @@ public class XaeroPlusShaders {
         .build();
 
     public static final RenderPipeline MULTI_COLOR_HIGHLIGHT_PIPELINE = RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET)
-        .withLocation(ResourceLocation.fromNamespaceAndPath("xaeroplus", "pipeline/multi_color_highlights"))
-        .withVertexShader(ResourceLocation.fromNamespaceAndPath("xaeroplus", "multi_color_highlights"))
-        .withFragmentShader(ResourceLocation.fromNamespaceAndPath("xaeroplus", "multi_color_highlights"))
+        .withLocation(Identifier.fromNamespaceAndPath("xaeroplus", "pipeline/multi_color_highlights"))
+        .withVertexShader(Identifier.fromNamespaceAndPath("xaeroplus", "multi_color_highlights"))
+        .withFragmentShader(Identifier.fromNamespaceAndPath("xaeroplus", "multi_color_highlights"))
         .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
         .withPolygonMode(PolygonMode.FILL)
         .withUniform("MultiColorHighlightTransforms", UniformType.UNIFORM_BUFFER)

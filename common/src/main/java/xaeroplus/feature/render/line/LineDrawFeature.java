@@ -2,8 +2,10 @@ package xaeroplus.feature.render.line;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import xaero.common.graphics.CustomRenderTypes;
+import xaeroplus.Globals;
 import xaeroplus.feature.render.DrawContext;
 import xaeroplus.feature.render.DrawHelper;
 import xaeroplus.util.ChunkUtils;
@@ -72,6 +74,12 @@ public class LineDrawFeature extends AbstractLineDrawFeature<List<Line>> {
         if (a == 0.0f) return;
         preRender(ctx);
         VertexConsumer lineBuffer = ctx.renderTypeBuffers().getBuffer(CustomRenderTypes.MAP_LINES);
+        float lineWidthScale = 16f * (float) Mth.clamp(
+            lineWidth() * ctx.fboScale(),
+            0.1f * (ctx.worldmap() ? 1.0f : Globals.minimapScaleMultiplier),
+            1000.0f
+        );
+        lineBuffer.setLineWidth(lineWidthScale);
         var r = ColorHelper.getR(color);
         var g = ColorHelper.getG(color);
         var b = ColorHelper.getB(color);

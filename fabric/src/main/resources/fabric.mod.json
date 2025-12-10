@@ -20,6 +20,9 @@
     ],
     "modmenu": [
       "xaeroplus.fabric.XaeroPlusModMenu"
+    ],
+    "sodium:config_api_user": [
+      "xaeroplus.fabric.XaeroPlusSodiumConfigBuilder"
     ]
   },
   "mixins": [

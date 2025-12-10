@@ -2,7 +2,7 @@ package xaeroplus.settings;
 
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import xaero.common.settings.ModOptions;
 import xaero.map.gui.CursorBox;
 import xaeroplus.XaeroPlus;
@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 import static java.util.Objects.nonNull;
 
 public class BooleanSetting extends XaeroPlusSetting {
-    public static final KeyMapping.Category KEYBIND_CATEGORY = KeyMapping.Category.register(ResourceLocation.fromNamespaceAndPath("xaeroplus", "keybindings"));
+    public static final KeyMapping.Category KEYBIND_CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("xaeroplus", "keybindings"));
     private boolean value;
     private BooleanConsumer settingChangeConsumer;
 

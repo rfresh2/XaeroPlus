@@ -665,6 +665,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         }
         original.call(instance, renderer);
         ((CustomWorldMapShader) MapShaders.WORLD_MAP).setTransparentBackground(false);
+        BlendMode.lastApplied = null;
     }
 
     @WrapOperation(method = "render", at = @At(
@@ -682,6 +683,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         }
         original.call(instance, renderer);
         ((CustomWorldMapShader) MapShaders.WORLD_MAP).setTransparentBackground(false);
+        BlendMode.lastApplied = null;
     }
 
     @WrapOperation(method = "render", at = @At(
@@ -695,6 +697,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             Globals.transparentWmBgApplyGuiBilinearBlend = true;
         }
         original.call(instance, renderer);
+        BlendMode.lastApplied = null;
     }
 
     @Inject(method = "shouldSkipWorldRender", at = @At("HEAD"), cancellable = true)

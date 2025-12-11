@@ -676,6 +676,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         }
         original.call(instance, renderer);
         XaeroPlusShaders.setTransparentBackground(false);
+        Globals.transparentWmBgApplyMapBlend = false;
     }
 
     @WrapOperation(method = "render", at = @At(
@@ -692,6 +693,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         }
         original.call(instance, renderer);
         XaeroPlusShaders.setTransparentBackground(false);
+        Globals.transparentWmBgApplyMapBlend = false;
     }
 
     @WrapOperation(method = "render", at = @At(
@@ -704,6 +706,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             Globals.transparentWmBgApplyGuiBilinearBlend = true;
         }
         original.call(instance, renderer);
+        Globals.transparentWmBgApplyGuiBilinearBlend = false;
     }
 
     @Inject(method = "shouldSkipWorldRender", at = @At("HEAD"), cancellable = true)

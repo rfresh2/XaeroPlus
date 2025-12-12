@@ -185,6 +185,7 @@ public class WaystoneSync extends Module {
 
     public void reloadWaystones() {
         blayWaystonesHelper.shouldSync = true;
+        blayWaystonesHelper.toSyncWaystones = List.copyOf(blayWaystonesHelper.currentWaystones);
         FabricWaystonesHelper.shouldSync = true;
     }
 

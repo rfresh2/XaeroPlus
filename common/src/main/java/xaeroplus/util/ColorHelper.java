@@ -60,7 +60,13 @@ public class ColorHelper {
         CYAN(ColorHelper.getColor(0, 255, 255, 100), "gui.xaero_aqua"),
         MAGENTA(ColorHelper.getColor(255, 0, 255, 100), "gui.xaero_purple"),
         WHITE(ColorHelper.getColor(255, 255, 255, 100), "gui.xaero_white"),
-        BLACK(ColorHelper.getColor(0, 0, 0, 100), "gui.xaero_black");
+        BLACK(ColorHelper.getColor(0, 0, 0, 100), "gui.xaero_black"),
+        ORANGE(ColorHelper.getColor(255, 128, 0, 100), "xaeroplus.gui.orange"),
+        LIME(ColorHelper.getColor(128, 255, 0, 100), "xaeroplus.gui.lime"),
+        EMERALD(ColorHelper.getColor(0, 255, 128, 100), "xaeroplus.gui.emerald"),
+        LIGHT_BLUE(ColorHelper.getColor(0, 128, 255, 100), "xaeroplus.gui.light_blue"),
+        PURPLE(ColorHelper.getColor(128, 0, 255, 100), "xaeroplus.gui.purple"),
+        PINK(ColorHelper.getColor(255, 0, 128, 100), "xaeroplus.gui.pink");
 
         private final int color;
         private final String translationKey;

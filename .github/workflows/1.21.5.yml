@@ -22,7 +22,7 @@ jobs:
         distribution: 'temurin'
 
     - name: Loom Cache
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: "**/.gradle/loom-cache"
         key: "${{ env.MINECRAFT_VERSION }}-loom-${{ hashFiles('settings.gradle.kts', 'gradle.properties', '**/gradle-wrapper.properties', 'buildSrc/build.gradle.kts', 'buildSrc/**/*.gradle.kts', '**/*.accesswidener') }}"
@@ -94,14 +94,14 @@ jobs:
       run: mv neo/build/libs/${{ env.XP_NEO }}.jar neo/build/libs/${{ env.XP_NEO_OUT }}.jar
 
     - name: Upload Fabric Artifact
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: ${{ env.XP_FABRIC_OUT }}
         path: fabric/build/libs/${{ env.XP_FABRIC_OUT }}.jar
         if-no-files-found: error
 
     - name: Upload Forge Artifact
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: ${{ env.XP_FORGE_OUT }}
         path: forge/build/libs/${{ env.XP_FORGE_OUT }}.jar
@@ -136,7 +136,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Download job artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           merge-multiple: true
           path: artifacts/
@@ -175,7 +175,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Download job artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           merge-multiple: true
           path: artifacts/

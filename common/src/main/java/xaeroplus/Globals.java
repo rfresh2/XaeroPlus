@@ -5,7 +5,6 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
-import xaero.common.HudMod;
 import xaero.hud.HudSession;
 import xaero.map.core.XaeroWorldMapCore;
 import xaeroplus.event.ClientPlaySessionFinalizedEvent;
@@ -80,15 +79,6 @@ public class Globals {
             nullOverworldDimensionFolder = Settings.REGISTRY.nullOverworldDimensionFolder.get();
             dataFolderResolutionMode = Settings.REGISTRY.dataFolderResolutionMode.get();
         }, ClientPlaySessionFinalizedEvent.class);
-    }
-
-    public static void initSyncedSettings() {
-        try {
-            boolean baseSetting = HudMod.INSTANCE.getSettings().radarHideInvisibleEntities;
-            Settings.REGISTRY.radarHideInvisibleEntities.setValue(baseSetting);
-        } catch (final Exception ex) {
-            XaeroPlus.LOGGER.error("Failed syncing setting: radarHideInvisibleEntities", ex);
-        }
     }
 
     public static void switchToDimension(final ResourceKey<Level> newDimId) {

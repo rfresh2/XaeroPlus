@@ -39,7 +39,6 @@ public class XaeroPlus {
 		XaeroPlus.EVENT_BUS.registerConsumer((e) -> {
 			if (Globals.minimapSettingsInitialized) return;
 			Globals.minimapSettingsInitialized = true;
-			Globals.initSyncedSettings();
 		}, MinimapInitCompletedEvent.class);
 		XaeroPlus.EVENT_BUS.register(KEYBIND_LISTENER);
 	}

@@ -67,9 +67,9 @@ public class DrawHelper {
     }
 
     public static void addColoredLineToExistingBuffer(
-        PoseStack.Pose matrices, VertexConsumer vertexBuffer, float x1, float y1, float x2, float y2, float r, float g, float b, float a
+        PoseStack.Pose matrices, VertexConsumer vertexBuffer, float x1, float y1, float x2, float y2, float r, float g, float b, float a, float lineWidth
     ) {
-        vertexBuffer.addVertex(matrices.pose(), x1, y1, 0.0F).setColor(r, g, b, a).setNormal(matrices, x2 - x1, y2 - y1, 0.0F);
-        vertexBuffer.addVertex(matrices.pose(), x2, y2, 0.0F).setColor(r, g, b, a).setNormal(matrices, x2 - x1, y2 - y1, 0.0F);
+        vertexBuffer.addVertex(matrices.pose(), x1, y1, 0.0F).setColor(r, g, b, a).setNormal(matrices, x2 - x1, y2 - y1, 0.0F).setLineWidth(lineWidth);
+        vertexBuffer.addVertex(matrices.pose(), x2, y2, 0.0F).setColor(r, g, b, a).setNormal(matrices, x2 - x1, y2 - y1, 0.0F).setLineWidth(lineWidth);
     }
 }

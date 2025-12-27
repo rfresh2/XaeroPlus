@@ -19,7 +19,7 @@ loom {
 val minecraft_version: String by project.properties
 val parchment_version: String by project.properties
 val mc = "com.mojang:minecraft:${minecraft_version}"
-val parchment = "org.parchmentmc.data:parchment-1.21.10:${parchment_version}"
+val parchment = "org.parchmentmc.data:parchment-${minecraft_version}:${parchment_version}"
 
 dependencies {
     minecraft(mc)

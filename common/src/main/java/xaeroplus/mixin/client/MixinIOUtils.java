@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xaero.common.misc.Misc;
+import xaero.lib.common.util.IOUtils;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.settings.Settings;
@@ -17,8 +17,8 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.concurrent.ThreadLocalRandom;
 
-@Mixin(value = Misc.class, remap = false)
-public class MixinCommonMisc {
+@Mixin(value = IOUtils.class, remap = false)
+public class MixinIOUtils {
     @WrapOperation(method = "quickFileBackupMove", at = @At(
         value = "INVOKE",
         target = "Ljava/nio/file/Path;resolveSibling(Ljava/lang/String;)Ljava/nio/file/Path;",

@@ -2,8 +2,8 @@ package xaeroplus.feature.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.lenni0451.lambdaevents.EventHandler;
-import net.minecraft.client.renderer.MultiBufferSource;
 import xaero.common.HudMod;
+import xaero.lib.client.graphics.XaeroBufferProvider;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.module.impl.TickTaskExecutor;
@@ -34,7 +34,7 @@ public class DrawManager {
         int insideX,
         int insideZ,
         final PoseStack matrixStack,
-        final MultiBufferSource.BufferSource renderTypeBuffers
+        final XaeroBufferProvider renderTypeBuffers
     ) {
         if (HudMod.INSTANCE.isFairPlay()) return;
         var ctx = new DrawContext(matrixStack, renderTypeBuffers, 1.0, false);
@@ -54,7 +54,7 @@ public class DrawManager {
         final int flooredCameraZ,
         final PoseStack matrixStack,
         final double fboScale,
-        final MultiBufferSource.BufferSource renderTypeBuffers) {
+        final XaeroBufferProvider renderTypeBuffers) {
         if (HudMod.INSTANCE.isFairPlay()) return;
         var ctx = new DrawContext(matrixStack, renderTypeBuffers, fboScale, true);
         matrixStack.pushPose();

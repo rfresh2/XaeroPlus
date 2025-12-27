@@ -49,7 +49,7 @@ public class MixinWaypointWorldRenderer {
 
     @ModifyArg(method = "renderElement(Lxaero/common/minimap/waypoints/Waypoint;ZZDFDDLxaero/hud/minimap/element/render/MinimapElementRenderInfo;Lxaero/hud/minimap/element/render/MinimapElementGraphics;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)Z", at = @At(
         value = "INVOKE",
-        target = "Lxaero/hud/minimap/waypoint/render/world/WaypointWorldRenderer;renderIconWithLabels(Lxaero/common/minimap/waypoints/Waypoint;ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;FIILnet/minecraft/client/gui/Font;ILcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)V"),
+        target = "Lxaero/hud/minimap/waypoint/render/world/WaypointWorldRenderer;renderIconWithLabels(Lxaero/common/minimap/waypoints/Waypoint;ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;FIILnet/minecraft/client/gui/Font;ILcom/mojang/blaze3d/vertex/PoseStack;Lxaero/lib/client/graphics/XaeroBufferProvider;)V"),
         index = 4,
     remap = true) // $REMAP
     public String preferOwWaypointsRemoveSubworldText(final String name) {
@@ -69,7 +69,7 @@ public class MixinWaypointWorldRenderer {
      */
     @ModifyArg(method = "renderElement(Lxaero/common/minimap/waypoints/Waypoint;ZZDFDDLxaero/hud/minimap/element/render/MinimapElementRenderInfo;Lxaero/hud/minimap/element/render/MinimapElementGraphics;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)Z", at = @At(
         value = "INVOKE",
-        target = "Lxaero/hud/minimap/waypoint/render/world/WaypointWorldRenderer;renderIconWithLabels(Lxaero/common/minimap/waypoints/Waypoint;ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;FIILnet/minecraft/client/gui/Font;ILcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)V"),
+        target = "Lxaero/hud/minimap/waypoint/render/world/WaypointWorldRenderer;renderIconWithLabels(Lxaero/common/minimap/waypoints/Waypoint;ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;FIILnet/minecraft/client/gui/Font;ILcom/mojang/blaze3d/vertex/PoseStack;Lxaero/lib/client/graphics/XaeroBufferProvider;)V"),
         index = 3,
         remap = true) // $REMAP
     public String modifyDistanceText(final String text, @Local(argsOnly = true) Waypoint waypoint) {

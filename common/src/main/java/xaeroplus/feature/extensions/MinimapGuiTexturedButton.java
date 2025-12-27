@@ -5,8 +5,8 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import xaero.common.graphics.CursorBox;
 import xaero.common.gui.TooltipButton;
+import xaero.lib.client.gui.widget.Tooltip;
 import xaeroplus.util.ColorHelper;
 
 import java.util.function.Supplier;
@@ -20,7 +20,7 @@ public class MinimapGuiTexturedButton extends TooltipButton {
     protected final int factorH;
     public final Identifier texture;
 
-    public MinimapGuiTexturedButton(int x, int y, int w, int h, int textureX, int textureY, int textureW, int textureH, Identifier texture, Button.OnPress onPress, Supplier<CursorBox> tooltip, int factorW, int factorH) {
+    public MinimapGuiTexturedButton(int x, int y, int w, int h, int textureX, int textureY, int textureW, int textureH, Identifier texture, Button.OnPress onPress, Supplier<Tooltip> tooltip, int factorW, int factorH) {
         super(x, y, w, h, Component.empty(), onPress, tooltip);
         this.textureX = textureX;
         this.textureY = textureY;

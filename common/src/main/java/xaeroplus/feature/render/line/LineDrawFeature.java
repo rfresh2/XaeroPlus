@@ -79,7 +79,6 @@ public class LineDrawFeature extends AbstractLineDrawFeature<List<Line>> {
             0.1f * (ctx.worldmap() ? 1.0f : Globals.minimapScaleMultiplier),
             1000.0f
         );
-        lineBuffer.setLineWidth(lineWidthScale);
         var r = ColorHelper.getR(color);
         var g = ColorHelper.getG(color);
         var b = ColorHelper.getB(color);
@@ -93,7 +92,8 @@ public class LineDrawFeature extends AbstractLineDrawFeature<List<Line>> {
             DrawHelper.addColoredLineToExistingBuffer(
                 ctx.matrixStack().last(), lineBuffer,
                 x1, z1, x2, z2,
-                r, g, b, a
+                r, g, b, a,
+                lineWidthScale
             );
         }
         if (!lines.isEmpty()) {

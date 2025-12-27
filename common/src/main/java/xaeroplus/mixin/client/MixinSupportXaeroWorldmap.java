@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.mods.SupportXaeroWorldmap;
-import xaero.hud.render.util.ImmediateRenderUtil;
+import xaero.lib.client.graphics.util.ImmediateRenderUtil;
 import xaero.map.WorldMapSession;
 import xaero.map.region.MapTileChunk;
 import xaeroplus.Globals;
@@ -26,7 +26,7 @@ import xaeroplus.settings.Settings;
 public abstract class MixinSupportXaeroWorldmap {
     @Inject(method = "drawMinimap", at = @At(
         value = "INVOKE",
-        target = "Lxaero/common/settings/ModSettings;getSlimeChunks(Lxaero/hud/minimap/module/MinimapSession;)Z"
+        target = "Lxaero/hud/minimap/config/util/MinimapConfigClientUtils;getEffectiveSlimeChunks(Lxaero/hud/minimap/module/MinimapSession;)Z"
     ), remap = false)
     public void overrideRegionRange(
         final CallbackInfo ci,
@@ -94,7 +94,7 @@ public abstract class MixinSupportXaeroWorldmap {
     ) {
         if (Settings.REGISTRY.transparentMinimapBackground.get()) {
             var meshData = bgBufferBuilderRef.get().build();
-            if (meshData != null) ImmediateRenderUtil.drawImmediateMeshData(meshData, RenderPipelines.GUI);
+            if (meshData != null) ImmediateRenderUtil.drawImmediateMeshData(meshData, RenderPipelines.GUI, ImmediateRenderUtil.NO_TEXTURES);
         }
     }
 

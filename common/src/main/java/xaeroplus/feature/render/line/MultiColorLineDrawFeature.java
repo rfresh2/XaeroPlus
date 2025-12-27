@@ -80,7 +80,6 @@ public class MultiColorLineDrawFeature extends AbstractLineDrawFeature<Object2In
             0.1f * (ctx.worldmap() ? 1.0f : Globals.minimapScaleMultiplier),
             1000.0f
         );
-        lineBuffer.setLineWidth(lineWidthScale);
         var lines = getLines();
         var it = Object2IntMaps.fastIterator(lines);
         boolean hasLines = false;
@@ -100,7 +99,8 @@ public class MultiColorLineDrawFeature extends AbstractLineDrawFeature<Object2In
             DrawHelper.addColoredLineToExistingBuffer(
                 ctx.matrixStack().last(), lineBuffer,
                 x1, z1, x2, z2,
-                r, g, b, a
+                r, g, b, a,
+                lineWidthScale
             );
             hasLines = true;
         }

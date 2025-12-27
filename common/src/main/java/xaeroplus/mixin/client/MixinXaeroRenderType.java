@@ -7,11 +7,11 @@ import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Slice;
-import xaero.map.graphics.CustomRenderTypes;
+import xaero.lib.client.graphics.XaeroRenderType;
 import xaeroplus.feature.render.shaders.XaeroPlusShaders;
 
-@Mixin(value = CustomRenderTypes.class, remap = false)
-public class MixinWMCustomRenderTypes {
+@Mixin(value = XaeroRenderType.class, remap = false)
+public class MixinXaeroRenderType {
 
     @WrapOperation(method = "<clinit>", at = @At(
         value = "INVOKE",
@@ -21,7 +21,7 @@ public class MixinWMCustomRenderTypes {
         slice = @Slice(
             from = @At(
                 value = "FIELD",
-                target = "Lxaero/map/graphics/shader/MapShaders;WORLD_MAP:Lnet/minecraft/resources/Identifier;",
+                target = "Lxaero/lib/client/graphics/shader/LibShaders;WORLD_MAP:Lnet/minecraft/resources/Identifier;",
                 opcode = Opcodes.GETSTATIC
             )
         )

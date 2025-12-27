@@ -1,7 +1,5 @@
 package xaeroplus.feature.render.text;
 
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.util.Mth;
@@ -55,7 +53,7 @@ public abstract class AbstractTextDrawFeature implements DrawFeature {
         if (!texts.isEmpty()) {
             try {
                 Globals.disableDrawCullingOverride = true;
-                ctx.renderTypeBuffers().endLastBatch();
+                ctx.renderTypeBuffers().endBatch();
             } finally {
                 Globals.disableDrawCullingOverride = false;
             }

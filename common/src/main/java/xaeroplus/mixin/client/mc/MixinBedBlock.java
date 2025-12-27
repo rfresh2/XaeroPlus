@@ -9,7 +9,6 @@ import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -20,15 +19,10 @@ import static net.minecraft.world.level.block.BedBlock.OCCUPIED;
 
 @Mixin(BedBlock.class)
 public abstract class MixinBedBlock {
-    @Shadow
-    public static boolean canSetSpawn(final Level level) {
-        return false;
-    }
-
     @Inject(method = "useWithoutItem", at = @At("HEAD"))
     public void checkBedSpawnPointSet(final BlockState state, final Level level, final BlockPos pos, final Player player, final BlockHitResult hitResult, final CallbackInfoReturnable<InteractionResult> cir) {
         if (player != Minecraft.getInstance().player) return;
-        if (!canSetSpawn(level)) return;
+        if (level.dimension() != Level.OVERWORLD) return;
         if (state.getValue(OCCUPIED)) return;
         XaeroPlus.EVENT_BUS.call(new RespawnPointSetEvent(pos));
     }

@@ -2,12 +2,12 @@ package xaeroplus.settings;
 
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import xaero.common.settings.ModOptions;
-import xaero.map.gui.CursorBox;
+import xaero.lib.common.gui.widget.TooltipInfo;
 import xaeroplus.XaeroPlus;
-import xaeroplus.mixin.client.AccessorMinimapModOptions;
-import xaeroplus.mixin.client.AccessorWorldMapModOptions;
+import xaeroplus.feature.extensions.XaeroPlusSettingEntry;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -134,21 +134,24 @@ public class BooleanSetting extends XaeroPlusSetting {
     }
 
     @Override
-    public ModOptions toMinimapModOptions() {
-        return AccessorMinimapModOptions.createBooleanSetting(
-            getSettingName(),
-            new xaero.common.graphics.CursorBox(getTooltipTranslationKey()),
-            isIngameOnly());
-    }
-
-    @Override
-    public xaero.map.settings.ModOptions toWorldMapModOptions() {
-        return AccessorWorldMapModOptions.createBooleanSetting(
-            getSettingName(),
-            new CursorBox(getTooltipTranslationKey()),
-            isIngameOnly(),
-            isRequiresMinimap(),
-            false);
+    public XaeroPlusSettingEntry<?> toXaeroSettingEntry() {
+        return new XaeroPlusSettingEntry<Boolean>(
+            this,
+            Component.literal(getTranslatedName()),
+            new TooltipInfo(getTooltipTranslationKey()),
+            false,
+            this::get,
+            0,
+            1,
+            v -> v == 1,
+            v -> Component.translatable(v ? "gui.xaero_on" : "gui.xaero_off"),
+            (v1, v2) -> {
+                setValue(v2);
+                SettingHooks.saveSettings();
+                Minecraft.getInstance().setScreen(Minecraft.getInstance().screen);
+            },
+            this::isVisible
+        );
     }
 
     public boolean get() {

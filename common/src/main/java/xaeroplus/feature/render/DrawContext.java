@@ -1,11 +1,11 @@
 package xaeroplus.feature.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.MultiBufferSource;
+import xaero.lib.client.graphics.XaeroBufferProvider;
 
 public record DrawContext(
     PoseStack matrixStack,
-    MultiBufferSource.BufferSource renderTypeBuffers,
+    XaeroBufferProvider renderTypeBuffers,
     double fboScale,
     boolean worldmap
 ) { }

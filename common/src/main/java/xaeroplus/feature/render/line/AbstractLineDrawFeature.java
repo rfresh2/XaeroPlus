@@ -5,7 +5,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
-import xaero.common.graphics.shader.FramebufferLinesShaderHelper;
+import xaero.lib.client.graphics.shader.FramebufferLinesShaderHelper;
 import xaeroplus.Globals;
 import xaeroplus.feature.render.DrawContext;
 import xaeroplus.feature.render.DrawFeature;

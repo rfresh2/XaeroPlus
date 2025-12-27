@@ -77,6 +77,7 @@
     "MixinWorldMapOption",
     "mc.MixinBedBlock",
     "mc.MixinClientPlayNetworkHandler",
+    "mc.MixinGui",
     "mc.MixinMinecraftClient",
     "mc.MixinPictureInPictureRenderer",
     "mc.MixinRenderPipeline",

@@ -190,7 +190,6 @@ jobs:
             fabric
             quilt
           game-versions: |
-            1.21.9
             ${{ env.MINECRAFT_VERSION }}
           dependencies: |
             xaerominimap@${{ needs.build.outputs.minimap_version_fabric }}(required){modrinth:1bokaNcj}{curseforge:263420}
@@ -219,7 +218,6 @@ jobs:
             fabric
             quilt
           game-versions: |
-            1.21.9
             ${{ env.MINECRAFT_VERSION }}
           dependencies: |
             xaerominimap@${{ needs.build.outputs.minimap_version_fabric }}(required){modrinth:1bokaNcj}{curseforge:263420}
@@ -247,7 +245,6 @@ jobs:
             forge
             neoforge
           game-versions: |
-            1.21.9
             ${{ env.MINECRAFT_VERSION }}
           dependencies: |
             xaerominimap@${{ needs.build.outputs.minimap_version_forge }}(required){modrinth:1bokaNcj}{curseforge:263420}
@@ -273,7 +270,6 @@ jobs:
           loaders: |
             forge
           game-versions: |
-            1.21.9
             ${{ env.MINECRAFT_VERSION }}
           dependencies: |
             xaerominimap@${{ needs.build.outputs.minimap_version_forge }}(required){modrinth:1bokaNcj}{curseforge:263420}
@@ -298,7 +294,6 @@ jobs:
           loaders: |
             neoforge
           game-versions: |
-            1.21.9
             ${{ env.MINECRAFT_VERSION }}
           dependencies: |
             xaerominimap@${{ needs.build.outputs.minimap_version_neo }}(required){modrinth:1bokaNcj}{curseforge:263420}
@@ -324,7 +319,6 @@ jobs:
           loaders: |
             neoforge
           game-versions: |
-            1.21.9
             ${{ env.MINECRAFT_VERSION }}
           dependencies: |
             xaerominimap@${{ needs.build.outputs.minimap_version_neo }}(required){modrinth:1bokaNcj}{curseforge:263420}

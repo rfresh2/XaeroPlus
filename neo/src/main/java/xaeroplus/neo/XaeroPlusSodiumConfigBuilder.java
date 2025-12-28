@@ -36,6 +36,7 @@ public class XaeroPlusSodiumConfigBuilder implements ConfigEntryPoint {
                             Settings.REGISTRY.minimapFpsLimit::getAsInt
                         )
                         .setStorageHandler(SettingHooks::saveSettings)
+                        .setValueFormatter(i -> Component.literal(String.valueOf(i)))
                         .setDefaultValue(60))
                     .addOption(builder.createIntegerOption(Identifier.fromNamespaceAndPath("xaeroplus", "minimap_scaling"))
                         .setName(Component.translatable("xaeroplus.setting.minimap_scaling"))
@@ -49,6 +50,7 @@ public class XaeroPlusSodiumConfigBuilder implements ConfigEntryPoint {
                             Settings.REGISTRY.minimapScaleMultiplierSetting::getAsInt
                         )
                         .setStorageHandler(SettingHooks::saveSettings)
+                        .setValueFormatter(i -> Component.literal(String.valueOf(i)))
                         .setDefaultValue(1))
                     )
                 );

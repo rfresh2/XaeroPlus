@@ -12,10 +12,11 @@ import net.minecraft.world.phys.Vec3;
 import xaero.common.HudMod;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.minimap.waypoints.WaypointVisibilityType;
-import xaero.common.settings.ModSettings;
 import xaero.hud.minimap.BuiltInHudModules;
+import xaero.hud.minimap.common.config.option.MinimapProfiledConfigOptions;
 import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.waypoint.WaypointPurpose;
+import xaero.lib.client.config.ClientConfigManager;
 import xaeroplus.settings.Settings;
 
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class WaypointBeaconRenderer {
     private final List<Waypoint> waypointList = new ArrayList<>();
     private long lastWaypointRenderListUpdate = -1L;
 
-    public void updateWaypointRenderList(final MinimapSession session, final ModSettings settings) {
+    public void updateWaypointRenderList(final MinimapSession session, final ClientConfigManager settings) {
         waypointList.clear();
         session.getWaypointSession().getCollector().collect(waypointList);
         waypointList.removeIf(w -> {
@@ -37,7 +38,7 @@ public class WaypointBeaconRenderer {
                 || w.getVisibility() == WaypointVisibilityType.WORLD_MAP_GLOBAL) {
                 return true;
             }
-            return !settings.getDeathpoints() && w.getPurpose().isDeath();
+            return !settings.getEffective(MinimapProfiledConfigOptions.DEATHPOINTS) && w.getPurpose().isDeath();
         });
         waypointList.sort(Waypoint::compareTo);
     }
@@ -45,23 +46,24 @@ public class WaypointBeaconRenderer {
     public void renderWaypointBeacons(float tickDelta, PoseStack matrixStack) {
         var session = BuiltInHudModules.MINIMAP.getCurrentSession();
         if (session == null) return;
-        var settings = HudMod.INSTANCE.getSettings();
-        if (settings == null) return;
-        if (!settings.getShowIngameWaypoints()) return;
+        var hudConfigs = HudMod.INSTANCE.getHudConfigs();
+        if (hudConfigs == null) return;
+        var clientConfigManager = hudConfigs.getClientConfigManager();
+        if (!clientConfigManager.getEffective(MinimapProfiledConfigOptions.WAYPOINTS_IN_WORLD)) return;
         var currentWorld = session.getWorldManager().getCurrentWorld();
         if (currentWorld == null) return;
         if (System.currentTimeMillis() - lastWaypointRenderListUpdate > 50L) {
-            updateWaypointRenderList(session, settings);
+            updateWaypointRenderList(session, clientConfigManager);
             lastWaypointRenderListUpdate = System.currentTimeMillis();
         }
         var dimDiv = session.getDimensionHelper().getDimensionDivision(currentWorld);
         var mc = Minecraft.getInstance();
         if (mc.level == null || mc.cameraEntity == null) return;
         if (mc.player.level() != mc.level) return;
-        var cameraPos = mc.cameraEntity.position();
-        double distanceScale = settings.dimensionScaledMaxWaypointDistance ? mc.level.dimensionType().coordinateScale() : 1.0;
-        double waypointsDistance = settings.getMaxWaypointsDistance();
-        double waypointsDistanceMin = settings.waypointsDistanceMin;
+        var cameraPos = mc.getCameraEntity().position();
+        double distanceScale = clientConfigManager.getEffective(MinimapProfiledConfigOptions.WAYPOINT_MAX_DISTANCE_DIMENSION_SCALE) ? mc.level.dimensionType().coordinateScale() : 1.0;
+        double waypointsDistance = clientConfigManager.getEffective(MinimapProfiledConfigOptions.WAYPOINT_MAX_DISTANCE);
+        double waypointsDistanceMin = clientConfigManager.getEffective(MinimapProfiledConfigOptions.WAYPOINT_MIN_DISTANCE_IN_WORLD);
         for (int i = 0; i < waypointList.size(); i++) {
             final var w = waypointList.get(i);
             double offX = (double)w.getX(dimDiv) - cameraPos.x + 0.5;
@@ -78,10 +80,10 @@ public class WaypointBeaconRenderer {
             }
             var shouldRender = w.isDestination()
                 || (w.getPurpose().isDeath()
-                    || w.isGlobal()
-                    || w.isTemporary() && settings.temporaryWaypointsGlobal
-                    || waypointsDistance == 0.0
-                    || !(distance2D > waypointsDistance)
+                || w.isGlobal()
+                || w.isTemporary() && clientConfigManager.getEffective(MinimapProfiledConfigOptions.TEMPORARY_WAYPOINTS_GLOBAL)
+                || waypointsDistance == 0.0
+                || !(distance2D > waypointsDistance)
             ) && (waypointsDistanceMin == 0.0 || !(unscaledDistance2D < waypointsDistanceMin));;
             if (shouldRender)
                 renderWaypointBeacon(w, dimDiv, tickDelta, matrixStack);

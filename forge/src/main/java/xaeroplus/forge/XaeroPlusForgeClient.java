@@ -10,6 +10,7 @@ import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.loading.FMLLoader;
+import xaero.lib.client.gui.config.context.BuiltInEditConfigScreenContexts;
 import xaero.map.gui.GuiWorldMapSettings;
 import xaeroplus.XaeroPlus;
 import xaeroplus.commands.XPClientCommandSource;
@@ -26,7 +27,7 @@ public class XaeroPlusForgeClient {
         RemovalCause explicit = RemovalCause.EXPLICIT; // force class load to stop forge shitting itself at runtime??
         ModLoadingContext.get().registerExtensionPoint(
             ConfigScreenHandler.ConfigScreenFactory.class,
-            () -> new ConfigScreenHandler.ConfigScreenFactory((mc, screen) -> new GuiXaeroPlusWorldMapSettings(new GuiWorldMapSettings(screen), screen))
+            () -> new ConfigScreenHandler.ConfigScreenFactory((mc, screen) -> new GuiXaeroPlusWorldMapSettings(new GuiWorldMapSettings(BuiltInEditConfigScreenContexts.CLIENT), screen))
         );
     }
 

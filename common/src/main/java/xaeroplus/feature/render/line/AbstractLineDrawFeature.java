@@ -7,7 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
-import xaero.common.graphics.shader.MinimapShaders;
+import xaero.lib.client.graphics.shader.LibShaders;
 import xaeroplus.Globals;
 import xaeroplus.feature.render.DrawContext;
 import xaeroplus.feature.render.DrawFeature;
@@ -63,10 +63,10 @@ public abstract class AbstractLineDrawFeature<T> implements DrawFeature {
     }
 
     public void preRender(DrawContext ctx) {
-        MinimapShaders.ensureShaders();
+        LibShaders.ensureShaders();
         var mc = Minecraft.getInstance();
         if (ctx.worldmap()) {
-            MinimapShaders.FRAMEBUFFER_LINES.setFrameSize(mc.getWindow().getWidth(), mc.getWindow().getHeight());
+            LibShaders.FRAMEBUFFER_LINES.setFrameSize(mc.getWindow().getWidth(), mc.getWindow().getHeight());
         }
         float lineWidthScale = 16f * (float) Mth.clamp(
             lineWidth() * ctx.fboScale(),

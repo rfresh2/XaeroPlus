@@ -22,21 +22,22 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xaero.common.IXaeroMinimap;
+import xaero.common.HudMod;
 import xaero.common.graphics.ImprovedFramebuffer;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRenderer;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
-import xaero.common.graphics.shader.MinimapShaders;
 import xaero.common.minimap.render.MinimapFBORenderer;
 import xaero.common.minimap.render.MinimapRenderer;
 import xaero.common.minimap.render.MinimapRendererHelper;
-import xaero.common.minimap.waypoints.render.WaypointsGuiRenderer;
 import xaero.common.mods.SupportXaeroWorldmap;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.Minimap;
 import xaero.hud.minimap.MinimapLogs;
+import xaero.hud.minimap.common.config.option.MinimapProfiledConfigOptions;
 import xaero.hud.minimap.compass.render.CompassRenderer;
 import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.waypoint.render.WaypointMapRenderer;
+import xaero.lib.client.graphics.shader.LibShaders;
 import xaeroplus.Globals;
 import xaeroplus.feature.extensions.CustomMinimapFBORenderer;
 import xaeroplus.settings.Settings;
@@ -52,8 +53,8 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
     @Shadow
     private boolean loadedFBO;
 
-    public MixinMinimapFBORenderer(final IXaeroMinimap modMain, final Minecraft mc, final WaypointsGuiRenderer waypointsGuiRenderer, final Minimap minimap, final CompassRenderer compassRenderer) {
-        super(modMain, mc, waypointsGuiRenderer, minimap, compassRenderer);
+    public MixinMinimapFBORenderer(final HudMod modMain, final Minecraft mc, final WaypointMapRenderer waypointMapRenderer, final Minimap minimap, final CompassRenderer compassRenderer) {
+        super(modMain, mc, waypointMapRenderer, minimap, compassRenderer);
     }
 
     @ModifyExpressionValue(
@@ -106,7 +107,8 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         if (Globals.minimapSizeMultiplier > 1) {
             int f = (Globals.minimapSizeMultiplier - 1) * Globals.minimapScaleMultiplier;
             s -= f * 6;
-            int scaledMinimapSize = modMain.getSettings().getMinimapSize();
+            int scaledMinimapSize = modMain.getHudConfigs().getClientConfigManager().getEffective(
+                MinimapProfiledConfigOptions.SIZE);
             int minimapNormalSize = scaledMinimapSize / Globals.minimapSizeMultiplier;
             int minimapScaledSizeDiff = 250 - minimapNormalSize;
             s -= minimapScaledSizeDiff * f;
@@ -205,7 +207,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         int tileZ = mapZ & 3;
         int insideX = xFloored & 15;
         int insideZ = zFloored & 15;
-        MinimapShaders.FRAMEBUFFER_LINES.setFrameSize((float)this.scalingFramebuffer.viewWidth, (float)this.scalingFramebuffer.viewHeight);
+        LibShaders.FRAMEBUFFER_LINES.setFrameSize((float)this.scalingFramebuffer.viewWidth, (float)this.scalingFramebuffer.viewHeight);
         Globals.drawManager.drawMinimapFeatures(
             chunkX,
             chunkZ,
@@ -228,7 +230,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
                                             @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers
     ) {
         original.call(instance, renderer);
-        MinimapShaders.FRAMEBUFFER_LINES.setFrameSize((float)this.scalingFramebuffer.viewWidth, (float)this.scalingFramebuffer.viewHeight);
+        LibShaders.FRAMEBUFFER_LINES.setFrameSize((float)this.scalingFramebuffer.viewWidth, (float)this.scalingFramebuffer.viewHeight);
         int mapX = xFloored >> 4;
         int mapZ = zFloored >> 4;
         int chunkX = mapX >> 2;

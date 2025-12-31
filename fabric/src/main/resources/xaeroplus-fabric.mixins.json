@@ -9,10 +9,9 @@
   "plugin": "xaeroplus.fabric.util.compat.XaeroPlusCompatibleMinimapMixinPlugin",
   "client": [
     "MixinHudMod",
-    "MixinPlatformContextFabric",
     "MixinSodium6OptionsGUI",
     "MixinWorldMap",
-    "MixinWorldMapFabric",
+    "MixinXaeroLibClientFabric",
     "fabric.MixinFabricClientCommandSource",
     "mc.MixinMinecraftClientFabric"
   ]

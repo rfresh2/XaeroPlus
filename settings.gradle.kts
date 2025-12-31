@@ -20,6 +20,7 @@ val worldmap_version_forge: String by ext.properties
 val minimap_version_forge: String by ext.properties
 val worldmap_version_neo: String by ext.properties
 val minimap_version_neo: String by ext.properties
+val xaerolib_version: String by ext.properties
 
 dependencyResolutionManagement {
 	versionCatalogs {
@@ -34,6 +35,9 @@ dependencyResolutionManagement {
 			library("minimap-fabric", "maven.modrinth:xaeros-minimap:${minimap_version_fabric}_Fabric_1.21")
 			library("minimap-forge", "maven.modrinth:xaeros-minimap:${minimap_version_forge}_Forge_1.21")
 			library("minimap-neo", "maven.modrinth:xaeros-minimap:${minimap_version_neo}_NeoForge_1.21")
+            library("xaerolib-fabric", "com.github.rfresh2:xaerolib-fabric:${xaerolib_version}+${minecraft_version}")
+            library("xaerolib-forge", "com.github.rfresh2:xaerolib-forge:${xaerolib_version}+${minecraft_version}")
+            library("xaerolib-neo", "com.github.rfresh2:xaerolib-neoforge:${xaerolib_version}+${minecraft_version}")
             library("mixinextras-common", "io.github.llamalad7:mixinextras-common:0.4.1")
             library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.4.1")
 			library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.0")
@@ -58,7 +62,7 @@ dependencyResolutionManagement {
             library("baritone-fabric", "com.github.rfresh2:baritone-fabric:1.21-SNAPSHOT")
             library("baritone-forge", "com.github.rfresh2:baritone-forge:1.21-SNAPSHOT")
             library("baritone-neoforge", "com.github.rfresh2:baritone-neoforge:1.21-SNAPSHOT")
-        }
+		}
 	}
 }
 

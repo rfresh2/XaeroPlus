@@ -17,6 +17,7 @@ dependencies {
     modImplementation(libs.fabric.loader)
     modCompileOnly(libs.worldmap.fabric)
     modCompileOnly(libs.minimap.fabric)
+    modCompileOnly(libs.xaerolib.fabric)
     implementation(libs.caffeine)
     implementation(libs.lambdaEvents)
     modCompileOnly(libs.baritone.fabric)

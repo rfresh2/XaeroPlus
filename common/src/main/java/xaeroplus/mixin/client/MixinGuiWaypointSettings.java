@@ -6,23 +6,24 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xaero.common.IXaeroMinimap;
-import xaero.common.gui.ConfigSettingEntry;
 import xaero.common.gui.GuiMinimapSettings;
 import xaero.common.gui.GuiWaypointSettings;
-import xaero.common.gui.ISettingEntry;
+import xaero.lib.client.gui.ISettingEntry;
+import xaero.lib.client.gui.config.context.IEditConfigScreenContext;
+import xaeroplus.feature.extensions.XaeroPlusSettingEntry;
 import xaeroplus.settings.SettingLocation;
 import xaeroplus.settings.Settings;
 
 @Mixin(value = GuiWaypointSettings.class, remap = false)
 public class MixinGuiWaypointSettings extends GuiMinimapSettings {
-    public MixinGuiWaypointSettings(final IXaeroMinimap modMain, final Component title, final Screen par1Screen, final Screen escScreen) {
-        super(modMain, title, par1Screen, escScreen);
+
+    public MixinGuiWaypointSettings(final Component title, final Screen par1Screen, final Screen escScreen, final IEditConfigScreenContext context) {
+        super(title, par1Screen, escScreen, context);
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
     public void init(final CallbackInfo ci) {
-        final ConfigSettingEntry[] configSettingEntries = Settings.REGISTRY.getMinimapConfigSettingEntries(SettingLocation.MINIMAP_WAYPOINTS);
+        final XaeroPlusSettingEntry[] configSettingEntries = Settings.REGISTRY.getXaeroSettingEntries(SettingLocation.MINIMAP_WAYPOINTS);
         final int oldLen = this.entries.length;
         final int newLen = configSettingEntries.length;
         final int totalNewLen = oldLen + configSettingEntries.length;

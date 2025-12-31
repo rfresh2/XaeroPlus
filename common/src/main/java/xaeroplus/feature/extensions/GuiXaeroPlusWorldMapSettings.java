@@ -3,8 +3,8 @@ package xaeroplus.feature.extensions;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import xaero.map.gui.GuiSettings;
-import xaero.map.gui.ISettingEntry;
+import xaero.lib.client.gui.GuiSettings;
+import xaero.lib.client.gui.ISettingEntry;
 import xaero.map.gui.ScreenSwitchSettingEntry;
 import xaeroplus.settings.SettingLocation;
 import xaeroplus.settings.Settings;
@@ -13,7 +13,7 @@ public class GuiXaeroPlusWorldMapSettings extends GuiSettings {
 
     public GuiXaeroPlusWorldMapSettings(Screen parent, Screen escapeScreen) {
         super(Component.translatable("xaeroplus.gui.world_map_settings"), parent, escapeScreen);
-        var mainSettingsEntries = Settings.REGISTRY.getWorldmapConfigSettingEntries(SettingLocation.WORLD_MAP_MAIN);
+        var mainSettingsEntries = Settings.REGISTRY.getXaeroSettingEntries(SettingLocation.WORLD_MAP_MAIN);
         var chunkHighlightSettingSwitchEntry = GuiXaeroPlusChunkHighlightSettings.getScreenSwitchSettingEntry(parent);
         var overlaySettingSwitchEntry = GuiXaeroPlusOverlaySettings.getScreenSwitchSettingEntry(parent);
         var drawOrderSettingSwitchEntry = DrawOrderScreen.getScreenSwitchSettingEntry();

@@ -10,8 +10,8 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.ResourceLocation;
-import xaero.map.graphics.shader.BuiltInCustomUniformValueTypes;
-import xaero.map.graphics.shader.CustomUniform;
+import xaero.lib.client.graphics.shader.BuiltInCustomUniformValueTypes;
+import xaero.lib.client.graphics.shader.CustomUniform;
 
 public class XaeroPlusShaders {
     public static final RenderPipeline HIGHLIGHT_PIPELINE = RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET)

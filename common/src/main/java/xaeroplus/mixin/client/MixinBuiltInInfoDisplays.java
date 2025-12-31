@@ -16,7 +16,7 @@ import xaeroplus.util.ChunkUtils;
 @Mixin(value = BuiltInInfoDisplays.class, remap = false)
 public class MixinBuiltInInfoDisplays {
 
-    @WrapOperation(method = "lambda$static$13", at = @At(
+    @WrapOperation(method = "lambda$static$20", at = @At(
         value = "INVOKE",
         target = "Lxaero/hud/minimap/info/render/compile/InfoDisplayCompiler;addWords(Ljava/lang/String;)V"))
     private static void hideAutoSubworldInfoWhenOwAutoWaypointsEnabled(final InfoDisplayCompiler instance, final String words, final Operation<Void> original,

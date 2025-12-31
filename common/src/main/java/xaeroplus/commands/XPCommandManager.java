@@ -6,7 +6,8 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.network.chat.Component;
-import xaero.hud.minimap.BuiltInHudModules;
+import xaero.common.HudMod;
+import xaero.hud.minimap.common.config.option.MinimapProfiledConfigOptions;
 import xaero.hud.minimap.waypoint.set.WaypointSet;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.waypoint.WaypointAPI;
@@ -50,8 +51,8 @@ public class XPCommandManager {
                         c.getSource().xaeroplus$sendFailure(Component.literal("Atlas import failed! Check log for details."));
                     } else {
                         c.getSource().xaeroplus$sendSuccess(Component.literal(addedCount + " waypoints imported to the \"atlas\" waypoint set!"));
-                        var session = BuiltInHudModules.MINIMAP.getCurrentSession();
-                        boolean allSetsEnabled = session.getModMain().getSettings().renderAllSets;
+                        boolean allSetsEnabled = HudMod.INSTANCE.getHudConfigs().getClientConfigManager().getEffective(
+                            MinimapProfiledConfigOptions.WAYPOINTS_ALL_SETS);
                         boolean isAtlasSetActive = Optional.ofNullable(WaypointAPI.getCurrentWaypointSet())
                             .map(WaypointSet::getName)
                             .filter(n -> n.equals("atlas"))

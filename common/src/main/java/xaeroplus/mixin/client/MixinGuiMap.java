@@ -36,16 +36,27 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import xaero.lib.client.config.ClientConfigManager;
+import xaero.lib.client.controls.util.KeyMappingUtils;
+import xaero.lib.client.graphics.shader.LibShaders;
+import xaero.lib.client.gui.ScreenBase;
+import xaero.lib.client.gui.widget.Tooltip;
+import xaero.lib.common.config.option.ConfigOption;
+import xaero.lib.common.config.single.SingleConfigManager;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMap;
 import xaero.map.animation.SlowingAnimation;
+import xaero.map.common.config.option.WorldMapProfiledConfigOptions;
+import xaero.map.config.util.WorldMapClientConfigUtils;
 import xaero.map.element.HoveredMapElementHolder;
 import xaero.map.element.MapElementRenderHandler;
 import xaero.map.graphics.MapRenderHelper;
 import xaero.map.graphics.renderer.multitexture.MultiTextureRenderTypeRenderer;
 import xaero.map.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
-import xaero.map.graphics.shader.MapShaders;
-import xaero.map.gui.*;
+import xaero.map.gui.GuiMap;
+import xaero.map.gui.GuiTexturedButton;
+import xaero.map.gui.IRightClickableElement;
+import xaero.map.gui.MapTileSelection;
 import xaero.map.gui.dropdown.rightclick.RightClickOption;
 import xaero.map.misc.Misc;
 import xaero.map.mods.SupportMods;
@@ -148,7 +159,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Unique
     private Component xaeroPlus$keybindPrefix(Component component, KeyMapping bind) {
         return Component.empty()
-            .append(Component.literal(Misc.getKeyName(bind) + " ").withStyle(ChatFormatting.DARK_GREEN))
+            .append(Component.literal(KeyMappingUtils.getKeyName(bind) + " ").withStyle(ChatFormatting.DARK_GREEN))
             .append(component);
     }
 
@@ -159,13 +170,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             0, this.dimensionToggleButton.getY() - 20, 20, 20, this.follow ? 61 : 42, 19, 16, 16,
             Globals.guiTextures,
             this::onFollowButton,
-            () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.toggle_follow_mode")
+            () -> new Tooltip(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.toggle_follow_mode")
                 .append(" " + I18n.get(this.follow ? "xaeroplus.gui.off" : "xaeroplus.gui.on")))));
         coordinateGotoButton = new GuiTexturedButton(
             0, followButton.getY() - 20 , 20, 20, 23, 19, 16, 16,
             Globals.guiTextures,
             this::onGotoCoordinatesButton,
-            () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.go_to_coordinates"))));
+            () -> new Tooltip(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.go_to_coordinates"))));
         xTextEntryField = new EditBox(Minecraft.getInstance().font, 20, coordinateGotoButton.getY() - 10, 75, 20, Component.nullToEmpty("X:"));
         xTextEntryField.setVisible(false);
         xTextEntryField.setCursorPosition(0);
@@ -178,7 +189,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             0, this.coordinateGotoButton.getY() - 20, 20, 20, 47, 0, 16, 16,
             Globals.guiTextures,
             (button -> onToggleDrawingButton()),
-            () -> new CursorBox(
+            () -> new Tooltip(
                 xaeroPlus$keybindPrefix(xaeroPlus$prefix(
                     Component.translatable("xaeroplus.gui.world_map.start_drawing")
                 ), Settings.REGISTRY.worldMapToggleDrawingKeybindSetting.getKeyBinding()
@@ -187,36 +198,36 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             startDrawingButton.getX() + 16, startDrawingButton.getY(), 20, 20, 65, 0, 16, 16,
             Globals.guiTextures,
             button -> setDrawingMode(DrawingMode.LINE_SEGMENT),
-            () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_line_segment"))));
+            () -> new Tooltip(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_line_segment"))));
         drawLineSegmentButton.visible = false;
         drawInfiniteLineButton = new GuiTexturedButton(
             startDrawingButton.getX() + 16, drawLineSegmentButton.getY() + 20, 20, 20, 101, 0, 16, 16,
             Globals.guiTextures,
             button -> setDrawingMode(DrawingMode.INFINITE_LINE),
-            () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_infinite_line"))));
+            () -> new Tooltip(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_infinite_line"))));
         drawInfiniteLineButton.visible = false;
         drawHighlightsButton = new GuiTexturedButton(
             startDrawingButton.getX() + 16, drawInfiniteLineButton.getY() + 20, 20, 20, 82, 0, 16, 16,
             Globals.guiTextures,
             button -> setDrawingMode(DrawingMode.HIGHLIGHT),
-            () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_highlights"))));
+            () -> new Tooltip(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_highlights"))));
         drawHighlightsButton.visible = false;
         drawTextButton = new GuiTexturedButton(
             startDrawingButton.getX() + 16, drawHighlightsButton.getY() + 20, 20, 20, 118, 0, 16, 16,
             Globals.guiTextures,
             button -> setDrawingMode(DrawingMode.TEXT),
-            () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_text"))));
+            () -> new Tooltip(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_text"))));
         drawTextButton.visible = false;
         drawColorCyclerButton = new DrawingColorCyclerButton(
             startDrawingButton.getX() + 16, drawTextButton.getY() + 20,
-            () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_color"))),
+            () -> new Tooltip(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_color"))),
             ModuleManager.getModule(Drawing.class).getDrawingColorCycler());
         drawColorCyclerButton.visible = false;
         drawMeasurementToolButton = new GuiTexturedButton(
             startDrawingButton.getX() + 16, drawColorCyclerButton.getY() + 20, 20, 20, 135, 0, 16, 16,
             Globals.guiTextures,
             button -> setDrawingMode(DrawingMode.MEASUREMENT),
-            () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_measurement_tool"))));
+            () -> new Tooltip(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_measurement_tool"))));
         drawMeasurementToolButton.visible = false;
         drawTextEntryField = new EditBox(Minecraft.getInstance().font, 0, 0, 150, 20, Component.nullToEmpty("Text:"));
         drawTextEntryField.setVisible(false);
@@ -227,7 +238,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             this.width - 20, zoomInButton.getY() - 20, 20, 20, 117, 19, 16, 16,
             Globals.guiTextures,
             (button -> onSwitchDimensionButton(END)),
-            () -> new CursorBox(
+            () -> new Tooltip(
                 xaeroPlus$keybindPrefix(xaeroPlus$prefix(
                     Component.translatable("xaeroplus.keybind.switch_to_end")
                     ), Settings.REGISTRY.switchToEndSetting.getKeyBinding()
@@ -237,7 +248,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             this.width - 20, this.switchToEndButton.getY() - 20, 20, 20, 98, 18, 16, 16,
             Globals.guiTextures,
             (button -> onSwitchDimensionButton(OVERWORLD)),
-            () -> new CursorBox(
+            () -> new Tooltip(
                 xaeroPlus$keybindPrefix(xaeroPlus$prefix(
                     Component.translatable("xaeroplus.keybind.switch_to_overworld")
                     ), Settings.REGISTRY.switchToOverworldSetting.getKeyBinding()
@@ -247,7 +258,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             this.width - 20, this.switchToOverworldButton.getY() - 20, 20, 20, 79, 19, 16, 16,
             Globals.guiTextures,
             (button -> onSwitchDimensionButton(NETHER)),
-            () -> new CursorBox(
+            () -> new Tooltip(
                 xaeroPlus$keybindPrefix(xaeroPlus$prefix(
                     Component.translatable("xaeroplus.keybind.switch_to_nether")
                     ), Settings.REGISTRY.switchToNetherSetting.getKeyBinding()
@@ -258,7 +269,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             this.width - 34, 2, 32, 32, 0, 0, 0, 0,
             Globals.guiTextures,
             (button -> onClose()),
-            () -> new CursorBox(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.exit")))
+            () -> new Tooltip(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.exit")))
         );
         pan = false;
         drawing = false;
@@ -320,14 +331,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     }
 
     @Override
-    protected void onExit(Screen screen) {
+    public void onExit(Screen screen) {
         if (!Settings.REGISTRY.persistMapDimensionSwitchSetting.get()) {
             try {
                 var actualDimension = ChunkUtils.getActualDimension();
                 if (Globals.getCurrentDimensionId() != actualDimension) {
                     Globals.switchToDimension(actualDimension);
                     if (!Settings.REGISTRY.radarWhileDimensionSwitchedSetting.get()) {
-                        WorldMap.settings.minimapRadar = true;
+                        trySettingCurrentProfileOption(WorldMapProfiledConfigOptions.MINIMAP_RADAR, true);
                     }
                 }
             } catch (final Exception e) {
@@ -345,7 +356,15 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     ), remap = true)
     public void toggleRadarWhileDimensionSwitched(final CallbackInfo ci, @Local(name = "currentFutureDim") MapDimension currentFutureDim) {
         if (!Settings.REGISTRY.radarWhileDimensionSwitchedSetting.get()) {
-            WorldMap.settings.minimapRadar = currentFutureDim.getDimId() == ChunkUtils.getActualDimension();
+            trySettingCurrentProfileOption(WorldMapProfiledConfigOptions.MINIMAP_RADAR, currentFutureDim.getDimId() == ChunkUtils.getActualDimension());
+        }
+    }
+
+    private static void trySettingCurrentProfileOption(ConfigOption<Boolean> option, boolean value) {
+        ClientConfigManager configManager = WorldMap.INSTANCE.getConfigs().getClientConfigManager();
+        var currentValue = configManager.getEffective(option);
+        if (currentValue != value) {
+            WorldMapClientConfigUtils.tryTogglingCurrentProfileOption(option);
         }
     }
 
@@ -367,13 +386,21 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         }
     }
 
-    @ModifyExpressionValue(method = "render", at = @At(
-        value = "FIELD",
-        target = "Lxaero/map/settings/ModSettings;debug:Z",
-        opcode = Opcodes.GETFIELD
-    ), remap = true) // multiple field accesses
-    public boolean hideDebugRenderingOnF1(boolean original) {
-        return original && !Minecraft.getInstance().options.hideGui;
+    @WrapOperation(method = "render", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/lib/common/config/single/SingleConfigManager;getEffective(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;",
+        ordinal = 0
+    ),
+        slice = @Slice(
+            from = @At(
+                value = "FIELD",
+                target = "Lxaero/map/config/primary/option/WorldMapPrimaryClientConfigOptions;DEBUG:Lxaero/lib/common/config/option/BooleanConfigOption;",
+                opcode = Opcodes.GETSTATIC)
+        )
+    )
+    public Object hideDebugRenderingOnF1(final SingleConfigManager instance, final ConfigOption option, final Operation original) {
+        var value = original.call(instance, option);
+        return ((Boolean) value) && !Minecraft.getInstance().options.hideGui;
     }
 
     @WrapOperation(method = "render",
@@ -432,30 +459,46 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         }
     }
 
-    @ModifyExpressionValue(method = "render", at = @At(
-        value = "FIELD",
-        target = "Lxaero/map/settings/ModSettings;footsteps:Z",
-        opcode = Opcodes.GETFIELD
-    ), remap = true)
-    public boolean hideFootstepsOnF1(boolean original) {
-        return original && !Minecraft.getInstance().options.hideGui;
+    @WrapOperation(method = "render", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/lib/client/config/ClientConfigManager;getEffective(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;",
+        ordinal = 0
+    ),
+        slice = @Slice(
+            from = @At(
+                value = "FIELD",
+                target = "Lxaero/map/common/config/option/WorldMapProfiledConfigOptions;FOOTSTEPS:Lxaero/lib/common/config/option/BooleanConfigOption;",
+                opcode = Opcodes.GETSTATIC)
+        )
+    )
+    public Object hideFootstepsOnF1(final ClientConfigManager instance, final ConfigOption option, final Operation original) {
+        var value = original.call(instance, option);
+        return ((Boolean) value) && !Minecraft.getInstance().options.hideGui;
     }
 
-    @ModifyExpressionValue(method = "render", at = @At(
-        value = "FIELD",
-        target = "Lxaero/map/settings/ModSettings;renderArrow:Z",
-        opcode = Opcodes.GETFIELD
-    ), remap = true)
-    public boolean hideArrowOnF1(boolean original) {
-        return original && !Minecraft.getInstance().options.hideGui;
+    @WrapOperation(method = "render", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/lib/client/config/ClientConfigManager;getEffective(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;",
+        ordinal = 0
+    ),
+        slice = @Slice(
+            from = @At(
+                value = "FIELD",
+                target = "Lxaero/map/common/config/option/WorldMapProfiledConfigOptions;ARROW:Lxaero/lib/common/config/option/BooleanConfigOption;",
+                opcode = Opcodes.GETSTATIC)
+        )
+    )
+    public Object hideArrowOnF1(final ClientConfigManager instance, final ConfigOption option, final Operation original) {
+        var value = original.call(instance, option);
+        return ((Boolean) value) && !Minecraft.getInstance().options.hideGui;
     }
 
     @ModifyArg(method = "render",
         slice = @Slice(
             from = @At(
                 value = "FIELD",
-                opcode = Opcodes.GETFIELD,
-                target = "Lxaero/map/settings/ModSettings;coordinates:Z"
+                opcode = Opcodes.GETSTATIC,
+                target = "Lxaero/map/common/config/option/WorldMapProfiledConfigOptions;COORDINATES:Lxaero/lib/common/config/option/BooleanConfigOption;"
             )
         ),
         at = @At(
@@ -493,7 +536,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "render", at = @At(
         value = "INVOKE",
-        target = "Lxaero/map/gui/ScreenBase;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V"
+        target = "Lxaero/lib/client/gui/ScreenBase;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V"
     ), remap = true)
     public void hideButtonsOnF1(final CallbackInfo ci) {
         if (Minecraft.getInstance().options.hideGui) {
@@ -543,7 +586,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Inject(method = "onDimensionToggleButton", at = @At(value = "RETURN"))
     public void onDimensionToggleAfter(final Button b, final CallbackInfo ci) {
         if (!Settings.REGISTRY.radarWhileDimensionSwitchedSetting.get()) {
-            WorldMap.settings.minimapRadar = mapProcessor.getMapWorld().getFutureDimensionId() == ChunkUtils.getActualDimension();
+            trySettingCurrentProfileOption(WorldMapProfiledConfigOptions.MINIMAP_RADAR, mapProcessor.getMapWorld().getFutureDimensionId() == ChunkUtils.getActualDimension());
         }
     }
 
@@ -658,14 +701,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     ))
     public void transparentBgConfigMapRenderWithLight(final MultiTextureRenderTypeRendererProvider instance, final MultiTextureRenderTypeRenderer renderer, final Operation<Void> original) {
         if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
-            BlendMode.lastApplied = MapShaders.WORLD_MAP.blend; // don't apply blend from shader.json
-            ((CustomWorldMapShader) MapShaders.WORLD_MAP).setTransparentBackground(true);
+            BlendMode.lastApplied = LibShaders.WORLD_MAP.blend; // don't apply blend from shader.json
+            ((CustomWorldMapShader) LibShaders.WORLD_MAP).setTransparentBackground(true);
             Globals.transparentWmBgApplyMapBlend = true;
         } else {
-            ((CustomWorldMapShader) MapShaders.WORLD_MAP).setTransparentBackground(false);
+            ((CustomWorldMapShader) LibShaders.WORLD_MAP).setTransparentBackground(false);
         }
         original.call(instance, renderer);
-        ((CustomWorldMapShader) MapShaders.WORLD_MAP).setTransparentBackground(false);
+        ((CustomWorldMapShader) LibShaders.WORLD_MAP).setTransparentBackground(false);
         BlendMode.lastApplied = null;
     }
 
@@ -676,14 +719,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     ))
     public void transparentBgConfigMapRenderNoLight(final MultiTextureRenderTypeRendererProvider instance, final MultiTextureRenderTypeRenderer renderer, final Operation<Void> original) {
         if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
-            BlendMode.lastApplied = MapShaders.WORLD_MAP.blend; // don't apply blend from shader.json
-            ((CustomWorldMapShader) MapShaders.WORLD_MAP).setTransparentBackground(true);
+            BlendMode.lastApplied = LibShaders.WORLD_MAP.blend; // don't apply blend from shader.json
+            ((CustomWorldMapShader) LibShaders.WORLD_MAP).setTransparentBackground(true);
             Globals.transparentWmBgApplyMapBlend = true;
         } else {
-            ((CustomWorldMapShader) MapShaders.WORLD_MAP).setTransparentBackground(false);
+            ((CustomWorldMapShader) LibShaders.WORLD_MAP).setTransparentBackground(false);
         }
         original.call(instance, renderer);
-        ((CustomWorldMapShader) MapShaders.WORLD_MAP).setTransparentBackground(false);
+        ((CustomWorldMapShader) LibShaders.WORLD_MAP).setTransparentBackground(false);
         BlendMode.lastApplied = null;
     }
 
@@ -694,7 +737,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     ))
     public void transparentBgConfigMainFBORender(final MultiTextureRenderTypeRendererProvider instance, final MultiTextureRenderTypeRenderer renderer, final Operation<Void> original) {
         if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
-            BlendMode.lastApplied = MapShaders.POSITION_COLOR_TEX.blend; // don't apply blend from shader.json
+            BlendMode.lastApplied = LibShaders.POSITION_COLOR_TEX.blend; // don't apply blend from shader.json
             Globals.transparentWmBgApplyGuiBilinearBlend = true;
         }
         original.call(instance, renderer);
@@ -747,8 +790,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "render", at = @At(
         value = "FIELD",
-        target = "Lxaero/map/settings/ModSettings;coordinates:Z",
-        opcode = Opcodes.GETFIELD,
+        target = "Lxaero/map/common/config/option/WorldMapProfiledConfigOptions;COORDINATES:Lxaero/lib/common/config/option/BooleanConfigOption;",
+        opcode = Opcodes.GETSTATIC,
         ordinal = 0
     ), remap = true)
     public void renderMeasurementToolText(
@@ -991,8 +1034,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "render", at = @At(
         value = "FIELD",
-        target = "Lxaero/map/settings/ModSettings;coordinates:Z",
-        opcode = Opcodes.GETFIELD,
+        target = "Lxaero/map/common/config/option/WorldMapProfiledConfigOptions;COORDINATES:Lxaero/lib/common/config/option/BooleanConfigOption;",
+        opcode = Opcodes.GETSTATIC,
         ordinal = 0
     ), remap = true)
     public void renderTileSelectionSize(
@@ -1112,20 +1155,20 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                         public void onAction(Screen screen) {
                             BaritoneExecutor.goal(goalX, goalZ);
                         }
-                    }.setNameFormatArgs(Misc.getKeyName(Settings.REGISTRY.worldMapBaritoneGoalHereKeybindSetting.getKeyBinding())));
+                    }.setNameFormatArgs(KeyMappingUtils.getKeyName(Settings.REGISTRY.worldMapBaritoneGoalHereKeybindSetting.getKeyBinding())));
             options.add(index++, new RightClickOption("xaeroplus.gui.world_map.baritone_path_here", options.size(), this) {
                         @Override
                         public void onAction(Screen screen) {
                             BaritoneExecutor.path(goalX, goalZ);
                         }
-                    }.setNameFormatArgs(Misc.getKeyName(Settings.REGISTRY.worldMapBaritonePathHereKeybindSetting.getKeyBinding())));
+                    }.setNameFormatArgs(KeyMappingUtils.getKeyName(Settings.REGISTRY.worldMapBaritonePathHereKeybindSetting.getKeyBinding())));
             if (BaritoneHelper.isBaritoneElytraPresent()) {
                 options.add(index++, new RightClickOption("xaeroplus.gui.world_map.baritone_elytra_here", options.size(), this) {
                         @Override
                         public void onAction(Screen screen) {
                             BaritoneExecutor.elytra(goalX, goalZ);
                         }
-                    }.setNameFormatArgs(Misc.getKeyName(Settings.REGISTRY.worldMapBaritoneElytraHereKeybindSetting.getKeyBinding())));
+                    }.setNameFormatArgs(KeyMappingUtils.getKeyName(Settings.REGISTRY.worldMapBaritoneElytraHereKeybindSetting.getKeyBinding())));
             }
         }
         boolean tileSelPresent = this.mapTileSelection != null;

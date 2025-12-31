@@ -1,10 +1,8 @@
 package xaeroplus.settings;
 
 import net.minecraft.client.Minecraft;
-import xaero.common.HudMod;
 import xaero.map.WorldMapSession;
 import xaeroplus.Globals;
-import xaeroplus.XaeroPlus;
 import xaeroplus.feature.waypoint.WaypointAPI;
 import xaeroplus.feature.waypoint.eta.WaypointEtaManager;
 import xaeroplus.module.ModuleManager;
@@ -330,13 +328,6 @@ public final class Settings extends SettingRegistry {
         BooleanSetting.create(
             "Waypoints List UI Additions",
             "xaeroplus.setting.waypoints_list_ui_additions",
-            true,
-            false),
-        SettingLocation.WORLD_MAP_MAIN);
-    public final BooleanSetting fixWaypointLoad = register(
-        BooleanSetting.create(
-            "Fix Waypoint Load Bug",
-            "Fix Waypoint Load Bug",
             true,
             false),
         SettingLocation.WORLD_MAP_MAIN);
@@ -1029,20 +1020,6 @@ public final class Settings extends SettingRegistry {
             "Fix Main Entity Dot",
             "xaeroplus.setting.fix_main_entity_dot",
             true),
-        SettingLocation.MINIMAP_ENTITY_RADAR);
-    public final BooleanSetting radarHideInvisibleEntities = register(
-        BooleanSetting.create(
-            "Hide Invisible Entities",
-            "xaeroplus.setting.radar_hide_invisible_entities",
-            true,
-            (b) -> {
-                if (!Globals.minimapSettingsInitialized) return;
-                try {
-                    HudMod.INSTANCE.getSettings().radarHideInvisibleEntities = b;
-                } catch (Exception e) {
-                    XaeroPlus.LOGGER.error("Error updating radarHideInvisibleEntities", e);
-                }
-            }),
         SettingLocation.MINIMAP_ENTITY_RADAR);
 
     /**

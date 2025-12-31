@@ -1,12 +1,12 @@
 package xaeroplus.settings;
 
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.ArrayUtils;
-import xaero.common.settings.ModOptions;
-import xaero.map.gui.CursorBox;
+import xaero.lib.common.gui.widget.TooltipInfo;
 import xaeroplus.XaeroPlus;
-import xaeroplus.mixin.client.AccessorMinimapModOptions;
-import xaeroplus.mixin.client.AccessorWorldMapModOptions;
+import xaeroplus.feature.extensions.XaeroPlusSettingEntry;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -95,25 +95,28 @@ public class EnumSetting<T extends Enum<T>> extends XaeroPlusSetting {
     }
 
     @Override
-    public ModOptions toMinimapModOptions() {
-        return AccessorMinimapModOptions.createEnumSetting(
-            getSettingName(),
+    public XaeroPlusSettingEntry<?> toXaeroSettingEntry() {
+        return new XaeroPlusSettingEntry<T>(
+            this,
+            Component.literal(getTranslatedName()),
+            new TooltipInfo(getTooltipTranslationKey()),
+            false,
+            this::get,
             0,
             getIndexMax(),
-            new xaero.common.graphics.CursorBox(getTooltipTranslationKey()),
-            isIngameOnly()
-        );
-    }
-
-    @Override
-    public xaero.map.settings.ModOptions toWorldMapModOptions() {
-        return AccessorWorldMapModOptions.createEnumSetting(
-            getSettingName(),
-            getIndexMax() + 1,
-            new CursorBox(getTooltipTranslationKey()),
-            isIngameOnly(),
-            isRequiresMinimap(),
-            false
+            v -> getEnumValues()[v],
+            v -> {
+                if (v instanceof TranslatableSettingEnum translatableSettingEnum) {
+                    return Component.translatable(translatableSettingEnum.getTranslationKey());
+                }
+                return Component.literal(v.toString());
+            },
+            (v1, v2) -> {
+                setValue(v2);
+                SettingHooks.saveSettings();
+                Minecraft.getInstance().setScreen(Minecraft.getInstance().screen);
+            },
+            this::isVisible
         );
     }
 

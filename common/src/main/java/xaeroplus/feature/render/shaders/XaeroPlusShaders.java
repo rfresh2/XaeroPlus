@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.ShaderDefines;
 import net.minecraft.client.renderer.ShaderProgram;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Matrix4f;
-import xaero.map.graphics.shader.MapShaders;
+import xaero.lib.client.graphics.shader.LibShaders;
 
 public class XaeroPlusShaders {
     public static final ShaderProgram HIGHLIGHT_SHADER_PROGRAM = new ShaderProgram(
@@ -63,7 +63,7 @@ public class XaeroPlusShaders {
     }
 
     public static void ensureTransparentBackgroundUniforms() {
-        CompiledShaderProgram currentProgram = Minecraft.getInstance().getShaderManager().getProgram(MapShaders.WORLD_MAP);
+        CompiledShaderProgram currentProgram = Minecraft.getInstance().getShaderManager().getProgram(LibShaders.WORLD_MAP);
         if (currentProgram != CACHED_CUSTOM_MAP_SHADER_PROGRAM) {
             CACHED_CUSTOM_MAP_SHADER_PROGRAM = currentProgram;
             TRANSPARENT_BACKGROUND_UNIFORM = currentProgram.getUniform("TransparentBackground");

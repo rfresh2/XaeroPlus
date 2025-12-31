@@ -11,7 +11,7 @@ authors = "rfresh2"
 description = '''
 Xaero WorldMap / Minimap Extra Features
 '''
-logoFile = "icon.jpg"
+logoFile = "icon.png"
 displayTest="IGNORE_ALL_VERSION"
 
 [[dependencies.xaeroplus]]

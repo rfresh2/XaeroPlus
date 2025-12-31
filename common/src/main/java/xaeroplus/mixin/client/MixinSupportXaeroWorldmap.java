@@ -24,7 +24,7 @@ import xaeroplus.settings.Settings;
 public abstract class MixinSupportXaeroWorldmap {
     @Inject(method = "drawMinimap", at = @At(
         value = "INVOKE",
-        target = "Lxaero/common/settings/ModSettings;getSlimeChunks(Lxaero/hud/minimap/module/MinimapSession;)Z"
+        target = "Lxaero/hud/minimap/config/util/MinimapConfigClientUtils;getEffectiveSlimeChunks(Lxaero/hud/minimap/module/MinimapSession;)Z"
     ), remap = false)
     public void overrideRegionRange(
         final CallbackInfo ci,

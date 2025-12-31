@@ -33,6 +33,7 @@ import xaero.map.MapProcessor;
 import xaero.map.MapWriter;
 import xaero.map.biome.BlockTintProvider;
 import xaero.map.region.MapRegion;
+import xaero.map.region.MapUpdateFastConfig;
 import xaero.map.region.OverlayBuilder;
 import xaero.map.region.OverlayManager;
 import xaero.map.world.MapWorld;
@@ -211,7 +212,7 @@ public abstract class MixinMapWriter {
 
     @WrapOperation(method = "writeMap", at = @At(
         value = "INVOKE",
-        target = "Lxaero/map/MapWriter;writeChunk(Lnet/minecraft/world/level/Level;IZLnet/minecraft/core/Registry;Lxaero/map/region/OverlayManager;ZZZZZLnet/minecraft/core/BlockPos$MutableBlockPos;Lxaero/map/biome/BlockTintProvider;IIIIIIIII)Z"
+        target = "Lxaero/map/MapWriter;writeChunk(Lnet/minecraft/world/level/Level;IZLnet/minecraft/core/Registry;Lxaero/map/region/OverlayManager;ZZZZZLnet/minecraft/core/BlockPos$MutableBlockPos;Lxaero/map/biome/BlockTintProvider;IIIIIIIIILxaero/map/region/MapUpdateFastConfig;)Z"
     ), remap = true) // $REMAP
     public boolean fastMap(final MapWriter instance,
                            Level world,
@@ -235,6 +236,7 @@ public abstract class MixinMapWriter {
                            int tileChunkLocalZ,
                            int chunkX,
                            int chunkZ,
+                           final MapUpdateFastConfig updateConfig,
                            final Operation<Boolean> original) {
         if (Settings.REGISTRY.fastMapSetting.get()) {
             if (this.mapProcessor.getCurrentCaveLayer() == Integer.MAX_VALUE) {
@@ -254,7 +256,7 @@ public abstract class MixinMapWriter {
         return original.call(instance, world, distance, onlyLoad, biomeRegistry,
                              overlayManager, loadChunks, updateChunks, ignoreHeightmaps, flowers, detailedDebug,
                              mutableBlockPos3, blockTintProvider, caveDepth, caveStart, layerToWrite, tileChunkX,
-                             tileChunkZ, tileChunkLocalX, tileChunkLocalZ, chunkX, chunkZ);
+                             tileChunkZ, tileChunkLocalX, tileChunkLocalZ, chunkX, chunkZ, updateConfig);
     }
 
     @Inject(method = "loadPixel", at = @At("HEAD"), remap = false)

@@ -47,6 +47,7 @@ dependencies {
     implementation(include(libs.mixinextras.forge.get())!!)
     modImplementation(libs.worldmap.forge)
     modImplementation(libs.minimap.forge)
+    modImplementation(libs.xaerolib.forge)
     modImplementation(libs.baritone.forge)
     modCompileOnly(libs.waystones.forge)
     modCompileOnly(libs.balm.forge)

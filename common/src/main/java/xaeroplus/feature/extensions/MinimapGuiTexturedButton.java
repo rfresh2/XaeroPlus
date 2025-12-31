@@ -5,8 +5,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import xaero.common.graphics.CursorBox;
 import xaero.common.gui.TooltipButton;
+import xaero.lib.client.gui.widget.Tooltip;
 
 import java.util.function.Supplier;
 
@@ -17,7 +17,7 @@ public class MinimapGuiTexturedButton extends TooltipButton {
     public final int textureH;
     public final ResourceLocation texture;
 
-    public MinimapGuiTexturedButton(int x, int y, int w, int h, int textureX, int textureY, int textureW, int textureH, ResourceLocation texture, Button.OnPress onPress, Supplier<CursorBox> tooltip) {
+    public MinimapGuiTexturedButton(int x, int y, int w, int h, int textureX, int textureY, int textureW, int textureH, ResourceLocation texture, Button.OnPress onPress, Supplier<Tooltip> tooltip) {
         super(x, y, w, h, Component.empty(), onPress, tooltip);
         this.textureX = textureX;
         this.textureY = textureY;

@@ -2,8 +2,8 @@ package xaeroplus.util;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import xaero.lib.client.gui.GuiSettings;
 import xaero.map.gui.GuiMap;
-import xaero.map.gui.GuiSettings;
 import xaeroplus.mixin.client.AccessorGuiMap;
 
 import java.util.Optional;

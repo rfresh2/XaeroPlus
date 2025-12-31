@@ -2,7 +2,7 @@ package xaeroplus.feature.drawing;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.network.chat.Component;
-import xaero.map.gui.CursorBox;
+import xaero.lib.client.gui.widget.Tooltip;
 import xaero.map.gui.TooltipButton;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.Drawing;
@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 public class DrawingColorCyclerButton extends TooltipButton {
     protected final Drawing.DrawingColorCycler drawingColorCycler;
     protected final IntSupplier alphaSupplier;
-    public DrawingColorCyclerButton(final int x, final int y, final Supplier<CursorBox> tooltip, final Drawing.DrawingColorCycler drawingColorCycler) {
+    public DrawingColorCyclerButton(final int x, final int y, final Supplier<Tooltip> tooltip, final Drawing.DrawingColorCycler drawingColorCycler) {
         super(
             x, y,
             20, 20,

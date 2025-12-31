@@ -10,10 +10,9 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xaero.common.IXaeroMinimap;
 import xaero.common.gui.GuiWaypointsOptions;
 import xaero.common.gui.MyBigButton;
-import xaero.common.gui.ScreenBase;
+import xaero.lib.client.gui.ScreenBase;
 import xaeroplus.settings.Settings;
 
 @Mixin(value = GuiWaypointsOptions.class, remap = false)
@@ -21,8 +20,8 @@ public abstract class MixinGuiWaypointsOptions extends ScreenBase {
     @Unique private Button xaeroPlus$showWaypointDistancesButton;
     @Shadow private boolean buttonTest;
 
-    protected MixinGuiWaypointsOptions(final IXaeroMinimap modMain, final Screen parent, final Screen escape, final Component titleIn) {
-        super(modMain, parent, escape, titleIn);
+    protected MixinGuiWaypointsOptions(final Screen parent, final Screen escape, final Component titleIn) {
+        super(parent, escape, titleIn);
     }
 
     @Inject(

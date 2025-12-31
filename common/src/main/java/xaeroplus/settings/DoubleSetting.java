@@ -1,11 +1,12 @@
 package xaeroplus.settings;
 
 import net.minecraft.client.KeyMapping;
-import xaero.common.settings.ModOptions;
-import xaero.map.gui.CursorBox;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
+import xaero.lib.common.gui.widget.TooltipInfo;
 import xaeroplus.XaeroPlus;
-import xaeroplus.mixin.client.AccessorMinimapModOptions;
-import xaeroplus.mixin.client.AccessorWorldMapModOptions;
+import xaeroplus.feature.extensions.XaeroPlusSettingEntry;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleConsumer;
@@ -113,28 +114,24 @@ public class DoubleSetting extends XaeroPlusSetting {
     }
 
     @Override
-    public ModOptions toMinimapModOptions() {
-        return AccessorMinimapModOptions.createDoubleSetting(
-            getSettingName(),
-            getValueMin(),
-            getValueMax(),
-            (float) getValueStep(),
-            new xaero.common.graphics.CursorBox(getTooltipTranslationKey()),
-            isIngameOnly()
-        );
-    }
-
-    @Override
-    public xaero.map.settings.ModOptions toWorldMapModOptions() {
-        return AccessorWorldMapModOptions.createDoubleSetting(
-            getSettingName(),
-            getValueMin(),
-            getValueMax(),
-            getValueStep(),
-            new CursorBox(getTooltipTranslationKey()),
-            isIngameOnly(),
-            isRequiresMinimap(),
-            false
+    public XaeroPlusSettingEntry<?> toXaeroSettingEntry() {
+        int numIndeces = (int) ((valueMax - valueMin) / valueStep);
+        return new XaeroPlusSettingEntry<Double>(
+            this,
+            Component.literal(getTranslatedName()),
+            new TooltipInfo(getTooltipTranslationKey()),
+            true,
+            this::get,
+            0,
+            numIndeces,
+            v -> Mth.clamp(valueMin + (v * valueStep), valueMin, valueMax),
+            v -> Component.literal(String.format("%.2f", v)),
+            (v1, v2) -> {
+                setValue(v2);
+                SettingHooks.saveSettings();
+                Minecraft.getInstance().setScreen(Minecraft.getInstance().screen);
+            },
+            this::isVisible
         );
     }
 

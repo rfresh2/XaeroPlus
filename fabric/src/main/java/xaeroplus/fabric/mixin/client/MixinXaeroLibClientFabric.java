@@ -6,11 +6,11 @@ import net.fabricmc.loader.api.FabricLoader;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import xaero.map.WorldMapFabric;
+import xaero.lib.client.XaeroLibClientFabric;
 
-@Mixin(value = WorldMapFabric.class, remap = false)
-public class MixinWorldMapFabric {
-    @Redirect(method = "loadClient", at = @At(
+@Mixin(value = XaeroLibClientFabric.class, remap = false)
+public class MixinXaeroLibClientFabric {
+    @Redirect(method = "load", at = @At(
         value = "INVOKE",
         target = "Lnet/fabricmc/fabric/api/resource/ResourceManagerHelper;registerReloadListener(Lnet/fabricmc/fabric/api/resource/IdentifiableResourceReloadListener;)V"
     ))

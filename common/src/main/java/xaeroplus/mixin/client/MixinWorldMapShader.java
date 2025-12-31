@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xaero.map.graphics.shader.WorldMapShader;
+import xaero.lib.client.graphics.shader.WorldMapShader;
 import xaeroplus.feature.extensions.CustomWorldMapShader;
 
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class MixinWorldMapShader extends ShaderInstance implements CustomWorldMa
         method = "<init>",
         at = @At(
             value = "CONSTANT",
-            args = "stringValue=xaeroworldmap/map")
+            args = "stringValue=xaerolib/map")
     )
     private static String editShader(final String constant) {
         return "xaeroplus/custom_map";

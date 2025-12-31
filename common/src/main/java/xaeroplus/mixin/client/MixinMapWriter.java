@@ -33,6 +33,7 @@ import xaero.map.MapProcessor;
 import xaero.map.MapWriter;
 import xaero.map.biome.BlockTintProvider;
 import xaero.map.region.MapRegion;
+import xaero.map.region.MapUpdateFastConfig;
 import xaero.map.region.OverlayBuilder;
 import xaero.map.region.OverlayManager;
 import xaero.map.world.MapWorld;
@@ -211,32 +212,34 @@ public abstract class MixinMapWriter {
 
     @WrapOperation(method = "writeMap", at = @At(
         value = "INVOKE",
-        target = "Lxaero/map/MapWriter;writeChunk(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/Registry;IZLnet/minecraft/core/Registry;Lxaero/map/region/OverlayManager;ZZZZZLnet/minecraft/core/BlockPos$MutableBlockPos;Lxaero/map/biome/BlockTintProvider;IIIIIIIII)Z"
+        target = "Lxaero/map/MapWriter;writeChunk(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/Registry;IZLnet/minecraft/core/Registry;Lxaero/map/region/OverlayManager;ZZZZZLnet/minecraft/core/BlockPos$MutableBlockPos;Lxaero/map/biome/BlockTintProvider;IIIIIIIIILxaero/map/region/MapUpdateFastConfig;)Z"
     ), remap = true) // $REMAP
-    public boolean fastMap(final MapWriter instance,
-                           Level world,
-                           Registry<Block> blockRegistry,
-                           int distance,
-                           boolean onlyLoad,
-                           Registry<Biome> biomeRegistry,
-                           OverlayManager overlayManager,
-                           boolean loadChunks,
-                           boolean updateChunks,
-                           boolean ignoreHeightmaps,
-                           boolean flowers,
-                           boolean detailedDebug,
-                           BlockPos.MutableBlockPos mutableBlockPos3,
-                           BlockTintProvider blockTintProvider,
-                           int caveDepth,
-                           int caveStart,
-                           int layerToWrite,
-                           int tileChunkX,
-                           int tileChunkZ,
-                           int tileChunkLocalX,
-                           int tileChunkLocalZ,
-                           int chunkX,
-                           int chunkZ,
-                           final Operation<Boolean> original) {
+    public boolean fastMap(
+        final MapWriter instance,
+        final Level world,
+        final Registry<Block> blockRegistry,
+        final int distance,
+        final boolean onlyLoad,
+        final Registry<Biome> biomeRegistry,
+        final OverlayManager overlayManager,
+        final boolean loadChunks,
+        final boolean updateChunks,
+        final boolean ignoreHeightmaps,
+        final boolean flowers,
+        final boolean detailedDebug,
+        final BlockPos.MutableBlockPos mutableBlockPos3,
+        final BlockTintProvider blockTintProvider,
+        final int caveDepth,
+        final int caveStart,
+        final int layerToWrite,
+        final int tileChunkX,
+        final int tileChunkZ,
+        final int tileChunkLocalX,
+        final int tileChunkLocalZ,
+        final int chunkX,
+        final int chunkZ,
+        final MapUpdateFastConfig updateConfig,
+        final Operation<Boolean> original) {
         if (Settings.REGISTRY.fastMapSetting.get()) {
             if (this.mapProcessor.getCurrentCaveLayer() == Integer.MAX_VALUE) {
                 final Long cacheable = ChunkUtils.chunkPosToLong(chunkX, chunkZ);
@@ -255,7 +258,7 @@ public abstract class MixinMapWriter {
         return original.call(instance, world, blockRegistry, distance, onlyLoad, biomeRegistry,
                              overlayManager, loadChunks, updateChunks, ignoreHeightmaps, flowers, detailedDebug,
                              mutableBlockPos3, blockTintProvider, caveDepth, caveStart, layerToWrite, tileChunkX,
-                             tileChunkZ, tileChunkLocalX, tileChunkLocalZ, chunkX, chunkZ);
+                             tileChunkZ, tileChunkLocalX, tileChunkLocalZ, chunkX, chunkZ, updateConfig);
     }
 
     @Inject(method = "loadPixel", at = @At("HEAD"), remap = false)

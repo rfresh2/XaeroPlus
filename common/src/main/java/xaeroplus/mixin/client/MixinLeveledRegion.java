@@ -30,8 +30,8 @@ public abstract class MixinLeveledRegion<T extends RegionTexture<T>> {
         value = "INVOKE",
         target = "Ljava/util/zip/ZipOutputStream;closeEntry()V"
     ))
-    public void writeSaveCacheTexturesZipOutputStream(final File tempFile, final int extraAttempts, final CallbackInfoReturnable<Boolean> cir,
-                                     @Local(name = "zipOutput") ZipOutputStream zipOutputRef
+    public void writeSaveCacheTexturesZipOutputStream(final File tempFile, final boolean debugConfig, final int extraAttempts, final CallbackInfoReturnable<Boolean> cir,
+                                                      @Local(name = "zipOutput") ZipOutputStream zipOutputRef
     ) {
         if (!Settings.REGISTRY.fastZipWrite.get()) return;
         try {

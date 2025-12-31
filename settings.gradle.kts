@@ -1,6 +1,5 @@
 pluginManagement {
 	repositories {
-        mavenLocal()
 		maven("https://maven.fabricmc.net/") { name = "Fabric" }
 		maven("https://maven.architectury.dev/")
 		maven("https://files.minecraftforge.net/maven/")
@@ -21,20 +20,24 @@ val worldmap_version_forge: String by ext.properties
 val minimap_version_forge: String by ext.properties
 val worldmap_version_neo: String by ext.properties
 val minimap_version_neo: String by ext.properties
+val xaerolib_version: String by ext.properties
 
 dependencyResolutionManagement {
 	versionCatalogs {
 		create("libs") {
-			library("fabric-loader", "net.fabricmc:fabric-loader:0.18.1")
+			library("fabric-loader", "net.fabricmc:fabric-loader:0.18.4")
 			library("forge", "net.minecraftforge:forge:1.21.10-60.1.4")
 			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.138.3+${minecraft_version}")
 			library("neoforge", "net.neoforged:neoforge:21.10.64")
-			library("worldmap-fabric", "maven.modrinth:xaeros-world-map:${worldmap_version_fabric}_Fabric_1.21.9")
-			library("worldmap-forge", "maven.modrinth:xaeros-world-map:${worldmap_version_forge}_Forge_1.21.9")
-			library("worldmap-neo", "maven.modrinth:xaeros-world-map:${worldmap_version_neo}_NeoForge_1.21.9")
-			library("minimap-fabric", "maven.modrinth:xaeros-minimap:${minimap_version_fabric}_Fabric_1.21.9")
-			library("minimap-forge", "maven.modrinth:xaeros-minimap:${minimap_version_forge}_Forge_1.21.9")
-			library("minimap-neo", "maven.modrinth:xaeros-minimap:${minimap_version_neo}_NeoForge_1.21.9")
+			library("worldmap-fabric", "maven.modrinth:xaeros-world-map:${worldmap_version_fabric}_Fabric_${minecraft_version}")
+			library("worldmap-forge", "maven.modrinth:xaeros-world-map:${worldmap_version_forge}_Forge_${minecraft_version}")
+			library("worldmap-neo", "maven.modrinth:xaeros-world-map:${worldmap_version_neo}_NeoForge_${minecraft_version}")
+			library("minimap-fabric", "maven.modrinth:xaeros-minimap:${minimap_version_fabric}_Fabric_${minecraft_version}")
+			library("minimap-forge", "maven.modrinth:xaeros-minimap:${minimap_version_forge}_Forge_${minecraft_version}")
+			library("minimap-neo", "maven.modrinth:xaeros-minimap:${minimap_version_neo}_NeoForge_${minecraft_version}")
+            library("xaerolib-fabric", "com.github.rfresh2:xaerolib-fabric:${xaerolib_version}+${minecraft_version}")
+            library("xaerolib-forge", "com.github.rfresh2:xaerolib-forge:${xaerolib_version}+${minecraft_version}")
+            library("xaerolib-neo", "com.github.rfresh2:xaerolib-neoforge:${xaerolib_version}+${minecraft_version}")
             library("mixinextras-common", "io.github.llamalad7:mixinextras-common:0.5.0")
             library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.5.0")
 			library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.0")
@@ -59,7 +62,7 @@ dependencyResolutionManagement {
             library("baritone-fabric", "com.github.rfresh2:baritone-fabric:${minecraft_version}-SNAPSHOT")
             library("baritone-forge", "com.github.rfresh2:baritone-forge:${minecraft_version}-SNAPSHOT")
             library("baritone-neoforge", "com.github.rfresh2:baritone-neoforge:${minecraft_version}-SNAPSHOT")
-        }
+		}
 	}
 }
 

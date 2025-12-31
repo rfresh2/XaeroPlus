@@ -27,8 +27,8 @@
     "xaeroplus-fabric.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.18.0",
-    "minecraft": ">=1.21.9",
+    "fabricloader": ">=0.18.4",
+    "minecraft": ["1.21.9", "1.21.10"],
     "xaeroworldmap": "${worldmap_version}"
   },
   "custom": {

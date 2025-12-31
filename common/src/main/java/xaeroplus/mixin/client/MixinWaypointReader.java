@@ -7,9 +7,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import xaero.lib.client.controls.util.KeyMappingUtils;
 import xaero.map.gui.IRightClickableElement;
 import xaero.map.gui.dropdown.rightclick.RightClickOption;
-import xaero.map.misc.Misc;
 import xaero.map.mods.gui.Waypoint;
 import xaero.map.mods.gui.WaypointReader;
 import xaeroplus.settings.Settings;
@@ -44,13 +44,13 @@ public class MixinWaypointReader {
                     public void onAction(Screen screen) {
                         BaritoneExecutor.goal(goalX, goalZ);
                     }
-                }.setNameFormatArgs(Misc.getKeyName(Settings.REGISTRY.worldMapBaritoneGoalHereKeybindSetting.getKeyBinding())));
+                }.setNameFormatArgs(KeyMappingUtils.getKeyName(Settings.REGISTRY.worldMapBaritoneGoalHereKeybindSetting.getKeyBinding())));
             options.add(index++, new RightClickOption("xaeroplus.gui.world_map.baritone_path_here", options.size(), target) {
                     @Override
                     public void onAction(Screen screen) {
                         BaritoneExecutor.path(goalX, goalZ);
                     }
-                }.setNameFormatArgs(Misc.getKeyName(Settings.REGISTRY.worldMapBaritonePathHereKeybindSetting.getKeyBinding())));
+                }.setNameFormatArgs(KeyMappingUtils.getKeyName(Settings.REGISTRY.worldMapBaritonePathHereKeybindSetting.getKeyBinding())));
             if (BaritoneHelper.isBaritoneElytraPresent()) {
                 options.addAll(5, asList(
                     new RightClickOption("xaeroplus.gui.world_map.baritone_elytra_here", options.size(), target) {
@@ -58,7 +58,7 @@ public class MixinWaypointReader {
                         public void onAction(Screen screen) {
                             BaritoneExecutor.elytra(goalX, goalZ);
                         }
-                    }.setNameFormatArgs(Misc.getKeyName(Settings.REGISTRY.worldMapBaritoneElytraHereKeybindSetting.getKeyBinding()))
+                    }.setNameFormatArgs(KeyMappingUtils.getKeyName(Settings.REGISTRY.worldMapBaritoneElytraHereKeybindSetting.getKeyBinding()))
                 ));
             }
         }

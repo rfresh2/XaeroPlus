@@ -46,6 +46,7 @@ dependencies {
 	implementation(libs.sqlite)
 	modImplementation(libs.worldmap.fabric)
 	modImplementation(libs.minimap.fabric)
+    modImplementation(libs.xaerolib.fabric)
     modCompileOnly(libs.baritone.fabric)
     modImplementation(libs.waystones.fabric)
     modImplementation(libs.balm.fabric)

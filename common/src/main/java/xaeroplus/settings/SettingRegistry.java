@@ -1,6 +1,8 @@
 package xaeroplus.settings;
 
 import net.minecraft.client.KeyMapping;
+import xaero.lib.client.gui.CustomSettingEntry;
+import xaeroplus.feature.extensions.XaeroPlusSettingEntry;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -60,31 +62,17 @@ public abstract class SettingRegistry {
         return new ArrayList<>(settingNameMap.values());
     }
 
-    public synchronized xaero.common.gui.ConfigSettingEntry[] getMinimapConfigSettingEntries(SettingLocation settingLocation) {
+    public synchronized XaeroPlusSettingEntry[] getXaeroSettingEntries(SettingLocation settingLocation) {
         var settingList = this.settingLocationMap.get(settingLocation);
         if (settingList != null) {
-            List<xaero.common.gui.ConfigSettingEntry> entries = new ArrayList<>(settingList.size());
+            List<CustomSettingEntry<?>> entries = new ArrayList<>(settingList.size());
             for (int i = 0; i < settingList.size(); i++) {
                 final XaeroPlusSetting xaeroPlusSetting = settingList.get(i);
-                var entry = xaeroPlusSetting.toMinimapConfigSettingEntry();
+                var entry = xaeroPlusSetting.toXaeroSettingEntry();
                 if (entry != null) entries.add(entry);
             }
-            return entries.toArray(new xaero.common.gui.ConfigSettingEntry[0]);
+            return entries.toArray(new XaeroPlusSettingEntry[0]);
         }
-        return new xaero.common.gui.ConfigSettingEntry[0];
-    }
-
-    public synchronized xaero.map.gui.ConfigSettingEntry[] getWorldmapConfigSettingEntries(SettingLocation settingLocation) {
-        var settingList = this.settingLocationMap.get(settingLocation);
-        if (settingList != null) {
-            List<xaero.map.gui.ConfigSettingEntry> entries = new ArrayList<>(settingList.size());
-            for (int i = 0; i < settingList.size(); i++) {
-                final XaeroPlusSetting xaeroPlusSetting = settingList.get(i);
-                var entry = xaeroPlusSetting.toWorldmapConfigSettingEntry();
-                if (entry != null) entries.add(entry);
-            }
-            return entries.toArray(new xaero.map.gui.ConfigSettingEntry[0]);
-        }
-        return new xaero.map.gui.ConfigSettingEntry[0];
+        return new XaeroPlusSettingEntry[0];
     }
 }

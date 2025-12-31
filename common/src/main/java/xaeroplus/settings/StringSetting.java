@@ -1,7 +1,7 @@
 package xaeroplus.settings;
 
-import xaero.common.settings.ModOptions;
 import xaeroplus.XaeroPlus;
+import xaeroplus.feature.extensions.XaeroPlusSettingEntry;
 
 import java.util.function.Consumer;
 
@@ -85,12 +85,7 @@ public class StringSetting extends XaeroPlusSetting {
     }
 
     @Override
-    public ModOptions toMinimapModOptions() {
-        return null;
-    }
-
-    @Override
-    public xaero.map.settings.ModOptions toWorldMapModOptions() {
+    public XaeroPlusSettingEntry<?> toXaeroSettingEntry() {
         return null;
     }
 }

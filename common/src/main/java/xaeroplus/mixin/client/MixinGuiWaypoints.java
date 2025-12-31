@@ -18,16 +18,15 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import xaero.common.IXaeroMinimap;
-import xaero.common.graphics.CursorBox;
 import xaero.common.gui.GuiWaypoints;
-import xaero.common.gui.ScreenBase;
 import xaero.common.minimap.waypoints.Waypoint;
-import xaero.common.misc.KeySortableByOther;
-import xaero.common.misc.Misc;
 import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.waypoint.WaypointsSort;
 import xaero.hud.minimap.world.MinimapWorld;
+import xaero.lib.client.gui.ScreenBase;
+import xaero.lib.client.gui.util.GuiUtils;
+import xaero.lib.client.gui.widget.Tooltip;
+import xaero.lib.common.util.KeySortableByOther;
 import xaeroplus.Globals;
 import xaeroplus.feature.extensions.MinimapGuiTexturedButton;
 import xaeroplus.settings.Settings;
@@ -46,13 +45,14 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
 
     @Shadow private MinimapWorld displayedWorld;
     @Shadow private ArrayList<Waypoint> waypointsSorted;
+
+    protected MixinGuiWaypoints(final Screen parent, final Screen escape, final Component titleIn) {
+        super(parent, escape, titleIn);
+    }
+
     @Shadow protected abstract boolean isOneSelected();
     @Shadow private MinimapSession session;
     @Shadow private ConcurrentSkipListSet<Integer> selectedListSet;
-
-    protected MixinGuiWaypoints(final IXaeroMinimap modMain, final Screen parent, final Screen escape, final Component titleIn) {
-        super(modMain, parent, escape, titleIn);
-    }
 
     @Inject(method = "init", at = @At("HEAD"), remap = true)
     public void initGui(CallbackInfo ci) {
@@ -76,7 +76,7 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
                 });
                 updateSortedList();
             },
-            () -> new CursorBox(Component.literal("[XP] ").append(Component.translatable("xaeroplus.gui.waypoints.toggle_enable_all"))),
+            () -> new Tooltip(Component.literal("[XP] ").append(Component.translatable("xaeroplus.gui.waypoints.toggle_enable_all"))),
             256, 256
     );
         if (!Settings.REGISTRY.waypointsListUIAdditions.get()) return;
@@ -90,7 +90,7 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         this.addRenderableWidget(toggleAllButton);
     }
 
-    @Inject(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lxaero/common/gui/ScreenBase;mouseClicked(Lnet/minecraft/client/input/MouseButtonEvent;Z)Z", shift = At.Shift.AFTER), remap = true)
+    @Inject(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lxaero/lib/client/gui/ScreenBase;mouseClicked(Lnet/minecraft/client/input/MouseButtonEvent;Z)Z", shift = At.Shift.AFTER), remap = true)
     public void mouseClickedInject(final MouseButtonEvent event, final boolean doubleClick, final CallbackInfoReturnable<Boolean> cir) {
         if (!Settings.REGISTRY.waypointsListUIAdditions.get()) return;
         boolean dropDownClosed = this.openDropdown == null;
@@ -105,7 +105,7 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         }
     }
 
-    @Inject(method = "keyPressed", at = @At(value = "INVOKE", target = "Lxaero/common/gui/ScreenBase;keyPressed(Lnet/minecraft/client/input/KeyEvent;)Z", shift = At.Shift.AFTER), remap = true, cancellable = true)
+    @Inject(method = "keyPressed", at = @At(value = "INVOKE", target = "Lxaero/lib/client/gui/ScreenBase;keyPressed(Lnet/minecraft/client/input/KeyEvent;)Z", shift = At.Shift.AFTER), remap = true, cancellable = true)
     public void keyTypedInject(final KeyEvent event, final CallbackInfoReturnable<Boolean> cir) {
         if (!Settings.REGISTRY.waypointsListUIAdditions.get()) return;
         if (searchField.isFocused() && searchField.isVisible()) {
@@ -122,16 +122,16 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         return result;
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lxaero/common/gui/ScreenBase;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", shift = At.Shift.AFTER), remap = true)
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lxaero/lib/client/gui/ScreenBase;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", shift = At.Shift.AFTER), remap = true)
     public void drawScreenInject(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partial, final CallbackInfo ci) {
         if (!Settings.REGISTRY.waypointsListUIAdditions.get()) return;
         if (!this.searchField.isFocused() && this.searchField.getValue().isEmpty()) {
-            Misc.setFieldText(this.searchField, I18n.get("gui.xaero_settings_search_placeholder", new Object[0]), ColorHelper.getColor(85, 85, 85, 255));
+            GuiUtils.setFieldText(this.searchField, I18n.get("gui.xaero_settings_search_placeholder", new Object[0]), ColorHelper.getColor(85, 85, 85, 255));
             this.searchField.moveCursorToStart(false);
         }
         this.searchField.render(guiGraphics, mouseX, mouseY, partial);
         if (!this.searchField.isFocused()) {
-            Misc.setFieldText(this.searchField, this.waypointsSearchFilter);
+            GuiUtils.setFieldText(this.searchField, this.waypointsSearchFilter);
         }
         super.renderTooltips(guiGraphics, mouseX, mouseY, partial);
     }

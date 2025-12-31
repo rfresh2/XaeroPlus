@@ -9,6 +9,7 @@ import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLLoader;
+import xaero.lib.client.gui.config.context.BuiltInEditConfigScreenContexts;
 import xaero.map.gui.GuiWorldMapSettings;
 import xaeroplus.XaeroPlus;
 import xaeroplus.commands.XPClientCommandSource;
@@ -24,7 +25,7 @@ public class XaeroPlusForgeClient {
         context.registerExtensionPoint(
             ConfigScreenHandler.ConfigScreenFactory.class,
             () -> new ConfigScreenHandler.ConfigScreenFactory((mc, screen) -> new GuiXaeroPlusWorldMapSettings(new GuiWorldMapSettings(
-                screen), screen))
+                BuiltInEditConfigScreenContexts.CLIENT), screen))
         );
     }
 

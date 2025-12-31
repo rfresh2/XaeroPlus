@@ -11,7 +11,7 @@ authors = "rfresh2"
 description = '''
 Xaero WorldMap / Minimap Extra Features
 '''
-logoFile = "icon.jpg"
+logoFile = "icon.png"
 displayTest="IGNORE_ALL_VERSION"
 clientSideOnly = true
 
@@ -25,7 +25,7 @@ side = "CLIENT"
 [[dependencies.xaeroplus]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.21.9,)"
+versionRange = "[1.21.9, 1.21.10]"
 ordering = "NONE"
 side = "CLIENT"
 

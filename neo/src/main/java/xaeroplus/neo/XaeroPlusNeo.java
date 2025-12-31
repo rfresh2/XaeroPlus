@@ -3,7 +3,6 @@ package xaeroplus.neo;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.client.Minecraft;
-import net.minecraft.commands.CommandSourceStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModLoadingContext;

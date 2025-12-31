@@ -59,6 +59,7 @@ dependencyResolutionManagement {
             library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")
             library("baritone-fabric", "com.github.rfresh2:baritone-fabric:${minecraft_version}-SNAPSHOT")
             library("baritone-forge", "com.github.rfresh2:baritone-forge:${minecraft_version}-SNAPSHOT")
+			library("baritone-neoforge", "com.github.rfresh2:baritone-forge:${minecraft_version}-SNAPSHOT")
 		}
 	}
 }
@@ -66,5 +67,6 @@ dependencyResolutionManagement {
 include("common")
 include("fabric")
 include("forge")
+include("neo")
 
 rootProject.name = "XaeroPlus"

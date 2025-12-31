@@ -13,6 +13,7 @@ import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import xaero.lib.client.gui.config.context.BuiltInEditConfigScreenContexts;
 import xaero.map.gui.GuiWorldMapSettings;
 import xaeroplus.XaeroPlus;
 import xaeroplus.commands.XPClientCommandSource;
@@ -32,7 +33,7 @@ public class XaeroPlusNeo {
             RemovalCause explicit = RemovalCause.EXPLICIT; // force class load to stop forge shitting itself at runtime??
             ModLoadingContext.get().registerExtensionPoint(
                 ConfigScreenHandler.ConfigScreenFactory.class,
-                () -> new ConfigScreenHandler.ConfigScreenFactory((mc, screen) -> new GuiXaeroPlusWorldMapSettings(new GuiWorldMapSettings(screen), screen))
+                () -> new ConfigScreenHandler.ConfigScreenFactory((mc, screen) -> new GuiXaeroPlusWorldMapSettings(new GuiWorldMapSettings(BuiltInEditConfigScreenContexts.CLIENT), screen))
             );
         }
     }

@@ -15,11 +15,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xaero.common.IXaeroMinimap;
+import xaero.common.HudMod;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.render.MinimapFBORenderer;
 import xaero.common.minimap.render.MinimapRenderer;
 import xaero.hud.minimap.Minimap;
+import xaero.hud.minimap.common.config.option.MinimapProfiledConfigOptions;
 import xaeroplus.Globals;
 import xaeroplus.feature.extensions.CustomMinimapFBORenderer;
 import xaeroplus.settings.Settings;
@@ -28,8 +29,6 @@ import xaeroplus.settings.Settings;
 public class MixinMinimapRenderer {
     @Shadow
     protected Minimap minimap;
-    @Shadow
-    protected IXaeroMinimap modMain;
 
     @Inject(method = "renderMinimap", at = @At("HEAD"))
     public void resetFBOSize(
@@ -150,7 +149,7 @@ public class MixinMinimapRenderer {
         @Local(name = "lockedNorth") boolean lockedNorth
     ) {
         if (Settings.REGISTRY.fixMainEntityDot.get()) {
-            return modMain.getSettings().mainEntityAs != 2 && !lockedNorth;
+            return HudMod.INSTANCE.getHudConfigs().getClientConfigManager().getEffective(MinimapProfiledConfigOptions.RADAR_MAIN_ENTITY) != 2 && !lockedNorth;
         }
         return true;
     }

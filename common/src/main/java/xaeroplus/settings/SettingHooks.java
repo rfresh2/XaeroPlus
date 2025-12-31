@@ -1,6 +1,5 @@
 package xaeroplus.settings;
 
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaeroplus.XaeroPlus;
 import xaeroplus.util.FileUtil;
 
@@ -53,69 +52,6 @@ public class SettingHooks {
                 }
                 setting.deserializeValue(settingValue);
             }
-        }
-    }
-
-    public static void getClientBooleanValue(String enumString, CallbackInfoReturnable<Boolean> cir) {
-        var setting = Settings.REGISTRY.getSettingByName(enumString);
-        if (setting instanceof BooleanSetting booleanSetting) {
-            cir.setReturnValue(booleanSetting.get());
-        }
-    }
-
-    // boolean or enum...
-    public static void setOptionValue(String enumString, final Object value) {
-        var setting = Settings.REGISTRY.getSettingByName(enumString);
-        if (setting instanceof BooleanSetting booleanSetting && value instanceof Boolean) {
-            booleanSetting.setValue((Boolean) value);
-        } else if (setting instanceof EnumSetting enumSetting && value instanceof Integer) {
-            enumSetting.setValueIndex((Integer) value);
-        }
-    }
-
-    // boolean or enum...
-    public static void getOptionValue(final String enumString, final CallbackInfoReturnable<Object> cir) {
-        var setting = Settings.REGISTRY.getSettingByName(enumString);
-        if (setting instanceof BooleanSetting booleanSetting) {
-            cir.setReturnValue(booleanSetting.get());
-        } else if (setting instanceof EnumSetting enumSetting) {
-            cir.setReturnValue(enumSetting.getValueIndex());
-        }
-    }
-
-    public static void setOptionDoubleValue(String enumString, double f) {
-        var setting = Settings.REGISTRY.getSettingByName(enumString);
-        if (setting instanceof DoubleSetting doubleSetting) {
-            doubleSetting.setValue(f);
-        }
-    }
-
-    public static void getOptionDoubleValue(String enumString, CallbackInfoReturnable<Double> cir) {
-        var setting = Settings.REGISTRY.getSettingByName(enumString);
-        if (setting instanceof DoubleSetting doubleSetting) {
-            cir.setReturnValue(doubleSetting.get());
-        }
-    }
-
-    public static void getOptionValueName(final String enumString, final CallbackInfoReturnable<String> cir) {
-        var setting = Settings.REGISTRY.getSettingByName(enumString);
-        if (setting instanceof EnumSetting enumSetting) {
-            cir.setReturnValue(enumSetting.get() instanceof TranslatableSettingEnum
-                                   ? ((TranslatableSettingEnum) enumSetting.get()).getTranslatedName()
-                                   : enumSetting.get().toString());
-        }
-    }
-
-    public static void getSliderOptionText(final String enumString, final CallbackInfoReturnable<String> cir) {
-        var setting = Settings.REGISTRY.getSettingByName(enumString);
-        if (setting == null) return;
-        var prefix = setting.getTranslatedName() + ": ";
-        if (setting instanceof DoubleSetting doubleSetting) {
-            cir.setReturnValue(prefix + String.format("%.2f", doubleSetting.get()));
-        } else if (setting instanceof EnumSetting enumSetting) {
-            cir.setReturnValue(prefix + (enumSetting.get() instanceof TranslatableSettingEnum
-                                   ? ((TranslatableSettingEnum) enumSetting.get()).getTranslatedName()
-                                   : enumSetting.get().toString()));
         }
     }
 }

@@ -18,11 +18,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xaero.common.IXaeroMinimap;
+import xaero.common.HudMod;
 import xaero.common.graphics.ImprovedFramebuffer;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRenderer;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
-import xaero.common.graphics.shader.FramebufferLinesShaderHelper;
 import xaero.common.minimap.render.MinimapFBORenderer;
 import xaero.common.minimap.render.MinimapRenderer;
 import xaero.common.minimap.render.MinimapRendererHelper;
@@ -30,10 +29,12 @@ import xaero.common.mods.SupportXaeroWorldmap;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.Minimap;
 import xaero.hud.minimap.MinimapLogs;
+import xaero.hud.minimap.common.config.option.MinimapProfiledConfigOptions;
 import xaero.hud.minimap.compass.render.CompassRenderer;
 import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.waypoint.render.WaypointMapRenderer;
-import xaero.hud.render.util.ImmediateRenderUtil;
+import xaero.lib.client.graphics.shader.FramebufferLinesShaderHelper;
+import xaero.lib.client.graphics.util.ImmediateRenderUtil;
 import xaeroplus.Globals;
 import xaeroplus.feature.extensions.CustomMinimapFBORenderer;
 import xaeroplus.settings.Settings;
@@ -49,8 +50,8 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
     @Shadow
     private boolean loadedFBO;
 
-    public MixinMinimapFBORenderer(final IXaeroMinimap modMain, final Minecraft mc, final WaypointMapRenderer waypointsGuiRenderer, final Minimap minimap, final CompassRenderer compassRenderer) {
-        super(modMain, mc, waypointsGuiRenderer, minimap, compassRenderer);
+    public MixinMinimapFBORenderer(final HudMod modMain, final Minecraft mc, final WaypointMapRenderer waypointMapRenderer, final Minimap minimap, final CompassRenderer compassRenderer) {
+        super(modMain, mc, waypointMapRenderer, minimap, compassRenderer);
     }
 
     @ModifyExpressionValue(
@@ -103,7 +104,8 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         if (Globals.minimapSizeMultiplier > 1) {
             int f = (Globals.minimapSizeMultiplier - 1) * Globals.minimapScaleMultiplier;
             s -= f * 6;
-            int scaledMinimapSize = modMain.getSettings().getMinimapSize();
+            int scaledMinimapSize = modMain.getHudConfigs().getClientConfigManager().getEffective(
+                MinimapProfiledConfigOptions.SIZE);
             int minimapNormalSize = scaledMinimapSize / Globals.minimapSizeMultiplier;
             int minimapScaledSizeDiff = 250 - minimapNormalSize;
             s -= minimapScaledSizeDiff * f;
@@ -178,7 +180,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
 
     @Redirect(method = "renderChunksToFBO", at = @At(
         value = "INVOKE",
-        target = "Lxaero/hud/render/util/ImmediateRenderUtil;texturedRect(Lcom/mojang/blaze3d/vertex/PoseStack;FFIIFFFFLcom/mojang/blaze3d/pipeline/RenderPipeline;)V"
+        target = "Lxaero/lib/client/graphics/util/ImmediateRenderUtil;texturedRect(Lcom/mojang/blaze3d/vertex/PoseStack;FFIIFFFFLcom/mojang/blaze3d/pipeline/RenderPipeline;)V"
     ), remap = true) // $REMAP
     public void redirectModelViewDraw(final PoseStack matrixStack, final float x, final float y, final int textureX, final int textureY, final float width, final float height, final float textureH, final float factor, final RenderPipeline renderPipeline,
                                       @Share("scaledSize") LocalIntRef scaledSize) {

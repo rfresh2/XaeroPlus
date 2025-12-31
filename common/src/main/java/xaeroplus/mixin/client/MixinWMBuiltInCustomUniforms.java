@@ -4,8 +4,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xaero.map.graphics.shader.BuiltInCustomUniforms;
-import xaero.map.graphics.shader.CustomUniforms;
+import xaero.lib.client.graphics.shader.BuiltInCustomUniforms;
+import xaero.lib.client.graphics.shader.CustomUniforms;
 import xaeroplus.feature.render.shaders.XaeroPlusShaders;
 
 @Mixin(value = BuiltInCustomUniforms.class, remap = false)

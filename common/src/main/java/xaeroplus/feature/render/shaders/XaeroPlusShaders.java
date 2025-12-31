@@ -46,8 +46,4 @@ public class XaeroPlusShaders {
             TRANSPARENT_WM_BACKGROUND_UNIFORM.setValue(intValue);
         }
     }
-
-    static {
-        setTransparentWMBackground(false);
-    }
 }

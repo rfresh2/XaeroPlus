@@ -90,11 +90,7 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         this.addRenderableWidget(toggleAllButton);
     }
 
-    @Inject(method = "mouseClicked", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/lib/client/gui/ScreenBase;mouseClicked(Lnet/minecraft/client/input/MouseButtonEvent;Z)Z",
-        shift = At.Shift.AFTER
-    ), remap = true)
+    @Inject(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lxaero/lib/client/gui/ScreenBase;mouseClicked(Lnet/minecraft/client/input/MouseButtonEvent;Z)Z", shift = At.Shift.AFTER), remap = true)
     public void mouseClickedInject(final MouseButtonEvent event, final boolean doubleClick, final CallbackInfoReturnable<Boolean> cir) {
         if (!Settings.REGISTRY.waypointsListUIAdditions.get()) return;
         boolean dropDownClosed = this.openDropdown == null;
@@ -109,11 +105,7 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         }
     }
 
-    @Inject(method = "keyPressed", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/lib/client/gui/ScreenBase;keyPressed(Lnet/minecraft/client/input/KeyEvent;)Z",
-        shift = At.Shift.AFTER
-    ), remap = true, cancellable = true)
+    @Inject(method = "keyPressed", at = @At(value = "INVOKE", target = "Lxaero/lib/client/gui/ScreenBase;keyPressed(Lnet/minecraft/client/input/KeyEvent;)Z", shift = At.Shift.AFTER), remap = true, cancellable = true)
     public void keyTypedInject(final KeyEvent event, final CallbackInfoReturnable<Boolean> cir) {
         if (!Settings.REGISTRY.waypointsListUIAdditions.get()) return;
         if (searchField.isFocused() && searchField.isVisible()) {
@@ -130,11 +122,7 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         return result;
     }
 
-    @Inject(method = "render", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/lib/client/gui/ScreenBase;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V",
-        shift = At.Shift.AFTER
-    ), remap = true)
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lxaero/lib/client/gui/ScreenBase;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", shift = At.Shift.AFTER), remap = true)
     public void drawScreenInject(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partial, final CallbackInfo ci) {
         if (!Settings.REGISTRY.waypointsListUIAdditions.get()) return;
         if (!this.searchField.isFocused() && this.searchField.getValue().isEmpty()) {

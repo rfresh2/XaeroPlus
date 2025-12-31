@@ -102,7 +102,8 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         if (Globals.minimapSizeMultiplier > 1) {
             int f = (Globals.minimapSizeMultiplier - 1) * Globals.minimapScaleMultiplier;
             s -= f * 6;
-            int scaledMinimapSize = modMain.getHudConfigs().getClientConfigManager().getEffective(MinimapProfiledConfigOptions.SIZE);
+            int scaledMinimapSize = modMain.getHudConfigs().getClientConfigManager().getEffective(
+                MinimapProfiledConfigOptions.SIZE);
             int minimapNormalSize = scaledMinimapSize / Globals.minimapSizeMultiplier;
             int minimapScaledSizeDiff = 250 - minimapNormalSize;
             s -= minimapScaledSizeDiff * f;

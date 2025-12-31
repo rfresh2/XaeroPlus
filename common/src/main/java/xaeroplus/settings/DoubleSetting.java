@@ -3,6 +3,7 @@ package xaeroplus.settings;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import xaero.lib.common.gui.widget.TooltipInfo;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.extensions.XaeroPlusSettingEntry;
@@ -123,7 +124,7 @@ public class DoubleSetting extends XaeroPlusSetting {
             this::get,
             0,
             numIndeces,
-            v -> Math.clamp(valueMin + (v * valueStep), valueMin, valueMax),
+            v -> Mth.clamp(valueMin + (v * valueStep), valueMin, valueMax),
             v -> Component.literal(String.format("%.2f", v)),
             (v1, v2) -> {
                 setValue(v2);

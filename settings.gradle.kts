@@ -61,7 +61,7 @@ dependencyResolutionManagement {
             library("baritone-fabric", "com.github.rfresh2:baritone-fabric:${minecraft_version}-SNAPSHOT")
             library("baritone-forge", "com.github.rfresh2:baritone-forge:${minecraft_version}-SNAPSHOT")
             library("baritone-neoforge", "com.github.rfresh2:baritone-neoforge:1.21.10-SNAPSHOT")
-        }
+		}
 	}
 }
 

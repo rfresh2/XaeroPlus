@@ -14,5 +14,6 @@ public class MixinWMBuiltInCustomUniforms {
     @Inject(method = "registerAll", at = @At("RETURN"))
     private static void registerCustomMapUniform(final CallbackInfo ci) {
         CustomUniforms.register(XaeroPlusShaders.TRANSPARENT_WM_BACKGROUND_UNIFORM);
+        XaeroPlusShaders.setTransparentWMBackground(false);
     }
 }

@@ -45,7 +45,6 @@
     "MixinMapWriter",
     "MixinMinimap",
     "MixinMinimapFBORenderer",
-    "MixinMinimapModSettings",
     "MixinMinimapRenderer",
     "MixinMinimapViewSettings",
     "MixinMinimapWorldManagerIO",

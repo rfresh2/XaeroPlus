@@ -11,6 +11,6 @@ public class XaeroPlusConfigScreenFactory implements IConfigScreenFactory {
 
     @Override
     public Screen createScreen(final ModContainer modContainer, final Screen screen) {
-        return new GuiXaeroPlusWorldMapSettings(new GuiWorldMapSettings(screen, BuiltInEditConfigScreenContexts.CLIENT), screen);
+        return new GuiXaeroPlusWorldMapSettings(new GuiWorldMapSettings(BuiltInEditConfigScreenContexts.CLIENT), screen);
     }
 }

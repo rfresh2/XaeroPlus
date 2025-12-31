@@ -51,7 +51,8 @@ public class XPCommandManager {
                         c.getSource().xaeroplus$sendFailure(Component.literal("Atlas import failed! Check log for details."));
                     } else {
                         c.getSource().xaeroplus$sendSuccess(Component.literal(addedCount + " waypoints imported to the \"atlas\" waypoint set!"));
-                        boolean allSetsEnabled = HudMod.INSTANCE.getHudConfigs().getClientConfigManager().getEffective(MinimapProfiledConfigOptions.WAYPOINTS_ALL_SETS);
+                        boolean allSetsEnabled = HudMod.INSTANCE.getHudConfigs().getClientConfigManager().getEffective(
+                            MinimapProfiledConfigOptions.WAYPOINTS_ALL_SETS);
                         boolean isAtlasSetActive = Optional.ofNullable(WaypointAPI.getCurrentWaypointSet())
                             .map(WaypointSet::getName)
                             .filter(n -> n.equals("atlas"))

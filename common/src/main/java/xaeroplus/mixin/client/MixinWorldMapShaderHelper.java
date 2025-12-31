@@ -4,7 +4,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xaero.map.graphics.shader.WorldMapShaderHelper;
+import xaero.lib.client.graphics.shader.WorldMapShaderHelper;
 import xaeroplus.feature.render.shaders.XaeroPlusShaders;
 
 @Mixin(value = WorldMapShaderHelper.class, remap = false)

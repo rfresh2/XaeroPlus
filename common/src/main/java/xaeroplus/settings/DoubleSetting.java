@@ -1,7 +1,6 @@
 package xaeroplus.settings;
 
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import xaero.lib.common.gui.widget.TooltipInfo;
@@ -129,7 +128,6 @@ public class DoubleSetting extends XaeroPlusSetting {
             (v1, v2) -> {
                 setValue(v2);
                 SettingHooks.saveSettings();
-                Minecraft.getInstance().setScreen(Minecraft.getInstance().screen);
             },
             this::isVisible
         );

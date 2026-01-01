@@ -1,6 +1,5 @@
 package xaeroplus.settings;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentString;
@@ -141,7 +140,6 @@ public class DoubleSetting extends XaeroPlusSetting {
             (v1, v2) -> {
                 setValue(v2);
                 SettingHooks.saveSettings();
-                Minecraft.getMinecraft().displayGuiScreen(Minecraft.getMinecraft().currentScreen);
             },
             this::isVisible
         );

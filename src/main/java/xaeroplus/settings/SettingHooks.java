@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 public class SettingHooks {
     public static void saveSettings() {
         try {
-            XaeroPlus.LOGGER.info("Saving settings");
             saveXPSettings();
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Failed saving settings", e);

@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.ITextComponent;
 import org.lwjgl.input.Keyboard;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -17,16 +18,16 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xaero.common.IXaeroMinimap;
 import xaero.common.gui.GuiWaypoints;
-import xaero.common.gui.MySmallButton;
-import xaero.common.gui.ScreenBase;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.minimap.waypoints.WaypointsSort;
-import xaero.common.misc.KeySortableByOther;
 import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.world.MinimapWorld;
 import xaero.hud.minimap.world.MinimapWorldManager;
+import xaero.lib.client.gui.ScreenBase;
+import xaero.lib.client.gui.util.GuiUtils;
+import xaero.lib.client.gui.widget.MySmallButton;
+import xaero.lib.common.util.KeySortableByOther;
 import xaeroplus.util.Globals;
 
 import java.util.ArrayList;
@@ -49,8 +50,8 @@ public class MixinGuiWaypoints extends ScreenBase {
     @Shadow private ConcurrentSkipListSet<Integer> selectedListSet;
     private GuiTextField searchField;
 
-    protected MixinGuiWaypoints(IXaeroMinimap modMain, GuiScreen parent, GuiScreen escape) {
-        super(modMain, parent, escape);
+    protected MixinGuiWaypoints(final GuiScreen parent, final GuiScreen escape, final ITextComponent titleIn) {
+        super(parent, escape, titleIn);
     }
 
     @Inject(method = "initGui()V", at = @At("TAIL"), remap = true)
@@ -78,7 +79,7 @@ public class MixinGuiWaypoints extends ScreenBase {
         }
     }
 
-    @Inject(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lxaero/common/gui/ScreenBase;mouseClicked(III)V", shift = At.Shift.AFTER), remap = true)
+    @Inject(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lxaero/lib/client/gui/ScreenBase;mouseClicked(III)V", shift = At.Shift.AFTER), remap = true)
     public void mouseClickedInject(int x, int y, int b, CallbackInfo ci) {
         boolean dropDownClosed = this.openDropdown == null;
         if (!this.buttonClicked && dropDownClosed) {
@@ -92,7 +93,7 @@ public class MixinGuiWaypoints extends ScreenBase {
         }
     }
 
-    @Inject(method = "keyTyped", at = @At(value = "INVOKE", target = "Lxaero/common/gui/ScreenBase;keyTyped(CI)V", shift = At.Shift.AFTER), remap = true, cancellable = true)
+    @Inject(method = "keyTyped", at = @At(value = "INVOKE", target = "Lxaero/lib/client/gui/ScreenBase;keyTyped(CI)V", shift = At.Shift.AFTER), remap = true, cancellable = true)
     public void keyTypedInject(char c, int i, CallbackInfo ci) {
         if (searchField.isFocused()) {
             searchField.textboxKeyTyped(c, i);
@@ -101,15 +102,15 @@ public class MixinGuiWaypoints extends ScreenBase {
         }
     }
 
-    @Inject(method = "drawScreen", at = @At(value = "INVOKE", target = "Lxaero/common/gui/ScreenBase;drawScreen(IIF)V", shift = At.Shift.AFTER), remap = true)
+    @Inject(method = "drawScreen", at = @At(value = "INVOKE", target = "Lxaero/lib/client/gui/ScreenBase;drawScreen(IIF)V", shift = At.Shift.AFTER), remap = true)
     public void drawScreenInject(int x, int y, float f, CallbackInfo ci) {
         if (!this.searchField.isFocused() && this.searchField.getText().isEmpty()) {
-            xaero.map.misc.Misc.setFieldText(this.searchField, I18n.format("gui.xaero_settings_search_placeholder", new Object[0]), -11184811);
+            GuiUtils.setFieldText(this.searchField, I18n.format("gui.xaero_settings_search_placeholder", new Object[0]), -11184811);
             this.searchField.setCursorPosition(0);
         }
         this.searchField.drawTextBox();
         if (!this.searchField.isFocused()) {
-            xaero.map.misc.Misc.setFieldText(this.searchField, Globals.waypointsSearchFilter);
+            GuiUtils.setFieldText(this.searchField, Globals.waypointsSearchFilter);
         }
     }
 

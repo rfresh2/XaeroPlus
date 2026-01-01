@@ -12,15 +12,16 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xaero.common.IXaeroMinimap;
+import xaero.common.HudMod;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.render.MinimapFBORenderer;
 import xaero.common.minimap.render.MinimapRenderer;
 import xaero.hud.minimap.Minimap;
+import xaero.hud.minimap.common.config.option.MinimapProfiledConfigOptions;
 import xaero.hud.minimap.element.render.over.MinimapElementOverMapRendererHandler;
 import xaero.hud.minimap.module.MinimapSession;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.CustomMinimapFBORenderer;
+import xaeroplus.feature.extensions.CustomMinimapFBORenderer;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.Globals;
 
 @Mixin(value = MinimapRenderer.class, remap = false)
@@ -28,15 +29,13 @@ public class MixinMinimapRenderer {
 
     @Shadow
     protected Minimap minimap;
-    @Shadow
-    protected IXaeroMinimap modMain;
 
     @Inject(method = "renderMinimap", at = @At("HEAD"))
     public void renderMinimap(
         final MinimapSession minimapSession, final MinimapProcessor minimap, final int x, final int y, final int width, final int height, final ScaledResolution scaledRes, final int size, final float partial, final CallbackInfo ci
     ) {
         if (this.minimap.usingFBO() && Globals.shouldResetFBO) {
-            Globals.minimapScalingFactor = (int) XaeroPlusSettingRegistry.minimapScaling.getValue();
+            Globals.minimapScalingFactor = (int) Settings.REGISTRY.minimapScaling.getValue();
             ((CustomMinimapFBORenderer) this.minimap.getMinimapFBORenderer()).reloadMapFrameBuffers();
             Globals.shouldResetFBO = false;
         }
@@ -81,8 +80,8 @@ public class MixinMinimapRenderer {
     public void redirectRenderMainEntityDot(MinimapFBORenderer instance, Entity entity, boolean cave, ScaledResolution scaledRes, final Operation<Void> original,
         @Local(name = "lockedNorth") boolean lockedNorth
     ) {
-        if (XaeroPlusSettingRegistry.fixMainEntityDot.getValue()) {
-            if (!(modMain.getSettings().mainEntityAs != 2 && !lockedNorth)) {
+        if (Settings.REGISTRY.fixMainEntityDot.getValue()) {
+            if (!(HudMod.INSTANCE.getHudConfigs().getClientConfigManager().getEffective(MinimapProfiledConfigOptions.RADAR_MAIN_ENTITY) != 2 && !lockedNorth)) {
                 return;
             }
         }
@@ -91,7 +90,7 @@ public class MixinMinimapRenderer {
 
     @ModifyVariable(method = "drawArrow", name = "offsetY", ordinal = 0, at = @At(value = "STORE"))
     public int modifyArrowOffsetY(final int offsetY) {
-        return XaeroPlusSettingRegistry.fixMainEntityDot.getValue() ? -10 : offsetY;
+        return Settings.REGISTRY.fixMainEntityDot.getValue() ? -10 : offsetY;
     }
 
 }

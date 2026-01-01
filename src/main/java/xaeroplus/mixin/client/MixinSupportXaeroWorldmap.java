@@ -17,9 +17,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import xaero.common.HudMod;
 import xaero.common.IXaeroMinimap;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.mods.SupportXaeroWorldmap;
+import xaero.hud.minimap.common.config.option.MinimapProfiledConfigOptions;
 import xaero.hud.minimap.module.MinimapSession;
 import xaero.map.MapProcessor;
 import xaero.map.gui.GuiMap;
@@ -28,7 +30,7 @@ import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
 import xaeroplus.module.impl.PortalSkipDetection;
 import xaeroplus.module.impl.Portals;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.Globals;
 import xaeroplus.util.GuiHelper;
@@ -37,7 +39,6 @@ import xaeroplus.util.WDLHelper;
 import java.util.Set;
 
 import static org.lwjgl.opengl.GL11.GL_LINE_LOOP;
-import static xaeroplus.settings.XaeroPlusSettingRegistry.transparentMinimapBackground;
 
 @Mixin(value = SupportXaeroWorldmap.class, remap = false)
 public abstract class MixinSupportXaeroWorldmap {
@@ -69,13 +70,13 @@ public abstract class MixinSupportXaeroWorldmap {
     @Inject(method = "renderChunks", at = @At("RETURN"))
     public void drawRenderDistance(final int minX, final int maxX, final int minZ, final int maxZ, final int minViewX, final int maxViewX, final int minViewZ, final int maxViewZ, final MapProcessor mapProcessor, final int renderedCaveLayer, final boolean shouldRequestLoading, final boolean reloadEverything, final int globalReloadVersion, final int globalRegionCacheHashCode, final int globalCaveStart, final int globalCaveDepth, final boolean playerIsMoving, final boolean noCaveMaps, final boolean slimeChunks, final int chunkX, final int chunkZ, final int tileX, final int tileZ, final int insideX, final int insideZ, final Long seed, final boolean wmHasCaveLayers, final boolean wmUsesHashcodes, final float brightness, final boolean zooming, final MinimapRendererHelper helper, final CallbackInfo ci) {
         final boolean isDimensionSwitched = Globals.getCurrentDimensionId() != Minecraft.getMinecraft().player.dimension;
-        if (XaeroPlusSettingRegistry.showRenderDistanceSetting.getValue() && !isDimensionSwitched) {
+        if (Settings.REGISTRY.showRenderDistanceSetting.getValue() && !isDimensionSwitched) {
             GuiMap.restoreTextureStates();
             if (compatibilityVersion >= 7) {
                 GL14.glBlendFuncSeparate(770, 771, 1, 771);
             }
 
-            final int setting = (int) XaeroPlusSettingRegistry.assumedServerRenderDistanceSetting.getValue();
+            final int setting = (int) Settings.REGISTRY.assumedServerRenderDistanceSetting.getValue();
             int width = setting * 2 + 1;
             // origin of the chunk we are standing in
             final int middleChunkX = -insideX;
@@ -93,7 +94,10 @@ public abstract class MixinSupportXaeroWorldmap {
             GlStateManager.enableBlend();
             // yellow
             GlStateManager.color(1.f, 1.f, 0.f, 0.8F);
-            GlStateManager.glLineWidth((float) this.modMain.getSettings().chunkGridLineWidth * Globals.minimapScalingFactor);
+            Integer chunkGridLineWidth = HudMod.INSTANCE.getHudConfigs()
+                .getClientConfigManager()
+                .getEffective(MinimapProfiledConfigOptions.CHUNK_GRID_LINE_WIDTH);
+            GlStateManager.glLineWidth((float) chunkGridLineWidth * Globals.minimapScalingFactor);
             vertexBuffer.pos(x0, z0, 0.0).endVertex();
             vertexBuffer.pos(x1, z0, 0.0).endVertex();
             vertexBuffer.pos(x1, z1, 0.0).endVertex();
@@ -122,7 +126,7 @@ public abstract class MixinSupportXaeroWorldmap {
                                             @Local(name = "chunk") MapTileChunk chunk) {
         int drawX = ((chunk.getX() - chunkX) << 6) - (tileX << 4) - insideX;
         int drawZ = ((chunk.getZ() - chunkZ) << 6) - (tileZ << 4) - insideZ;
-        if (transparentMinimapBackground.getValue()) {
+        if (Settings.REGISTRY.transparentMinimapBackground.getValue()) {
             GuiHelper.drawMMBackground(drawX, drawZ, brightness, chunk);
             GuiMap.setupTextureMatricesAndTextures(brightness);
         }
@@ -134,7 +138,7 @@ public abstract class MixinSupportXaeroWorldmap {
     ))
     public void finishTransparentMMBackgroundA(final float x, final float y, final int textureX, final int textureY, final float width, final float height, final Operation<Void> original) {
         original.call(x, y, textureX, textureY, width, height);
-        if (transparentMinimapBackground.getValue()) {
+        if (Settings.REGISTRY.transparentMinimapBackground.getValue()) {
             GuiHelper.finishMMSetup(compatibilityVersion, getMinimapBrightness(), null, false);
         }
     }
@@ -145,7 +149,7 @@ public abstract class MixinSupportXaeroWorldmap {
     ))
     public void finishTransparentMMBackgroundB(final float x, final float y, final float width, final float height, final Operation<Void> original) {
         original.call(x, y, width, height);
-        if (transparentMinimapBackground.getValue()) {
+        if (Settings.REGISTRY.transparentMinimapBackground.getValue()) {
             GuiHelper.finishMMSetup(compatibilityVersion, getMinimapBrightness(), null, false);
         }
     }
@@ -172,7 +176,7 @@ public abstract class MixinSupportXaeroWorldmap {
             GL14.glBlendFuncSeparate(770, 771, 1, 771);
         }
         final boolean isDimensionSwitched = Globals.getCurrentDimensionId() != Minecraft.getMinecraft().player.dimension;
-        if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
+        if (Settings.REGISTRY.newChunksEnabledSetting.getValue()) {
             final NewChunks newChunks = ModuleManager.getModule(NewChunks.class);
             GuiHelper.drawMMHighlights(
                 (x, z) -> newChunks.isNewChunk(x, z, Globals.getCurrentDimensionId()),
@@ -182,7 +186,7 @@ public abstract class MixinSupportXaeroWorldmap {
                 chunk.getZ() << 2,
                 newChunks.getNewChunksColor());
         }
-        if (XaeroPlusSettingRegistry.portalSkipDetectionEnabledSetting.getValue() && XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
+        if (Settings.REGISTRY.portalSkipDetectionEnabledSetting.getValue() && Settings.REGISTRY.newChunksEnabledSetting.getValue()) {
             final PortalSkipDetection portalSkipDetection = ModuleManager.getModule(
                 PortalSkipDetection.class);
             GuiHelper.drawMMHighlights(
@@ -193,7 +197,7 @@ public abstract class MixinSupportXaeroWorldmap {
                 chunk.getZ() << 2,
                 portalSkipDetection.getPortalSkipChunksColor());
         }
-        if (XaeroPlusSettingRegistry.portalsEnabledSetting.getValue()) {
+        if (Settings.REGISTRY.portalsEnabledSetting.getValue()) {
             final Portals portalModule = ModuleManager.getModule(Portals.class);
             GuiHelper.drawMMHighlights(
                 (x, z) -> portalModule.isPortalChunk(x, z, Globals.getCurrentDimensionId()),
@@ -203,7 +207,7 @@ public abstract class MixinSupportXaeroWorldmap {
                 chunk.getZ() << 2,
                 portalModule.getPortalsColor());
         }
-        if (XaeroPlusSettingRegistry.wdlEnabledSetting.getValue()
+        if (Settings.REGISTRY.wdlEnabledSetting.getValue()
             && WDLHelper.isWdlPresent()
             && WDLHelper.isDownloading()
             && !isDimensionSwitched) {

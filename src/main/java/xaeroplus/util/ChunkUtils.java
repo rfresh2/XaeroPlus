@@ -2,7 +2,7 @@ package xaeroplus.util;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.ChunkPos;
-import xaeroplus.util.highlights.HighlightAtChunkPos;
+import xaeroplus.feature.highlights.HighlightAtChunkPos;
 
 import java.util.ArrayList;
 import java.util.List;

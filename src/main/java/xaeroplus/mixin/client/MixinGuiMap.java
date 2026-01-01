@@ -22,23 +22,33 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import xaero.common.XaeroMinimapSession;
+import xaero.common.HudMod;
 import xaero.common.misc.OptimizedMath;
+import xaero.hud.minimap.common.config.option.MinimapProfiledConfigOptions;
+import xaero.lib.client.config.ClientConfigManager;
+import xaero.lib.client.gui.ScreenBase;
+import xaero.lib.client.gui.util.GuiUtils;
+import xaero.lib.client.gui.widget.Tooltip;
+import xaero.lib.common.config.option.ConfigOption;
+import xaero.lib.common.config.single.SingleConfigManager;
 import xaero.map.WorldMap;
 import xaero.map.animation.SlowingAnimation;
+import xaero.map.config.util.WorldMapClientConfigUtils;
 import xaero.map.element.HoveredMapElementHolder;
 import xaero.map.element.MapElementRenderHandler;
-import xaero.map.gui.*;
+import xaero.map.gui.GuiMap;
+import xaero.map.gui.GuiTexturedButton;
+import xaero.map.gui.IRightClickableElement;
 import xaero.map.gui.dropdown.rightclick.RightClickOption;
-import xaero.map.misc.Misc;
 import xaeroplus.XaeroPlus;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.NewChunks;
 import xaeroplus.module.impl.PortalSkipDetection;
 import xaeroplus.module.impl.Portals;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.*;
 
 import java.io.IOException;
@@ -67,8 +77,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     GuiButton switchToOverworldButton;
     GuiButton switchToEndButton;
 
-    protected MixinGuiMap(GuiScreen parent, GuiScreen escape) {
-        super(parent, escape);
+    protected MixinGuiMap(GuiScreen parent, GuiScreen escape, ITextComponent title) {
+        super(parent, escape, title);
     }
     @Shadow
     private double cameraX;
@@ -109,7 +119,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             value = "CONSTANT",
             args = "doubleValue=0.0625"))
     public double customMinZoom(final double original) {
-        return XaeroPlusSettingRegistry.worldMapMinZoomSetting.getValue() / 10.0f;
+        return Settings.REGISTRY.worldMapMinZoomSetting.getValue() / 10.0f;
     }
 
     @Inject(method = "initGui()V", at = @At(value = "TAIL"), remap = true)
@@ -120,14 +130,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             public void accept(GuiButton guiButton) {
                 onFollowButton(guiButton);
             }
-        }, () -> new CursorBox(new TextComponentTranslation("gui.world_map.toggle_follow_mode").appendText(" " + I18n.format(FOLLOW ? "gui.xaeroplus.off" : "gui.xaeroplus.on"))));
+        }, () -> new Tooltip(new TextComponentTranslation("gui.world_map.toggle_follow_mode").appendText(" " + I18n.format(FOLLOW ? "gui.xaeroplus.off" : "gui.xaeroplus.on"))));
         addGuiButton(followButton);
         coordinateGotoButton = new GuiTexturedButton(0, followButton.y - 20 , 20, 20, 229, 16, 16, 16, WorldMap.guiTextures, new Consumer<GuiButton>() {
             @Override
             public void accept(GuiButton guiButton) {
                 onGotoCoordinatesButton(guiButton);
             }
-        }, () -> new CursorBox(new TextComponentTranslation("gui.world_map.go_to_coordinates")));
+        }, () -> new Tooltip(new TextComponentTranslation("gui.world_map.go_to_coordinates")));
         addGuiButton(coordinateGotoButton);
         xTextEntryField = new GuiTextField(2, mc.fontRenderer, 20, coordinateGotoButton.y - 10, 50, 20);
         xTextEntryField.setVisible(false);
@@ -140,21 +150,21 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             public void accept(final GuiButton button) {
                 onSwitchDimensionButton(1);
             }
-        }, () -> new CursorBox(new TextComponentTranslation("setting.keybinds.switch_to_end")));
+        }, () -> new Tooltip(new TextComponentTranslation("setting.keybinds.switch_to_end")));
         this.switchToOverworldButton = new GuiTexturedButton(
             this.width - 20, this.switchToEndButton.y - 20, 20, 20, 16, 0, 16, 16, Globals.xpGuiTextures, new Consumer<GuiButton>() {
             @Override
             public void accept(final GuiButton button) {
                 onSwitchDimensionButton(0);
             }
-        }, () -> new CursorBox(new TextComponentTranslation("setting.keybinds.switch_to_overworld")));
+        }, () -> new Tooltip(new TextComponentTranslation("setting.keybinds.switch_to_overworld")));
         this.switchToNetherButton = new GuiTexturedButton(
             this.width - 20, this.switchToOverworldButton.y - 20, 20, 20, 0, 0, 16, 16, Globals.xpGuiTextures, new Consumer<GuiButton>() {
             @Override
             public void accept(final GuiButton button) {
                 onSwitchDimensionButton(-1);
             }
-        }, () -> new CursorBox(new TextComponentTranslation("setting.keybinds.switch_to_nether")));
+        }, () -> new Tooltip(new TextComponentTranslation("setting.keybinds.switch_to_nether")));
         addGuiButton(switchToNetherButton);
         addGuiButton(switchToOverworldButton);
         addGuiButton(switchToEndButton);
@@ -162,7 +172,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "onGuiClosed", at = @At(value = "RETURN"), remap = true)
     public void onGuiClosed(final CallbackInfo ci) {
-        if (!XaeroPlusSettingRegistry.persistMapDimensionSwitchSetting.getValue()) {
+        if (!Settings.REGISTRY.persistMapDimensionSwitchSetting.getValue()) {
             try {
                 int actualDimension = ChunkUtils.getActualDimension();
                 if (Globals.getCurrentDimensionId() != actualDimension) {
@@ -206,13 +216,29 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         }
     }
 
-    @ModifyExpressionValue(method = "drawScreen", at = @At(
-        value = "FIELD",
-        target = "Lxaero/map/settings/ModSettings;debug:Z",
-        opcode = Opcodes.GETFIELD
-    ), remap = true) // multiple field accesses
-    public boolean hideDebugRenderingOnF1(boolean original) {
-        return original && !mc.gameSettings.hideGUI;
+    @WrapOperation(method = "drawScreen", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/lib/common/config/single/SingleConfigManager;getEffective(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;",
+        ordinal = 0
+    ),
+        slice = @Slice(
+            from = @At(
+                value = "FIELD",
+                target = "Lxaero/map/config/primary/option/WorldMapPrimaryClientConfigOptions;DEBUG:Lxaero/lib/common/config/option/BooleanConfigOption;",
+                opcode = Opcodes.GETSTATIC)
+        )
+    )
+    public Object hideDebugRenderingOnF1(final SingleConfigManager instance, final ConfigOption option, final Operation original) {
+        Object value = original.call(instance, option);
+        return ((Boolean) value) && !mc.gameSettings.hideGUI;
+    }
+
+    private static void trySettingCurrentProfileOption(ConfigOption<Boolean> option, boolean value) {
+        ClientConfigManager configManager = WorldMap.INSTANCE.getConfigs().getClientConfigManager();
+        Boolean currentValue = configManager.getEffective(option);
+        if (currentValue != value) {
+            WorldMapClientConfigUtils.tryTogglingCurrentProfileOption(option);
+        }
     }
 
     @WrapWithCondition(method = "drawScreen", at = @At(
@@ -235,22 +261,38 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         }
     }
 
-    @ModifyExpressionValue(method = "drawScreen", at = @At(
-        value = "FIELD",
-        target = "Lxaero/map/settings/ModSettings;footsteps:Z",
-        opcode = Opcodes.GETFIELD
-    ), remap = true)
-    public boolean hideFootstepsOnF1(boolean original) {
-        return original && !mc.gameSettings.hideGUI;
+    @WrapOperation(method = "drawScreen", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/lib/client/config/ClientConfigManager;getEffective(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;",
+        ordinal = 0
+    ),
+        slice = @Slice(
+            from = @At(
+                value = "FIELD",
+                target = "Lxaero/map/common/config/option/WorldMapProfiledConfigOptions;FOOTSTEPS:Lxaero/lib/common/config/option/BooleanConfigOption;",
+                opcode = Opcodes.GETSTATIC)
+        )
+    )
+    public Object hideFootstepsOnF1(final ClientConfigManager instance, final ConfigOption option, final Operation original) {
+        Object value = original.call(instance, option);
+        return ((Boolean) value) && !mc.gameSettings.hideGUI;
     }
 
-    @ModifyExpressionValue(method = "drawScreen", at = @At(
-        value = "FIELD",
-        target = "Lxaero/map/settings/ModSettings;renderArrow:Z",
-        opcode = Opcodes.GETFIELD
-    ), remap = true)
-    public boolean hideArrowOnF1(boolean original) {
-        return original && !mc.gameSettings.hideGUI;
+    @WrapOperation(method = "drawScreen", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/lib/client/config/ClientConfigManager;getEffective(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;",
+        ordinal = 0
+    ),
+        slice = @Slice(
+            from = @At(
+                value = "FIELD",
+                target = "Lxaero/map/common/config/option/WorldMapProfiledConfigOptions;ARROW:Lxaero/lib/common/config/option/BooleanConfigOption;",
+                opcode = Opcodes.GETSTATIC)
+        )
+    )
+    public Object hideArrowOnF1(final ClientConfigManager instance, final ConfigOption option, final Operation original) {
+        Object value = original.call(instance, option);
+        return ((Boolean) value) && !mc.gameSettings.hideGUI;
     }
 
     @WrapWithCondition(method = "drawScreen", at = @At(
@@ -279,7 +321,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "drawScreen", at = @At(
         value = "INVOKE",
-        target = "Lxaero/map/gui/ScreenBase;drawScreen(IIF)V"
+        target = "Lxaero/lib/client/gui/ScreenBase;drawScreen(IIF)V"
     ), remap = true)
     public void hideButtonsOnF1(int mouseX, int mouseY, float partial, CallbackInfo ci) {
         if (mc.gameSettings.hideGUI) {
@@ -301,9 +343,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "drawScreen",
         at = @At(
-            value = "FIELD",
-            target = "Lxaero/map/settings/ModSettings;debug:Z",
-            ordinal = 2
+            value = "INVOKE",
+            target = "Lxaero/map/region/LeveledRegion;loadingAnimation()Z",
+            ordinal = 0
         ), remap = true)
     public void drawWorldMapFeatures(int scaledMouseX, int scaledMouseY, float partialTicks, CallbackInfo ci,
                                      @Local(name = "leafRegionMinX") int leafRegionMinX,
@@ -314,21 +356,21 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                      @Local(name = "brightness") float brightness
     ){
         GuiMap.restoreTextureStates();
-        if (XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue() && !mc.gameSettings.hideGUI) {
+        if (Settings.REGISTRY.newChunksEnabledSetting.getValue() && !mc.gameSettings.hideGUI) {
             final NewChunks newChunks = ModuleManager.getModule(NewChunks.class);
             GuiHelper.drawHighlightAtChunkPosList(newChunks.getNewChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions, getCurrentDimensionId()),
                                                   flooredCameraX,
                                                   flooredCameraZ,
                                                   newChunks.getNewChunksColor());
         }
-        if (XaeroPlusSettingRegistry.portalSkipDetectionEnabledSetting.getValue() && !mc.gameSettings.hideGUI && XaeroPlusSettingRegistry.newChunksEnabledSetting.getValue()) {
+        if (Settings.REGISTRY.portalSkipDetectionEnabledSetting.getValue() && !mc.gameSettings.hideGUI && Settings.REGISTRY.newChunksEnabledSetting.getValue()) {
             final PortalSkipDetection portalSkipDetection = ModuleManager.getModule(PortalSkipDetection.class);
             GuiHelper.drawHighlightAtChunkPosList(portalSkipDetection.getPortalSkipChunksInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions),
                                                   flooredCameraX,
                                                   flooredCameraZ,
                                                   portalSkipDetection.getPortalSkipChunksColor());
         }
-        if (XaeroPlusSettingRegistry.portalsEnabledSetting.getValue() && !mc.gameSettings.hideGUI) {
+        if (Settings.REGISTRY.portalsEnabledSetting.getValue() && !mc.gameSettings.hideGUI) {
             final Portals portals = ModuleManager.getModule(Portals.class);
             GuiHelper.drawHighlightAtChunkPosList(portals.getPortalsInRegion(leafRegionMinX, leafRegionMinZ, leveledSideInRegions, getCurrentDimensionId()),
                                                   flooredCameraX,
@@ -336,7 +378,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                                   portals.getPortalsColor());
         }
         final boolean isDimensionSwitched = Globals.getCurrentDimensionId() != mc.player.dimension;
-        if (XaeroPlusSettingRegistry.wdlEnabledSetting.getValue()
+        if (Settings.REGISTRY.wdlEnabledSetting.getValue()
             && !mc.gameSettings.hideGUI
             && WDLHelper.isWdlPresent()
             && WDLHelper.isDownloading()
@@ -353,8 +395,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "drawScreen", at = @At(
         value = "FIELD",
-        target = "Lxaero/map/settings/ModSettings;renderArrow:Z",
-        opcode = Opcodes.GETFIELD,
+        target = "Lxaero/map/common/config/option/WorldMapProfiledConfigOptions;ARROW:Lxaero/lib/common/config/option/BooleanConfigOption;",
+        opcode = Opcodes.GETSTATIC,
         ordinal = 0
     ), remap = true)
     public void showRenderDistanceWorldMap(int scaledMouseX, int scaledMouseY, float partialTicks, CallbackInfo ci,
@@ -364,8 +406,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                            @Local(name = "flooredCameraZ") int flooredCameraZ
     ){
         final boolean isDimensionSwitched = Globals.getCurrentDimensionId() != mc.player.dimension;
-        if (XaeroPlusSettingRegistry.showRenderDistanceWorldMapSetting.getValue() && !mc.gameSettings.hideGUI && !isDimensionSwitched) {
-            final int setting = (int) XaeroPlusSettingRegistry.assumedServerRenderDistanceSetting.getValue();
+        if (Settings.REGISTRY.showRenderDistanceWorldMapSetting.getValue() && !mc.gameSettings.hideGUI && !isDimensionSwitched) {
+            final int setting = (int) Settings.REGISTRY.assumedServerRenderDistanceSetting.getValue();
             int width = setting * 2 + 1;
             int xFloored = OptimizedMath.myFloor(scaledPlayerX);
             int zFloored = OptimizedMath.myFloor(scaledPlayerZ);
@@ -385,7 +427,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             GlStateManager.enableBlend();
             // yellow
             GlStateManager.color(1.f, 1.f, 0.f, 0.8F);
-            float settingWidth = (float) XaeroMinimapSession.getCurrentSession().getModMain().getSettings().chunkGridLineWidth;
+            float settingWidth = (float) HudMod.INSTANCE.getHudConfigs().getClientConfigManager().getEffective(MinimapProfiledConfigOptions.CHUNK_GRID_LINE_WIDTH);
             float lineScale = (float) Math.min(settingWidth * this.scale, settingWidth);
             GlStateManager.glLineWidth(lineScale);
             vertexBuffer.pos(x0, z0, 0.0).endVertex();
@@ -404,11 +446,11 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     public void insertCoordinatesGoToButton(int scaledMouseX, int scaledMouseY, float partialTicks, CallbackInfo ci) {
         if (mc.currentScreen != null && mc.currentScreen.getClass().equals(GuiMap.class) && xTextEntryField.getVisible() && zTextEntryField.getVisible()) {
             if (xTextEntryField.getText().isEmpty() && !this.xTextEntryField.isFocused()) {
-                Misc.setFieldText(xTextEntryField, "X:", -11184811);
+                GuiUtils.setFieldText(xTextEntryField, "X:", -11184811);
             }
             xTextEntryField.drawTextBox();
             if (zTextEntryField.getText().isEmpty() && !this.zTextEntryField.isFocused()) {
-                Misc.setFieldText(zTextEntryField, "Z:", -11184811);
+                GuiUtils.setFieldText(zTextEntryField, "Z:", -11184811);
             }
             zTextEntryField.drawTextBox();
         }
@@ -458,7 +500,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         }
     }
 
-    @Inject(method = "keyTyped(CI)V", at = @At(value = "INVOKE", target = "Lxaero/map/gui/ScreenBase;keyTyped(CI)V", shift = At.Shift.AFTER), remap = true, cancellable = true)
+    @Inject(method = "keyTyped(CI)V", at = @At(value = "INVOKE", target = "Lxaero/lib/client/gui/ScreenBase;keyTyped(CI)V", shift = At.Shift.AFTER), remap = true, cancellable = true)
     public void keyTyped(char typedChar, int keyCode, CallbackInfo ci) throws IOException {
         if (keyCode == 59) {
             mc.gameSettings.hideGUI = !mc.gameSettings.hideGUI;

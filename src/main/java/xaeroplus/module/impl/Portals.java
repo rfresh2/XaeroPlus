@@ -13,12 +13,12 @@ import xaeroplus.XaeroPlus;
 import xaeroplus.event.ChunkDataEvent;
 import xaeroplus.event.PacketReceivedEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
+import xaeroplus.feature.highlights.ChunkHighlightSavingCache;
+import xaeroplus.feature.highlights.HighlightAtChunkPos;
 import xaeroplus.module.Module;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
-import xaeroplus.util.highlights.ChunkHighlightSavingCache;
-import xaeroplus.util.highlights.HighlightAtChunkPos;
 
 import java.util.Collections;
 import java.util.List;
@@ -155,10 +155,10 @@ public class Portals extends Module {
     }
 
     public void setRgbColor(final int color) {
-        portalsColor = ColorHelper.getColorWithAlpha(color, (int) XaeroPlusSettingRegistry.portalsAlphaSetting.getValue());
+        portalsColor = ColorHelper.getColorWithAlpha(color, (int) Settings.REGISTRY.portalsAlphaSetting.getValue());
     }
 
-    public void setAlpha(final float a) {
+    public void setAlpha(final double a) {
         portalsColor = ColorHelper.getColorWithAlpha(portalsColor, (int) (a));
     }
 

@@ -10,7 +10,7 @@ import xaero.map.cache.BlockStateShortShapeCache;
 import xaero.map.region.MapTile;
 import xaero.map.region.MapTileChunk;
 import xaero.map.region.texture.LeafRegionTexture;
-import xaeroplus.util.SeenChunksTrackingMapTileChunk;
+import xaeroplus.feature.extensions.SeenChunksTrackingMapTileChunk;
 
 import java.io.DataInputStream;
 

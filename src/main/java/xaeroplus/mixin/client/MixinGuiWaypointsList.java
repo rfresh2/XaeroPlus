@@ -15,7 +15,7 @@ import xaero.common.gui.GuiWaypoints;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.hud.minimap.world.MinimapWorld;
 import xaeroplus.XaeroPlus;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.Globals;
 
 import java.lang.reflect.Field;
@@ -95,10 +95,10 @@ public abstract class MixinGuiWaypointsList {
 
     @Inject(method = "drawWaypointSlot", at = @At(
         value = "INVOKE",
-        target = "Lxaero/common/minimap/waypoints/render/WaypointsGuiRenderer;drawIconOnGUI(Lxaero/common/minimap/render/MinimapRendererHelper;Lxaero/common/minimap/waypoints/Waypoint;Lxaero/common/settings/ModSettings;II)V"
+        target = "Lxaero/hud/minimap/waypoint/render/WaypointsGuiRenderer;drawIconOnGUI(Lxaero/common/minimap/render/MinimapRendererHelper;Lxaero/common/minimap/waypoints/Waypoint;III)V"
     ))
     public void drawWaypointDistances(Waypoint w, int x, int y, final CallbackInfo ci) {
-        if (XaeroPlusSettingRegistry.showWaypointDistances.getValue()) {
+        if (Settings.REGISTRY.showWaypointDistances.getValue()) {
             Entity renderViewEntity = Minecraft.getMinecraft().getRenderViewEntity();
             final double playerX = renderViewEntity.posX;
             final double playerZ = renderViewEntity.posZ;

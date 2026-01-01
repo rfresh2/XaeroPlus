@@ -1,10 +1,10 @@
-package xaeroplus.util.newchunks;
+package xaeroplus.feature.newchunks;
 
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.longs.Long2LongMaps;
-import xaeroplus.util.highlights.ChunkHighlightCacheDimensionHandler;
-import xaeroplus.util.highlights.ChunkHighlightSavingCache;
-import xaeroplus.util.highlights.HighlightAtChunkPos;
+import xaeroplus.feature.highlights.ChunkHighlightCacheDimensionHandler;
+import xaeroplus.feature.highlights.ChunkHighlightSavingCache;
+import xaeroplus.feature.highlights.HighlightAtChunkPos;
 
 import java.util.List;
 

@@ -35,11 +35,8 @@ import xaero.map.biome.BiomeColorCalculator;
 import xaero.map.biome.WriterBiomeInfoSupplier;
 import xaero.map.cache.BlockStateColorTypeCache;
 import xaero.map.misc.Misc;
-import xaero.map.region.MapBlock;
-import xaero.map.region.MapRegion;
-import xaero.map.region.OverlayBuilder;
-import xaero.map.region.OverlayManager;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaero.map.region.*;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
 
 import java.util.ArrayList;
@@ -103,23 +100,6 @@ public abstract class MixinMapWriter {
     @Shadow
     private int writingLayer;
 
-    @Shadow
-    public abstract boolean writeMap(
-            World world,
-            double playerX,
-            double playerY,
-            double playerZ,
-            BiomeColorCalculator biomeColorCalculator,
-            OverlayManager overlayManager,
-            boolean loadChunks,
-            boolean updateChunks,
-            boolean ignoreHeightmaps,
-            boolean flowers,
-            boolean detailedDebug,
-            BlockPos.MutableBlockPos mutableBlockPos3,
-            int caveDepth
-    );
-
     protected MixinMapWriter() {
     }
 
@@ -146,7 +126,7 @@ public abstract class MixinMapWriter {
      */
     @Inject(method = "shouldOverlay", at = @At("HEAD"), cancellable = true)
     public void shouldOverlay(IBlockState state, CallbackInfoReturnable<Boolean> cir) {
-        if (!XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()) {
+        if (!Settings.REGISTRY.transparentObsidianRoofSetting.getValue()) {
             return;
         }
         if (!(state.getBlock() instanceof BlockAir) && !(state.getBlock() instanceof BlockGlass) && state.getBlock().getRenderLayer() != BlockRenderLayer.TRANSLUCENT) {
@@ -176,7 +156,7 @@ public abstract class MixinMapWriter {
                           boolean flowers,
                           BlockPos.MutableBlockPos mutableBlockPos3,
                           CallbackInfo ci) {
-        if (!XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()) {
+        if (!Settings.REGISTRY.transparentObsidianRoofSetting.getValue()) {
             return;
         } else {
             ci.cancel();
@@ -209,7 +189,7 @@ public abstract class MixinMapWriter {
             state = this.unpackFramedBlocks(state, world, this.mutableGlobalPos);
             Block b = state.getBlock();
             boolean roofObsidian = (h > 253 && b == Blocks.OBSIDIAN);
-            if (roofObsidian && XaeroPlusSettingRegistry.transparentObsidianRoofDarkeningSetting.getValue() == 0) {
+            if (roofObsidian && Settings.REGISTRY.transparentObsidianRoofDarkeningSetting.getValue() == 0) {
                 continue;  // skip over obsidian roof completely
             }
             if (roofObsidian & !columnRoofObsidian) {
@@ -320,10 +300,10 @@ public abstract class MixinMapWriter {
     public void fastMapMaxTilesPerCycleSetting(final BiomeColorCalculator biomeColorCalculator, final OverlayManager overlayManager, final CallbackInfo ci,
                                                @Local(name = "tilesToUpdate") LocalLongRef tilesToUpdateRef,
                                                @Local(name = "sizeTiles") int sizeTiles) {
-        if (XaeroPlusSettingRegistry.fastMapSetting.getValue()) {
+        if (Settings.REGISTRY.fastMapSetting.getValue()) {
             this.writeFreeSinceLastWrite = Math.max(1L, this.writeFreeSinceLastWrite);
             if (this.mapProcessor.getCurrentCaveLayer() == Integer.MAX_VALUE) {
-                tilesToUpdateRef.set((long) Math.min(sizeTiles, XaeroPlusSettingRegistry.fastMapMaxTilesPerCycle.getValue()));
+                tilesToUpdateRef.set((long) Math.min(sizeTiles, Settings.REGISTRY.fastMapMaxTilesPerCycle.getValue()));
             }
         }
     }
@@ -334,7 +314,7 @@ public abstract class MixinMapWriter {
         ordinal = 2
     ))
     public long removeWriteTimeLimiterPerFrame(long original) {
-        if (XaeroPlusSettingRegistry.fastMapSetting.getValue()) {
+        if (Settings.REGISTRY.fastMapSetting.getValue()) {
             if (this.mapProcessor.getCurrentCaveLayer() == Integer.MAX_VALUE) {
                 return 0;
             }
@@ -357,7 +337,7 @@ public abstract class MixinMapWriter {
 
     @WrapOperation(method = "writeMap", at = @At(
         value = "INVOKE",
-        target = "Lxaero/map/MapWriter;writeChunk(Lnet/minecraft/world/World;IZLxaero/map/biome/BiomeColorCalculator;Lxaero/map/region/OverlayManager;ZZZZZLnet/minecraft/util/math/BlockPos$MutableBlockPos;IIIIIIIII)Z"
+        target = "Lxaero/map/MapWriter;writeChunk(Lnet/minecraft/world/World;IZLxaero/map/biome/BiomeColorCalculator;Lxaero/map/region/OverlayManager;ZZZZZLnet/minecraft/util/math/BlockPos$MutableBlockPos;IIIIIIIIILxaero/map/region/MapUpdateFastConfig;)Z"
     ))
     public boolean fastMap(final MapWriter instance,
                            World world,
@@ -380,8 +360,9 @@ public abstract class MixinMapWriter {
                            int tileChunkLocalZ,
                            int chunkX,
                            int chunkZ,
+                           MapUpdateFastConfig config,
                            final Operation<Boolean> original) {
-        if (XaeroPlusSettingRegistry.fastMapSetting.getValue()) {
+        if (Settings.REGISTRY.fastMapSetting.getValue()) {
             if (this.mapProcessor.getCurrentCaveLayer() == Integer.MAX_VALUE) {
                 final Long cacheable = ChunkUtils.chunkPosToLong(chunkX, chunkZ);
                 final Long cacheValue = tileUpdateCache.getIfPresent(cacheable);
@@ -398,7 +379,7 @@ public abstract class MixinMapWriter {
         }
         return original.call(instance, world, distance, onlyLoad, biomeColorCalculator, overlayManager, loadChunks, updateChunks,
                              ignoreHeightmaps, flowers, detailedDebug, mutableBlockPos3, caveDepth, caveStart, layerToWrite, tileChunkX,
-                             tileChunkZ, tileChunkLocalX, tileChunkLocalZ, chunkX, chunkZ);
+                             tileChunkZ, tileChunkLocalX, tileChunkLocalZ, chunkX, chunkZ, config);
     }
 
     @Redirect(method = "writeChunk", at = @At(value = "INVOKE", target = "Lxaero/map/MapWriter;loadPixel(Lnet/minecraft/world/World;Lxaero/map/region/MapBlock;Lxaero/map/region/MapBlock;Lnet/minecraft/world/chunk/Chunk;IIIIZZIZZZLnet/minecraft/util/math/BlockPos$MutableBlockPos;)V"))
@@ -417,7 +398,7 @@ public abstract class MixinMapWriter {
                                               boolean ignoreHeightmaps,
                                               boolean flowers,
                                               BlockPos.MutableBlockPos mutableBlockPos3) {
-        if (XaeroPlusSettingRegistry.netherCaveFix.getValue()) {
+        if (Settings.REGISTRY.netherCaveFix.getValue()) {
             final boolean nether = world.provider.getDimensionType() == DimensionType.NETHER;
             final boolean shouldForceFullInNether = !cave && nether;
             instance.loadPixel(world, pixel, currentPixel, bchunk, insideX, insideZ, highY, lowY,

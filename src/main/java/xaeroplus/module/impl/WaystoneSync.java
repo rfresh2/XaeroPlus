@@ -17,13 +17,13 @@ import xaero.hud.path.XaeroPath;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.module.Module;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.WaystonesHelper;
 
 import java.util.List;
 import java.util.Locale;
 
-import static xaero.common.settings.ModSettings.COLORS;
+import static xaero.hud.minimap.common.config.MinimapConfigConstants.COLORS;
 
 @Module.ModuleInfo()
 public class WaystoneSync extends Module {
@@ -70,7 +70,7 @@ public class WaystoneSync extends Module {
             final int waystoneDimension = waystoneEntry.getDimensionId();
 
             final int currentWaypointDim = currentWorld.getDimId();
-            if (XaeroPlusSettingRegistry.waystonesCrossDimSyncSetting.getValue() && waystoneDimension != currentWaypointDim) { // special case handling
+            if (Settings.REGISTRY.waystonesCrossDimSyncSetting.getValue() && waystoneDimension != currentWaypointDim) { // special case handling
                 // god i hate how there's no easy way to get waypoint sets in other dimensions. also the entire handling of waypoint dimensions...
                 // this will probably (definitely) fail if there are nonstandard waypoint sets in use.
                 try {

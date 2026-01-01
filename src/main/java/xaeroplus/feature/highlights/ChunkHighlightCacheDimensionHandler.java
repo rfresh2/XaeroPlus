@@ -1,4 +1,4 @@
-package xaeroplus.util.highlights;
+package xaeroplus.feature.highlights;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;

@@ -1,4 +1,4 @@
-package xaeroplus.util.highlights;
+package xaeroplus.feature.highlights;
 
 import xaeroplus.XaeroPlus;
 

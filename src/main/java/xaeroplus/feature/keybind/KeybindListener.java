@@ -6,8 +6,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
-import xaeroplus.settings.XaeroPlusBooleanSetting;
-import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
+import xaeroplus.settings.BooleanSetting;
+import xaeroplus.settings.Settings;
 
 public class KeybindListener {
     // prevents repeat events if keybind is held down
@@ -17,12 +17,12 @@ public class KeybindListener {
     public void onTick(InputEvent.KeyInputEvent event) {
         if (Minecraft.getMinecraft().currentScreen != null) return;
         if (Minecraft.getMinecraft().player == null) return;
-        for (KeyBinding keybind : XaeroPlusSettingsReflectionHax.keybindsSupplier.get()) {
+        for (KeyBinding keybind : Settings.REGISTRY.getKeybindings()) {
             if (keybind.isPressed()) {
                 boolean wasPrevDown = prevKeybindState.getOrDefault(keybind, false);
                 prevKeybindState.put(keybind, true);
                 if (!wasPrevDown) {
-                    XaeroPlusBooleanSetting setting = XaeroPlusSettingsReflectionHax.keybindingMapSupplier.get().get(keybind);
+                    BooleanSetting setting = Settings.REGISTRY.getKeybindingSetting(keybind);
                     if (setting != null) {
                         setting.setValue(!setting.getValue());
                     }

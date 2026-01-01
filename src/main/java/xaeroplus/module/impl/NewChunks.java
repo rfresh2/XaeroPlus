@@ -7,14 +7,14 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.PacketReceivedEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
+import xaeroplus.feature.highlights.HighlightAtChunkPos;
+import xaeroplus.feature.newchunks.NewChunksCache;
+import xaeroplus.feature.newchunks.NewChunksLocalCache;
+import xaeroplus.feature.newchunks.NewChunksSavingCache;
 import xaeroplus.module.Module;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
-import xaeroplus.util.highlights.HighlightAtChunkPos;
-import xaeroplus.util.newchunks.NewChunksCache;
-import xaeroplus.util.newchunks.NewChunksLocalCache;
-import xaeroplus.util.newchunks.NewChunksSavingCache;
 
 import java.util.List;
 
@@ -56,9 +56,9 @@ public class NewChunks extends Module {
 
     @SubscribeEvent
     public void onXaeroWorldChangeEvent(final XaeroWorldChangeEvent event) {
-        if (XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.getValue()) {
+        if (Settings.REGISTRY.newChunksSaveLoadToDisk.getValue()) {
             if (inUnknownDimension() && newChunksCache instanceof NewChunksSavingCache) {
-                XaeroPlusSettingRegistry.newChunksSaveLoadToDisk.setValue(false);
+                Settings.REGISTRY.newChunksSaveLoadToDisk.setValue(false);
                 XaeroPlus.LOGGER.warn("Entered unknown dimension with saving cache on, disabling disk saving");
             }
         }
@@ -92,10 +92,10 @@ public class NewChunks extends Module {
     }
 
     public void setRgbColor(final int color) {
-        newChunksColor = ColorHelper.getColorWithAlpha(color, (int) XaeroPlusSettingRegistry.newChunksAlphaSetting.getValue());
+        newChunksColor = ColorHelper.getColorWithAlpha(color, (int) Settings.REGISTRY.newChunksAlphaSetting.getValue());
     }
 
-    public void setAlpha(final float a) {
+    public void setAlpha(final double a) {
         newChunksColor = ColorHelper.getColorWithAlpha(newChunksColor, (int) (a));
     }
 

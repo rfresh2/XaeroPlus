@@ -6,7 +6,8 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import xaero.map.gui.GuiMap;
 import xaero.map.region.MapTileChunk;
-import xaeroplus.util.highlights.HighlightAtChunkPos;
+import xaeroplus.feature.extensions.SeenChunksTrackingMapTileChunk;
+import xaeroplus.feature.highlights.HighlightAtChunkPos;
 
 import java.util.List;
 import java.util.function.BiFunction;

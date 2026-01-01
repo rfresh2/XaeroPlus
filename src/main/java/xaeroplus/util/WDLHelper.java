@@ -7,9 +7,9 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
 import wdl.WDL;
 import xaeroplus.XaeroPlus;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.util.highlights.HighlightAtChunkPos;
-import xaeroplus.util.highlights.RegionRenderPos;
+import xaeroplus.feature.highlights.HighlightAtChunkPos;
+import xaeroplus.feature.highlights.RegionRenderPos;
+import xaeroplus.settings.Settings;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -102,10 +102,10 @@ public class WDLHelper {
     }
 
     public static void setRgbColor(final int color) {
-        wdlColor = ColorHelper.getColorWithAlpha(color, (int) XaeroPlusSettingRegistry.wdlAlphaSetting.getValue());
+        wdlColor = ColorHelper.getColorWithAlpha(color, (int) Settings.REGISTRY.wdlAlphaSetting.getValue());
     }
 
-    public static void setAlpha(float a) {
+    public static void setAlpha(double a) {
         wdlColor = ColorHelper.getColorWithAlpha(wdlColor, (int) a);
     }
 }

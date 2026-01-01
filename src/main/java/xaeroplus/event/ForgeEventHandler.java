@@ -8,14 +8,14 @@ import xaero.hud.minimap.Minimap;
 import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.waypoint.render.world.WaypointWorldRenderer;
 import xaeroplus.XaeroPlus;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.WaypointBeaconRenderer;
 
 public class ForgeEventHandler {
     int errorCount = 0;
     @SubscribeEvent
     public void onRenderWorldLastEvent(final RenderWorldLastEvent event) {
-        if (!XaeroPlusSettingRegistry.waypointBeacons.getValue()) return;
+        if (!Settings.REGISTRY.waypointBeacons.getValue()) return;
         HudMod hudMod = HudMod.INSTANCE;
         if (hudMod == null) return;
         Minimap minimap = hudMod.getMinimap();

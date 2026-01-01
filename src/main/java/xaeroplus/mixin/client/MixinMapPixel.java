@@ -16,7 +16,7 @@ import xaero.map.cache.BlockStateShortShapeCache;
 import xaero.map.misc.Misc;
 import xaero.map.region.*;
 import xaero.map.world.MapDimension;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 
 import java.util.ArrayList;
 @Mixin(value = MapPixel.class, remap = false)
@@ -52,14 +52,15 @@ public abstract class MixinMapPixel {
             MapProcessor mapProcessor,
             OverlayManager overlayManager,
             BlockStateShortShapeCache blockStateShortShapeCache,
+            MapUpdateFastConfig updateConfig,
             CallbackInfo ci
     ) {
-        if (XaeroPlusSettingRegistry.transparentObsidianRoofSetting.getValue()) {
+        if (Settings.REGISTRY.transparentObsidianRoofSetting.getValue()) {
             int state = this.state;
             IBlockState blockState = Misc.getStateById(state);
             boolean isObsidian = blockState.getBlock() instanceof BlockObsidian;
             if (isObsidian) {
-                result_dest[3] = (int) XaeroPlusSettingRegistry.transparentObsidianRoofDarkeningSetting.getValue();
+                result_dest[3] = (int) Settings.REGISTRY.transparentObsidianRoofDarkeningSetting.getValue();
             }
         }
     }

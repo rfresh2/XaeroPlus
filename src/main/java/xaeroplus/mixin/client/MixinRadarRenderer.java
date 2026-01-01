@@ -19,7 +19,7 @@ import xaero.hud.minimap.element.render.MinimapElementRenderInfo;
 import xaero.hud.minimap.element.render.MinimapElementRenderLocation;
 import xaero.hud.minimap.radar.render.element.RadarRenderContext;
 import xaero.hud.minimap.radar.render.element.RadarRenderer;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.Globals;
 
 @Mixin(value = RadarRenderer.class, remap = false)
@@ -35,10 +35,10 @@ public abstract class MixinRadarRenderer extends MinimapElementRenderer<Entity, 
     public void forceEntityRadarRenderSettings(final Entity e, final CallbackInfo ci) {
         if (!(e instanceof EntityPlayer)) return;
         if (e == Minecraft.getMinecraft().player) return;
-        if (XaeroPlusSettingRegistry.alwaysRenderPlayerIconOnRadar.getValue()) {
+        if (Settings.REGISTRY.alwaysRenderPlayerIconOnRadar.getValue()) {
             context.icon = true;
         }
-        if (XaeroPlusSettingRegistry.alwaysRenderPlayerWithNameOnRadar.getValue()) {
+        if (Settings.REGISTRY.alwaysRenderPlayerWithNameOnRadar.getValue()) {
             this.name = true;
         }
     }

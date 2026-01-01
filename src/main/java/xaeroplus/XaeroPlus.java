@@ -10,20 +10,23 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventBus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import xaero.lib.platform.Services;
 import xaeroplus.event.ForgeEventHandler;
 import xaeroplus.feature.keybind.KeybindListener;
 import xaeroplus.module.ModuleManager;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
+import xaeroplus.settings.SettingHooks;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.Globals;
 import xaeroplus.util.XaeroPlusGameTest;
+
+import java.io.File;
 
 @Mod(
         modid = XaeroPlus.MODID,
         name = XaeroPlus.NAME,
         version = XaeroPlus.VERSION,
         clientSideOnly = true,
-        dependencies = "required:mixinbooter@[9.4,);after:xaerominimap@[25.2.10];required-after:xaeroworldmap@[1.39.12];"
+        dependencies = "required:mixinbooter@[9.4,);after:xaerominimap@[25.3.2];required-after:xaeroworldmap@[1.40.2];"
 )
 public class XaeroPlus {
     public static final String MODID = "xaeroplus";
@@ -33,6 +36,7 @@ public class XaeroPlus {
     public static Logger LOGGER = LogManager.getLogger("XaeroPlus");
     private static final ForgeEventHandler forgeEventHandler = new ForgeEventHandler();
     private static final KeybindListener keybindListener = new KeybindListener();
+    public static final File configFile = Services.PLATFORM.getConfigDir().resolve("xaeroplus.txt").toFile();
 
     @Mod.Instance
     public static XaeroPlus INSTANCE;
@@ -41,7 +45,8 @@ public class XaeroPlus {
     public void preInit(FMLPreInitializationEvent event) {
         ModuleManager.init();
         boolean follow = Globals.FOLLOW;// force static instances to init
-        XaeroPlusSettingRegistry.fastMapSetting.getValue(); // force static instances to init
+        SettingHooks.loadXPSettings();
+        Globals.onAllSettingsLoaded();
     }
 
     @Mod.EventHandler
@@ -51,7 +56,7 @@ public class XaeroPlus {
         if (System.getenv("XP_CI_TEST") != null) {
             XaeroPlusGameTest.applyMixinsTest();
         }
-        for (KeyBinding kb : XaeroPlusSettingsReflectionHax.keybindsSupplier.get()) {
+        for (KeyBinding kb : Settings.REGISTRY.getKeybindings()) {
             ClientRegistry.registerKeyBinding(kb);
         }
         EVENT_BUS.register(keybindListener);

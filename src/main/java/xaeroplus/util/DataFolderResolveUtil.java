@@ -4,15 +4,15 @@ import com.google.common.net.InternetDomainName;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaeroplus.XaeroPlus;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 
 import static java.util.Objects.nonNull;
 
 public class DataFolderResolveUtil {
 
     public static void resolveDataFolder(final CallbackInfoReturnable<String> cir) {
-        final XaeroPlusSettingRegistry.DataFolderResolutionMode dataFolderResolutionMode = Globals.dataFolderResolutionMode;
-        if (dataFolderResolutionMode == XaeroPlusSettingRegistry.DataFolderResolutionMode.SERVER_NAME) {
+        final Settings.DataFolderResolutionMode dataFolderResolutionMode = Globals.dataFolderResolutionMode;
+        if (dataFolderResolutionMode == Settings.DataFolderResolutionMode.SERVER_NAME) {
             Minecraft mc = Minecraft.getMinecraft();
             if (nonNull(mc.getCurrentServerData())) {
                 String serverName = mc.getCurrentServerData().serverName.replace(":", "_");
@@ -31,7 +31,7 @@ public class DataFolderResolveUtil {
             if (!mc.isIntegratedServerRunning()) {
                 XaeroPlus.LOGGER.error("Unable to resolve valid MC Server Name. Falling back to default Xaero data folder resolution");
             }
-        } else if (dataFolderResolutionMode == XaeroPlusSettingRegistry.DataFolderResolutionMode.BASE_DOMAIN) {
+        } else if (dataFolderResolutionMode == Settings.DataFolderResolutionMode.BASE_DOMAIN) {
             Minecraft mc = Minecraft.getMinecraft();
             if (nonNull(mc.getCurrentServerData())) {
                 // use the base domain name, e.g connect.2b2t.org -> 2b2t.org

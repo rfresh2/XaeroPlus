@@ -8,9 +8,8 @@ import xaero.map.WorldMapSession;
 import xaero.map.core.XaeroWorldMapCore;
 import xaero.map.world.MapWorld;
 import xaeroplus.XaeroPlus;
+import xaeroplus.settings.Settings;
 import xaeroplus.settings.XaeroPlusSetting;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
-import xaeroplus.settings.XaeroPlusSettingsReflectionHax;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -32,7 +31,7 @@ public class Globals {
     public static boolean FOLLOW = false;
     // cache and only update this on new world loads
     public static boolean nullOverworldDimensionFolder = false;
-    public static XaeroPlusSettingRegistry.DataFolderResolutionMode dataFolderResolutionMode = XaeroPlusSettingRegistry.DataFolderResolutionMode.IP;
+    public static Settings.DataFolderResolutionMode dataFolderResolutionMode = Settings.DataFolderResolutionMode.IP;
     public static int minimapScalingFactor = 1;
     public static boolean shouldResetFBO = false;
     public static String LOCK_ID = UUID.randomUUID().toString();
@@ -54,10 +53,10 @@ public class Globals {
     public static final ResourceLocation xpGuiTextures = new ResourceLocation("xaeroplus", "gui/xpgui.png");
 
     public static void onAllSettingsLoaded() {
-        XaeroPlusSettingsReflectionHax.ALL_SETTINGS.get().forEach(XaeroPlusSetting::init);
-        nullOverworldDimensionFolder = XaeroPlusSettingRegistry.nullOverworldDimensionFolder.getValue();
-        dataFolderResolutionMode = XaeroPlusSettingRegistry.dataFolderResolutionMode.getValue();
-        minimapScalingFactor = (int) XaeroPlusSettingRegistry.minimapScaling.getValue();
+        Settings.REGISTRY.getAllSettings().forEach(XaeroPlusSetting::init);
+        nullOverworldDimensionFolder = Settings.REGISTRY.nullOverworldDimensionFolder.getValue();
+        dataFolderResolutionMode = Settings.REGISTRY.dataFolderResolutionMode.getValue();
+        minimapScalingFactor = (int) Settings.REGISTRY.minimapScaling.getValue();
     }
 
     public static void switchToDimension(final int newDimId) {

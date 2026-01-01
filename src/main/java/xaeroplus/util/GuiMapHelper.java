@@ -3,8 +3,13 @@ package xaeroplus.util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import xaero.lib.client.gui.GuiSettings;
+import xaero.lib.client.gui.widget.Tooltip;
+import xaero.map.WorldMapSession;
 import xaero.map.core.XaeroWorldMapCore;
-import xaero.map.gui.*;
+import xaero.map.gui.GuiCaveModeOptions;
+import xaero.map.gui.GuiMap;
+import xaero.map.gui.TooltipButton;
 import xaero.map.world.MapDimension;
 import xaeroplus.mixin.client.AccessorGuiCaveModeOptions;
 import xaeroplus.mixin.client.MixinGuiMapAccessor;
@@ -64,14 +69,25 @@ public class GuiMapHelper {
         for (GuiButton button : buttonList) {
             if (!(button instanceof TooltipButton)) continue;
             final TooltipButton tooltipButton = (TooltipButton) button;
-            final Supplier<CursorBox> xaeroWmTooltipSupplier = tooltipButton.getTooltip();
+            final Supplier<Tooltip> xaeroWmTooltipSupplier = tooltipButton.getXaero_tooltip();
             if (xaeroWmTooltipSupplier == null) continue;
-            final CursorBox cursorBox = xaeroWmTooltipSupplier.get();
+            final Tooltip cursorBox = xaeroWmTooltipSupplier.get();
             if (cursorBox == null) continue;
             final String code = cursorBox.getFullCode();
             if (Objects.equals(code, "gui.xaero_wm_box_cave_mode_type")) {
                 button.displayString = options.invokeCaveModeTypeButtonMessage().getFormattedText();
                 break;
+            }
+        }
+    }
+
+    public static void markChunksDirtyInWriteDistance() {
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc.world != null && mc.player != null) {
+            WorldMapSession session = WorldMapSession.getCurrentSession();
+            if (session != null) {
+                session.getMapProcessor().getMapWriter().setDirtyInWriteDistance(mc.player, mc.world);
+                session.getMapProcessor().getMapWriter().requestCachedColoursClear();
             }
         }
     }

@@ -1,4 +1,4 @@
-package xaeroplus.util.highlights;
+package xaeroplus.feature.highlights;
 
 import com.google.common.collect.Lists;
 import xaero.map.WorldMap;

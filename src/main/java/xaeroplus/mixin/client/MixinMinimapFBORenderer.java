@@ -9,19 +9,19 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import xaero.common.IXaeroMinimap;
+import xaero.common.HudMod;
 import xaero.common.graphics.ImprovedFramebuffer;
 import xaero.common.minimap.render.MinimapFBORenderer;
 import xaero.common.minimap.render.MinimapRenderer;
 import xaero.common.minimap.render.MinimapRendererHelper;
-import xaero.common.minimap.waypoints.render.WaypointsGuiRenderer;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.Minimap;
 import xaero.hud.minimap.MinimapLogs;
 import xaero.hud.minimap.compass.render.CompassRenderer;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaero.hud.minimap.waypoint.render.WaypointMapRenderer;
+import xaeroplus.feature.extensions.CustomMinimapFBORenderer;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.ColorHelper;
-import xaeroplus.util.CustomMinimapFBORenderer;
 import xaeroplus.util.Globals;
 
 @Mixin(value = MinimapFBORenderer.class, remap = false)
@@ -34,8 +34,8 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
     @Shadow
     private boolean loadedFBO;
 
-    public MixinMinimapFBORenderer(IXaeroMinimap modMain, Minecraft mc, WaypointsGuiRenderer waypointsGuiRenderer, Minimap minimapInterface, CompassRenderer compassRenderer) {
-        super(modMain, mc, waypointsGuiRenderer, minimapInterface, compassRenderer);
+    public MixinMinimapFBORenderer(final HudMod modMain, final Minecraft mc, final WaypointMapRenderer waypointMapRenderer, final Minimap minimap, final CompassRenderer compassRenderer) {
+        super(modMain, mc, waypointMapRenderer, minimap, compassRenderer);
     }
 
     @WrapOperation(method = "loadFrameBuffer", at = @At(
@@ -98,7 +98,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
     ), remap = true)
     public void adjustMinimapBackgroundRect(final int left, final int top, final int right, final int bottom, final int color, final Operation<Void> original) {
         final int scaledSize = 256 * Globals.minimapScalingFactor;
-        if (!XaeroPlusSettingRegistry.transparentMinimapBackground.getValue()) {
+        if (!Settings.REGISTRY.transparentMinimapBackground.getValue()) {
             original.call(-scaledSize, -scaledSize, scaledSize, scaledSize, ColorHelper.getColor(0, 0, 0, 255));
         } else {
             original.call(-scaledSize, -scaledSize, scaledSize, scaledSize, ColorHelper.getColor(0, 0, 0, 0));

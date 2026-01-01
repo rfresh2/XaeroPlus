@@ -10,7 +10,7 @@ import xaero.map.file.worldsave.WorldDataReader;
 import xaero.map.region.MapTile;
 import xaero.map.region.MapTileChunk;
 import xaero.map.world.MapDimensionTypeInfo;
-import xaeroplus.settings.XaeroPlusSettingRegistry;
+import xaeroplus.settings.Settings;
 
 @Mixin(value = WorldDataReader.class, remap = false)
 public abstract class MixinWorldDataReader {
@@ -52,7 +52,7 @@ public abstract class MixinWorldDataReader {
                                      final World world,
                                      MapDimensionTypeInfo dimType,
                                      final boolean flowers) {
-        if (XaeroPlusSettingRegistry.netherCaveFix.getValue()) {
+        if (Settings.REGISTRY.netherCaveFix.getValue()) {
             boolean cave = caveStart != Integer.MAX_VALUE;
             boolean nether = tileChunk.getInRegion().getDim().getDimId() == -1;
             int customCaveStart = caveStart;

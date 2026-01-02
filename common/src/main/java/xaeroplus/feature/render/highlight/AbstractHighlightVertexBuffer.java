@@ -5,6 +5,7 @@ import com.mojang.blaze3d.buffers.Std140SizeCalculator;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import net.minecraft.client.renderer.MappableRingBuffer;
 import org.jetbrains.annotations.Nullable;
+import xaeroplus.Globals;
 import xaeroplus.feature.render.DrawContext;
 
 public abstract class AbstractHighlightVertexBuffer {
@@ -21,7 +22,9 @@ public abstract class AbstractHighlightVertexBuffer {
 
     public void preRender(final DrawContext ctx, final Long2LongMap highlights, final int color) {
         if (needsRefresh(ctx)) {
+            Globals.bypassVertexCountLimit = true;
             refresh(ctx, highlights, color);
+            Globals.bypassVertexCountLimit = false;
         }
         if (uniformBuffer == null) {
             uniformBuffer = new MappableRingBuffer(

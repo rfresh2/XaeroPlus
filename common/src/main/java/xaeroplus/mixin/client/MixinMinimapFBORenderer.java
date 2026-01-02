@@ -155,7 +155,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         )
     ), remap = true)
     public Matrix4f correctPreRotationTranslationForSizeMult(final Matrix4fStack instance, final float x, final float y, final float z) {
-        return instance.translate(x / Globals.minimapSizeMultiplier, y / Globals.minimapSizeMultiplier, z);
+        return instance.translate((x / Globals.minimapSizeMultiplier), (y / Globals.minimapSizeMultiplier), z);
     }
 
     @Inject(method = "renderChunksToFBO", at = @At(
@@ -174,7 +174,8 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         @Local(name = "halfWView") float halfWView,
         @Local(name = "shaderMatrixStack") Matrix4fStack shaderMatrixStack
     ) {
-        float sizeMultTranslation = (halfWView / Globals.minimapSizeMultiplier) * (Globals.minimapSizeMultiplier - 1);
+        float sizeMult = Globals.minimapSizeMultiplier;
+        float sizeMultTranslation = halfWView * (sizeMult - 1.0f) / (sizeMult * sizeMult);
         shaderMatrixStack.translate(sizeMultTranslation, sizeMultTranslation, 0f);
     }
 

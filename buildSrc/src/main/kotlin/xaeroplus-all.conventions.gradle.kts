@@ -12,24 +12,13 @@ version = project.properties["mod_version"].toString()
 group = "xaeroplus"
 
 repositories {
-    maven("https://maven.neoforged.net/releases/") {
-        name = "NeoForge"
-    }
-    maven("https://api.modrinth.com/maven") {
-        name = "Modrinth"
-    }
-    maven("https://maven.2b2t.vc/releases") {
-        name = "maven.2b2t.vc"
-    }
-    maven("https://maven.parchmentmc.org") {
-        name = "ParchmentMC"
-    }
-    maven("https://maven.lenni0451.net/releases") {
-        name = "Lenni0451"
-    }
+    maven("https://maven.neoforged.net/releases/")
+    maven("https://api.modrinth.com/maven")
+    maven("https://maven.2b2t.vc/releases")
+    maven("https://maven.2b2t.vc/xaero")
+    maven("https://maven.parchmentmc.org")
     maven("https://maven.shedaniel.me/")
-    maven("https://maven.terraformersmc.com/releases/")
-    mavenLocal()
+    maven("https://maven.2b2t.vc/remote")
 }
 
 tasks {

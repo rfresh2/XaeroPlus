@@ -35,9 +35,9 @@ dependencyResolutionManagement {
 			library("minimap-fabric", "maven.modrinth:xaeros-minimap:${minimap_version_fabric}_Fabric_1.21")
 			library("minimap-forge", "maven.modrinth:xaeros-minimap:${minimap_version_forge}_Forge_1.21")
 			library("minimap-neo", "maven.modrinth:xaeros-minimap:${minimap_version_neo}_NeoForge_1.21")
-            library("xaerolib-fabric", "com.github.rfresh2:xaerolib-fabric:${xaerolib_version}+${minecraft_version}")
-            library("xaerolib-forge", "com.github.rfresh2:xaerolib-forge:${xaerolib_version}+${minecraft_version}")
-            library("xaerolib-neo", "com.github.rfresh2:xaerolib-neoforge:${xaerolib_version}+${minecraft_version}")
+            library("xaerolib-fabric", "xaero.lib:xaerolib-fabric-1.21:${xaerolib_version}")
+            library("xaerolib-forge", "xaero.lib:xaerolib-forge-1.21:${xaerolib_version}")
+            library("xaerolib-neo", "xaero.lib:xaerolib-neoforge-1.21:${xaerolib_version}")
             library("mixinextras-common", "io.github.llamalad7:mixinextras-common:0.4.1")
             library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.4.1")
 			library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.0")
@@ -65,8 +65,6 @@ dependencyResolutionManagement {
 		}
 	}
 }
-
-
 
 include("common")
 include("fabric")

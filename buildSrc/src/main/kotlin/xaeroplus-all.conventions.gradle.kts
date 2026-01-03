@@ -20,6 +20,7 @@ repositories {
     maven("https://maven.shedaniel.me/")
     maven("https://maven.2b2t.vc/remote")
     maven("https://maven.caffeinemc.net/releases")
+    maven("https://cursemaven.com")
 }
 
 tasks {

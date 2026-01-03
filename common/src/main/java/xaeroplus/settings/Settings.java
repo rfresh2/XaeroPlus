@@ -338,6 +338,13 @@ public final class Settings extends SettingRegistry {
             true,
             false),
         SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting optimizeRegionDetectionLookups = register(
+        BooleanSetting.create(
+            "Optimize Region Detection Lookups",
+            "Optimize Region Detection Lookups",
+            true,
+            false),
+        SettingLocation.WORLD_MAP_MAIN);
 
     /**
      * Chunk Highlights

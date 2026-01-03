@@ -147,8 +147,8 @@ jobs:
       - name: Setup Fabric Test Mods
         run: |
           mkdir -p run/mods && cp artifacts/${{ needs.build.outputs.xp_fabric }}.jar run/mods \
-          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ needs.build.outputs.minimap_version_fabric }}_Fabric_1.21/xaeros-minimap-${{ needs.build.outputs.minimap_version_fabric }}_Fabric_1.21.jar -P run/mods/ \
-          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ needs.build.outputs.worldmap_version_fabric }}_Fabric_1.21/xaeros-world-map-${{ needs.build.outputs.worldmap_version_fabric }}_Fabric_1.21.jar -P run/mods/
+          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/fabric-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.minimap_version_fabric }}/xaeros-minimap-fabric-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.minimap_version_fabric }}.jar -P run/mods/ \
+          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/fabric-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_fabric }}/xaeros-world-map-fabric-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_fabric }}.jar -P run/mods/
 
       - name: Fabric Test
         uses: headlesshq/mc-runtime-test@4.1.0
@@ -186,8 +186,8 @@ jobs:
       - name: Setup Forge Test
         run: |
           mkdir -p run/mods && cp artifacts/${{ needs.build.outputs.xp_forge }}.jar run/mods \
-          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ needs.build.outputs.minimap_version_forge }}_Forge_1.21/xaeros-minimap-${{ needs.build.outputs.minimap_version_forge }}_Forge_1.21.jar -P run/mods/ \
-          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ needs.build.outputs.worldmap_version_forge }}_Forge_1.21/xaeros-world-map-${{ needs.build.outputs.worldmap_version_forge }}_Forge_1.21.jar -P run/mods/
+          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/forge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.minimap_version_forge }}/xaeros-minimap-forge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.minimap_version_forge }}.jar -P run/mods/ \
+          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/forge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_fabric }}/xaeros-world-map-forge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_forge }}.jar -P run/mods/
 
       - name: Forge Test
         uses: headlesshq/mc-runtime-test@4.1.0
@@ -224,8 +224,8 @@ jobs:
       - name: Setup Neo Test
         run: |
           mkdir -p run/mods && cp artifacts/${{ needs.build.outputs.xp_neo }}.jar run/mods \
-          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/${{ needs.build.outputs.minimap_version_neo}}_NeoForge_1.21/xaeros-minimap-${{ needs.build.outputs.minimap_version_neo }}_NeoForge_1.21.jar -P run/mods/ \
-          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/${{ needs.build.outputs.worldmap_version_neo }}_NeoForge_1.21/xaeros-world-map-${{ needs.build.outputs.worldmap_version_neo }}_NeoForge_1.21.jar -P run/mods/
+          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/neoforge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.minimap_version_neo }}/xaeros-minimap-neoforge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.minimap_version_neo }}.jar -P run/mods/ \
+          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/neoforge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_neo }}/xaeros-world-map-neoforge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_neo }}.jar -P run/mods/
 
       - name: Neo Test
         uses: headlesshq/mc-runtime-test@4.1.0

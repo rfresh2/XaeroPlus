@@ -704,12 +704,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             BlendMode.lastApplied = LibShaders.WORLD_MAP.blend; // don't apply blend from shader.json
             ((CustomWorldMapShader) LibShaders.WORLD_MAP).setTransparentBackground(true);
             Globals.transparentWmBgApplyMapBlend = true;
+            original.call(instance, renderer);
+            ((CustomWorldMapShader) LibShaders.WORLD_MAP).setTransparentBackground(false);
+            BlendMode.lastApplied = null;
         } else {
             ((CustomWorldMapShader) LibShaders.WORLD_MAP).setTransparentBackground(false);
+            original.call(instance, renderer);
         }
-        original.call(instance, renderer);
-        ((CustomWorldMapShader) LibShaders.WORLD_MAP).setTransparentBackground(false);
-        BlendMode.lastApplied = null;
     }
 
     @WrapOperation(method = "render", at = @At(
@@ -722,12 +723,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             BlendMode.lastApplied = LibShaders.WORLD_MAP.blend; // don't apply blend from shader.json
             ((CustomWorldMapShader) LibShaders.WORLD_MAP).setTransparentBackground(true);
             Globals.transparentWmBgApplyMapBlend = true;
+            original.call(instance, renderer);
+            ((CustomWorldMapShader) LibShaders.WORLD_MAP).setTransparentBackground(false);
+            BlendMode.lastApplied = null;
         } else {
             ((CustomWorldMapShader) LibShaders.WORLD_MAP).setTransparentBackground(false);
+            original.call(instance, renderer);
         }
-        original.call(instance, renderer);
-        ((CustomWorldMapShader) LibShaders.WORLD_MAP).setTransparentBackground(false);
-        BlendMode.lastApplied = null;
     }
 
     @WrapOperation(method = "render", at = @At(
@@ -739,9 +741,11 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
             BlendMode.lastApplied = LibShaders.POSITION_COLOR_TEX.blend; // don't apply blend from shader.json
             Globals.transparentWmBgApplyGuiBilinearBlend = true;
+            original.call(instance, renderer);
+            BlendMode.lastApplied = null;
+        } else {
+            original.call(instance, renderer);
         }
-        original.call(instance, renderer);
-        BlendMode.lastApplied = null;
     }
 
     @Inject(method = "shouldSkipWorldRender", at = @At("HEAD"), cancellable = true)

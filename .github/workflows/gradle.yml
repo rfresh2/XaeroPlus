@@ -4,8 +4,9 @@ on:
   workflow_dispatch:
 
 env:
-  WORLDMAP_VERSION: "1.40.2"
+  WORLDMAP_VERSION: "1.40.5"
   MINIMAP_VERSION: "25.3.5"
+  XAEROLIB_VERSION: "1.0.44"
   MINECRAFT_VERSION: "1.12.2"
   MINECRAFT_VERSION_SHORT: "1.12"
   MOD_LOADER: "Forge"
@@ -45,13 +46,6 @@ jobs:
       with:
         name: ${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}
         path: XaeroPlus-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar
-
-    - name: Download Xaero WorldMap
-      run: wget https://chocolateminecraft.com/mods2/worldmap/XaerosWorldMap_${{ env.WORLDMAP_VERSION }}_${{ env.MOD_LOADER }}_${{ env.MINECRAFT_VERSION_SHORT }}.jar --no-check-certificate
-
-    - name: Download Xaero Minimap
-      run: wget https://chocolateminecraft.com/mods2/minimap/Xaeros_Minimap_${{ env.MINIMAP_VERSION }}_${{ env.MOD_LOADER }}_${{ env.MINECRAFT_VERSION_SHORT }}.jar --no-check-certificate
-
 
     # todo: for future auto-update check feature
 #    - name: Create version identifier file

@@ -11,7 +11,7 @@ public class MixinBufferBuilder {
 
     @ModifyExpressionValue(method = "beginVertex", at = @At(
         value = "CONSTANT",
-        args = "intValue=16777215") // this limit was added in 1.21.10
+        args = "intValue=16777215") // this limit was added in 1.21.8
     )
     public int bypassVertexCountLimit(final int original) {
         // XP can sometimes upload millions of highlight vertices

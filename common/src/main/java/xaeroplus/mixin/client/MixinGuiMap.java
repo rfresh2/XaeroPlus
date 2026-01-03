@@ -717,14 +717,15 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
             XaeroPlusShaders.setTransparentWMBackground(true);
             Globals.transparentWmBgApplyMapBlend = true;
+            try {
+                original.call(instance, renderer);
+            } finally {
+                XaeroPlusShaders.setTransparentWMBackground(false);
+                Globals.transparentWmBgApplyMapBlend = false;
+            }
         } else {
             XaeroPlusShaders.setTransparentWMBackground(false);
-        }
-        try {
             original.call(instance, renderer);
-        } finally {
-            XaeroPlusShaders.setTransparentWMBackground(false);
-            Globals.transparentWmBgApplyMapBlend = false;
         }
     }
 
@@ -737,14 +738,15 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
             XaeroPlusShaders.setTransparentWMBackground(true);
             Globals.transparentWmBgApplyMapBlend = true;
+            try {
+                original.call(instance, renderer);
+            } finally {
+                XaeroPlusShaders.setTransparentWMBackground(false);
+                Globals.transparentWmBgApplyMapBlend = false;
+            }
         } else {
             XaeroPlusShaders.setTransparentWMBackground(false);
-        }
-        try {
             original.call(instance, renderer);
-        } finally {
-            XaeroPlusShaders.setTransparentWMBackground(false);
-            Globals.transparentWmBgApplyMapBlend = false;
         }
     }
 
@@ -756,11 +758,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     public void transparentBgConfigMainFBORender(final MultiTextureRenderTypeRendererProvider instance, final MultiTextureRenderTypeRenderer renderer, final Operation<Void> original) {
         if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
             Globals.transparentWmBgApplyMapFrameBlend = true;
-        }
-        try {
+            try {
+                original.call(instance, renderer);
+            } finally {
+                Globals.transparentWmBgApplyMapFrameBlend = false;
+            }
+        } else {
             original.call(instance, renderer);
-        } finally {
-            Globals.transparentWmBgApplyMapFrameBlend = false;
         }
     }
 

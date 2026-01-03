@@ -71,6 +71,7 @@
     "MixinWorldMapInternet",
     "MixinXaeroRenderType",
     "mc.MixinBedBlock",
+    "mc.MixinBufferBuilder",
     "mc.MixinClientPlayNetworkHandler",
     "mc.MixinGui",
     "mc.MixinMinecraftClient",

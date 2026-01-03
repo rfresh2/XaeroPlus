@@ -701,12 +701,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
             ((CustomWorldMapShader) LibShaders.WORLD_MAP).setTransparentBackground(true);
             Globals.transparentWmBgApplyMapBlend = true;
+            original.call(instance, renderer);
+            ((CustomWorldMapShader) LibShaders.WORLD_MAP).setTransparentBackground(false);
+            Globals.transparentWmBgApplyMapBlend = false;
         } else {
             ((CustomWorldMapShader) LibShaders.WORLD_MAP).setTransparentBackground(false);
+            original.call(instance, renderer);
         }
-        original.call(instance, renderer);
-        ((CustomWorldMapShader) LibShaders.WORLD_MAP).setTransparentBackground(false);
-        Globals.transparentWmBgApplyMapBlend = false;
     }
 
     @WrapOperation(method = "render", at = @At(
@@ -718,12 +719,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
             ((CustomWorldMapShader) LibShaders.WORLD_MAP).setTransparentBackground(true);
             Globals.transparentWmBgApplyMapBlend = true;
+            original.call(instance, renderer);
+            ((CustomWorldMapShader) LibShaders.WORLD_MAP).setTransparentBackground(false);
+            Globals.transparentWmBgApplyMapBlend = false;
         } else {
             ((CustomWorldMapShader) LibShaders.WORLD_MAP).setTransparentBackground(false);
+            original.call(instance, renderer);
         }
-        original.call(instance, renderer);
-        ((CustomWorldMapShader) LibShaders.WORLD_MAP).setTransparentBackground(false);
-        Globals.transparentWmBgApplyMapBlend = false;
     }
 
     @WrapOperation(method = "render", at = @At(
@@ -734,9 +736,11 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     public void transparentBgConfigMainFBORender(final MultiTextureRenderTypeRendererProvider instance, final MultiTextureRenderTypeRenderer renderer, final Operation<Void> original) {
         if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
             Globals.transparentWmBgApplyGuiBilinearBlend = true;
+            original.call(instance, renderer);
+            Globals.transparentWmBgApplyGuiBilinearBlend = false;
+        } else {
+            original.call(instance, renderer);
         }
-        original.call(instance, renderer);
-        Globals.transparentWmBgApplyGuiBilinearBlend = false;
     }
 
     @Inject(method = "shouldSkipWorldRender", at = @At("HEAD"), cancellable = true)

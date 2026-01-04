@@ -45,8 +45,8 @@ dependencies {
     forge(libs.forge)
     implementation(annotationProcessor(libs.mixinextras.common.get())!!)
     implementation(include(libs.mixinextras.forge.get())!!)
-    modImplementation(libs.worldmap.forge)
-    modImplementation(libs.minimap.forge)
+    modImplementation(libs.worldmap.forge) { isTransitive = false }
+    modImplementation(libs.minimap.forge) { isTransitive = false }
     modImplementation(libs.xaerolib.forge)
     modImplementation(libs.baritone.forge)
     modCompileOnly(libs.waystones.forge)

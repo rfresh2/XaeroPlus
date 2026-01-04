@@ -38,8 +38,8 @@ sourceSets.main.get().resources.srcDir(common.layout.buildDirectory.get().asFile
 
 dependencies {
     neoForge(libs.neoforge)
-    modImplementation(libs.worldmap.neo)
-    modImplementation(libs.minimap.neo)
+    modImplementation(libs.worldmap.neo) { isTransitive = false }
+    modImplementation(libs.minimap.neo) { isTransitive = false }
     modImplementation(libs.xaerolib.neo)
     modImplementation(libs.baritone.neoforge)
     modCompileOnly(libs.waystones.neoforge)

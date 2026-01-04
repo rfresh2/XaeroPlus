@@ -539,7 +539,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "render", at = @At(
         value = "INVOKE",
-        target = "Lxaero/lib/client/gui/ScreenBase;render(Lcom/mojang/blaze3d/vertex/PoseStack;IIF)V"
+        target = "Lxaero/map/gui/ScreenBase;render(Lcom/mojang/blaze3d/vertex/PoseStack;IIF)V"
     ), remap = true)
     public void hideButtonsOnF1(final CallbackInfo ci) {
         if (Minecraft.getInstance().options.hideGui) {

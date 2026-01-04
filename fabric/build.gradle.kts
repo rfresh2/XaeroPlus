@@ -44,8 +44,8 @@ dependencies {
 	modApi(libs.fabric.api)
 	shadow(libs.sqlite)
 	implementation(libs.sqlite)
-	modImplementation(libs.worldmap.fabric)
-	modImplementation(libs.minimap.fabric)
+	modImplementation(libs.worldmap.fabric) { isTransitive = false }
+	modImplementation(libs.minimap.fabric) { isTransitive = false }
     modImplementation(libs.xaerolib.fabric)
     modCompileOnly(libs.baritone.fabric)
 	modCompileOnly(libs.waystones.fabric)

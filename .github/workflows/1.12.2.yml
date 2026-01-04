@@ -7,7 +7,7 @@ on:
       - "mainline"
 
 env:
-  WORLDMAP_VERSION: "1.40.5"
+  WORLDMAP_VERSION: "1.40.6"
   MINIMAP_VERSION: "25.3.5"
   XAEROLIB_VERSION: "1.0.44"
   MINECRAFT_VERSION: "1.12.2"

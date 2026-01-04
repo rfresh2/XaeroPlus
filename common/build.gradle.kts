@@ -15,8 +15,8 @@ loom {
 
 dependencies {
     modImplementation(libs.fabric.loader)
-    modCompileOnly(libs.worldmap.fabric)
-    modCompileOnly(libs.minimap.fabric)
+    modCompileOnly(libs.worldmap.fabric) { isTransitive = false }
+    modCompileOnly(libs.minimap.fabric) { isTransitive = false }
     modCompileOnly(libs.xaerolib.fabric)
     implementation(libs.caffeine)
     implementation(libs.lambdaEvents)

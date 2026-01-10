@@ -1,8 +1,10 @@
 pluginManagement {
 	repositories {
-		maven("https://maven.fabricmc.net/") { name = "Fabric" }
-		maven("https://maven.architectury.dev/")
+		maven("https://maven.fabricmc.net/")
 		maven("https://files.minecraftforge.net/maven/")
+		maven("https://maven.neoforged.net/releases")
+		maven("https://maven.2b2t.vc/remote")
+		maven("https://maven.architectury.dev/")
 		mavenCentral()
 		gradlePluginPortal()
 	}
@@ -31,8 +33,8 @@ dependencyResolutionManagement {
             library("minimap-forge", "xaero.minimap:xaerominimap-forge-${minecraft_version}:${minimap_version_forge}")
             library("xaerolib-fabric", "xaero.lib:xaerolib-fabric-${minecraft_version}:${xaerolib_version}")
             library("xaerolib-forge", "xaero.lib:xaerolib-forge-${minecraft_version}:${xaerolib_version}")
-			library("mixinextras-common", "io.github.llamalad7:mixinextras-common:0.4.1")
-			library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.4.1")
+			library("mixinextras-common", "io.github.llamalad7:mixinextras-common:0.5.2")
+			library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.5.2")
 			library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.0")
 			library("lambdaEvents", "net.lenni0451:LambdaEvents:2.4.2")
 			library("waystones-fabric", "maven.modrinth:waystones:11.4.2+fabric-1.19.2")

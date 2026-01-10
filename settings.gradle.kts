@@ -1,10 +1,10 @@
 pluginManagement {
 	repositories {
 		maven("https://maven.fabricmc.net/")
-		maven("https://maven.architectury.dev/")
 		maven("https://files.minecraftforge.net/maven/")
 		maven("https://maven.neoforged.net/releases")
 		maven("https://maven.2b2t.vc/remote")
+		maven("https://maven.architectury.dev/")
 		mavenCentral()
 		gradlePluginPortal()
 	}

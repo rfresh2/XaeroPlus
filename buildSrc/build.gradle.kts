@@ -3,13 +3,11 @@ plugins {
 }
 
 repositories {
-    mavenLocal()
-    maven("https://maven.fabricmc.net/") { name = "Fabric" }
-    maven("https://maven.architectury.dev/")
-    maven("https://maven.neoforged.net/releases/") {
-        name = "NeoForge"
-    }
+    maven("https://maven.fabricmc.net/")
+    maven("https://maven.neoforged.net/releases/")
     maven("https://files.minecraftforge.net/maven/")
+    maven("https://maven.2b2t.vc/remote")
+    maven("https://maven.architectury.dev/")
     mavenCentral()
     gradlePluginPortal()
 }

@@ -37,7 +37,7 @@ public class BaritoneGoalSync extends Module {
     private ResourceKey<Level> baritoneWpDimension = OVERWORLD;
 
     @EventHandler
-    public void onClientTickEvent(final ClientTickEvent.Post event) {
+    public void syncGoal(final ClientTickEvent.Post event) {
         if (!BaritoneHelper.isBaritonePresent()) return;
         MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
         if (minimapSession == null) return;

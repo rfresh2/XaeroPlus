@@ -754,6 +754,34 @@ public final class Settings extends SettingRegistry {
      * Overlays
      */
 
+    public final BooleanSetting baritonePathSyncSetting = register(
+        BooleanSetting.create(
+            "Baritone Path",
+            "xaeroplus.setting.baritone_path",
+            true,
+            (b) -> {
+                if (BaritoneHelper.isBaritonePresent()) ModuleManager.getModule(BaritonePathSync.class).setEnabled(b);
+            },
+            BaritoneHelper::isBaritonePresent),
+        SettingLocation.OVERLAYS);
+    public final EnumSetting<ColorHelper.HighlightColor> baritonePathSyncColorSetting = register(
+        EnumSetting.create(
+            "Baritone Path Color",
+            "xaeroplus.setting.baritone_path_color",
+            ColorHelper.HighlightColor.values(),
+            ColorHelper.HighlightColor.RED,
+            (b) -> ModuleManager.getModule(BaritonePathSync.class).setColor(b.getColor()),
+            () -> ModuleManager.getModule(BaritonePathSync.class).isEnabled()),
+        SettingLocation.OVERLAYS);
+    public final DoubleSetting baritonePathSyncOpacity = register(
+        DoubleSetting.create(
+            "Baritone Path Opacity",
+            "xaeroplus.setting.baritone_path_opacity",
+            0, 255, 5,
+            150,
+            (v) -> ModuleManager.getModule(BaritonePathSync.class).setOpacity((int) v),
+            () -> ModuleManager.getModule(BaritonePathSync.class).isEnabled()),
+        SettingLocation.OVERLAYS);
     public final BooleanSetting highwayHighlightsSetting = register(
         BooleanSetting.create(
             "2b2t Highways",

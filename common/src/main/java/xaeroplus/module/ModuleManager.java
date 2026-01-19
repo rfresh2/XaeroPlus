@@ -12,6 +12,7 @@ public class ModuleManager {
     static {
         asList(
             new BaritoneGoalSync(),
+            new BaritonePathSync(),
             new Breadcrumbs(),
             new Drawing(),
             new FpsLimiter(),

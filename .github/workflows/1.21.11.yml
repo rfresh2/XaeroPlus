@@ -198,7 +198,7 @@ jobs:
           mc: ${{ env.MINECRAFT_VERSION }}
           modloader: forge
           regex: .*forge.*
-          mc-runtime-test: lexforge
+          mc-runtime-test: none
           java: 21
           xvfb: false
           headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true

@@ -26,7 +26,7 @@ import java.io.File;
         name = XaeroPlus.NAME,
         version = XaeroPlus.VERSION,
         clientSideOnly = true,
-        dependencies = "required:mixinbooter@[9.4,);after:xaerominimap@[25.3.5];required-after:xaeroworldmap@[1.40.6];required-after:xaerolib@[1.0.44];"
+        dependencies = "required:mixinbooter@[9.4,);after:xaerominimap@[25.3.8];required-after:xaeroworldmap@[1.40.9];required-after:xaerolib@[1.1.0];"
 )
 public class XaeroPlus {
     public static final String MODID = "xaeroplus";

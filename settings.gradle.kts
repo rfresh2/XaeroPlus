@@ -36,7 +36,8 @@ dependencyResolutionManagement {
             library("minimap-forge", "xaero.minimap:xaerominimap-forge-${minecraft_version}:${minimap_version_forge}")
             library("minimap-neo", "xaero.minimap:xaerominimap-neoforge-${minecraft_version}:${minimap_version_neo}")
             library("xaerolib-fabric", "xaero.lib:xaerolib-fabric-${minecraft_version}:${xaerolib_version}")
-            library("xaerolib-neo", "xaero.lib:xaerolib-neoforge-${minecraft_version}:${xaerolib_version}")
+			library("xaerolib-forge", "xaero.lib:xaerolib-forge-${minecraft_version}:${xaerolib_version}")
+			library("xaerolib-neo", "xaero.lib:xaerolib-neoforge-${minecraft_version}:${xaerolib_version}")
             library("mixinextras-common", "io.github.llamalad7:mixinextras-common:0.5.3")
             library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.5.3")
 			library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.0")
@@ -67,7 +68,7 @@ dependencyResolutionManagement {
 
 include("common")
 include("fabric")
-//include("forge")
+include("forge")
 include("neo")
 
 rootProject.name = "XaeroPlus"

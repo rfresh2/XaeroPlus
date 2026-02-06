@@ -17,7 +17,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import xaero.lib.client.gui.IScreenBase;
 import xaero.map.MapProcessor;
 import xaero.map.region.MapRegion;
 import xaero.map.world.MapDimension;
@@ -247,22 +246,5 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
             this.xaeroPlus$prevMWId = this.currentMWId;
         }
         original.call(instance, value);
-    }
-
-    /**
-     * racey checking mc state off the main thread and assuming var state doesn't change
-     * 	Caused by: java.lang.NullPointerException: Cannot invoke "xaero.lib.client.gui.IScreenBase.shouldSkipWorldRender()" because "screenBase" is null
-     * 	at knot//xaero.map.MapProcessor.shouldSkipWorldRender(MapProcessor.java:384)
-     * 	at knot//xaero.map.MapProcessor.run(MapProcessor.java:366)
-     * 	at knot//xaero.map.MapRunner.run(MapRunner.java:18)
-     * 	at java.base/java.lang.Thread.run(Thread.java:1474)
-     */
-    @WrapOperation(method = "shouldSkipWorldRender", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/lib/client/gui/IScreenBase;shouldSkipWorldRender()Z"
-    ))
-    private static boolean preventRaceConditionCrash(final IScreenBase instance, final Operation<Boolean> original) {
-        if (instance == null) return false;
-        return original.call(instance);
     }
 }

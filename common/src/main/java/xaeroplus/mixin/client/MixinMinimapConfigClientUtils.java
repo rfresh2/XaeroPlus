@@ -1,8 +1,6 @@
 package xaeroplus.mixin.client;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -10,7 +8,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.common.HudMod;
 import xaero.hud.minimap.Minimap;
 import xaero.hud.minimap.config.util.MinimapConfigClientUtils;
-import xaero.hud.minimap.world.MinimapWorld;
 import xaeroplus.Globals;
 import xaeroplus.settings.Settings;
 
@@ -42,22 +39,5 @@ public class MixinMinimapConfigClientUtils {
         } catch (final Exception e) {
             // fall through
         }
-    }
-
-    /**
-     * original:
-     * session.getWorldManager().getAutoWorld().getSlimeChunkSeed()
-     *
-     * but `getAutoWorld()` can return null in certain cases
-     */
-    @WrapOperation(method = "getEffectiveSlimeChunks", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/hud/minimap/world/MinimapWorld;getSlimeChunkSeed()Ljava/lang/Long;"
-    ))
-    private static Long patchGetEffectiveSlimeChunksNPE(final MinimapWorld instance, final Operation<Long> original) {
-        if (instance == null) {
-            return null;
-        }
-        return original.call(instance);
     }
 }

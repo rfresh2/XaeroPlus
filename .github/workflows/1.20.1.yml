@@ -120,8 +120,8 @@ jobs:
       - name: Setup Fabric Test Mods
         run: |
           mkdir -p run/mods && cp artifacts/${{ needs.build.outputs.xp_fabric }}.jar run/mods \
-          && wget https://maven.2b2t.vc/xaero/xaero/minimap/xaerominimap-fabric-${{ env.MINECRAFT_VERSION }}/${{ needs.build.outputs.minimap_version_fabric }}/xaerominimap-fabric-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.minimap_version_fabric }}.jar -P run/mods/ \
-          && wget https://maven.2b2t.vc/xaero/xaero/map/xaeroworldmap-fabric-${{ env.MINECRAFT_VERSION }}/${{ needs.build.outputs.worldmap_version_fabric }}/xaeroworldmap-fabric-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_fabric }}.jar -P run/mods/
+          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/fabric-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.minimap_version_fabric }}/xaeros-minimap-fabric-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.minimap_version_fabric }}.jar -P run/mods/ \
+          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/fabric-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_fabric }}/xaeros-world-map-fabric-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_fabric }}.jar -P run/mods/
 
       - name: Fabric Test
         uses: headlesshq/mc-runtime-test@4.1.0

@@ -46,7 +46,7 @@ jobs:
         run: echo "XAEROLIB_VERSION=$(./gradlew -q printXaeroLibVersion)" >> $GITHUB_ENV
 
       - name: Get Forge Jar Filename
-        run: echo "XP_FORGE=XaeroPlus-${{ github.run_number }}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}" >> $GITHUB_ENV
+        run: echo "XP_FORGE=XaeroPlus-DEV-${{ github.run_number }}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}" >> $GITHUB_ENV
 
       - name: Rename built mod
         run: mv build/libs/XaeroPlus-*.jar ${{ env.XP_FORGE }}.jar

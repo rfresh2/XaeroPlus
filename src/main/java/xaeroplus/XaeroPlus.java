@@ -26,7 +26,10 @@ import java.io.File;
         name = XaeroPlus.NAME,
         version = XaeroPlus.VERSION,
         clientSideOnly = true,
-        dependencies = "required:mixinbooter@[9.4,);after:xaerominimap@[25.3.10];required-after:xaeroworldmap@[1.40.11];required-after:xaerolib@[1.1.0];"
+        dependencies = "required:mixinbooter@[9.4,);"
+            + "after:xaerominimap@[" + BuildConstants.MINIMAP_VERSION + "];"
+            + "required-after:xaeroworldmap@[" + BuildConstants.WORLDMAP_VERSION + "];"
+            + "required-after:xaerolib@[" + BuildConstants.XAEROLIB_VERSION + "];"
 )
 public class XaeroPlus {
     public static final String MODID = "xaeroplus";

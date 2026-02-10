@@ -4,11 +4,7 @@ on:
   workflow_dispatch:
 
 env:
-  WORLDMAP_VERSION: "1.40.11"
-  MINIMAP_VERSION: "25.3.10"
-  XAEROLIB_VERSION: "1.1.0"
   MINECRAFT_VERSION: "1.12.2"
-  MINECRAFT_VERSION_SHORT: "1.12"
   MOD_LOADER: "Forge"
 
 jobs:
@@ -37,19 +33,29 @@ jobs:
 
     - name: Build mod
       run: ./gradlew build
+      env:
+        RELEASE_VERSION: ${{ github.run_number }}
+
+    - name: Get WorldMap Version
+      run: echo "WORLDMAP_VERSION=$(./gradlew -q printWorldMapVersion)" >> $GITHUB_ENV
+
+    - name: Get Minimap Version
+      run: echo "MINIMAP_VERSION=$(./gradlew -q printMinimapVersion)" >> $GITHUB_ENV
+
+    - name: Get XaeroLib Version
+      run: echo "XAEROLIB_VERSION=$(./gradlew -q printXaeroLibVersion)" >> $GITHUB_ENV
+
+    - name: Get Forge Jar Filename
+      run: echo "XP_FORGE=XaeroPlus-${{ github.run_number }}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}" >> $GITHUB_ENV
 
     - name: Rename built mod
-      run: mv build/libs/xaeroplus-${{ env.MINECRAFT_VERSION }}.jar XaeroPlus-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar
+      run: mv build/libs/XaeroPlus-*.jar ${{ env.XP_FORGE }}.jar
 
     - name: Upload artifact
       uses: actions/upload-artifact@v6
       with:
         name: ${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}
         path: XaeroPlus-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar
-
-    # todo: for future auto-update check feature
-#    - name: Create version identifier file
-#      run: echo ${{ github.run_number }} > version.txt
 
     - name: Get Previous Release Number
       env:

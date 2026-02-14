@@ -1,11 +1,10 @@
 package xaeroplus.feature.render.line;
 
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
-import xaero.common.graphics.CustomRenderTypes;
-import xaeroplus.Globals;
 import xaeroplus.feature.render.DrawContext;
 import xaeroplus.feature.render.DrawHelper;
 import xaeroplus.util.ChunkUtils;
@@ -73,31 +72,27 @@ public class LineDrawFeature extends AbstractLineDrawFeature<List<Line>> {
         var a = ColorHelper.getA(color);
         if (a == 0.0f) return;
         preRender(ctx);
-        VertexConsumer lineBuffer = ctx.renderTypeBuffers().getBuffer(CustomRenderTypes.MAP_LINES);
-        float lineWidthScale = 16f * (float) Mth.clamp(
-            lineWidth() * ctx.fboScale(),
-            0.1f * (ctx.worldmap() ? 1.0f : Globals.minimapScaleMultiplier),
-            1000.0f
-        );
         var r = ColorHelper.getR(color);
         var g = ColorHelper.getG(color);
         var b = ColorHelper.getB(color);
         var lines = getLines();
-        for (int j = 0; j < lines.size(); j++) {
-            var line = lines.get(j);
-            int x1 = ctx.worldmap() ? line.x2() : line.x1();
-            int z1 = ctx.worldmap() ? line.z2() : line.z1();
-            int x2 = ctx.worldmap() ? line.x1() : line.x2();
-            int z2 = ctx.worldmap() ? line.z1() : line.z2();
-            DrawHelper.addColoredLineToExistingBuffer(
-                ctx.matrixStack().last(), lineBuffer,
-                x1, z1, x2, z2,
-                r, g, b, a,
-                lineWidthScale
-            );
-        }
         if (!lines.isEmpty()) {
-            ctx.renderTypeBuffers().endBatch(CustomRenderTypes.MAP_LINES);
+            var bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+            for (int j = 0; j < lines.size(); j++) {
+                var line = lines.get(j);
+                int x1 = ctx.worldmap() ? line.x2() : line.x1();
+                int z1 = ctx.worldmap() ? line.z2() : line.z1();
+                int x2 = ctx.worldmap() ? line.x1() : line.x2();
+                int z2 = ctx.worldmap() ? line.z1() : line.z2();
+                DrawHelper.addColoredLineQuadToExistingBuffer(
+                    ctx.matrixStack().last(), bufferBuilder,
+                    x1, z1, x2, z2,
+                r, g, b, a
+                );
+            }
+            var meshData = bufferBuilder.buildOrThrow();
+            drawLines(ctx, meshData);
         }
+        postRender(ctx);
     }
 }

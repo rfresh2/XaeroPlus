@@ -21,14 +21,21 @@ public class XaeroPlusShaders {
         DefaultVertexFormat.POSITION_COLOR,
         ShaderDefines.EMPTY
     );
+    public static final ShaderProgram LINES_SHADER_PROGRAM = new ShaderProgram(
+        ResourceLocation.fromNamespaceAndPath("xaeroplus", "lines"),
+        DefaultVertexFormat.POSITION_TEX_COLOR,
+        ShaderDefines.EMPTY
+    );
 
     private static CompiledShaderProgram CACHED_HIGHLIGHT_SHADER_PROGRAM;
     private static CompiledShaderProgram CACHED_MULTI_COLOR_HIGHLIGHT_SHADER_PROGRAM;
     private static CompiledShaderProgram CACHED_CUSTOM_MAP_SHADER_PROGRAM;
+    private static CompiledShaderProgram CACHED_LINES_SHADER_PROGRAM;
     private static Uniform HIGHLIGHT_COLOR_UNIFORM;
     private static Uniform HIGHLIGHT_MAP_VIEW_MATRIX_UNIFORM;
     private static Uniform MULTI_COLOR_HIGHLIGHT_MAP_VIEW_MATRIX_UNIFORM;
     private static Uniform TRANSPARENT_BACKGROUND_UNIFORM;
+    private static Uniform LINES_FRAME_SIZE_UNIFORM;
 
     public static void setHighlightColor(float r, float g, float b, float a) {
         CompiledShaderProgram currentProgram = Minecraft.getInstance().getShaderManager().getProgram(HIGHLIGHT_SHADER_PROGRAM);
@@ -74,5 +81,22 @@ public class XaeroPlusShaders {
         ensureTransparentBackgroundUniforms();
         final int intValue = value ? 1 : 0;
         TRANSPARENT_BACKGROUND_UNIFORM.set(intValue);
+    }
+
+    public static void setLinesFrameSize(float width, float height) {
+        CompiledShaderProgram currentProgram = Minecraft.getInstance().getShaderManager().getProgram(LINES_SHADER_PROGRAM);
+        if (currentProgram != CACHED_LINES_SHADER_PROGRAM) {
+            CACHED_LINES_SHADER_PROGRAM = currentProgram;
+            LINES_FRAME_SIZE_UNIFORM = currentProgram.getUniform("FrameSize");
+        }
+        LINES_FRAME_SIZE_UNIFORM.set(width, height);
+    }
+
+    public static void setLinesWidth(float linesWidth) {
+        CompiledShaderProgram currentProgram = Minecraft.getInstance().getShaderManager().getProgram(LINES_SHADER_PROGRAM);
+        if (currentProgram != CACHED_LINES_SHADER_PROGRAM) {
+            CACHED_LINES_SHADER_PROGRAM = currentProgram;
+        }
+        CACHED_LINES_SHADER_PROGRAM.LINE_WIDTH.set(linesWidth);
     }
 }

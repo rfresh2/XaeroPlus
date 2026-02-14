@@ -987,6 +987,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     public void panMouseButtonClick(final InputConstants.Type type, final int code, final CallbackInfoReturnable<Boolean> cir) {
         if (type != InputConstants.Type.MOUSE) return;
         if (code != GLFW_MOUSE_BUTTON_MIDDLE) return;
+        if (!Settings.REGISTRY.worldMapUIAdditions.get()) return;
         pan = true;
         var mc = Minecraft.getInstance();
         panMouseStartX = Misc.getMouseX(mc, true);

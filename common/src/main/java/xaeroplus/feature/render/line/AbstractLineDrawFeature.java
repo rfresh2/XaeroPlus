@@ -4,22 +4,25 @@ import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
-import xaero.lib.client.graphics.shader.LibShaders;
 import xaeroplus.Globals;
 import xaeroplus.feature.render.DrawContext;
 import xaeroplus.feature.render.DrawFeature;
+import xaeroplus.feature.render.shaders.XaeroPlusShaders;
 import xaeroplus.module.impl.TickTaskExecutor;
 import xaeroplus.util.ChunkUtils;
 
+import java.lang.ref.WeakReference;
 import java.util.concurrent.TimeUnit;
 
 import static xaeroplus.util.GuiMapHelper.*;
 
 public abstract class AbstractLineDrawFeature<T> implements DrawFeature {
     public final AsyncLoadingCache<Long, T> lineRenderCache;
+    WeakReference<ShaderInstance> prevShaderRef = new WeakReference<>(null);
 
     protected AbstractLineDrawFeature(int refreshIntervalMs) {
         this.lineRenderCache = Caffeine.newBuilder()
@@ -63,17 +66,30 @@ public abstract class AbstractLineDrawFeature<T> implements DrawFeature {
     }
 
     public void preRender(DrawContext ctx) {
-        LibShaders.ensureShaders();
+        XaeroPlusShaders.ensureShaders();
         var mc = Minecraft.getInstance();
         if (ctx.worldmap()) {
-            LibShaders.FRAMEBUFFER_LINES.setFrameSize(mc.getWindow().getWidth(), mc.getWindow().getHeight());
+            XaeroPlusShaders.LINES_SHADER.setFrameSize(mc.getWindow().getWidth(), mc.getWindow().getHeight());
         }
         float lineWidthScale = 16f * (float) Mth.clamp(
             lineWidth() * ctx.fboScale(),
             0.1f * (ctx.worldmap() ? 1.0f : Globals.minimapScaleMultiplier),
             1000.0f
         );
-        RenderSystem.lineWidth(lineWidthScale);
+//        RenderSystem.lineWidth(lineWidthScale);
+        // VertexBuffer._drawWithShader() only updates line width uniform if mode is set to LINES or LINE_STRIP
+        // so we have to set it ourselves
+        XaeroPlusShaders.LINES_SHADER.LINE_WIDTH.set(lineWidthScale);
+        RenderSystem.enableBlend();
+        RenderSystem.disableCull();
+        prevShaderRef = new WeakReference<>(RenderSystem.getShader());
+    }
+
+    public void postRender(DrawContext ctx) {
+        RenderSystem.disableBlend();
+        RenderSystem.enableCull();
+        var prevShader = prevShaderRef.get();
+        RenderSystem.setShader(() -> prevShader);
     }
 
     @Override

@@ -9,3 +9,9 @@ accessible field net/minecraft/client/multiplayer/ClientLevel entityStorage Lnet
 accessible field com/mojang/blaze3d/shaders/BlendMode lastApplied Lcom/mojang/blaze3d/shaders/BlendMode;
 accessible field net/minecraft/client/renderer/ShaderInstance blend Lcom/mojang/blaze3d/shaders/BlendMode;
 mutable field net/minecraft/client/renderer/ShaderInstance blend Lcom/mojang/blaze3d/shaders/BlendMode;
+accessible field com/mojang/math/Matrix4f m00 F
+accessible field com/mojang/math/Matrix4f m01 F
+accessible field com/mojang/math/Matrix4f m03 F
+accessible field com/mojang/math/Matrix4f m10 F
+accessible field com/mojang/math/Matrix4f m11 F
+accessible field com/mojang/math/Matrix4f m13 F

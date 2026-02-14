@@ -37,9 +37,9 @@ import xaero.hud.minimap.common.config.option.MinimapProfiledConfigOptions;
 import xaero.hud.minimap.compass.render.CompassRenderer;
 import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.waypoint.render.WaypointMapRenderer;
-import xaero.lib.client.graphics.shader.LibShaders;
 import xaeroplus.Globals;
 import xaeroplus.feature.extensions.CustomMinimapFBORenderer;
+import xaeroplus.feature.render.shaders.XaeroPlusShaders;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.ColorHelper;
 
@@ -208,7 +208,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         int tileZ = mapZ & 3;
         int insideX = xFloored & 15;
         int insideZ = zFloored & 15;
-        LibShaders.FRAMEBUFFER_LINES.setFrameSize((float)this.scalingFramebuffer.viewWidth, (float)this.scalingFramebuffer.viewHeight);
+        XaeroPlusShaders.LINES_SHADER.setFrameSize((float)this.scalingFramebuffer.viewWidth, (float)this.scalingFramebuffer.viewHeight);
         Globals.drawManager.drawMinimapFeatures(
             chunkX,
             chunkZ,
@@ -231,7 +231,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
                                             @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers
     ) {
         original.call(instance, renderer);
-        LibShaders.FRAMEBUFFER_LINES.setFrameSize((float)this.scalingFramebuffer.viewWidth, (float)this.scalingFramebuffer.viewHeight);
+        XaeroPlusShaders.LINES_SHADER.setFrameSize((float)this.scalingFramebuffer.viewWidth, (float)this.scalingFramebuffer.viewHeight);
         int mapX = xFloored >> 4;
         int mapZ = zFloored >> 4;
         int chunkX = mapX >> 2;

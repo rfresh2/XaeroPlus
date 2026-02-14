@@ -34,6 +34,17 @@ public class XaeroPlusShaders {
         .withBlend(new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ONE_MINUS_SRC_ALPHA))
         .build();
 
+    public static final RenderPipeline LINES_PIPELINE = RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET)
+        .withLocation(ResourceLocation.fromNamespaceAndPath("xaeroplus", "pipeline/lines"))
+        .withVertexShader(ResourceLocation.fromNamespaceAndPath("xaeroplus", "lines"))
+        .withFragmentShader(ResourceLocation.fromNamespaceAndPath("xaeroplus", "lines"))
+        .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS)
+        .withPolygonMode(PolygonMode.FILL)
+        .withUniform("LinesTransforms", UniformType.UNIFORM_BUFFER)
+        .withBlend(new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ONE_MINUS_SRC_ALPHA))
+        .withCull(false)
+        .build();
+
     public static Integer cachedTransparentBackground = null;
     public static final CustomUniform<Integer> TRANSPARENT_WM_BACKGROUND_UNIFORM = new CustomUniform<>(
         new RenderPipeline.UniformDescription("TransparentBackgroundBlock", UniformType.UNIFORM_BUFFER),
@@ -45,5 +56,12 @@ public class XaeroPlusShaders {
             cachedTransparentBackground = intValue;
             TRANSPARENT_WM_BACKGROUND_UNIFORM.setValue(intValue);
         }
+    }
+
+    public static final float[] LINES_FRAME_SIZE = new float[2];
+
+    public static void setLinesFrameSize(float width, float height) {
+        LINES_FRAME_SIZE[0] = width;
+        LINES_FRAME_SIZE[1] = height;
     }
 }

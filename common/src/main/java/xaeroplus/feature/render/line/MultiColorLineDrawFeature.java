@@ -1,31 +1,22 @@
 package xaeroplus.feature.render.line;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferUploader;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaeroplus.feature.render.DrawContext;
-import xaeroplus.feature.render.DrawHelper;
-import xaeroplus.feature.render.shaders.XaeroPlusShaders;
-import xaeroplus.util.ChunkUtils;
-import xaeroplus.util.ColorHelper;
-
-import java.util.List;
 
 public class MultiColorLineDrawFeature extends AbstractLineDrawFeature<Object2IntMap<Line>> {
     private final String id;
     private final MultiColorLineProvider lineProvider;
+    private final MultiColorLineVertexBuffer drawBuffer;
 
     public MultiColorLineDrawFeature(final String id, final MultiColorLineProvider lineProvider, int refreshIntervalMs) {
         super(refreshIntervalMs);
         this.id = id;
         this.lineProvider = lineProvider;
+        this.drawBuffer = new MultiColorLineVertexBuffer(lineProvider.colorFunction());
     }
 
     @Override
@@ -42,22 +33,13 @@ public class MultiColorLineDrawFeature extends AbstractLineDrawFeature<Object2In
     public Object2IntMap<Line> preProcessLines(final Object2IntMap<Line> lines, final int windowX, final int windowZ, final int windowSize) {
         if (lines.isEmpty()) return Object2IntMaps.emptyMap();
         Object2IntMap<Line> out = new Object2IntOpenHashMap<>(lines.size());
-        int windowXMin = ChunkUtils.regionCoordToCoord(windowX - windowSize);
-        int windowZMin = ChunkUtils.regionCoordToCoord(windowZ - windowSize);
-        int windowXMax = ChunkUtils.regionCoordToCoord(windowX + windowSize);
-        int windowZMax = ChunkUtils.regionCoordToCoord(windowZ + windowSize);
+        var bounds = LinePreProcessor.windowBounds(windowX, windowZ, windowSize);
         var it = Object2IntMaps.fastIterator(lines);
         while (it.hasNext()) {
             var entry = it.next();
-            Line line = entry.getKey();
-            if (!line.lineClip(windowXMin, windowXMax, windowZMin, windowZMax)) continue;
-            List<Line> newLines = LinePreProcessor.ensureLength(line);
-            if (!newLines.isEmpty()) {
-                for (Line newLine : newLines) {
-                    out.put(LinePreProcessor.ensureOrientation(newLine), entry.getIntValue());
-                }
-            } else {
-                out.put(LinePreProcessor.ensureOrientation(line), entry.getIntValue());
+            var processedLines = LinePreProcessor.clippedSplitOriented(entry.getKey(), bounds);
+            for (int i = 0; i < processedLines.size(); i++) {
+                out.put(processedLines.get(i), entry.getIntValue());
             }
         }
         return out;
@@ -74,35 +56,20 @@ public class MultiColorLineDrawFeature extends AbstractLineDrawFeature<Object2In
     }
 
     @Override
+    protected void markDrawBufferStale() {
+        drawBuffer.markStale();
+    }
+
+    @Override
+    protected void closeDrawBuffer() {
+        drawBuffer.close();
+    }
+
+    @Override
     public void render(final DrawContext ctx) {
         preRender(ctx);
-        var lines = getLines();
-        if (!lines.isEmpty()) {
-            var bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-            var it = Object2IntMaps.fastIterator(lines);
-            while (it.hasNext()) {
-                var entry = it.next();
-                var line = entry.getKey();
-                var color = lineProvider.colorFunction().getColor(line, entry.getIntValue());
-                var r = ColorHelper.getR(color);
-                var g = ColorHelper.getG(color);
-                var b = ColorHelper.getB(color);
-                var a = ColorHelper.getA(color);
-                if (a == 0) continue;
-                int x1 = ctx.worldmap() ? line.x2() : line.x1();
-                int z1 = ctx.worldmap() ? line.z2() : line.z1();
-                int x2 = ctx.worldmap() ? line.x1() : line.x2();
-                int z2 = ctx.worldmap() ? line.z1() : line.z2();
-                DrawHelper.addColoredLineQuadToExistingBuffer(
-                    ctx.matrixStack().last(), bufferBuilder,
-                    x1, z1, x2, z2,
-                    r, g, b, a
-                );
-            }
-            var meshData = bufferBuilder.buildOrThrow();
-            RenderSystem.setShader(() -> XaeroPlusShaders.LINES_SHADER);
-            BufferUploader.drawWithShader(meshData);
-        }
+        drawBuffer.preRender(ctx, getLines());
+        drawBuffer.render();
         postRender(ctx);
     }
 }

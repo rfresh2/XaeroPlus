@@ -1,4 +1,4 @@
-#version 150
+#version 330
 
 #moj_import <xaeroplus:lines_include.glsl>
 
@@ -24,7 +24,7 @@ void main() {
         discard;
     }
 
-    vec4 color = vertexColor * ColorModulator;
+    vec4 color = vertexColor;
     color.a *= alpha;
     fragColor = color;
 }

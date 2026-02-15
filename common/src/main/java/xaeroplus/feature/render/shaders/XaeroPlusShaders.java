@@ -50,6 +50,7 @@ public class XaeroPlusShaders {
         new RenderPipeline.UniformDescription("TransparentBackgroundBlock", UniformType.UNIFORM_BUFFER),
         BuiltInCustomUniformValueTypes.INT, 32
     );
+
     public static void setTransparentWMBackground(boolean value) {
         int intValue = value ? 1 : 0;
         if (cachedTransparentBackground == null || cachedTransparentBackground != intValue) {

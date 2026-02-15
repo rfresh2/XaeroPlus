@@ -47,12 +47,14 @@ public class XaeroPlusShaders {
         .withUniform("ColorModulator", UniformType.VEC4)
         .withUniform("LineWidth", UniformType.FLOAT)
         .withUniform("FrameSize", UniformType.VEC2)
+        .withUniform("MapViewMatrix", UniformType.MATRIX4X4)
         .withBlend(new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ONE_MINUS_SRC_ALPHA))
         .withCull(false)
         .build();
 
     public static final int[] TRANSPARENT_WM_BACKGROUND_UNIFORM_VALUE = new int[1];
     public static final RenderPipeline.UniformDescription TRANSPARENT_WM_BACKGROUND_UNIFORM = new RenderPipeline.UniformDescription("TransparentBackground", UniformType.INT);
+
     public static void setTransparentWMBackground(boolean value) {
         int intValue = value ? 1 : 0;
         TRANSPARENT_WM_BACKGROUND_UNIFORM_VALUE[0] = intValue;

@@ -1,12 +1,36 @@
 package xaeroplus.feature.render.line;
 
 import net.minecraft.util.Mth;
+import xaeroplus.util.ChunkUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class LinePreProcessor {
+    public record WindowBounds(int minX, int maxX, int minZ, int maxZ) {
+        public boolean contains(final Line line) {
+            return line.lineClip(minX, maxX, minZ, maxZ);
+        }
+    }
+
+    public static WindowBounds windowBounds(final int windowX, final int windowZ, final int windowSize) {
+        int minX = ChunkUtils.regionCoordToCoord(windowX - windowSize);
+        int minZ = ChunkUtils.regionCoordToCoord(windowZ - windowSize);
+        int maxX = ChunkUtils.regionCoordToCoord(windowX + windowSize);
+        int maxZ = ChunkUtils.regionCoordToCoord(windowZ + windowSize);
+        return new WindowBounds(minX, maxX, minZ, maxZ);
+    }
+
+    public static List<Line> clippedSplitOriented(final Line line, final WindowBounds windowBounds) {
+        if (!windowBounds.contains(line)) return Collections.emptyList();
+        var splitLines = ensureLength(line);
+        if (splitLines.isEmpty()) {
+            return List.of(ensureOrientation(line));
+        }
+        splitLines.replaceAll(LinePreProcessor::ensureOrientation);
+        return splitLines;
+    }
 
     public static Line ensureOrientation(Line line) {
         // z1 must always be less than or equal to z2

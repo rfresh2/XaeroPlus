@@ -1,6 +1,5 @@
 #version 150
 
-uniform vec4 ColorModulator;
 uniform float LineWidth;
 in vec4 vertexColor;
 in vec2 segmentLocalPx;
@@ -24,7 +23,7 @@ void main() {
         discard;
     }
 
-    vec4 color = vertexColor * ColorModulator;
+    vec4 color = vertexColor;
     color.a *= alpha;
     fragColor = color;
 }

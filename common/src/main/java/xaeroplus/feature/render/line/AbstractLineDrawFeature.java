@@ -2,66 +2,47 @@ package xaeroplus.feature.render.line;
 
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import com.mojang.blaze3d.buffers.Std140Builder;
-import com.mojang.blaze3d.buffers.Std140SizeCalculator;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.MeshData;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MappableRingBuffer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
-import org.joml.Vector4f;
 import xaeroplus.Globals;
 import xaeroplus.feature.render.DrawContext;
 import xaeroplus.feature.render.DrawFeature;
+import xaeroplus.feature.render.MapRenderWindow;
 import xaeroplus.feature.render.shaders.XaeroPlusShaders;
 import xaeroplus.module.impl.TickTaskExecutor;
-import xaeroplus.util.ChunkUtils;
 
-import java.util.OptionalInt;
 import java.util.concurrent.TimeUnit;
-
-import static xaeroplus.util.GuiMapHelper.*;
 
 public abstract class AbstractLineDrawFeature<T> implements DrawFeature {
     public final AsyncLoadingCache<Long, T> lineRenderCache;
-    public MappableRingBuffer uniformBuffer = null;
 
     protected AbstractLineDrawFeature(int refreshIntervalMs) {
         this.lineRenderCache = Caffeine.newBuilder()
             .expireAfterWrite(10, TimeUnit.SECONDS)
             .refreshAfterWrite(refreshIntervalMs, TimeUnit.MILLISECONDS)
             .executor(TickTaskExecutor.INSTANCE)
+            .removalListener((k, v, cause) -> markDrawBufferStale())
             .buildAsync(k -> loadLinesInWindow());
     }
 
     @Override
     public void invalidateCache() {
         lineRenderCache.synchronous().invalidateAll();
+        markDrawBufferStale();
     }
 
     public abstract float lineWidth();
 
     public T loadLinesInWindow() {
-        final int windowX, windowZ, windowSize;
-        var guiMapOptional = getGuiMap();
-        if (guiMapOptional.isPresent()) {
-            var guiMap = guiMapOptional.get();
-            windowX = getGuiMapCenterRegionX(guiMap);
-            windowZ = getGuiMapCenterRegionZ(guiMap);
-            windowSize = getGuiMapRegionSize(guiMap);
-        } else {
-            windowX = ChunkUtils.getPlayerRegionX();
-            windowZ = ChunkUtils.getPlayerRegionZ();
-            windowSize = Math.max(3, Globals.minimapScaleMultiplier);
-        }
-        return preProcessLines(provideLinesInWindow(windowX, windowZ, windowSize, Globals.getCurrentDimensionId()), windowX, windowZ, windowSize);
+        var window = MapRenderWindow.resolveCurrent();
+        return preProcessLines(
+            provideLinesInWindow(window.windowX(), window.windowZ(), window.windowSize(), window.dimension()),
+            window.windowX(),
+            window.windowZ(),
+            window.windowSize()
+        );
     }
 
     public abstract T provideLinesInWindow(int windowX, int windowZ, int windowSize, ResourceKey<Level> dimension);
@@ -70,70 +51,33 @@ public abstract class AbstractLineDrawFeature<T> implements DrawFeature {
 
     public abstract T emptyLines();
 
+    protected abstract void markDrawBufferStale();
+
+    protected abstract void closeDrawBuffer();
+
     public T getLines() {
         return lineRenderCache.get(0L).getNow(emptyLines());
     }
 
-    public void preRender(DrawContext ctx) {
-        if (ctx.worldmap()) {
-            XaeroPlusShaders.setLinesFrameSize(Minecraft.getInstance().getWindow().getWidth(), Minecraft.getInstance().getWindow().getHeight());
-        }
-        if (uniformBuffer == null) {
-            uniformBuffer = new MappableRingBuffer(
-                () -> "XaeroPlus Lines Uniform Buffer",
-                GpuBuffer.USAGE_UNIFORM | GpuBuffer.USAGE_MAP_WRITE,
-                new Std140SizeCalculator()
-                    .putVec2()
-                    .putVec2()
-                    .get()
-            );
-        }
-    }
-
-    void drawLines(DrawContext ctx, MeshData meshData) {
-        float lineWidthScale = 16f * (float) Mth.clamp(
+    protected float lineWidthScale(final DrawContext ctx) {
+        return 16f * (float) Mth.clamp(
             lineWidth() * ctx.fboScale(),
             0.1f * (ctx.worldmap() ? 1.0f : Globals.minimapScaleMultiplier),
             1000.0f
         );
-        uniformBuffer.rotate();
-        try (var mappedView = RenderSystem.getDevice().createCommandEncoder().mapBuffer(uniformBuffer.currentBuffer(), false, true)) {
-            Std140Builder.intoBuffer(mappedView.data())
-                .putVec2(XaeroPlusShaders.LINES_FRAME_SIZE[0], XaeroPlusShaders.LINES_FRAME_SIZE[1]);
-        }
-        GpuBufferSlice dynamic = RenderSystem.getDynamicUniforms()
-            // only need ModelViewMat
-            .writeTransform(RenderSystem.getModelViewMatrix(), new Vector4f(1.0f, 1.0f, 1.0f, 1.0f), new Vector3f(), new Matrix4f(), lineWidthScale);
-        VertexFormat.IndexType indexType;
-        GpuBuffer indexBuffer;
-        GpuBuffer vertexBuffer;
-        try (meshData) {
-            if (meshData.indexBuffer() == null) {
-                RenderSystem.AutoStorageIndexBuffer autoStorageIndexBuffer = RenderSystem.getSequentialBuffer(meshData.drawState().mode());
-                indexBuffer = autoStorageIndexBuffer.getBuffer(meshData.drawState().indexCount());
-                indexType = autoStorageIndexBuffer.type();
-            } else {
-                indexBuffer = XaeroPlusShaders.LINES_PIPELINE.getVertexFormat().uploadImmediateIndexBuffer(meshData.indexBuffer());
-                indexType = meshData.drawState().indexType();
-            }
-            vertexBuffer = XaeroPlusShaders.LINES_PIPELINE.getVertexFormat().uploadImmediateVertexBuffer(meshData.vertexBuffer());
-        }
-        try (var pass = RenderSystem.getDevice().createCommandEncoder()
-            .createRenderPass(() -> "XaeroPlus Lines", Minecraft.getInstance().getMainRenderTarget().getColorTextureView(), OptionalInt.empty())) {
-            pass.setPipeline(XaeroPlusShaders.LINES_PIPELINE);
-            RenderSystem.bindDefaultUniforms(pass);
-            pass.setUniform("DynamicTransforms", dynamic);
-            pass.setUniform("LinesTransforms", uniformBuffer.currentBuffer());
-            pass.setIndexBuffer(indexBuffer, indexType);
-            pass.setVertexBuffer(0, vertexBuffer);
-            pass.drawIndexed(0, 0, meshData.drawState().indexCount(), 1);
+    }
+
+    public void preRender(final DrawContext ctx) {
+        if (ctx.worldmap()) {
+            XaeroPlusShaders.setLinesFrameSize(Minecraft.getInstance().getWindow().getWidth(), Minecraft.getInstance().getWindow().getHeight());
         }
     }
 
-    public void postRender(DrawContext ctx) {}
+    public void postRender(final DrawContext ctx) {}
 
     @Override
     public void close() {
         lineRenderCache.synchronous().invalidateAll();
+        closeDrawBuffer();
     }
 }

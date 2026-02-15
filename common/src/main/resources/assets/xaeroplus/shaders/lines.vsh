@@ -1,4 +1,4 @@
-#version 150
+#version 330
 
 #moj_import <xaeroplus:lines_include.glsl>
 
@@ -15,11 +15,11 @@ void main() {
     const float aaRadiusPx = 1.0;
 
     // Vertex packing contract:
-    // - Position.xy: segment start in map-space (already pose-transformed on CPU)
-    // - UV0.xy: segment end in the same space as Position
+    // - Position.xy: segment start in map-space
+    // - UV0.xy: segment end in map-space
     // - gl_VertexID % 4: logical quad corner selector
-    vec4 startPos = ProjMat * ModelViewMat * vec4(Position, 1.0);
-    vec4 endPos = ProjMat * ModelViewMat * vec4(UV0, Position.z, 1.0);
+    vec4 startPos = ProjMat * ModelViewMat * MapViewMatrix * vec4(Position, 1.0);
+    vec4 endPos = ProjMat * ModelViewMat * MapViewMatrix * vec4(UV0, Position.z, 1.0);
 
     vec3 startNdc = startPos.xyz / startPos.w;
     vec3 endNdc = endPos.xyz / endPos.w;

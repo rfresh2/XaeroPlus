@@ -2,5 +2,6 @@
 #moj_import <minecraft:dynamictransforms.glsl>
 
 layout(std140) uniform LinesTransforms {
+    mat4 MapViewMatrix;
     vec2 FrameSize;
 };

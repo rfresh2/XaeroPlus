@@ -74,17 +74,13 @@ public class DrawHelper {
     }
 
     public static void addColoredLineQuadToExistingBuffer(
-        PoseStack.Pose matrices, VertexConsumer vertexBuffer, float x1, float y1, float x2, float y2, float r, float g, float b, float a
+        VertexConsumer vertexBuffer, float x1, float y1, float x2, float y2, float r, float g, float b, float a
     ) {
-        var pose = matrices.pose();
-        // POSITION is transformed by `vertex(matrix, ...)`, so UV0 endpoint must be transformed too.
-        float x2t = pose.m00 * x2 + pose.m01 * y2 + pose.m03;
-        float y2t = pose.m10 * x2 + pose.m11 * y2 + pose.m13;
         // The line shader expands this segment into a quad in screen space using gl_VertexID.
-        // Endpoint is packed in UV0 to avoid the low precision of NORMAL packing.
-        vertexBuffer.vertex(pose, x1, y1, 0.0F).color(r, g, b, a).uv(x2t, y2t).endVertex();
-        vertexBuffer.vertex(pose, x1, y1, 0.0F).color(r, g, b, a).uv(x2t, y2t).endVertex();
-        vertexBuffer.vertex(pose, x1, y1, 0.0F).color(r, g, b, a).uv(x2t, y2t).endVertex();
-        vertexBuffer.vertex(pose, x1, y1, 0.0F).color(r, g, b, a).uv(x2t, y2t).endVertex();
+        // Position and UV0 are both in map-space and transformed by MapViewMatrix in the shader.
+        vertexBuffer.vertex(x1, y1, 0.0F).color(r, g, b, a).uv(x2, y2).endVertex();
+        vertexBuffer.vertex(x1, y1, 0.0F).color(r, g, b, a).uv(x2, y2).endVertex();
+        vertexBuffer.vertex(x1, y1, 0.0F).color(r, g, b, a).uv(x2, y2).endVertex();
+        vertexBuffer.vertex(x1, y1, 0.0F).color(r, g, b, a).uv(x2, y2).endVertex();
     }
 }

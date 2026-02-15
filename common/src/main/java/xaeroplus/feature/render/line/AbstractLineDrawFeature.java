@@ -5,55 +5,46 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.CompiledShaderProgram;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import xaeroplus.Globals;
 import xaeroplus.feature.render.DrawContext;
 import xaeroplus.feature.render.DrawFeature;
+import xaeroplus.feature.render.MapRenderWindow;
 import xaeroplus.feature.render.shaders.XaeroPlusShaders;
 import xaeroplus.module.impl.TickTaskExecutor;
-import xaeroplus.util.ChunkUtils;
 
-import java.lang.ref.WeakReference;
 import java.util.concurrent.TimeUnit;
-
-import static xaeroplus.util.GuiMapHelper.*;
 
 public abstract class AbstractLineDrawFeature<T> implements DrawFeature {
     public final AsyncLoadingCache<Long, T> lineRenderCache;
-    WeakReference<CompiledShaderProgram> prevShaderRef = new WeakReference<>(null);
 
     protected AbstractLineDrawFeature(int refreshIntervalMs) {
         this.lineRenderCache = Caffeine.newBuilder()
             .expireAfterWrite(10, TimeUnit.SECONDS)
             .refreshAfterWrite(refreshIntervalMs, TimeUnit.MILLISECONDS)
             .executor(TickTaskExecutor.INSTANCE)
+            .removalListener((k, v, cause) -> markDrawBufferStale())
             .buildAsync(k -> loadLinesInWindow());
     }
 
     @Override
     public void invalidateCache() {
         lineRenderCache.synchronous().invalidateAll();
+        markDrawBufferStale();
     }
 
     public abstract float lineWidth();
 
     public T loadLinesInWindow() {
-        final int windowX, windowZ, windowSize;
-        var guiMapOptional = getGuiMap();
-        if (guiMapOptional.isPresent()) {
-            var guiMap = guiMapOptional.get();
-            windowX = getGuiMapCenterRegionX(guiMap);
-            windowZ = getGuiMapCenterRegionZ(guiMap);
-            windowSize = getGuiMapRegionSize(guiMap);
-        } else {
-            windowX = ChunkUtils.getPlayerRegionX();
-            windowZ = ChunkUtils.getPlayerRegionZ();
-            windowSize = Math.max(3, Globals.minimapScaleMultiplier);
-        }
-        return preProcessLines(provideLinesInWindow(windowX, windowZ, windowSize, Globals.getCurrentDimensionId()), windowX, windowZ, windowSize);
+        var window = MapRenderWindow.resolveCurrent();
+        return preProcessLines(
+            provideLinesInWindow(window.windowX(), window.windowZ(), window.windowSize(), window.dimension()),
+            window.windowX(),
+            window.windowZ(),
+            window.windowSize()
+        );
     }
 
     public abstract T provideLinesInWindow(int windowX, int windowZ, int windowSize, ResourceKey<Level> dimension);
@@ -61,6 +52,10 @@ public abstract class AbstractLineDrawFeature<T> implements DrawFeature {
     public abstract T preProcessLines(T lines, final int windowX, final int windowZ, final int windowSize);
 
     public abstract T emptyLines();
+
+    protected abstract void markDrawBufferStale();
+
+    protected abstract void closeDrawBuffer();
 
     public T getLines() {
         return lineRenderCache.get(0L).getNow(emptyLines());
@@ -76,10 +71,10 @@ public abstract class AbstractLineDrawFeature<T> implements DrawFeature {
             0.1f * (ctx.worldmap() ? 1.0f : Globals.minimapScaleMultiplier),
             1000.0f
         );
-//        RenderSystem.lineWidth(lineWidthScale);
         // VertexBuffer._drawWithShader() only updates line width uniform if mode is set to LINES or LINE_STRIP
         // so we have to set it ourselves
         XaeroPlusShaders.setLinesWidth(lineWidthScale);
+        XaeroPlusShaders.setLinesMapViewMatrix(ctx.matrixStack().last().pose());
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(
             GlStateManager.SourceFactor.SRC_ALPHA,
@@ -88,18 +83,16 @@ public abstract class AbstractLineDrawFeature<T> implements DrawFeature {
             GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA
         );
         RenderSystem.disableCull();
-        prevShaderRef = new WeakReference<>(RenderSystem.getShader());
     }
 
     public void postRender(DrawContext ctx) {
         RenderSystem.disableBlend();
         RenderSystem.enableCull();
-        var prevShader = prevShaderRef.get();
-        RenderSystem.setShader(prevShader);
     }
 
     @Override
     public void close() {
         lineRenderCache.synchronous().invalidateAll();
+        closeDrawBuffer();
     }
 }

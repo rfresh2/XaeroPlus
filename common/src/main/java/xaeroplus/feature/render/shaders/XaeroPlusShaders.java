@@ -36,6 +36,7 @@ public class XaeroPlusShaders {
     private static Uniform MULTI_COLOR_HIGHLIGHT_MAP_VIEW_MATRIX_UNIFORM;
     private static Uniform TRANSPARENT_BACKGROUND_UNIFORM;
     private static Uniform LINES_FRAME_SIZE_UNIFORM;
+    private static Uniform LINES_MAP_VIEW_MATRIX_UNIFORM;
 
     public static void setHighlightColor(float r, float g, float b, float a) {
         CompiledShaderProgram currentProgram = Minecraft.getInstance().getShaderManager().getProgram(HIGHLIGHT_SHADER_PROGRAM);
@@ -88,6 +89,7 @@ public class XaeroPlusShaders {
         if (currentProgram != CACHED_LINES_SHADER_PROGRAM) {
             CACHED_LINES_SHADER_PROGRAM = currentProgram;
             LINES_FRAME_SIZE_UNIFORM = currentProgram.getUniform("FrameSize");
+            LINES_MAP_VIEW_MATRIX_UNIFORM = currentProgram.getUniform("MapViewMatrix");
         }
         LINES_FRAME_SIZE_UNIFORM.set(width, height);
     }
@@ -96,7 +98,17 @@ public class XaeroPlusShaders {
         CompiledShaderProgram currentProgram = Minecraft.getInstance().getShaderManager().getProgram(LINES_SHADER_PROGRAM);
         if (currentProgram != CACHED_LINES_SHADER_PROGRAM) {
             CACHED_LINES_SHADER_PROGRAM = currentProgram;
+            LINES_MAP_VIEW_MATRIX_UNIFORM = currentProgram.getUniform("MapViewMatrix");
         }
         CACHED_LINES_SHADER_PROGRAM.LINE_WIDTH.set(linesWidth);
+    }
+
+    public static void setLinesMapViewMatrix(Matrix4f matrix) {
+        CompiledShaderProgram currentProgram = Minecraft.getInstance().getShaderManager().getProgram(LINES_SHADER_PROGRAM);
+        if (currentProgram != CACHED_LINES_SHADER_PROGRAM) {
+            CACHED_LINES_SHADER_PROGRAM = currentProgram;
+            LINES_MAP_VIEW_MATRIX_UNIFORM = currentProgram.getUniform("MapViewMatrix");
+        }
+        LINES_MAP_VIEW_MATRIX_UNIFORM.set(matrix);
     }
 }

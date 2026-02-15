@@ -6,11 +6,9 @@ import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.longs.Long2LongMaps;
 import xaeroplus.Globals;
 import xaeroplus.feature.render.DrawContext;
-import xaeroplus.util.ChunkUtils;
+import xaeroplus.feature.render.MapRenderWindow;
 
 import java.util.concurrent.TimeUnit;
-
-import static xaeroplus.util.GuiMapHelper.*;
 
 public class AsyncChunkHighlightDrawFeature extends AbstractChunkHighlightDrawFeature {
     private final String id;
@@ -31,19 +29,9 @@ public class AsyncChunkHighlightDrawFeature extends AbstractChunkHighlightDrawFe
     }
 
     private Long2LongMap loadFeatureHighlightsInWindow() {
-        final int windowX, windowZ, windowSize;
-        var guiMapOptional = getGuiMap();
-        if (guiMapOptional.isPresent()) {
-            var guiMap = guiMapOptional.get();
-            windowX = getGuiMapCenterRegionX(guiMap);
-            windowZ = getGuiMapCenterRegionZ(guiMap);
-            windowSize = getGuiMapRegionSize(guiMap);
-        } else {
-            windowX = ChunkUtils.getPlayerRegionX();
-            windowZ = ChunkUtils.getPlayerRegionZ();
-            windowSize = Math.max(3, Globals.minimapScaleMultiplier);
-        }
-        return chunkHighlightProvider.chunkHighlightSupplier().getHighlights(windowX, windowZ, windowSize, Globals.getCurrentDimensionId());
+        var window = MapRenderWindow.resolveCurrent();
+        return chunkHighlightProvider.chunkHighlightSupplier()
+            .getHighlights(window.windowX(), window.windowZ(), window.windowSize(), window.dimension());
     }
 
     @Override

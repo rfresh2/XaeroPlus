@@ -5,13 +5,14 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import xaeroplus.settings.Settings;
 import xaeroplus.util.GuiMapHelper;
 
 @Mixin(Gui.class)
 public class MixinGui {
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    public void cancelGuiRenderWhileInTransparentMinimap(final CallbackInfo ci) {
-        if (GuiMapHelper.isGuiMapLoaded()) ci.cancel();
+    public void cancelGuiRenderWhileInTransparentWorldMap(final CallbackInfo ci) {
+        if (GuiMapHelper.isGuiMapLoaded() && Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) ci.cancel();
     }
 }

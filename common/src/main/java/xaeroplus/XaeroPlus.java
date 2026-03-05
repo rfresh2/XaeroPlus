@@ -14,6 +14,7 @@ import xaeroplus.event.MinimapInitCompletedEvent;
 import xaeroplus.feature.keybind.KeybindListener;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.Drawing;
+import xaeroplus.module.impl.HotReloadHandler;
 import xaeroplus.settings.Settings;
 import xaeroplus.settings.XaeroPlusSetting;
 
@@ -36,6 +37,7 @@ public class XaeroPlus {
 		Settings.REGISTRY.getAllSettings().forEach(XaeroPlusSetting::init);
 		Globals.initStickySettings();
 		ModuleManager.getModule(Drawing.class).enable();
+		ModuleManager.getModule(HotReloadHandler.class).enable();
 		XaeroPlus.EVENT_BUS.registerConsumer((e) -> {
 			if (Globals.minimapSettingsInitialized) return;
 			Globals.minimapSettingsInitialized = true;

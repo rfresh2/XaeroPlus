@@ -12,8 +12,8 @@ repositories {
 }
 
 dependencies {
+    implementation("gg.essential.loom:gg.essential.loom.gradle.plugin:1.15.45")
     implementation("architectury-plugin:architectury-plugin.gradle.plugin:3.4-SNAPSHOT")
-    implementation("dev.architectury:architectury-loom:1.13-SNAPSHOT")
-    implementation("com.gradleup.shadow:shadow-gradle-plugin:9.3.1")
+    implementation("com.gradleup.shadow:shadow-gradle-plugin:9.4.0")
 }
 

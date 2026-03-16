@@ -54,10 +54,6 @@ dependencies {
 	modRuntimeOnly(libs.immediatelyfast)
 	modImplementation(libs.modmenu)
 	modImplementation(libs.sodium)
-	modRuntimeOnly(libs.fpsdisplay)
-	modRuntimeOnly(libs.cloth.config.fabric) {
-		exclude(group = "net.fabricmc.fabric-api")
-	}
 	modRuntimeOnly(libs.opac.fabric)
 	modRuntimeOnly(libs.forge.config.api.port)
 	implementation(shadow(libs.caffeine.get())!!)

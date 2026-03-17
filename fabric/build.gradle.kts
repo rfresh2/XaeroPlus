@@ -51,13 +51,8 @@ dependencies {
 	modCompileOnly(libs.waystones.fabric)
 	modCompileOnly(libs.balm.fabric)
 	modCompileOnly(libs.fabric.waystones)
-//	modRuntimeOnly(libs.immediatelyfast)
     modImplementation(libs.modmenu)
 	modCompileOnly(libs.sodium)
-//	modRuntimeOnly(libs.fpsdisplay)
-//	modRuntimeOnly(libs.cloth.config.fabric) {
-//		exclude(group = "net.fabricmc.fabric-api")
-//	}
     implementation(shadow(libs.caffeine.get())!!)
     implementation(shadow(libs.lambdaEvents.get())!!)
     implementation(shadow(libs.oldbiomes.get())!!)

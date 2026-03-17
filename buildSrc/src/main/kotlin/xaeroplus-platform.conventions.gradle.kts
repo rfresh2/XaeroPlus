@@ -1,5 +1,5 @@
 plugins {
-    id("dev.architectury.loom")
+    id("gg.essential.loom")
     id("com.gradleup.shadow")
 }
 

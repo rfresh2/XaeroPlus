@@ -51,11 +51,9 @@ dependencyResolutionManagement {
 			library("fabric-waystones", "maven.modrinth:fwaystones:3.3.2+mc1.20.4")
 			library("worldtools", "maven.modrinth:worldtools:1.2.4+1.20.4")
             library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.51.2.1") // relocated xerial sqlite to avoid conflicts with other mods
-            library("immediatelyfast", "maven.modrinth:immediatelyfast:1.5.2+1.20.4-fabric")
+            library("immediatelyfast", "maven.modrinth:immediatelyfast:1.5.4+1.20.4-fabric")
 			library("modmenu", "maven.modrinth:modmenu:9.2.0")
 			library("sodium", "maven.modrinth:sodium:mc1.20.4-0.5.8")
-			library("fpsdisplay", "maven.modrinth:fpsdisplay:4.0.1+1.20.4")
-			library("cloth-config-fabric", "me.shedaniel.cloth:cloth-config-fabric:13.0.121")
             library("embeddium", "maven.modrinth:embeddium:0.3.25+mc1.20.4")
             library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")
             library("baritone-fabric", "com.github.rfresh2:baritone-fabric:${minecraft_version}-SNAPSHOT")

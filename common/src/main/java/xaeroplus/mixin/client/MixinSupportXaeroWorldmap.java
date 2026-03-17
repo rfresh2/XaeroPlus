@@ -82,7 +82,7 @@ public abstract class MixinSupportXaeroWorldmap {
         target = "Lxaero/common/mods/SupportXaeroWorldmap;renderSlimeChunks(Lxaero/map/region/MapTileChunk;Ljava/lang/Long;IILcom/mojang/blaze3d/vertex/PoseStack;Lxaero/common/minimap/render/MinimapRendererHelper;Lcom/mojang/blaze3d/vertex/VertexConsumer;)V"
     ), remap = true) // $REMAP
     public boolean hideSlimeChunksWhileDimSwitched(SupportXaeroWorldmap instance, MapTileChunk chunk, Long seed, int drawX, int drawZ, PoseStack matrixStack, MinimapRendererHelper helper, VertexConsumer overlayBufferBuilder) {
-        return Globals.getCurrentDimensionId() != Minecraft.getInstance().level.dimension();
+        return Globals.getCurrentDimensionId() == Minecraft.getInstance().level.dimension();
     }
 
     @Inject(method = "renderChunks", at = @At("RETURN"), remap = false)

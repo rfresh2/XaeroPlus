@@ -54,10 +54,6 @@ dependencies {
 	modRuntimeOnly(libs.immediatelyfast)
 	modImplementation(libs.modmenu)
     modImplementation(libs.sodium.fabric)
-//	modRuntimeOnly(libs.fpsdisplay)
-	modRuntimeOnly(libs.cloth.config.fabric) {
-		exclude(group = "net.fabricmc.fabric-api")
-	}
 	implementation(shadow(libs.caffeine.get())!!)
 	implementation(shadow(libs.lambdaEvents.get())!!)
 	implementation(shadow(libs.oldbiomes.get())!!)

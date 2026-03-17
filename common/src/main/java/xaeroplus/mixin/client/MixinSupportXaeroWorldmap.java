@@ -7,7 +7,6 @@ import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderPipelines;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -15,7 +14,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.mods.SupportXaeroWorldmap;
-import xaero.lib.client.graphics.util.ImmediateRenderUtil;
 import xaero.map.WorldMapSession;
 import xaero.map.region.MapTileChunk;
 import xaeroplus.Globals;
@@ -25,17 +23,17 @@ import xaeroplus.settings.Settings;
 @Mixin(value = SupportXaeroWorldmap.class, remap = false)
 public abstract class MixinSupportXaeroWorldmap {
     @Inject(method = "drawMinimap", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/hud/minimap/config/util/MinimapConfigClientUtils;getEffectiveSlimeChunks(Lxaero/hud/minimap/module/MinimapSession;)Z"
+            value = "INVOKE",
+            target = "Lxaero/map/settings/ModSettings;getRegionCacheHashCode()I"
     ), remap = false)
     public void overrideRegionRange(
-        final CallbackInfo ci,
-        @Local(name = "mapX") int mapX,
-        @Local(name = "mapZ") int mapZ,
-        @Local(name = "minX") LocalIntRef minXRef,
-        @Local(name = "maxX") LocalIntRef maxXRef,
-        @Local(name = "minZ") LocalIntRef minZRef,
-        @Local(name = "maxZ") LocalIntRef maxZRef
+            final CallbackInfo ci,
+            @Local(name = "mapX") int mapX,
+            @Local(name = "mapZ") int mapZ,
+            @Local(name = "minX") LocalIntRef minXRef,
+            @Local(name = "maxX") LocalIntRef maxXRef,
+            @Local(name = "minZ") LocalIntRef minZRef,
+            @Local(name = "maxZ") LocalIntRef maxZRef
     ) {
         final int scaledSize = Globals.minimapScaleMultiplier * 4;
         minXRef.set((mapX >> 2) - scaledSize);
@@ -46,42 +44,43 @@ public abstract class MixinSupportXaeroWorldmap {
 
     @Inject(method = "renderChunks", at = @At("HEAD"), remap = false)
     public void setupTransparentMMBgBuffer(
-        final CallbackInfo ci,
-        @Share("bgTesselator") LocalRef<Tesselator> bgTesselatorRef,
-        @Share("bgBufferBuilder") LocalRef<BufferBuilder> bgBufferBuilderRef
+            final CallbackInfo ci,
+            @Share("bgTesselator") LocalRef<Tesselator> bgTesselatorRef,
+            @Share("bgBufferBuilder") LocalRef<BufferBuilder> bgBufferBuilderRef
     ) {
         if (Settings.REGISTRY.transparentMinimapBackground.get()) {
             var bgTesselator = Tesselator.getInstance();
             bgTesselatorRef.set(bgTesselator);
-            var bgBufferBuilder = bgTesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+            var bgBufferBuilder = bgTesselator.getBuilder();
+            bgBufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
             bgBufferBuilderRef.set(bgBufferBuilder);
         }
     }
 
     @Inject(method = "renderChunks", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/common/mods/SupportXaeroWorldmap;prepareMapTexturedRect(Lorg/joml/Matrix4f;FFIIFFLxaero/map/region/MapTileChunk;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRenderer;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRenderer;Lxaero/common/minimap/render/MinimapRendererHelper;)V"
+            value = "INVOKE",
+            target = "Lxaero/common/mods/SupportXaeroWorldmap;prepareMapTexturedRect(Lorg/joml/Matrix4f;FFIIFFLxaero/map/region/MapTileChunk;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRenderer;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRenderer;Lxaero/common/minimap/render/MinimapRendererHelper;)V"
     ), remap = false)
     public void buildTransparentMMBg(
-        final CallbackInfo ci,
-        @Share("bgBufferBuilder") LocalRef<BufferBuilder> bgBufferBuilderRef,
-        @Local(argsOnly = true) final PoseStack matrixStack,
-        @Local(name = "drawX") int drawX,
-        @Local(name = "drawZ") int drawZ,
-        @Local(name = "chunk") MapTileChunk chunk
+            final CallbackInfo ci,
+            @Share("bgBufferBuilder") LocalRef<BufferBuilder> bgBufferBuilderRef,
+            @Local(argsOnly = true) final PoseStack matrixStack,
+            @Local(name = "drawX") int drawX,
+            @Local(name = "drawZ") int drawZ,
+            @Local(name = "chunk") MapTileChunk chunk
     ) {
         if (Settings.REGISTRY.transparentMinimapBackground.get()) {
             DrawHelper.addMMBackgroundToBuffer(matrixStack.last().pose(),
-                                               bgBufferBuilderRef.get(),
-                                               drawX,
-                                               drawZ,
-                                               chunk);
+                    bgBufferBuilderRef.get(),
+                    drawX,
+                    drawZ,
+                    chunk);
         }
     }
 
     @WrapWithCondition(method = "renderChunks", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/common/mods/SupportXaeroWorldmap;renderSlimeChunks(Lxaero/map/region/MapTileChunk;Ljava/lang/Long;IILcom/mojang/blaze3d/vertex/PoseStack;Lxaero/common/minimap/render/MinimapRendererHelper;Lcom/mojang/blaze3d/vertex/VertexConsumer;)V"
+            value = "INVOKE",
+            target = "Lxaero/common/mods/SupportXaeroWorldmap;renderSlimeChunks(Lxaero/map/region/MapTileChunk;Ljava/lang/Long;IILcom/mojang/blaze3d/vertex/PoseStack;Lxaero/common/minimap/render/MinimapRendererHelper;Lcom/mojang/blaze3d/vertex/VertexConsumer;)V"
     ), remap = true) // $REMAP
     public boolean hideSlimeChunksWhileDimSwitched(SupportXaeroWorldmap instance, MapTileChunk chunk, Long seed, int drawX, int drawZ, PoseStack matrixStack, MinimapRendererHelper helper, VertexConsumer overlayBufferBuilder) {
         return Globals.getCurrentDimensionId() == Minecraft.getInstance().level.dimension();
@@ -89,22 +88,19 @@ public abstract class MixinSupportXaeroWorldmap {
 
     @Inject(method = "renderChunks", at = @At("RETURN"), remap = false)
     public void drawTransparentMMBackground(
-        final CallbackInfo ci,
-        @Share("bgBufferBuilder") LocalRef<BufferBuilder> bgBufferBuilderRef
+            final CallbackInfo ci,
+            @Share("bgTesselator") LocalRef<Tesselator> bgTesselatorRef
     ) {
-        if (Settings.REGISTRY.transparentMinimapBackground.get()) {
-            var meshData = bgBufferBuilderRef.get().build();
-            if (meshData != null) ImmediateRenderUtil.drawImmediateMeshData(meshData, RenderPipelines.GUI, ImmediateRenderUtil.NO_TEXTURES);
-        }
+        if (Settings.REGISTRY.transparentMinimapBackground.get()) bgTesselatorRef.get().end();
     }
 
     @Inject(method = "tryToGetMultiworldId", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/map/WorldMapSession;getMapProcessor()Lxaero/map/MapProcessor;"
+            value = "INVOKE",
+            target = "Lxaero/map/WorldMapSession;getMapProcessor()Lxaero/map/MapProcessor;"
     ), cancellable = true, remap = false)
     public void preventPossibleNPE(
-        final CallbackInfoReturnable<String> cir,
-        @Local WorldMapSession session
+            final CallbackInfoReturnable<String> cir,
+            @Local WorldMapSession session
     ) {
         // possible race condition where WM session is not initialized when client ticks start
         /**

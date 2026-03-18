@@ -26,7 +26,7 @@ dependencyResolutionManagement {
 	versionCatalogs {
 		create("libs") {
 			library("fabric-loader", "net.fabricmc:fabric-loader:0.18.4")
-			library("forge", "net.minecraftforge:forge:1.21.11-61.1.1")
+			library("forge", "net.minecraftforge:forge:1.21.11-61.1.4")
 			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.141.3+${minecraft_version}")
 			library("neoforge", "net.neoforged:neoforge:21.11.38-beta")
             library("worldmap-fabric", "maven.modrinth:xaeros-world-map:fabric-${minecraft_version}-${worldmap_version_fabric}")

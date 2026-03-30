@@ -25,10 +25,10 @@ val xaerolib_version: String by ext.properties
 dependencyResolutionManagement {
 	versionCatalogs {
 		create("libs") {
-			library("fabric-loader", "net.fabricmc:fabric-loader:0.18.4")
-			library("forge", "net.minecraftforge:forge:1.21.11-61.1.4")
+			library("fabric-loader", "net.fabricmc:fabric-loader:0.18.5")
+			library("forge", "net.minecraftforge:forge:1.21.11-61.1.5")
 			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.141.3+${minecraft_version}")
-			library("neoforge", "net.neoforged:neoforge:21.11.38-beta")
+			library("neoforge", "net.neoforged:neoforge:21.11.42")
             library("worldmap-fabric", "maven.modrinth:xaeros-world-map:fabric-${minecraft_version}-${worldmap_version_fabric}")
             library("worldmap-forge", "maven.modrinth:xaeros-world-map:forge-${minecraft_version}-${worldmap_version_forge}")
             library("worldmap-neo", "maven.modrinth:xaeros-world-map:neoforge-${minecraft_version}-${worldmap_version_neo}")
@@ -42,24 +42,24 @@ dependencyResolutionManagement {
             library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.5.3")
 			library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.0")
 			library("lambdaEvents", "net.lenni0451:LambdaEvents:2.4.2")
-			library("waystones-fabric", "maven.modrinth:waystones:21.11.6+fabric-${minecraft_version}")
-			library("waystones-forge", "maven.modrinth:waystones:21.11.6+forge-${minecraft_version}")
-			library("waystones-neoforge", "maven.modrinth:waystones:21.11.6+neoforge-${minecraft_version}")
-			library("balm-fabric", "maven.modrinth:balm:21.11.6+fabric-${minecraft_version}")
-			library("balm-forge", "maven.modrinth:balm:21.11.6+forge-${minecraft_version}")
-			library("balm-neoforge", "maven.modrinth:balm:21.11.6+neoforge-${minecraft_version}")
+			library("waystones-fabric", "maven.modrinth:waystones:21.11.9+fabric-${minecraft_version}")
+			library("waystones-forge", "maven.modrinth:waystones:21.11.9+forge-${minecraft_version}")
+			library("waystones-neoforge", "maven.modrinth:waystones:21.11.9+neoforge-${minecraft_version}")
+			library("balm-fabric", "maven.modrinth:balm:21.11.8+fabric-${minecraft_version}")
+			library("balm-forge", "maven.modrinth:balm:21.11.8+forge-${minecraft_version}")
+			library("balm-neoforge", "maven.modrinth:balm:21.11.8+neoforge-${minecraft_version}")
 			library("fabric-waystones", "maven.modrinth:fwaystones:3.3.5+mc1.21.4")
 			library("worldtools", "maven.modrinth:worldtools:1.2.8+1.21.4")
             library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.51.2.1") // relocated xerial sqlite to avoid conflicts with other mods
 			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.14.2+${minecraft_version}-fabric")
 			library("immediatelyfast-neo", "maven.modrinth:immediatelyfast:1.14.2+${minecraft_version}-neoforge")
-			library("modmenu", "maven.modrinth:modmenu:17.0.0-beta.2")
-			library("sodium-fabric", "net.caffeinemc:sodium-fabric:0.8.4+mc${minecraft_version}")
-            library("sodium-neoforge", "net.caffeinemc:sodium-neoforge-mod:0.8.4+mc${minecraft_version}")
+			library("modmenu", "maven.modrinth:modmenu:17.0.0")
+			library("sodium-fabric", "net.caffeinemc:sodium-fabric:0.8.7+mc${minecraft_version}")
+            library("sodium-neoforge", "net.caffeinemc:sodium-neoforge-mod:0.8.7+mc${minecraft_version}")
             library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")
             library("baritone-fabric", "com.github.rfresh2:baritone-fabric:${minecraft_version}-SNAPSHOT")
             library("baritone-forge", "com.github.rfresh2:baritone-forge:${minecraft_version}-SNAPSHOT")
-            library("baritone-neoforge", "com.github.rfresh2:baritone-neoforge:1.21.10-SNAPSHOT")
+            library("baritone-neoforge", "com.github.rfresh2:baritone-neoforge:${minecraft_version}-SNAPSHOT")
 		}
 	}
 }

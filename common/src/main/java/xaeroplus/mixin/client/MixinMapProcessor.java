@@ -2,8 +2,10 @@ package xaeroplus.mixin.client;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -56,6 +58,7 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
     @Shadow private String currentWorldId;
     @Shadow private String currentDimId;
     @Shadow private String currentMWId;
+    @Shadow private long mainWorldChangedTime;
 
     @Unique
     private static final ThreadLocal<Boolean> xaeroPlus$getLeafRegionActualDimSignal = ThreadLocal.withInitial(() -> false);
@@ -71,6 +74,8 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
     }
 
     @Shadow public abstract String getDimensionName(final ResourceKey<Level> id);
+    @Shadow public abstract void updateWorldSpawn(BlockPos newSpawn, ClientLevel world);
+
 
     @Inject(method = "getMainId(ILnet/minecraft/client/multiplayer/ClientPacketListener;)Ljava/lang/String;", at = @At("HEAD"),
         cancellable = true,
@@ -246,5 +251,28 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
             this.xaeroPlus$prevMWId = this.currentMWId;
         }
         original.call(instance, value);
+    }
+
+    @Unique
+    private long xaeroPlus$lastWorldHashCode = 0L;
+
+    // fixes case where if server doesn't send ClientboundSetDefaultSpawnPositionPacket the xaero map never loads
+    // there may be some attempts at a fallback strategy in worldmap but the map never loads normally
+    @Inject(method = "onClientTickStart", at = @At("RETURN"))
+    public void fixDeadlockIfSpawnPacketNeverReceived(final CallbackInfo ci) {
+        var mc = Minecraft.getInstance();
+        if (mc.level == null || mc.player == null) return;
+        if (this.mapWorld == null || this.world != null || this.mainWorldChangedTime != -1) return;
+        // if mw type is based on world spawn, don't fallback spawn with alternate data
+        if (this.mapWorld.getCurrentMultiworldType() == 2) return;
+        var futureDim = this.mapWorld.getFutureDimension();
+        if (futureDim != null && this.mapWorld.getFutureMultiworldType(futureDim) == 2) return;
+        if (xaeroPlus$lastWorldHashCode == mc.level.hashCode()) return; // re-entrancy check just in case we somehow get called again
+        if (mc.player.tickCount > 5 * 20) { // 5 second timeout
+            xaeroPlus$lastWorldHashCode = mc.level.hashCode();
+            XaeroPlus.LOGGER.info("Unblocking map load with fallback spawn point, xaero hooks didn't receive or process DefaultSpawnPositionPacket");
+            BlockPos spawnPointPos = mc.level.getRespawnData().pos();
+            updateWorldSpawn(spawnPointPos, mc.level);
+        }
     }
 }

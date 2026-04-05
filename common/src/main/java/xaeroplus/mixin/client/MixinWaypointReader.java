@@ -38,17 +38,27 @@ public class MixinWaypointReader {
         if (BaritoneHelper.isBaritonePresent()) {
             int goalX = Mth.floor(element.getRenderX() - 0.5);
             int goalZ = Mth.floor(element.getRenderZ() - 0.5);
+            boolean isYPresent = element.isyIncluded();
+            int goalY = isYPresent ? element.getY() : 64;
             options.add(index++,
                 new RightClickOption("xaeroplus.gui.world_map.baritone_goal_here", options.size(), target) {
                     @Override
                     public void onAction(Screen screen) {
-                        BaritoneExecutor.goal(goalX, goalZ);
+                        if (isYPresent) {
+                            BaritoneExecutor.goal(goalX, goalY, goalZ);
+                        } else {
+                            BaritoneExecutor.goal(goalX, goalZ);
+                        }
                     }
                 }.setNameFormatArgs(KeyMappingUtils.getKeyName(Settings.REGISTRY.worldMapBaritoneGoalHereKeybindSetting.getKeyBinding())));
             options.add(index++, new RightClickOption("xaeroplus.gui.world_map.baritone_path_here", options.size(), target) {
                     @Override
                     public void onAction(Screen screen) {
-                        BaritoneExecutor.path(goalX, goalZ);
+                        if (isYPresent) {
+                            BaritoneExecutor.path(goalX, goalY, goalZ);
+                        } else {
+                            BaritoneExecutor.path(goalX, goalZ);
+                        }
                     }
                 }.setNameFormatArgs(KeyMappingUtils.getKeyName(Settings.REGISTRY.worldMapBaritonePathHereKeybindSetting.getKeyBinding())));
             if (BaritoneHelper.isBaritoneElytraPresent()) {
@@ -56,7 +66,11 @@ public class MixinWaypointReader {
                     new RightClickOption("xaeroplus.gui.world_map.baritone_elytra_here", options.size(), target) {
                         @Override
                         public void onAction(Screen screen) {
-                            BaritoneExecutor.elytra(goalX, goalZ);
+                            if (isYPresent) {
+                                BaritoneExecutor.elytra(goalX, goalY, goalZ);
+                            } else {
+                                BaritoneExecutor.elytra(goalX, goalZ);
+                            }
                         }
                     }.setNameFormatArgs(KeyMappingUtils.getKeyName(Settings.REGISTRY.worldMapBaritoneElytraHereKeybindSetting.getKeyBinding()))
                 ));

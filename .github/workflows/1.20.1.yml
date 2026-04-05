@@ -123,6 +123,10 @@ jobs:
           && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/fabric-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.minimap_version_fabric }}/xaeros-minimap-fabric-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.minimap_version_fabric }}.jar -P run/mods/ \
           && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/fabric-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_fabric }}/xaeros-world-map-fabric-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_fabric }}.jar -P run/mods/
 
+      - name: Setup Additional 1.20.1 Fabric Mods
+        run: |
+          wget https://maven.meteordev.org/releases/meteordevelopment/meteor-client/0.5.4/meteor-client-0.5.4.jar -P run/mods
+
       - name: Fabric Test
         uses: headlesshq/mc-runtime-test@4.1.0
         with:

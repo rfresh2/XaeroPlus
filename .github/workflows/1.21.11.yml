@@ -151,7 +151,7 @@ jobs:
           && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/fabric-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_fabric }}/xaeros-world-map-fabric-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_fabric }}.jar -P run/mods/
 
       - name: Fabric Test
-        uses: headlesshq/mc-runtime-test@4.1.0
+        uses: headlesshq/mc-runtime-test@4.3.0
         with:
           mc: ${{ env.MINECRAFT_VERSION }}
           modloader: fabric
@@ -162,7 +162,6 @@ jobs:
           xvfb: false
           headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
           cache-mc: github
-          hmc-version: 2.8.0
 
   test-forge:
     runs-on: ubuntu-latest
@@ -193,7 +192,7 @@ jobs:
           && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/forge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_fabric }}/xaeros-world-map-forge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_forge }}.jar -P run/mods/
 
       - name: Forge Test
-        uses: headlesshq/mc-runtime-test@4.1.0
+        uses: headlesshq/mc-runtime-test@4.3.0
         with:
           mc: ${{ env.MINECRAFT_VERSION }}
           modloader: forge
@@ -203,7 +202,6 @@ jobs:
           xvfb: false
           headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
           cache-mc: github
-          hmc-version: 2.8.0
 
   test-neo:
     runs-on: ubuntu-latest
@@ -234,7 +232,7 @@ jobs:
           && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/neoforge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_neo }}/xaeros-world-map-neoforge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_neo }}.jar -P run/mods/
 
       - name: Neo Test
-        uses: headlesshq/mc-runtime-test@4.1.0
+        uses: headlesshq/mc-runtime-test@4.3.0
         with:
           mc: ${{ env.MINECRAFT_VERSION }}
           modloader: neoforge
@@ -244,4 +242,3 @@ jobs:
           xvfb: false
           headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
           cache-mc: github
-          hmc-version: 2.8.0

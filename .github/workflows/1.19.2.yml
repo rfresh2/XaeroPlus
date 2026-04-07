@@ -124,7 +124,7 @@ jobs:
           && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/fabric-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_fabric }}/xaeros-world-map-fabric-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_fabric }}.jar -P run/mods/
 
       - name: Fabric Test
-        uses: headlesshq/mc-runtime-test@4.3.0
+        uses: headlesshq/mc-runtime-test@4.3.1
         with:
           mc: ${{ env.MINECRAFT_VERSION }}
           modloader: fabric
@@ -165,7 +165,7 @@ jobs:
           && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/forge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_fabric }}/xaeros-world-map-forge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_forge }}.jar -P run/mods/
 
       - name: Forge Test
-        uses: headlesshq/mc-runtime-test@4.3.0
+        uses: headlesshq/mc-runtime-test@4.3.1
         with:
           mc: ${{ env.MINECRAFT_VERSION }}
           modloader: forge

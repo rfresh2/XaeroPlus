@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    implementation("gg.essential.loom:gg.essential.loom.gradle.plugin:1.15.45")
+    implementation("gg.essential.loom:gg.essential.loom.gradle.plugin:1.15.49")
     implementation("architectury-plugin:architectury-plugin.gradle.plugin:3.4-SNAPSHOT")
     implementation("com.gradleup.shadow:shadow-gradle-plugin:9.4.1")
 }

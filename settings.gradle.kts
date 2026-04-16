@@ -16,6 +16,7 @@ plugins {
 val minecraft_version: String by ext.properties
 val worldmap_version_fabric: String by ext.properties
 val minimap_version_fabric: String by ext.properties
+val minimap_version_fabric_maven: String by ext.properties
 val worldmap_version_forge: String by ext.properties
 val minimap_version_forge: String by ext.properties
 val worldmap_version_neo: String by ext.properties
@@ -32,7 +33,7 @@ dependencyResolutionManagement {
             library("worldmap-fabric", "maven.modrinth:xaeros-world-map:fabric-${minecraft_version}-${worldmap_version_fabric}")
             library("worldmap-forge", "maven.modrinth:xaeros-world-map:forge-${minecraft_version}-${worldmap_version_forge}")
             library("worldmap-neo", "maven.modrinth:xaeros-world-map:neoforge-${minecraft_version}-${worldmap_version_neo}")
-            library("minimap-fabric", "maven.modrinth:xaeros-minimap:fabric-${minecraft_version}-${minimap_version_fabric}")
+            library("minimap-fabric", "maven.modrinth:xaeros-minimap:${minimap_version_fabric_maven}")
             library("minimap-forge", "maven.modrinth:xaeros-minimap:forge-${minecraft_version}-${minimap_version_forge}")
             library("minimap-neo", "maven.modrinth:xaeros-minimap:neoforge-${minecraft_version}-${minimap_version_neo}")
             library("xaerolib-fabric", "xaero.lib:xaerolib-fabric-${minecraft_version}:${xaerolib_version}")

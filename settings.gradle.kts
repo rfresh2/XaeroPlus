@@ -38,8 +38,8 @@ dependencyResolutionManagement {
             library("xaerolib-fabric", "xaero.lib:xaerolib-fabric-${minecraft_version}:${xaerolib_version}")
             library("xaerolib-forge", "xaero.lib:xaerolib-forge-${minecraft_version}:${xaerolib_version}")
             library("xaerolib-neo", "xaero.lib:xaerolib-neoforge-${minecraft_version}:${xaerolib_version}")
-            library("mixinextras-common", "io.github.llamalad7:mixinextras-common:0.5.3")
-            library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.5.3")
+            library("mixinextras-common", "io.github.llamalad7:mixinextras-common:0.5.4")
+            library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.5.4")
 			library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.0")
 			library("lambdaEvents", "net.lenni0451:LambdaEvents:2.4.2")
 			library("waystones-fabric", "maven.modrinth:waystones:21.1.20+fabric-1.21.1")
@@ -50,16 +50,16 @@ dependencyResolutionManagement {
 			library("balm-neoforge", "maven.modrinth:balm:21.0.48+neoforge-1.21.1")
 			library("fabric-waystones", "maven.modrinth:fwaystones:3.3.4+mc1.21.1")
 			library("worldtools", "maven.modrinth:worldtools:1.2.6+1.21.1")
-            library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.51.2.1") // relocated xerial sqlite to avoid conflicts with other mods
+            library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.53.0.1") // relocated xerial sqlite to avoid conflicts with other mods
 			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.6.6+1.21.1-fabric")
 			library("immediatelyfast-neo", "maven.modrinth:immediatelyfast:1.6.6+1.21.1-neoforge")
 			library("modmenu", "maven.modrinth:modmenu:11.0.3")
 			library("sodium-fabric", "maven.modrinth:sodium:mc1.21.1-0.6.13-fabric")
 			library("sodium-neoforge", "maven.modrinth:sodium:mc1.21.1-0.6.13-neoforge")
             library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")
-            library("baritone-fabric", "com.github.rfresh2:baritone-fabric:1.21-SNAPSHOT")
-            library("baritone-forge", "com.github.rfresh2:baritone-forge:1.21-SNAPSHOT")
-            library("baritone-neoforge", "com.github.rfresh2:baritone-neoforge:1.21-SNAPSHOT")
+            library("baritone-fabric", "com.github.rfresh2:baritone-fabric:${minecraft_version}-SNAPSHOT")
+            library("baritone-forge", "com.github.rfresh2:baritone-forge:${minecraft_version}-SNAPSHOT")
+            library("baritone-neoforge", "com.github.rfresh2:baritone-neoforge:${minecraft_version}-SNAPSHOT")
 		}
 	}
 }

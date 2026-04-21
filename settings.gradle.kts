@@ -32,8 +32,8 @@ dependencyResolutionManagement {
             library("minimap-forge", "maven.modrinth:xaeros-minimap:forge-${minecraft_version}-${minimap_version_forge}")
             library("xaerolib-fabric", "xaero.lib:xaerolib-fabric-${minecraft_version}:${xaerolib_version}")
             library("xaerolib-forge", "xaero.lib:xaerolib-forge-${minecraft_version}:${xaerolib_version}")
-			library("mixinextras-common", "io.github.llamalad7:mixinextras-common:0.5.3")
-			library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.5.3")
+			library("mixinextras-common", "io.github.llamalad7:mixinextras-common:0.5.4")
+			library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.5.4")
 			library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.0")
 			library("lambdaEvents", "net.lenni0451:LambdaEvents:2.4.2")
 			library("waystones-fabric", "maven.modrinth:waystones:11.4.2+fabric-1.19.2")
@@ -42,7 +42,7 @@ dependencyResolutionManagement {
 			library("balm-forge", "maven.modrinth:balm:4.6.0+forge-1.19.2")
 			library("fabric-waystones", "maven.modrinth:fwaystones:3.0.8+MC1.19.2")
 			library("worldtools", "maven.modrinth:worldtools:1.2.0+1.20.1")
-            library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.51.2.1") // relocated xerial sqlite to avoid conflicts with other mods
+            library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.53.0.1") // relocated xerial sqlite to avoid conflicts with other mods
 			library("sodium", "maven.modrinth:sodium:mc1.19.2-0.4.4")
 			library("embeddium", "maven.modrinth:embeddium:0.3.18+mc1.19.2")
             library("modmenu", "maven.modrinth:modmenu:4.2.0-beta.2")

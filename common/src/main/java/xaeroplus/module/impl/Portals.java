@@ -115,12 +115,13 @@ public class Portals extends Module {
     }
 
     private void findPortalInChunk(final ChunkAccess chunk) {
-        final boolean chunkHadPortal = portalsCache.get().isHighlighted(chunk.getPos().x, chunk.getPos().z, ChunkUtils.getActualDimension());
+        final var chunkPos = chunk.getPos();
+        final boolean chunkHadPortal = portalsCache.get().isHighlighted(chunkPos.x(), chunkPos.z(), ChunkUtils.getActualDimension());
         var hasPortal = ChunkScanner.chunkContainsBlocks(chunk, PORTAL_BLOCKS, mc.level.getMinY());
         if (hasPortal) {
-            portalsCache.get().addHighlight(chunk.getPos().x, chunk.getPos().z);
+            portalsCache.get().addHighlight(chunkPos.x(), chunkPos.z());
         } else if (chunkHadPortal) {
-            portalsCache.get().removeHighlight(chunk.getPos().x, chunk.getPos().z);
+            portalsCache.get().removeHighlight(chunkPos.x(), chunkPos.z());
         }
     }
 

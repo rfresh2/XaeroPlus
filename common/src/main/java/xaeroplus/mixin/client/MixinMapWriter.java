@@ -153,7 +153,7 @@ public abstract class MixinMapWriter {
 
     @WrapOperation(method = "loadPixelHelp", at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/world/level/block/state/BlockState;getLightBlock()I",
+        target = "Lnet/minecraft/world/level/block/state/BlockState;getLightDampening()I",
         ordinal = 1
     ), remap = true)
     public int getOpacityForObsidianRoof(final BlockState instance, final Operation<Integer> original, @Local(argsOnly = true) Level world, @Local(name = "h") int h) {

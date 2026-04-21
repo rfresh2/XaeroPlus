@@ -97,15 +97,15 @@ tasks {
         relocate("net.lenni0451.lambdaevents", "$shadePkg.lambdaevents")
         relocate("com.github.benmanes.caffeine", "$shadePkg.caffeine")
     }
-
-    remapJar {
-        dependsOn(shadowJar, transformForge)
-        inputFile.set(shadowJar.get().archiveFile.get())
-        archiveVersion = destArchiveVersion
-        archiveClassifier = destArchiveClassifier
-    }
-
-    compileJava {
-        dependsOn(common.tasks.getByName("remapForge"))
-    }
+//
+//    remapJar {
+//        dependsOn(shadowJar, transformForge)
+//        inputFile.set(shadowJar.get().archiveFile.get())
+//        archiveVersion = destArchiveVersion
+//        archiveClassifier = destArchiveClassifier
+//    }
+//
+//    compileJava {
+//        dependsOn(common.tasks.getByName("remapForge"))
+//    }
 }

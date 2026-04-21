@@ -24,7 +24,7 @@ side = "CLIENT"
 [[dependencies.xaeroplus]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.21.11]"
+versionRange = "[26.1, 26.2)"
 ordering = "NONE"
 side = "CLIENT"
 

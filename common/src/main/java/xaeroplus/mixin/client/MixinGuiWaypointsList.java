@@ -5,7 +5,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -85,7 +85,7 @@ public abstract class MixinGuiWaypointsList {
     @Inject(method = "drawWaypointSlot", at = @At(
         value = "RETURN"
     ), remap = true)
-    public void drawWaypointDistances(final GuiGraphics guiGraphics, final Waypoint w, final int x, final int y, final CallbackInfo ci) {
+    public void drawWaypointDistances(final GuiGraphicsExtractor guiGraphics, final Waypoint w, final int x, final int y, final CallbackInfo ci) {
         if (!Settings.REGISTRY.waypointsListUIAdditions.get()) return;
         if (Settings.REGISTRY.showWaypointDistances.get() && w != null) {
             Entity renderViewEntity = Minecraft.getInstance().getCameraEntity();
@@ -102,7 +102,7 @@ public abstract class MixinGuiWaypointsList {
             final double distance = Math.sqrt(Math.pow(playerX - wpX, 2) + Math.pow(playerY - wpY, 2) + Math.pow(playerZ - wpZ, 2));
             final String text = NumberFormat.getIntegerInstance().format(distance) + "m";
             final Font fontRenderer = Minecraft.getInstance().font;
-            guiGraphics.drawString(fontRenderer, text, x + 250, y + 1, -1);
+            guiGraphics.text(fontRenderer, text, x + 250, y + 1, -1);
         }
     }
 }

@@ -67,13 +67,13 @@ public class OldBiomes extends Module {
             if (event.chunk().getLevel().dimension() != OVERWORLD) return;
             searchBiome(event.chunk());
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error checking for OldBiome at chunk pos: [{}, {}]", event.chunk().getPos().x, event.chunk().getPos().z, e);
+            XaeroPlus.LOGGER.error("Error checking for OldBiome at chunk pos: [{}, {}]", event.chunk().getPos().x(), event.chunk().getPos().z(), e);
         }
     }
 
     private void searchBiome(final ChunkAccess chunk) {
-        var x = chunk.getPos().x;
-        var z = chunk.getPos().z;
+        var x = chunk.getPos().x();
+        var z = chunk.getPos().z();
         if (oldBiomesCache.get().isHighlighted(x, z, ChunkUtils.getActualDimension())) return;
         var blockPosX = ChunkUtils.chunkCoordToCoord(x) + 1;
         var blockPosZ = ChunkUtils.chunkCoordToCoord(z) + 1;

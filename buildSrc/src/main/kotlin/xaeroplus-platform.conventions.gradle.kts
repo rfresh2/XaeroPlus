@@ -1,5 +1,5 @@
 plugins {
-    id("gg.essential.loom")
+    id("gg.essential.loom-no-remap")
     id("com.gradleup.shadow")
 }
 
@@ -16,17 +16,19 @@ loom {
 //    }
 }
 
+// Unobfuscated versions of Loom no longer need to remap mod dependencies, and so no longer provide the `mod*`
+// configurations. We'll re-create them so they can be used across all versions.
+configurations.api.get().extendsFrom(configurations.create("modApi"))
+configurations.implementation.get().extendsFrom(configurations.create("modImplementation"))
+configurations.compileOnly.get().extendsFrom(configurations.create("modCompileOnly"))
+configurations.runtimeOnly.get().extendsFrom(configurations.create("modRuntimeOnly"))
+configurations.localRuntime.get().extendsFrom(configurations.create("modLocalRuntime"))
+
 val minecraft_version: String by project.properties
-val parchment_version: String by project.properties
 val mc = "com.mojang:minecraft:${minecraft_version}"
-val parchment = "org.parchmentmc.data:parchment-${minecraft_version}:${parchment_version}"
 
 dependencies {
     minecraft(mc)
-    mappings(loom.layered {
-        officialMojangMappings()
-        parchment(parchment)
-    })
 }
 
 tasks {

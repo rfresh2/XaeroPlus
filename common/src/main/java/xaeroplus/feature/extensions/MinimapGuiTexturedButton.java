@@ -1,6 +1,6 @@
 package xaeroplus.feature.extensions;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -39,7 +39,7 @@ public class MinimapGuiTexturedButton extends TooltipButton {
     }
 
     @Override
-    public void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void extractContents(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         int iconX = this.getX() + this.width / 2 - this.textureW / 2;
         int iconY = this.getY() + this.height / 2 - this.textureH / 2;
         int color = ColorHelper.getColor(64, 64, 64, 255);

@@ -15,15 +15,15 @@ public class ChunkUtils {
      * Caching helpers
      **/
     public static long chunkPosToLong(final ChunkPos chunkPos) {
-        return chunkPos.toLong();
+        return chunkPos.pack();
     }
 
     public static long chunkPosToLong(final int x, final int z) {
-        return ChunkPos.asLong(x, z);
+        return ChunkPos.pack(x, z);
     }
 
     public static ChunkPos longToChunkPos(final long l) {
-        return new ChunkPos(l);
+        return ChunkPos.unpack(l);
     }
 
     public static int posToChunkPos(final int i) {
@@ -75,7 +75,7 @@ public class ChunkUtils {
     }
     public static int actualPlayerChunkX() {
         try {
-            return Minecraft.getInstance().player.chunkPosition().x;
+            return Minecraft.getInstance().player.chunkPosition().x();
         } catch (final NullPointerException e) {
             return 0;
         }
@@ -85,7 +85,7 @@ public class ChunkUtils {
     }
     public static int actualPlayerChunkZ() {
         try {
-            return Minecraft.getInstance().player.chunkPosition().z;
+            return Minecraft.getInstance().player.chunkPosition().z();
         } catch (final NullPointerException e) {
             return 0;
         }

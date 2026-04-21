@@ -48,8 +48,8 @@ dependencies {
 	modImplementation(libs.minimap.fabric) { isTransitive = false }
 	modImplementation(libs.xaerolib.fabric)
 	modImplementation(libs.baritone.fabric)
-    modImplementation(libs.waystones.fabric)
-    modImplementation(libs.balm.fabric)
+	modCompileOnly(libs.waystones.fabric)
+	modCompileOnly(libs.balm.fabric)
 	modCompileOnly(libs.fabric.waystones)
 //	modRuntimeOnly(libs.immediatelyfast)
 	modImplementation(libs.modmenu)
@@ -61,7 +61,7 @@ dependencies {
 	productionRuntimeMods(libs.worldmap.fabric)
 	productionRuntimeMods(libs.fabric.api)
 
-	common(project(path = ":common", configuration = "namedElements")) { isTransitive = false }
+	common(project(":common")) { isTransitive = false }
     shadow(project(path = ":common", configuration = "transformProductionFabric")) { isTransitive = false }
 }
 
@@ -78,12 +78,6 @@ tasks {
 
 	shadowJar {
 		configurations = listOf(project.configurations.shadow.get())
-	}
-
-	remapJar {
-		injectAccessWidener = true
-		dependsOn(shadowJar)
-		inputFile.set(shadowJar.get().archiveFile)
 		archiveVersion = destArchiveVersion
 		archiveClassifier = destArchiveClassifier
 	}

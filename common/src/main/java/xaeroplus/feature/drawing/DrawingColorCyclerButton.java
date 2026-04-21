@@ -1,6 +1,6 @@
 package xaeroplus.feature.drawing;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import xaero.lib.client.gui.widget.Tooltip;
 import xaero.map.gui.TooltipButton;
@@ -26,7 +26,7 @@ public class DrawingColorCyclerButton extends TooltipButton {
     }
 
     @Override
-    public void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void extractContents(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         int minX = this.getX() + 6;
         int minY = this.getY() + 6;
         if (this.isActive() && this.isHovered()) {

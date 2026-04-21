@@ -1,6 +1,6 @@
 package xaeroplus.feature.extensions;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import xaero.lib.client.gui.GuiSettings;
@@ -15,9 +15,9 @@ public class GuiXaeroPlusOverlaySettings extends GuiSettings {
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void extractBackground(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
         this.renderEscapeScreen(guiGraphics, 0, 0, f);
-        super.renderBackground(guiGraphics, i, j, f);
+        super.extractBackground(guiGraphics, i, j, f);
     }
 
     public static ScreenSwitchSettingEntry getScreenSwitchSettingEntry(Screen parent) {

@@ -107,17 +107,17 @@ public class LiquidNewChunks extends Module {
         // or the player could have travelled back into chunks we just saw
         if (seenChunksCache.getIfPresent(chunkLong) != null) return;
         seenChunksCache.put(chunkLong, Byte.MAX_VALUE);
-        if (newChunksCache.get().isHighlighted(chunkPos.x, chunkPos.z, getActualDimension())) return;
-        if (inverseNewChunksCache.get().isHighlighted(chunkPos.x, chunkPos.z, getActualDimension())) return;
+        if (newChunksCache.get().isHighlighted(chunkPos.x(), chunkPos.z(), getActualDimension())) return;
+        if (inverseNewChunksCache.get().isHighlighted(chunkPos.x(), chunkPos.z(), getActualDimension())) return;
 
         ChunkScanner.chunkScanBlockstatePredicate(chunk, liquidBlockTypeFilter, (c, state, relX, y, relZ) -> {
-            int x = ChunkUtils.chunkCoordToCoord(c.getPos().x) + relX;
-            int z = ChunkUtils.chunkCoordToCoord(c.getPos().z) + relZ;
+            int x = ChunkUtils.chunkCoordToCoord(c.getPos().x()) + relX;
+            int z = ChunkUtils.chunkCoordToCoord(c.getPos().z()) + relZ;
 
             var fluid = state.getFluidState();
             if (!fluid.isEmpty() && !fluid.isSource()) {
                 if (fluid.getAmount() < 2) {
-                    inverseNewChunksCache.get().addHighlight(c.getPos().x, chunk.getPos().z);
+                    inverseNewChunksCache.get().addHighlight(c.getPos().x(), chunk.getPos().z());
                     return true;
                 }
                 boolean foundColumn = true;
@@ -129,7 +129,7 @@ public class LiquidNewChunks extends Module {
                     }
                 }
                 if (foundColumn) {
-                    inverseNewChunksCache.get().addHighlight(c.getPos().x, c.getPos().z);
+                    inverseNewChunksCache.get().addHighlight(c.getPos().x(), c.getPos().z());
                     return true;
                 }
             }

@@ -1,7 +1,7 @@
 package xaeroplus.feature.extensions;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -67,15 +67,15 @@ public class DrawOrderScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        drawFeatureList.render(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.drawCenteredString(mc.font, title, width / 2, 5, -1);
-        guiGraphics.drawCenteredString(mc.font, Component.translatable("xaeroplus.gui.draw_order.subtitle"), width / 2, height - 52, -1);
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        drawFeatureList.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
+        guiGraphics.centeredText(mc.font, title, width / 2, 5, -1);
+        guiGraphics.centeredText(mc.font, Component.translatable("xaeroplus.gui.draw_order.subtitle"), width / 2, height - 52, -1);
+        super.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void extractBackground(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
     }
 
     public List<String> loadEntries() {
@@ -170,9 +170,9 @@ public class DrawOrderScreen extends Screen {
         }
 
         @Override
-        public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        public void extractWidgetRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
             renderBackdrop(guiGraphics);
-            super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
+            super.extractWidgetRenderState(guiGraphics, mouseX, mouseY, partialTicks);
             if (dragging) {
                 var draggedEntry = getEntry(dragged);
                 draggedEntry.renderEntryText(guiGraphics, mouseX + draggedOffsetX, mouseY + draggedOffsetY);
@@ -193,16 +193,16 @@ public class DrawOrderScreen extends Screen {
             }
         }
 
-        public void renderBackdrop(GuiGraphics guiGraphics) {
+        public void renderBackdrop(GuiGraphicsExtractor guiGraphics) {
             guiGraphics.fill(0, 0, drawOrderScreen.width, drawOrderScreen.height, ColorHelper.getColor(0, 0, 0, 100));
         }
 
         @Override
-        public void renderListBackground(GuiGraphics guiGraphics) {
+        protected void extractListBackground(GuiGraphicsExtractor guiGraphics) {
         }
 
         @Override
-        public void renderListSeparators(GuiGraphics guiGraphics) {
+        protected void extractListSeparators(GuiGraphicsExtractor guiGraphics) {
         }
     }
 
@@ -221,9 +221,9 @@ public class DrawOrderScreen extends Screen {
             this.index = index;
         }
 
-        public void renderEntryText(GuiGraphics guiGraphics, int x, int y) {
+        public void renderEntryText(GuiGraphicsExtractor guiGraphics, int x, int y) {
             String id = drawOrderScreen.drawFeatureIdOrder.get(index);
-            guiGraphics.drawString(mc.font, id, x + 6, y + 6, -1);
+            guiGraphics.text(mc.font, id, x + 6, y + 6, -1);
         }
 
         @Override
@@ -233,11 +233,11 @@ public class DrawOrderScreen extends Screen {
 
 
         @Override
-        public void renderContent(GuiGraphics guiGraphics, int mouseX, int mouseY, boolean isMouseOver, float partialTicks) {
+        public void extractContent(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, boolean isMouseOver, float partialTicks) {
             if (drawFeatureList.getSelected() != this) {
                 // todo: fix
 //                guiGraphics.fill(getContentX() - 2, getContentHeight(), getContentRight(), getContentBottom(), ColorHelper.getColor(0, 0, 0, 150));
-                guiGraphics.renderOutline(getContentX() - 2, getContentY(), getContentWidth(), getContentHeight(), ColorHelper.getColor(68, 68, 68, 255));
+                guiGraphics.outline(getContentX() - 2, getContentY(), getContentWidth(), getContentHeight(), ColorHelper.getColor(68, 68, 68, 255));
             }
             lastRenderX = getX();
             lastRenderY = getY();

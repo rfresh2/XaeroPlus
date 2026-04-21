@@ -74,8 +74,8 @@ public class OldChunks extends Module {
 
     private void searchChunk(final ChunkAccess chunk) {
         ResourceKey<Level> actualDimension = ChunkUtils.getActualDimension();
-        var x = chunk.getPos().x;
-        var z = chunk.getPos().z;
+        var x = chunk.getPos().x();
+        var z = chunk.getPos().z();
         if (modernChunksCache.get().isHighlighted(x, z, actualDimension)) return;
         if (oldChunksCache.get().isHighlighted(x, z, actualDimension)) return;
         if (actualDimension == OVERWORLD || actualDimension == NETHER) {

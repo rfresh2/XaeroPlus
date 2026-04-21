@@ -3,7 +3,7 @@ package xaeroplus.fabric.util.compat;
 import net.fabricmc.loader.api.Version;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
@@ -71,9 +71,9 @@ public class IncompatibleMinimapWarningScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.drawCenteredString(this.font, titleComponent, this.width / 2, 50, ColorHelper.getColor(255, 255, 255, 255));
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
+        guiGraphics.centeredText(this.font, titleComponent, this.width / 2, 50, ColorHelper.getColor(255, 255, 255, 255));
         int i = this.width / 2 - this.message.getWidth() / 2;
         this.message.visitLines(TextAlignment.LEFT, i, 75, 18, guiGraphics.textRenderer());
     }

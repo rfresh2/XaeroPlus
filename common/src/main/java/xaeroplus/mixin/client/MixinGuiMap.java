@@ -6,7 +6,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -14,7 +13,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Renderable;
@@ -31,7 +30,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
-import org.joml.Matrix4f;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -54,7 +52,6 @@ import xaero.map.config.util.WorldMapClientConfigUtils;
 import xaero.map.element.HoveredMapElementHolder;
 import xaero.map.element.MapElementRenderHandler;
 import xaero.map.graphics.MapRenderHelper;
-import xaero.map.graphics.renderer.multitexture.MultiTextureRenderTypeRenderer;
 import xaero.map.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
 import xaero.map.gui.GuiMap;
 import xaero.map.gui.GuiTexturedButton;
@@ -68,7 +65,6 @@ import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.drawing.DrawingColorCyclerButton;
 import xaeroplus.feature.render.line.Line;
-import xaeroplus.feature.render.shaders.XaeroPlusShaders;
 import xaeroplus.feature.render.text.Text;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.*;
@@ -363,7 +359,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         super.onExit(screen);
     }
 
-    @Inject(method = "render", at = @At(
+    @Inject(method = "extractRenderState", at = @At(
         value = "INVOKE",
         target = "Lxaero/map/gui/GuiMap;init(II)V",
         ordinal = 0,
@@ -383,17 +379,17 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         }
     }
 
-    @Redirect(method = "render", at = @At(value = "FIELD", target = "Lxaero/map/gui/GuiMap;cameraX:D", opcode = Opcodes.PUTFIELD, ordinal = 1), remap = true)
+    @Redirect(method = "extractRenderState", at = @At(value = "FIELD", target = "Lxaero/map/gui/GuiMap;cameraX:D", opcode = Opcodes.PUTFIELD, ordinal = 1), remap = true)
     public void fixDimensionSwitchCameraCoordsX(GuiMap owner, double value, @Local(name = "playerDimDiv") double playerDimDiv) {
         this.cameraX *= prevPlayerDimDiv / playerDimDiv;
     }
 
-    @Redirect(method = "render", at = @At(value = "FIELD", target = "Lxaero/map/gui/GuiMap;cameraZ:D", opcode = Opcodes.PUTFIELD, ordinal = 1), remap = true)
+    @Redirect(method = "extractRenderState", at = @At(value = "FIELD", target = "Lxaero/map/gui/GuiMap;cameraZ:D", opcode = Opcodes.PUTFIELD, ordinal = 1), remap = true)
     public void fixDimensionSwitchCameraCoordsZ(GuiMap owner, double value, @Local(name = "playerDimDiv") double playerDimDiv) {
         this.cameraZ *= prevPlayerDimDiv / playerDimDiv;
     }
 
-    @Inject(method = "render", at = @At(value = "FIELD", target = "Lxaero/map/gui/GuiMap;lastStartTime:J", opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER), remap = true)
+    @Inject(method = "extractRenderState", at = @At(value = "FIELD", target = "Lxaero/map/gui/GuiMap;lastStartTime:J", opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER), remap = true)
     public void injectFollowMode(final CallbackInfo ci) {
         if (follow && isNull(this.cameraDestination) && isNull(this.cameraDestinationAnimX) && isNull(this.cameraDestinationAnimZ)) {
             this.cameraDestinationAnimX = new SlowingAnimation(this.cameraX, getPlayerX(), 0.15, 0.5);
@@ -401,7 +397,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         }
     }
 
-    @WrapOperation(method = "render", at = @At(
+    @WrapOperation(method = "extractRenderState", at = @At(
         value = "INVOKE",
         target = "Lxaero/lib/common/config/single/SingleConfigManager;getEffective(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;",
         ordinal = 0
@@ -418,7 +414,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         return ((Boolean) value) && !Minecraft.getInstance().options.hideGui;
     }
 
-    @WrapOperation(method = "render",
+    @WrapOperation(method = "extractRenderState",
         slice = @Slice(
             from = @At(
                 value = "FIELD",
@@ -454,7 +450,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         );
     }
 
-    @WrapWithCondition(method = "render", at = @At(
+    @WrapWithCondition(method = "extractRenderState", at = @At(
         value = "INVOKE",
         target = "Lxaero/map/graphics/MapRenderHelper;renderDynamicHighlight(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;IIIIIIFFFFFFFF)V"
     ), remap = true)
@@ -462,7 +458,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         return !Minecraft.getInstance().options.hideGui;
     }
 
-    @WrapOperation(method = "render", at = @At(
+    @WrapOperation(method = "extractRenderState", at = @At(
         value = "INVOKE",
         target = "Lxaero/map/element/MapElementRenderHandler;render(Lxaero/map/gui/GuiMap;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;DDIIDDDDDFZLxaero/map/element/HoveredMapElementHolder;Lnet/minecraft/client/Minecraft;F)Lxaero/map/element/HoveredMapElementHolder;"
     ), remap = true)
@@ -474,7 +470,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         }
     }
 
-    @WrapOperation(method = "render", at = @At(
+    @WrapOperation(method = "extractRenderState", at = @At(
         value = "INVOKE",
         target = "Lxaero/lib/client/config/ClientConfigManager;getEffective(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;",
         ordinal = 0
@@ -491,7 +487,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         return ((Boolean) value) && !Minecraft.getInstance().options.hideGui;
     }
 
-    @WrapOperation(method = "render", at = @At(
+    @WrapOperation(method = "extractRenderState", at = @At(
         value = "INVOKE",
         target = "Lxaero/lib/client/config/ClientConfigManager;getEffective(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;",
         ordinal = 0
@@ -508,7 +504,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         return ((Boolean) value) && !Minecraft.getInstance().options.hideGui;
     }
 
-    @ModifyArg(method = "render",
+    @ModifyArg(method = "extractRenderState",
         slice = @Slice(
             from = @At(
                 value = "FIELD",
@@ -518,7 +514,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         ),
         at = @At(
             value = "INVOKE",
-            target = "Lxaero/map/graphics/MapRenderHelper;drawCenteredStringWithBackground(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIFFFF)V",
+            target = "Lxaero/map/graphics/MapRenderHelper;drawCenteredStringWithBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIFFFF)V",
             ordinal = 0
         )
     )
@@ -534,25 +530,25 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         return original + " [" + x + ", " + z + "]";
     }
 
-    @WrapWithCondition(method = "render", at = @At(
+    @WrapWithCondition(method = "extractRenderState", at = @At(
         value = "INVOKE",
-        target = "Lxaero/map/graphics/MapRenderHelper;drawCenteredStringWithBackground(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIFFFF)V"
+        target = "Lxaero/map/graphics/MapRenderHelper;drawCenteredStringWithBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIFFFF)V"
     ), remap = true)
-    public boolean hideRenderedStringsOnF1(final GuiGraphics guiGraphics, final Font font, final String string, final int x, final int y, final int color, final float bgRed, final float bgGreen, final float bgBlue, final float bgAlpha) {
+    public boolean hideRenderedStringsOnF1(final GuiGraphicsExtractor guiGraphics, final Font font, final String string, final int x, final int y, final int color, final float bgRed, final float bgGreen, final float bgBlue, final float bgAlpha) {
         return !Minecraft.getInstance().options.hideGui;
     }
 
-    @WrapWithCondition(method = "render", at = @At(
+    @WrapWithCondition(method = "extractRenderState", at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIFFIIII)V"
+        target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blit(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIFFIIII)V"
     ), remap = true)
-    public boolean hideCompassOnF1(final GuiGraphics instance, final RenderPipeline renderPipeline, final Identifier arg, final int i, final int j, final float f, final float g, final int k, final int l, final int m, final int n) {
+    public boolean hideCompassOnF1(final GuiGraphicsExtractor instance, final RenderPipeline renderPipeline, final Identifier arg, final int i, final int j, final float f, final float g, final int k, final int l, final int m, final int n) {
         return !Minecraft.getInstance().options.hideGui;
     }
 
-    @Inject(method = "render", at = @At(
+    @Inject(method = "extractRenderState", at = @At(
         value = "INVOKE",
-        target = "Lxaero/lib/client/gui/ScreenBase;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V"
+        target = "Lxaero/lib/client/gui/ScreenBase;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V"
     ), remap = true)
     public void hideButtonsOnF1(final CallbackInfo ci) {
         if (Minecraft.getInstance().options.hideGui) {
@@ -573,29 +569,29 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         }
     }
 
-    @Inject(method = "render", at = @At(
+    @Inject(method = "extractRenderState", at = @At(
         value = "INVOKE",
         target = "Lxaero/map/graphics/MapRenderHelper;restoreDefaultShaderBlendState()V"
     ), remap = true)
-    public void renderCoordinatesGotoTextEntryFields(final GuiGraphics guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci) {
+    public void renderCoordinatesGotoTextEntryFields(final GuiGraphicsExtractor guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci) {
         if (!Settings.REGISTRY.worldMapUIAdditions.get()) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.screen != null && mc.screen.getClass().equals(GuiMap.class)) {
             if (xTextEntryField.isVisible() && zTextEntryField.isVisible()) {
-                xTextEntryField.render(guiGraphics, scaledMouseX, scaledMouseY, partialTicks);
-                zTextEntryField.render(guiGraphics, scaledMouseX, scaledMouseY, partialTicks);
+                xTextEntryField.extractRenderState(guiGraphics, scaledMouseX, scaledMouseY, partialTicks);
+                zTextEntryField.extractRenderState(guiGraphics, scaledMouseX, scaledMouseY, partialTicks);
             }
             if (drawing && drawTextEntryActive && drawingMode == DrawingMode.TEXT && drawTextEntryField.visible) {
-                drawTextEntryField.render(guiGraphics, scaledMouseX, scaledMouseY, partialTicks);
+                drawTextEntryField.extractRenderState(guiGraphics, scaledMouseX, scaledMouseY, partialTicks);
             }
         }
     }
 
-    @WrapWithCondition(method = "render", at = @At(
+    @WrapWithCondition(method = "extractRenderState", at = @At(
         value = "INVOKE",
-        target = "Lxaero/map/graphics/MapRenderHelper;drawCenteredStringWithBackground(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIFFFF)V"
+        target = "Lxaero/map/graphics/MapRenderHelper;drawCenteredStringWithBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIFFFF)V"
     ), remap = true)
-    public boolean hideMoreRenderedStringsOnF1(final GuiGraphics guiGraphics, final Font font, final Component text, final int x, final int y, final int color, final float bgRed, final float bgGreen, final float bgBlue, final float bgAlpha) {
+    public boolean hideMoreRenderedStringsOnF1(final GuiGraphicsExtractor guiGraphics, final Font font, final Component text, final int x, final int y, final int color, final float bgRed, final float bgGreen, final float bgBlue, final float bgAlpha) {
         return !Minecraft.getInstance().options.hideGui;
     }
 
@@ -663,7 +659,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         }
     }
 
-    @Inject(method = "render", at = @At("RETURN"))
+    @Inject(method = "extractRenderState", at = @At("RETURN"))
     public void updateInProgressLine(CallbackInfo ci) {
         if (drawing) {
             switch (drawingMode) {
@@ -696,130 +692,131 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         }
     }
 
-    @WrapOperation(method = "render", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/lib/client/graphics/util/TextureUtils;clearRenderTarget(Lcom/mojang/blaze3d/pipeline/RenderTarget;IF)V"
-    ))
-    public void transparentBgSetTransparentClearColor(final RenderTarget renderTarget, final int color, final float depth, final Operation<Void> original) {
-        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
-            original.call(renderTarget, ColorHelper.getColor(0, 0, 0, 0), depth);
-        } else {
-            original.call(renderTarget, color, depth);
-        }
-    }
+    // todo: fix and re-enable
+//    @WrapOperation(method = "extractRenderState", at = @At(
+//        value = "INVOKE",
+//        target = "Lxaero/lib/client/graphics/util/TextureUtils;clearRenderTarget(Lcom/mojang/blaze3d/pipeline/RenderTarget;IF)V"
+//    ))
+//    public void transparentBgSetTransparentClearColor(final RenderTarget renderTarget, final int color, final float depth, final Operation<Void> original) {
+//        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
+//            original.call(renderTarget, ColorHelper.getColor(0, 0, 0, 0), depth);
+//        } else {
+//            original.call(renderTarget, color, depth);
+//        }
+//    }
+//
+//    @WrapOperation(method = "extractRenderState", at = @At(
+//        value = "INVOKE",
+//        target = "Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;draw(Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRenderer;)V",
+//        ordinal = 0
+//    ))
+//    public void transparentBgConfigMapRenderWithLight(final MultiTextureRenderTypeRendererProvider instance, final MultiTextureRenderTypeRenderer renderer, final Operation<Void> original) {
+//        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
+//            XaeroPlusShaders.setTransparentWMBackground(true);
+//            Globals.transparentWmBgApplyMapBlend = true;
+//            try {
+//                original.call(instance, renderer);
+//            } finally {
+//                XaeroPlusShaders.setTransparentWMBackground(false);
+//                Globals.transparentWmBgApplyMapBlend = false;
+//            }
+//        } else {
+//            XaeroPlusShaders.setTransparentWMBackground(false);
+//            original.call(instance, renderer);
+//        }
+//    }
+//
+//    @WrapOperation(method = "extractRenderState", at = @At(
+//        value = "INVOKE",
+//        target = "Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;draw(Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRenderer;)V",
+//        ordinal = 1
+//    ))
+//    public void transparentBgConfigMapRenderNoLight(final MultiTextureRenderTypeRendererProvider instance, final MultiTextureRenderTypeRenderer renderer, final Operation<Void> original) {
+//        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
+//            XaeroPlusShaders.setTransparentWMBackground(true);
+//            Globals.transparentWmBgApplyMapBlend = true;
+//            try {
+//                original.call(instance, renderer);
+//            } finally {
+//                XaeroPlusShaders.setTransparentWMBackground(false);
+//                Globals.transparentWmBgApplyMapBlend = false;
+//            }
+//        } else {
+//            XaeroPlusShaders.setTransparentWMBackground(false);
+//            original.call(instance, renderer);
+//        }
+//    }
+//
+//    @WrapOperation(method = "extractRenderState", at = @At(
+//        value = "INVOKE",
+//        target = "Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;draw(Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRenderer;)V",
+//        ordinal = 2
+//    ))
+//    public void transparentBgConfigMainFBORender(final MultiTextureRenderTypeRendererProvider instance, final MultiTextureRenderTypeRenderer renderer, final Operation<Void> original) {
+//        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
+//            Globals.transparentWmBgApplyMapFrameBlend = true;
+//            try {
+//                original.call(instance, renderer);
+//            } finally {
+//                Globals.transparentWmBgApplyMapFrameBlend = false;
+//            }
+//        } else {
+//            original.call(instance, renderer);
+//        }
+//    }
+//
+//    @Inject(method = "shouldSkipWorldRender", at = @At("HEAD"), cancellable = true)
+//    public void transparentBgDisableWorldRenderSkip(final CallbackInfoReturnable<Boolean> cir) {
+//        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
+//            cir.setReturnValue(false);
+//        }
+//    }
+//
+//    // honestly no idea why xaero is doing here, its drawing 2 thin lines along the bottom and right side of the map
+//    // but it looks bad with transparent background, so bye
+//
+//    @WrapWithCondition(method = "extractRenderState", at = @At(
+//        value = "INVOKE",
+//        target = "Lxaero/map/graphics/MapRenderHelper;fillIntoExistingBuffer(Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/vertex/VertexConsumer;IIIIFFFF)V",
+//        ordinal = 0
+//    ),
+//        slice = @Slice(
+//            from = @At(
+//                value = "FIELD",
+//                target = "Lxaero/map/graphics/CustomRenderTypes;MAP_COLOR_FILLER:Lnet/minecraft/client/renderer/rendertype/RenderType;",
+//                opcode = Opcodes.GETSTATIC
+//            )
+//        )
+//    )
+//    public boolean transparentBgCancelMapColorFiller0(final Matrix4f matrix, final VertexConsumer bufferBuilder, final int x1, final int y1, final int x2, final int y2, final float r, final float g, final float b, final float a) {
+//        return !Settings.REGISTRY.transparentWorldmapBackgroundSetting.get();
+//    }
+//
+//    @WrapWithCondition(method = "extractRenderState", at = @At(
+//        value = "INVOKE",
+//        target = "Lxaero/map/graphics/MapRenderHelper;fillIntoExistingBuffer(Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/vertex/VertexConsumer;IIIIFFFF)V",
+//        ordinal = 1
+//    ),
+//        slice = @Slice(
+//            from = @At(
+//                value = "FIELD",
+//                target = "Lxaero/map/graphics/CustomRenderTypes;MAP_COLOR_FILLER:Lnet/minecraft/client/renderer/rendertype/RenderType;",
+//                opcode = Opcodes.GETSTATIC
+//            )
+//        )
+//    )
+//    public boolean transparentBgCancelMapColorFiller1(final Matrix4f matrix, final VertexConsumer bufferBuilder, final int x1, final int y1, final int x2, final int y2, final float r, final float g, final float b, final float a) {
+//        return !Settings.REGISTRY.transparentWorldmapBackgroundSetting.get();
+//    }
 
-    @WrapOperation(method = "render", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;draw(Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRenderer;)V",
-        ordinal = 0
-    ))
-    public void transparentBgConfigMapRenderWithLight(final MultiTextureRenderTypeRendererProvider instance, final MultiTextureRenderTypeRenderer renderer, final Operation<Void> original) {
-        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
-            XaeroPlusShaders.setTransparentWMBackground(true);
-            Globals.transparentWmBgApplyMapBlend = true;
-            try {
-                original.call(instance, renderer);
-            } finally {
-                XaeroPlusShaders.setTransparentWMBackground(false);
-                Globals.transparentWmBgApplyMapBlend = false;
-            }
-        } else {
-            XaeroPlusShaders.setTransparentWMBackground(false);
-            original.call(instance, renderer);
-        }
-    }
-
-    @WrapOperation(method = "render", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;draw(Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRenderer;)V",
-        ordinal = 1
-    ))
-    public void transparentBgConfigMapRenderNoLight(final MultiTextureRenderTypeRendererProvider instance, final MultiTextureRenderTypeRenderer renderer, final Operation<Void> original) {
-        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
-            XaeroPlusShaders.setTransparentWMBackground(true);
-            Globals.transparentWmBgApplyMapBlend = true;
-            try {
-                original.call(instance, renderer);
-            } finally {
-                XaeroPlusShaders.setTransparentWMBackground(false);
-                Globals.transparentWmBgApplyMapBlend = false;
-            }
-        } else {
-            XaeroPlusShaders.setTransparentWMBackground(false);
-            original.call(instance, renderer);
-        }
-    }
-
-    @WrapOperation(method = "render", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;draw(Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRenderer;)V",
-        ordinal = 2
-    ))
-    public void transparentBgConfigMainFBORender(final MultiTextureRenderTypeRendererProvider instance, final MultiTextureRenderTypeRenderer renderer, final Operation<Void> original) {
-        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
-            Globals.transparentWmBgApplyMapFrameBlend = true;
-            try {
-                original.call(instance, renderer);
-            } finally {
-                Globals.transparentWmBgApplyMapFrameBlend = false;
-            }
-        } else {
-            original.call(instance, renderer);
-        }
-    }
-
-    @Inject(method = "shouldSkipWorldRender", at = @At("HEAD"), cancellable = true)
-    public void transparentBgDisableWorldRenderSkip(final CallbackInfoReturnable<Boolean> cir) {
-        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
-            cir.setReturnValue(false);
-        }
-    }
-
-    // honestly no idea why xaero is doing here, its drawing 2 thin lines along the bottom and right side of the map
-    // but it looks bad with transparent background, so bye
-
-    @WrapWithCondition(method = "render", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/map/graphics/MapRenderHelper;fillIntoExistingBuffer(Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/vertex/VertexConsumer;IIIIFFFF)V",
-        ordinal = 0
-    ),
-        slice = @Slice(
-            from = @At(
-                value = "FIELD",
-                target = "Lxaero/map/graphics/CustomRenderTypes;MAP_COLOR_FILLER:Lnet/minecraft/client/renderer/rendertype/RenderType;",
-                opcode = Opcodes.GETSTATIC
-            )
-        )
-    )
-    public boolean transparentBgCancelMapColorFiller0(final Matrix4f matrix, final VertexConsumer bufferBuilder, final int x1, final int y1, final int x2, final int y2, final float r, final float g, final float b, final float a) {
-        return !Settings.REGISTRY.transparentWorldmapBackgroundSetting.get();
-    }
-
-    @WrapWithCondition(method = "render", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/map/graphics/MapRenderHelper;fillIntoExistingBuffer(Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/vertex/VertexConsumer;IIIIFFFF)V",
-        ordinal = 1
-    ),
-        slice = @Slice(
-            from = @At(
-                value = "FIELD",
-                target = "Lxaero/map/graphics/CustomRenderTypes;MAP_COLOR_FILLER:Lnet/minecraft/client/renderer/rendertype/RenderType;",
-                opcode = Opcodes.GETSTATIC
-            )
-        )
-    )
-    public boolean transparentBgCancelMapColorFiller1(final Matrix4f matrix, final VertexConsumer bufferBuilder, final int x1, final int y1, final int x2, final int y2, final float r, final float g, final float b, final float a) {
-        return !Settings.REGISTRY.transparentWorldmapBackgroundSetting.get();
-    }
-
-    @Inject(method = "render", at = @At(
+    @Inject(method = "extractRenderState", at = @At(
         value = "FIELD",
         target = "Lxaero/map/common/config/option/WorldMapProfiledConfigOptions;COORDINATES:Lxaero/lib/common/config/option/BooleanConfigOption;",
         opcode = Opcodes.GETSTATIC,
         ordinal = 0
     ), remap = true)
     public void renderMeasurementToolText(
-        final GuiGraphics guiGraphics,
+        final GuiGraphicsExtractor guiGraphics,
         final int scaledMouseX,
         final int scaledMouseY,
         final float partialTicks,
@@ -849,13 +846,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         return fboScale;
     }
 
-    @Inject(method = "render", at = @At(
+    @Inject(method = "extractRenderState", at = @At(
         value = "INVOKE",
         target = "Lxaero/map/mods/SupportXaeroMinimap;getSubWorldNameToRender()Ljava/lang/String;"
     ))
     public void renderDrawingStatusText(
         final CallbackInfo ci,
-        @Local(argsOnly = true) final GuiGraphics guiGraphics
+        @Local(argsOnly = true) final GuiGraphicsExtractor guiGraphics
     ) {
         if (!drawing) return;
         MapRenderHelper.drawCenteredStringWithBackground(
@@ -1036,7 +1033,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         return !drawing;
     }
 
-    @Inject(method = "render", at = @At("HEAD"))
+    @Inject(method = "extractRenderState", at = @At("HEAD"))
     public void panMapOnRender(
         final CallbackInfo ci,
         @Local(argsOnly = true) final float partialTicks
@@ -1053,14 +1050,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         cameraZ += panDeltaZ;
     }
 
-    @Inject(method = "render", at = @At(
+    @Inject(method = "extractRenderState", at = @At(
         value = "FIELD",
         target = "Lxaero/map/common/config/option/WorldMapProfiledConfigOptions;COORDINATES:Lxaero/lib/common/config/option/BooleanConfigOption;",
         opcode = Opcodes.GETSTATIC,
         ordinal = 0
     ), remap = true)
     public void renderTileSelectionSize(
-        final GuiGraphics guiGraphics,
+        final GuiGraphicsExtractor guiGraphics,
         final int scaledMouseX,
         final int scaledMouseY,
         final float partialTicks,

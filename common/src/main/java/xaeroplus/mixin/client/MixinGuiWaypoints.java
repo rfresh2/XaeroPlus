@@ -1,7 +1,7 @@
 package xaeroplus.mixin.client;
 
 import net.minecraft.client.Camera;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.CharacterEvent;
@@ -122,14 +122,14 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         return result;
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lxaero/lib/client/gui/ScreenBase;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", shift = At.Shift.AFTER), remap = true)
-    public void drawScreenInject(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partial, final CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lxaero/lib/client/gui/ScreenBase;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V", shift = At.Shift.AFTER), remap = true)
+    public void drawScreenInject(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float partial, final CallbackInfo ci) {
         if (!Settings.REGISTRY.waypointsListUIAdditions.get()) return;
         if (!this.searchField.isFocused() && this.searchField.getValue().isEmpty()) {
             GuiUtils.setFieldText(this.searchField, I18n.get("gui.xaero_settings_search_placeholder", new Object[0]), ColorHelper.getColor(85, 85, 85, 255));
             this.searchField.moveCursorToStart(false);
         }
-        this.searchField.render(guiGraphics, mouseX, mouseY, partial);
+        this.searchField.extractRenderState(guiGraphics, mouseX, mouseY, partial);
         if (!this.searchField.isFocused()) {
             GuiUtils.setFieldText(this.searchField, this.waypointsSearchFilter);
         }

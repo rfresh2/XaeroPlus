@@ -32,6 +32,7 @@ val minimap_version_neo: String by project.properties
 val minecraft_version: String by project.properties
 val destArchiveVersion = "${project.version}+${loom.platform.get().id()}-${minecraft_version}"
 val destArchiveClassifier = "WM${worldmap_version_neo}-MM${minimap_version_neo}"
+val generatedAccessTransformer = layout.buildDirectory.file("generated/resources/META-INF/accesstransformer.cfg")
 
 sourceSets.main.get().java.srcDir(common.layout.buildDirectory.get().asFile.path + "/remappedSources/forge/java")
 sourceSets.main.get().resources.srcDir(common.layout.buildDirectory.get().asFile.path + "/remappedSources/forge/resources")
@@ -56,7 +57,18 @@ dependencies {
 }
 
 tasks {
+    val convertAwToAt = register<ConvertAwToAtTask>("convertAwToAt") {
+        group = "build"
+        description = "Converts the common access widener into a NeoForge access transformer."
+        accessWidener.set(common.loom.accessWidenerPath)
+        accessTransformer.set(generatedAccessTransformer)
+    }
+
     processResources {
+        dependsOn(convertAwToAt)
+        from(generatedAccessTransformer) {
+            into("META-INF")
+        }
         filesMatching("META-INF/neoforge.mods.toml") {
             expand(mapOf(
                 "version" to project.version,
@@ -76,6 +88,7 @@ tasks {
         archiveVersion = destArchiveVersion
         archiveClassifier = destArchiveClassifier
     }
+    jar.get().dependsOn(transformNeo)
 
     shadowJar {
         configurations = listOf(project.configurations.shadow.get())
@@ -83,15 +96,17 @@ tasks {
         relocate("kaptainwutax", "$shadePkg.kaptainwutax")
         relocate("net.lenni0451.lambdaevents", "$shadePkg.lambdaevents")
         relocate("com.github.benmanes.caffeine", "$shadePkg.caffeine")
-    }
-
-    remapJar {
-        dependsOn(shadowJar, transformNeo)
-        inputFile.set(shadowJar.get().archiveFile.get())
         archiveVersion = destArchiveVersion
         archiveClassifier = destArchiveClassifier
-        atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
     }
+
+//    remapJar {
+//        dependsOn(shadowJar, transformNeo)
+//        inputFile.set(shadowJar.get().archiveFile.get())
+//        archiveVersion = destArchiveVersion
+//        archiveClassifier = destArchiveClassifier
+//        atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
+//    }
 
     compileJava {
         dependsOn(common.tasks.getByName("remapForge"))

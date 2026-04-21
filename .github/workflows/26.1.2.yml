@@ -1,0 +1,244 @@
+name: 26.1.2 Build
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "26.1.2"
+env:
+  MINECRAFT_VERSION: "26.1.2"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v6
+
+    - name: Set up JDK 25
+      uses: actions/setup-java@v5
+      with:
+        java-version: '25'
+        distribution: 'temurin'
+
+    - name: Loom Cache
+      uses: actions/cache@v5
+      with:
+        path: "**/.gradle/loom-cache"
+        key: "${{ env.MINECRAFT_VERSION }}-loom-${{ hashFiles('settings.gradle.kts', 'gradle.properties', '**/gradle-wrapper.properties', 'buildSrc/build.gradle.kts', 'buildSrc/**/*.gradle.kts', '**/*.accesswidener') }}"
+
+    - name: Elevate wrapper permissions
+      run: chmod +x ./gradlew
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v6
+      with:
+        # read only on pull requests, otherwise allow writes
+        cache-read-only: ${{ github.event_name == 'pull_request' }}
+
+    - name: Build Mods
+      run: ./gradlew build
+
+    - name: Get WorldMap Version Fabric
+      run: echo "WORLDMAP_VERSION_FABRIC=$(./gradlew -q printWorldMapVersionFabric)" >> $GITHUB_ENV
+
+    - name: Get Minimap Version Fabric
+      run: echo "MINIMAP_VERSION_FABRIC=$(./gradlew -q printMinimapVersionFabric)" >> $GITHUB_ENV
+
+#    - name: Get WorldMap Version Forge
+#      run: echo "WORLDMAP_VERSION_FORGE=$(./gradlew -q printWorldMapVersionForge)" >> $GITHUB_ENV
+#
+#    - name: Get Minimap Version Forge
+#      run: echo "MINIMAP_VERSION_FORGE=$(./gradlew -q printMinimapVersionForge)" >> $GITHUB_ENV
+#
+#    - name: Get WorldMap Version NeoForge
+#      run: |
+#        echo "WORLDMAP_VERSION_NEO=$(./gradlew -q printWorldMapVersionNeo)" >> $GITHUB_ENV
+#
+#    - name: Get Minimap Version NeoForge
+#      run: |
+#        echo "MINIMAP_VERSION_NEO=$(./gradlew -q printMinimapVersionNeo)" >> $GITHUB_ENV
+
+    - name: Get XaeroPlus Version
+      run: echo "XP_VERSION=$(./gradlew -q printXaeroPlusVersion)" >> $GITHUB_ENV
+
+    - name: Get Fabric Jar Filename
+      run: echo "XP_FABRIC=XaeroPlus-${{ env.XP_VERSION }}+fabric-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FABRIC }}-MM${{ env.MINIMAP_VERSION_FABRIC }}" >> $GITHUB_ENV
+
+#    - name: Get Forge Jar Filename
+#      run: echo "XP_FORGE=XaeroPlus-${{ env.XP_VERSION }}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
+#
+#    - name: Get Neo Jar Filename
+#      run: |
+#        echo "XP_NEO=XaeroPlus-${{ env.XP_VERSION}}+neoforge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_NEO }}-MM${{ env.MINIMAP_VERSION_NEO }}" >> $GITHUB_ENV
+
+    - name: Get Commit Hash
+      run: echo "COMMIT_HASH=$(git rev-parse --short=8 HEAD)" >> $GITHUB_ENV
+
+    - name: Get Fabric Jar Result Filename
+      run: echo "XP_FABRIC_OUT=XaeroPlus-${{ env.XP_VERSION }}-DEV-${{ env.COMMIT_HASH }}+fabric-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FABRIC }}-MM${{ env.MINIMAP_VERSION_FABRIC }}" >> $GITHUB_ENV
+
+    - name: Append Commit Hash To Fabric Jar Name
+      run: mv fabric/build/libs/${{ env.XP_FABRIC }}.jar fabric/build/libs/${{ env.XP_FABRIC_OUT }}.jar
+
+#    - name: Get Forge Jar Result Filename
+#      run: echo "XP_FORGE_OUT=XaeroPlus-${{ env.XP_VERSION }}-DEV-${{ env.COMMIT_HASH }}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_FORGE }}-MM${{ env.MINIMAP_VERSION_FORGE }}" >> $GITHUB_ENV
+#
+#    - name: Append Commit Hash To Forge Jar Name
+#      run: mv forge/build/libs/${{ env.XP_FORGE }}.jar forge/build/libs/${{ env.XP_FORGE_OUT }}.jar
+#
+#    - name: Get NeoForge Jar Result Filename
+#      run: echo "XP_NEO_OUT=XaeroPlus-${{ env.XP_VERSION }}-DEV-${{ env.COMMIT_HASH }}+neoforge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION_NEO }}-MM${{ env.MINIMAP_VERSION_NEO }}" >> $GITHUB_ENV
+#
+#    - name: Append Commit Hash To NeoForge Jar Name
+#      run: mv neo/build/libs/${{ env.XP_NEO }}.jar neo/build/libs/${{ env.XP_NEO_OUT }}.jar
+
+    - name: Upload Fabric Artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: ${{ env.XP_FABRIC_OUT }}
+        path: fabric/build/libs/${{ env.XP_FABRIC_OUT }}.jar
+        if-no-files-found: error
+
+#    - name: Upload Forge Artifact
+#      uses: actions/upload-artifact@v7
+#      with:
+#        name: ${{ env.XP_FORGE_OUT }}
+#        path: forge/build/libs/${{ env.XP_FORGE_OUT }}.jar
+#        if-no-files-found: error
+#
+#    - name: Upload NeoForge Artifact
+#      uses: actions/upload-artifact@v5
+#      with:
+#        name: ${{ env.XP_NEO_OUT }}
+#        path: neo/build/libs/${{ env.XP_NEO_OUT }}.jar
+#        if-no-files-found: error
+    outputs:
+      worldmap_version_fabric: ${{ env.WORLDMAP_VERSION_FABRIC }}
+#      worldmap_version_forge: ${{ env.WORLDMAP_VERSION_FORGE }}
+#      worldmap_version_neo: ${{ env.WORLDMAP_VERSION_NEO }}
+      minimap_version_fabric: ${{ env.MINIMAP_VERSION_FABRIC }}
+#      minimap_version_forge: ${{ env.MINIMAP_VERSION_FORGE }}
+#      minimap_version_neo: ${{ env.MINIMAP_VERSION_NEO }}
+      xp_fabric: ${{ env.XP_FABRIC_OUT }}
+#      xp_forge: ${{ env.XP_FORGE_OUT }}
+#      xp_neo: ${{ env.XP_NEO_OUT }}
+
+  test-fabric:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
+      - name: Set up JDK 25
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+
+      - name: Download job artifacts
+        uses: actions/download-artifact@v8
+        with:
+          merge-multiple: true
+          path: artifacts/
+
+      - name: Set CI Test Env Var
+        run: echo "XP_CI_TEST=true" >> $GITHUB_ENV
+
+      - name: Setup Fabric Test Mods
+        run: |
+          mkdir -p run/mods && cp artifacts/${{ needs.build.outputs.xp_fabric }}.jar run/mods \
+          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/fabric-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.minimap_version_fabric }}/xaeros-minimap-fabric-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.minimap_version_fabric }}.jar -P run/mods/ \
+          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/fabric-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_fabric }}/xaeros-world-map-fabric-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_fabric }}.jar -P run/mods/
+
+      - name: Fabric Test
+        uses: headlesshq/mc-runtime-test@4.3.1
+        with:
+          mc: ${{ env.MINECRAFT_VERSION }}
+          modloader: fabric
+          regex: .*fabric.*
+          mc-runtime-test: fabric
+          fabric-api: 0.146.1
+          java: 25
+          xvfb: false
+          headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
+          cache-mc: github
+
+#  test-forge:
+#    runs-on: ubuntu-latest
+#    needs:
+#      - build
+#    steps:
+#      - name: Set up JDK 25
+#        uses: actions/setup-java@v5
+#        with:
+#          java-version: '25'
+#          distribution: 'temurin'
+#
+#      - name: Download job artifacts
+#        uses: actions/download-artifact@v8
+#        with:
+#          merge-multiple: true
+#          path: artifacts/
+#
+#      - name: Set CI Test Env Var
+#        run: echo "XP_CI_TEST=true" >> $GITHUB_ENV
+#
+#      - name: Setup Forge Test
+#        # xaero's maven version does not jij xaerolib for some reason
+#        # so just use modrinth for now
+#        run: |
+#          mkdir -p run/mods && cp artifacts/${{ needs.build.outputs.xp_forge }}.jar run/mods \
+#          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/forge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.minimap_version_forge }}/xaeros-minimap-forge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.minimap_version_forge }}.jar -P run/mods/ \
+#          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/forge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_fabric }}/xaeros-world-map-forge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_forge }}.jar -P run/mods/
+#
+#      - name: Forge Test
+#        uses: headlesshq/mc-runtime-test@4.3.1
+#        with:
+#          mc: ${{ env.MINECRAFT_VERSION }}
+#          modloader: forge
+#          regex: .*forge.*
+#          mc-runtime-test: lexforge
+#          java: 25
+#          xvfb: false
+#          headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
+#          cache-mc: github
+#
+#  test-neo:
+#    runs-on: ubuntu-latest
+#    needs:
+#      - build
+#    steps:
+#      - name: Set up JDK 25
+#        uses: actions/setup-java@v5
+#        with:
+#          java-version: '25'
+#          distribution: 'temurin'
+#
+#      - name: Download job artifacts
+#        uses: actions/download-artifact@v6
+#        with:
+#          merge-multiple: true
+#          path: artifacts/
+#
+#      - name: Set CI Test Env Var
+#        run: echo "XP_CI_TEST=true" >> $GITHUB_ENV
+#
+#      - name: Setup Neo Test
+#        # xaero's maven version does not jij xaerolib for some reason
+#        # so just use modrinth for now
+#        run: |
+#          mkdir -p run/mods && cp artifacts/${{ needs.build.outputs.xp_neo }}.jar run/mods \
+#          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/neoforge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.minimap_version_neo }}/xaeros-minimap-neoforge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.minimap_version_neo }}.jar -P run/mods/ \
+#          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/neoforge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_neo }}/xaeros-world-map-neoforge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_neo }}.jar -P run/mods/
+#
+#      - name: Neo Test
+#        uses: headlesshq/mc-runtime-test@4.3.1
+#        with:
+#          mc: ${{ env.MINECRAFT_VERSION }}
+#          modloader: neoforge
+#          regex: .*neoforge.*
+#          mc-runtime-test: neoforge
+#          java: 25
+#          xvfb: false
+#          headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
+#          cache-mc: github

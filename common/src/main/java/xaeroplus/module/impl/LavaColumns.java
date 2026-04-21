@@ -41,12 +41,12 @@ public class LavaColumns extends Module {
         var chunk = event.chunk();
         var chunkPos = chunk.getPos();
         if (getActualDimension() != Level.NETHER) return;
-        if (lavaColumnsCache.get().isHighlighted(chunkPos.x, chunkPos.z, getActualDimension())) return;
+        if (lavaColumnsCache.get().isHighlighted(chunkPos.x(), chunkPos.z(), getActualDimension())) return;
 
         var maxHeight = new AtomicInteger(0);
         ChunkScanner.chunkScanBlockstatePredicate(chunk, lavaFilter, (c, state, relX, y, relZ) -> {
-            var x = ChunkUtils.chunkCoordToCoord(c.getPos().x) + relX;
-            var z = ChunkUtils.chunkCoordToCoord(c.getPos().z) + relZ;
+            var x = ChunkUtils.chunkCoordToCoord(c.getPos().x()) + relX;
+            var z = ChunkUtils.chunkCoordToCoord(c.getPos().z()) + relZ;
             var maxY = level.getMaxY();
             var fluid = state.getFluidState();
             if (!fluid.isEmpty() && !fluid.isSource()) {
@@ -63,7 +63,7 @@ public class LavaColumns extends Module {
             return false;
         }, 0);
 
-        lavaColumnsCache.get().addHighlight(chunk.getPos().x, chunk.getPos().z, maxHeight.get());
+        lavaColumnsCache.get().addHighlight(chunkPos.x(), chunkPos.z(), maxHeight.get());
     }
 
     @Override

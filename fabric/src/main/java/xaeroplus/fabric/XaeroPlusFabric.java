@@ -4,7 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.Version;
@@ -12,7 +12,6 @@ import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.Minecraft;
 import xaeroplus.XaeroPlus;
 import xaeroplus.commands.XPClientCommandSource;
-import xaeroplus.fabric.util.FabricWaystonesHelperInit;
 import xaeroplus.fabric.util.compat.IncompatibleMinimapWarningScreen;
 import xaeroplus.fabric.util.compat.XaeroPlusMinimapCompatibilityChecker;
 import xaeroplus.settings.Settings;
@@ -35,9 +34,8 @@ public class XaeroPlusFabric implements ClientModInitializer {
 				.map(ModMetadata::getVersion)
 				.map(Version::getFriendlyString)
 				.orElse("2.x");
-			FabricWaystonesHelperInit.doInit();
 			XaeroPlus.initializeSettings();
-			Settings.REGISTRY.getKeybindings().forEach(KeyBindingHelper::registerKeyBinding);
+			Settings.REGISTRY.getKeybindings().forEach(KeyMappingHelper::registerKeyMapping);
         }
 	}
 

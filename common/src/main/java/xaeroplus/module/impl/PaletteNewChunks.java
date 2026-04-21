@@ -50,8 +50,8 @@ public class PaletteNewChunks extends Module {
         if (event.seenChunk()) return; // never will be newchunk if we've already cached it
         var dim = ChunkUtils.getActualDimension();
         var chunk = event.chunk();
-        var x = chunk.getPos().x;
-        var z = chunk.getPos().z;
+        var x = chunk.getPos().x();
+        var z = chunk.getPos().z();
         try {
             if (newChunksCache.get().isHighlighted(x, z, dim)) return;
             if (newChunksInverseCache.get().isHighlighted(x, z, dim)) return;

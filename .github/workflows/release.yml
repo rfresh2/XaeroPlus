@@ -243,7 +243,6 @@ jobs:
 #          version: ${{ needs.build.outputs.xp_version }}+forge-${{ env.MINECRAFT_VERSION }}
 #          loaders: |
 #            forge
-#            neoforge
 #          game-versions: |
 #            ${{ env.MINECRAFT_VERSION }}
 #          dependencies: |

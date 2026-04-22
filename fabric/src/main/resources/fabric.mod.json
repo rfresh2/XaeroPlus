@@ -39,5 +39,6 @@
     "lithium:options": {
       "mixin.chunk.palette": false
     }
-  }
+  },
+  "accessWidener": "xaeroplus.accesswidener"
 }

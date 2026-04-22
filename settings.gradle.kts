@@ -68,6 +68,6 @@ dependencyResolutionManagement {
 include("common")
 include("fabric")
 //include("forge")
-//include("neo")
+include("neo")
 
 rootProject.name = "XaeroPlus"

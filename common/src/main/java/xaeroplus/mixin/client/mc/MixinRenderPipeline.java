@@ -23,7 +23,7 @@ public class MixinRenderPipeline {
     @Inject(method = "getColorTargetState", at = @At("HEAD"), cancellable = true, remap = false)
     public void transparentWmBgOverrideBlendFunction(final CallbackInfoReturnable<ColorTargetState> cir) {
         if (Globals.transparentWmBgApplyMapFrameBlend) {
-            cir.setReturnValue(new ColorTargetState(new BlendFunction(SourceFactor.ONE, DestFactor.ZERO, SourceFactor.ZERO, DestFactor.ONE)));
+            cir.setReturnValue(new ColorTargetState(new BlendFunction(SourceFactor.ONE, DestFactor.ZERO, SourceFactor.ONE, DestFactor.ZERO)));
         }
         if (Globals.transparentWmBgApplyMapBlend) {
             cir.setReturnValue(new ColorTargetState(new BlendFunction(SourceFactor.ONE, DestFactor.ZERO, SourceFactor.ONE, DestFactor.ZERO)));

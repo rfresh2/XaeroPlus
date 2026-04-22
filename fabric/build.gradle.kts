@@ -48,9 +48,9 @@ dependencies {
 	modImplementation(libs.minimap.fabric) { isTransitive = false }
 	modImplementation(libs.xaerolib.fabric)
 	modImplementation(libs.baritone.fabric)
-	modCompileOnly(libs.waystones.fabric)
-	modCompileOnly(libs.balm.fabric)
-	modCompileOnly(libs.fabric.waystones)
+	modImplementation(libs.waystones.fabric)
+	modImplementation(libs.balm.fabric)
+//	modCompileOnly(libs.fabric.waystones)
 //	modRuntimeOnly(libs.immediatelyfast)
 	modImplementation(libs.modmenu)
     modImplementation(libs.sodium.fabric)

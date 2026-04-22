@@ -9,6 +9,7 @@ import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.*;
 import xaeroplus.util.BaritoneHelper;
 import xaeroplus.util.ColorHelper;
+import xaeroplus.util.WaystonesHelper;
 import xaeroplus.util.WorldToolsHelper;
 
 import java.io.ByteArrayOutputStream;
@@ -86,10 +87,9 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.waystones_sync",
             true,
             (b) -> {
-//                if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setEnabled(b);
+                if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setEnabled(b);
             },
-//            WaystonesHelper::isAnyWaystonesPresent),
-            () -> false),
+            WaystonesHelper::isAnyWaystonesPresent),
         SettingLocation.WORLD_MAP_MAIN);
     public final EnumSetting<ColorHelper.WaystoneColor> waystoneColorSetting = register(
         EnumSetting.create(
@@ -98,10 +98,9 @@ public final class Settings extends SettingRegistry {
             ColorHelper.WaystoneColor.values(),
             ColorHelper.WaystoneColor.RANDOM,
             (b) -> {
-//                if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setColor(b);
+                if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setColor(b);
             },
-//            () -> WaystonesHelper.isAnyWaystonesPresent() && ModuleManager.getModule(WaystoneSync.class).isEnabled()),
-            () -> false),
+            () -> WaystonesHelper.isAnyWaystonesPresent() && ModuleManager.getModule(WaystoneSync.class).isEnabled()),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting waystoneWaypointSetSetting = register(
         BooleanSetting.create(
@@ -109,10 +108,9 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.waystone_waypoint_set",
             false,
             (b) -> {
-//                if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setWaypointSet(b);
+                if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setWaypointSet(b);
             },
-//            () -> WaystonesHelper.isAnyWaystonesPresent() && ModuleManager.getModule(WaystoneSync.class).isEnabled()),
-            () -> false),
+            () -> WaystonesHelper.isAnyWaystonesPresent() && ModuleManager.getModule(WaystoneSync.class).isEnabled()),
         SettingLocation.WORLD_MAP_MAIN);
     public final EnumSetting<WaystoneWpVisibilityType> waystoneWaypointVisibilityModeSetting = register(
         EnumSetting.create(
@@ -121,10 +119,9 @@ public final class Settings extends SettingRegistry {
             WaystoneWpVisibilityType.values(),
             WaystoneWpVisibilityType.LOCAL,
             (mode) -> {
-//                if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setVisibilityType(mode);
+                if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setVisibilityType(mode);
             },
-//            () -> WaystonesHelper.isAnyWaystonesPresent() && ModuleManager.getModule(WaystoneSync.class).isEnabled()),
-            () -> false),
+            () -> WaystonesHelper.isAnyWaystonesPresent() && ModuleManager.getModule(WaystoneSync.class).isEnabled()),
         SettingLocation.WORLD_MAP_MAIN);
     public enum WaystoneWpVisibilityType implements TranslatableSettingEnum {
         // order here must mirror xaero's visibility enum

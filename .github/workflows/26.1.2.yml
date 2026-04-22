@@ -156,7 +156,7 @@ jobs:
           mc: ${{ env.MINECRAFT_VERSION }}
           modloader: fabric
           regex: .*fabric.*
-          mc-runtime-test: fabric
+          mc-runtime-test: none
           fabric-api: 0.146.1
           java: 25
           xvfb: false

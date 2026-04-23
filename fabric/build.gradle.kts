@@ -67,6 +67,7 @@ dependencies {
 
 tasks {
 	processResources {
+		from(project(":common").file("src/main/resources/xaeroplus.accesswidener"))
 		filesMatching("fabric.mod.json") {
 			expand(mapOf(
 				"version" to project.version,

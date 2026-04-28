@@ -151,12 +151,12 @@ jobs:
           && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/fabric-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_fabric }}/xaeros-world-map-fabric-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_fabric }}.jar -P run/mods/
 
       - name: Fabric Test
-        uses: headlesshq/mc-runtime-test@4.3.1
+        uses: headlesshq/mc-runtime-test@4.4.0
         with:
           mc: ${{ env.MINECRAFT_VERSION }}
           modloader: fabric
           regex: .*fabric.*
-          mc-runtime-test: none
+          mc-runtime-test: fabric
           fabric-api: 0.146.1
           java: 25
           xvfb: false
@@ -192,7 +192,7 @@ jobs:
 #          && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/forge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_fabric }}/xaeros-world-map-forge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_forge }}.jar -P run/mods/
 #
 #      - name: Forge Test
-#        uses: headlesshq/mc-runtime-test@4.3.1
+#        uses: headlesshq/mc-runtime-test@4.4.0
 #        with:
 #          mc: ${{ env.MINECRAFT_VERSION }}
 #          modloader: forge
@@ -232,12 +232,12 @@ jobs:
           && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/neoforge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_neo }}/xaeros-world-map-neoforge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_neo }}.jar -P run/mods/
 
       - name: Neo Test
-        uses: headlesshq/mc-runtime-test@4.3.1
+        uses: headlesshq/mc-runtime-test@4.4.0
         with:
           mc: ${{ env.MINECRAFT_VERSION }}
           modloader: neoforge
           regex: .*neoforge.*
-          mc-runtime-test: none
+          mc-runtime-test: neoforge
           java: 25
           xvfb: false
           headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true

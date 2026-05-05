@@ -8,7 +8,7 @@ plugins {
     id("java-library")
     id("org.jetbrains.gradle.plugin.idea-ext") version "1.3"
     id("com.gtnewhorizons.retrofuturagradle") version "2.0.2"
-    id("com.gradleup.shadow") version "9.3.1"
+    id("com.gradleup.shadow") version "9.4.1"
 }
 
 // Project properties
@@ -109,7 +109,7 @@ dependencies {
     }
 
     jarLibs("com.github.ben-manes.caffeine:caffeine:2.9.3")
-    jarLibs("org.rfresh.xerial:sqlite-jdbc:3.51.2.0")
+    jarLibs("org.rfresh.xerial:sqlite-jdbc:3.53.0.1")
     implementation(modUtils.deobfuscate("maven.modrinth:xaeros-world-map:forge-1.12.2-${project.properties["worldmap_version"]}"))
     implementation(modUtils.deobfuscate("maven.modrinth:xaeros-minimap:forge-1.12.2-${project.properties["minimap_version"]}"))
     implementation(modUtils.deobfuscate("maven.modrinth:xaerolib:forge-1.12.2-${project.properties["xaerolib_version"]}"))

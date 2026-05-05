@@ -91,7 +91,7 @@ jobs:
           && wget https://api.modrinth.com/maven/maven/modrinth/xaerolib/forge-1.12.2-${{ needs.build.outputs.xaerolib_version }}/xaerolib-forge-1.12.2-${{ needs.build.outputs.xaerolib_version }}.jar -P run/mods/
 
       - name: Forge Test
-        uses: headlesshq/mc-runtime-test@4.1.0
+        uses: headlesshq/mc-runtime-test@4.4.0
         with:
           mc: ${{ env.MINECRAFT_VERSION }}
           modloader: forge

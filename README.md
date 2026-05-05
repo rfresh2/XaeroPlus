@@ -2,7 +2,7 @@
 
 <p align="center">
   <a href="https://discord.gg/nJZrSaRKtb">
-  <img alt="Discord" src="https://dcbadge.vercel.app/api/server/nJZrSaRKtb">
+  <img alt="Discord" src="https://dcbadge.limes.pink/api/server/nJZrSaRKtb">
   </a>
 </p>
 
@@ -29,7 +29,7 @@
   <img src="https://img.shields.io/badge/MC-26.1.2-brightgreen.svg" alt="Minecraft"/>
   <img src="https://img.shields.io/github/languages/code-size/rfresh2/XaeroPlus.svg" alt="Code size"/>
   <img src="https://img.shields.io/github/repo-size/rfresh2/XaeroPlus.svg" alt="GitHub repo size"/>
-  <img src="https://tokei.rs/b1/github/rfresh2/XaeroPlus?category=code&style=flat" alt="Lines of Code"/>
+  <img src="https://img.shields.io/endpoint?url=https%3A%2F%2Ftokei.kojix2.net%2Fbadge%2Fgithub%2Frfresh2%2FXaeroPlus%2Flines" alt="Lines of Code"/>
 </p>
 
 XaeroPlus is a client-side Minecraft mod that depends on and modifies the Xaero's WorldMap and Minimap mods with extra

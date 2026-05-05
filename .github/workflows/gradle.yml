@@ -55,7 +55,8 @@ jobs:
       uses: actions/upload-artifact@v6
       with:
         name: ${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}
-        path: XaeroPlus-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar
+        path: ${{ env.XP_FORGE }}.jar
+        if-no-files-found: error
 
     - name: Get Previous Release Number
       env:
@@ -82,12 +83,12 @@ jobs:
 
         github-token: ${{ secrets.GITHUB_TOKEN }}
         github-files: |
-          XaeroPlus-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar
+          ${{ env.XP_FORGE }}.jar
         github-tag: ${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}
         github-commitish: mainline
 
         files: |
-          XaeroPlus-${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}.jar
+          ${{ env.XP_FORGE }}.jar
         name: ${{ env.MOD_LOADER }}-${{ env.MINECRAFT_VERSION }}-${{ github.run_number }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}
         version: ${{ github.run_number }}
         loaders: |

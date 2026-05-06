@@ -174,6 +174,8 @@ tasks {
         exclude("org/rfresh/sqlite/native/Linux/ppc64/**")
         exclude("org/rfresh/sqlite/native/Linux/riscv64/**")
         exclude("org/rfresh/sqlite/native/Windows/armv7/**")
+        exclude("META-INF/versions/9/**")
+        exclude("org/rfresh/sqlite/nativeimage/**")
     }
 
     register("printWorldMapVersion") {

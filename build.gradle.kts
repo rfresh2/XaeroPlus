@@ -113,7 +113,7 @@ dependencies {
     implementation(modUtils.deobfuscate("maven.modrinth:xaeros-world-map:forge-1.12.2-${project.properties["worldmap_version"]}"))
     implementation(modUtils.deobfuscate("maven.modrinth:xaeros-minimap:forge-1.12.2-${project.properties["minimap_version"]}"))
     implementation(modUtils.deobfuscate("maven.modrinth:xaerolib:forge-1.12.2-${project.properties["xaerolib_version"]}"))
-    implementation(modUtils.deobfuscate("cabaletta:baritone-deobf-unoptimized-mcp-dev:1.2"))
+    compileOnly(modUtils.deobfuscate("cabaletta:baritone-deobf-unoptimized-mcp-dev:1.2"))
     compileOnly(modUtils.deobfuscate("curse.maven:waystones-245755:2859589"))
 }
 

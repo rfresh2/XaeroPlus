@@ -47,6 +47,7 @@ dependencies {
     modCompileOnly(libs.worldtools)
     modCompileOnly(libs.fabric.waystones)
     modCompileOnly(libs.sodium.neoforge)
+    modCompileOnly(libs.sodium8.neoforge)
     modRuntimeOnly(libs.immediatelyfast.neo)
     shadow(libs.sqlite)
     forgeRuntimeLibrary(implementation(shadow(libs.caffeine.get())!!)!!)

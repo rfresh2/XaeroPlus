@@ -54,6 +54,7 @@ dependencies {
 	modRuntimeOnly(libs.immediatelyfast)
 	modImplementation(libs.modmenu)
     modImplementation(libs.sodium.fabric)
+	modCompileOnly(libs.sodium8.fabric)
 	implementation(shadow(libs.caffeine.get())!!)
 	implementation(shadow(libs.lambdaEvents.get())!!)
 	implementation(shadow(libs.oldbiomes.get())!!)

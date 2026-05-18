@@ -6,7 +6,10 @@ import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import xaeroplus.event.ClientTickEvent;
+import xaeroplus.settings.SettingHooks;
 import xaeroplus.settings.Settings;
+
+import java.util.concurrent.ForkJoinPool;
 
 public class KeybindListener {
     // prevents repeat events if keybind is held down
@@ -24,6 +27,7 @@ public class KeybindListener {
                     var setting = Settings.REGISTRY.getKeybindingSetting(keybind);
                     if (setting != null) {
                         setting.setValue(!setting.get());
+                        ForkJoinPool.commonPool().execute(SettingHooks::saveSettings);
                     }
                 }
             } else {

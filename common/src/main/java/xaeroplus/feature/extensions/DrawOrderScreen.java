@@ -10,6 +10,7 @@ import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 import xaero.map.gui.ScreenSwitchSettingEntry;
 import xaeroplus.module.impl.TickTaskExecutor;
+import xaeroplus.settings.SettingHooks;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.ColorHelper;
 import xaeroplus.util.DrawOrderHelper;
@@ -38,7 +39,10 @@ public class DrawOrderScreen extends Screen {
         addWidget(drawFeatureList);
         addRenderableWidget(
             Button.builder(Component.translatable("gui.done"),
-                b -> mc.setScreen(parent))
+                b -> {
+                    this.onClose();
+                    mc.setScreen(parent);
+                })
                 .bounds(this.width / 2 - 100, this.height - 34, 200, 20)
                 .build()
         );
@@ -75,6 +79,11 @@ public class DrawOrderScreen extends Screen {
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    }
+
+    @Override
+    public void onClose() {
+        SettingHooks.saveSettings();
     }
 
     public List<String> loadEntries() {

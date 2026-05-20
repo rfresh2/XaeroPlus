@@ -54,7 +54,9 @@ public class ChunkScanner {
                 for (int z = 0; z < 16; z++) {
                     for (int y = yScanStart; y < 16; y++) {
                         BlockState state = blockStateContainer.get(x, y, z);
-                        if (statePredicate.test(chunk, state, x, (i*16) + y, z))
+                        if (!filter.contains(state.getBlock()))
+                            continue;
+                        if (statePredicate.test(chunk, state, x, sectionBottomY + y, z))
                             return;
                     }
                 }

@@ -49,6 +49,7 @@ dependencyResolutionManagement {
 			library("embeddium", "maven.modrinth:embeddium:0.3.31+mc1.20.1")
 			library("opac-fabric", "maven.modrinth:open-parties-and-claims:fabric-1.20.1-0.25.10")
 			library("forge-config-api-port", "maven.modrinth:forge-config-api-port:v8.0.3-1.20.1-Fabric")
+			library("spark-fabric", "maven.modrinth:spark:1.10.53-fabric")
 			library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")
 			library("baritone-fabric", "com.github.rfresh2:baritone-fabric:${minecraft_version}-SNAPSHOT")
 			library("baritone-forge", "com.github.rfresh2:baritone-forge:${minecraft_version}-SNAPSHOT")

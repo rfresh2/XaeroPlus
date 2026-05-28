@@ -56,6 +56,7 @@ dependencies {
 	modImplementation(libs.sodium)
 	modRuntimeOnly(libs.opac.fabric)
 	modRuntimeOnly(libs.forge.config.api.port)
+	modRuntimeOnly(libs.spark.fabric)
 	implementation(shadow(libs.caffeine.get())!!)
 	implementation(shadow(libs.lambdaEvents.get())!!)
 	implementation(shadow(libs.oldbiomes.get())!!)

@@ -761,6 +761,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         }
     }
 
+    @Inject(method = "shouldSkipWorldRender", at = @At("HEAD"), cancellable = true)
+    public void shouldRenderGameBehindWorldMap(final CallbackInfoReturnable<Boolean> cir) {
+        if (Settings.REGISTRY.renderGameBehindWorldMap.get()) {
+            cir.setReturnValue(false);
+        }
+    }
+
     // honestly no idea why xaero is doing here, its drawing 2 thin lines along the bottom and right side of the map
     // but it looks bad with transparent background, so bye
 

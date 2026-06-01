@@ -240,6 +240,12 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.show_coords_in_right_click_options",
             true),
         SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting renderGameBehindWorldMap = register(
+        BooleanSetting.create(
+            "Render Game Behind WorldMap",
+            "xaeroplus.settings.render_game_behind_worldmap",
+            false),
+        SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting nullOverworldDimensionFolder = register(
         BooleanSetting.create(
             "null OW Dim Dir",

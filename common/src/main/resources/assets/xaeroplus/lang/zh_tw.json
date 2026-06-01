@@ -194,6 +194,8 @@
   "xaeroplus.setting.show_waypoint_distances.tooltip": "在完整定位點選單中顯示到每個定位點的距離。",
   "xaeroplus.setting.show_coords_in_right_click_options": "在右鍵選單中顯示座標",
   "xaeroplus.setting.show_coords_in_right_click_options.tooltip": "切換是否在世界地圖的右鍵選單中顯示座標",
+  "xaeroplus.settings.render_game_behind_worldmap": "在世界地圖背後渲染遊戲",
+  "xaeroplus.settings.render_game_behind_worldmap.tooltip": "預設情況下，開啟世界地圖時 Xaero 會取消遊戲渲染。 \n 此設定允許你啟用遊戲渲染。 \n 可能會提升與某些模組的相容性，但會影響 FPS",
   "xaeroplus.setting.show_render_distance": "顯示渲染距離",
   "xaeroplus.setting.show_render_distance.tooltip": "顯示伺服器端渲染距離（實際上只是另一個設定）。",
   "xaeroplus.setting.show_world_border": "顯示世界邊界",

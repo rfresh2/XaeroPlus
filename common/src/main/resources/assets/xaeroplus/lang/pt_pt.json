@@ -194,6 +194,8 @@
   "xaeroplus.setting.show_waypoint_distances.tooltip": "Mostra a distância de todas as localizações no menu completo da localizações.",
   "xaeroplus.setting.show_coords_in_right_click_options": "Mostrar coordenadas nas opções do clique direito",
   "xaeroplus.setting.show_coords_in_right_click_options.tooltip": "Alterna se as coordenadas são exibidas no menu de opções do clique direito no Mapa Mundial",
+  "xaeroplus.settings.render_game_behind_worldmap": "Renderizar o jogo atrás do Mapa Mundial",
+  "xaeroplus.settings.render_game_behind_worldmap.tooltip": "Por predefinição, o Xaero cancela a renderização do jogo quando o Mapa Mundial está aberto. \n Esta definição permite ativar a renderização do jogo. \n Pode melhorar a compatibilidade com certos mods, mas terá impacto nos FPS",
   "xaeroplus.setting.show_render_distance": "Mostrar Alcance Visual",
   "xaeroplus.setting.show_render_distance.tooltip": "Mostra o alcance visual do servidor (apenas outra configuração)",
   "xaeroplus.setting.show_world_border": "Mostrar Fronteira do Mundo",

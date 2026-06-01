@@ -194,6 +194,8 @@
   "xaeroplus.setting.show_waypoint_distances.tooltip": "Display the distance to every waypoint in the full waypoint menu.",
   "xaeroplus.setting.show_coords_in_right_click_options": "Coords in Right Click Options",
   "xaeroplus.setting.show_coords_in_right_click_options.tooltip": "Toggles whether coordinates are shown in the right click options menu on the WorldMap",
+  "xaeroplus.settings.render_game_behind_worldmap": "Render Game Behind WorldMap",
+  "xaeroplus.settings.render_game_behind_worldmap.tooltip": "By default, Xaero cancels game rendering when the WorldMap is open. \n This setting allows you to enable game rendering. \n May improve compatibility with certain mods but will have FPS impact",
   "xaeroplus.setting.show_render_distance": "Show Render Distance",
   "xaeroplus.setting.show_render_distance.tooltip": "Show server side render distance (actually just another setting).",
   "xaeroplus.setting.show_world_border": "Show World Border",

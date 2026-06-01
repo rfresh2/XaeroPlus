@@ -56,6 +56,7 @@ dependencyResolutionManagement {
 			library("modmenu", "maven.modrinth:modmenu:16.0.0-rc.1")
 			library("sodium-fabric", "maven.modrinth:sodium:mc${minecraft_version}-0.7.3-fabric")
             library("sodium-neoforge", "maven.modrinth:sodium:mc1.21.8-0.7.3-neoforge")
+            library("spark-fabric", "maven.modrinth:spark:1.10.152-fabric")
             library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")
             library("baritone-fabric", "com.github.rfresh2:baritone-fabric:${minecraft_version}-SNAPSHOT")
             library("baritone-forge", "com.github.rfresh2:baritone-forge:${minecraft_version}-SNAPSHOT")

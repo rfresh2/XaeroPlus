@@ -22,6 +22,7 @@ public class GuiXaeroPlusWorldMapSettings extends GuiSettings {
         this.entries[1] = overlaySettingSwitchEntry;
         this.entries[2] = drawOrderSettingSwitchEntry;
         System.arraycopy(mainSettingsEntries, 0, this.entries, 3, mainSettingsEntries.length);
+        this.canSkipWorldRender = true;
     }
 
     @Override

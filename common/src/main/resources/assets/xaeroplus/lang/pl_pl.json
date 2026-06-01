@@ -213,6 +213,8 @@
   "xaeroplus.setting.transparent_background.tooltip": "Powoduje, że tło Minimapy jest przezroczyste zamiast czarnego.",
   "xaeroplus.setting.minimap_scaling": "Mnożnik Skalowania Minimapy",
   "xaeroplus.setting.minimap_scaling.tooltip": "Mnoży skalowanie renderowania minimapy. \n Zwiększa ilość widocznych fragmentów. \n Aby zmniejszyć artefakty wizualne, ustaw w granicach 2 wartości Mnożnika Rozmiaru Minimapy. \n Umiarkowany wpływ na FPS. Ogranicznik FPS jest zalecany, jeśli ustawiono > 2.",
+  "xaeroplus.setting.minimap_size_multiplier": "Mnożnik Rozmiaru Minimapy",
+  "xaeroplus.setting.minimap_size_multiplier.tooltip": "Mnoży rozmiar minimapy. \n Aby uzyskać najlepsze rezultaty, zwiększaj tylko podczas zwiększania Skalowania Minimapy. \n Brak wpływu na FPS.",
   "xaeroplus.setting.minimap_render_z_offset": "Renderowanie Z",
   "xaeroplus.setting.minimap_render_z_offset.tooltip": "Określa, czy inne interfejsy GUI renderują się przed czy za minimapą. Niższe Z = dalej w tle",
   "xaeroplus.keybind.switch_to_nether": "Przełącz na Nether",

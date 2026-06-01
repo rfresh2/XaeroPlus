@@ -194,6 +194,8 @@
   "xaeroplus.setting.show_waypoint_distances.tooltip": "Отображает расстояние до каждой точки в меню вейпоинтов",
   "xaeroplus.setting.show_coords_in_right_click_options": "Показ координат в меню правого клика",
   "xaeroplus.setting.show_coords_in_right_click_options.tooltip": "Переключает отображение координат в меню параметров по правому клику на Карте Мира",
+  "xaeroplus.settings.render_game_behind_worldmap": "Отрисовка игры за Картой Мира",
+  "xaeroplus.settings.render_game_behind_worldmap.tooltip": "По умолчанию Xaero отменяет отрисовку игры, когда Карта Мира открыта. \n Эта настройка позволяет включить отрисовку игры. \n Может улучшить совместимость с некоторыми модами, но повлияет на FPS",
   "xaeroplus.setting.show_render_distance": "Показать дистанцию прорисовки",
   "xaeroplus.setting.show_render_distance.tooltip": "Показывает серверную дистанцию прорисовки вокруг игрока",
   "xaeroplus.setting.show_world_border": "Показать границу мира",

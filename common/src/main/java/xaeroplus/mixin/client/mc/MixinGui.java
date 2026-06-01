@@ -13,6 +13,6 @@ public class MixinGui {
 
     @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
     public void cancelGuiRenderWhileInTransparentWorldMap(final CallbackInfo ci) {
-        if (GuiMapHelper.isGuiMapLoaded() && Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) ci.cancel();
+        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get() && GuiMapHelper.isGuiMapLoaded()) ci.cancel();
     }
 }

@@ -12,6 +12,7 @@ public class GuiXaeroPlusOverlaySettings extends GuiSettings {
     public GuiXaeroPlusOverlaySettings(Screen parent, Screen escapeScreen) {
         super(Component.translatable("xaeroplus.gui.overlay_settings"), parent, escapeScreen);
         this.entries = Settings.REGISTRY.getXaeroSettingEntries(SettingLocation.OVERLAYS);
+        this.canSkipWorldRender = true;
     }
 
     @Override

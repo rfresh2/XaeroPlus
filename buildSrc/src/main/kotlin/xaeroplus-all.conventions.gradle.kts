@@ -27,6 +27,7 @@ tasks {
     withType<JavaCompile> {
         options.encoding = "UTF-8"
         options.release = 25
+        options.compilerArgs.add("-parameters")
     }
 }
 

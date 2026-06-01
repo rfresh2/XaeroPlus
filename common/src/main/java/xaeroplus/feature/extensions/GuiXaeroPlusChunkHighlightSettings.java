@@ -12,6 +12,7 @@ public class GuiXaeroPlusChunkHighlightSettings extends GuiSettings {
     public GuiXaeroPlusChunkHighlightSettings(Screen parent, Screen escapeScreen) {
         super(Component.translatable("xaeroplus.gui.chunk_highlight_settings"), parent, escapeScreen);
         this.entries = Settings.REGISTRY.getXaeroSettingEntries(SettingLocation.CHUNK_HIGHLIGHTS);
+        this.canSkipWorldRender = true;
     }
 
     @Override

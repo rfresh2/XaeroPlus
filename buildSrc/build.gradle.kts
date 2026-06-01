@@ -16,5 +16,5 @@ dependencies {
     implementation("dev.architectury:at:1.0.1")
     implementation("gg.essential.loom-no-remap:gg.essential.loom-no-remap.gradle.plugin:1.15.50")
     implementation("architectury-plugin:architectury-plugin.gradle.plugin:3.5-SNAPSHOT")
-    implementation("com.gradleup.shadow:shadow-gradle-plugin:9.4.1")
+    implementation("com.gradleup.shadow:shadow-gradle-plugin:9.4.2")
 }

@@ -194,6 +194,8 @@
   "xaeroplus.setting.show_waypoint_distances.tooltip": "Afficher la distance de chaque point de passage dans le menu complet des points de passage.",
   "xaeroplus.setting.show_coords_in_right_click_options": "Afficher les coordonnées dans les options du clic droit",
   "xaeroplus.setting.show_coords_in_right_click_options.tooltip": "Active ou désactive l'affichage des coordonnées dans le menu des options du clic droit sur la carte du monde",
+  "xaeroplus.settings.render_game_behind_worldmap": "Afficher le jeu derrière la carte du monde",
+  "xaeroplus.settings.render_game_behind_worldmap.tooltip": "Par défaut, Xaero annule l'affichage du jeu lorsque la carte du monde est ouverte. \n Ce réglage permet d'activer l'affichage du jeu. \n Peut améliorer la compatibilité avec certains mods, mais aura un impact sur les FPS",
   "xaeroplus.setting.show_render_distance": "Afficher la distance de rendu",
   "xaeroplus.setting.show_render_distance.tooltip": "Afficher la distance de rendu côté serveur.",
   "xaeroplus.setting.show_world_border": "Afficher la Frontière du Monde",

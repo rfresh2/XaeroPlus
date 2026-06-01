@@ -194,6 +194,8 @@
   "xaeroplus.setting.show_waypoint_distances.tooltip": "Hiển thị khoảng cách đến mọi điểm đến trong menu điểm đến đầy đủ.",
   "xaeroplus.setting.show_coords_in_right_click_options": "Hiển thị tọa độ trong menu chuột phải",
   "xaeroplus.setting.show_coords_in_right_click_options.tooltip": "Chuyển đổi việc hiển thị tọa độ trong menu chuột phải trên Bản Đồ Thế Giới",
+  "xaeroplus.settings.render_game_behind_worldmap": "Hiển thị trò chơi phía sau Bản Đồ Thế Giới",
+  "xaeroplus.settings.render_game_behind_worldmap.tooltip": "Theo mặc định, Xaero hủy hiển thị trò chơi khi Bản Đồ Thế Giới đang mở. \n Cài đặt này cho phép bạn bật hiển thị trò chơi. \n Có thể cải thiện khả năng tương thích với một số mod nhưng sẽ ảnh hưởng đến FPS",
   "xaeroplus.setting.show_render_distance": "Hiển Thị Khoảng Cách Hiển Thị",
   "xaeroplus.setting.show_render_distance.tooltip": "Hiển thị khoảng cách hiển thị phía máy chủ (thực chất chỉ là một cài đặt khác)",
   "xaeroplus.setting.show_world_border": "Hiển Thị Ranh Giới Thế Giới",

@@ -41,7 +41,8 @@ public class HighlightVertexBuffer extends AbstractHighlightVertexBuffer {
         }
         var bufferBuilder = Tesselator.getInstance().getBuilder();
         bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
-        for (var highlight : highlights.keySet()) {
+        for (var it = highlights.keySet().iterator(); it.hasNext(); ) {
+            var highlight = it.nextLong();
             var chunkPosX = ChunkUtils.longToChunkX(highlight);
             var chunkPosZ = ChunkUtils.longToChunkZ(highlight);
             float x1 = chunkPosX;

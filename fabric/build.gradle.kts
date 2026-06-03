@@ -55,6 +55,7 @@ dependencies {
 	modImplementation(libs.modmenu)
     modImplementation(libs.sodium.fabric)
     modRuntimeOnly(libs.spark.fabric)
+	modRuntimeOnly(libs.fabric.permissions.api)
     implementation(shadow(libs.caffeine.get())!!)
 	implementation(shadow(libs.lambdaEvents.get())!!)
 	implementation(shadow(libs.oldbiomes.get())!!)

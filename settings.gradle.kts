@@ -26,10 +26,10 @@ val xaerolib_version: String by ext.properties
 dependencyResolutionManagement {
 	versionCatalogs {
 		create("libs") {
-			library("fabric-loader", "net.fabricmc:fabric-loader:0.19.2")
+			library("fabric-loader", "net.fabricmc:fabric-loader:0.19.3")
 			library("forge", "net.minecraftforge:forge:26.1.2-64.0.8")
-			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.149.0+${minecraft_version}")
-			library("neoforge", "net.neoforged:neoforge:26.1.2.59-beta")
+			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.150.0+${minecraft_version}")
+			library("neoforge", "net.neoforged:neoforge:26.1.2.71")
             library("worldmap-fabric", "maven.modrinth:xaeros-world-map:fabric-${minecraft_version}-${worldmap_version_fabric}")
             library("worldmap-forge", "maven.modrinth:xaeros-world-map:forge-${minecraft_version}-${worldmap_version_forge}")
             library("worldmap-neo", "maven.modrinth:xaeros-world-map:neoforge-${minecraft_version}-${worldmap_version_neo}")
@@ -43,9 +43,9 @@ dependencyResolutionManagement {
             library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.5.4")
 			library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.0")
 			library("lambdaEvents", "net.lenni0451:LambdaEvents:2.4.2")
-			library("waystones-fabric", "net.blay09.mods:waystones-fabric:${minecraft_version}.3")
+			library("waystones-fabric", "net.blay09.mods:waystones-fabric:${minecraft_version}.5")
 			library("waystones-forge", "maven.modrinth:waystones:21.11.9+forge-1.21.11")
-			library("waystones-neoforge", "net.blay09.mods:waystones-neoforge:${minecraft_version}.3")
+			library("waystones-neoforge", "net.blay09.mods:waystones-neoforge:${minecraft_version}.5")
 			library("balm-fabric", "net.blay09.mods:balm-fabric:${minecraft_version}.6")
 			library("balm-forge", "maven.modrinth:balm:21.11.8+forge-1.21.11")
 			library("balm-neoforge", "net.blay09.mods:balm-neoforge:${minecraft_version}.6")

@@ -174,9 +174,17 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
         var key = chunkPosToLong(x, z);
         if (chunks.containsKey(key)) {
             super.removeHighlight(x, z);
-            staleChunks.add(key);
             dbExecutor.execute(() -> database.removeHighlight(x, z, dimension));
         }
+    }
+
+    @Override
+    public void removeHighlights(final LongCollection toRemove) {
+        if (!mc.isSameThread()) {
+            throw new RuntimeException("removeHighlights must be called on the main thread!");
+        }
+        toRemove.forEach(this.chunks::remove);
+        dbExecutor.execute(() -> database.removeHighlights(toRemove, dimension));
     }
 
     @Override

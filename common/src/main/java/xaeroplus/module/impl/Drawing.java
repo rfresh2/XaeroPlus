@@ -1,9 +1,6 @@
 package xaeroplus.module.impl;
 
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.LongArrayList;
-import it.unimi.dsi.fastutil.longs.LongArraySet;
-import it.unimi.dsi.fastutil.longs.LongList;
+import it.unimi.dsi.fastutil.longs.*;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
@@ -41,6 +38,8 @@ public class Drawing extends Module {
     public DrawingColorCycler getDrawingColorCycler() {
         return drawingColorCycler;
     }
+
+    // todo: wire in bulk selection delete undo?
 
     public void startOperation(ResourceKey<Level> dimension, boolean erase) {
         operationCollector = new DrawingOperationCollector(dimension, erase);
@@ -177,6 +176,22 @@ public class Drawing extends Module {
         drawingCache.removeHighlight(chunkX, chunkZ, Globals.getCurrentDimensionId());
         if (operationCollector != null) {
             operationCollector.addHighlight(chunkX, chunkZ);
+        }
+    }
+
+    public void removeHighlights(final LongCollection toRemove) {
+        LongCollection matched = new LongArrayList();
+        var it = toRemove.longIterator();
+        var existingCache = drawingCache.getHighlights(Globals.getCurrentDimensionId());
+        while (it.hasNext()) {
+            long chunkLong = it.nextLong();
+            if (existingCache.containsKey(chunkLong)) {
+                matched.add(chunkLong);
+            }
+        }
+        drawingCache.removeHighlights(matched, Globals.getCurrentDimensionId());
+        if (operationCollector != null) {
+            operationCollector.addHighlights(matched);
         }
     }
 
@@ -398,6 +413,10 @@ public class Drawing extends Module {
         public void addHighlight(int chunkX, int chunkZ) {
             long chunkLong = ChunkUtils.chunkPosToLong(chunkX, chunkZ);
             chunks.add(chunkLong);
+        }
+
+        public void addHighlights(LongCollection toAdd) {
+            chunks.addAll(toAdd);
         }
 
         public void addLine(Line line) {

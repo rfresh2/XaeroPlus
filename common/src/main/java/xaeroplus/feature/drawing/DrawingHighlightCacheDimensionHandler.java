@@ -172,9 +172,21 @@ public class DrawingHighlightCacheDimensionHandler extends ChunkHighlightBaseCac
         var key = chunkPosToLong(x, z);
         if (chunks.containsKey(key)) {
             super.removeHighlight(x, z);
-            staleChunks.add(key);
             dbExecutor.execute(() -> database.removeHighlight(x, z, dimension));
         }
+    }
+
+    @Override
+    public void removeHighlights(final LongCollection toRemove) {
+        if (!mc.isSameThread()) {
+            throw new RuntimeException("removeHighlights must be called on the main thread!");
+        }
+        toRemove.forEach(pos -> {
+            var x = ChunkUtils.longToChunkX(pos);
+            var z = ChunkUtils.longToChunkZ(pos);
+            super.removeHighlight(x, z);
+        });
+        dbExecutor.execute(() -> database.removeHighlights(toRemove, dimension));
     }
 
     @Override

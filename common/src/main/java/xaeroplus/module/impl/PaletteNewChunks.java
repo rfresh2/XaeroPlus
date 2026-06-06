@@ -25,6 +25,7 @@ import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
 
+import java.time.Duration;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -39,6 +40,8 @@ public class PaletteNewChunks extends Module {
     private final IntSet presentStateIdsBuf = new IntOpenHashSet();
     private final IntList presentStateIdsOrderedBuf = new IntArrayList();
     private boolean renderInverse = false;
+    private Duration minRescanAge = Duration.ofDays(7);
+    private boolean rescan = false;
 
     public void setDiskCache(final boolean disk) {
         newChunksCache.setDiskCache(disk, isEnabled());
@@ -53,30 +56,51 @@ public class PaletteNewChunks extends Module {
         var x = chunk.getPos().x;
         var z = chunk.getPos().z;
         try {
-            if (newChunksCache.get().isHighlighted(x, z, dim)) return;
-            if (newChunksInverseCache.get().isHighlighted(x, z, dim)) return;
-            if (isNewChunk(dim, chunk)) newChunksCache.get().addHighlight(x, z);
-            else newChunksInverseCache.get().addHighlight(x, z);
+            if (shouldSkipScan(x, z, dim, newChunksCache)) return;
+            if (shouldSkipScan(x, z, dim, newChunksInverseCache)) return;
+            if (scanIsNewChunk(dim, chunk)) {
+                newChunksCache.get().addHighlight(x, z);
+            } else {
+                newChunksInverseCache.get().addHighlight(x, z);
+            }
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error checking palette NewChunk at [{} {}]", x, z, e);
         }
     }
 
-    private boolean isNewChunk(final ResourceKey<Level> dim, final LevelChunk chunk) {
+    private boolean shouldSkipScan(final int x, final int z, final ResourceKey<Level> dim, final SavableHighlightCacheInstance cache) {
+        if (cache.get().isHighlighted(x, z, dim)) {
+            if (rescan) {
+                var chunks = cache.get().getCacheMap(dim);
+                var foundTime = chunks.get(ChunkUtils.chunkPosToLong(x, z));
+                var age = Duration.ofMillis(Math.abs(System.currentTimeMillis() - foundTime));
+                if (age.compareTo(minRescanAge) < 0) {
+                    return true;
+                }
+                // warning !!! data deletion !!!
+                cache.get().removeHighlight(x, z);
+            } else {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean scanIsNewChunk(final ResourceKey<Level> dim, final LevelChunk chunk) {
         if (dim == OVERWORLD) {
             return Settings.REGISTRY.paletteNewChunksVersionUpgradedChunks.get()
-                ? checkNewChunkBlockStatePalette(chunk)
-                : switch (checkNewChunkBiomePalette(chunk, true)) {
+                ? scanNewChunkBlockStatePalette(chunk)
+                : switch (scanNewChunkBiomePalette(chunk, true)) {
                     case NO_PLAINS -> false;
                     case PLAINS_IN_PALETTE -> true;
-                    case PLAINS_PRESENT -> checkNewChunkBlockStatePalette(chunk);
+                    case PLAINS_PRESENT -> scanNewChunkBlockStatePalette(chunk);
                 };
         } else if (dim == NETHER) {
             return Settings.REGISTRY.paletteNewChunksVersionUpgradedChunks.get()
-                ? checkNewChunkBlockStatePalette(chunk)
-                : checkNewChunkBiomePalette(chunk, false) == PLAINS_IN_PALETTE;
+                ? scanNewChunkBlockStatePalette(chunk)
+                : scanNewChunkBiomePalette(chunk, false) == PLAINS_IN_PALETTE;
         } else if (dim == END) {
-            return checkNewChunkBiomePalette(chunk, false) == PLAINS_IN_PALETTE;
+            return scanNewChunkBiomePalette(chunk, false) == PLAINS_IN_PALETTE;
         }
         return false;
     }
@@ -107,7 +131,7 @@ public class PaletteNewChunks extends Module {
      * Credits to etianl (https://github.com/etianl/Trouser-Streak) for first idea and public implementation for examining palette entries
      * and crosby (https://github.com/RacoonDog) for idea to check if air is the first palette entry that this was extended from
      */
-    private boolean checkNewChunkBlockStatePalette(LevelChunk chunk) {
+    public boolean scanNewChunkBlockStatePalette(LevelChunk chunk) {
         var sections = chunk.getSections();
         if (sections.length == 0) return false;
         for (int i = 0; i < Math.min(sections.length, 12); i++) {
@@ -117,7 +141,7 @@ public class PaletteNewChunks extends Module {
             if (palette.getSize() < 2) continue;
             if (palette instanceof LinearPalette<BlockState>) {
                 // no more iterating needed if we find a linear palette at any point
-                return checkLinearPaletteOrder(palette, section);
+                return scanLinearPaletteOrder(palette, section);
             } else if (palette instanceof HashMapPalette<BlockState>) {
                 if (checkForExtraPaletteEntries(paletteContainerData)) {
                     return true;
@@ -127,7 +151,7 @@ public class PaletteNewChunks extends Module {
         return false;
     }
 
-    private boolean checkLinearPaletteOrder(final Palette<BlockState> palette, final LevelChunkSection section) {
+    public boolean scanLinearPaletteOrder(final Palette<BlockState> palette, final LevelChunkSection section) {
         // when chunk data is saved to disk, a new palette is created to pack only present ids
         // the new palette selects its ids in order of iterating over the backing BitStorage
         // so if the order does not match it wasn't saved prior to us loading it, and therefore is a newly generated chunk
@@ -167,7 +191,7 @@ public class PaletteNewChunks extends Module {
      * chunks from previous MC versions like 1.12.2 - which is the vast majority of chunks on 2b2t
      * Marking version upgraded chunks as new is useful for determining whether a 1.12 trail was already followed or not
      */
-    private BiomeCheckResult checkNewChunkBiomePalette(LevelChunk chunk, boolean checkData) {
+    public synchronized BiomeCheckResult scanNewChunkBiomePalette(LevelChunk chunk, boolean checkData) {
         var sections = chunk.getSections();
         if (sections.length == 0) return NO_PLAINS;
         var firstSection = sections[0];
@@ -191,13 +215,13 @@ public class PaletteNewChunks extends Module {
         return NO_PLAINS;
     }
 
-    enum BiomeCheckResult {
+    public enum BiomeCheckResult {
         NO_PLAINS,
         PLAINS_IN_PALETTE,
         PLAINS_PRESENT
     }
 
-    private synchronized boolean checkForExtraPaletteEntries(PalettedContainer.Data<BlockState> paletteContainer) {
+    public synchronized boolean checkForExtraPaletteEntries(PalettedContainer.Data<BlockState> paletteContainer) {
         presentStateIdsBuf.clear(); // reusing to reduce gc pressure
         var palette = paletteContainer.palette();
         BitStorage storage = paletteContainer.storage();
@@ -244,6 +268,14 @@ public class PaletteNewChunks extends Module {
 
     public void setInverse(final boolean b) {
         renderInverse = b;
+    }
+
+    public void setRescan(final boolean b) {
+        this.rescan = b;
+    }
+
+    public void setMinRescanAgeDays(final double v) {
+        this.minRescanAge = Duration.ofDays((long) v);
     }
 
     public boolean isHighlighted(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> dimensionId) {

@@ -174,6 +174,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
         var key = chunkPosToLong(x, z);
         if (chunks.containsKey(key)) {
             super.removeHighlight(x, z);
+            // todo: bulk ops can be optimized with batching
             dbExecutor.execute(() -> database.removeHighlight(x, z, dimension));
         }
     }

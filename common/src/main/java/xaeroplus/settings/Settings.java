@@ -405,6 +405,24 @@ public final class Settings extends SettingRegistry {
             (b) -> ModuleManager.getModule(PaletteNewChunks.class).setInverse(b),
             () -> ModuleManager.getModule(PaletteNewChunks.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
+    public final BooleanSetting paletteNewChunksRescan = register(
+        BooleanSetting.create(
+            "Palette NewChunks Rescan",
+            "xaeroplus.setting.palette_new_chunks_rescan",
+            false,
+            (b) -> ModuleManager.getModule(PaletteNewChunks.class).setRescan(b),
+            () -> ModuleManager.getModule(PaletteNewChunks.class).isEnabled()),
+        SettingLocation.CHUNK_HIGHLIGHTS);
+    public final DoubleSetting paletteNewChunksMinRescanAge = register(
+        DoubleSetting.create(
+            "Palette NewChunks Min Rescan Age Days",
+            "xaeroplus.setting.palette_new_chunks_min_rescan_age",
+            0, 30, 1,
+            7,
+            (v) -> ModuleManager.getModule(PaletteNewChunks.class).setMinRescanAgeDays(v),
+            () -> ModuleManager.getModule(PaletteNewChunks.class).isEnabled() && paletteNewChunksRescan.get()
+        ),
+        SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting oldChunksEnabledSetting = register(
         BooleanSetting.create(
             "OldChunks Highlighting",

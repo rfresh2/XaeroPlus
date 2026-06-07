@@ -283,8 +283,8 @@ public class PaletteNewChunks extends Module {
         this.rescan = b;
     }
 
-    public void setMinRescanAgeDays(final double v) {
-        this.minRescanAge = Duration.ofDays((long) v);
+    public void setMinRescanAge(final Duration duration) {
+        minRescanAge = duration;
     }
 
     public boolean isHighlighted(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> dimensionId) {

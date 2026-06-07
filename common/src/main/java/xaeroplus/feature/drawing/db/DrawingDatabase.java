@@ -1,9 +1,6 @@
 package xaeroplus.feature.drawing.db;
 
-import it.unimi.dsi.fastutil.longs.Long2LongMap;
-import it.unimi.dsi.fastutil.longs.Long2LongMaps;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
+import it.unimi.dsi.fastutil.longs.*;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import net.minecraft.resources.ResourceKey;
@@ -570,6 +567,48 @@ public class DrawingDatabase implements Closeable {
             statement.executeUpdate("DELETE FROM \"" + getTableName(dimension, HIGHLIGHTS_TABLE) + "\" WHERE x = " + x + " AND z = " + z);
         } catch (SQLException e) {
             XaeroPlus.LOGGER.error("Error while removing highlight from {} database in dimension: {}, at {}, {}", databaseName, dimension.location(), x, z, e);
+            if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
+                XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
+                recoverCorruptDatabase();
+            }
+            return false;
+        }
+        return true;
+    }
+
+    public void removeHighlights(final LongCollection toRemove, final ResourceKey<Level> dimension) {
+        int tryCount = 0;
+        while (tryCount++ < 3) {
+            if (removeHighlights0(toRemove, dimension)) {
+                return;
+            }
+            XaeroPlus.LOGGER.info("Retrying removal of highlight set from {} database in dimension: {} (attempt {}/{})", databaseName, dimension.location(), tryCount, 3);
+            Wait.waitMs(50);
+        }
+    }
+
+    private boolean removeHighlights0(final LongCollection toRemove, final ResourceKey<Level> dimension) {
+        if (toRemove.isEmpty()) return true;
+        try {
+            int batchSize = 500;
+            var it = toRemove.longIterator();
+            var sb = new StringBuilder(50 * Math.min(batchSize, toRemove.size()) + 75);
+            while (it.hasNext()) {
+                sb.setLength(0);
+                sb.append("DELETE FROM \"").append(getTableName(dimension, HIGHLIGHTS_TABLE)).append("\" WHERE ");
+                for (int i = 0; i < batchSize && it.hasNext(); i++) {
+                    var chunk = it.nextLong();
+                    var chunkX = ChunkUtils.longToChunkX(chunk);
+                    var chunkZ = ChunkUtils.longToChunkZ(chunk);
+                    sb.append("(x=").append(chunkX).append(" AND z=").append(chunkZ).append(")");
+                    if (i < batchSize - 1 && it.hasNext()) sb.append(" OR ");
+                }
+                try (var statement = connection.createStatement()) {
+                    statement.executeUpdate(sb.toString());
+                }
+            }
+        } catch (SQLException e) {
+            XaeroPlus.LOGGER.error("Error while removing highlight set from {} database in dimension: {} with {} highlights", databaseName, dimension.location(), toRemove.size(), e);
             if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
                 recoverCorruptDatabase();

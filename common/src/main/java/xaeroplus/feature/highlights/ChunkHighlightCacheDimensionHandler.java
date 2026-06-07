@@ -29,6 +29,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
     // if a highlight is not in this set, we do not write it to the database
     // helps performance at very low zoom levels as most data is old and does not need to be rewritten constantly
     public final LongSet staleChunks = new LongOpenHashSet();
+    public final LongSet staleToRemoveChunks = new LongOpenHashSet();
     ListenableFuture<?> windowMoveFuture = Futures.immediateVoidFuture();
 
     public ChunkHighlightCacheDimensionHandler(
@@ -66,10 +67,13 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
     }
 
     private ListenableFuture<?> moveWindow0(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final int prevWindowRegionX, final int prevWindowRegionZ, final int prevWindowRegionSize) {
-        ListenableFuture<Long2LongMap> loadDataFuture = dbExecutor.submit(() -> loadUpdatedWindowFromDatabase(windowRegionX, windowRegionZ, windowRegionSize, prevWindowRegionX, prevWindowRegionZ, prevWindowRegionSize));
+        var loadDataFuture = dbExecutor.submit(() -> loadUpdatedWindowFromDatabase(windowRegionX, windowRegionZ, windowRegionSize, prevWindowRegionX, prevWindowRegionZ, prevWindowRegionSize));
         Futures.addCallback(loadDataFuture, new WindowDataLoadFutureCallback(), mc);
-        ListenableFuture<?> removeDataFuture = flushChunksOutsideWindow(windowRegionX, windowRegionZ, windowRegionSize);
-        return Futures.allAsList(loadDataFuture, removeDataFuture);
+        // must collect what to delete before flushOutsideWindowFuture
+        // so that we can double check that chunks map doesn't contain any staleToRemove chunks
+        var flushToDeleteChunksFuture = flushStaleToRemoveChunks();
+        var flushOutsideWindowFuture = flushChunksOutsideWindow(windowRegionX, windowRegionZ, windowRegionSize);
+        return Futures.allAsList(loadDataFuture, flushToDeleteChunksFuture, flushOutsideWindowFuture);
     }
 
 
@@ -115,7 +119,35 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
                 it.remove();
             }
         }
+        if (dataBuf.isEmpty()) return Futures.immediateVoidFuture();
         return dbExecutor.submit(() -> database.insertHighlightList(dataBuf, dimension));
+    }
+
+    public ListenableFuture<?> flushStaleToRemoveChunks() {
+        if (!mc.isSameThread()) {
+            throw new RuntimeException("flushStaleToRemoveChunks must be called on the main thread");
+        }
+        var dataBuf = collectStaleToRemoveChunks();
+        if (dataBuf.isEmpty()) return Futures.immediateVoidFuture();
+        try {
+            return dbExecutor.submit(() -> database.removeHighlights(dataBuf, dimension));
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Failed to execute flush stale to remove chunks task for {} disk cache dimension: {}", database.databaseName, dimension.location(), e);
+            return Futures.immediateFailedFuture(e);
+        }
+    }
+
+    private LongCollection collectStaleToRemoveChunks() {
+        if (staleToRemoveChunks.isEmpty()) return LongSets.emptySet();
+        var chunksToRemove = new LongOpenHashSet(staleToRemoveChunks.size());
+        for (var it = staleToRemoveChunks.longIterator(); it.hasNext(); ) {
+            var chunkPos = it.nextLong();
+            if (!chunks.containsKey(chunkPos)) {
+                chunksToRemove.add(chunkPos);
+            }
+            it.remove();
+        }
+        return chunksToRemove;
     }
 
     public Long2LongMap collectStaleHighlightsToWrite() {
@@ -157,13 +189,17 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
     @Override
     public void addHighlight(final int x, final int z, final long foundTime) {
         super.addHighlight(x, z, foundTime);
-        staleChunks.add(chunkPosToLong(x, z));
+        var pos = chunkPosToLong(x, z);
+        staleChunks.add(pos);
+        staleToRemoveChunks.remove(pos);
     }
 
     @Override
     public void addHighlight(final int x, final int z, final ResourceKey<Level> dimensionId) {
         super.addHighlight(x, z, dimensionId);
-        staleChunks.add(chunkPosToLong(x, z));
+        var pos = chunkPosToLong(x, z);
+        staleChunks.add(pos);
+        staleToRemoveChunks.remove(pos);
     }
 
     @Override
@@ -171,12 +207,18 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
         if (!mc.isSameThread()) {
             throw new RuntimeException("removeHighlight must be called on the main thread!");
         }
-        var key = chunkPosToLong(x, z);
-        if (chunks.containsKey(key)) {
-            super.removeHighlight(x, z);
-            staleChunks.add(key);
-            dbExecutor.execute(() -> database.removeHighlight(x, z, dimension));
+        var pos = chunkPosToLong(x, z);
+        super.removeHighlight(x, z);
+        staleToRemoveChunks.add(pos);
+    }
+
+    @Override
+    public void removeHighlights(final LongCollection toRemove) {
+        if (!mc.isSameThread()) {
+            throw new RuntimeException("removeHighlights must be called on the main thread!");
         }
+        toRemove.forEach(this.chunks::remove);
+        staleToRemoveChunks.addAll(toRemove);
     }
 
     @Override

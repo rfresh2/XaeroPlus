@@ -5,6 +5,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.longs.Long2LongMaps;
+import it.unimi.dsi.fastutil.longs.LongCollection;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -113,6 +114,25 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     }
 
     @Override
+    public void removeHighlights(final LongCollection toRemove) {
+        removeHighlights(toRemove, ChunkUtils.getActualDimension());
+    }
+
+    @Override
+    public void removeHighlights(final LongCollection toRemove, final ResourceKey<Level> dimension) {
+        try {
+            var cacheForActualDimension = getCacheForDimension(dimension, true);
+            if (cacheForActualDimension == null) {
+                initializeTaskQueue.add(() -> removeHighlights(toRemove, dimension));
+                return;
+            }
+            cacheForActualDimension.removeHighlights(toRemove);
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.warn("Error removing highlights from {} disk cache: {}, {}", databaseName, toRemove, dimension, e);
+        }
+    }
+
+    @Override
     public boolean isHighlighted(final int chunkPosX, final int chunkPosZ, final ResourceKey<Level> dimensionId) {
         if (dimensionId == null) return false;
         ChunkHighlightCacheDimensionHandler cacheForDimension = getCacheForDimension(dimensionId, false);
@@ -198,7 +218,10 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     // note: writes occur on the worker thread
     private List<CompletableFuture<?>> flushAllChunks() {
         return getAllCaches().stream()
-            .map(cache -> submitTickTask(cache::writeStaleHighlightsToDatabase))
+            .map(cache -> submitTickTask(() -> {
+                cache.flushStaleToRemoveChunks();
+                cache.writeStaleHighlightsToDatabase();
+            }))
             .collect(Collectors.toList());
     }
 

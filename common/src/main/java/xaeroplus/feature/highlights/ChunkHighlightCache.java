@@ -1,6 +1,7 @@
 package xaeroplus.feature.highlights;
 
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
+import it.unimi.dsi.fastutil.longs.LongCollection;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaeroplus.event.XaeroWorldChangeEvent;
@@ -15,6 +16,8 @@ public interface ChunkHighlightCache {
     void addHighlight(final int x, final int z, long foundTime);
     void removeHighlight(final int x, final int z);
     void removeHighlight(final int x, final int z, ResourceKey<Level> dimensionId);
+    void removeHighlights(final LongCollection toRemove);
+    void removeHighlights(final LongCollection toRemove, ResourceKey<Level> dimensionId);
     boolean isHighlighted(final int x, final int z, ResourceKey<Level> dimensionId);
     /**
      * retrieves the current cache map for the given dimension. Database data is loaded in a window around the current view asynchronously

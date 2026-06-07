@@ -3,10 +3,7 @@ package xaeroplus.feature.drawing;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import it.unimi.dsi.fastutil.longs.Long2LongMap;
-import it.unimi.dsi.fastutil.longs.Long2LongMaps;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
+import it.unimi.dsi.fastutil.longs.*;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import net.minecraft.client.Minecraft;
@@ -118,6 +115,19 @@ public class DrawingCache implements Closeable {
             cacheForActualDimension.removeHighlight(x, z);
         } catch (final Exception e) {
             XaeroPlus.LOGGER.warn("Error removing highlight from {} disk cache: {}, {}", databaseName, x, z, e);
+        }
+    }
+
+    public void removeHighlights(final LongCollection toRemove, final ResourceKey<Level> dimension) {
+        try {
+            var cacheForActualDimension = getHighlightCacheForDimension(dimension, true);
+            if (cacheForActualDimension == null) {
+                initializeTaskQueue.add(() -> removeHighlights(toRemove, dimension));
+                return;
+            }
+            cacheForActualDimension.removeHighlights(toRemove);
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.warn("Error removing {} highlights from {} disk cache: {}", toRemove.size(), databaseName, toRemove, e);
         }
     }
 

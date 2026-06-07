@@ -218,7 +218,10 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     // note: writes occur on the worker thread
     private List<CompletableFuture<?>> flushAllChunks() {
         return getAllCaches().stream()
-            .map(cache -> submitTickTask(cache::writeStaleHighlightsToDatabase))
+            .map(cache -> submitTickTask(() -> {
+                cache.flushStaleToRemoveChunks();
+                cache.writeStaleHighlightsToDatabase();
+            }))
             .collect(Collectors.toList());
     }
 

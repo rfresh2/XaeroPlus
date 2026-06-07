@@ -10,6 +10,8 @@ import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.longs.LongList;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -1206,43 +1208,45 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             @Override
             public void onAction(final Screen screen) {
                 var dim = Globals.getCurrentDimensionId();
+                LongList toRemove = new LongArrayList((delHighlightMaxX - delHighlightMinX + 1) * (delHighlightMaxZ - delHighlightMinZ + 1));
                 for (int x = delHighlightMinX; x <= delHighlightMaxX; x++) {
                     for (int z = delHighlightMinZ; z <= delHighlightMaxZ; z++) {
-                        var breadcrumbs = ModuleManager.getModule(Breadcrumbs.class);
-                        if (breadcrumbs.isEnabled()) {
-                            breadcrumbs.breadcrumbsCache.get().removeHighlight(x, z, dim);
-                        }
-                        var liquidNewChunks = ModuleManager.getModule(LiquidNewChunks.class);
-                        if (liquidNewChunks.isEnabled()) {
-                            liquidNewChunks.newChunksCache.get().removeHighlight(x, z, dim);
-                            liquidNewChunks.inverseNewChunksCache.get().removeHighlight(x, z, dim);
-                        }
-                        var oldbiomes = ModuleManager.getModule(OldBiomes.class);
-                        if (oldbiomes.isEnabled()) {
-                            oldbiomes.oldBiomesCache.get().removeHighlight(x, z, dim);
-                        }
-                        var oldChunks = ModuleManager.getModule(OldChunks.class);
-                        if (oldChunks.isEnabled()) {
-                            oldChunks.oldChunksCache.get().removeHighlight(x, z, dim);
-                            oldChunks.modernChunksCache.get().removeHighlight(x, z, dim);
-                        }
-                        var paletteNewChunks = ModuleManager.getModule(PaletteNewChunks.class);
-                        if (paletteNewChunks.isEnabled()) {
-                            paletteNewChunks.newChunksCache.get().removeHighlight(x, z, dim);
-                            paletteNewChunks.newChunksInverseCache.get().removeHighlight(x, z, dim);
-                        }
-                        var portals = ModuleManager.getModule(Portals.class);
-                        if (portals.isEnabled()) {
-                            portals.portalsCache.get().removeHighlight(x, z, dim);
-                        }
-                        var lavaColumns = ModuleManager.getModule(LavaColumns.class);
-                        if (lavaColumns.isEnabled()) {
-                            lavaColumns.lavaColumnsCache.get().removeHighlight(x, z, dim);
-                        }
-                        ModuleManager.getModule(Drawing.class).removeHighlight(x, z);
+                        toRemove.add(ChunkUtils.chunkPosToLong(x, z));
                         ModuleManager.getModule(Drawing.class).removeLine(ChunkUtils.chunkCoordToCoord(x), ChunkUtils.chunkCoordToCoord(z));
                         ModuleManager.getModule(Drawing.class).removeText(ChunkUtils.chunkCoordToCoord(x), ChunkUtils.chunkCoordToCoord(z), 1);
                     }
+                }
+                ModuleManager.getModule(Drawing.class).removeHighlights(toRemove);
+                var breadcrumbs = ModuleManager.getModule(Breadcrumbs.class);
+                if (breadcrumbs.isEnabled()) {
+                    breadcrumbs.breadcrumbsCache.get().removeHighlights(toRemove, dim);
+                }
+                var liquidNewChunks = ModuleManager.getModule(LiquidNewChunks.class);
+                if (liquidNewChunks.isEnabled()) {
+                    liquidNewChunks.newChunksCache.get().removeHighlights(toRemove, dim);
+                    liquidNewChunks.inverseNewChunksCache.get().removeHighlights(toRemove, dim);
+                }
+                var oldbiomes = ModuleManager.getModule(OldBiomes.class);
+                if (oldbiomes.isEnabled()) {
+                    oldbiomes.oldBiomesCache.get().removeHighlights(toRemove, dim);
+                }
+                var oldChunks = ModuleManager.getModule(OldChunks.class);
+                if (oldChunks.isEnabled()) {
+                    oldChunks.oldChunksCache.get().removeHighlights(toRemove, dim);
+                    oldChunks.modernChunksCache.get().removeHighlights(toRemove, dim);
+                }
+                var paletteNewChunks = ModuleManager.getModule(PaletteNewChunks.class);
+                if (paletteNewChunks.isEnabled()) {
+                    paletteNewChunks.newChunksCache.get().removeHighlights(toRemove, dim);
+                    paletteNewChunks.newChunksInverseCache.get().removeHighlights(toRemove, dim);
+                }
+                var portals = ModuleManager.getModule(Portals.class);
+                if (portals.isEnabled()) {
+                    portals.portalsCache.get().removeHighlights(toRemove, dim);
+                }
+                var lavaColumns = ModuleManager.getModule(LavaColumns.class);
+                if (lavaColumns.isEnabled()) {
+                    lavaColumns.lavaColumnsCache.get().removeHighlights(toRemove, dim);
                 }
             }
         });

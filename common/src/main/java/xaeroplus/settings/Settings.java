@@ -13,6 +13,7 @@ import xaeroplus.util.WaystonesHelper;
 import xaeroplus.util.WorldToolsHelper;
 
 import java.io.ByteArrayOutputStream;
+import java.time.Duration;
 
 import static net.minecraft.world.level.Level.*;
 
@@ -404,6 +405,44 @@ public final class Settings extends SettingRegistry {
             false,
             (b) -> ModuleManager.getModule(PaletteNewChunks.class).setInverse(b),
             () -> ModuleManager.getModule(PaletteNewChunks.class).isEnabled()),
+        SettingLocation.CHUNK_HIGHLIGHTS);
+    public final BooleanSetting paletteNewChunksRescan = register(
+        BooleanSetting.create(
+            "Palette NewChunks Rescan",
+            "xaeroplus.setting.palette_new_chunks_rescan",
+            false,
+            (b) -> ModuleManager.getModule(PaletteNewChunks.class).setRescan(b),
+            () -> ModuleManager.getModule(PaletteNewChunks.class).isEnabled()),
+        SettingLocation.CHUNK_HIGHLIGHTS);
+    public enum PaletteNewChunksRescanAge implements TranslatableSettingEnum {
+        ZERO(Duration.ZERO, "xaeroplus.setting.palette_new_chunks_rescan_age.zero"),
+        ONE_HOUR(Duration.ofHours(1), "xaeroplus.setting.palette_new_chunks_rescan_age.one_hour"),
+        ONE_DAY(Duration.ofDays(1), "xaeroplus.setting.palette_new_chunks_rescan_age.one_day"),
+        ONE_WEEK(Duration.ofDays(7), "xaeroplus.setting.palette_new_chunks_rescan_age.one_week");
+
+        private final Duration duration;
+        private final String translationKey;
+        PaletteNewChunksRescanAge(Duration duration, String translationKey) {
+            this.duration = duration;
+            this.translationKey = translationKey;
+        }
+        public Duration getDuration() {
+            return duration;
+        }
+        @Override
+        public String getTranslationKey() {
+            return translationKey;
+        }
+    }
+    public final EnumSetting<PaletteNewChunksRescanAge> paletteNewChunksMinRescanAge = register(
+        EnumSetting.create(
+            "Palette NewChunks Min Rescan Age",
+            "xaeroplus.setting.palette_new_chunks_min_rescan_age",
+            PaletteNewChunksRescanAge.values(),
+            PaletteNewChunksRescanAge.ONE_WEEK,
+            (v) -> ModuleManager.getModule(PaletteNewChunks.class).setMinRescanAge(v.getDuration()),
+            () -> ModuleManager.getModule(PaletteNewChunks.class).isEnabled() && paletteNewChunksRescan.get()
+        ),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting oldChunksEnabledSetting = register(
         BooleanSetting.create(

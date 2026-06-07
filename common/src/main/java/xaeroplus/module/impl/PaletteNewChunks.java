@@ -134,18 +134,27 @@ public class PaletteNewChunks extends Module {
     public boolean scanNewChunkBlockStatePalette(LevelChunk chunk) {
         var sections = chunk.getSections();
         if (sections.length == 0) return false;
-        for (int i = 0; i < Math.min(sections.length, 12); i++) {
+        // somewhat arbitrary threshold
+        // server can tick chunks before sending
+        // which can introduce false positives, e.g. a fire block gets extinguished in the tick
+        // but in a true newchunk it's likely that multiple sections will be positive
+        int threshold = 3;
+        int positiveCount = 0;
+        for (int i = 0; i < sections.length; i++) {
             var section = sections[i];
             var paletteContainerData = section.getStates().data;
             var palette = paletteContainerData.palette();
-            if (palette.getSize() < 2) continue;
             if (palette instanceof LinearPalette<BlockState>) {
-                // no more iterating needed if we find a linear palette at any point
-                return scanLinearPaletteOrder(palette, section);
+                if (scanLinearPaletteOrder(palette, section)) {
+                    positiveCount++;
+                }
             } else if (palette instanceof HashMapPalette<BlockState>) {
                 if (checkForExtraPaletteEntries(paletteContainerData)) {
-                    return true;
+                    positiveCount++;
                 }
+            }
+            if (positiveCount >= threshold) {
+                return true;
             }
         }
         return false;

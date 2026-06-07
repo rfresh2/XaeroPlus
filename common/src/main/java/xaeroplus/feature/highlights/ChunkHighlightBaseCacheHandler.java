@@ -2,6 +2,7 @@ package xaeroplus.feature.highlights;
 
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongCollection;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -45,6 +46,19 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
     @Override
     public void removeHighlight(final int x, final int z, final ResourceKey<Level> dimensionId) {
         removeHighlight(x, z);
+    }
+
+    @Override
+    public void removeHighlights(final LongCollection toRemove) {
+        if (!mc.isSameThread()) {
+            throw new RuntimeException("removeHighlights must be called on the main thread!");
+        }
+        toRemove.forEach(this.chunks::remove);
+    }
+
+    @Override
+    public void removeHighlights(final LongCollection toRemove, ResourceKey<Level> dimensionId) {
+        removeHighlights(toRemove);
     }
 
     @Override

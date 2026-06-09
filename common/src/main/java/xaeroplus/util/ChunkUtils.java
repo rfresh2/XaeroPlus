@@ -46,12 +46,12 @@ public class ChunkUtils {
             // when player is in the nether or the custom dimension is the nether, perform coordinate translation
             if ((dim == NETHER || Globals.getCurrentDimensionId() == NETHER) && dim != Globals.getCurrentDimensionId()) {
                 if (Globals.getCurrentDimensionId() == OVERWORLD) {
-                    return mc.player.getX() * 8.0;
+                    return mc.getCameraEntity().getX() * 8.0;
                 } else if (Globals.getCurrentDimensionId() == NETHER && dim == OVERWORLD) {
-                    return mc.player.getX() / 8.0;
+                    return mc.getCameraEntity().getX() / 8.0;
                 }
             }
-            return mc.player.getX();
+            return mc.getCameraEntity().getX();
         } catch (final Exception e) {
             return 0;
         }
@@ -63,19 +63,19 @@ public class ChunkUtils {
             // when player is in the nether or the custom dimension is the nether, perform coordinate translation
             if ((dim == NETHER || Globals.getCurrentDimensionId() == NETHER) && dim != Globals.getCurrentDimensionId()) {
                 if (Globals.getCurrentDimensionId() == OVERWORLD) {
-                    return mc.player.getZ() * 8.0;
+                    return mc.getCameraEntity().getZ() * 8.0;
                 } else if (Globals.getCurrentDimensionId() == NETHER && dim == OVERWORLD) {
-                    return mc.player.getZ() / 8.0;
+                    return mc.getCameraEntity().getZ() / 8.0;
                 }
             }
-            return mc.player.getZ();
+            return mc.getCameraEntity().getZ();
         } catch (final Exception e) {
             return 0;
         }
     }
     public static int actualPlayerChunkX() {
         try {
-            return Minecraft.getInstance().player.chunkPosition().x;
+            return Minecraft.getInstance().getCameraEntity().chunkPosition().x;
         } catch (final NullPointerException e) {
             return 0;
         }
@@ -85,7 +85,7 @@ public class ChunkUtils {
     }
     public static int actualPlayerChunkZ() {
         try {
-            return Minecraft.getInstance().player.chunkPosition().z;
+            return Minecraft.getInstance().getCameraEntity().chunkPosition().z;
         } catch (final NullPointerException e) {
             return 0;
         }

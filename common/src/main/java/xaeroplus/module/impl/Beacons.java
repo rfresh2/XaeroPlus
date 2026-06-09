@@ -15,10 +15,7 @@ import net.minecraft.world.level.block.entity.BeaconBlockEntity;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.EmptyLevelChunk;
 import xaeroplus.Globals;
-import xaeroplus.event.ChunkBlockUpdateEvent;
-import xaeroplus.event.ChunkBlocksUpdateEvent;
-import xaeroplus.event.ChunkDataEvent;
-import xaeroplus.event.Phase;
+import xaeroplus.event.*;
 import xaeroplus.feature.render.DrawFeatureFactory;
 import xaeroplus.feature.render.line.Line;
 import xaeroplus.module.Module;
@@ -93,6 +90,14 @@ public class Beacons extends Module {
         }
     }
 
+    @EventHandler
+    public void onWorldChange(XaeroWorldChangeEvent event) {
+        switch (event.worldChangeType()) {
+            case EXIT_WORLD, ACTUAL_DIMENSION_SWITCH -> {
+                TickTaskExecutor.INSTANCE.execute(beaconBlockEntityCache::clear);
+            }
+        }
+    }
 
     private void searchAllLoadedChunks() {
         if (mc.level == null) return;

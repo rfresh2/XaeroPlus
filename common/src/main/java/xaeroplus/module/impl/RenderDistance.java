@@ -40,7 +40,7 @@ public class RenderDistance extends Module {
 
     List<Line> getLines(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
         Minecraft mc = Minecraft.getInstance();
-        var player = mc.player;
+        var player = mc.getCameraEntity();
         if (player == null) return Collections.emptyList();
         if (dimension != ChunkUtils.getActualDimension()) return Collections.emptyList();
         final int viewDistance = mc.options.serverRenderDistance;

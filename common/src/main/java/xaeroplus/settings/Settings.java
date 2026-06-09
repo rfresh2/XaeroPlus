@@ -1,6 +1,7 @@
 package xaeroplus.settings;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.player.Player;
 import xaero.map.WorldMapSession;
 import xaeroplus.Globals;
 import xaeroplus.feature.waypoint.WaypointAPI;
@@ -168,10 +169,10 @@ public final class Settings extends SettingRegistry {
         SettingLocation.WORLD_MAP_MAIN);
     static void markChunksDirtyInWriteDistance() {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.level != null && mc.player != null) {
+        if (mc.level != null && mc.getCameraEntity() != null && mc.getCameraEntity() instanceof Player player) {
             WorldMapSession session = WorldMapSession.getCurrentSession();
             if (session != null) {
-                session.getMapProcessor().getMapWriter().setDirtyInWriteDistance(mc.player, mc.level);
+                session.getMapProcessor().getMapWriter().setDirtyInWriteDistance(player, mc.level);
                 session.getMapProcessor().getMapWriter().requestCachedColoursClear();
             }
         }

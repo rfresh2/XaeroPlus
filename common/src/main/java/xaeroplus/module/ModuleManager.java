@@ -13,6 +13,7 @@ public class ModuleManager {
         asList(
             new BaritoneGoalSync(),
             new BaritonePathSync(),
+            new Beacons(),
             new Breadcrumbs(),
             new Drawing(),
             new FpsLimiter(),

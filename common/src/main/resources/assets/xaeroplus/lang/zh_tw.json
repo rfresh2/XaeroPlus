@@ -170,6 +170,8 @@
   "xaeroplus.setting.region_grid_color.tooltip": "設置網格的顏色",
   "xaeroplus.setting.region_grid_text": "區域網格文字",
   "xaeroplus.setting.region_grid_text.tooltip": "顯示每個區域的區域坐標",
+  "xaeroplus.setting.beacons_overlay": "烽火台",
+  "xaeroplus.setting.beacons_overlay.tooltip": "在已啟用烽火台的有效範圍周圍顯示方框",
   "xaeroplus.setting.old_biomes_enabled": "2b2t 舊生物群系",
   "xaeroplus.setting.old_biomes_enabled.tooltip": "突出顯示與 2b2t 1.12.2 生物群系匹配的區塊。 \n 由於在 1.12.2 區塊升級期間的區塊混合，舊區塊不一定總是能檢測到 1.12.2 區塊。 \n 此模組僅在主世界中啟用，並且會將許多區塊檢測為誤報，儘管舊生物群系的區塊路徑應該相當明顯。",
   "xaeroplus.setting.old_biomes_save_load_to_disk": "保存/載入舊生物群繫到磁碟",

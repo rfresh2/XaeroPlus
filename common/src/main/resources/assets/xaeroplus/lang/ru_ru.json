@@ -170,6 +170,8 @@
   "xaeroplus.setting.region_grid_color.tooltip": "Задает цвет сетки",
   "xaeroplus.setting.region_grid_text": "Текст регионов",
   "xaeroplus.setting.region_grid_text.tooltip": "Отображает координаты региона для каждого региона",
+  "xaeroplus.setting.beacons_overlay": "Маяки",
+  "xaeroplus.setting.beacons_overlay.tooltip": "Показывает квадрат вокруг активной зоны маяков",
   "xaeroplus.setting.old_biomes_enabled": "Старые биомы 2b2t",
   "xaeroplus.setting.old_biomes_enabled.tooltip": "Подсвечивает чанки с биомами 2b2t из версии 1.12.2. \n Из-за обновлений сервера, OldChunks не всегда верно их определяет. \n Работает только в Верхнем мире, возможны ложные срабатывания, но следы старых биомов заметны",
   "xaeroplus.setting.old_biomes_save_load_to_disk": "Сохранять старые биомы на диск",

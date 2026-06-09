@@ -8,6 +8,7 @@ import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket;
@@ -71,6 +72,11 @@ public class MixinClientPlayNetworkHandler {
         original.call(instance, pos, state, flags);
         event.setPhase(Phase.POST);
         XaeroPlus.EVENT_BUS.call(event);
+    }
+
+    @Inject(method = "handleBlockEntityData", at = @At("RETURN"))
+    public void onBlockEntityData(final ClientboundBlockEntityDataPacket packet, final CallbackInfo ci) {
+        XaeroPlus.EVENT_BUS.call(new ChunkBlockEntityUpdateEvent(packet));
     }
 
     @Inject(method = "close", at = @At(

@@ -28,9 +28,9 @@ public class WaypointEtaManager {
     public void onClickTick(ClientTickEvent.Post event) {
         if (!measurementTimer.tick(measurementInterval)) return;
         final Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null || mc.player == null) return;
-        double currentX = mc.player.getX();
-        double currentZ = mc.player.getZ();
+        if (mc.level == null || mc.getCameraEntity() == null) return;
+        double currentX = mc.getCameraEntity().getX();
+        double currentZ = mc.getCameraEntity().getZ();
         double dist = Math.hypot(currentX - lastX, currentZ - lastZ);
         lastX = currentX;
         lastZ = currentZ;
@@ -42,13 +42,13 @@ public class WaypointEtaManager {
 
     public long getEtaSecondsToReachWaypoint(Waypoint waypoint) {
         final Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null || mc.player == null) return 0;
+        if (mc.level == null || mc.getCameraEntity() == null) return 0;
         MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
         if (minimapSession == null) return 0;
         double dimDiv = minimapSession.getDimensionHelper().getDimensionDivision(minimapSession.getWorldManager().getCurrentWorld());
         int wpX = waypoint.getX(dimDiv);
         int wpZ = waypoint.getZ(dimDiv);
-        double wpDist = Math.hypot(wpX - mc.player.getX(), wpZ - mc.player.getZ());
+        double wpDist = Math.hypot(wpX - mc.getCameraEntity().getX(), wpZ - mc.getCameraEntity().getZ());
         double etaSeconds = wpDist / speedBlocksPerSecond;
         if (etaSeconds == Double.POSITIVE_INFINITY || etaSeconds == Double.NEGATIVE_INFINITY || Double.isNaN(etaSeconds)) return 0;
         return (long) etaSeconds;

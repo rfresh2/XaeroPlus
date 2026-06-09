@@ -170,6 +170,8 @@
   "xaeroplus.setting.region_grid_color.tooltip": "グリッドの色を設定",
   "xaeroplus.setting.region_grid_text": "リージョンのテキスト",
   "xaeroplus.setting.region_grid_text.tooltip": "各リージョンのリージョン座標を表示",
+  "xaeroplus.setting.beacons_overlay": "ビーコン",
+  "xaeroplus.setting.beacons_overlay.tooltip": "起動中ビーコンの有効範囲を四角で表示",
   "xaeroplus.setting.old_biomes_enabled": "2b2t 旧バイオーム",
   "xaeroplus.setting.old_biomes_enabled.tooltip": "2b2t 1.12.2 のバイオームに一致するチャンクをハイライトします。 \n 1.12.2 のチャンクアップグレード中のチャンクブレンドにより、OldChunks は常に 1.12.2 チャンクを検出できるわけではありません。 \n このモジュールはオーバーワールドでのみアクティブで、多くのチャンクを誤検出しますが、旧バイオームのチャンクトレイルはかなり明白です。",
   "xaeroplus.setting.old_biomes_save_load_to_disk": "旧バイオームをディスクに保存/ロード",

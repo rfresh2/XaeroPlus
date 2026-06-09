@@ -170,6 +170,8 @@
   "xaeroplus.setting.region_grid_color.tooltip": "Define a cor da grelha",
   "xaeroplus.setting.region_grid_text": "Texto das Regiões",
   "xaeroplus.setting.region_grid_text.tooltip": "Renderiza as coordenadas da região para cada região",
+  "xaeroplus.setting.beacons_overlay": "Beacons",
+  "xaeroplus.setting.beacons_overlay.tooltip": "Mostra um quadrado na área ativa dos beacons",
   "xaeroplus.setting.old_biomes_enabled": "BiomasAntigos 2b2t",
   "xaeroplus.setting.old_biomes_enabled.tooltip": "Destaca os pedaços que correspondem aos biomas 2b2t 1.12.2. \n Devido à mesclagem de pedaços durante a atualização do pedaço 1.12.2, o OldChunks nem sempre pode detectar os pedaços 1.12.2. \n Este módulo está ativo apenas no mundo normal e detectará muitos pedaços como falsos positivos, embora as trilhas de pedaços de BiomasAntigos devam ser bastante óbvias.",
   "xaeroplus.setting.old_biomes_save_load_to_disk": "Salvar/Carregar BiomasAntigos para Disco",

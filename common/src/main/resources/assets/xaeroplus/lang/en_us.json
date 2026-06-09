@@ -170,6 +170,8 @@
   "xaeroplus.setting.region_grid_color.tooltip": "Sets the color of the grid",
   "xaeroplus.setting.region_grid_text": "Regions Text",
   "xaeroplus.setting.region_grid_text.tooltip": "Renders the region coordinates of each region",
+  "xaeroplus.setting.beacons_overlay": "Beacons",
+  "xaeroplus.setting.beacons_overlay.tooltip": "Renders a square around the effective area of activated beacons",
   "xaeroplus.setting.old_biomes_enabled": "Old Biomes",
   "xaeroplus.setting.old_biomes_enabled.tooltip": "Highlights chunks that match the 2b2t 1.12.2 biomes. \n Due to chunk blending during the 1.12.2 chunk upgrade, OldChunks cannot always detect 1.12.2 chunks. \n This module is only active in the overworld and will detect many chunks as false positives, although OldBiome chunk trails should be fairly obvious.",
   "xaeroplus.setting.old_biomes_save_load_to_disk": "Save/Load OldBiomes to Disk",

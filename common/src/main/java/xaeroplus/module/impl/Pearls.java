@@ -114,7 +114,7 @@ public class Pearls extends Module {
         if (con == null) return;
         var selfUuid = con.getLocalGameProfile().getId();
         if (selfUuid == null) return;
-        var player = mc.player;
+        var player = mc.getCameraEntity();
         if (player == null) return;
 
         var effectiveRenderDistance = mc.options.getEffectiveRenderDistance();

@@ -147,7 +147,6 @@ public class Beacons extends Module {
             var z = ChunkUtils.chunkCoordToCoord(c.getPos().z) + relZ;
             if (!state.hasBlockEntity()) return false;
             var blockEntity = c.getBlockEntity(new BlockPos(x, y, z));
-            if (blockEntity == null) return false;
             if (blockEntity instanceof BeaconBlockEntity beaconBlockEntity) {
                 beaconBlockEntityCache.put(beaconBlockEntity, true);
             }
@@ -159,7 +158,8 @@ public class Beacons extends Module {
         if (dimension != ChunkUtils.getActualDimension()) return Object2IntMaps.emptyMap();
         var level = mc.level;
         if (level == null || mc.levelRenderer.viewArea == null) return Object2IntMaps.emptyMap();
-        var lines = new Object2IntOpenHashMap<Line>();
+        if (beaconBlockEntityCache.isEmpty()) return Object2IntMaps.emptyMap();
+        var lines = new Object2IntOpenHashMap<Line>(beaconBlockEntityCache.size());
         for (var it = beaconBlockEntityCache.keySet().iterator(); it.hasNext(); ) {
             var beaconBlockEntity = it.next();
             // there is some delay between the beacon getting gc'd and it being removed

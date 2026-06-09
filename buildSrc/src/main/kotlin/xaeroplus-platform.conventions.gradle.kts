@@ -1,5 +1,5 @@
 plugins {
-    id("gg.essential.loom")
+    id("dev.architectury.loom")
     id("com.gradleup.shadow")
 }
 
@@ -7,8 +7,8 @@ loom {
     silentMojangMappingsLicense()
     runs {
         getByName("client") {
-            vmArg("-Dsodium.checks.issue2561=false")
-            programArgs("--username", "rfresh2")
+            jvmArguments.addAll("-Dsodium.checks.issue2561=false")
+            programArguments.addAll("--username", "rfresh2")
         }
     }
 //    mixin {

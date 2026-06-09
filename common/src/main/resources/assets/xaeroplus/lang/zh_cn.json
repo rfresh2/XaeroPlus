@@ -170,6 +170,8 @@
   "xaeroplus.setting.region_grid_color.tooltip": "设置网格的颜色",
   "xaeroplus.setting.region_grid_text": "区域网格文字",
   "xaeroplus.setting.region_grid_text.tooltip": "显示每个区域的区域坐标",
+  "xaeroplus.setting.beacons_overlay": "信标",
+  "xaeroplus.setting.beacons_overlay.tooltip": "在已激活信标的有效范围周围显示方框",
   "xaeroplus.setting.old_biomes_enabled": "2b2t 旧生物群系",
   "xaeroplus.setting.old_biomes_enabled.tooltip": "突出显示与 2b2t 1.12.2 生物群系匹配的区块。 \n 由于在 1.12.2 区块升级期间的区块混合，旧区块不一定总是能检测到 1.12.2 区块。 \n 此模块仅在主世界中激活，并且会将许多区块检测为误报，尽管旧生物群系的区块路径应该相当明显。",
   "xaeroplus.setting.old_biomes_save_load_to_disk": "保存/加载旧生物群系到磁盘",

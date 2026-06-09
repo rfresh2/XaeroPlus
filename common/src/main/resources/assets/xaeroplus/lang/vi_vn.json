@@ -170,6 +170,8 @@
   "xaeroplus.setting.region_grid_color.tooltip": "Đặt màu của lưới",
   "xaeroplus.setting.region_grid_text": "Văn Bản Vùng",
   "xaeroplus.setting.region_grid_text.tooltip": "Hiển thị tọa độ vùng cho mỗi vùng",
+  "xaeroplus.setting.beacons_overlay": "Đèn hiệu",
+  "xaeroplus.setting.beacons_overlay.tooltip": "Hiển thị hình vuông quanh vùng hiệu lực của đèn hiệu",
   "xaeroplus.setting.old_biomes_enabled": "CácQuầnXãCũ 2b2t",
   "xaeroplus.setting.old_biomes_enabled.tooltip": "Làm nổi bật các khối phù hợp với các quần xã 2b2t 1.12.2. \n Do việc pha trộn khối trong quá trình nâng cấp khối 1.12.2, OldChunks không phải lúc nào cũng phát hiện được khối 1.12.2. \n Module này chỉ hoạt động trong thế giới Overworld và sẽ phát hiện nhiều khối là dương tính giả, mặc dù dấu vết khối của CácQuầnXãCũ sẽ khá rõ ràng.",
   "xaeroplus.setting.old_biomes_save_load_to_disk": "Lưu/Tải CácQuầnXãCũ lên Đĩa",

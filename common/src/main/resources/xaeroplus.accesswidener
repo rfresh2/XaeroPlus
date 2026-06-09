@@ -28,3 +28,4 @@ transitive-accessible field net/minecraft/client/renderer/RenderPipelines MATRIC
 transitive-accessible field net/minecraft/client/Minecraft mainRenderTarget Lcom/mojang/blaze3d/pipeline/RenderTarget;
 transitive-mutable field net/minecraft/client/Minecraft mainRenderTarget Lcom/mojang/blaze3d/pipeline/RenderTarget;
 accessible field net/minecraft/client/multiplayer/ClientLevel entityStorage Lnet/minecraft/world/level/entity/TransientEntitySectionManager;
+accessible field net/minecraft/world/level/block/entity/BeaconBlockEntity levels I

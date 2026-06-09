@@ -1017,6 +1017,14 @@ public final class Settings extends SettingRegistry {
             (b) -> ModuleManager.getModule(RegionGrid.class).setTextEnabled(b),
             () -> ModuleManager.getModule(RegionGrid.class).isEnabled()),
         SettingLocation.OVERLAYS);
+    public final BooleanSetting beaconsOverlaySetting = register(
+        BooleanSetting.create(
+            "Beacons Overlay",
+            "xaeroplus.setting.beacons_overlay",
+            false,
+            true,
+            (b) -> ModuleManager.getModule(Beacons.class).setEnabled(b)
+        ), SettingLocation.OVERLAYS);
     public final DoubleSetting drawingOpacitySetting = register(
         DoubleSetting.create(
             "Drawing Opacity",

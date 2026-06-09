@@ -1,5 +1,5 @@
 plugins {
-    id("gg.essential.loom-no-remap")
+    id("dev.architectury.loom-no-remap")
     id("com.gradleup.shadow")
 }
 
@@ -7,14 +7,17 @@ loom {
     silentMojangMappingsLicense()
     runs {
         getByName("client") {
-            vmArg("-Dsodium.checks.issue2561=false")
-            programArgs("--username", "rfresh2")
+            jvmArguments.addAll("-Dsodium.checks.issue2561=false")
+            programArguments.addAll("--username", "rfresh2")
         }
     }
 //    mixin {
 //        useLegacyMixinAp = true
 //    }
 }
+
+val minecraft_version: String by project.properties
+val mc = "com.mojang:minecraft:${minecraft_version}"
 
 // Unobfuscated versions of Loom no longer need to remap mod dependencies, and so no longer provide the `mod*`
 // configurations. We'll re-create them so they can be used across all versions.
@@ -24,8 +27,6 @@ configurations.compileOnly.get().extendsFrom(configurations.create("modCompileOn
 configurations.runtimeOnly.get().extendsFrom(configurations.create("modRuntimeOnly"))
 configurations.localRuntime.get().extendsFrom(configurations.create("modLocalRuntime"))
 
-val minecraft_version: String by project.properties
-val mc = "com.mojang:minecraft:${minecraft_version}"
 
 dependencies {
     minecraft(mc)

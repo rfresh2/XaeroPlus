@@ -1,3 +1,4 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import dev.architectury.plugin.TransformingTask
 import dev.architectury.transformer.transformers.TransformNeoForgeAnnotations
 import dev.architectury.transformer.transformers.TransformNeoForgeEnvironment
@@ -18,6 +19,7 @@ val common = project(":common")
 loom {
     neoForge {
         accessWidenerPath.set(common.loom.accessWidenerPath)
+        convertAccessWideners(tasks.named("shadowJar", ShadowJar::class), accessWidenerPath.get().asFile.name)
     }
     runs {
         getByName("client") {
@@ -32,7 +34,6 @@ val minimap_version_neo: String by project.properties
 val minecraft_version: String by project.properties
 val destArchiveVersion = "${project.version}+${loom.platform.get().id()}-${minecraft_version}"
 val destArchiveClassifier = "WM${worldmap_version_neo}-MM${minimap_version_neo}"
-val generatedAccessTransformer = layout.buildDirectory.file("generated/resources/META-INF/accesstransformer.cfg")
 
 sourceSets.main.get().java.srcDir(common.layout.buildDirectory.get().asFile.path + "/remappedSources/forge/java")
 sourceSets.main.get().resources.srcDir(common.layout.buildDirectory.get().asFile.path + "/remappedSources/forge/resources")
@@ -57,18 +58,7 @@ dependencies {
 }
 
 tasks {
-    val convertAwToAt = register<ConvertAwToAtTask>("convertAwToAt") {
-        group = "build"
-        description = "Converts the common access widener into a NeoForge access transformer."
-        accessWidener.set(common.loom.accessWidenerPath)
-        accessTransformer.set(generatedAccessTransformer)
-    }
-
     processResources {
-        dependsOn(convertAwToAt)
-        from(generatedAccessTransformer) {
-            into("META-INF")
-        }
         filesMatching("META-INF/neoforge.mods.toml") {
             expand(mapOf(
                 "version" to project.version,

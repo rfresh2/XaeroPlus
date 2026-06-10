@@ -26,7 +26,7 @@ loom {
     }
     runs {
         getByName("client") {
-            ideConfigGenerated(true)
+            generateRunConfig = true
             client()
         }
     }

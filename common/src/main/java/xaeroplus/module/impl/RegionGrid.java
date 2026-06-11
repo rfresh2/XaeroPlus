@@ -35,7 +35,7 @@ public class RegionGrid extends Module {
             )
         );
         Globals.drawManager.registry().register(
-            DrawFeatureFactory.text(
+            DrawFeatureFactory.asyncText(
                 "RegionGridText",
                 this::getText,
                 250

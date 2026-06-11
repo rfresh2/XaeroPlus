@@ -11,6 +11,11 @@ import java.util.function.IntSupplier;
 
 public interface DrawFeatureFactory {
 
+    /**
+     * Refreshed on MC render thread
+     * Single color across all highlights
+     * Color function is called each frame
+     */
     static DrawFeature chunkHighlights(
         String id,
         DirectChunkHighlightSupplier chunkHighlightSupplier,
@@ -28,6 +33,11 @@ public interface DrawFeatureFactory {
         );
     }
 
+    /**
+     * Refreshed on MC render thread
+     * Color function per-chunk
+     * Color function is called only on refresh
+     */
     static DrawFeature multiColorChunkHighlights(
         String id,
         DirectChunkHighlightSupplier chunkHighlightSupplier,
@@ -45,6 +55,11 @@ public interface DrawFeatureFactory {
         );
     }
 
+    /**
+     * Refreshed async, not on the MC render thread
+     * Single color across all highlights
+     * Color function is called each frame
+     */
     static DrawFeature asyncChunkHighlights(
         String id,
         AsyncChunkHighlightSupplier chunkHighlightSupplier,
@@ -60,6 +75,11 @@ public interface DrawFeatureFactory {
         );
     }
 
+    /**
+     * Refreshed async, not on the MC render thread
+     * Color function per-chunk
+     * Color function is called only on refresh
+     */
     static DrawFeature multiColorAsyncChunkHighlights(
         String id,
         AsyncChunkHighlightSupplier chunkHighlightSupplier,
@@ -75,6 +95,11 @@ public interface DrawFeatureFactory {
         );
     }
 
+    /**
+     * Refreshed on MC render thread
+     * Single color across all lines
+     * Color function is called each frame
+     */
     static DrawFeature lines(
         String id,
         LineSupplier lineSupplier,
@@ -93,6 +118,11 @@ public interface DrawFeatureFactory {
         );
     }
 
+    /**
+     * Refreshed on MC render thread
+     * Color function per-line
+     * Color function is called only on refresh
+     */
     static DrawFeature multiColorLines(
         String id,
         MultiColorLineSupplier lineSupplier,
@@ -111,6 +141,9 @@ public interface DrawFeatureFactory {
         );
     }
 
+    /**
+     * Refreshed every frame on MC render thread
+     */
     static DrawFeature text(
         String id,
         TextSupplier textSupplier
@@ -121,7 +154,10 @@ public interface DrawFeatureFactory {
         );
     }
 
-    static DrawFeature text(
+    /**
+     * Refreshed async, not on the MC render thread
+     */
+    static DrawFeature asyncText(
         String id,
         TextSupplier textSupplier,
         int refreshIntervalMs

@@ -14,7 +14,8 @@ loom {
 	accessWidenerPath = project(":common").loom.accessWidenerPath
 	runs {
 		getByName("client") {
-			ideConfigGenerated(true)
+			generateRunConfig = true
+			preferGradleTask = true
 			client()
 		}
 	}
@@ -28,8 +29,10 @@ configurations.getByName("developmentFabric").extendsFrom(common)
 afterEvaluate {
 	loom.runs.configureEach {
 		// https://fabricmc.net/wiki/tutorial:mixin_hotswaps
-		vmArg("-javaagent:${ configurations.compileClasspath.get().find { it.name.contains("sponge-mixin") } }")
-//		vmArg("-Dmixin.debug.export=true")
+		jvmArguments.addAll(
+			"-javaagent:${ configurations.compileClasspath.get().find { it.name.contains("sponge-mixin") } }",
+//			"-Dmixin.debug.export=true"
+		)
 	}
 }
 

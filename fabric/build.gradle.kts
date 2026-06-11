@@ -15,6 +15,7 @@ loom {
 	runs {
 		getByName("client") {
 			generateRunConfig = true
+			preferGradleTask = true
 			client()
 		}
 	}

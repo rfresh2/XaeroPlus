@@ -47,7 +47,7 @@ dependencyResolutionManagement {
 			library("modmenu", "maven.modrinth:modmenu:7.2.2")
 			library("sodium", "maven.modrinth:sodium:mc$minecraft_version-0.5.13-fabric")
 			library("embeddium", "maven.modrinth:embeddium:0.3.31+mc$minecraft_version")
-			library("opac-fabric", "maven.modrinth:open-parties-and-claims:fabric-$minecraft_version-0.25.10")
+			library("opac-fabric", "maven.modrinth:open-parties-and-claims:fabric-$minecraft_version-0.27.5")
 			library("forge-config-api-port", "maven.modrinth:forge-config-api-port:v8.0.3-$minecraft_version-Fabric")
 			library("spark-fabric", "maven.modrinth:spark:1.10.53-fabric")
 			library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")

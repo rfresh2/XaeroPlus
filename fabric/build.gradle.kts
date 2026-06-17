@@ -84,6 +84,7 @@ tasks {
 
 	shadowJar {
 		configurations = listOf(project.configurations.shadow.get())
+		destinationDirectory = project.layout.buildDirectory.dir("shadowJar")
 	}
 
 	remapJar {

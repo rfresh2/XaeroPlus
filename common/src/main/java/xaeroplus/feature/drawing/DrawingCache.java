@@ -235,17 +235,22 @@ public class DrawingCache implements Closeable {
     private synchronized void reset() {
         this.currentWorldId = null;
         if (this.dbExecutor != null) {
-            var closeFuture = this.dbExecutor.submit(() -> {
-                if (this.database != null) {
-                    this.database.close();
-                }
-            });
             try {
                 this.dbExecutor.shutdown();
-                closeFuture.get(3L, TimeUnit.SECONDS);
-                this.dbExecutor.awaitTermination(3L, TimeUnit.SECONDS);
+                if (!this.dbExecutor.awaitTermination(6L, TimeUnit.SECONDS)) {
+                    throw new RuntimeException("Timed out awaiting shutdown termination");
+                }
             } catch (final Throwable e) {
                 XaeroPlus.LOGGER.error("Timed out waiting for {} executor to shutdown", databaseName, e);
+                try {
+                    var droppedTasks = this.dbExecutor.shutdownNow();
+                    if (!this.dbExecutor.awaitTermination(4L, TimeUnit.SECONDS)) {
+                        throw new RuntimeException("Timed out awaiting force shutdown termination");
+                    }
+                    XaeroPlus.LOGGER.error("Forcibly shut down {} executor with {} tasks remaining", databaseName, droppedTasks.size());
+                } catch (final Throwable e2) {
+                    XaeroPlus.LOGGER.error("Error force shutting down {} executor", databaseName, e2);
+                }
             }
         }
         if (this.database != null) this.database.close();

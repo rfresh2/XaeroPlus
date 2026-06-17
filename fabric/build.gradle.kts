@@ -1,3 +1,4 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
 
 plugins {
@@ -12,6 +13,7 @@ architectury {
 
 loom {
 	accessWidenerPath = project(":common").loom.accessWidenerPath
+	injectAccessWidener(tasks.named<ShadowJar>("shadowJar"))
 	runs {
 		getByName("client") {
 			generateRunConfig = true

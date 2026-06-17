@@ -23,7 +23,7 @@ loom {
     }
     runs {
         getByName("client") {
-            ideConfigGenerated(true)
+            generateRunConfig = true
             client()
         }
     }
@@ -89,14 +89,6 @@ tasks {
         archiveVersion = destArchiveVersion
         archiveClassifier = destArchiveClassifier
     }
-
-//    remapJar {
-//        dependsOn(shadowJar, transformNeo)
-//        inputFile.set(shadowJar.get().archiveFile.get())
-//        archiveVersion = destArchiveVersion
-//        archiveClassifier = destArchiveClassifier
-//        atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
-//    }
 
     compileJava {
         dependsOn(common.tasks.getByName("remapForge"))

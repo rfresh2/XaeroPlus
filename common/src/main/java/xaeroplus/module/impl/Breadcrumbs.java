@@ -31,7 +31,7 @@ public class Breadcrumbs extends Module {
         for (int x = playerChunkX - chunkRadius; x <= playerChunkX + chunkRadius; x++) {
             for (int z = playerChunkZ - chunkRadius; z <= playerChunkZ + chunkRadius; z++) {
                 if (!breadcrumbsCache.get().isHighlighted(x, z, dim)) {
-                    breadcrumbsCache.get().addHighlight(x, z);
+                    breadcrumbsCache.get().addHighlight(x, z, dim);
                 }
             }
         }

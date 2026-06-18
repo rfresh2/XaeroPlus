@@ -51,17 +51,17 @@ public class PaletteNewChunks extends Module {
     @EventHandler
     public void onChunkData(ChunkDataEvent event) {
         if (event.seenChunk()) return; // never will be newchunk if we've already cached it
-        var dim = ChunkUtils.getActualDimension();
         var chunk = event.chunk();
+        var dim = chunk.getLevel().dimension();
         var x = chunk.getPos().x;
         var z = chunk.getPos().z;
         try {
             if (shouldSkipScan(x, z, dim, newChunksCache)) return;
             if (shouldSkipScan(x, z, dim, newChunksInverseCache)) return;
             if (scanIsNewChunk(dim, chunk)) {
-                newChunksCache.get().addHighlight(x, z);
+                newChunksCache.get().addHighlight(x, z, dim);
             } else {
-                newChunksInverseCache.get().addHighlight(x, z);
+                newChunksInverseCache.get().addHighlight(x, z, dim);
             }
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Error checking palette NewChunk at [{} {}]", x, z, e);
@@ -78,7 +78,7 @@ public class PaletteNewChunks extends Module {
                     return true;
                 }
                 // warning !!! data deletion !!!
-                cache.get().removeHighlight(x, z);
+                cache.get().removeHighlight(x, z, dim);
             } else {
                 return true;
             }

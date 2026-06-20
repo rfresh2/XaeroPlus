@@ -14,6 +14,7 @@ public interface ChunkHighlightCache {
     void addHighlight(final int x, final int z);
     void addHighlight(final int x, final int z, ResourceKey<Level> dimensionId);
     void addHighlight(final int x, final int z, long foundTime);
+    void addHighlight(final int x, final int z, long foundTime, ResourceKey<Level> dimensionId);
     void removeHighlight(final int x, final int z);
     void removeHighlight(final int x, final int z, ResourceKey<Level> dimensionId);
     void removeHighlights(final LongCollection toRemove);

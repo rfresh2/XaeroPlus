@@ -11,8 +11,8 @@ import net.minecraft.util.datafix.fixes.BiomeFix;
 import net.minecraft.util.datafix.fixes.CavesAndCliffsRenames;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.EmptyLevelChunk;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
@@ -71,10 +71,11 @@ public class OldBiomes extends Module {
         }
     }
 
-    private void searchBiome(final ChunkAccess chunk) {
+    private void searchBiome(final LevelChunk chunk) {
+        var dim = chunk.getLevel().dimension();
         var x = chunk.getPos().x;
         var z = chunk.getPos().z;
-        if (oldBiomesCache.get().isHighlighted(x, z, ChunkUtils.getActualDimension())) return;
+        if (oldBiomesCache.get().isHighlighted(x, z, dim)) return;
         var blockPosX = ChunkUtils.chunkCoordToCoord(x) + 1;
         var blockPosZ = ChunkUtils.chunkCoordToCoord(z) + 1;
         var blockPosY = 50;
@@ -106,7 +107,7 @@ public class OldBiomes extends Module {
                 containsBiome.set(match);
             });
         }
-        if (containsBiome.get()) oldBiomesCache.get().addHighlight(x, z);
+        if (containsBiome.get()) oldBiomesCache.get().addHighlight(x, z, dim);
     }
 
     private String fixupOldBiome(String oldBiome) {
@@ -117,7 +118,7 @@ public class OldBiomes extends Module {
     }
 
     private void searchAllLoadedChunks() {
-        if (mc.level == null || ChunkUtils.getActualDimension() != OVERWORLD) return;
+        if (mc.level == null || mc.level.dimension() != OVERWORLD) return;
         final int renderDist = mc.options.renderDistance().get();
         final int xMin = ChunkUtils.actualPlayerChunkX() - renderDist;
         final int xMax = ChunkUtils.actualPlayerChunkX() + renderDist;
@@ -125,7 +126,7 @@ public class OldBiomes extends Module {
         final int zMax = ChunkUtils.actualPlayerChunkZ() + renderDist;
         for (int x = xMin; x <= xMax; x++) {
             for (int z = zMin; z <= zMax; z++) {
-                ChunkAccess chunk = mc.level.getChunkSource().getChunk(x, z, false);
+                var chunk = mc.level.getChunkSource().getChunk(x, z, false);
                 if (chunk instanceof EmptyLevelChunk || chunk == null) continue;
                 searchBiome(chunk);
             }

@@ -52,13 +52,13 @@ dependencies {
 	modImplementation(libs.worldmap.fabric) { isTransitive = false }
 	modImplementation(libs.minimap.fabric) { isTransitive = false }
 	modImplementation(libs.xaerolib.fabric)
-	modCompileOnly(libs.baritone.fabric)
-	modCompileOnly(libs.waystones.fabric)
-	modCompileOnly(libs.balm.fabric)
+	modImplementation(libs.baritone.fabric)
+	modImplementation(libs.waystones.fabric)
+	modImplementation(libs.balm.fabric)
 //	modCompileOnly(libs.fabric.waystones)
-//	modRuntimeOnly(libs.immediatelyfast)
+	modRuntimeOnly(libs.immediatelyfast)
 	modImplementation(libs.modmenu)
-	modCompileOnly(libs.sodium.fabric)
+	modImplementation(libs.sodium.fabric)
 //    modRuntimeOnly(libs.spark.fabric)
     implementation(shadow(libs.caffeine.get())!!)
 	implementation(shadow(libs.lambdaEvents.get())!!)

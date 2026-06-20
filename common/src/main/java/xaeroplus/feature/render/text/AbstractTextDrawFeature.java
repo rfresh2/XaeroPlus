@@ -1,12 +1,15 @@
 package xaeroplus.feature.render.text;
 
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.font.TextRenderable;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.util.Mth;
-import xaero.lib.client.graphics.font.util.FontUtils;
 import xaeroplus.Globals;
 import xaeroplus.feature.render.DrawContext;
 import xaeroplus.feature.render.DrawFeature;
+import xaeroplus.feature.render.shaders.XaeroPlusShaders;
 
 import java.util.Collection;
 
@@ -37,25 +40,25 @@ public abstract class AbstractTextDrawFeature implements DrawFeature {
                 -font.lineHeight / 2.0f,
                 0
             );
-            FontUtils.drawText(
-                font,
-                ctx.matrixStack(),
+            var preparedText = font.prepareText(
                 text.value(),
                 0, 0,
                 text.color(),
                 true,
-                Font.DisplayMode.NORMAL,
-                ctx.renderTypeBuffers()
+                0
             );
+            preparedText.visit(new Font.GlyphVisitor() {
+                @Override
+                public void acceptRenderable(final TextRenderable renderable) {
+                    RenderType renderType = XaeroPlusShaders.TEXT_NO_CULL;
+                    VertexConsumer vertexConsumer = ctx.renderTypeBuffers().getBuffer(renderType);
+                    renderable.render(ctx.matrixStack().last().pose(), vertexConsumer, 15728880, false);
+                }
+            });
             ctx.matrixStack().popPose();
         }
         if (!texts.isEmpty()) {
-            try {
-                Globals.disableDrawCullingOverride = true;
-                ctx.renderTypeBuffers().endBatch();
-            } finally {
-                Globals.disableDrawCullingOverride = false;
-            }
+            ctx.renderTypeBuffers().endBatch();
         }
     }
 }

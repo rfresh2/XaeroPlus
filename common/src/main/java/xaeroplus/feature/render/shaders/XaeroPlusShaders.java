@@ -10,7 +10,12 @@ import com.mojang.blaze3d.platform.PolygonMode;
 import com.mojang.blaze3d.shaders.UniformType;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import net.minecraft.client.renderer.BindGroupLayouts;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.rendertype.OutputTarget;
+import net.minecraft.client.renderer.rendertype.RenderSetup;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
+import xaero.lib.client.graphics.XaeroRenderType;
 import xaero.lib.client.graphics.shader.BuiltInCustomUniformValueTypes;
 import xaero.lib.client.graphics.shader.CustomUniform;
 
@@ -75,4 +80,19 @@ public class XaeroPlusShaders {
         LINES_FRAME_SIZE[0] = width;
         LINES_FRAME_SIZE[1] = height;
     }
+
+    public static final RenderPipeline TEXT_NO_CULL_RP = RenderPipeline.builder(RenderPipelines.WORLD_TEXT_SNIPPET)
+        .withLocation(Identifier.fromNamespaceAndPath("xaeroplus", "pipeline/text_no_cull"))
+        .withVertexShader("core/text")
+        .withFragmentShader("core/text")
+        .withCull(false)
+        .build();
+
+    public static final RenderType TEXT_NO_CULL = XaeroRenderType.createRenderType(
+        "xaeroplus_text_no_cull",
+        RenderSetup.builder(TEXT_NO_CULL_RP)
+            // todo: does this need to change when language/font is switched?
+            .withTexture("Sampler0", Identifier.withDefaultNamespace("default/0"))
+            .useLightmap()
+            .setOutputTarget(OutputTarget.MAIN_TARGET));
 }

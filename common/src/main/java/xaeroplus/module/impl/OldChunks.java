@@ -12,8 +12,8 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.EmptyLevelChunk;
+import net.minecraft.world.level.chunk.LevelChunk;
 import xaeroplus.Globals;
 import xaeroplus.event.ChunkDataEvent;
 import xaeroplus.feature.highlights.SavableHighlightCacheInstance;
@@ -72,30 +72,29 @@ public class OldChunks extends Module {
         searchChunk(event.chunk());
     }
 
-    private void searchChunk(final ChunkAccess chunk) {
-        ResourceKey<Level> actualDimension = ChunkUtils.getActualDimension();
+    private void searchChunk(final LevelChunk chunk) {
+        var dim = chunk.getLevel().dimension();
         var x = chunk.getPos().x;
         var z = chunk.getPos().z;
-        if (modernChunksCache.get().isHighlighted(x, z, actualDimension)) return;
-        if (oldChunksCache.get().isHighlighted(x, z, actualDimension)) return;
-        if (actualDimension == OVERWORLD || actualDimension == NETHER) {
-            if (ChunkScanner.chunkContainsBlocks(chunk, actualDimension == OVERWORLD ? OVERWORLD_BLOCKS : NETHER_BLOCKS, 5)) {
-                modernChunksCache.get().addHighlight(x, z);
+        if (modernChunksCache.get().isHighlighted(x, z, dim)) return;
+        if (oldChunksCache.get().isHighlighted(x, z, dim)) return;
+        if (dim == OVERWORLD || dim == NETHER) {
+            if (ChunkScanner.chunkContainsBlocks(chunk, dim == OVERWORLD ? OVERWORLD_BLOCKS : NETHER_BLOCKS, 5)) {
+                modernChunksCache.get().addHighlight(x, z, dim);
             } else {
-                oldChunksCache.get().addHighlight(x, z);
+                oldChunksCache.get().addHighlight(x, z, dim);
             }
-        } else if (actualDimension == END) {
+        } else if (dim == END) {
             Holder<Biome> biomeHolder = mc.level.getBiome(new BlockPos(ChunkUtils.chunkCoordToCoord(x) + 8, 64, ChunkUtils.chunkCoordToCoord(z) + 8));
-            if (biomeHolder.unwrapKey().filter(biome -> biome.equals(Biomes.THE_END)).isEmpty()) {
-                modernChunksCache.get().addHighlight(x, z);
+            if (biomeHolder.is(Biomes.THE_END)) {
+                oldChunksCache.get().addHighlight(x, z, dim);
             } else {
-                oldChunksCache.get().addHighlight(x, z);
+                modernChunksCache.get().addHighlight(x, z, dim);
             }
         }
     }
 
-    public boolean inUnknownDimension() {
-        final ResourceKey<Level> dim = ChunkUtils.getActualDimension();
+    public boolean inUnknownDimension(final ResourceKey<Level> dim) {
         return dim != OVERWORLD && dim != NETHER && dim != END;
     }
 
@@ -115,7 +114,7 @@ public class OldChunks extends Module {
     }
 
     private void searchAllLoadedChunks() {
-        if (mc.level == null || inUnknownDimension()) return;
+        if (mc.level == null || inUnknownDimension(mc.level.dimension())) return;
         final int renderDist = mc.options.renderDistance().get();
         final int xMin = ChunkUtils.actualPlayerChunkX() - renderDist;
         final int xMax = ChunkUtils.actualPlayerChunkX() + renderDist;
@@ -123,7 +122,7 @@ public class OldChunks extends Module {
         final int zMax = ChunkUtils.actualPlayerChunkZ() + renderDist;
         for (int x = xMin; x <= xMax; x++) {
             for (int z = zMin; z <= zMax; z++) {
-                ChunkAccess chunk = mc.level.getChunkSource().getChunk(x, z, false);
+                var chunk = mc.level.getChunkSource().getChunk(x, z, false);
                 if (chunk instanceof EmptyLevelChunk || chunk == null) continue;
                 searchChunk(chunk);
             }
@@ -169,7 +168,7 @@ public class OldChunks extends Module {
         return modernChunksCache.get().isHighlighted(chunkPosX, chunkPosZ, dimensionId);
     }
 
-    public void setInverse(final Boolean b) {
+    public void setInverse(final boolean b) {
         this.inverse = b;
     }
 }

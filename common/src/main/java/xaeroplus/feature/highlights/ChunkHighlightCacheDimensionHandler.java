@@ -195,6 +195,14 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
     }
 
     @Override
+    public void addHighlight(final int x, final int z, final long foundTime, final ResourceKey<Level> dimensionId) {
+        super.addHighlight(x, z, foundTime, dimensionId);
+        var pos = chunkPosToLong(x, z);
+        staleChunks.add(pos);
+        staleToRemoveChunks.remove(pos);
+    }
+
+    @Override
     public void addHighlight(final int x, final int z, final ResourceKey<Level> dimensionId) {
         super.addHighlight(x, z, dimensionId);
         var pos = chunkPosToLong(x, z);

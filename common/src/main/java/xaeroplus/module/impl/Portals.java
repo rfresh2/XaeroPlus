@@ -4,7 +4,6 @@ import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
 import net.lenni0451.lambdaevents.EventHandler;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -13,8 +12,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EndPortalBlock;
 import net.minecraft.world.level.block.NetherPortalBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.EmptyLevelChunk;
+import net.minecraft.world.level.chunk.LevelChunk;
 import xaeroplus.Globals;
 import xaeroplus.event.ChunkBlockUpdateEvent;
 import xaeroplus.event.ChunkBlocksUpdateEvent;
@@ -78,14 +77,15 @@ public class Portals extends Module {
 
     // checking for portal removal
     private void handleMultiBlockChangePost(final ChunkBlocksUpdateEvent event) {
-        ClientLevel level = mc.level;
+        var level = mc.level;
         if (level == null) return;
+        var dim = level.dimension();
         event.packet().runUpdates(((blockPos, blockState) -> {
             if (!blockState.isAir()) return;
             int chunkX = ChunkUtils.posToChunkPos(blockPos.getX());
             int chunkZ = ChunkUtils.posToChunkPos(blockPos.getZ());
-            if (!portalsCache.get().isHighlighted(chunkX, chunkZ, ChunkUtils.getActualDimension())) return;
-            ChunkAccess chunk = level.getChunkSource().getChunk(chunkX, chunkZ, false);
+            if (!portalsCache.get().isHighlighted(chunkX, chunkZ, dim)) return;
+            var chunk = level.getChunkSource().getChunk(chunkX, chunkZ, false);
             if (chunk instanceof EmptyLevelChunk || chunk == null) return;
             findPortalInChunk(chunk);
         }));
@@ -101,26 +101,28 @@ public class Portals extends Module {
 
     // checking for portal removal
     private void handleBlockChangePost(final ChunkBlockUpdateEvent event) {
-        ClientLevel level = mc.level;
+        var level = mc.level;
         if (level == null) return;
+        var dim = level.dimension();
         var blockPos = event.packet().getPos();
         var blockState = event.packet().getBlockState();
         if (!blockState.isAir()) return;
         int chunkX = ChunkUtils.posToChunkPos(blockPos.getX());
         int chunkZ = ChunkUtils.posToChunkPos(blockPos.getZ());
-        if (!portalsCache.get().isHighlighted(chunkX, chunkZ, ChunkUtils.getActualDimension())) return;
-        ChunkAccess chunk = level.getChunkSource().getChunk(chunkX, chunkZ, false);
+        if (!portalsCache.get().isHighlighted(chunkX, chunkZ, dim)) return;
+        var chunk = level.getChunkSource().getChunk(chunkX, chunkZ, false);
         if (chunk instanceof EmptyLevelChunk || chunk == null) return;
         findPortalInChunk(chunk);
     }
 
-    private void findPortalInChunk(final ChunkAccess chunk) {
-        final boolean chunkHadPortal = portalsCache.get().isHighlighted(chunk.getPos().x, chunk.getPos().z, ChunkUtils.getActualDimension());
+    private void findPortalInChunk(final LevelChunk chunk) {
+        var dim = chunk.getLevel().dimension();
+        var chunkHadPortal = portalsCache.get().isHighlighted(chunk.getPos().x, chunk.getPos().z, dim);
         var hasPortal = ChunkScanner.chunkContainsBlocks(chunk, PORTAL_BLOCKS, mc.level.getMinY());
         if (hasPortal) {
-            portalsCache.get().addHighlight(chunk.getPos().x, chunk.getPos().z);
+            portalsCache.get().addHighlight(chunk.getPos().x, chunk.getPos().z, dim);
         } else if (chunkHadPortal) {
-            portalsCache.get().removeHighlight(chunk.getPos().x, chunk.getPos().z);
+            portalsCache.get().removeHighlight(chunk.getPos().x, chunk.getPos().z, dim);
         }
     }
 
@@ -133,7 +135,7 @@ public class Portals extends Module {
         final int zMax = ChunkUtils.actualPlayerChunkZ() + renderDist;
         for (int x = xMin; x <= xMax; x++) {
             for (int z = zMin; z <= zMax; z++) {
-                ChunkAccess chunk = mc.level.getChunkSource().getChunk(x, z, false);
+                var chunk = mc.level.getChunkSource().getChunk(x, z, false);
                 if (chunk instanceof EmptyLevelChunk || chunk == null) continue;
                 findPortalInChunk(chunk);
             }
@@ -141,10 +143,11 @@ public class Portals extends Module {
     }
 
     private void handleBlockChange(final BlockPos pos, final BlockState state) {
+        var dim = ChunkUtils.getActualDimension();
         int chunkX = ChunkUtils.posToChunkPos(pos.getX());
         int chunkZ = ChunkUtils.posToChunkPos(pos.getZ());
         if (!(state.getBlock() instanceof NetherPortalBlock || state.getBlock() instanceof EndPortalBlock)) return;
-        portalsCache.get().addHighlight(chunkX, chunkZ);
+        portalsCache.get().addHighlight(chunkX, chunkZ, dim);
     }
 
     public int getPortalsColor() {

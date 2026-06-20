@@ -34,7 +34,8 @@ public final class Settings extends SettingRegistry {
         BooleanSetting.create(
             "Transparent WorldMap Background",
             "xaeroplus.setting.transparent_worldmap_background",
-            false),
+            false,
+            () -> false),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting fastMapSetting = register(
         BooleanSetting.create(

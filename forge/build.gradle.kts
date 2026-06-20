@@ -89,6 +89,7 @@ tasks {
 
     shadowJar {
         configurations = listOf(project.configurations.shadow.get())
+        destinationDirectory = project.layout.buildDirectory.dir("shadowJar")
         val shadePkg = "xaeroplus.shadow"
         relocate("kaptainwutax", "$shadePkg.kaptainwutax")
         relocate("net.lenni0451.lambdaevents", "$shadePkg.lambdaevents")

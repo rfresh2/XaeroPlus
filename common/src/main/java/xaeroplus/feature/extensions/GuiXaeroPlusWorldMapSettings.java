@@ -5,6 +5,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import xaero.lib.client.gui.GuiSettings;
 import xaero.lib.client.gui.ISettingEntry;
+import xaero.lib.client.gui.ScreenBase;
 import xaero.map.gui.ScreenSwitchSettingEntry;
 import xaeroplus.settings.SettingLocation;
 import xaeroplus.settings.Settings;
@@ -27,7 +28,9 @@ public class GuiXaeroPlusWorldMapSettings extends GuiSettings {
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        this.renderEscapeScreen(guiGraphics, 0, 0, f);
+        if (this.escape instanceof ScreenBase) {
+            this.renderEscapeScreen(guiGraphics, 0, 0, f);
+        }
         super.renderBackground(guiGraphics, i, j, f);
     }
 

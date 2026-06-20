@@ -25,7 +25,7 @@ val xaerolib_version: String by ext.properties
 dependencyResolutionManagement {
 	versionCatalogs {
 		create("libs") {
-			library("fabric-loader", "net.fabricmc:fabric-loader:0.18.5")
+            library("fabric-loader", "net.fabricmc:fabric-loader:0.19.3")
 			library("forge", "net.minecraftforge:forge:$minecraft_version-61.1.5")
 			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.141.4+$minecraft_version")
 			library("neoforge", "net.neoforged:neoforge:21.11.42")

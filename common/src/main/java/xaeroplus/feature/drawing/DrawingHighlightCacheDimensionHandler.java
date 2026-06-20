@@ -159,6 +159,12 @@ public class DrawingHighlightCacheDimensionHandler extends ChunkHighlightBaseCac
     }
 
     @Override
+    public void addHighlight(final int x, final int z, final long foundTime, final ResourceKey<Level> dimensionId) {
+        super.addHighlight(x, z, foundTime, dimensionId);
+        staleChunks.add(chunkPosToLong(x, z));
+    }
+
+    @Override
     public void addHighlight(final int x, final int z, final ResourceKey<Level> dimensionId) {
         super.addHighlight(x, z, dimensionId);
         staleChunks.add(chunkPosToLong(x, z));

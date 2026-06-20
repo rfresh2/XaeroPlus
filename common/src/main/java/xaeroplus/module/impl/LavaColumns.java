@@ -19,8 +19,6 @@ import xaeroplus.util.ColorHelper;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static xaeroplus.util.ChunkUtils.getActualDimension;
-
 public class LavaColumns extends Module {
     public final SavableHighlightCacheInstance lavaColumnsCache = new SavableHighlightCacheInstance("XaeroPlusLavaColumns");
     private int minColumnHeight = 5;
@@ -39,9 +37,10 @@ public class LavaColumns extends Module {
         var level = mc.level;
         if (level == null || mc.levelRenderer.viewArea == null) return;
         var chunk = event.chunk();
+        var dim = chunk.getLevel().dimension();
         var chunkPos = chunk.getPos();
-        if (getActualDimension() != Level.NETHER) return;
-        if (lavaColumnsCache.get().isHighlighted(chunkPos.x(), chunkPos.z(), getActualDimension())) return;
+        if (dim != Level.NETHER) return;
+        if (lavaColumnsCache.get().isHighlighted(chunkPos.x(), chunkPos.z(), dim)) return;
 
         var maxHeight = new AtomicInteger(0);
         ChunkScanner.chunkScanBlockstatePredicate(chunk, lavaFilter, (c, state, relX, y, relZ) -> {
@@ -63,7 +62,7 @@ public class LavaColumns extends Module {
             return false;
         }, 0);
 
-        lavaColumnsCache.get().addHighlight(chunkPos.x(), chunkPos.z(), maxHeight.get());
+        lavaColumnsCache.get().addHighlight(chunk.getPos().x(), chunk.getPos().z(), maxHeight.get(), dim);
     }
 
     @Override

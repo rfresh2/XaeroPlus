@@ -17,7 +17,7 @@ public class KeybindListener {
 
     @EventHandler
     public void onTick(ClientTickEvent.Post event) {
-        if (Minecraft.getInstance().screen != null) return;
+        if (Minecraft.getInstance().gui.screen() != null) return;
         if (Minecraft.getInstance().player == null) return;
         for (KeyMapping keybind : Settings.REGISTRY.getKeybindings()) {
             if (keybind.isDown()) {

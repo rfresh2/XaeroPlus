@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public class GuiMapHelper {
     public static Optional<GuiMap> getGuiMap() {
-        Screen currentScreen = Minecraft.getInstance().screen;
+        Screen currentScreen = Minecraft.getInstance().gui.screen();
         if (currentScreen instanceof GuiMap) {
             return Optional.of((GuiMap) currentScreen);
         } else if (currentScreen instanceof GuiSettings screen) {
@@ -38,7 +38,7 @@ public class GuiMapHelper {
     }
 
     public static boolean isGuiMapLoaded() {
-        return Minecraft.getInstance().screen instanceof GuiMap;
+        return Minecraft.getInstance().gui.screen() instanceof GuiMap;
     }
 
     public static int getGuiMapCenterRegionX(final GuiMap guiMap) {

@@ -2,6 +2,7 @@ package xaeroplus.mixin.client;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.mojang.blaze3d.pipeline.BindGroupLayout;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,7 +28,7 @@ public class MixinXaeroRenderType {
         )
     )
     private static RenderPipeline setCustomMapShader(final RenderPipeline.Builder instance, final Operation<RenderPipeline> original) {
-        instance.withUniform(XaeroPlusShaders.TRANSPARENT_WM_BACKGROUND_UNIFORM.name(), XaeroPlusShaders.TRANSPARENT_WM_BACKGROUND_UNIFORM.type());
+        instance.withBindGroupLayout(BindGroupLayout.builder().withUniform(XaeroPlusShaders.TRANSPARENT_WM_BACKGROUND_UNIFORM.name(), XaeroPlusShaders.TRANSPARENT_WM_BACKGROUND_UNIFORM.type()).build());
         return original.call(instance);
     }
 }

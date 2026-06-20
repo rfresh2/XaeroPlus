@@ -18,7 +18,7 @@ public class MixinWaypointMapRenderer {
     @Shadow
     private double waypointsDistance;
 
-    @Inject(method = "renderElement(Lxaero/common/minimap/waypoints/Waypoint;ZZDFDDLxaero/hud/minimap/element/render/MinimapElementRenderInfo;Lxaero/hud/minimap/element/render/MinimapElementGraphics;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)Z", at = @At(
+    @Inject(method = "renderElement(Lxaero/common/minimap/waypoints/Waypoint;ZZDFDDLxaero/hud/minimap/element/render/MinimapElementRenderInfo;Lxaero/hud/minimap/element/render/MinimapElementGraphics;Lxaero/lib/client/graphics/XaeroBufferProvider;)Z", at = @At(
         value = "INVOKE",
         target = "Lxaero/common/minimap/waypoints/Waypoint;isDestination()Z",
         ordinal = 0

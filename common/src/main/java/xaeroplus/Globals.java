@@ -40,6 +40,7 @@ public class Globals {
     public static final boolean atomicMoveAvailable = testAtomicMoveAvailable();
     public static boolean transparentWmBgApplyMapBlend = false;
     public static boolean transparentWmBgApplyMapFrameBlend = false;
+    public static boolean transparentWmBgApplyMapFrameDepthState = false;
     public static boolean bypassVertexCountLimit = false;
     public static ResourceKey<Level> getCurrentDimensionId() {
         try {

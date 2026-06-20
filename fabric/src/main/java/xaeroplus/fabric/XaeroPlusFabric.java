@@ -51,7 +51,7 @@ public class XaeroPlusFabric implements ClientModInitializer {
 			var versionCheckResult = XaeroPlusMinimapCompatibilityChecker.versionCheckResult;
 			if (versionCheckResult.minimapCompatible()) return;
 			var anyPresentVersion = versionCheckResult.minimapVersion().or(versionCheckResult::betterPvpVersion);
-			Minecraft.getInstance().setScreen(
+			Minecraft.getInstance().gui.setScreen(
 				new IncompatibleMinimapWarningScreen(anyPresentVersion, versionCheckResult.expectedVersion()));
 		});
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {

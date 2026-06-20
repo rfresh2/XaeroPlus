@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.blockentity.BeaconRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.state.level.LevelRenderState;
@@ -32,7 +31,7 @@ public class WaypointBeaconRenderer {
 
     private int errorCount = 0;
 
-    public void renderHook(final PoseStack poseStack, final LevelRenderState levelRenderState, final SubmitNodeStorage submitNodeStorage) {
+    public void renderHook(final PoseStack poseStack, final LevelRenderState levelRenderState, final SubmitNodeCollector submitNodeCollector) {
         if (!Settings.REGISTRY.waypointBeacons.get()) return;
         var hudMod = HudMod.INSTANCE;
         if (hudMod == null) return;
@@ -43,13 +42,13 @@ public class WaypointBeaconRenderer {
         MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
         if (minimapSession == null) return;
         try {
-            WaypointBeaconRenderer.INSTANCE.renderWaypointBeacons(poseStack, levelRenderState, submitNodeStorage);
+            WaypointBeaconRenderer.INSTANCE.renderWaypointBeacons(poseStack, levelRenderState, submitNodeCollector);
         } catch (final Exception e) {
             if (errorCount++ < 2) XaeroPlus.LOGGER.error("Error rendering waypoints", e);
         }
     }
 
-    private void renderWaypointBeacons(final PoseStack matrixStack, final LevelRenderState levelRenderState, final SubmitNodeStorage submitNodeStorage) {
+    private void renderWaypointBeacons(final PoseStack matrixStack, final LevelRenderState levelRenderState, final SubmitNodeCollector submitNodeStorage) {
         var session = BuiltInHudModules.MINIMAP.getCurrentSession();
         if (session == null) return;
         var hudConfigs = HudMod.INSTANCE.getHudConfigs();

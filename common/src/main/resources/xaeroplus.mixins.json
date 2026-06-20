@@ -49,6 +49,7 @@
     "MixinMinimap",
     "MixinMinimapConfigClientUtils",
     "MixinMinimapFBORenderer",
+    "MixinMinimapModuleRenderer",
     "MixinMinimapRenderer",
     "MixinMinimapViewSettings",
     "MixinMinimapWorldManagerIO",

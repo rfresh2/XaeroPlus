@@ -28,7 +28,7 @@ public class MixinWaypointWorldRenderer {
     @Shadow
     private double waypointsDistance;
 
-    @Inject(method = "renderElement(Lxaero/common/minimap/waypoints/Waypoint;ZZDFDDLxaero/hud/minimap/element/render/MinimapElementRenderInfo;Lxaero/hud/minimap/element/render/MinimapElementGraphics;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)Z", at = @At(
+    @Inject(method = "renderElement(Lxaero/common/minimap/waypoints/Waypoint;ZZDFDDLxaero/hud/minimap/element/render/MinimapElementRenderInfo;Lxaero/hud/minimap/element/render/MinimapElementGraphics;Lxaero/lib/client/graphics/XaeroBufferProvider;)Z", at = @At(
         value = "INVOKE",
         target = "Lxaero/common/minimap/waypoints/Waypoint;isDestination()Z",
         ordinal = 0
@@ -47,7 +47,7 @@ public class MixinWaypointWorldRenderer {
         }
     }
 
-    @ModifyArg(method = "renderElement(Lxaero/common/minimap/waypoints/Waypoint;ZZDFDDLxaero/hud/minimap/element/render/MinimapElementRenderInfo;Lxaero/hud/minimap/element/render/MinimapElementGraphics;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)Z", at = @At(
+    @ModifyArg(method = "renderElement(Lxaero/common/minimap/waypoints/Waypoint;ZZDFDDLxaero/hud/minimap/element/render/MinimapElementRenderInfo;Lxaero/hud/minimap/element/render/MinimapElementGraphics;Lxaero/lib/client/graphics/XaeroBufferProvider;)Z", at = @At(
         value = "INVOKE",
         target = "Lxaero/hud/minimap/waypoint/render/world/WaypointWorldRenderer;renderIconWithLabels(Lxaero/common/minimap/waypoints/Waypoint;ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;FIILnet/minecraft/client/gui/Font;ILcom/mojang/blaze3d/vertex/PoseStack;Lxaero/lib/client/graphics/XaeroBufferProvider;)V"),
         index = 4,
@@ -67,7 +67,7 @@ public class MixinWaypointWorldRenderer {
      * todo: separate out rendering so it is independent of when distance text is rendered
      *  and put it on its own line
      */
-    @ModifyArg(method = "renderElement(Lxaero/common/minimap/waypoints/Waypoint;ZZDFDDLxaero/hud/minimap/element/render/MinimapElementRenderInfo;Lxaero/hud/minimap/element/render/MinimapElementGraphics;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)Z", at = @At(
+    @ModifyArg(method = "renderElement(Lxaero/common/minimap/waypoints/Waypoint;ZZDFDDLxaero/hud/minimap/element/render/MinimapElementRenderInfo;Lxaero/hud/minimap/element/render/MinimapElementGraphics;Lxaero/lib/client/graphics/XaeroBufferProvider;)Z", at = @At(
         value = "INVOKE",
         target = "Lxaero/hud/minimap/waypoint/render/world/WaypointWorldRenderer;renderIconWithLabels(Lxaero/common/minimap/waypoints/Waypoint;ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;FIILnet/minecraft/client/gui/Font;ILcom/mojang/blaze3d/vertex/PoseStack;Lxaero/lib/client/graphics/XaeroBufferProvider;)V"),
         index = 3,

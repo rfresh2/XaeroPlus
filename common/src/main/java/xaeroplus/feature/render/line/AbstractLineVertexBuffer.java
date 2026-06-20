@@ -29,6 +29,7 @@ public abstract class AbstractLineVertexBuffer<T> {
                     .putMat4f()
                     .putVec2()
                     .putFloat()
+                    .align(80)
                     .get()
             );
         }

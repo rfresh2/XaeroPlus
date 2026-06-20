@@ -11,7 +11,7 @@
     "MixinHudMod",
     "MixinWorldMap",
     "fabric.MixinFabricClientCommandSource",
-    "mc.MixinLevelRenderer",
-    "mc.MixinMinecraftClientFabric"
+    "mc.MixinGui",
+    "mc.MixinLevelRenderer"
   ]
 }

@@ -56,6 +56,7 @@ public class DrawingCache implements Closeable {
                     .setUncaughtExceptionHandler((t, e) -> {
                         XaeroPlus.LOGGER.error("Uncaught exception in {}", t.getName(), e);
                     })
+                    .setDaemon(true)
                     .build()
             )
         );
@@ -457,6 +458,7 @@ public class DrawingCache implements Closeable {
                         .setUncaughtExceptionHandler((t, e) -> {
                             XaeroPlus.LOGGER.error("Uncaught exception handler in {}", t.getName(), e);
                         })
+                        .setDaemon(true)
                         .build()));
             this.database = new DrawingDatabase(worldId, databaseName);
             initializeHighlightDimensionCacheHandler(OVERWORLD);

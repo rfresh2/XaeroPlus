@@ -25,7 +25,6 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -34,6 +33,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import org.joml.Matrix4f;
+import org.joml.Vector4f;
+import org.joml.Vector4fc;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -422,7 +423,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     )
     public Object hideDebugRenderingOnF1(final SingleConfigManager instance, final ConfigOption option, final Operation original) {
         var value = original.call(instance, option);
-        return ((Boolean) value) && !Minecraft.getInstance().options.hideGui;
+        return ((Boolean) value) && !Minecraft.getInstance().gui.hud.isHidden();
     }
 
     @WrapOperation(method = "extractRenderState",
@@ -451,7 +452,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                      @Local(name = "fboScale") double fboScale
     ) {
         original.call(instance);
-        if (Minecraft.getInstance().options.hideGui) return;
+        if (Minecraft.getInstance().gui.hud.isHidden()) return;
         Globals.drawManager.drawWorldMapFeatures(
             flooredCameraX,
             flooredCameraZ,
@@ -466,15 +467,15 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         target = "Lxaero/map/graphics/MapRenderHelper;renderDynamicHighlight(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;IIIIIIFFFFFFFF)V"
     ), remap = true)
     public boolean hideHighlightsOnF1(final PoseStack matrixStack, final VertexConsumer overlayBuffer, final int flooredCameraX, final int flooredCameraZ, final int leftX, final int rightX, final int topZ, final int bottomZ, final float sideR, final float sideG, final float sideB, final float sideA, final float centerR, final float centerG, final float centerB, final float centerA) {
-        return !Minecraft.getInstance().options.hideGui;
+        return !Minecraft.getInstance().gui.hud.isHidden();
     }
 
     @WrapOperation(method = "extractRenderState", at = @At(
         value = "INVOKE",
-        target = "Lxaero/map/element/MapElementRenderHandler;render(Lxaero/map/gui/GuiMap;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;DDIIDDDDDFZLxaero/map/element/HoveredMapElementHolder;Lnet/minecraft/client/Minecraft;F)Lxaero/map/element/HoveredMapElementHolder;"
+        target = "Lxaero/map/element/MapElementRenderHandler;render(Lxaero/map/gui/GuiMap;Lxaero/lib/client/graphics/XaeroBufferProvider;Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;DDIIDDDDDFZLxaero/map/element/HoveredMapElementHolder;Lnet/minecraft/client/Minecraft;F)Lxaero/map/element/HoveredMapElementHolder;"
     ), remap = true)
-    public HoveredMapElementHolder<?, ?> hideMapElementsOnF1(MapElementRenderHandler handler, GuiMap mapScreen, MultiBufferSource.BufferSource renderTypeBuffers, MultiTextureRenderTypeRendererProvider rendererProvider, double cameraX, double cameraZ, int width, int height, double screenSizeBasedScale, double scale, double playerDimDiv, double mouseX, double mouseZ, float brightness, boolean cave, HoveredMapElementHolder<?, ?> oldHovered, Minecraft mc, float partialTicks, Operation<HoveredMapElementHolder<?, ?>> original) {
-        if (!Minecraft.getInstance().options.hideGui) {
+    public HoveredMapElementHolder<?, ?> hideMapElementsOnF1(final MapElementRenderHandler handler, final GuiMap mapScreen, final XaeroBufferProvider renderTypeBuffers, final MultiTextureRenderTypeRendererProvider rendererProvider, final double cameraX, final double cameraZ, final int width, final int height, final double screenSizeBasedScale, final double scale, final double playerDimDiv, final double mouseX, final double mouseZ, final float brightness, final boolean cave, final HoveredMapElementHolder<?, ?> oldHovered, final Minecraft mc, final float partialTicks, final Operation<HoveredMapElementHolder<?, ?>> original) {
+        if (!Minecraft.getInstance().gui.hud.isHidden()) {
             return original.call(handler, mapScreen, renderTypeBuffers, rendererProvider, cameraX, cameraZ, width, height, screenSizeBasedScale, scale, playerDimDiv, mouseX, mouseZ, brightness, cave, oldHovered, mc, partialTicks);
         } else {
             return null;
@@ -495,7 +496,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     )
     public Object hideFootstepsOnF1(final ClientConfigManager instance, final ConfigOption option, final Operation original) {
         var value = original.call(instance, option);
-        return ((Boolean) value) && !Minecraft.getInstance().options.hideGui;
+        return ((Boolean) value) && !Minecraft.getInstance().gui.hud.isHidden();
     }
 
     @WrapOperation(method = "extractRenderState", at = @At(
@@ -512,7 +513,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     )
     public Object hideArrowOnF1(final ClientConfigManager instance, final ConfigOption option, final Operation original) {
         var value = original.call(instance, option);
-        return ((Boolean) value) && !Minecraft.getInstance().options.hideGui;
+        return ((Boolean) value) && !Minecraft.getInstance().gui.hud.isHidden();
     }
 
     @ModifyArg(method = "extractRenderState",
@@ -546,7 +547,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         target = "Lxaero/map/graphics/MapRenderHelper;drawCenteredStringWithBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIFFFF)V"
     ), remap = true)
     public boolean hideRenderedStringsOnF1(final GuiGraphicsExtractor guiGraphics, final Font font, final String string, final int x, final int y, final int color, final float bgRed, final float bgGreen, final float bgBlue, final float bgAlpha) {
-        return !Minecraft.getInstance().options.hideGui;
+        return !Minecraft.getInstance().gui.hud.isHidden();
     }
 
     @WrapWithCondition(method = "extractRenderState", at = @At(
@@ -554,7 +555,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blit(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIFFIIII)V"
     ), remap = true)
     public boolean hideCompassOnF1(final GuiGraphicsExtractor instance, final RenderPipeline renderPipeline, final Identifier arg, final int i, final int j, final float f, final float g, final int k, final int l, final int m, final int n) {
-        return !Minecraft.getInstance().options.hideGui;
+        return !Minecraft.getInstance().gui.hud.isHidden();
     }
 
     @Inject(method = "extractRenderState", at = @At(
@@ -562,7 +563,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         target = "Lxaero/lib/client/gui/ScreenBase;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V"
     ), remap = true)
     public void hideButtonsOnF1(final CallbackInfo ci) {
-        if (Minecraft.getInstance().options.hideGui) {
+        if (Minecraft.getInstance().gui.hud.isHidden()) {
             List<Button> buttonList = getButtonList();
             if (!buttonList.isEmpty()) {
                 this.guiMapButtonTempList.clear();
@@ -587,7 +588,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     public void renderCoordinatesGotoTextEntryFields(final GuiGraphicsExtractor guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci) {
         if (!Settings.REGISTRY.worldMapUIAdditions.get()) return;
         Minecraft mc = Minecraft.getInstance();
-        if (mc.screen != null && mc.screen.getClass().equals(GuiMap.class)) {
+        if (mc.gui.screen() != null && mc.gui.screen().getClass().equals(GuiMap.class)) {
             if (xTextEntryField.isVisible() && zTextEntryField.isVisible()) {
                 xTextEntryField.extractRenderState(guiGraphics, scaledMouseX, scaledMouseY, partialTicks);
                 zTextEntryField.extractRenderState(guiGraphics, scaledMouseX, scaledMouseY, partialTicks);
@@ -603,7 +604,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         target = "Lxaero/map/graphics/MapRenderHelper;drawCenteredStringWithBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIFFFF)V"
     ), remap = true)
     public boolean hideMoreRenderedStringsOnF1(final GuiGraphicsExtractor guiGraphics, final Font font, final Component text, final int x, final int y, final int color, final float bgRed, final float bgGreen, final float bgBlue, final float bgAlpha) {
-        return !Minecraft.getInstance().options.hideGui;
+        return !Minecraft.getInstance().gui.hud.isHidden();
     }
 
     @Inject(method = "onDimensionToggleButton", at = @At(value = "RETURN"))
@@ -705,7 +706,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @WrapOperation(method = "extractRenderState", at = @At(
         value = "INVOKE",
-        target = "Lxaero/lib/client/graphics/util/TextureUtils;clearRenderTarget(Lcom/mojang/blaze3d/pipeline/RenderTarget;IF)V",
+        target = "Lxaero/lib/client/graphics/util/TextureUtils;clearRenderTarget(Lcom/mojang/blaze3d/pipeline/RenderTarget;Lorg/joml/Vector4fc;F)V",
         ordinal = 0
     ), slice = @Slice(
         from = @At(
@@ -714,9 +715,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             opcode = Opcodes.GETSTATIC
         )
     ))
-    public void transparentBgSetPrimaryFboTransparentClearColor(final RenderTarget renderTarget, final int color, final float depth, final Operation<Void> original) {
+    public void transparentBgSetPrimaryFboTransparentClearColor(final RenderTarget renderTarget, final Vector4fc color, final float depth, final Operation<Void> original) {
         if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
-            original.call(renderTarget, ColorHelper.getColor(0, 0, 0, 0), depth);
+            original.call(renderTarget, new Vector4f(0, 0, 0, 0), depth);
         } else {
             original.call(renderTarget, color, depth);
         }
@@ -729,7 +730,11 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     ))
     public void onImmediateFboRenderStateRegister(final CallbackInfo ci) {
         if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
-            TextureUtils.clearRenderTarget(immediateRenderFBO, ColorHelper.getColor(0, 0, 0, 0), 1.0f);
+            TextureUtils.clearRenderTarget(immediateRenderFBO, new Vector4f(0, 0, 0, 0), 1.0f);
+        } else {
+            // only actually necessary when transparent WM toggled from ON to OFF
+            // i don't think it will hurt to do every frame tho
+            TextureUtils.clearRenderTarget(immediateRenderFBO, new Vector4f(0, 0, 0, 1));
         }
     }
 
@@ -783,13 +788,57 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     public void transparentBgConfigMainFBORender(final MultiTextureRenderTypeRendererProvider instance, final MultiTextureRenderTypeRenderer renderer, final Operation<Void> original) {
         if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
             Globals.transparentWmBgApplyMapFrameBlend = true;
+            Globals.transparentWmBgApplyMapFrameDepthState = true;
             try {
                 original.call(instance, renderer);
             } finally {
                 Globals.transparentWmBgApplyMapFrameBlend = false;
+                Globals.transparentWmBgApplyMapFrameDepthState = false;
             }
         } else {
             original.call(instance, renderer);
+        }
+    }
+
+    @WrapOperation(method = "extractRenderState", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/map/element/MapElementRenderHandler;render(Lxaero/map/gui/GuiMap;Lxaero/lib/client/graphics/XaeroBufferProvider;Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;DDIIDDDDDFZLxaero/map/element/HoveredMapElementHolder;Lnet/minecraft/client/Minecraft;F)Lxaero/map/element/HoveredMapElementHolder;",
+        ordinal = 0
+    ))
+    public HoveredMapElementHolder transparentBgConfigMainFBORender(final MapElementRenderHandler instance, final GuiMap mapScreen, final XaeroBufferProvider xaeroBufferProvider, final MultiTextureRenderTypeRendererProvider rendererProvider, final double cameraX, final double cameraZ, final int width, final int height, final double screenSizeBasedScale, final double scale, final double playerDimDiv, final double mouseX, final double mouseZ, final float brightness, final boolean cave, final HoveredMapElementHolder oldHovered, final Minecraft mc, final float partialTicks, final Operation<HoveredMapElementHolder> original) {
+        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
+            Globals.transparentWmBgApplyMapFrameDepthState = true;
+            try {
+                return original.call(instance, mapScreen, xaeroBufferProvider, rendererProvider, cameraX, cameraZ, width, height, screenSizeBasedScale, scale, playerDimDiv, mouseX, mouseZ, brightness, cave, oldHovered, mc, partialTicks);
+            } finally {
+                Globals.transparentWmBgApplyMapFrameDepthState = false;
+            }
+        } else {
+            return original.call(instance, mapScreen, xaeroBufferProvider, rendererProvider, cameraX, cameraZ, width, height, screenSizeBasedScale, scale, playerDimDiv, mouseX, mouseZ, brightness, cave, oldHovered, mc, partialTicks);
+        }
+    }
+
+    @WrapOperation(method = "extractRenderState", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/lib/client/graphics/XaeroBufferProvider;endBatch()V",
+        ordinal = 0
+    ), slice = @Slice(
+        from = @At(
+            value = "FIELD",
+            opcode = Opcodes.GETSTATIC,
+            target = "Lxaero/map/common/config/option/WorldMapProfiledConfigOptions;ARROW:Lxaero/lib/common/config/option/BooleanConfigOption;"
+        )
+    ))
+    public void transparentBgDecorationsRender(final XaeroBufferProvider instance, final Operation<Void> original) {
+        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
+            Globals.transparentWmBgApplyMapFrameDepthState = true;
+            try {
+                original.call(instance);
+            } finally {
+                Globals.transparentWmBgApplyMapFrameDepthState = false;
+            }
+        } else {
+            original.call(instance);
         }
     }
 
@@ -1112,7 +1161,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true, remap = true)
     public void onInputPress(final KeyEvent event, final CallbackInfoReturnable<Boolean> cir) {
         if (event.key() == GLFW_KEY_F1) {
-            Minecraft.getInstance().options.hideGui = !Minecraft.getInstance().options.hideGui;
+            Minecraft.getInstance().gui.hud.toggle();
             cir.setReturnValue(true);
             return;
         }

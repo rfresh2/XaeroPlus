@@ -19,7 +19,7 @@ public class MixinHudMinimapRenderer {
         if (!original) return original;
 
         // awkward mixin, invert condition on screens we want to render minimap under
-        var screen = Minecraft.getInstance().screen;
+        var screen = Minecraft.getInstance().gui.screen();
         if (screen instanceof DrawOrderScreen) {
             return false;
         }

@@ -114,7 +114,7 @@ public class EnumSetting<T extends Enum<T>> extends XaeroPlusSetting {
             (v1, v2) -> {
                 setValue(v2);
                 SettingHooks.saveSettings();
-                Minecraft.getInstance().setScreen(Minecraft.getInstance().screen);
+                Minecraft.getInstance().gui.setScreen(Minecraft.getInstance().gui.screen());
             },
             this::isVisible
         );

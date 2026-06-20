@@ -55,6 +55,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
                     .setUncaughtExceptionHandler((t, e) -> {
                         XaeroPlus.LOGGER.error("Uncaught exception in {}", t.getName(), e);
                     })
+                    .setDaemon(true)
                     .build()));
     }
 
@@ -301,6 +302,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
                         .setUncaughtExceptionHandler((t, e) -> {
                             XaeroPlus.LOGGER.error("Uncaught exception handler in {}", t.getName(), e);
                         })
+                        .setDaemon(true)
                         .build()));
             this.database = new ChunkHighlightDatabase(worldId, databaseName);
             initializeDimensionCacheHandler(OVERWORLD);

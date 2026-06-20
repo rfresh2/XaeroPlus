@@ -161,7 +161,7 @@ public abstract class MixinGuiWaypoints extends ScreenBase {
         WaypointsSort sortType = this.displayedWorld.getRootConfig().getSortType();
         Iterable<Waypoint> waypointsList = this.displayedWorld.getCurrentWaypointSet().getWaypoints();
         GuiWaypoints.distanceDivided = this.session.getDimensionHelper().getDimensionDivision(this.displayedWorld);
-        Camera camera = this.minecraft.gameRenderer.getMainCamera();
+        Camera camera = this.minecraft.gameRenderer.mainCamera();
 
         final List<Waypoint> disabledWaypoints = new ArrayList<>();
         final List<Waypoint> enabledWaypoints = new ArrayList<>();

@@ -1,13 +1,14 @@
 package xaeroplus.feature.render.highlight;
 
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.buffers.Std140Builder;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import net.minecraft.client.Minecraft;
 import org.joml.Matrix4f;
@@ -18,7 +19,7 @@ import xaeroplus.feature.render.shaders.XaeroPlusShaders;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.ColorHelper;
 
-import java.util.OptionalInt;
+import java.util.Optional;
 
 public class HighlightVertexBuffer extends AbstractHighlightVertexBuffer {
     @Override
@@ -35,25 +36,26 @@ public class HighlightVertexBuffer extends AbstractHighlightVertexBuffer {
             close();
             return;
         }
-        var bufferBuilder = Tesselator.getInstance()
-            .begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
-        for (var it = highlights.keySet().iterator(); it.hasNext(); ) {
-            var highlight = it.nextLong();
-            var chunkPosX = ChunkUtils.longToChunkX(highlight);
-            var chunkPosZ = ChunkUtils.longToChunkZ(highlight);
-            float x1 = chunkPosX;
-            float x2 = chunkPosX + 1;
-            float y1 = flipped ? chunkPosZ + 1 : chunkPosZ;
-            float y2 = flipped ? chunkPosZ : chunkPosZ + 1;
-            bufferBuilder.addVertex(x1, y2, 0.0F);
-            bufferBuilder.addVertex(x2, y2, 0.0F);
-            bufferBuilder.addVertex(x2, y1, 0.0F);
-            bufferBuilder.addVertex(x1, y1, 0.0F);
-        }
-        try (var meshData = bufferBuilder.buildOrThrow()) {
-            close();
-            vertexBuffer = RenderSystem.getDevice().createBuffer(() -> "Chunk Highlight Buffer", GpuBuffer.USAGE_VERTEX, meshData.vertexBuffer());
-            indexCount = meshData.drawState().indexCount();
+        try (var byteBuffer = new ByteBufferBuilder(128)) {
+            var bufferBuilder = new BufferBuilder(byteBuffer, PrimitiveTopology.QUADS, DefaultVertexFormat.POSITION);
+            for (var it = highlights.keySet().iterator(); it.hasNext(); ) {
+                var highlight = it.nextLong();
+                var chunkPosX = ChunkUtils.longToChunkX(highlight);
+                var chunkPosZ = ChunkUtils.longToChunkZ(highlight);
+                float x1 = chunkPosX;
+                float x2 = chunkPosX + 1;
+                float y1 = flipped ? chunkPosZ + 1 : chunkPosZ;
+                float y2 = flipped ? chunkPosZ : chunkPosZ + 1;
+                bufferBuilder.addVertex(x1, y2, 0.0F);
+                bufferBuilder.addVertex(x2, y2, 0.0F);
+                bufferBuilder.addVertex(x2, y1, 0.0F);
+                bufferBuilder.addVertex(x1, y1, 0.0F);
+            }
+            try (var meshData = bufferBuilder.buildOrThrow()) {
+                close();
+                vertexBuffer = RenderSystem.getDevice().createBuffer(() -> "Chunk Highlight Buffer", GpuBuffer.USAGE_VERTEX, meshData.vertexBuffer());
+                indexCount = meshData.drawState().indexCount();
+            }
         }
     }
 
@@ -65,26 +67,26 @@ public class HighlightVertexBuffer extends AbstractHighlightVertexBuffer {
         var g = ColorHelper.getG(color);
         var b = ColorHelper.getB(color);
         uniformBuffer.rotate();
-        try (var mappedView = RenderSystem.getDevice().createCommandEncoder().mapBuffer(uniformBuffer.currentBuffer(), false, true)) {
+        try (var mappedView = uniformBuffer.currentBuffer().map(false, true)) {
             Std140Builder.intoBuffer(mappedView.data())
                 .putMat4f(ctx.matrixStack().last().pose())
                 .putVec4(new Vector4f(r, g, b, a));
         }
         GpuBufferSlice dynamic = RenderSystem.getDynamicUniforms()
             // only need ModelViewMat
-            .writeTransform(RenderSystem.getModelViewMatrix(), new Vector4f(), new Vector3f(), new Matrix4f());
-        var autoIndexBuffer = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
+            .writeTransform(RenderSystem.getModelViewStack(), new Vector4f(), new Vector3f(), new Matrix4f());
+        var autoIndexBuffer = RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS);
         var indexType = autoIndexBuffer.type();
         var indexBuffer = autoIndexBuffer.getBuffer(indexCount);
         try (final RenderPass pass = RenderSystem.getDevice().createCommandEncoder()
-            .createRenderPass(() -> "XaeroPlus Highlight Vertex Buffer", Minecraft.getInstance().getMainRenderTarget().getColorTextureView(), OptionalInt.empty())) {
+            .createRenderPass(() -> "XaeroPlus Highlight Vertex Buffer", Minecraft.getInstance().gameRenderer.mainRenderTarget().getColorTextureView(), Optional.empty())) {
             pass.setPipeline(XaeroPlusShaders.HIGHLIGHT_PIPELINE);
             RenderSystem.bindDefaultUniforms(pass); // Projection
             pass.setUniform("DynamicTransforms", dynamic);
             pass.setUniform("HighlightTransforms", uniformBuffer.currentBuffer());
             pass.setIndexBuffer(indexBuffer, indexType);
-            pass.setVertexBuffer(0, vertexBuffer);
-            pass.drawIndexed(0, 0, indexCount, 1);
+            pass.setVertexBuffer(0, vertexBuffer.slice());
+            pass.drawIndexed(indexCount, 1, 0, 0, 0);
         }
     }
 }

@@ -3,6 +3,7 @@ package xaeroplus.feature.render.text;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.util.Mth;
+import xaero.lib.client.graphics.font.util.FontUtils;
 import xaeroplus.Globals;
 import xaeroplus.feature.render.DrawContext;
 import xaeroplus.feature.render.DrawFeature;
@@ -36,17 +37,15 @@ public abstract class AbstractTextDrawFeature implements DrawFeature {
                 -font.lineHeight / 2.0f,
                 0
             );
-            font.drawInBatch(
+            FontUtils.drawText(
+                font,
+                ctx.matrixStack(),
                 text.value(),
-                0,
-                0,
+                0, 0,
                 text.color(),
                 true,
-                ctx.matrixStack().last().pose(),
-                ctx.renderTypeBuffers(),
                 Font.DisplayMode.NORMAL,
-                0,
-                15728880
+                ctx.renderTypeBuffers()
             );
             ctx.matrixStack().popPose();
         }

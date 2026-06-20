@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -47,13 +48,13 @@ public abstract class MixinSupportXaeroWorldmap {
     @Inject(method = "renderChunks", at = @At("HEAD"), remap = false)
     public void setupTransparentMMBgBuffer(
         final CallbackInfo ci,
-        @Share("bgTesselator") LocalRef<Tesselator> bgTesselatorRef,
+        @Share("bgByteBufferBuilder") LocalRef<ByteBufferBuilder> bgByteBufferBuilder,
         @Share("bgBufferBuilder") LocalRef<BufferBuilder> bgBufferBuilderRef
     ) {
         if (Settings.REGISTRY.transparentMinimapBackground.get()) {
-            var bgTesselator = Tesselator.getInstance();
-            bgTesselatorRef.set(bgTesselator);
-            var bgBufferBuilder = bgTesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+            var byteBufferBuilder = new ByteBufferBuilder(256);
+            bgByteBufferBuilder.set(byteBufferBuilder);
+            var bgBufferBuilder = new BufferBuilder(byteBufferBuilder, PrimitiveTopology.QUADS, DefaultVertexFormat.POSITION_COLOR);
             bgBufferBuilderRef.set(bgBufferBuilder);
         }
     }
@@ -90,11 +91,17 @@ public abstract class MixinSupportXaeroWorldmap {
     @Inject(method = "renderChunks", at = @At("RETURN"), remap = false)
     public void drawTransparentMMBackground(
         final CallbackInfo ci,
+        @Share("bgByteBufferBuilder") LocalRef<ByteBufferBuilder> bgByteBufferBuilder,
         @Share("bgBufferBuilder") LocalRef<BufferBuilder> bgBufferBuilderRef
     ) {
         if (Settings.REGISTRY.transparentMinimapBackground.get()) {
-            var meshData = bgBufferBuilderRef.get().build();
-            if (meshData != null) ImmediateRenderUtil.drawImmediateMeshData(meshData, RenderPipelines.GUI, ImmediateRenderUtil.NO_TEXTURES);
+            try (var _ = bgByteBufferBuilder.get();
+                 var meshData = bgBufferBuilderRef.get().build()
+            ) {
+                if (meshData != null) {
+                    ImmediateRenderUtil.drawImmediateMeshData(meshData, RenderPipelines.GUI, ImmediateRenderUtil.NO_TEXTURES);
+                }
+            }
         }
     }
 

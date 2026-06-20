@@ -41,7 +41,7 @@ public class DrawOrderScreen extends Screen {
             Button.builder(Component.translatable("gui.done"),
                 b -> {
                     this.onClose();
-                    mc.setScreen(parent);
+                    mc.gui.setScreen(parent);
                 })
                 .bounds(this.width / 2 - 100, this.height - 34, 200, 20)
                 .build()

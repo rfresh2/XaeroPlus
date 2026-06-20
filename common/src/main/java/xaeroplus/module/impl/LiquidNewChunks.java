@@ -26,7 +26,6 @@ import xaeroplus.util.ColorHelper;
 
 import java.time.Duration;
 
-import static xaeroplus.util.ChunkUtils.getActualDimension;
 import static xaeroplus.util.ColorHelper.getColor;
 
 public class LiquidNewChunks extends Module {
@@ -76,8 +75,9 @@ public class LiquidNewChunks extends Module {
         if (!state.getFluidState().isEmpty() && !state.getFluidState().isSource()) {
             int chunkX = ChunkUtils.posToChunkPos(pos.getX());
             int chunkZ = ChunkUtils.posToChunkPos(pos.getZ());
-            if (inverseNewChunksCache.get().isHighlighted(chunkX, chunkZ, ChunkUtils.getActualDimension())) return;
-            if (newChunksCache.get().isHighlighted(chunkX, chunkZ, getActualDimension())) return;
+            var dim = level.dimension();
+            if (inverseNewChunksCache.get().isHighlighted(chunkX, chunkZ, dim)) return;
+            if (newChunksCache.get().isHighlighted(chunkX, chunkZ, dim)) return;
             final int srcX = pos.getX();
             final int srcY = pos.getY();
             if (Settings.REGISTRY.liquidNewChunksOnlyAboveY0Setting.get() && srcY <= 0) return;
@@ -87,7 +87,7 @@ public class LiquidNewChunks extends Module {
                 final Direction dir = searchDirs[i];
                 bp.set(srcX + dir.getStepX(), srcY + dir.getStepY(), srcZ + dir.getStepZ());
                 if (level.getBlockState(bp).getFluidState().isSource()) {
-                    newChunksCache.get().addHighlight(chunkX, chunkZ);
+                    newChunksCache.get().addHighlight(chunkX, chunkZ, dim);
                     return;
                 }
             }
@@ -99,6 +99,7 @@ public class LiquidNewChunks extends Module {
         var level = mc.level;
         if (level == null || mc.levelRenderer.viewArea == null) return;
         var chunk = event.chunk();
+        var dim = chunk.getLevel().dimension();
         var chunkPos = chunk.getPos();
         long chunkLong = ChunkUtils.chunkPosToLong(chunkPos);
 
@@ -107,8 +108,8 @@ public class LiquidNewChunks extends Module {
         // or the player could have travelled back into chunks we just saw
         if (seenChunksCache.getIfPresent(chunkLong) != null) return;
         seenChunksCache.put(chunkLong, Byte.MAX_VALUE);
-        if (newChunksCache.get().isHighlighted(chunkPos.x(), chunkPos.z(), getActualDimension())) return;
-        if (inverseNewChunksCache.get().isHighlighted(chunkPos.x(), chunkPos.z(), getActualDimension())) return;
+        if (newChunksCache.get().isHighlighted(chunkPos.x(), chunkPos.z(), dim)) return;
+        if (inverseNewChunksCache.get().isHighlighted(chunkPos.x(), chunkPos.z(), dim)) return;
 
         ChunkScanner.chunkScanBlockstatePredicate(chunk, liquidBlockTypeFilter, (c, state, relX, y, relZ) -> {
             int x = ChunkUtils.chunkCoordToCoord(c.getPos().x()) + relX;
@@ -117,7 +118,7 @@ public class LiquidNewChunks extends Module {
             var fluid = state.getFluidState();
             if (!fluid.isEmpty() && !fluid.isSource()) {
                 if (fluid.getAmount() < 2) {
-                    inverseNewChunksCache.get().addHighlight(c.getPos().x(), chunk.getPos().z());
+                    inverseNewChunksCache.get().addHighlight(c.getPos().x(), chunk.getPos().z(), dim);
                     return true;
                 }
                 boolean foundColumn = true;
@@ -129,7 +130,7 @@ public class LiquidNewChunks extends Module {
                     }
                 }
                 if (foundColumn) {
-                    inverseNewChunksCache.get().addHighlight(c.getPos().x(), c.getPos().z());
+                    inverseNewChunksCache.get().addHighlight(c.getPos().x(), c.getPos().z(), dim);
                     return true;
                 }
             }

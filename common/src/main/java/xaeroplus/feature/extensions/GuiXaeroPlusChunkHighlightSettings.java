@@ -4,6 +4,8 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import xaero.lib.client.gui.GuiSettings;
+import xaero.lib.client.gui.ScreenBase;
+import xaero.lib.client.gui.ScreenBase;
 import xaero.map.gui.ScreenSwitchSettingEntry;
 import xaeroplus.settings.SettingLocation;
 import xaeroplus.settings.Settings;
@@ -17,7 +19,9 @@ public class GuiXaeroPlusChunkHighlightSettings extends GuiSettings {
 
     @Override
     public void extractBackground(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
-        this.renderEscapeScreen(guiGraphics, 0, 0, f);
+        if (this.escape instanceof ScreenBase) {
+            this.renderEscapeScreen(guiGraphics, 0, 0, f);
+        }
         super.extractBackground(guiGraphics, i, j, f);
     }
 

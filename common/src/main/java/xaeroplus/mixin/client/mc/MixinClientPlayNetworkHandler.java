@@ -8,10 +8,7 @@ import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
-import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
-import net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket;
+import net.minecraft.network.protocol.game.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import org.spongepowered.asm.mixin.Mixin;
@@ -89,5 +86,12 @@ public class MixinClientPlayNetworkHandler {
     @Inject(method = "handleMovePlayer", at = @At("RETURN"))
     public void onTeleport(CallbackInfo ci) {
         XaeroPlus.EVENT_BUS.call(ClientTeleportEvent.INSTANCE);
+    }
+
+    @Inject(method = "handleGameEvent", at = @At("RETURN"))
+    private void onGameEvent(ClientboundGameEventPacket packet, CallbackInfo ci) {
+        if (packet.getEvent() == ClientboundGameEventPacket.NO_RESPAWN_BLOCK_AVAILABLE) {
+            XaeroPlus.EVENT_BUS.call(RespawnObstructedEvent.INSTANCE);
+        }
     }
 }

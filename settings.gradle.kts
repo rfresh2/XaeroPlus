@@ -32,7 +32,7 @@ dependencyResolutionManagement {
 			library("neoforge", "net.neoforged:neoforge:$minecraft_version.71")
             library("worldmap-fabric", "maven.modrinth:xaeros-world-map:fabric-$minecraft_version-${worldmap_version_fabric}")
             library("worldmap-forge", "maven.modrinth:xaeros-world-map:forge-$minecraft_version-${worldmap_version_forge}")
-            library("worldmap-neo", "maven.modrinth:xaeros-world-map:neoforge-$minecraft_version-${worldmap_version_neo}")
+			library("worldmap-neo", "maven.modrinth:xaeros-world-map:neoforge-$minecraft_version-${worldmap_version_neo}")
             library("minimap-fabric", "maven.modrinth:xaeros-minimap:fabric-$minecraft_version-${minimap_version_fabric}")
             library("minimap-forge", "maven.modrinth:xaeros-minimap:forge-$minecraft_version-${minimap_version_forge}")
             library("minimap-neo", "maven.modrinth:xaeros-minimap:neoforge-$minecraft_version-${minimap_version_neo}")

@@ -17,7 +17,6 @@
     "MixinBlockStateShortShapeCache",
     "MixinBuiltInInfoDisplays",
     "MixinClientEvents",
-    "MixinClientPacketListener",
     "MixinCommonInternet",
     "MixinCrashHandler",
     "MixinDimensionHighlighterHandler",

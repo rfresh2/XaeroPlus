@@ -227,14 +227,10 @@ public class SpawnPoint extends Module {
         private static final Map<String, ResourceKey<Level>> DIMENSION_CACHE = new ConcurrentHashMap<>();
 
         public ResourceKey<Level> dimension() {
-            ResourceKey<Level> cached = DIMENSION_CACHE.get(dimensionKey);
-            if (cached != null) return cached;
-            ResourceKey<Level> parsed = parseDimension(dimensionKey);
-            if (parsed != null) DIMENSION_CACHE.put(dimensionKey, parsed);
-            return parsed;
+            return DIMENSION_CACHE.computeIfAbsent(dimensionKey, s -> parseDimension(dimensionKey));
         }
 
-        public static ResourceKey<Level> parseDimension(String key) {
+        private ResourceKey<Level> parseDimension(String key) {
             if (key == null) return null;
             ResourceLocation location = ResourceLocation.tryParse(key);
             if (location == null) return null;

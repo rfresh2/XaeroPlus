@@ -4,14 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import net.lenni0451.lambdaevents.EventHandler;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.RespawnAnchorBlock;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.module.MinimapSession;
@@ -22,6 +18,7 @@ import xaero.map.WorldMap;
 import xaero.map.core.XaeroWorldMapCore;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.ClientTickEvent;
+import xaeroplus.event.RespawnObstructedEvent;
 import xaeroplus.event.RespawnPointSetEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.feature.extensions.SyncedWaypoint;
@@ -49,14 +46,10 @@ public class SpawnPoint extends Module {
     private WeakReference<Waypoint> wpRef = nullRef;
     private WeakReference<WaypointSet> wpSetRef = nullRef;
     private SpawnPosition wpSpawnPoint = null;
-    private boolean wasDead = false;
-    private int respawnCheckDelay = 0;
-    private long respawnPointSetTimestamp = 0;
 
     @Override
     public void onEnable() {
         if (mc.level == null) return;
-        this.wasDead = false;
         this.respawnPoints.clear();
         loadRespawnPoints();
     }
@@ -78,24 +71,31 @@ public class SpawnPoint extends Module {
                 ChunkUtils.getActualDimension().location().toString(),
                 event.pos().getX(),
                 event.pos().getY(),
-                event.pos().getZ()));
-                respawnPointSetTimestamp = System.currentTimeMillis() + 3000;
+                event.pos().getZ())
+        );
         saveRespawnPointsAsync();
+    }
+
+    @EventHandler
+    public void onRespawnObstructed(RespawnObstructedEvent event) {
+        var con = mc.getConnection();
+        if (con == null) return;
+        UUID uuid = con.getLocalGameProfile().getId();
+        if (respawnPoints.containsKey(uuid)) {
+            removeSpawnPoint(uuid);
+            XaeroPlus.LOGGER.info("[SpawnPoint] Respawn obstructed or bed/anchor missing. Waypoint removed.");
+        }
     }
 
     @EventHandler
     public void onXaeroWorldChange(XaeroWorldChangeEvent event) {
         switch (event.worldChangeType()) {
             case EXIT_WORLD -> {
-                this.respawnPointSetTimestamp = 0;
-                this.wasDead = false;
                 saveRespawnPoints();
                 clearWpAndState();
                 this.respawnPoints.clear();
             }
             case ENTER_WORLD -> {
-                this.respawnPointSetTimestamp = 0;
-                this.wasDead = false;
                 clearWpAndState();
                 this.respawnPoints.clear();
                 loadRespawnPoints();
@@ -117,29 +117,6 @@ public class SpawnPoint extends Module {
             return;
         }
 
-        var player = mc.player;
-        if (player == null) return;
-        boolean isAlive = !player.isDeadOrDying();
-
-        if (isAlive) {
-            if (checkAndRemoveIfInvalid(uuid, spawnPoint)) return;
-            if (wasDead) respawnCheckDelay = 5;
-        }
-
-        wasDead = !isAlive;
-        if (respawnCheckDelay > 0) {
-            respawnCheckDelay--;
-            if (respawnCheckDelay == 0) {
-                if (isAlive && respawnPoints.containsKey(uuid)) {
-                    if (!isValidSpawnPosition(player.blockPosition(), spawnPoint)) {
-                        removeSpawnPoint(uuid);
-                        XaeroPlus.LOGGER.info("[SpawnPoint] Respawn obstructed. Waypoint removed");
-                        return;
-                    }
-                }
-            }
-        }
-
         var spawnPointDimension = spawnPoint.dimension();
         if (spawnPointDimension == null) {
             clearWpAndState();
@@ -148,8 +125,11 @@ public class SpawnPoint extends Module {
         if (Settings.REGISTRY.owAutoWaypointDimension.get() && spawnPointDimension == NETHER) {
             spawnPointDimension = OVERWORLD;
             spawnPoint = new SpawnPosition(
-                OVERWORLD.location().toString(),
-                spawnPoint.x() * 8, spawnPoint.y(), spawnPoint.z() * 8);
+                    OVERWORLD.location().toString(),
+                    spawnPoint.x() * 8,
+                    spawnPoint.y(),
+                    spawnPoint.z() * 8
+            );
         }
         var minimapWorld = WaypointAPI.getMinimapWorld(spawnPointDimension);
         if (minimapWorld == null) {
@@ -161,13 +141,12 @@ public class SpawnPoint extends Module {
         if (!isWaypointStateValid(spawnPoint)) {
             clearWpAndState();
             wpSetRef = new WeakReference<>(waypointSet);
-            Waypoint wp = SyncedWaypoint.create(
-                spawnPoint.x(),
-                spawnPoint.y(),
-                spawnPoint.z(),
-                "Spawn Point",
-                "SP",
-                WaypointColor.AQUA
+            Waypoint wp = SyncedWaypoint.create(spawnPoint.x(),
+                    spawnPoint.y(),
+                    spawnPoint.z(),
+                    "Spawn Point",
+                    "SP",
+                    WaypointColor.AQUA
             );
             waypointSet.add(wp);
             wpRef = new WeakReference<>(wp);
@@ -177,7 +156,9 @@ public class SpawnPoint extends Module {
     }
 
     private synchronized void clearWpAndState() {
-        removeWaypointFromSet();
+        WaypointSet set = wpSetRef.get();
+        Waypoint wp = wpRef.get();
+        if (set != null && wp != null) set.remove(wp);
         wpRef = nullRef;
         wpSetRef = nullRef;
         wpSpawnPoint = null;
@@ -189,75 +170,10 @@ public class SpawnPoint extends Module {
         saveRespawnPointsAsync();
     }
 
-    private boolean isValidSpawnPosition(BlockPos playerPos, SpawnPosition spawnPoint) {
-        int px = playerPos.getX(), py = playerPos.getY(), pz = playerPos.getZ();
-        int cx = spawnPoint.x(), cy = spawnPoint.y(), cz = spawnPoint.z();
-        if (spawnPoint.dimension() == NETHER)
-            return Math.abs(px - cx) <= 1 && (py == cy || py == cy + 1) && Math.abs(pz - cz) <= 1;
-
-        var level = mc.player.clientLevel;
-        BlockPos headPos = new BlockPos(cx, cy, cz);
-        if (level.isLoaded(headPos)) {
-            var headState = level.getBlockState(headPos);
-            if (headState.is(BlockTags.BEDS)) {
-                var facing = headState.getValue(net.minecraft.world.level.block.BedBlock.FACING);
-                BlockPos footPos = headPos.relative(facing.getOpposite());
-                if (isAdjacentToBed(playerPos, headPos) || isAdjacentToBed(playerPos, footPos)) {
-                    return true;
-                }
-            }
-        }
-
-        return px == cx && py == cy && pz == cz
-                || px == cx + 1 && py == cy && pz == cz
-                || px == cx - 1 && py == cy && pz == cz
-                || px == cx && py == cy && pz == cz + 1
-                || px == cx && py == cy && pz == cz - 1;
-    }
-
-    private boolean isAdjacentToBed(BlockPos playerPos, BlockPos bedPos) {
-        if (playerPos.getY() != bedPos.getY()) return false;
-        int dx = playerPos.getX() - bedPos.getX();
-        int dz = playerPos.getZ() - bedPos.getZ();
-        return (Math.abs(dx) == 1 && dz == 0) || (Math.abs(dz) == 1 && dx == 0) || playerPos.equals(bedPos);
-    }
-
-    private boolean checkAndRemoveIfInvalid(UUID uuid, SpawnPosition spawnPoint) {
-        if (System.currentTimeMillis() < respawnPointSetTimestamp) return false;
-        var player = mc.player;
-        if (player == null) return false;
-        var level = player.clientLevel;
-        ResourceKey<Level> currentDim = level.dimension();
-        if (!currentDim.equals(spawnPoint.dimension())) return false;
-        BlockPos center = new BlockPos(spawnPoint.x(), spawnPoint.y(), spawnPoint.z());
-        if (!level.isLoaded(center)) return false;
-        var state = level.getBlockState(center);
-        boolean isValid;
-        if (spawnPoint.dimension() == NETHER) {
-            isValid = state.is(Blocks.RESPAWN_ANCHOR) && state.getValue(RespawnAnchorBlock.CHARGE) > 0;
-        } else {
-            isValid = state.is(BlockTags.BEDS);
-        }
-        if (!isValid) {
-            removeSpawnPoint(uuid);
-            XaeroPlus.LOGGER.info("[SpawnPoint] Bed/Anchor destroyed. Waypoint removed");
-            return true;
-        }
-        return false;
-    }
-
-    private synchronized void removeWaypointFromSet() {
-        WaypointSet set = wpSetRef.get();
-        Waypoint wp = wpRef.get();
-        if (set != null && wp != null) set.remove(wp);
-    }
-
     private boolean isWaypointStateValid(SpawnPosition spawnPoint) {
         Waypoint wp = wpRef.get();
         WaypointSet set = wpSetRef.get();
-        boolean spawnUnchanged = Objects.equals(wpSpawnPoint, spawnPoint);
-        boolean stateExists = wp != null && set != null;
-        return spawnUnchanged && stateExists;
+        return Objects.equals(wpSpawnPoint, spawnPoint) && wp != null && set != null;
     }
 
     private File getSaveFile() {
@@ -274,12 +190,7 @@ public class SpawnPoint extends Module {
     public synchronized void loadRespawnPoints() {
         try {
             var saveFile = getSaveFile();
-            if (saveFile == null) {
-                return;
-            }
-            if (!saveFile.exists()) {
-                return;
-            }
+            if (saveFile == null || !saveFile.exists()) return;
             try (var reader = Files.newBufferedReader(saveFile.toPath())) {
                 Map<UUID, SpawnPosition> map = gson.fromJson(reader, new TypeToken<Map<UUID, SpawnPosition>>() {}.getType());
                 if (map != null) {

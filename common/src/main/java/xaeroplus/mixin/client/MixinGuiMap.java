@@ -366,9 +366,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         ordinal = 0,
         shift = At.Shift.AFTER
     ), remap = true)
-    public void toggleRadarWhileDimensionSwitched(final CallbackInfo ci, @Local(name = "currentFutureDim") MapDimension currentFutureDim) {
-        if (!Settings.REGISTRY.radarWhileDimensionSwitchedSetting.get()) {
-            trySettingCurrentProfileOption(WorldMapProfiledConfigOptions.MINIMAP_RADAR, currentFutureDim.getDimId() == ChunkUtils.getActualDimension());
+    public void toggleRadarWhileDimensionSwitched(final CallbackInfo ci, @Local(name = "futureDimension") MapDimension futureDimension) {
+        if (!Settings.REGISTRY.radarWhileDimensionSwitchedSetting.get() && futureDimension != null) {
+            trySettingCurrentProfileOption(WorldMapProfiledConfigOptions.MINIMAP_RADAR, futureDimension.getDimId() == ChunkUtils.getActualDimension());
         }
     }
 

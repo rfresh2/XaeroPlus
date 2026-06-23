@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import net.lenni0451.lambdaevents.EventHandler;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -14,12 +13,12 @@ import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.waypoint.WaypointColor;
 import xaero.hud.minimap.waypoint.set.WaypointSet;
-import xaero.hud.minimap.world.MinimapWorld;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMap;
 import xaero.map.core.XaeroWorldMapCore;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.ClientTickEvent;
+import xaeroplus.event.RespawnObstructedEvent;
 import xaeroplus.event.RespawnPointSetEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.feature.extensions.SyncedWaypoint;
@@ -69,10 +68,23 @@ public class SpawnPoint extends Module {
         if (con == null) return;
         UUID activeUUID = con.getLocalGameProfile().id();
         respawnPoints.put(activeUUID, new SpawnPosition(
-            ChunkUtils.getActualDimension().identifier().toString(),
-            event.pos().getX(), event.pos().getY(), event.pos().getZ()
-        ));
+                ChunkUtils.getActualDimension().identifier().toString(),
+                event.pos().getX(),
+                event.pos().getY(),
+                event.pos().getZ())
+        );
         saveRespawnPointsAsync();
+    }
+
+    @EventHandler
+    public void onRespawnObstructed(RespawnObstructedEvent event) {
+        var con = mc.getConnection();
+        if (con == null) return;
+        UUID uuid = con.getLocalGameProfile().id();
+        if (respawnPoints.containsKey(uuid)) {
+            removeSpawnPoint(uuid);
+            XaeroPlus.LOGGER.info("[SpawnPoint] Respawn obstructed or bed/anchor missing. Waypoint removed.");
+        }
     }
 
     @EventHandler
@@ -95,8 +107,7 @@ public class SpawnPoint extends Module {
     public void onClientTick(ClientTickEvent.Post event) {
         MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
         if (minimapSession == null) return;
-        MinimapWorld currentWorld = minimapSession.getWorldManager().getCurrentWorld();
-        if (currentWorld == null) return;
+        if (minimapSession.getWorldManager().getCurrentWorld() == null) return;
         var con = mc.getConnection();
         if (con == null) return;
         var uuid = con.getLocalGameProfile().id();
@@ -106,7 +117,6 @@ public class SpawnPoint extends Module {
             return;
         }
 
-
         var spawnPointDimension = spawnPoint.dimension();
         if (spawnPointDimension == null) {
             clearWpAndState();
@@ -115,8 +125,10 @@ public class SpawnPoint extends Module {
         if (Settings.REGISTRY.owAutoWaypointDimension.get() && spawnPointDimension == NETHER) {
             spawnPointDimension = OVERWORLD;
             spawnPoint = new SpawnPosition(
-                OVERWORLD.identifier().toString(),
-                spawnPoint.x() * 8, spawnPoint.y(), spawnPoint.z() * 8
+                    OVERWORLD.identifier().toString(),
+                    spawnPoint.x() * 8,
+                    spawnPoint.y(),
+                    spawnPoint.z() * 8
             );
         }
         var minimapWorld = WaypointAPI.getMinimapWorld(spawnPointDimension);
@@ -126,16 +138,15 @@ public class SpawnPoint extends Module {
         }
         WaypointSet waypointSet = WaypointAPI.getOrCreateWaypointSetInWorld(minimapWorld, "gui.xaero_default");
 
-        if (!Objects.equals(wpSpawnPoint, spawnPoint) || wpSetRef.get() == null || wpRef.get() == null) {
+        if (!isWaypointStateValid(spawnPoint)) {
             clearWpAndState();
             wpSetRef = new WeakReference<>(waypointSet);
-            Waypoint wp = SyncedWaypoint.create(
-                spawnPoint.x(),
-                spawnPoint.y(),
-                spawnPoint.z(),
-                "Spawn Point",
-                "SP",
-                WaypointColor.AQUA
+            Waypoint wp = SyncedWaypoint.create(spawnPoint.x(),
+                    spawnPoint.y(),
+                    spawnPoint.z(),
+                    "Spawn Point",
+                    "SP",
+                    WaypointColor.AQUA
             );
             waypointSet.add(wp);
             wpRef = new WeakReference<>(wp);
@@ -145,10 +156,24 @@ public class SpawnPoint extends Module {
     }
 
     private synchronized void clearWpAndState() {
-        if (wpRef.get() != null && wpSetRef.get() != null) wpSetRef.get().remove(this.wpRef.get());
+        WaypointSet set = wpSetRef.get();
+        Waypoint wp = wpRef.get();
+        if (set != null && wp != null) set.remove(wp);
         wpRef = nullRef;
         wpSetRef = nullRef;
         wpSpawnPoint = null;
+    }
+
+    private void removeSpawnPoint(UUID uuid) {
+        respawnPoints.remove(uuid);
+        clearWpAndState();
+        saveRespawnPointsAsync();
+    }
+
+    private boolean isWaypointStateValid(SpawnPosition spawnPoint) {
+        Waypoint wp = wpRef.get();
+        WaypointSet set = wpSetRef.get();
+        return Objects.equals(wpSpawnPoint, spawnPoint) && wp != null && set != null;
     }
 
     private File getSaveFile() {
@@ -159,21 +184,13 @@ public class SpawnPoint extends Module {
         final String worldId = mapProcessor.getCurrentWorldId();
         if (worldId == null) return null;
         if (WorldMap.saveFolder == null) return null;
-        return WorldMap.saveFolder.toPath()
-            .resolve(worldId)
-            .resolve("xaeroplus-respawn-points.json")
-            .toFile();
+        return WorldMap.saveFolder.toPath().resolve(worldId).resolve("xaeroplus-respawn-points.json").toFile();
     }
 
     public synchronized void loadRespawnPoints() {
         try {
             var saveFile = getSaveFile();
-            if (saveFile == null) {
-                return;
-            }
-            if (!saveFile.exists()) {
-                return;
-            }
+            if (saveFile == null || !saveFile.exists()) return;
             try (var reader = Files.newBufferedReader(saveFile.toPath())) {
                 Map<UUID, SpawnPosition> map = gson.fromJson(reader, new TypeToken<Map<UUID, SpawnPosition>>() {}.getType());
                 if (map != null) {
@@ -207,31 +224,20 @@ public class SpawnPoint extends Module {
     }
 
     public record SpawnPosition(String dimensionKey, int x, int y, int z) {
-
-        public Identifier dimensionLocation() {
-            return Identifier.tryParse(dimensionKey);
-        }
+        private static final Map<String, ResourceKey<Level>> DIMENSION_CACHE = new ConcurrentHashMap<>();
 
         public ResourceKey<Level> dimension() {
-            var dimensionLocation = dimensionLocation();
-            if (dimensionLocation == null) return null;
-            var ow = OVERWORLD.identifier();
-            var nether = NETHER.identifier();
-            var end = END.identifier();
-            if (dimensionLocation.equals(ow)) {
-                return OVERWORLD;
-            } else if (dimensionLocation.equals(nether)) {
-                return NETHER;
-            } else if (dimensionLocation.equals(end)) {
-                return END;
-            }
-            var level = Minecraft.getInstance().level;
-            if (level != null) {
-                if (level.dimension().identifier().equals(dimensionLocation)) {
-                    return level.dimension();
-                }
-            }
-            return ResourceKey.create(Registries.DIMENSION, dimensionLocation);
+            return DIMENSION_CACHE.computeIfAbsent(dimensionKey, s -> parseDimension(dimensionKey));
+        }
+
+        private ResourceKey<Level> parseDimension(String key) {
+            if (key == null) return null;
+            var location = Identifier.tryParse(key);
+            if (location == null) return null;
+            if (location.equals(OVERWORLD.identifier())) return OVERWORLD;
+            if (location.equals(NETHER.identifier())) return NETHER;
+            if (location.equals(END.identifier())) return END;
+            return ResourceKey.create(Registries.DIMENSION, location);
         }
     }
 }

@@ -338,5 +338,7 @@
   "xaeroplus.setting.teleport_fail_notifier_delay.tooltip": "等待Xaero传送尝试的刻数",
   "xaeroplus.gui.teleport_fail_notifier.message": "看起来你的传送尝试失败了 :( \n 你可能没有使用 /tp 命令的服务器权限。 \n 请联系服务器管理员！",
   "xaeroplus.setting.disable_teleportation": "禁用传送",
-  "xaeroplus.setting.disable_teleportation.tooltip": "全局禁用传送按钮"
+  "xaeroplus.setting.disable_teleportation.tooltip": "全局禁用传送按钮",
+  "xaeroplus.gui.toast.database_migration_in_progress": "%s 个数据库迁移正在进行，%s 个已完成，%s 个失败",
+  "xaeroplus.gui.toast.database_migration_done": "%s 个数据库迁移已完成，%s 个失败"
 }

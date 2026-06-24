@@ -12,6 +12,7 @@ import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.db.DatabaseMigrator;
 import xaeroplus.feature.highlights.db.V0ToV1Migration;
+import xaeroplus.feature.highlights.db.V1ToV2Migration;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.Wait;
 
@@ -30,34 +31,83 @@ import static xaeroplus.util.ChunkUtils.regionCoordToChunkCoord;
 
 public class ChunkHighlightDatabase implements Closeable {
     public static final int MAX_HIGHLIGHTS_LIST = 25000;
+    private static final int DATABASE_VERSION = 2;
     private Connection connection;
     protected final String databaseName;
     protected final Path dbPath;
     private static final DatabaseMigrator MIGRATOR = new DatabaseMigrator(
         List.of(
-            new V0ToV1Migration()
+            new V0ToV1Migration(),
+            new V1ToV2Migration()
         )
     );
     boolean recoveryAttempted = false;
     private static final int MAX_RETRIES = 3;
+    private final boolean init;
 
     public ChunkHighlightDatabase(String worldId, String databaseName) {
         this.databaseName = databaseName;
         try {
-            // workaround for other mods that might have forced the JDBC drivers to be init
-            // before we are on the classpath
+            // workaround for other mods that might have forced the JDBC drivers to be init before we are on the classpath
             var jdbcClass = org.rfresh.sqlite.JDBC.class;
-
             dbPath = WorldMap.saveFolder.toPath().resolve(worldId).resolve(databaseName + ".db");
-            boolean init = !dbPath.toFile().exists();
+            init = !dbPath.toFile().exists();
             connection = DriverManager.getConnection("jdbc:rfresh_sqlite:" + dbPath);
             ((SQLiteConnection) connection).setBusyTimeout(5000);
-            MIGRATOR.migrate(dbPath, databaseName, connection, init);
-            createMetadataTable();
-            setPragmas();
         } catch (Exception e) {
             XaeroPlus.LOGGER.error("Error while creating chunk highlight database: {} for worldId: {}", databaseName, worldId, e);
             throw new RuntimeException(e);
+        }
+    }
+
+    void initializeDb() {
+        try {
+            connection = MIGRATOR.migrate(dbPath, databaseName, connection, init);
+            validateDbVersion();
+            setPragmas();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    int getDatabaseMetadataVersion() {
+        var version = DATABASE_VERSION;
+        try (var statement = connection.createStatement()) {
+            try (var rs = statement.executeQuery("select version from metadata where id = '0'")) {
+                rs.next();
+                version = rs.getInt("version");
+            }
+        } catch (Exception e) {
+            XaeroPlus.LOGGER.error("Error reading database version: {}", DATABASE_VERSION, e);
+        }
+        return version;
+    }
+
+    void validateDbVersion() {
+        var version = getDatabaseMetadataVersion();
+        if (version < DATABASE_VERSION) {
+            XaeroPlus.LOGGER.error("Database version mismatch: expected {} found {}", DATABASE_VERSION, version);
+            // we do want to throw an exception here
+            // but we can get into a state where this would cause us to get stuck otherwise
+            // sequence:
+            // 1. db init or migrated to DATABASE_VERSION
+            // 2. XP downgraded to a version below DATABASE_VERSION
+            // 3. XP upgraded back again
+            // will uncomment this at some point in the future after we can assume a large amount of users have updated and won't downgrade
+            // there's just no good solution to this at the moment, can't retroactively change previous XP versions
+//            throw new IllegalStateException("Database version mismatch: expected " + DATABASE_VERSION + ", found " + version);
+        }
+        if (version > DATABASE_VERSION) {
+            throw new IllegalStateException("Database version mismatch: expected " + DATABASE_VERSION + ", found " + version);
+        }
+        writeDbVersion();
+    }
+
+    void writeDbVersion() {
+        try (var statement = connection.createStatement()) {
+            statement.executeUpdate("INSERT OR REPLACE INTO metadata (id, version) VALUES ('0', " + DATABASE_VERSION + ")");
+        } catch (SQLException e) {
+            XaeroPlus.LOGGER.error("Error writing database version: {}", DATABASE_VERSION, e);
         }
     }
 
@@ -76,33 +126,6 @@ public class ChunkHighlightDatabase implements Closeable {
         } catch (SQLException e) {
             throw new RuntimeException("Failed to set sqlite pragmas", e);
         }
-    }
-
-    private void createMetadataTable() {
-        int tryCount = 0;
-        while (tryCount++ < MAX_RETRIES) {
-            if (createMetadataTable0()) {
-                return;
-            }
-            XaeroPlus.LOGGER.info("Retrying creation of metadata table in {} database (attempt {}/{})", databaseName, tryCount, 3);
-            Wait.waitMs(50);
-        }
-        throw new RuntimeException("Failed to create metadata table");
-    }
-
-    private boolean createMetadataTable0() {
-        try (var statement = connection.createStatement()) {
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS metadata (id INTEGER PRIMARY KEY, version INTEGER)");
-            statement.executeUpdate("INSERT OR REPLACE INTO metadata (id, version) VALUES (0, 1)");
-        } catch (SQLException e) {
-            XaeroPlus.LOGGER.error("Error creating metadata table for db: {}", databaseName, e);
-            if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
-                XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
-                recoverCorruptDatabase();
-            }
-            return false;
-        }
-        return true;
     }
 
     // this can take an extremely long time for large databases
@@ -182,8 +205,7 @@ public class ChunkHighlightDatabase implements Closeable {
 
     private boolean createHighlightsTableIfNotExists0(ResourceKey<Level> dimension) {
         try (var statement = connection.createStatement()) {
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS \"" + getTableName(dimension) + "\" (x INTEGER, z INTEGER, foundTime INTEGER)");
-            statement.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS \"unique_xz_" + getTableName(dimension) + "\" ON \"" + getTableName(dimension) + "\" (x, z)");
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS \"" + getTableName(dimension) + "\" (x INTEGER, z INTEGER, foundTime INTEGER, PRIMARY KEY (x, z)) WITHOUT ROWID");
         } catch (SQLException e) {
             XaeroPlus.LOGGER.error("Error creating highlights table for db: {} in dimension: {}", databaseName, dimension.location(), e);
             if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
@@ -218,7 +240,7 @@ public class ChunkHighlightDatabase implements Closeable {
             StringBuilder sb = new StringBuilder(50 * Math.min(batchSize, chunks.size()) + 75);
             while (it.hasNext()) {
                 sb.setLength(0);
-                sb.append("INSERT OR IGNORE INTO \"").append(getTableName(dimension)).append("\" VALUES ");
+                sb.append("INSERT OR IGNORE INTO \"").append(getTableName(dimension)).append("\" (x, z, foundTime) VALUES ");
                 boolean trailingComma = false;
                 for (int i = 0; i < batchSize && it.hasNext(); i++) {
                     var entry = it.next();
@@ -276,7 +298,7 @@ public class ChunkHighlightDatabase implements Closeable {
     ) {
         try (var statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery(
-                "SELECT * FROM \"" + getTableName(dimension) + "\" "
+                "SELECT x, z, foundTime FROM \"" + getTableName(dimension) + "\" "
                     + "WHERE x >= " + regionCoordToChunkCoord(regionXMin) + " AND x <= " + regionCoordToChunkCoord(regionXMax)
                     + " AND z >= " + regionCoordToChunkCoord(regionZMin) + " AND z <= " + regionCoordToChunkCoord(regionZMax))) {
                 while (resultSet.next()) {
@@ -335,7 +357,7 @@ public class ChunkHighlightDatabase implements Closeable {
         int prevZMax = regionCoordToChunkCoord(prevRegionZMax);
         try (var statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery(
-                "SELECT * FROM \"" + getTableName(dimension) + "\" " +
+                "SELECT x, z, foundTime FROM \"" + getTableName(dimension) + "\" " +
                     "WHERE x BETWEEN " + xMin + " AND " + xMax + " " +
                     "AND z BETWEEN " + zMin + " AND " + zMax + " " +
                     "AND NOT (x BETWEEN " + prevXMin + " AND " + prevXMax + " " +

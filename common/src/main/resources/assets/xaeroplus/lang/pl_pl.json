@@ -338,5 +338,7 @@
   "xaeroplus.setting.teleport_fail_notifier_delay.tooltip": "Liczba ticków oczekiwania na próbę teleportu Xaero",
   "xaeroplus.gui.teleport_fail_notifier.message": "Wygląda na to, że twoja próba teleportacji się nie powiodła :( \n Prawdopodobnie nie masz uprawnień serwera do używania komend /tp. \n Poproś administratora serwera o pomoc!",
   "xaeroplus.setting.disable_teleportation": "Wyłącz teleportację",
-  "xaeroplus.setting.disable_teleportation.tooltip": "Globalnie wyłącza przyciski teleportacji"
+  "xaeroplus.setting.disable_teleportation.tooltip": "Globalnie wyłącza przyciski teleportacji",
+  "xaeroplus.gui.toast.database_migration_in_progress": "%s migracji bazy danych w toku, %s ukończono, %s nieudanych",
+  "xaeroplus.gui.toast.database_migration_done": "%s migracji bazy danych ukończono, %s nieudanych"
 }

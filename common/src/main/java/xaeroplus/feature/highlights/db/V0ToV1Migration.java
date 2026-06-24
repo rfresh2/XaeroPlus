@@ -24,6 +24,9 @@ public class V0ToV1Migration implements DatabaseMigration {
                 || tableExists("-1", connection)
                 || tableExists("1", connection);
         } catch (final Exception e) {
+            if (DatabaseMigration.isCorruptDatabase(e)) {
+                throw new RuntimeException(e);
+            }
             XaeroPlus.LOGGER.error("Failed checking if {} database should migrate", databaseName, e);
             return false;
         }
@@ -51,6 +54,7 @@ public class V0ToV1Migration implements DatabaseMigration {
             }
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Failed creating new tables for {} database", databaseName, e);
+            throw new RuntimeException(e);
         }
     }
 

@@ -18,8 +18,7 @@ public class V1ToV2Migration implements DatabaseMigration {
     @Override
     public boolean shouldMigrate(final String databaseName, final Connection connection) throws SQLException {
         try {
-            if (getMetadataVersion(connection) >= VERSION) return false;
-            return !getHighlightTableNames(connection).isEmpty();
+            return getMetadataVersion(connection) < VERSION;
         } catch (SQLException ex) {
             throw ex;
         } catch (final Exception e) {

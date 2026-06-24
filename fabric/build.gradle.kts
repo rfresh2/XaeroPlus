@@ -23,7 +23,7 @@ loom {
 	}
 }
 
-val common: Configuration by configurations.creating
+val common = configurations.create("common")
 configurations.compileClasspath.get().extendsFrom(common)
 configurations.runtimeClasspath.get().extendsFrom(common)
 configurations.getByName("developmentFabric").extendsFrom(common)
@@ -38,9 +38,9 @@ afterEvaluate {
 	}
 }
 
-val worldmap_version_fabric: String by project.properties
-val minimap_version_fabric: String by project.properties
-val minecraft_version: String by project.properties
+val worldmap_version_fabric = providers.gradleProperty("worldmap_version_fabric").get()
+val minimap_version_fabric= providers.gradleProperty("minimap_version_fabric").get()
+val minecraft_version = providers.gradleProperty("minecraft_version").get()
 val destArchiveVersion = "${project.version}+${loom.platform.get().id()}-${minecraft_version}"
 val destArchiveClassifier = "WM${worldmap_version_fabric}-MM${minimap_version_fabric}"
 

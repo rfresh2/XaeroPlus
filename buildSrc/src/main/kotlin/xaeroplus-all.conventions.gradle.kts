@@ -8,7 +8,7 @@ configure<BasePluginExtension> {
     archivesName = "XaeroPlus"
 }
 
-version = project.properties["mod_version"].toString()
+version = providers.gradleProperty("mod_version").get()
 group = "xaeroplus"
 
 repositories {

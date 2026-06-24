@@ -2,25 +2,35 @@ package xaeroplus.util;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.Component;
+
+import static net.minecraft.network.chat.Component.literal;
 
 public class NotificationUtil {
     public static void inGameNotification(String message) {
         var mc = Minecraft.getInstance();
-        if (mc.player != null) {
-            mc.gui.getChat().addClientSystemMessage(Component.literal("[XaeroPlus] ").append(Component.literal(message)));
-        }
+        mc.execute(() -> {
+            if (mc.player != null) {
+                mc.gui.getChat().addClientSystemMessage(
+                    literal("[").withStyle(ChatFormatting.GRAY)
+                        .append(literal("XaeroPlus").withStyle(ChatFormatting.AQUA))
+                        .append(literal("] ").withStyle(ChatFormatting.GRAY))
+                        .append(literal(message).withStyle(ChatFormatting.WHITE))
+                );
+            }
+        });
     }
 
     public static void errorNotification(String message) {
         var mc = Minecraft.getInstance();
-        if (mc.player != null) {
-            mc.gui.getChat().addClientSystemMessage(Component
-                .literal("[XaeroPlus] ")
-                .withStyle(ChatFormatting.RED)
-                .append(Component
-                    .literal(message)
-                    .withStyle(ChatFormatting.WHITE)));
-        }
+        mc.execute(() -> {
+            if (mc.player != null) {
+                mc.gui.getChat().addClientSystemMessage(
+                    literal("[").withStyle(ChatFormatting.GRAY)
+                        .append(literal("XaeroPlus").withStyle(ChatFormatting.RED))
+                        .append(literal("] ").withStyle(ChatFormatting.GRAY))
+                        .append(literal(message).withStyle(ChatFormatting.RED))
+                );
+            }
+        });
     }
 }

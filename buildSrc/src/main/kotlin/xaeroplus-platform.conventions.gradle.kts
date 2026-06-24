@@ -7,7 +7,7 @@ loom {
     silentMojangMappingsLicense()
     runs {
         getByName("client") {
-            jvmArguments.addAll("-Dsodium.checks.issue2561=false")
+            jvmArguments.addAll("-Dsodium.checks.issue2561=false", "-Xmx4G")
             programArguments.addAll("--username", "rfresh2")
         }
     }

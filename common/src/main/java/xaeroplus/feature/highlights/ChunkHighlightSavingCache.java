@@ -1,8 +1,6 @@
 package xaeroplus.feature.highlights;
 
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.common.util.concurrent.*;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.longs.Long2LongMaps;
 import it.unimi.dsi.fastutil.longs.LongCollection;
@@ -161,20 +159,37 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         return cacheForDimension.getHighlightsInCustomWindow(windowRegionX, windowRegionZ, windowRegionSize, dimension);
     }
 
+    private ListenableFuture<?> initializeTask = Futures.immediateVoidFuture();
+
     @Override
     public void handleWorldChange(final XaeroWorldChangeEvent event) {
+        if (XaeroWorldMapCore.currentSession == null) return;
         parentExecutor.execute(() -> {
             switch (event.worldChangeType()) {
                 case ENTER_WORLD -> {
-                    if (!cacheReady.get()) {
-                        if (initializeWorld()) {
-                            cacheReady.set(true);
-                        }
+                    if (!cacheReady.get() && initializeTask.isDone()) {
+                        initializeTask = initializeWorld();
+                        Futures.addCallback(initializeTask, new FutureCallback() {
+                            @Override
+                            public void onSuccess(@Nullable final Object result) {
+                                cacheReady.compareAndSet(false, true);
+                            }
+
+                            @Override
+                            public void onFailure(@NotNull final Throwable t) {
+                                XaeroPlus.LOGGER.error("Error initializing {} disk cache", databaseName, t);
+                                cacheReady.set(false);
+                                reset();
+                            }
+                        }, parentExecutor);
                     } else {
                         XaeroPlus.LOGGER.warn("[{}] Entered world when cache was already initialized", databaseName);
                     }
                 }
                 case EXIT_WORLD -> {
+                    if (!initializeTask.isDone()) {
+                        initializeTask.cancel(true);
+                    }
                     // make sure we mark as unready to prevent further mutations
                     if (cacheReady.compareAndSet(true, false)) {
                         try {
@@ -292,12 +307,14 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
 
     // returns false if we were not able to get to a ready state
     // will happen if we are disconnecting from a server where the mc world is not loaded
-    private synchronized boolean initializeWorld() {
+    private synchronized ListenableFuture<?> initializeWorld() {
         try {
-            MapProcessor mapProcessor = XaeroWorldMapCore.currentSession.getMapProcessor();
-            if (mapProcessor == null) return false;
+            var currentSession = XaeroWorldMapCore.currentSession;
+            if (currentSession == null) return Futures.immediateFailedFuture(new IllegalStateException("WorldMapSession is null"));
+            MapProcessor mapProcessor = currentSession.getMapProcessor();
+            if (mapProcessor == null) return Futures.immediateFailedFuture(new IllegalStateException("MapProcessor is null"));
             final String worldId = mapProcessor.getCurrentWorldId();
-            if (worldId == null) return false;
+            if (worldId == null) return Futures.immediateFailedFuture(new IllegalStateException("WorldId is null"));
             this.currentWorldId = worldId;
             this.dbExecutor = MoreExecutors.listeningDecorator(
                 Executors.newSingleThreadExecutor(
@@ -307,20 +324,21 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
                             XaeroPlus.LOGGER.error("Uncaught exception handler in {}", t.getName(), e);
                         })
                         .build()));
-            this.database = new ChunkHighlightDatabase(worldId, databaseName);
-            initializeDimensionCacheHandler(OVERWORLD);
-            initializeDimensionCacheHandler(NETHER);
-            initializeDimensionCacheHandler(END);
-            loadChunksInViewedDimension();
-            if (!initializeTaskQueue.isEmpty()) XaeroPlus.LOGGER.info("[{}] Running {} queued tasks", databaseName, initializeTaskQueue.size());
-            while (!this.initializeTaskQueue.isEmpty()) {
-                submitTickTask(this.initializeTaskQueue.poll());
-            }
-            return true;
+            return this.dbExecutor.submit(() -> {
+                this.database = new ChunkHighlightDatabase(worldId, databaseName);
+                this.database.initializeDb();
+                initializeDimensionCacheHandler(OVERWORLD);
+                initializeDimensionCacheHandler(NETHER);
+                initializeDimensionCacheHandler(END);
+                loadChunksInViewedDimension();
+                if (!initializeTaskQueue.isEmpty()) XaeroPlus.LOGGER.info("[{}] Running {} queued tasks", databaseName, initializeTaskQueue.size());
+                while (!this.initializeTaskQueue.isEmpty()) {
+                    submitTickTask(this.initializeTaskQueue.poll());
+                }
+            });
         } catch (final Exception e) {
-            // expected on game launch
             reset(); // ensure we don't leave ourselves in a half init state somehow
-            return false;
+            return Futures.immediateFailedFuture(e);
         }
     }
 

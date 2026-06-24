@@ -3,7 +3,7 @@ plugins {
     idea
 }
 
-val minecraft_version: String by project.properties
+val minecraft_version = providers.gradleProperty("minecraft_version").get()
 
 architectury {
     minecraft = minecraft_version
@@ -12,25 +12,25 @@ architectury {
 tasks {
     register("printWorldMapVersionFabric") {
         doLast {
-            println(project.properties["worldmap_version_fabric"])
+            println(providers.gradleProperty("worldmap_version_fabric").get())
         }
         outputs.upToDateWhen { false }
     }
     register("printMinimapVersionFabric") {
         doLast {
-            println(project.properties["minimap_version_fabric"])
+            println(providers.gradleProperty("minimap_version_fabric").get())
         }
         outputs.upToDateWhen { false }
     }
     register("printWorldMapVersionForge") {
         doLast {
-            println(project.properties["worldmap_version_forge"])
+            println(providers.gradleProperty("worldmap_version_forge").get())
         }
         outputs.upToDateWhen { false }
     }
     register("printMinimapVersionForge") {
         doLast {
-            println(project.properties["minimap_version_forge"])
+            println(providers.gradleProperty("minimap_version_forge").get())
         }
         outputs.upToDateWhen { false }
     }

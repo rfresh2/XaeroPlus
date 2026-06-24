@@ -16,8 +16,8 @@ loom {
 //    }
 }
 
-val minecraft_version: String by project.properties
-val parchment_version: String by project.properties
+val minecraft_version = providers.gradleProperty("minecraft_version").get()
+val parchment_version = providers.gradleProperty("parchment_version").get()
 val mc = "com.mojang:minecraft:${minecraft_version}"
 val parchment = "org.parchmentmc.data:parchment-${minecraft_version}:${parchment_version}"
 

@@ -21,6 +21,9 @@ public class V0Migration implements DatabaseMigration {
                 }
             }
         } catch (Exception e) {
+            if (DatabaseMigration.isCorruptDatabase(e)) {
+                throw new RuntimeException(e);
+            }
             XaeroPlus.LOGGER.error("Failed checking if {} database should migrate", databaseName, e);
         }
         return false;

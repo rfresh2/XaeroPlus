@@ -338,5 +338,7 @@
   "xaeroplus.setting.teleport_fail_notifier_delay.tooltip": "Xaeroのテレポート試行を待機するティック数",
   "xaeroplus.gui.teleport_fail_notifier.message": "テレポートが失敗したようです :( \n サーバーで /tp コマンドを使う権限がない可能性があります。 \n サーバー管理者に問い合わせてください！",
   "xaeroplus.setting.disable_teleportation": "テレポートを無効にする",
-  "xaeroplus.setting.disable_teleportation.tooltip": "テレポートボタンをグローバルに無効にします\n"
+  "xaeroplus.setting.disable_teleportation.tooltip": "テレポートボタンをグローバルに無効にします\n",
+  "xaeroplus.gui.toast.database_migration_in_progress": "%s 件のデータベース移行が進行中、%s 件完了、%s 件失敗",
+  "xaeroplus.gui.toast.database_migration_done": "%s 件のデータベース移行が完了、%s 件失敗"
 }

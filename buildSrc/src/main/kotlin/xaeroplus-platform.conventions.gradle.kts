@@ -16,7 +16,7 @@ loom {
 //    }
 }
 
-val minecraft_version: String by project.properties
+val minecraft_version = providers.gradleProperty("minecraft_version").get()
 val mc = "com.mojang:minecraft:${minecraft_version}"
 
 // Unobfuscated versions of Loom no longer need to remap mod dependencies, and so no longer provide the `mod*`

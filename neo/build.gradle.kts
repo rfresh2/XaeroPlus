@@ -24,14 +24,15 @@ loom {
     runs {
         getByName("client") {
             generateRunConfig = true
+            preferGradleTask = true
             client()
         }
     }
 }
 
-val worldmap_version_neo: String by project.properties
-val minimap_version_neo: String by project.properties
-val minecraft_version: String by project.properties
+val worldmap_version_neo = providers.gradleProperty("worldmap_version_neo").get()
+val minimap_version_neo = providers.gradleProperty("minimap_version_neo").get()
+val minecraft_version = providers.gradleProperty("minecraft_version").get()
 val destArchiveVersion = "${project.version}+${loom.platform.get().id()}-${minecraft_version}"
 val destArchiveClassifier = "WM${worldmap_version_neo}-MM${minimap_version_neo}"
 

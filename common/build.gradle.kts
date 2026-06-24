@@ -6,7 +6,7 @@ plugins {
 }
 
 architectury {
-    common(rootProject.properties["enabled_platforms"].toString().split(","))
+    common(providers.gradleProperty("enabled_platforms").get().split(","))
 }
 
 loom {

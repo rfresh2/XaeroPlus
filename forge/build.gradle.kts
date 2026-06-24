@@ -15,7 +15,7 @@ architectury {
 }
 
 val common = project(":common")
-val shadowCommon: Configuration by configurations.creating
+val shadowCommon = configurations.create("shadowCommon")
 
 loom {
     accessWidenerPath = common.loom.accessWidenerPath
@@ -34,9 +34,9 @@ loom {
     }
 }
 
-val worldmap_version_forge: String by project.properties
-val minimap_version_forge: String by project.properties
-val minecraft_version: String by project.properties
+val worldmap_version_forge = providers.gradleProperty("worldmap_version_forge").get()
+val minimap_version_forge = providers.gradleProperty("minimap_version_forge").get()
+val minecraft_version = providers.gradleProperty("minecraft_version").get()
 val destArchiveVersion = "${project.version}+${loom.platform.get().id()}-${minecraft_version}"
 val destArchiveClassifier = "WM${worldmap_version_forge}-MM${minimap_version_forge}"
 

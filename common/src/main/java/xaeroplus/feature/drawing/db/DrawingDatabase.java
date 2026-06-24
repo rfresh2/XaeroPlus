@@ -62,7 +62,7 @@ public class DrawingDatabase implements Closeable {
             boolean init = !dbPath.toFile().exists();
             connection = DriverManager.getConnection("jdbc:rfresh_sqlite:" + dbPath);
             ((SQLiteConnection) connection).setBusyTimeout(5000);
-            MIGRATOR.migrate(dbPath, databaseName, connection, init);
+            connection = MIGRATOR.migrate(dbPath, databaseName, connection, init);
             setPragmas();
         } catch (Exception e) {
             if (!nativeLibraryErrorSent && e.getCause() instanceof NativeLibraryNotFoundException nativeException) {

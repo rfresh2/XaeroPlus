@@ -300,7 +300,7 @@ public class DatabaseMigrator {
             toastActive = true;
         }
 
-        @EventHandler
+        @EventHandler(priority = 1000)
         public synchronized void onWorldChange(XaeroWorldChangeEvent event) {
             switch (event.worldChangeType()) {
                 case EXIT_WORLD, ENTER_WORLD -> {

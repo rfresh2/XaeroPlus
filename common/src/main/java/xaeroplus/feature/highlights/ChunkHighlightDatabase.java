@@ -105,6 +105,7 @@ public class ChunkHighlightDatabase implements Closeable {
 
     void writeDbVersion() {
         try (var statement = connection.createStatement()) {
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS metadata (id INTEGER PRIMARY KEY, version INTEGER)");
             statement.executeUpdate("INSERT OR REPLACE INTO metadata (id, version) VALUES ('0', " + DATABASE_VERSION + ")");
         } catch (SQLException e) {
             XaeroPlus.LOGGER.error("Error writing database version: {}", DATABASE_VERSION, e);

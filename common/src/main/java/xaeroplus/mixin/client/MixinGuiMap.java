@@ -6,6 +6,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -24,6 +25,7 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -31,6 +33,9 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
+import org.joml.Matrix4f;
+import org.joml.Vector4f;
+import org.joml.Vector4fc;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -41,6 +46,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.lib.client.config.ClientConfigManager;
 import xaero.lib.client.controls.util.KeyMappingUtils;
 import xaero.lib.client.graphics.XaeroBufferProvider;
+import xaero.lib.client.graphics.util.TextureUtils;
 import xaero.lib.client.gui.ScreenBase;
 import xaero.lib.client.gui.widget.Tooltip;
 import xaero.lib.common.config.option.ConfigOption;
@@ -54,6 +60,7 @@ import xaero.map.element.HoveredMapElementHolder;
 import xaero.map.element.MapElementRenderHandler;
 import xaero.map.graphics.ImprovedFramebuffer;
 import xaero.map.graphics.MapRenderHelper;
+import xaero.map.graphics.renderer.multitexture.MultiTextureRenderTypeRenderer;
 import xaero.map.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
 import xaero.map.gui.GuiMap;
 import xaero.map.gui.GuiTexturedButton;
@@ -67,6 +74,7 @@ import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.drawing.DrawingColorCyclerButton;
 import xaeroplus.feature.render.line.Line;
+import xaeroplus.feature.render.shaders.XaeroPlusShaders;
 import xaeroplus.feature.render.text.Text;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.*;
@@ -165,6 +173,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         return Component.empty()
             .append(Component.literal(KeyMappingUtils.getKeyName(bind) + " ").withStyle(ChatFormatting.DARK_GREEN))
             .append(component);
+    }
+
+    @Inject(method = "<init>", at = @At("RETURN"))
+    public void onConstructor(CallbackInfo ci) {
+        // workaround bug where the atlas doesn't always init correctly
+        // not sure what triggers it yet
+        // should be minimal perf impact just resetting on gui init
+        WorldMap.waypointSymbolCreator.resetChars();
     }
 
     @Inject(method = "init", at = @At(value = "RETURN"), remap = true)
@@ -697,150 +713,102 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         }
     }
 
-//    @WrapOperation(method = "extractRenderState", at = @At(
-//        value = "INVOKE",
-//        target = "Lxaero/lib/client/graphics/util/TextureUtils;clearRenderTarget(Lcom/mojang/blaze3d/pipeline/RenderTarget;Lorg/joml/Vector4fc;F)V",
-//        ordinal = 0
-//    ), slice = @Slice(
-//        from = @At(
-//            value = "FIELD",
-//            target = "Lxaero/map/common/config/option/WorldMapProfiledConfigOptions;DETECT_AMBIGUOUS_Y:Lxaero/lib/common/config/option/BooleanConfigOption;",
-//            opcode = Opcodes.GETSTATIC
-//        )
-//    ))
-//    public void transparentBgSetPrimaryFboTransparentClearColor(final RenderTarget renderTarget, final Vector4fc color, final float depth, final Operation<Void> original) {
-//        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
-//            original.call(renderTarget, new Vector4f(0, 0, 0, 0), depth);
-//        } else {
-//            original.call(renderTarget, color, depth);
-//        }
-//    }
-//
-//    @Inject(method = "extractRenderState", at = @At(
-//        value = "INVOKE",
-//        target = "Lnet/minecraft/client/renderer/state/gui/GuiRenderState;addGuiElement(Lnet/minecraft/client/renderer/state/gui/GuiElementRenderState;)V",
-//        ordinal = 0
-//    ))
-//    public void onImmediateFboRenderStateRegister(final CallbackInfo ci) {
-//        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
-//            TextureUtils.clearRenderTarget(immediateRenderFBO, new Vector4f(0, 0, 0, 0), 1.0f);
-//        } else {
-//            // only actually necessary when transparent WM toggled from ON to OFF
-//            // i don't think it will hurt to do every frame tho
-//            TextureUtils.clearRenderTarget(immediateRenderFBO, new Vector4f(0, 0, 0, 1));
-//        }
-//    }
-//
-//    @WrapOperation(method = "extractRenderState", at = @At(
-//        value = "INVOKE",
-//        target = "Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;draw(Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRenderer;)V",
-//        ordinal = 0
-//    ))
-//    public void transparentBgConfigMapRenderWithLight(final MultiTextureRenderTypeRendererProvider instance, final MultiTextureRenderTypeRenderer renderer, final Operation<Void> original) {
-//        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
-//            XaeroPlusShaders.setTransparentWMBackground(true);
-//            Globals.transparentWmBgApplyMapBlend = true;
-//            try {
-//                original.call(instance, renderer);
-//            } finally {
-//                XaeroPlusShaders.setTransparentWMBackground(false);
-//                Globals.transparentWmBgApplyMapBlend = false;
-//            }
-//        } else {
-//            XaeroPlusShaders.setTransparentWMBackground(false);
-//            original.call(instance, renderer);
-//        }
-//    }
-//
-//    @WrapOperation(method = "extractRenderState", at = @At(
-//        value = "INVOKE",
-//        target = "Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;draw(Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRenderer;)V",
-//        ordinal = 1
-//    ))
-//    public void transparentBgConfigMapRenderNoLight(final MultiTextureRenderTypeRendererProvider instance, final MultiTextureRenderTypeRenderer renderer, final Operation<Void> original) {
-//        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
-//            XaeroPlusShaders.setTransparentWMBackground(true);
-//            Globals.transparentWmBgApplyMapBlend = true;
-//            try {
-//                original.call(instance, renderer);
-//            } finally {
-//                XaeroPlusShaders.setTransparentWMBackground(false);
-//                Globals.transparentWmBgApplyMapBlend = false;
-//            }
-//        } else {
-//            XaeroPlusShaders.setTransparentWMBackground(false);
-//            original.call(instance, renderer);
-//        }
-//    }
-//
-//    @WrapOperation(method = "extractRenderState", at = @At(
-//        value = "INVOKE",
-//        target = "Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;draw(Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRenderer;)V",
-//        ordinal = 2
-//    ))
-//    public void transparentBgConfigMainFBORender(final MultiTextureRenderTypeRendererProvider instance, final MultiTextureRenderTypeRenderer renderer, final Operation<Void> original) {
-//        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
-//            Globals.transparentWmBgApplyMapFrameBlend = true;
-//            Globals.transparentWmBgApplyMapFrameDepthState = true;
-//            try {
-//                original.call(instance, renderer);
-//            } finally {
-//                Globals.transparentWmBgApplyMapFrameBlend = false;
-//                Globals.transparentWmBgApplyMapFrameDepthState = false;
-//            }
-//        } else {
-//            original.call(instance, renderer);
-//        }
-//    }
-//
-//    @WrapOperation(method = "extractRenderState", at = @At(
-//        value = "INVOKE",
-//        target = "Lxaero/map/element/MapElementRenderHandler;render(Lxaero/map/gui/GuiMap;Lxaero/lib/client/graphics/XaeroBufferProvider;Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;DDIIDDDDDFZLxaero/map/element/HoveredMapElementHolder;Lnet/minecraft/client/Minecraft;F)Lxaero/map/element/HoveredMapElementHolder;",
-//        ordinal = 0
-//    ))
-//    public HoveredMapElementHolder transparentBgConfigMainFBORender(final MapElementRenderHandler instance, final GuiMap mapScreen, final XaeroBufferProvider xaeroBufferProvider, final MultiTextureRenderTypeRendererProvider rendererProvider, final double cameraX, final double cameraZ, final int width, final int height, final double screenSizeBasedScale, final double scale, final double playerDimDiv, final double mouseX, final double mouseZ, final float brightness, final boolean cave, final HoveredMapElementHolder oldHovered, final Minecraft mc, final float partialTicks, final Operation<HoveredMapElementHolder> original) {
-//        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
-//            Globals.transparentWmBgApplyMapFrameDepthState = true;
-//            try {
-//                return original.call(instance, mapScreen, xaeroBufferProvider, rendererProvider, cameraX, cameraZ, width, height, screenSizeBasedScale, scale, playerDimDiv, mouseX, mouseZ, brightness, cave, oldHovered, mc, partialTicks);
-//            } finally {
-//                Globals.transparentWmBgApplyMapFrameDepthState = false;
-//            }
-//        } else {
-//            return original.call(instance, mapScreen, xaeroBufferProvider, rendererProvider, cameraX, cameraZ, width, height, screenSizeBasedScale, scale, playerDimDiv, mouseX, mouseZ, brightness, cave, oldHovered, mc, partialTicks);
-//        }
-//    }
-//
-//    @WrapOperation(method = "extractRenderState", at = @At(
-//        value = "INVOKE",
-//        target = "Lxaero/lib/client/graphics/XaeroBufferProvider;endBatch()V",
-//        ordinal = 0
-//    ), slice = @Slice(
-//        from = @At(
-//            value = "FIELD",
-//            opcode = Opcodes.GETSTATIC,
-//            target = "Lxaero/map/common/config/option/WorldMapProfiledConfigOptions;ARROW:Lxaero/lib/common/config/option/BooleanConfigOption;"
-//        )
-//    ))
-//    public void transparentBgDecorationsRender(final XaeroBufferProvider instance, final Operation<Void> original) {
-//        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
-//            Globals.transparentWmBgApplyMapFrameDepthState = true;
-//            try {
-//                original.call(instance);
-//            } finally {
-//                Globals.transparentWmBgApplyMapFrameDepthState = false;
-//            }
-//        } else {
-//            original.call(instance);
-//        }
-//    }
-//
-//    @Inject(method = "shouldSkipWorldRender", at = @At("HEAD"), cancellable = true)
-//    public void transparentBgDisableWorldRenderSkip(final CallbackInfoReturnable<Boolean> cir) {
-//        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
-//            cir.setReturnValue(false);
-//        }
-//    }
+    @WrapOperation(method = "extractRenderState", at = @At(
+        value = "FIELD",
+        opcode = Opcodes.GETSTATIC,
+        target = "Lxaero/map/graphics/CustomRenderTypes;MAP:Lnet/minecraft/client/renderer/rendertype/RenderType;"
+    ))
+    public RenderType injectCustomMapRenderType(final Operation<RenderType> original) {
+        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
+            return XaeroPlusShaders.CUSTOM_MAP;
+        }
+        return original.call();
+    }
+
+    @WrapOperation(method = "extractRenderState", at = @At(
+        value = "FIELD",
+        opcode = Opcodes.GETSTATIC,
+        target = "Lxaero/map/graphics/CustomRenderTypes;MAP_FRAME:Lnet/minecraft/client/renderer/rendertype/RenderType;"
+    ))
+    public RenderType injectCustomMapFrameRenderType(final Operation<RenderType> original) {
+        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
+            return XaeroPlusShaders.CUSTOM_MAP_FRAME;
+        }
+        return original.call();
+    }
+
+    @WrapOperation(method = "extractRenderState", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/lib/client/graphics/util/TextureUtils;clearRenderTarget(Lcom/mojang/blaze3d/pipeline/RenderTarget;Lorg/joml/Vector4fc;F)V",
+        ordinal = 0
+    ), slice = @Slice(
+        from = @At(
+            value = "FIELD",
+            target = "Lxaero/map/common/config/option/WorldMapProfiledConfigOptions;DETECT_AMBIGUOUS_Y:Lxaero/lib/common/config/option/BooleanConfigOption;",
+            opcode = Opcodes.GETSTATIC
+        )
+    ))
+    public void transparentBgSetPrimaryFboTransparentClearColor(final RenderTarget renderTarget, final Vector4fc color, final float depth, final Operation<Void> original) {
+        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
+            original.call(renderTarget, new Vector4f(0, 0, 0, 0), depth);
+        } else {
+            original.call(renderTarget, color, depth);
+        }
+    }
+
+    @Inject(method = "extractRenderState", at = @At(
+        value = "INVOKE",
+        target = "Lnet/minecraft/client/renderer/state/gui/GuiRenderState;addGuiElement(Lnet/minecraft/client/renderer/state/gui/GuiElementRenderState;)V",
+        ordinal = 0
+    ))
+    public void onImmediateFboRenderStateRegister(final CallbackInfo ci) {
+        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
+            TextureUtils.clearRenderTarget(immediateRenderFBO, new Vector4f(0, 0, 0, 0), 0.0f);
+        } else {
+            // only actually necessary when transparent WM toggled from ON to OFF
+            // i don't think it will hurt to do every frame tho
+            TextureUtils.clearRenderTarget(immediateRenderFBO, new Vector4f(0, 0, 0, 1));
+        }
+    }
+
+    @WrapOperation(method = "extractRenderState", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;draw(Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRenderer;)V",
+        ordinal = 0
+    ))
+    public void transparentBgConfigMapRenderWithLight(final MultiTextureRenderTypeRendererProvider instance, final MultiTextureRenderTypeRenderer renderer, final Operation<Void> original) {
+        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
+            XaeroPlusShaders.setTransparentWMBackground(true);
+            try {
+                original.call(instance, renderer);
+            } finally {
+                XaeroPlusShaders.setTransparentWMBackground(false);
+            }
+        }
+    }
+
+    @WrapOperation(method = "extractRenderState", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;draw(Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRenderer;)V",
+        ordinal = 1
+    ))
+    public void transparentBgConfigMapRenderNoLight(final MultiTextureRenderTypeRendererProvider instance, final MultiTextureRenderTypeRenderer renderer, final Operation<Void> original) {
+        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
+            XaeroPlusShaders.setTransparentWMBackground(true);
+            try {
+                original.call(instance, renderer);
+            } finally {
+                XaeroPlusShaders.setTransparentWMBackground(false);
+            }
+        }
+    }
+
+    @Inject(method = "shouldSkipWorldRender", at = @At("HEAD"), cancellable = true)
+    public void transparentBgDisableWorldRenderSkip(final CallbackInfoReturnable<Boolean> cir) {
+        if (Settings.REGISTRY.transparentWorldmapBackgroundSetting.get()) {
+            cir.setReturnValue(false);
+        }
+    }
 
     @Inject(method = "shouldSkipWorldRender", at = @At("HEAD"), cancellable = true)
     public void shouldRenderGameBehindWorldMap(final CallbackInfoReturnable<Boolean> cir) {
@@ -852,39 +820,39 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     // honestly no idea why xaero is doing here, its drawing 2 thin lines along the bottom and right side of the map
     // but it looks bad with transparent background, so bye
 
-//    @WrapWithCondition(method = "extractRenderState", at = @At(
-//        value = "INVOKE",
-//        target = "Lxaero/map/graphics/MapRenderHelper;fillIntoExistingBuffer(Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/vertex/VertexConsumer;IIIIFFFF)V",
-//        ordinal = 0
-//    ),
-//        slice = @Slice(
-//            from = @At(
-//                value = "FIELD",
-//                target = "Lxaero/map/graphics/CustomRenderTypes;MAP_COLOR_FILLER:Lnet/minecraft/client/renderer/rendertype/RenderType;",
-//                opcode = Opcodes.GETSTATIC
-//            )
-//        )
-//    )
-//    public boolean transparentBgCancelMapColorFiller0(final Matrix4f matrix, final VertexConsumer bufferBuilder, final int x1, final int y1, final int x2, final int y2, final float r, final float g, final float b, final float a) {
-//        return !Settings.REGISTRY.transparentWorldmapBackgroundSetting.get();
-//    }
-//
-//    @WrapWithCondition(method = "extractRenderState", at = @At(
-//        value = "INVOKE",
-//        target = "Lxaero/map/graphics/MapRenderHelper;fillIntoExistingBuffer(Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/vertex/VertexConsumer;IIIIFFFF)V",
-//        ordinal = 1
-//    ),
-//        slice = @Slice(
-//            from = @At(
-//                value = "FIELD",
-//                target = "Lxaero/map/graphics/CustomRenderTypes;MAP_COLOR_FILLER:Lnet/minecraft/client/renderer/rendertype/RenderType;",
-//                opcode = Opcodes.GETSTATIC
-//            )
-//        )
-//    )
-//    public boolean transparentBgCancelMapColorFiller1(final Matrix4f matrix, final VertexConsumer bufferBuilder, final int x1, final int y1, final int x2, final int y2, final float r, final float g, final float b, final float a) {
-//        return !Settings.REGISTRY.transparentWorldmapBackgroundSetting.get();
-//    }
+    @WrapWithCondition(method = "extractRenderState", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/map/graphics/MapRenderHelper;fillIntoExistingBuffer(Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/vertex/VertexConsumer;IIIIFFFF)V",
+        ordinal = 0
+    ),
+        slice = @Slice(
+            from = @At(
+                value = "FIELD",
+                target = "Lxaero/map/graphics/CustomRenderTypes;MAP_COLOR_FILLER:Lnet/minecraft/client/renderer/rendertype/RenderType;",
+                opcode = Opcodes.GETSTATIC
+            )
+        )
+    )
+    public boolean transparentBgCancelMapColorFiller0(final Matrix4f matrix, final VertexConsumer bufferBuilder, final int x1, final int y1, final int x2, final int y2, final float r, final float g, final float b, final float a) {
+        return !Settings.REGISTRY.transparentWorldmapBackgroundSetting.get();
+    }
+
+    @WrapWithCondition(method = "extractRenderState", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/map/graphics/MapRenderHelper;fillIntoExistingBuffer(Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/vertex/VertexConsumer;IIIIFFFF)V",
+        ordinal = 1
+    ),
+        slice = @Slice(
+            from = @At(
+                value = "FIELD",
+                target = "Lxaero/map/graphics/CustomRenderTypes;MAP_COLOR_FILLER:Lnet/minecraft/client/renderer/rendertype/RenderType;",
+                opcode = Opcodes.GETSTATIC
+            )
+        )
+    )
+    public boolean transparentBgCancelMapColorFiller1(final Matrix4f matrix, final VertexConsumer bufferBuilder, final int x1, final int y1, final int x2, final int y2, final float r, final float g, final float b, final float a) {
+        return !Settings.REGISTRY.transparentWorldmapBackgroundSetting.get();
+    }
 
     @Inject(method = "extractRenderState", at = @At(
         value = "FIELD",

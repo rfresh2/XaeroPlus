@@ -1,13 +1,14 @@
 package xaeroplus.feature.render.shaders;
 
 import com.mojang.blaze3d.PrimitiveTopology;
-import com.mojang.blaze3d.pipeline.BindGroupLayout;
-import com.mojang.blaze3d.pipeline.BlendFunction;
-import com.mojang.blaze3d.pipeline.ColorTargetState;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.pipeline.*;
 import com.mojang.blaze3d.platform.BlendFactor;
+import com.mojang.blaze3d.platform.CompareOp;
 import com.mojang.blaze3d.platform.PolygonMode;
 import com.mojang.blaze3d.shaders.UniformType;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.AddressMode;
+import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import net.minecraft.client.renderer.BindGroupLayouts;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -17,7 +18,12 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
 import xaero.lib.client.graphics.XaeroRenderType;
 import xaero.lib.client.graphics.shader.BuiltInCustomUniformValueTypes;
+import xaero.lib.client.graphics.shader.BuiltInCustomUniforms;
 import xaero.lib.client.graphics.shader.CustomUniform;
+import xaero.lib.client.graphics.shader.LibShaders;
+import xaero.map.WorldMap;
+
+import java.util.OptionalDouble;
 
 public class XaeroPlusShaders {
     public static final RenderPipeline HIGHLIGHT_PIPELINE = RenderPipeline.builder()
@@ -95,4 +101,56 @@ public class XaeroPlusShaders {
             .withTexture("Sampler0", Identifier.withDefaultNamespace("default/0"))
             .useLightmap()
             .setOutputTarget(OutputTarget.MAIN_TARGET));
+
+    public static final RenderPipeline CUSTOM_MAP_RP = RenderPipeline.builder()
+        .withBindGroupLayout(
+            BindGroupLayout.builder().withUniform("DynamicTransforms", UniformType.UNIFORM_BUFFER).withUniform("Projection", UniformType.UNIFORM_BUFFER).build()
+        )
+        .withLocation(Identifier.fromNamespaceAndPath("xaeroplus", "pipeline/custom_map"))
+        .withVertexShader(Identifier.fromNamespaceAndPath("xaeroplus", "custom_map"))
+        .withFragmentShader(Identifier.fromNamespaceAndPath("xaeroplus", "custom_map"))
+        .withVertexBinding(0, DefaultVertexFormat.POSITION_TEX)
+        .withPrimitiveTopology(PrimitiveTopology.QUADS)
+        .withBindGroupLayout(
+            BindGroupLayout.builder()
+                .withSampler("Sampler0")
+                .withUniform(BuiltInCustomUniforms.BRIGHTNESS.name(), BuiltInCustomUniforms.BRIGHTNESS.type())
+                .withUniform(BuiltInCustomUniforms.WITH_LIGHT.name(), BuiltInCustomUniforms.WITH_LIGHT.type())
+                .withUniform(XaeroPlusShaders.TRANSPARENT_WM_BACKGROUND_UNIFORM.name(), XaeroPlusShaders.TRANSPARENT_WM_BACKGROUND_UNIFORM.type())
+                .build()
+        )
+        .withColorTargetState(new ColorTargetState(new BlendFunction(BlendFactor.ONE, BlendFactor.ZERO, BlendFactor.ONE, BlendFactor.ZERO)))
+        .withCull(false)
+        .withDepthStencilState(DepthStencilState.DEFAULT)
+        .build();
+
+    public static final RenderType CUSTOM_MAP = XaeroRenderType.createRenderType(
+        "xaeroplus_custom_map",
+        RenderSetup.builder(CUSTOM_MAP_RP)
+            .withTexture("Sampler0", WorldMap.guiTextures, () -> RenderSystem.getDevice().createSampler(AddressMode.CLAMP_TO_EDGE, AddressMode.CLAMP_TO_EDGE, FilterMode.LINEAR, FilterMode.NEAREST, 1, OptionalDouble.of(1.0)))
+            .setOutputTarget(OutputTarget.MAIN_TARGET)
+    );
+
+    public static final RenderPipeline CUSTOM_MAP_FRAME_RP = RenderPipeline.builder()
+        .withBindGroupLayout(
+            BindGroupLayout.builder().withUniform("DynamicTransforms", UniformType.UNIFORM_BUFFER).withUniform("Projection", UniformType.UNIFORM_BUFFER).build()
+        )
+        .withVertexShader(LibShaders.POSITION_COLOR_TEX)
+        .withFragmentShader(LibShaders.POSITION_COLOR_TEX)
+        .withVertexBinding(0, XaeroRenderType.POSITION_COLOR_TEX)
+        .withPrimitiveTopology(PrimitiveTopology.QUADS)
+        .withBindGroupLayout(BindGroupLayout.builder().withSampler("Sampler0").build())
+        .withLocation(Identifier.fromNamespaceAndPath("xaeroplus", "pipeline/custom_map_frame"))
+        .withColorTargetState(new ColorTargetState(new BlendFunction(BlendFactor.ONE, BlendFactor.ZERO, BlendFactor.ONE, BlendFactor.ZERO)))
+        .withCull(false)
+        .withDepthStencilState(new DepthStencilState(CompareOp.ALWAYS_PASS, false))
+        .build();
+
+    public static final RenderType CUSTOM_MAP_FRAME = XaeroRenderType.createRenderType(
+        "xaeroplus_custom_map_frame",
+        RenderSetup.builder(CUSTOM_MAP_FRAME_RP)
+            .withTexture("Sampler0", WorldMap.guiTextures, () -> RenderSystem.getDevice()
+                .createSampler(AddressMode.CLAMP_TO_EDGE, AddressMode.CLAMP_TO_EDGE, FilterMode.LINEAR, FilterMode.LINEAR, 1, OptionalDouble.of(1.0)))
+            .setOutputTarget(OutputTarget.MAIN_TARGET)
+    );
 }

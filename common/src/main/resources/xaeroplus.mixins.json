@@ -19,6 +19,7 @@
     "MixinClientEvents",
     "MixinCommonInternet",
     "MixinCrashHandler",
+    "MixinCustomRenderTypes",
     "MixinDimensionHighlighterHandler",
     "MixinGuiAddWaypoint",
     "MixinGuiEntityRadarSettings",
@@ -37,7 +38,6 @@
     "MixinKeyMappingUtils",
     "MixinLayeredRegionManager",
     "MixinLeveledRegion",
-    "MixinLibShaders",
     "MixinMapDimension",
     "MixinMapPixel",
     "MixinMapProcessor",
@@ -70,14 +70,11 @@
     "MixinWMBuiltInCustomUniforms",
     "MixinWorldDataReader",
     "MixinWorldMapInternet",
-    "MixinXaeroRenderType",
     "mc.MixinBedBlock",
     "mc.MixinBufferBuilder",
     "mc.MixinClientPlayNetworkHandler",
-    "mc.MixinGui",
     "mc.MixinMinecraftClient",
     "mc.MixinPictureInPictureRenderer",
-    "mc.MixinRenderPipeline",
     "mc.MixinRespawnAnchor"
   ]
 }

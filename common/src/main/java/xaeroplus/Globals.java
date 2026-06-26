@@ -36,11 +36,7 @@ public class Globals {
     public static boolean shouldResetFBO = false;
     public static boolean minimapSettingsInitialized = false;
     public static boolean switchingDimension = false;
-    public static boolean disableDrawCullingOverride = false;
     public static final boolean atomicMoveAvailable = testAtomicMoveAvailable();
-    public static boolean transparentWmBgApplyMapBlend = false;
-    public static boolean transparentWmBgApplyMapFrameBlend = false;
-    public static boolean transparentWmBgApplyMapFrameDepthState = false;
     public static boolean bypassVertexCountLimit = false;
     public static ResourceKey<Level> getCurrentDimensionId() {
         try {

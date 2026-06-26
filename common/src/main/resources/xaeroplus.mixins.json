@@ -33,7 +33,6 @@
     "MixinGuiWorldMapSettings",
     "MixinHudMinimapRenderer",
     "MixinHudMod",
-    "MixinImprovedFramebuffer",
     "MixinIOUtils",
     "MixinKeyMappingUtils",
     "MixinLayeredRegionManager",

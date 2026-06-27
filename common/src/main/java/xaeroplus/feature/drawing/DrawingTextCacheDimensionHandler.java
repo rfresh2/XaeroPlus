@@ -59,6 +59,15 @@ public class DrawingTextCacheDimensionHandler {
         }
     }
 
+    public void removeAllTexts() {
+        if (!mc.isSameThread()) {
+            throw new RuntimeException("removeAllTexts must be called on the main thread!");
+        }
+        texts.clear();
+        staleTexts.clear();
+        dbExecutor.execute(() -> database.removeAllTexts(dimension));
+    }
+
     public Long2ObjectMap<Text> getTexts() {
         return texts;
     }

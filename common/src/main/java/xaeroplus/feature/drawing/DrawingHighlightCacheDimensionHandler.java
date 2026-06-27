@@ -195,6 +195,15 @@ public class DrawingHighlightCacheDimensionHandler extends ChunkHighlightBaseCac
         dbExecutor.execute(() -> database.removeHighlights(toRemove, dimension));
     }
 
+    public void removeAllHighlights() {
+        if (!mc.isSameThread()) {
+            throw new RuntimeException("removeAllHighlights must be called on the main thread!");
+        }
+        staleChunks.clear();
+        chunks.clear();
+        dbExecutor.execute(() -> database.removeAllHighlights(dimension));
+    }
+
     @Override
     public CompletableFuture<Long2LongMap> getHighlightsInCustomWindow(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
         // stale highlight write is async but our db executor is single threaded so we will always execute after the write task

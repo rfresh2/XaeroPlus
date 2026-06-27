@@ -9,6 +9,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import xaeroplus.Globals;
+import xaeroplus.XaeroPlus;
+import xaeroplus.event.ClientStoppingEvent;
 import xaeroplus.event.ClientTickEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.feature.drawing.DrawingCache;
@@ -116,6 +118,16 @@ public class Drawing extends Module {
     @EventHandler
     public void onWorldChange(final XaeroWorldChangeEvent event) {
         drawingCache.handleWorldChange(event);
+    }
+
+    @EventHandler
+    public void onClientStopping(ClientStoppingEvent event) {
+        try {
+            drawingCache.onDisable();
+            drawingCache.closeAndAwaitTermination();
+        } catch (Exception e) {
+            XaeroPlus.LOGGER.error("Failed to close drawing cache", e);
+        }
     }
 
     private Object2IntMap<Line> getSavedLines(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {

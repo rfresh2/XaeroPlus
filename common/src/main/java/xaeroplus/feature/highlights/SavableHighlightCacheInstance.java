@@ -2,6 +2,7 @@ package xaeroplus.feature.highlights;
 
 import net.lenni0451.lambdaevents.EventHandler;
 import xaeroplus.XaeroPlus;
+import xaeroplus.event.ClientStoppingEvent;
 import xaeroplus.event.ClientTickEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
 
@@ -63,17 +64,23 @@ public class SavableHighlightCacheInstance {
     }
 
     @EventHandler
-    public void onClientTickEvent(final ClientTickEvent.Post event) {
+    public void onClientTickEvent(ClientTickEvent.Post event) {
         try {
-//            long before = System.nanoTime();
             cache.handleTick();
-//            long after = System.nanoTime();
-//            long duration = after - before;
-//            if (duration > TimeUnit.NANOSECONDS.convert(1, TimeUnit.MILLISECONDS)) {
-//                XaeroPlus.LOGGER.warn("Cache {} took {} ms to tick", dbName, TimeUnit.MILLISECONDS.convert(duration, TimeUnit.NANOSECONDS));
-//            }
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error handling tick event for cache: {} event: {}", dbName, event, e);
+            XaeroPlus.LOGGER.error("Error handling tick event for cache: {}", dbName, e);
+        }
+    }
+
+    @EventHandler
+    public void onClientStopping(ClientStoppingEvent event) {
+        try {
+            cache.onDisable();
+            if (cache instanceof ChunkHighlightSavingCache savingCache) {
+                savingCache.closeAndAwaitTermination();
+            }
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Error closing {}", dbName, e);
         }
     }
 }

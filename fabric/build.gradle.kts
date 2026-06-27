@@ -12,13 +12,6 @@ architectury {
 
 loom {
 	accessWidenerPath = project(":common").loom.accessWidenerPath
-	runs {
-		getByName("client") {
-			generateRunConfig = true
-			preferGradleTask = true
-			client()
-		}
-	}
 }
 
 val common = configurations.create("common")

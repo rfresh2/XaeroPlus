@@ -19,13 +19,6 @@ loom {
     neoForge {
         accessWidenerPath.set(common.loom.accessWidenerPath)
     }
-    runs {
-        getByName("client") {
-            generateRunConfig = true
-            preferGradleTask = true
-            client()
-        }
-    }
 }
 
 val worldmap_version_neo = providers.gradleProperty("worldmap_version_neo").get()

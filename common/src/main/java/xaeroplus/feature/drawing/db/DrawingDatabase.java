@@ -551,6 +551,31 @@ public class DrawingDatabase implements Closeable {
         return true;
     }
 
+    public void removeAllLines(final ResourceKey<Level> dimension) {
+        int tryCount = 0;
+        while (tryCount++ < MAX_RETRIES) {
+            if (removeAllLines0(dimension)) {
+                return;
+            }
+            XaeroPlus.LOGGER.info("Retrying removing all lines from {} database in dimension: {}, (attempt {}/{})", databaseName, dimension.location(), tryCount, MAX_RETRIES);
+            Wait.waitMs(50);
+        }
+    }
+
+    private boolean removeAllLines0(final ResourceKey<Level> dimension) {
+        try (var statement = connection.createStatement()) {
+            statement.executeUpdate("DELETE FROM \"" + getTableName(dimension, LINES_TABLE) + "\"");
+        } catch (SQLException e) {
+            XaeroPlus.LOGGER.error("Error while removing all lines from {} database in dimension: {}", databaseName, dimension.location(), e);
+            if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
+                XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
+                recoverCorruptDatabase();
+            }
+            return false;
+        }
+        return true;
+    }
+
     public void removeHighlight(final int x, final int z, final ResourceKey<Level> dimension) {
         int tryCount = 0;
         while (tryCount++ < MAX_RETRIES) {
@@ -618,6 +643,31 @@ public class DrawingDatabase implements Closeable {
         return true;
     }
 
+    public void removeAllHighlights(final ResourceKey<Level> dimension) {
+        int tryCount = 0;
+        while (tryCount++ < 3) {
+            if (removeAllHighlights0(dimension)) {
+                return;
+            }
+            XaeroPlus.LOGGER.info("Retrying removing all highlights from {} database in dimension: {} (attempt {}/{})", databaseName, dimension.location(), tryCount, 3);
+            Wait.waitMs(50);
+        }
+    }
+
+    private boolean removeAllHighlights0(final ResourceKey<Level> dimension) {
+        try (var statement = connection.createStatement()) {
+            statement.executeUpdate("DELETE FROM \"" + getTableName(dimension, HIGHLIGHTS_TABLE) + "\"");
+        } catch (SQLException e) {
+            XaeroPlus.LOGGER.error("Error while removing all highlights from {} database in dimension: {}", databaseName, dimension.location(), e);
+            if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
+                XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
+                recoverCorruptDatabase();
+            }
+            return false;
+        }
+        return true;
+    }
+
     public void removeText(final int x, final int z, final ResourceKey<Level> dimension) {
         int tryCount = 0;
         while (tryCount++ < MAX_RETRIES) {
@@ -634,6 +684,31 @@ public class DrawingDatabase implements Closeable {
             statement.executeUpdate("DELETE FROM \"" + getTableName(dimension, TEXTS_TABLE) + "\" WHERE x = " + x + " AND z = " + z);
         } catch (SQLException e) {
             XaeroPlus.LOGGER.error("Error while removing text from {} database in dimension: {}, at {}, {}", databaseName, dimension.identifier(), x, z, e);
+            if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
+                XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
+                recoverCorruptDatabase();
+            }
+            return false;
+        }
+        return true;
+    }
+
+    public void removeAllTexts(final ResourceKey<Level> dimension) {
+        int tryCount = 0;
+        while (tryCount++ < MAX_RETRIES) {
+            if (removeAllTexts0(dimension)) {
+                return;
+            }
+            XaeroPlus.LOGGER.info("Retrying removing all texts from {} database in dimension: {}, (attempt {}/{})", databaseName, dimension.location(), tryCount, MAX_RETRIES);
+            Wait.waitMs(50);
+        }
+    }
+
+    private boolean removeAllTexts0(final ResourceKey<Level> dimension) {
+        try (var statement = connection.createStatement()) {
+            statement.executeUpdate("DELETE FROM \"" + getTableName(dimension, TEXTS_TABLE) + "\"");
+        } catch (SQLException e) {
+            XaeroPlus.LOGGER.error("Error while removing all texts from {} database in dimension: {}", databaseName, dimension.location(), e);
             if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
                 recoverCorruptDatabase();

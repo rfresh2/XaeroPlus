@@ -10,7 +10,7 @@ loom {
             jvmArguments.addAll("-Dsodium.checks.issue2561=false", "-Xmx4G")
             programArguments.addAll("--username", "rfresh2")
             generateRunConfig = true
-            preferGradleTask = false
+            preferGradleTask = true
         }
     }
 //    mixin {

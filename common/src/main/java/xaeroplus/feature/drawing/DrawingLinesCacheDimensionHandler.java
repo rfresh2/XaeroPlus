@@ -60,6 +60,15 @@ public class DrawingLinesCacheDimensionHandler {
         }
     }
 
+    public void removeAllLines() {
+        if (!mc.isSameThread()) {
+            throw new RuntimeException("removeAllLines must be called on the main thread!");
+        }
+        lines.clear();
+        staleLines.clear();
+        dbExecutor.execute(() -> database.removeAllLines(dimension));
+    }
+
     public Object2IntMap<Line> getLines() {
         return lines;
     }

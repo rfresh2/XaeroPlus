@@ -335,7 +335,9 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
                 loadChunksInViewedDimension();
                 if (!initOperationQueue.isEmpty()) XaeroPlus.LOGGER.info("[{}] Running {} queued tasks", databaseName, initOperationQueue.size());
                 while (!this.initOperationQueue.isEmpty()) {
-                    submitTickTask(this.initOperationQueue.poll().task());
+                    var op = this.initOperationQueue.poll();
+                    if (op == null || op.task() == null) continue;
+                    submitTickTask(op.task());
                 }
             });
         } catch (final Exception e) {

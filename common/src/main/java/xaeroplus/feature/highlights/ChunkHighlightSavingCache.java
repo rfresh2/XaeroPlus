@@ -21,6 +21,7 @@ import xaeroplus.util.timer.Timers;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -41,7 +42,8 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     // executor used for single threaded tasks that involve changing worlds and preparing the cache for operations
     @NotNull private final ListeningExecutorService parentExecutor;
     private final Map<ResourceKey<Level>, ChunkHighlightCacheDimensionHandler> dimensionCacheMap = new ConcurrentHashMap<>(3);
-    private final Queue<Runnable> initializeTaskQueue = new ConcurrentLinkedQueue<>();
+    // highlight add/remove ops queued while the cache is initializing
+    private final Queue<QueuedInitOperation> initOperationQueue = new ConcurrentLinkedQueue<>();
     Minecraft mc = Minecraft.getInstance();
 
     public ChunkHighlightSavingCache(final @NotNull String databaseName) {
@@ -67,7 +69,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
             ChunkHighlightCacheDimensionHandler cacheForActualDimension = getCacheForDimension(dimension, true);
             if (cacheForActualDimension == null) {
                 // if the cache is not ready yet, queue the highlight to be added
-                initializeTaskQueue.add(() -> addHighlight(x, z, dimension));
+                addInitOperation(() -> addHighlight(x, z, dimension));
                 return;
             }
             cacheForActualDimension.addHighlight(x, z);
@@ -87,7 +89,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
             ChunkHighlightCacheDimensionHandler cacheForActualDimension = getCacheForDimension(dimension, true);
             if (cacheForActualDimension == null) {
                 // if the cache is not ready yet, queue the highlight to be added
-                initializeTaskQueue.add(() -> addHighlight(x, z, foundTime, dimension));
+                addInitOperation(() -> addHighlight(x, z, foundTime, dimension));
                 return;
             }
             cacheForActualDimension.addHighlight(x, z, foundTime);
@@ -107,7 +109,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
             ChunkHighlightCacheDimensionHandler cacheForActualDimension = getCacheForDimension(dimension, true);
             if (cacheForActualDimension == null) {
                 // if the cache is not ready yet, queue the highlight to be removed
-                initializeTaskQueue.add(() -> removeHighlight(x, z, dimension));
+                initOperationQueue.add(new QueuedInitOperation(() -> removeHighlight(x, z, dimension)));
                 return;
             }
             cacheForActualDimension.removeHighlight(x, z);
@@ -126,7 +128,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         try {
             var cacheForActualDimension = getCacheForDimension(dimension, true);
             if (cacheForActualDimension == null) {
-                initializeTaskQueue.add(() -> removeHighlights(toRemove, dimension));
+                addInitOperation(() -> removeHighlights(toRemove, dimension));
                 return;
             }
             cacheForActualDimension.removeHighlights(toRemove);
@@ -237,7 +239,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         // dimension cache instances will be GC'd, no need to explicitly clear them
         this.dimensionCacheMap.clear();
         this.database = null;
-        this.initializeTaskQueue.clear();
+        this.initOperationQueue.clear();
     }
 
     // note: writes occur on the worker thread
@@ -331,9 +333,9 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
                 initializeDimensionCacheHandler(NETHER);
                 initializeDimensionCacheHandler(END);
                 loadChunksInViewedDimension();
-                if (!initializeTaskQueue.isEmpty()) XaeroPlus.LOGGER.info("[{}] Running {} queued tasks", databaseName, initializeTaskQueue.size());
-                while (!this.initializeTaskQueue.isEmpty()) {
-                    submitTickTask(this.initializeTaskQueue.poll());
+                if (!initOperationQueue.isEmpty()) XaeroPlus.LOGGER.info("[{}] Running {} queued tasks", databaseName, initOperationQueue.size());
+                while (!this.initOperationQueue.isEmpty()) {
+                    submitTickTask(this.initOperationQueue.poll().task());
                 }
             });
         } catch (final Exception e) {
@@ -456,5 +458,30 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         // does not await the shutdown
         // this saving cache instance should never be reused after this is called
         parentExecutor.shutdown();
+    }
+
+    private synchronized void addInitOperation(final Runnable task) {
+        if (!initOperationQueue.isEmpty()) {
+            var cutoff = Instant.now().minusSeconds(10);
+            while (true) {
+                var next = initOperationQueue.peek();
+                if (next == null) break;
+                if (next.time().isBefore(cutoff)) {
+                    initOperationQueue.poll();
+                } else {
+                    break;
+                }
+            }
+        }
+        if (initOperationQueue.size() > 5000) {
+            return;
+        }
+        initOperationQueue.add(new QueuedInitOperation(task));
+    }
+
+    record QueuedInitOperation(Instant time, Runnable task) {
+        public QueuedInitOperation(Runnable task) {
+            this(Instant.now(), task);
+        }
     }
 }

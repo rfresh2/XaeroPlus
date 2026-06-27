@@ -72,7 +72,7 @@
     "mc.MixinBedBlock",
     "mc.MixinBufferBuilder",
     "mc.MixinClientPlayNetworkHandler",
-    "mc.MixinMinecraftClient",
+    "mc.MixinMinecraft",
     "mc.MixinPictureInPictureRenderer",
     "mc.MixinRespawnAnchor"
   ]

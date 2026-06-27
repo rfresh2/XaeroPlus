@@ -73,7 +73,7 @@
     "mc.MixinBufferBuilder",
     "mc.MixinClientPlayNetworkHandler",
     "mc.MixinGui",
-    "mc.MixinMinecraftClient",
+    "mc.MixinMinecraft",
     "mc.MixinPictureInPictureRenderer",
     "mc.MixinRenderPipeline",
     "mc.MixinRespawnAnchor"

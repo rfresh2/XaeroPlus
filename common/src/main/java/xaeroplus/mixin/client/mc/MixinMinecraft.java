@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
+import xaeroplus.event.ClientStoppingEvent;
 import xaeroplus.event.ClientTickEvent;
 import xaeroplus.module.impl.FpsLimiter;
 import xaeroplus.settings.Settings;
@@ -19,7 +20,7 @@ import xaeroplus.settings.Settings;
     value = Minecraft.class,
     priority = 999 // MUST be before xaero mods mixins to handle dimension switch correctly
 )
-public class MixinMinecraftClient {
+public class MixinMinecraft {
     @Shadow public ClientLevel level;
 
     @Inject(method = "runTick", at = @At("HEAD"))
@@ -55,5 +56,14 @@ public class MixinMinecraftClient {
     @Inject(method = "setLevel", at = @At("RETURN"))
     public void onLevelChangePost(CallbackInfo info) {
         Globals.switchingDimension = false;
+    }
+
+    @Inject(method = "destroy", at = @At(
+        value = "INVOKE",
+        target = "Lorg/slf4j/Logger;info(Ljava/lang/String;)V",
+        shift = At.Shift.AFTER
+    ))
+    public void onDestroy(CallbackInfo info) {
+        XaeroPlus.EVENT_BUS.call(ClientStoppingEvent.INSTANCE);
     }
 }

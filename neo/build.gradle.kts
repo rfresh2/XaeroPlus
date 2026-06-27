@@ -21,13 +21,6 @@ loom {
         accessWidenerPath.set(common.loom.accessWidenerPath)
         convertAccessWideners(tasks.named("shadowJar", ShadowJar::class), accessWidenerPath.get().asFile.name)
     }
-    runs {
-        getByName("client") {
-            generateRunConfig = true
-            preferGradleTask = true
-            client()
-        }
-    }
 }
 
 val worldmap_version_neo = providers.gradleProperty("worldmap_version_neo").get()

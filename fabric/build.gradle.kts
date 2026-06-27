@@ -14,13 +14,6 @@ architectury {
 loom {
 	accessWidenerPath = project(":common").loom.accessWidenerPath
 	injectAccessWidener(tasks.named<ShadowJar>("shadowJar"))
-	runs {
-		getByName("client") {
-			generateRunConfig = true
-			preferGradleTask = true
-			client()
-		}
-	}
 }
 
 val common = configurations.create("common")

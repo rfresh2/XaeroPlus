@@ -12,6 +12,7 @@ public abstract class AbstractLineVertexBuffer<T> {
     protected boolean flipped = false;
     protected int indexCount = 0;
     public MappableRingBuffer uniformBuffer = null;
+    public MappableRingBuffer dynamicTransformUniformBuffer = null;
 
     public boolean needsRefresh(final DrawContext ctx) {
         return vertexBuffer == null || vertexBuffer.isClosed() || stale || flipped != ctx.worldmap() || uniformBuffer == null;
@@ -33,6 +34,18 @@ public abstract class AbstractLineVertexBuffer<T> {
                     .get()
             );
         }
+        if (dynamicTransformUniformBuffer == null) {
+            dynamicTransformUniformBuffer = new MappableRingBuffer(
+                () -> "XaeroPlus Lines DynamicTransforms Uniform Buffer",
+                GpuBuffer.USAGE_UNIFORM | GpuBuffer.USAGE_MAP_WRITE,
+                new Std140SizeCalculator()
+                    .putMat4f()
+                    .putVec4()
+                    .putVec3()
+                    .putMat4f()
+                    .get()
+            );
+        }
     }
 
     protected abstract void refresh(DrawContext ctx, T lines);
@@ -51,6 +64,10 @@ public abstract class AbstractLineVertexBuffer<T> {
         if (uniformBuffer != null) {
             uniformBuffer.close();
             uniformBuffer = null;
+        }
+        if (dynamicTransformUniformBuffer != null) {
+            dynamicTransformUniformBuffer.close();
+            dynamicTransformUniformBuffer = null;
         }
     }
 }

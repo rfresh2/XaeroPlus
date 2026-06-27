@@ -175,14 +175,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             .append(component);
     }
 
-    @Inject(method = "<init>", at = @At("RETURN"))
-    public void onConstructor(CallbackInfo ci) {
-        // workaround bug where the atlas doesn't always init correctly
-        // not sure what triggers it yet
-        // should be minimal perf impact just resetting on gui init
-        WorldMap.waypointSymbolCreator.resetChars();
-    }
-
     @Inject(method = "init", at = @At(value = "RETURN"), remap = true)
     public void customInitGui(CallbackInfo ci) {
         // left side

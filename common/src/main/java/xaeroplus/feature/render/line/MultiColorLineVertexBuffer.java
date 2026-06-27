@@ -2,7 +2,6 @@ package xaeroplus.feature.render.line;
 
 import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.buffers.Std140Builder;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -12,6 +11,7 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.DynamicUniforms;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -84,8 +84,11 @@ public class MultiColorLineVertexBuffer extends AbstractLineVertexBuffer<Object2
                 .putVec2(XaeroPlusShaders.LINES_FRAME_SIZE[0], XaeroPlusShaders.LINES_FRAME_SIZE[1])
                 .putFloat(lineWidthScale);
         }
-        GpuBufferSlice dynamic = RenderSystem.getDynamicUniforms()
-            .writeTransform(RenderSystem.getModelViewStack(), new Vector4f(1.0f, 1.0f, 1.0f, 1.0f), new Vector3f(), new Matrix4f());
+        dynamicTransformUniformBuffer.rotate();
+        try (var mappedView = dynamicTransformUniformBuffer.currentBuffer().map(false, true)) {
+            var transform = new DynamicUniforms.Transform(RenderSystem.getModelViewStack(), new Vector4f(1.0f, 1.0f, 1.0f, 1.0f), new Vector3f(), new Matrix4f());
+            transform.write(mappedView.data());
+        }
         var autoIndexBuffer = RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS);
         var indexType = autoIndexBuffer.type();
         var indexBuffer = autoIndexBuffer.getBuffer(indexCount);
@@ -93,7 +96,7 @@ public class MultiColorLineVertexBuffer extends AbstractLineVertexBuffer<Object2
             .createRenderPass(() -> "XaeroPlus Lines",  Minecraft.getInstance().gameRenderer.mainRenderTarget().getColorTextureView(), Optional.empty())) {
             pass.setPipeline(XaeroPlusShaders.LINES_PIPELINE);
             RenderSystem.bindDefaultUniforms(pass);
-            pass.setUniform("DynamicTransforms", dynamic);
+            pass.setUniform("DynamicTransforms", dynamicTransformUniformBuffer.currentBuffer());
             pass.setUniform("LinesTransforms", uniformBuffer.currentBuffer());
             pass.setIndexBuffer(indexBuffer, indexType);
             pass.setVertexBuffer(0, vertexBuffer.slice());

@@ -15,6 +15,7 @@ public abstract class AbstractHighlightVertexBuffer {
     public long lastRefreshed = 0L;
     public int indexCount = 0;
     public MappableRingBuffer uniformBuffer = null;
+    public MappableRingBuffer dynamicTransformUniformBuffer = null;
 
     public boolean needsRefresh(DrawContext ctx) {
         return vertexBuffer == null || vertexBuffer.isClosed() || stale || flipped != ctx.worldmap() || uniformBuffer == null;
@@ -38,6 +39,18 @@ public abstract class AbstractHighlightVertexBuffer {
                     .get()
             );
         }
+        if (dynamicTransformUniformBuffer == null) {
+            dynamicTransformUniformBuffer = new MappableRingBuffer(
+                () -> "XaeroPlus Highlights DynamicTransforms Uniform Buffer",
+                GpuBuffer.USAGE_UNIFORM | GpuBuffer.USAGE_MAP_WRITE,
+                new Std140SizeCalculator()
+                    .putMat4f()
+                    .putVec4()
+                    .putVec3()
+                    .putMat4f()
+                    .get()
+            );
+        }
     }
 
     public abstract void refresh(DrawContext ctx, Long2LongMap highlights, int color);
@@ -54,6 +67,10 @@ public abstract class AbstractHighlightVertexBuffer {
         if (uniformBuffer != null) {
             uniformBuffer.close();
             uniformBuffer = null;
+        }
+        if (dynamicTransformUniformBuffer != null) {
+            dynamicTransformUniformBuffer.close();
+            dynamicTransformUniformBuffer = null;
         }
     }
 }

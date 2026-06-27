@@ -2,7 +2,6 @@ package xaeroplus.feature.render.highlight;
 
 import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.buffers.Std140Builder;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -11,6 +10,7 @@ import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.DynamicUniforms;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -72,9 +72,11 @@ public class HighlightVertexBuffer extends AbstractHighlightVertexBuffer {
                 .putMat4f(ctx.matrixStack().last().pose())
                 .putVec4(new Vector4f(r, g, b, a));
         }
-        GpuBufferSlice dynamic = RenderSystem.getDynamicUniforms()
-            // only need ModelViewMat
-            .writeTransform(RenderSystem.getModelViewStack(), new Vector4f(), new Vector3f(), new Matrix4f());
+        dynamicTransformUniformBuffer.rotate();
+        try (var mappedView = dynamicTransformUniformBuffer.currentBuffer().map(false, true)) {
+            var transform = new DynamicUniforms.Transform(RenderSystem.getModelViewStack(), new Vector4f(), new Vector3f(), new Matrix4f());
+            transform.write(mappedView.data());
+        }
         var autoIndexBuffer = RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS);
         var indexType = autoIndexBuffer.type();
         var indexBuffer = autoIndexBuffer.getBuffer(indexCount);
@@ -82,7 +84,7 @@ public class HighlightVertexBuffer extends AbstractHighlightVertexBuffer {
             .createRenderPass(() -> "XaeroPlus Highlight Vertex Buffer", Minecraft.getInstance().gameRenderer.mainRenderTarget().getColorTextureView(), Optional.empty())) {
             pass.setPipeline(XaeroPlusShaders.HIGHLIGHT_PIPELINE);
             RenderSystem.bindDefaultUniforms(pass); // Projection
-            pass.setUniform("DynamicTransforms", dynamic);
+            pass.setUniform("DynamicTransforms", dynamicTransformUniformBuffer.currentBuffer());
             pass.setUniform("HighlightTransforms", uniformBuffer.currentBuffer());
             pass.setIndexBuffer(indexBuffer, indexType);
             pass.setVertexBuffer(0, vertexBuffer.slice());

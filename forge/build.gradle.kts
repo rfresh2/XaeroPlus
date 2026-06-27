@@ -24,13 +24,6 @@ loom {
         convertAccessWideners = true
         extraAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
     }
-    runs {
-        getByName("client") {
-            generateRunConfig = true
-            preferGradleTask = true
-            client()
-        }
-    }
 }
 
 val worldmap_version_forge = providers.gradleProperty("worldmap_version_forge").get()

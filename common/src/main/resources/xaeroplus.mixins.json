@@ -75,7 +75,7 @@
     "mc.MixinClientPlayNetworkHandler",
     "mc.MixinGlStateManager",
     "mc.MixinGui",
-    "mc.MixinMinecraftClient",
+    "mc.MixinMinecraft",
     "mc.MixinRespawnAnchor"
   ]
 }

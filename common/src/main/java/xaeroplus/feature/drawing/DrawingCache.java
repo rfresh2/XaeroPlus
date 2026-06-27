@@ -672,6 +672,46 @@ public class DrawingCache implements Closeable {
     public void close() throws IOException {
         // does not await the shutdown
         // this saving cache instance should never be reused after this is called
+        parentExecutor.execute(() -> {
+            var dbExec = this.dbExecutor;
+            if (dbExec != null && !dbExec.isShutdown()) {
+                dbExec.execute(() -> {
+                    if (database != null) {
+                        database.close();
+                    }
+                });
+                dbExec.shutdown();
+            }
+        });
         parentExecutor.shutdown();
+    }
+
+    public void closeAndAwaitTermination() throws IOException {
+        parentExecutor.execute(() -> {
+            var dbExec = this.dbExecutor;
+            if (dbExec != null && !dbExec.isShutdown()) {
+                dbExec.execute(() -> {
+                    if (database != null) {
+                        database.close();
+                    }
+                });
+                dbExec.shutdown();
+                try {
+                    if (!dbExec.awaitTermination(5L, TimeUnit.SECONDS)) {
+                        throw new RuntimeException("Failed to shutdown drawing executor");
+                    }
+                } catch (Exception e) {
+                    XaeroPlus.LOGGER.error("Error waiting for darwing db executor to shutdown", e);
+                }
+            }
+        });
+        parentExecutor.shutdown();
+        try {
+            if (!parentExecutor.awaitTermination(5L, TimeUnit.SECONDS)) {
+                throw new RuntimeException("Failed to shutdown drawing executor");
+            }
+        } catch (Exception e) {
+            XaeroPlus.LOGGER.error("Error waiting for executor to shutdown", e);
+        }
     }
 }

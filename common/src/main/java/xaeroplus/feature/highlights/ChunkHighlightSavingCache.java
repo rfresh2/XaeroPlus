@@ -457,7 +457,43 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     public void close() throws IOException {
         // does not await the shutdown
         // this saving cache instance should never be reused after this is called
+        parentExecutor.execute(() -> {
+            var dbExec = dbExecutor;
+            if (dbExec != null && !dbExec.isShutdown()) {
+                dbExec.execute(() -> {
+                    if (database != null) database.close();
+                });
+                dbExec.shutdown();
+            }
+        });
         parentExecutor.shutdown();
+    }
+
+    public void closeAndAwaitTermination() throws IOException {
+        parentExecutor.execute(() -> {
+            var dbExec = dbExecutor;
+            if (dbExec != null && !dbExec.isShutdown()) {
+                dbExec.execute(() -> {
+                    if (database != null) database.close();
+                });
+                dbExec.shutdown();
+                try {
+                    if (!dbExec.awaitTermination(5L, TimeUnit.SECONDS)) {
+                        throw new RuntimeException("Timed out awaiting shutdown termination");
+                    }
+                } catch (Exception e) {
+                    XaeroPlus.LOGGER.error("Error waiting for {} db executor to shutdown", databaseName, e);
+                }
+            }
+        });
+        parentExecutor.shutdown();
+        try {
+            if (!parentExecutor.awaitTermination(5L, TimeUnit.SECONDS)) {
+                throw new RuntimeException("Timed out awaiting shutdown termination");
+            }
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.error("Error waiting for {} executor to shutdown", databaseName, e);
+        }
     }
 
     private synchronized void addInitOperation(final Runnable task) {

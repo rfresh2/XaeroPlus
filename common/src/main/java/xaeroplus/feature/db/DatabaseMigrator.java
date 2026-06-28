@@ -247,6 +247,7 @@ public class DatabaseMigrator {
 
     public static class MigrationMonitor {
         private final Map<String, MigrationStatus> migrations = new HashMap<>();
+        private final SystemToast.SystemToastId toastId = new SystemToast.SystemToastId();
 
         public MigrationMonitor() {
             XaeroPlus.EVENT_BUS.register(this);
@@ -285,7 +286,7 @@ public class DatabaseMigrator {
             }
             if (inProgressMigrations <= 0) {
                 if (toastActive) {
-                    SystemToast.addOrUpdate(mc.getToasts(), SystemToast.SystemToastId.WORLD_ACCESS_FAILURE,
+                    SystemToast.addOrUpdate(mc.getToasts(), toastId,
                         Component.literal("XaeroPlus"),
                         Component.translatable("xaeroplus.gui.toast.database_migration_done", completedMigrations, failedMigrations)
                     );
@@ -293,7 +294,7 @@ public class DatabaseMigrator {
                 toastActive = false;
                 return;
             }
-            SystemToast.addOrUpdate(mc.getToasts(), SystemToast.SystemToastId.WORLD_ACCESS_FAILURE,
+            SystemToast.addOrUpdate(mc.getToasts(), toastId,
                 Component.literal("XaeroPlus"),
                 Component.translatable("xaeroplus.gui.toast.database_migration_in_progress", inProgressMigrations, completedMigrations, failedMigrations)
             );

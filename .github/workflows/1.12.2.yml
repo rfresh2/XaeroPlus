@@ -16,10 +16,10 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
         with:
           # read only on pull requests, otherwise allow writes
           cache-read-only: ${{ github.event_name == 'pull_request' }}
@@ -27,8 +27,8 @@ jobs:
       - name: Set up JDK 8
         uses: actions/setup-java@v5
         with:
-          java-version: '8'
-          distribution: 'temurin'
+          java-version: 8
+          distribution: temurin
 
       - name: Elevate wrapper permissions
         run: chmod +x ./gradlew
@@ -45,6 +45,9 @@ jobs:
       - name: Get XaeroLib Version
         run: echo "XAEROLIB_VERSION=$(./gradlew -q printXaeroLibVersion)" >> $GITHUB_ENV
 
+      - name: Get MixinBooter Version
+        run: echo "MIXINBOOTER_VERSION=$(./gradlew -q printMixinBooterVersion)" >> $GITHUB_ENV
+
       - name: Get Forge Jar Filename
         run: echo "XP_FORGE=XaeroPlus-DEV-${{ github.run_number }}+forge-${{ env.MINECRAFT_VERSION }}-WM${{ env.WORLDMAP_VERSION }}-MM${{ env.MINIMAP_VERSION }}" >> $GITHUB_ENV
 
@@ -52,15 +55,17 @@ jobs:
         run: mv build/libs/XaeroPlus-*.jar ${{ env.XP_FORGE }}.jar
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ env.XP_FORGE }}
           path: ${{ env.XP_FORGE }}.jar
+          if-no-files-found: error
     outputs:
       xp_forge: ${{ env.XP_FORGE }}
       worldmap_version: ${{ env.WORLDMAP_VERSION }}
       minimap_version: ${{ env.MINIMAP_VERSION }}
       xaerolib_version: ${{ env.XAEROLIB_VERSION }}
+      mixinbooter_version: ${{ env.MIXINBOOTER_VERSION }}
 
   test-forge:
     runs-on: ubuntu-latest
@@ -70,11 +75,11 @@ jobs:
       - name: Set up JDK 8
         uses: actions/setup-java@v5
         with:
-          java-version: '8'
-          distribution: 'temurin'
+          java-version: 8
+          distribution: temurin
 
       - name: Download job artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           merge-multiple: true
           path: artifacts/
@@ -87,7 +92,7 @@ jobs:
           mkdir -p run/mods && cp artifacts/${{ needs.build.outputs.xp_forge }}.jar run/mods \
           && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-minimap/forge-1.12.2-${{ needs.build.outputs.minimap_version }}/xaeros-minimap-forge-1.12.2-${{ needs.build.outputs.minimap_version }}.jar -P run/mods/ \
           && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/forge-1.12.2-${{ needs.build.outputs.worldmap_version }}/xaeros-world-map-forge-1.12.2-${{ needs.build.outputs.worldmap_version }}.jar -P run/mods/ \
-          && wget https://api.modrinth.com/maven/maven/modrinth/mixinbooter/9.4/!mixinbooter-9.4.jar -P run/mods/ \
+          && wget https://api.modrinth.com/maven/maven/modrinth/mixinbooter/${{ needs.build.outputs.mixinbooter_version }}/!mixinbooter-${{ needs.build.outputs.mixinbooter_version }}.jar -P run/mods/ \
           && wget https://api.modrinth.com/maven/maven/modrinth/xaerolib/forge-1.12.2-${{ needs.build.outputs.xaerolib_version }}/xaerolib-forge-1.12.2-${{ needs.build.outputs.xaerolib_version }}.jar -P run/mods/
 
       - name: Forge Test

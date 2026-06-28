@@ -8,68 +8,41 @@ plugins {
     id("java-library")
     id("org.jetbrains.gradle.plugin.idea-ext") version "1.3"
     id("com.gtnewhorizons.retrofuturagradle") version "2.0.2"
-    id("com.gradleup.shadow") version "9.4.1"
+    id("com.gradleup.shadow") version "9.4.2"
 }
 
-// Project properties
 group = "xaeroplus"
 version = providers.environmentVariable("RELEASE_VERSION").orElse("1.12.2").get()
+val mixin_booter_version = property("mixin_booter_version") as String
+val worldmap_version = property("worldmap_version") as String
+val minimap_version = property("minimap_version") as String
+val xaerolib_version = property("xaerolib_version") as String
 
-
-// Set the toolchain version to decouple the Java we run Gradle with from the Java used to compile and run the mod
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(8))
     }
 }
 
-// Most RFG configuration lives here, see the JavaDoc for com.gtnewhorizons.retrofuturagradle.MinecraftExtension
 minecraft {
-    mcVersion.set("1.12.2")
+    mcVersion = "1.12.2"
+    username = "rfresh2"
 
-    // Username for client run configurations
-    username.set("Developer")
+    injectedTags.put("MOD_VERSION", project.version.toString())
+    injectedTags.put("MIXIN_BOOTER_VERSION", mixin_booter_version)
+    injectedTags.put("WORLDMAP_VERSION", worldmap_version)
+    injectedTags.put("MINIMAP_VERSION", minimap_version)
+    injectedTags.put("XAEROLIB_VERSION", xaerolib_version)
 
-    // Generate a field named VERSION with the mod version in the injected Tags class
-    injectedTags.put("WORLDMAP_VERSION", project.properties["worldmap_version"] as String)
-    injectedTags.put("MINIMAP_VERSION", project.properties["minimap_version"] as String)
-    injectedTags.put("XAEROLIB_VERSION", project.properties["xaerolib_version"] as String)
-
-    // If you need the old replaceIn mechanism, prefer the injectTags task because it doesn't inject a javac plugin.
-    // tagReplacementFiles.add("RfgExampleMod.java")
-
-    // Enable assertions in the mod's package when running the client or server
     extraRunJvmArguments.add("-ea:${project.group}")
 
-    // If needed, add extra tweaker classes like for mixins.
-     extraTweakClasses.add("org.spongepowered.asm.launch.MixinTweaker")
-
-    // Exclude some Maven dependency groups from being automatically included in the reobfuscated runs
+    extraTweakClasses.add("org.spongepowered.asm.launch.MixinTweaker")
 }
-
-// Create a new dependency type for runtime-only dependencies that don't get included in the maven publication
-//val runtimeOnlyNonPublishable: Configuration by configurations.creating {
-//    description = "Runtime only dependencies that are not published alongside the jar"
-//    isCanBeConsumed = false
-//    isCanBeResolved = false
-//}
-//listOf(configurations.runtimeClasspath, configurations.testRuntimeClasspath).forEach {
-//    it.configure {
-//        extendsFrom(
-//            runtimeOnlyNonPublishable
-//        )
-//    }
-//}
 
 // Add an access tranformer
 // tasks.deobfuscateMergedJarToSrg.configure {accessTransformerFiles.from("src/main/resources/META-INF/mymod_at.cfg")}
 
-// Dependencies
 repositories {
-    maven {
-        name = "OvermindDL1 Maven"
-        url = uri("https://gregtech.overminddl1.com/")
-    }
     maven {
         name = "GTNH Maven"
         url = uri("https://nexus.gtnewhorizons.com/repository/public/")
@@ -93,11 +66,11 @@ sourceSets {
     }
 }
 
-val jarLibs by configurations.creating
+val jarLibs = configurations.create("jarLibs")
 configurations.implementation.get().extendsFrom(jarLibs)
 
 dependencies {
-    val mixin: String = modUtils.enableMixins("zone.rong:mixinbooter:10.7", "mixins.xaeroplus.refmap.json") as String
+    val mixin: String = modUtils.enableMixins("zone.rong:mixinbooter:$mixin_booter_version", "mixins.xaeroplus.refmap.json") as String
     api(mixin) {
         isTransitive = false
     }
@@ -109,31 +82,30 @@ dependencies {
     }
 
     jarLibs("com.github.ben-manes.caffeine:caffeine:2.9.3")
-    jarLibs("org.rfresh.xerial:sqlite-jdbc:3.53.0.1")
-    implementation(modUtils.deobfuscate("maven.modrinth:xaeros-world-map:forge-1.12.2-${project.properties["worldmap_version"]}"))
-    implementation(modUtils.deobfuscate("maven.modrinth:xaeros-minimap:forge-1.12.2-${project.properties["minimap_version"]}"))
-    implementation(modUtils.deobfuscate("maven.modrinth:xaerolib:forge-1.12.2-${project.properties["xaerolib_version"]}"))
+    jarLibs("org.rfresh.xerial:sqlite-jdbc:3.53.2.0")
+    implementation(modUtils.deobfuscate("maven.modrinth:xaeros-world-map:forge-1.12.2-$worldmap_version"))
+    implementation(modUtils.deobfuscate("maven.modrinth:xaeros-minimap:forge-1.12.2-$minimap_version"))
+    implementation(modUtils.deobfuscate("maven.modrinth:xaerolib:forge-1.12.2-$xaerolib_version"))
     compileOnly(modUtils.deobfuscate("cabaletta:baritone-deobf-unoptimized-mcp-dev:1.2"))
     compileOnly(modUtils.deobfuscate("curse.maven:waystones-245755:2859589"))
 }
 
 tasks {
     jar {
-        enabled = false
+        destinationDirectory = project.layout.buildDirectory.dir("devlib")
     }
 
     reobfJar {
         inputJar.set(shadowJar.get().archiveFile)
+        destinationDirectory = project.layout.buildDirectory.dir("libs")
     }
 
-    // Generates a class named rfg.examplemod.Tags with the mod version in it, you can find it at
     injectTags.configure {
         outputClassName.set("${project.group}.BuildConstants")
     }
 
-    // Put the version from gradle into mcmod.info
     processResources.configure {
-        val projVersion = project.version.toString() // Needed for configuration cache to work
+        val projVersion = project.version.toString()
         inputs.property("version", projVersion)
 
         filesMatching("mcmod.info") {
@@ -180,19 +152,25 @@ tasks {
 
     register("printWorldMapVersion") {
         doLast {
-            println(project.properties["worldmap_version"])
+            println(worldmap_version)
         }
         outputs.upToDateWhen { false }
     }
     register("printMinimapVersion") {
         doLast {
-            println(project.properties["minimap_version"])
+            println(minimap_version)
         }
         outputs.upToDateWhen { false }
     }
     register("printXaeroLibVersion") {
         doLast {
-            println(project.properties["xaerolib_version"])
+            println(xaerolib_version)
+        }
+        outputs.upToDateWhen { false }
+    }
+    register("printMixinBooterVersion") {
+        doLast {
+            println(mixin_booter_version)
         }
         outputs.upToDateWhen { false }
     }
@@ -221,40 +199,13 @@ idea {
                     self.add(Gradle("4. Run Obfuscated Server").apply {
                         setProperty("taskNames", listOf("runObfServer"))
                     })
-                    /*
-                    These require extra configuration in IntelliJ, so are not enabled by default
-                    self.add(Application("Run Client (IJ Native, Deprecated)", project).apply {
-                      mainClass = "GradleStart"
-                      moduleName = project.name + ".ideVirtualMain"
-                      afterEvaluate {
-                        val runClient = tasks.runClient.get()
-                        workingDirectory = runClient.workingDir.absolutePath
-                        programParameters = runClient.calculateArgs(project).map { '"' + it + '"' }.joinToString(" ")
-                        jvmArgs = runClient.calculateJvmArgs(project).map { '"' + it + '"' }.joinToString(" ") +
-                          ' ' + runClient.systemProperties.map { "\"-D" + it.key + '=' + it.value.toString() + '"' }
-                          .joinToString(" ")
-                      }
-                    })
-                    self.add(Application("Run Server (IJ Native, Deprecated)", project).apply {
-                      mainClass = "GradleStartServer"
-                      moduleName = project.name + ".ideVirtualMain"
-                      afterEvaluate {
-                        val runServer = tasks.runServer.get()
-                        workingDirectory = runServer.workingDir.absolutePath
-                        programParameters = runServer.calculateArgs(project).map { '"' + it + '"' }.joinToString(" ")
-                        jvmArgs = runServer.calculateJvmArgs(project).map { '"' + it + '"' }.joinToString(" ") +
-                          ' ' + runServer.systemProperties.map { "\"-D" + it.key + '=' + it.value.toString() + '"' }
-                          .joinToString(" ")
-                      }
-                    })
-                    */
                 }
                 "compiler" {
                     val self = this.delegate as org.jetbrains.gradle.ext.IdeaCompilerConfiguration
                     afterEvaluate {
                         self.javac.moduleJavacAdditionalOptions = mapOf(
                             (project.name + ".main") to
-                                    tasks.compileJava.get().options.compilerArgs.map { '"' + it + '"' }.joinToString(" ")
+                                    tasks.compileJava.get().options.compilerArgs.joinToString(" ") { '"' + it + '"' }
                         )
                     }
                 }

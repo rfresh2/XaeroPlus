@@ -22,19 +22,18 @@ import xaeroplus.util.XaeroPlusGameTest;
 import java.io.File;
 
 @Mod(
-        modid = XaeroPlus.MODID,
-        name = XaeroPlus.NAME,
-        version = XaeroPlus.VERSION,
-        clientSideOnly = true,
-        dependencies = "required:mixinbooter@[9.4,);"
-            + "after:xaerominimap@[" + BuildConstants.MINIMAP_VERSION + "];"
-            + "required-after:xaeroworldmap@[" + BuildConstants.WORLDMAP_VERSION + "];"
-            + "required-after:xaerolib@[" + BuildConstants.XAEROLIB_VERSION + "];"
+    modid = XaeroPlus.MODID,
+    name = XaeroPlus.NAME,
+    version = BuildConstants.MOD_VERSION,
+    clientSideOnly = true,
+    dependencies = "required:mixinbooter@[" + BuildConstants.MIXIN_BOOTER_VERSION + ",);"
+        + "after:xaerominimap@[" + BuildConstants.MINIMAP_VERSION + "];"
+        + "required-after:xaeroworldmap@[" + BuildConstants.WORLDMAP_VERSION + "];"
+        + "required-after:xaerolib@[" + BuildConstants.XAEROLIB_VERSION + "];"
 )
 public class XaeroPlus {
     public static final String MODID = "xaeroplus";
     public static final String NAME = "XaeroPlus";
-    public static final String VERSION = "1.12.2";
     public static EventBus EVENT_BUS = MinecraftForge.EVENT_BUS;
     public static Logger LOGGER = LogManager.getLogger("XaeroPlus");
     private static final ForgeEventHandler forgeEventHandler = new ForgeEventHandler();

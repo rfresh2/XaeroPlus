@@ -24,7 +24,7 @@ dependencyResolutionManagement {
 	versionCatalogs {
 		create("libs") {
 			library("fabric-loader", "net.fabricmc:fabric-loader:0.15.11")
-			library("forge", "net.minecraftforge:forge:$minecraft_version-47.4.4")
+			library("forge", "net.minecraftforge:forge:$minecraft_version-47.4.20")
             library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.92.3+$minecraft_version")
 			library("worldmap-fabric", "maven.modrinth:xaeros-world-map:fabric-$minecraft_version-$worldmap_version_fabric")
 			library("worldmap-forge", "maven.modrinth:xaeros-world-map:forge-$minecraft_version-$worldmap_version_forge")
@@ -34,7 +34,7 @@ dependencyResolutionManagement {
 			library("xaerolib-forge", "xaero.lib:xaerolib-forge-$minecraft_version:$xaerolib_version")
 			library("mixinextras-common", "io.github.llamalad7:mixinextras-common:0.5.4")
 			library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.5.4")
-			library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.0")
+			library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.4")
 			library("lambdaEvents", "net.lenni0451:LambdaEvents:2.4.2")
 			library("waystones-fabric", "maven.modrinth:waystones:14.1.20+fabric-$minecraft_version")
 			library("waystones-forge", "maven.modrinth:waystones:14.1.20+forge-$minecraft_version")

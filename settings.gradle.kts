@@ -41,7 +41,7 @@ dependencyResolutionManagement {
 			library("xaerolib-neo", "xaero.lib:xaerolib-neoforge-$minecraft_version:${xaerolib_version}")
             library("mixinextras-common", "io.github.llamalad7:mixinextras-common:0.5.4")
             library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.5.4")
-			library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.0")
+            library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.4")
 			library("lambdaEvents", "net.lenni0451:LambdaEvents:2.4.2")
 			library("waystones-fabric", "net.blay09.mods:waystones-fabric:$minecraft_version.5")
 			library("waystones-forge", "maven.modrinth:waystones:21.11.9+forge-1.21.11")

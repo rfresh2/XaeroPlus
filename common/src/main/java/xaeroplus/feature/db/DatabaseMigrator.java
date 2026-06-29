@@ -53,9 +53,13 @@ public class DatabaseMigrator {
                     NotificationUtil.inGameNotification("Database: " + databaseName + " recovered successfully! Retrying migration...");
                     continue;
                 }
-                XaeroPlus.LOGGER.error("Failed migrating database: {}", databaseName, e);
-                NotificationUtil.inGameNotification("Database: " + databaseName + " failed to migrate!");
-                NotificationUtil.inGameNotification("More info will be in your log");
+                if (e instanceof InterruptedException) {
+                    XaeroPlus.LOGGER.warn("Migration interrupted: {}", databaseName);
+                } else {
+                    XaeroPlus.LOGGER.error("Failed migrating database: {}", databaseName, e);
+                    NotificationUtil.inGameNotification("Database: " + databaseName + " failed to migrate!");
+                    NotificationUtil.inGameNotification("More info will be in your log");
+                }
                 throw e;
             }
         }
@@ -63,7 +67,7 @@ public class DatabaseMigrator {
 
     private Connection migrateExisting(final Path dbPath, String databaseName, Connection connection) throws SQLException, InterruptedException {
         for (var migration : migrations) {
-            if (migration.shouldMigrate(databaseName, connection)) {
+            if (migration.shouldMigrate(databaseName, connection, false)) {
                 long beforeMigration = System.nanoTime();
                 XaeroPlus.LOGGER.info("Found database: {} that needs migration", databaseName);
                 MIGRATION_MONITOR.onMigrationStart(databaseName);
@@ -72,18 +76,18 @@ public class DatabaseMigrator {
                     long beforeBackup = System.nanoTime();
                     var backupPath = backupDatabase(dbPath, databaseName, connection);
                     long afterBackup = System.nanoTime();
-                    XaeroPlus.LOGGER.info("Backed up database: {} to {} in {} ms", databaseName, backupPath, (afterBackup - beforeBackup) / 1000000);
+                    XaeroPlus.LOGGER.info("Backed up database: {} to {} in {} ms", databaseName, backupPath, TimeUnit.NANOSECONDS.toMillis(afterBackup - beforeBackup));
                     long beforeRunMigration = System.nanoTime();
-                    runMigration(databaseName, connection, migration);
+                    runMigration(databaseName, connection, migration, false);
                     long afterRunMigration = System.nanoTime();
-                    XaeroPlus.LOGGER.info("Ran migration: {} in {} ms", migration.getClass().getSimpleName(), (afterRunMigration - beforeRunMigration) / 1000000);
+                    XaeroPlus.LOGGER.info("Ran migration: {} in {} ms", migration.getClass().getSimpleName(), TimeUnit.NANOSECONDS.toMillis(afterRunMigration - beforeRunMigration));
                     long beforeVacuum = System.nanoTime();
                     vacuum(connection);
                     long afterVacuum = System.nanoTime();
-                    XaeroPlus.LOGGER.info("Vacuumed database: {} in {} ms", databaseName, (afterVacuum - beforeVacuum) / 1000000);
+                    XaeroPlus.LOGGER.info("Vacuumed database: {} in {} ms", databaseName, TimeUnit.NANOSECONDS.toMillis(afterVacuum - beforeVacuum));
                 });
                 long afterMigration = System.nanoTime();
-                XaeroPlus.LOGGER.info("completed {} migration duration in {} ms", databaseName, (afterMigration - beforeMigration) / 1000000);
+                XaeroPlus.LOGGER.info("completed {} migration duration in {} ms", databaseName, TimeUnit.NANOSECONDS.toMillis(afterMigration - beforeMigration));
                 MIGRATION_MONITOR.onMigrationEnd(databaseName, true);
             }
         }
@@ -92,8 +96,8 @@ public class DatabaseMigrator {
 
     private Connection migrateInit(final Path dbPath, String databaseName, Connection connection) throws SQLException, InterruptedException {
         for (var migration : migrations) {
-            if (migration.shouldMigrate(databaseName, connection)) {
-                runMigration(databaseName, connection, migration);
+            if (migration.shouldMigrate(databaseName, connection, true)) {
+                runMigration(databaseName, connection, migration, true);
             }
         }
         return connection;
@@ -102,16 +106,20 @@ public class DatabaseMigrator {
     private void runMigration(
         final String databaseName,
         final Connection connection,
-        final DatabaseMigration migration
+        final DatabaseMigration migration,
+        final boolean init
     ) throws SQLException, InterruptedException {
         var committed = false;
         try {
             connection.setAutoCommit(false);
-            migration.doMigration(databaseName, connection);
+            migration.doMigration(databaseName, connection, init);
             if (Thread.currentThread().isInterrupted()) {
                 throw new InterruptedException("Migration interrupted");
             }
+            long beforeCommit = System.nanoTime();
             connection.commit();
+            long afterCommit = System.nanoTime();
+            if (!init) XaeroPlus.LOGGER.info("Committed migration: {} in {} ms", migration.getClass().getSimpleName(), TimeUnit.NANOSECONDS.toMillis(afterCommit - beforeCommit));
             committed = true;
         } finally {
             try {
@@ -132,7 +140,7 @@ public class DatabaseMigrator {
         final String operation,
         final SqlOperation sqlOperation
     ) throws SQLException, InterruptedException {
-        var permitAcquired = HEAVY_OPERATION_PERMITS.tryAcquire(48, TimeUnit.HOURS);
+        var permitAcquired = HEAVY_OPERATION_PERMITS.tryAcquire(100, TimeUnit.HOURS);
         if (!permitAcquired) {
             throw new RuntimeException("Failed to acquire permit for database " + operation + ": " + databaseName);
         }
@@ -231,9 +239,10 @@ public class DatabaseMigrator {
         if (!dbPath.toFile().exists()) return;
         try {
             var dbSize = Files.size(dbPath);
+            XaeroPlus.LOGGER.info("Database size: {} mb", dbSize / (1024 * 1024));
             long freeSpace = dbPath.getParent().toFile().getUsableSpace();
             if (freeSpace < dbSize * 3) {
-                throw new RuntimeException("Not enough available disk space to migrate database: " + dbPath.toFile().getName());
+                throw new RuntimeException("Not enough available disk space to migrate database: " + dbPath.toFile().getName() + " - " + freeSpace / (1024 * 1024) + "mb available");
             }
         } catch (IOException e) {
             throw new RuntimeException("Failed to check available disk space for database: " + dbPath.toFile().getName(), e);

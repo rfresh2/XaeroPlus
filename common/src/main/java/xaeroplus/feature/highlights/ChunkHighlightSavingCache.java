@@ -179,7 +179,11 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
 
                             @Override
                             public void onFailure(@NotNull final Throwable t) {
-                                XaeroPlus.LOGGER.error("Error initializing {} disk cache", databaseName, t);
+                                if (t instanceof CancellationException) {
+                                    XaeroPlus.LOGGER.warn("{} disk cache initialization cancelled", databaseName);
+                                } else {
+                                    XaeroPlus.LOGGER.error("Error initializing {} disk cache", databaseName, t);
+                                }
                                 cacheReady.set(false);
                                 reset();
                             }

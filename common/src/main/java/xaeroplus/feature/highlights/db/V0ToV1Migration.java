@@ -18,7 +18,7 @@ public class V0ToV1Migration implements DatabaseMigration {
      */
 
     @Override
-    public boolean shouldMigrate(String databaseName, Connection connection) {
+    public boolean shouldMigrate(String databaseName, Connection connection, boolean init) {
         try {
             return tableExists("0", connection)
                 || tableExists("-1", connection)
@@ -33,7 +33,7 @@ public class V0ToV1Migration implements DatabaseMigration {
     }
 
     @Override
-    public void doMigration(String databaseName, final Connection connection) {
+    public void doMigration(String databaseName, final Connection connection, final boolean init) {
         // migrate old tables and indexes
         try {
             // migrate table name

@@ -9,8 +9,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 public interface DatabaseMigration {
-    boolean shouldMigrate(String databaseName, Connection connection) throws SQLException;
-    void doMigration(String databaseName, Connection connection) throws SQLException, InterruptedException;
+    boolean shouldMigrate(String databaseName, Connection connection, boolean init) throws SQLException;
+    void doMigration(String databaseName, Connection connection, boolean init) throws SQLException, InterruptedException;
 
     static boolean isCorruptDatabase(final Throwable throwable) {
         var current = throwable;

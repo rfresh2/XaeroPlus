@@ -11,7 +11,7 @@ import java.sql.SQLException;
 
 public class V0Migration implements DatabaseMigration {
     @Override
-    public boolean shouldMigrate(final String databaseName, final Connection connection) {
+    public boolean shouldMigrate(final String databaseName, final Connection connection, final boolean init) {
         try {
             if (!tableExists("metadata", connection)) return true;
             try (var statement = connection.createStatement()) {
@@ -30,7 +30,7 @@ public class V0Migration implements DatabaseMigration {
     }
 
     @Override
-    public void doMigration(final String databaseName, final Connection connection) {
+    public void doMigration(final String databaseName, final Connection connection, final boolean init) {
         createMetadataTable(databaseName, connection);
         createLinesTable(databaseName, connection, Level.OVERWORLD);
         createLinesTable(databaseName, connection, Level.NETHER);

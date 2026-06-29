@@ -132,7 +132,7 @@ public class DatabaseMigrator {
         final String operation,
         final SqlOperation sqlOperation
     ) throws SQLException, InterruptedException {
-        var permitAcquired = HEAVY_OPERATION_PERMITS.tryAcquire(1, TimeUnit.HOURS);
+        var permitAcquired = HEAVY_OPERATION_PERMITS.tryAcquire(48, TimeUnit.HOURS);
         if (!permitAcquired) {
             throw new RuntimeException("Failed to acquire permit for database " + operation + ": " + databaseName);
         }

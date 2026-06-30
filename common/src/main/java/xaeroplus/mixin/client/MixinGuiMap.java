@@ -776,6 +776,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             } finally {
                 XaeroPlusShaders.setTransparentWMBackground(false);
             }
+        } else {
+            original.call(instance, renderer);
         }
     }
 
@@ -792,6 +794,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             } finally {
                 XaeroPlusShaders.setTransparentWMBackground(false);
             }
+        } else {
+            original.call(instance, renderer);
         }
     }
 

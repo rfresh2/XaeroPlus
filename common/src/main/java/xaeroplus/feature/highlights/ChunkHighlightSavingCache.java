@@ -16,6 +16,7 @@ import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.util.ChunkUtils;
+import xaeroplus.util.Wait;
 import xaeroplus.util.timer.Timer;
 import xaeroplus.util.timer.Timers;
 
@@ -389,12 +390,30 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         parentExecutor.execute(() -> {
             cacheReady.set(false);
             try {
-                CompletableFuture.allOf(flushAllChunks().toArray(new CompletableFuture[0])).get(30, TimeUnit.SECONDS);
+                long before = System.currentTimeMillis();
+                var future = CompletableFuture.allOf(flushAllChunks().toArray(CompletableFuture[]::new));
+                while (!future.isDone() && mc.isRunning() && TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - before) < 30) {
+                    Wait.wait(1);
+                }
             } catch (final Exception e) {
                 XaeroPlus.LOGGER.error("Error saving all chunks before disabling", e);
             }
             reset();
         });
+    }
+
+    @Override
+    public void onShutdown() {
+        if (!mc.isSameThread()) {
+            onDisable();
+            return;
+        }
+        cacheReady.set(false);
+        for (var cache : getAllCaches()) {
+            cache.flushStaleToRemoveChunks();
+            cache.writeStaleHighlightsToDatabase();
+        }
+        reset();
     }
 
     public int getMinimapRegionWindowSize() {

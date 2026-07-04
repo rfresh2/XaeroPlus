@@ -119,13 +119,14 @@ public class Drawing extends Module {
 
     @EventHandler
     public void onWorldChange(final XaeroWorldChangeEvent event) {
+        if (!mc.isRunning()) return;
         drawingCache.handleWorldChange(event);
     }
 
     @EventHandler
     public void onClientStopping(ClientStoppingEvent event) {
         try {
-            drawingCache.onDisable();
+            drawingCache.onShutdown();
             drawingCache.closeAndAwaitTermination();
         } catch (Exception e) {
             XaeroPlus.LOGGER.error("Failed to close drawing cache", e);

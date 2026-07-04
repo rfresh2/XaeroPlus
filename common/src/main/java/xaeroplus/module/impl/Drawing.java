@@ -12,7 +12,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
-import xaeroplus.event.ClientStoppingEvent;
 import xaeroplus.event.ClientTickEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.feature.drawing.DrawingCache;
@@ -29,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingDeque;
 
 public class Drawing extends Module {
@@ -123,13 +123,12 @@ public class Drawing extends Module {
         drawingCache.handleWorldChange(event);
     }
 
-    @EventHandler
-    public void onClientStopping(ClientStoppingEvent event) {
+    public CompletableFuture<Void> shutdown() {
         try {
-            drawingCache.onShutdown();
-            drawingCache.closeAndAwaitTermination();
+            return drawingCache.onShutdown();
         } catch (Exception e) {
             XaeroPlus.LOGGER.error("Failed to close drawing cache", e);
+            return CompletableFuture.completedFuture(null);
         }
     }
 

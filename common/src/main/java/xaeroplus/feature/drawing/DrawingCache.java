@@ -575,15 +575,12 @@ public class DrawingCache implements Closeable {
         parentExecutor.execute(() -> {
             cacheReady.set(false);
             try {
-                long before = System.currentTimeMillis();
                 List<CompletableFuture<?>> tasks = new ArrayList<>();
                 tasks.addAll(flushAllChunks());
                 tasks.addAll(flushAllLines());
                 tasks.addAll(flushAllTexts());
                 var future = CompletableFuture.allOf(tasks.toArray(CompletableFuture[]::new));
-                while (!future.isDone() && mc.isRunning() && TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - before) < 30) {
-                    Wait.wait(1);
-                }
+                Wait.waitUntil(() -> !mc.isRunning() || future.isDone(), 30);
             } catch (final Exception e) {
                 XaeroPlus.LOGGER.error("Error saving all drawing data before disabling", e);
             }
@@ -591,10 +588,10 @@ public class DrawingCache implements Closeable {
         });
     }
 
-    public void onShutdown() {
+    public CompletableFuture<Void> onShutdown() {
         if (!mc.isSameThread()) {
             onDisable();
-            return;
+            return CompletableFuture.completedFuture(null);
         }
         cacheReady.set(false);
         for (var cache : getAllHighlightCaches()) {
@@ -606,7 +603,7 @@ public class DrawingCache implements Closeable {
         for (var cache : getAllTextsCaches()) {
             cache.writeStaleTextsToDatabase();
         }
-        reset();
+        return CompletableFuture.runAsync(this::closeAndAwaitTermination);
     }
 
     public int getMinimapRegionWindowSize() {
@@ -709,7 +706,7 @@ public class DrawingCache implements Closeable {
         parentExecutor.shutdown();
     }
 
-    public void closeAndAwaitTermination() throws IOException {
+    public void closeAndAwaitTermination() {
         parentExecutor.execute(() -> {
             var dbExec = this.dbExecutor;
             if (dbExec != null && !dbExec.isShutdown()) {
@@ -724,7 +721,7 @@ public class DrawingCache implements Closeable {
                         throw new RuntimeException("Failed to shutdown drawing executor");
                     }
                 } catch (Exception e) {
-                    XaeroPlus.LOGGER.error("Error waiting for darwing db executor to shutdown", e);
+                    XaeroPlus.LOGGER.error("Error waiting for drawing db executor to shutdown", e);
                 }
             }
         });

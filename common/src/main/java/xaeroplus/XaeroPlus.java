@@ -10,7 +10,9 @@ import org.slf4j.LoggerFactory;
 import xaero.map.platform.Services;
 import xaeroplus.commands.XPClientCommandSource;
 import xaeroplus.commands.XPCommandManager;
+import xaeroplus.event.ClientStoppingEvent;
 import xaeroplus.event.MinimapInitCompletedEvent;
+import xaeroplus.feature.highlights.SavableHighlightCacheInstance;
 import xaeroplus.feature.keybind.KeybindListener;
 import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.Drawing;
@@ -18,6 +20,9 @@ import xaeroplus.settings.Settings;
 import xaeroplus.settings.XaeroPlusSetting;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static xaeroplus.settings.SettingHooks.loadXPSettings;
@@ -36,11 +41,25 @@ public class XaeroPlus {
 		Settings.REGISTRY.getAllSettings().forEach(XaeroPlusSetting::init);
 		Globals.initStickySettings();
 		ModuleManager.getModule(Drawing.class).enable();
-		XaeroPlus.EVENT_BUS.registerConsumer((e) -> {
+		XaeroPlus.EVENT_BUS.registerConsumer(o -> {
 			if (Globals.minimapSettingsInitialized) return;
 			Globals.minimapSettingsInitialized = true;
 		}, MinimapInitCompletedEvent.class);
 		XaeroPlus.EVENT_BUS.register(KEYBIND_LISTENER);
+		XaeroPlus.EVENT_BUS.registerConsumer(o -> {
+			try {
+				var futures = new ArrayList<CompletableFuture<Void>>();
+				SavableHighlightCacheInstance.instances().stream()
+					.map(SavableHighlightCacheInstance::shutdown)
+					.forEach(futures::add);
+				futures.add(ModuleManager.getModule(Drawing.class).shutdown());
+				CompletableFuture
+					.allOf(futures.toArray(CompletableFuture[]::new))
+					.get(5L, TimeUnit.SECONDS);
+			} catch (Exception e) {
+				LOGGER.warn("Timed out awaiting XaeroPlus cache shutdowns");
+			}
+		}, ClientStoppingEvent.class);
 	}
 
 	public static void registerCommands(CommandDispatcher<XPClientCommandSource> dispatcher, CommandBuildContext context) {

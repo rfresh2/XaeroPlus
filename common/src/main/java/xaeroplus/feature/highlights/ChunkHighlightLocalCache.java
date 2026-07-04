@@ -65,7 +65,4 @@ public class ChunkHighlightLocalCache extends ChunkHighlightBaseCacheHandler {
 
     @Override
     public void onDisable() {}
-
-    @Override
-    public void onShutdown() {}
 }

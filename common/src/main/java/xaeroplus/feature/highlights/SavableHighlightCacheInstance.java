@@ -1,13 +1,16 @@
 package xaeroplus.feature.highlights;
 
 import net.lenni0451.lambdaevents.EventHandler;
-import net.minecraft.client.Minecraft;
 import xaeroplus.XaeroPlus;
-import xaeroplus.event.ClientStoppingEvent;
 import xaeroplus.event.ClientTickEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
 
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class SavableHighlightCacheInstance {
+    private static final Set<SavableHighlightCacheInstance> INSTANCES = ConcurrentHashMap.newKeySet();
     private ChunkHighlightCache cache;
     private final String dbName;
 
@@ -16,6 +19,10 @@ public class SavableHighlightCacheInstance {
         // always starts as a local cache
         // to switch to disk cache call setDiskCache
         this.cache = new ChunkHighlightLocalCache();
+    }
+
+    public static Set<SavableHighlightCacheInstance> instances() {
+        return INSTANCES;
     }
 
     public ChunkHighlightCache get() {
@@ -29,11 +36,13 @@ public class SavableHighlightCacheInstance {
     public synchronized void onEnable() {
         XaeroPlus.EVENT_BUS.register(this);
         cache.onEnable();
+        INSTANCES.add(this);
     }
 
     public synchronized void onDisable() {
         cache.onDisable();
         XaeroPlus.EVENT_BUS.unregister(this);
+        INSTANCES.remove(this);
     }
 
     public synchronized void setDiskCache(final boolean disk, final boolean enabled) {
@@ -57,7 +66,6 @@ public class SavableHighlightCacheInstance {
 
     @EventHandler
     public void onXaeroWorldChange(XaeroWorldChangeEvent event) {
-        if (!Minecraft.getInstance().isRunning()) return;
         try {
             cache.handleWorldChange(event);
         } catch (final Exception e) {
@@ -74,15 +82,13 @@ public class SavableHighlightCacheInstance {
         }
     }
 
-    @EventHandler
-    public void onClientStopping(ClientStoppingEvent event) {
-        try {
-            cache.onShutdown();
-            if (cache instanceof ChunkHighlightSavingCache savingCache) {
-                savingCache.closeAndAwaitTermination();
-            }
-        } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error closing {}", dbName, e);
+    public CompletableFuture<Void> shutdown() {
+        if (!INSTANCES.contains(this)) return CompletableFuture.completedFuture(null);
+        XaeroPlus.EVENT_BUS.unregister(this);
+        INSTANCES.remove(this);
+        if (cache instanceof ChunkHighlightSavingCache savingCache) {
+            return savingCache.onShutdown();
         }
+        return CompletableFuture.completedFuture(null);
     }
 }

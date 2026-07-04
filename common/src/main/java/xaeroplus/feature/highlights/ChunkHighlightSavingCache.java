@@ -390,11 +390,8 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         parentExecutor.execute(() -> {
             cacheReady.set(false);
             try {
-                long before = System.currentTimeMillis();
                 var future = CompletableFuture.allOf(flushAllChunks().toArray(CompletableFuture[]::new));
-                while (!future.isDone() && mc.isRunning() && TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - before) < 30) {
-                    Wait.wait(1);
-                }
+                Wait.waitUntil(() -> !mc.isRunning() || future.isDone(), 30);
             } catch (final Exception e) {
                 XaeroPlus.LOGGER.error("Error saving all chunks before disabling", e);
             }
@@ -402,18 +399,17 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         });
     }
 
-    @Override
-    public void onShutdown() {
+    public CompletableFuture<Void> onShutdown() {
         if (!mc.isSameThread()) {
             onDisable();
-            return;
+            return CompletableFuture.completedFuture(null);
         }
         cacheReady.set(false);
         for (var cache : getAllCaches()) {
             cache.flushStaleToRemoveChunks();
             cache.writeStaleHighlightsToDatabase();
         }
-        reset();
+        return CompletableFuture.runAsync(this::closeAndAwaitTermination);
     }
 
     public int getMinimapRegionWindowSize() {
@@ -494,7 +490,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         parentExecutor.shutdown();
     }
 
-    public void closeAndAwaitTermination() throws IOException {
+    public void closeAndAwaitTermination() {
         parentExecutor.execute(() -> {
             var dbExec = dbExecutor;
             if (dbExec != null && !dbExec.isShutdown()) {

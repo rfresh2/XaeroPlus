@@ -20,6 +20,7 @@ import xaeroplus.feature.render.line.Line;
 import xaeroplus.feature.render.text.Text;
 import xaeroplus.module.impl.TickTaskExecutor;
 import xaeroplus.util.ChunkUtils;
+import xaeroplus.util.Wait;
 import xaeroplus.util.timer.Timer;
 import xaeroplus.util.timer.Timers;
 
@@ -574,16 +575,38 @@ public class DrawingCache implements Closeable {
         parentExecutor.execute(() -> {
             cacheReady.set(false);
             try {
+                long before = System.currentTimeMillis();
                 List<CompletableFuture<?>> tasks = new ArrayList<>();
                 tasks.addAll(flushAllChunks());
                 tasks.addAll(flushAllLines());
                 tasks.addAll(flushAllTexts());
-                CompletableFuture.allOf(tasks.toArray(new CompletableFuture[0])).get(30, TimeUnit.SECONDS);
+                var future = CompletableFuture.allOf(tasks.toArray(CompletableFuture[]::new));
+                while (!future.isDone() && mc.isRunning() && TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - before) < 30) {
+                    Wait.wait(1);
+                }
             } catch (final Exception e) {
                 XaeroPlus.LOGGER.error("Error saving all drawing data before disabling", e);
             }
             reset();
         });
+    }
+
+    public void onShutdown() {
+        if (!mc.isSameThread()) {
+            onDisable();
+            return;
+        }
+        cacheReady.set(false);
+        for (var cache : getAllHighlightCaches()) {
+            cache.writeStaleHighlightsToDatabase();
+        }
+        for (var cache : getAllLinesCaches()) {
+            cache.writeStaleLinesToDatabase();
+        }
+        for (var cache : getAllTextsCaches()) {
+            cache.writeStaleTextsToDatabase();
+        }
+        reset();
     }
 
     public int getMinimapRegionWindowSize() {

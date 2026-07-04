@@ -768,6 +768,25 @@ public final class Settings extends SettingRegistry {
             (b) -> ModuleManager.getModule(Breadcrumbs.class).setDiskCache(b),
             () -> ModuleManager.getModule(Breadcrumbs.class).isEnabled()),
         SettingLocation.CHUNK_HIGHLIGHTS);
+    public enum BreadcrumbsMode implements TranslatableSettingEnum {
+        CHUNK_RADIUS("xaeroplus.setting.breadcrumbs_mode.chunk_radius"),
+        SEEN_CHUNKS("xaeroplus.setting.breadcrumbs_mode.seen_chunks");
+        private final String translationKey;
+        BreadcrumbsMode(final String translationKey) {
+            this.translationKey = translationKey;
+        }
+        @Override
+        public String getTranslationKey() {
+            return translationKey;
+        }
+    }
+    public final EnumSetting<BreadcrumbsMode> breadcrumbsModeSetting = register(
+        EnumSetting.create(
+            "Breadcrumbs Mode",
+            "xaeroplus.setting.breadcrumbs_mode",
+            BreadcrumbsMode.values(),
+            BreadcrumbsMode.CHUNK_RADIUS
+        ), SettingLocation.CHUNK_HIGHLIGHTS);
     public final DoubleSetting breadcrumbsChunkRadiusSetting = register(
         DoubleSetting.create(
             "Breadcrumbs Chunk Radius",
@@ -775,7 +794,7 @@ public final class Settings extends SettingRegistry {
             0, 16, 1,
             0,
             (d) -> ModuleManager.getModule(Breadcrumbs.class).setChunkRadius(d),
-            () -> ModuleManager.getModule(Breadcrumbs.class).isEnabled()),
+            () -> ModuleManager.getModule(Breadcrumbs.class).isEnabled() && breadcrumbsModeSetting.get() == BreadcrumbsMode.CHUNK_RADIUS),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final EnumSetting<ColorHelper.HighlightColor> breadcrumbsColorSetting = register(
         EnumSetting.create(

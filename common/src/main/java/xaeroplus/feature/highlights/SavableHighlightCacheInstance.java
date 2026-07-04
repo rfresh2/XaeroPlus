@@ -1,6 +1,7 @@
 package xaeroplus.feature.highlights;
 
 import net.lenni0451.lambdaevents.EventHandler;
+import net.minecraft.client.Minecraft;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.ClientStoppingEvent;
 import xaeroplus.event.ClientTickEvent;
@@ -56,6 +57,7 @@ public class SavableHighlightCacheInstance {
 
     @EventHandler
     public void onXaeroWorldChange(XaeroWorldChangeEvent event) {
+        if (!Minecraft.getInstance().isRunning()) return;
         try {
             cache.handleWorldChange(event);
         } catch (final Exception e) {
@@ -75,7 +77,7 @@ public class SavableHighlightCacheInstance {
     @EventHandler
     public void onClientStopping(ClientStoppingEvent event) {
         try {
-            cache.onDisable();
+            cache.onShutdown();
             if (cache instanceof ChunkHighlightSavingCache savingCache) {
                 savingCache.closeAndAwaitTermination();
             }

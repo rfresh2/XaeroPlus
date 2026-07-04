@@ -45,6 +45,7 @@ public interface ChunkHighlightCache {
     void handleTick();
     void onEnable();
     void onDisable();
+    void onShutdown();
     default <V> CompletableFuture<V> submitTickTask(final Supplier<V> task) {
         return TickTaskExecutor.INSTANCE.submit(task);
     }

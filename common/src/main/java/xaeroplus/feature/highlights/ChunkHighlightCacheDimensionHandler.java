@@ -270,9 +270,6 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
     @Override
     public void onDisable() {}
 
-    @Override
-    public void onShutdown() {}
-
     private final class WindowDataLoadFutureCallback implements FutureCallback<Long2LongMap> {
         @Override
         public void onSuccess(Long2LongMap dataBuf) {

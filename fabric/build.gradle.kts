@@ -107,7 +107,8 @@ tasks {
 
 	register<ClientProductionRunTask>("runProdTest") {
 		jvmArgs = listOf("-DXP_CI_TEST", "-Dfabric.client.gametest", "-Dsodium.checks.issue2561=false")
-		mods.from(gametestJar)
+		mods.setFrom(gametestJar, shadowJar.get().archiveFile, productionRuntimeMods)
+
 		runDir = file("build/runProdTest")
 		useXVFB = true
 		doFirst {

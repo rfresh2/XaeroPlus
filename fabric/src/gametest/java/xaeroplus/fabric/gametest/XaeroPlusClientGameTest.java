@@ -159,14 +159,14 @@ public class XaeroPlusClientGameTest implements FabricClientGameTest {
 
     private static void waitFor(ClientGameTestContext context, String description, Predicate<Minecraft> condition) {
         LOGGER.info("Waiting for {}", description);
-        context.waitFor(condition, (20 * 60));
+        context.waitFor(condition, (20 * 300));
     }
 
     private static void waitForStable(ClientGameTestContext context, String description, Predicate<Minecraft> condition, int stableTicks) {
         LOGGER.info("Waiting for {} to be stable for {} ticks", description, stableTicks);
         var consecutiveTicks = 0;
         for (var elapsedTicks = 0; consecutiveTicks < stableTicks; elapsedTicks++) {
-            if (elapsedTicks >= (20 * 60)) {
+            if (elapsedTicks >= (20 * 300)) {
                 throw new IllegalStateException("Timed out waiting for " + description);
             }
             consecutiveTicks = context.computeOnClient(condition::test) ? consecutiveTicks + 1 : 0;

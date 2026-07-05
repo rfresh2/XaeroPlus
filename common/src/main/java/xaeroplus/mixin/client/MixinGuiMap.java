@@ -429,7 +429,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     public void drawWorldMapFeatures(final MultiBufferSource.BufferSource instance, final Operation<Void> original,
                                      @Local(name = "flooredCameraX") int flooredCameraX,
                                      @Local(name = "flooredCameraZ") int flooredCameraZ,
-                                     @Local(name = "matrixStack") PoseStack matrixStack,
+                                     @Local(name = "poseStack") PoseStack matrixStack,
                                      @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers,
                                      @Local(name = "fboScale") double fboScale
     ) {

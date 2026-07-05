@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "xaeroplus-gametest",
+  "version": "1.0.0",
+  "name": "XaeroPlus GameTest",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "xaeroplus.fabric.gametest.XaeroPlusClientGameTest"
+    ]
+  }
+}

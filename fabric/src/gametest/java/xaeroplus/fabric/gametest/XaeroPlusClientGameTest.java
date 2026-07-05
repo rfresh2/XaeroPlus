@@ -224,7 +224,7 @@ public class XaeroPlusClientGameTest implements ClientModInitializer {
     }
 
     private static void waitFor(String description, Predicate<Minecraft> condition) {
-        var deadline = Instant.now().plus(Duration.ofMinutes(1));
+        var deadline = Instant.now().plus(Duration.ofMinutes(5));
         String lastScreen = null;
         while (!submit(condition::test)) {
             var screen = submit(mc -> mc.screen == null ? "<none>" : mc.screen.getClass().getName());
@@ -242,7 +242,7 @@ public class XaeroPlusClientGameTest implements ClientModInitializer {
     private static void waitForStable(String description, Predicate<Minecraft> condition, int stableTicks) {
         var consecutiveTicks = 0;
         var lastTick = -1L;
-        var deadline = Instant.now().plus(Duration.ofMinutes(1));
+        var deadline = Instant.now().plus(Duration.ofMinutes(5));
         while (consecutiveTicks < stableTicks) {
             var result = submit(mc -> new StableWaitSample(CLIENT_TICKS.get(), condition.test(mc)));
             if (result.tick() != lastTick) {

@@ -206,7 +206,8 @@ public class DrawingCache implements Closeable {
                             tasks.addAll(flushAllChunks());
                             tasks.addAll(flushAllLines());
                             tasks.addAll(flushAllTexts());
-                            CompletableFuture.allOf(tasks.toArray(new CompletableFuture[0])).get(30, TimeUnit.SECONDS);
+                            var future = CompletableFuture.allOf(tasks.toArray(CompletableFuture[]::new));
+                            Wait.waitUntil(() -> !mc.isRunning() || future.isDone(), 30);
                         } catch (final Exception e) {
                             XaeroPlus.LOGGER.error("Error saving all chunks before world change", e);
                         }

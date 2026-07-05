@@ -200,9 +200,10 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
                     // make sure we mark as unready to prevent further mutations
                     if (cacheReady.compareAndSet(true, false)) {
                         try {
-                            CompletableFuture.allOf(flushAllChunks().toArray(new CompletableFuture[0])).get(30, TimeUnit.SECONDS);
+                            var future = CompletableFuture.allOf(flushAllChunks().toArray(CompletableFuture[]::new));
+                            Wait.waitUntil(() -> !mc.isRunning() || future.isDone(), 30);
                         } catch (final Exception e) {
-                            XaeroPlus.LOGGER.error("Error saving all chunks before world change", e);
+                            XaeroPlus.LOGGER.error("Error saving all chunks before disabling", e);
                         }
                     } else {
                         XaeroPlus.LOGGER.warn("[{}] Exited world when cache was already uninitialized", databaseName);

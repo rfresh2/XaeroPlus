@@ -28,7 +28,7 @@ dependencyResolutionManagement {
 		create("libs") {
 			library("fabric-loader", "net.fabricmc:fabric-loader:0.19.3")
 			library("forge", "net.minecraftforge:forge:$minecraft_version-64.0.8")
-			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.150.0+$minecraft_version")
+			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.154.0+$minecraft_version")
 			library("neoforge", "net.neoforged:neoforge:$minecraft_version.71")
             library("worldmap-fabric", "maven.modrinth:xaeros-world-map:fabric-$minecraft_version-${worldmap_version_fabric}")
             library("worldmap-forge", "maven.modrinth:xaeros-world-map:forge-$minecraft_version-${worldmap_version_forge}")
@@ -52,8 +52,8 @@ dependencyResolutionManagement {
 			library("fabric-waystones", "maven.modrinth:fwaystones:3.3.5+mc1.21.4")
 			library("worldtools", "maven.modrinth:worldtools:1.2.8+1.21.4")
             library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.53.2.0") // relocated xerial sqlite to avoid conflicts with other mods
-			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.15.2+$minecraft_version-fabric")
-			library("immediatelyfast-neo", "maven.modrinth:immediatelyfast:1.15.2+$minecraft_version-neoforge")
+			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.15.3+26.1-fabric")
+			library("immediatelyfast-neo", "maven.modrinth:immediatelyfast:1.15.3+26.1-neoforge")
 			library("modmenu", "maven.modrinth:modmenu:18.0.0-beta.1")
 			library("sodium-fabric", "net.caffeinemc:sodium-fabric:0.8.12+mc$minecraft_version")
             library("sodium-neoforge", "net.caffeinemc:sodium-neoforge-mod:0.8.12+mc$minecraft_version")

@@ -1,4 +1,6 @@
+import net.fabricmc.loom.task.RemapJarTask
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
+import org.gradle.jvm.tasks.Jar
 
 plugins {
 	id("xaeroplus-all.conventions")
@@ -10,8 +12,22 @@ architectury {
 	fabric()
 }
 
+fabricApi {
+	configureTests {
+		createSourceSet = true
+		modId = "xaeroplus-gametest"
+		enableGameTests = false
+		eula = true
+	}
+}
+
 loom {
 	accessWidenerPath = project(":common").loom.accessWidenerPath
+	runs {
+		named("clientGameTest") {
+			jvmArguments = listOf("-Dsodium.checks.issue2561=false", "-DXP_CI_TEST", "-Dfabric.client.gametest")
+		}
+	}
 }
 
 val common = configurations.create("common")
@@ -35,6 +51,11 @@ val minecraft_version = providers.gradleProperty("minecraft_version").get()
 val destArchiveVersion = "${project.version}+${loom.platform.get().id()}-${minecraft_version}"
 val destArchiveClassifier = "WM${worldmap_version_fabric}-MM${minimap_version_fabric}"
 
+val productionRuntimeMods = configurations.getByName("productionRuntimeMods")
+productionRuntimeMods.extendsFrom(configurations.getByName("modRuntimeOnly"))
+productionRuntimeMods.extendsFrom(configurations.getByName("modImplementation"))
+productionRuntimeMods.extendsFrom(configurations.getByName("modApi"))
+
 dependencies {
 	modImplementation(libs.fabric.loader)
 	modApi(libs.fabric.api)
@@ -48,6 +69,7 @@ dependencies {
 	modImplementation(libs.balm.fabric)
 	modCompileOnly(libs.fabric.waystones)
 	modRuntimeOnly(libs.immediatelyfast)
+	runtimeOnly("net.lenni0451:Reflect:1.6.1") // immediatelyfast jij
 	modImplementation(libs.modmenu)
     modImplementation(libs.sodium.fabric)
 	modCompileOnly(libs.sodium8.fabric)
@@ -56,9 +78,6 @@ dependencies {
     implementation(shadow(libs.caffeine.get())!!)
 	implementation(shadow(libs.lambdaEvents.get())!!)
 	implementation(shadow(libs.oldbiomes.get())!!)
-	productionRuntimeMods(libs.minimap.fabric)
-	productionRuntimeMods(libs.worldmap.fabric)
-	productionRuntimeMods(libs.fabric.api)
 
 	common(project(path = ":common", configuration = "namedElements")) { isTransitive = false }
     shadow(project(path = ":common", configuration = "transformProductionFabric")) { isTransitive = false }
@@ -88,11 +107,33 @@ tasks {
 		archiveClassifier = destArchiveClassifier
 	}
 
+	val gametestJar = register<Jar>("gametestJar") {
+		from(sourceSets["gametest"].output)
+		archiveClassifier = "gametest-dev"
+		destinationDirectory = project.layout.buildDirectory.dir("gametestJar")
+	}
+
+	val remapGametestJar = register<RemapJarTask>("remapGametestJar") {
+		dependsOn(gametestJar)
+		inputFile = gametestJar.flatMap { it.archiveFile }
+		archiveClassifier = "gametest"
+		destinationDirectory = project.layout.buildDirectory.dir("gametestJar")
+	}
+
 	register<ClientProductionRunTask>("runProdTest") {
-		this.jvmArgs.add("-DXP_CI_TEST")
+		jvmArgs = listOf("-DXP_CI_TEST", "-Dfabric.client.gametest", "-Dsodium.checks.issue2561=false")
+		mods.from(remapGametestJar)
+		runDir = file("build/runProdTest")
+		useXVFB = true
+		doFirst {
+			runDir.get().asFile.deleteRecursively()
+		}
+		outputs.upToDateWhen { false }
 	}
 
 	register<ClientProductionRunTask>("runProd") {
-
+		jvmArgs = listOf("-Dsodium.checks.issue2561=false")
+		runDir = file("build/runProd")
+		outputs.upToDateWhen { false }
 	}
 }

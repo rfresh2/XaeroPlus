@@ -22,7 +22,6 @@ import java.util.function.Predicate;
 
 public class XaeroPlusClientGameTest implements FabricClientGameTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(XaeroPlusClientGameTest.class);
-    private static final int TIMEOUT_TICKS = 5 * 60 * 20;
 
     @Override
     public void runTest(ClientGameTestContext context) {
@@ -70,7 +69,6 @@ public class XaeroPlusClientGameTest implements FabricClientGameTest {
                     throw new RuntimeException("Failed to change world map zoom", e);
                 }
             });
-            context.waitTicks(5 * 20);
             takeScreenshot(context, "world_map");
             context.runOnClient(mc -> {
                 Settings.REGISTRY.transparentWorldmapBackgroundSetting.setValue(true);
@@ -164,14 +162,14 @@ public class XaeroPlusClientGameTest implements FabricClientGameTest {
 
     private static void waitFor(ClientGameTestContext context, String description, Predicate<Minecraft> condition) {
         LOGGER.info("Waiting for {}", description);
-        context.waitFor(condition, TIMEOUT_TICKS);
+        context.waitFor(condition, (20 * 60));
     }
 
     private static void waitForStable(ClientGameTestContext context, String description, Predicate<Minecraft> condition, int stableTicks) {
         LOGGER.info("Waiting for {} to be stable for {} ticks", description, stableTicks);
         var consecutiveTicks = 0;
         for (var elapsedTicks = 0; consecutiveTicks < stableTicks; elapsedTicks++) {
-            if (elapsedTicks >= TIMEOUT_TICKS) {
+            if (elapsedTicks >= (20 * 60)) {
                 throw new IllegalStateException("Timed out waiting for " + description);
             }
             consecutiveTicks = context.computeOnClient(condition::test) ? consecutiveTicks + 1 : 0;

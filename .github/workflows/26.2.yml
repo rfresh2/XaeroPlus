@@ -186,6 +186,9 @@ jobs:
       - name: Set CI Test Env Var
         run: echo "XP_CI_TEST=true" >> $GITHUB_ENV
 
+      - name: Set HMC Test Env Var
+        run: echo "HMC_TEST=true" >> $GITHUB_ENV
+
       - name: Setup Fabric Test Mods
         run: |
           mkdir -p run/mods && cp artifacts/${{ needs.build.outputs.xp_fabric }}.jar run/mods \
@@ -199,7 +202,7 @@ jobs:
           modloader: fabric
           regex: .*fabric.*
           mc-runtime-test: none
-          fabric-api: 0.152.2
+          fabric-api: 0.154.0
           java: 25
           xvfb: true
           headlessmc-command: --jvm -Djava.awt.headless=true
@@ -264,6 +267,9 @@ jobs:
 
       - name: Set CI Test Env Var
         run: echo "XP_CI_TEST=true" >> $GITHUB_ENV
+
+      - name: Set HMC Test Env Var
+        run: echo "HMC_TEST=true" >> $GITHUB_ENV
 
       - name: Setup Neo Test
         # xaero's maven version does not jij xaerolib for some reason

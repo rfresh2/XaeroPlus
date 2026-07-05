@@ -36,7 +36,6 @@ import java.util.function.Predicate;
 
 public class XaeroPlusClientGameTest implements ClientModInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(XaeroPlusClientGameTest.class);
-    private static final Duration TIMEOUT = Duration.ofMinutes(5);
     private static final AtomicLong CLIENT_TICKS = new AtomicLong();
 
     @Override
@@ -111,7 +110,6 @@ public class XaeroPlusClientGameTest implements ClientModInitializer {
                 }
                 return null;
             });
-            waitFor(Duration.ofSeconds(5));
             takeScreenshot("world_map");
             submit(mc -> {
                 Settings.REGISTRY.transparentWorldmapBackgroundSetting.setValue(true);
@@ -226,7 +224,7 @@ public class XaeroPlusClientGameTest implements ClientModInitializer {
     }
 
     private static void waitFor(String description, Predicate<Minecraft> condition) {
-        var deadline = Instant.now().plus(TIMEOUT);
+        var deadline = Instant.now().plus(Duration.ofMinutes(1));
         String lastScreen = null;
         while (!submit(condition::test)) {
             var screen = submit(mc -> mc.screen == null ? "<none>" : mc.screen.getClass().getName());
@@ -244,7 +242,7 @@ public class XaeroPlusClientGameTest implements ClientModInitializer {
     private static void waitForStable(String description, Predicate<Minecraft> condition, int stableTicks) {
         var consecutiveTicks = 0;
         var lastTick = -1L;
-        var deadline = Instant.now().plus(TIMEOUT);
+        var deadline = Instant.now().plus(Duration.ofMinutes(1));
         while (consecutiveTicks < stableTicks) {
             var result = submit(mc -> new StableWaitSample(CLIENT_TICKS.get(), condition.test(mc)));
             if (result.tick() != lastTick) {

@@ -51,8 +51,8 @@ dependencyResolutionManagement {
 			library("fabric-waystones", "maven.modrinth:fwaystones:3.3.5+mc1.21.4")
 			library("worldtools", "maven.modrinth:worldtools:1.2.8+1.21.4")
             library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.53.2.0") // relocated xerial sqlite to avoid conflicts with other mods
-			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.14.2+$minecraft_version-fabric")
-			library("immediatelyfast-neo", "maven.modrinth:immediatelyfast:1.14.2+$minecraft_version-neoforge")
+			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.14.3+$minecraft_version-fabric")
+			library("immediatelyfast-neo", "maven.modrinth:immediatelyfast:1.14.3+$minecraft_version-neoforge")
 			library("modmenu", "maven.modrinth:modmenu:17.0.0")
 			library("sodium-fabric", "net.caffeinemc:sodium-fabric:0.8.12+mc$minecraft_version")
             library("sodium-neoforge", "net.caffeinemc:sodium-neoforge-mod:0.8.12+mc$minecraft_version")

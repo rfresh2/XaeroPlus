@@ -43,7 +43,7 @@ public abstract class MixinRadarRenderer extends MinimapElementRenderer<Entity, 
         remap = true) // $REMAP
     public void adjustElementScaleForMinimapScaling(final CallbackInfoReturnable<Boolean> cir, @Local(argsOnly = true) LocalRef<MinimapElementRenderInfo> renderInfoRef, @Local(argsOnly = true) LocalFloatRef optionalScaleRef) {
         if (renderInfoRef.get().location == MinimapElementRenderLocation.IN_MINIMAP) {
-            optionalScaleRef.set(optionalScaleRef.get() * Globals.minimapScaleMultiplier);
+            optionalScaleRef.set((optionalScaleRef.get() * Globals.minimapScaleMultiplier) / Globals.minimapSizeMultiplier);
         }
     }
 }

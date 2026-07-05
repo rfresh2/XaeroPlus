@@ -53,7 +53,7 @@ dependencyResolutionManagement {
             library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.53.2.0") // relocated xerial sqlite to avoid conflicts with other mods
 			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.13.2+$minecraft_version-fabric")
 			library("immediatelyfast-neo", "maven.modrinth:immediatelyfast:1.13.2+$minecraft_version-neoforge")
-			library("modmenu", "maven.modrinth:modmenu:16.0.0-rc.1")
+			library("modmenu", "maven.modrinth:modmenu:16.0.1")
 			library("sodium-fabric", "maven.modrinth:sodium:mc$minecraft_version-0.7.3-fabric")
             library("sodium-neoforge", "maven.modrinth:sodium:mc1.21.8-0.7.3-neoforge")
             library("spark-fabric", "maven.modrinth:spark:1.10.152-fabric")

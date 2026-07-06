@@ -11,15 +11,22 @@ import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
+import net.minecraft.client.tutorial.TutorialSteps;
 import net.minecraft.network.chat.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xaero.common.HudMod;
 import xaero.common.XaeroMinimapSession;
+import xaero.common.gui.GuiMinimapMain;
+import xaero.common.gui.GuiWaypoints;
+import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.common.config.option.MinimapProfiledConfigOptions;
 import xaero.hud.minimap.waypoint.WaypointColor;
+import xaero.lib.client.gui.config.context.BuiltInEditConfigScreenContexts;
 import xaero.map.WorldMapSession;
 import xaero.map.gui.GuiMap;
+import xaero.map.gui.GuiWorldMapSettings;
+import xaeroplus.feature.extensions.DrawOrderScreen;
 import xaeroplus.feature.extensions.SyncedWaypoint;
 import xaeroplus.feature.render.line.Line;
 import xaeroplus.feature.render.text.Text;
@@ -53,6 +60,10 @@ public class XaeroPlusClientGameTest implements ClientModInitializer {
     private void runTest() {
         try {
             waitFor("initial resource load", mc -> mc.getOverlay() == null);
+            submit(mc -> {
+                Minecraft.getInstance().options.tutorialStep = TutorialSteps.NONE;
+                return null;
+            });
             if (submit(mc -> mc.screen instanceof AccessibilityOnboardingScreen)) {
                 clickButton("gui.continue");
             }
@@ -77,17 +88,18 @@ public class XaeroPlusClientGameTest implements ClientModInitializer {
             });
             waitFor("Xaero Minimap Session", mc -> {
                 var session = XaeroMinimapSession.getCurrentSession();
-                return session != null && session.getMinimapProcessor() != null;
+                return session != null && session.getMinimapProcessor() != null && WaypointAPI.getCurrentWaypointSet() != null;
             });
             submit(mc -> {
                 ModuleManager.getModule(Drawing.class).addHighlight(ChunkUtils.actualPlayerChunkX() + 5, ChunkUtils.actualPlayerChunkZ() - 5);
                 var lx = ChunkUtils.chunkCoordToCoord(ChunkUtils.actualPlayerChunkX());
                 var lz = ChunkUtils.chunkCoordToCoord(ChunkUtils.actualPlayerChunkZ());
                 ModuleManager.getModule(Drawing.class).addLine(new Line(lx - 128, lz - 128, lx + 128, lz + 128), ColorHelper.getColor(255, 0, 0, 200));
-                ModuleManager.getModule(Drawing.class).addText(new Text("testing the text", lx, lz + 64, ColorHelper.getColor(255, 255, 255, 255), 1f));
+                ModuleManager.getModule(Drawing.class).addText(new Text("bottom text", lx, lz + 64, ColorHelper.getColor(255, 255, 255, 255), 1f));
                 HudMod.INSTANCE.getHudConfigs().getClientConfigManager().getCurrentProfile().set(MinimapProfiledConfigOptions.SIZE, 200);
                 HudMod.INSTANCE.getHudConfigs().getClientConfigManager().getCurrentProfile().set(MinimapProfiledConfigOptions.NORTH_LOCKED, true);
-                WaypointAPI.getCurrentWaypointSet().add(SyncedWaypoint.create((int) ChunkUtils.getPlayerX() - 32, (int) ChunkUtils.getPlayerZ() + 32, "Test", "TST", WaypointColor.AQUA));
+                HudMod.INSTANCE.getHudConfigs().getClientConfigManager().getCurrentProfile().set(MinimapProfiledConfigOptions.WAYPOINT_DISTANCE_IN_WORLD, 2);
+                WaypointAPI.getCurrentWaypointSet().add(SyncedWaypoint.create((int) ChunkUtils.getPlayerX() - 32, (int) ChunkUtils.getPlayerZ() + 32, "Test", "T", WaypointColor.AQUA));
                 Settings.REGISTRY.waypointBeacons.setValue(true);
                 Settings.REGISTRY.waypointEta.setValue(true);
                 Settings.REGISTRY.showRenderDistanceSetting.setValue(true);
@@ -130,6 +142,30 @@ public class XaeroPlusClientGameTest implements ClientModInitializer {
             });
 
             takeScreenshot("world_map_transparent");
+
+            submit(mc -> {
+                mc.setScreen(new GuiWorldMapSettings(mc.screen, null, BuiltInEditConfigScreenContexts.CLIENT));
+                return null;
+            });
+            takeScreenshot("world_map_settings");
+
+            submit(mc -> {
+                mc.setScreen(new GuiMinimapMain(XaeroMinimapSession.getCurrentSession().getModMain(), mc.screen, null, true, BuiltInEditConfigScreenContexts.CLIENT));
+                return null;
+            });
+            takeScreenshot("minimap_settings");
+
+            submit(mc -> {
+                mc.setScreen(new GuiWaypoints(HudMod.INSTANCE, BuiltInHudModules.MINIMAP.getCurrentSession(), null, null));
+                return null;
+            });
+            takeScreenshot("waypoints_list");
+
+            submit(mc -> {
+                mc.setScreen(new DrawOrderScreen(null, null));
+                return null;
+            });
+            takeScreenshot("draw_order_screen");
 
             LOGGER.info("XaeroPlus client GameTest passed");
             submit(mc -> {

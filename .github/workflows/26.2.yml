@@ -128,6 +128,9 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - build
+    strategy:
+      matrix:
+        graphics_backend: [vulkan, opengl]
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
@@ -148,7 +151,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Setup XVFB
-        run: sudo apt update && sudo apt install -y xvfb
+        run: sudo apt update && sudo apt install -y xvfb mesa-vulkan-drivers
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
@@ -157,7 +160,7 @@ jobs:
           cache-read-only: ${{ github.event_name == 'pull_request' }}
 
       - name: Run Gametest
-        run: ./gradlew fabric:runProdTest
+        run: MC_GRAPHICS_BACKEND=${{ matrix.graphics_backend }} ./gradlew fabric:runProdTest
 
       - name: Upload Screenshots
         uses: actions/upload-artifact@v7

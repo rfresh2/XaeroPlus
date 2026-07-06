@@ -113,6 +113,15 @@ tasks {
 		useXVFB = true
 		doFirst {
 			runDir.get().asFile.deleteRecursively()
+			val gfxBackendVar = providers.environmentVariable("MC_GRAPHICS_BACKEND")
+			if (gfxBackendVar.isPresent) {
+				val optionsTxt = runDir.get().file("options.txt").asFile
+				optionsTxt.parentFile.mkdirs()
+				optionsTxt.writeText("""
+					version:4896
+					preferredGraphicsBackend:${gfxBackendVar.get()}
+				""".trimIndent())
+			}
 		}
 		outputs.upToDateWhen { false }
 	}

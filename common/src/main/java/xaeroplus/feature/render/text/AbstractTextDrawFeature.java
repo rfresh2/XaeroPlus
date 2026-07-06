@@ -21,9 +21,10 @@ public abstract class AbstractTextDrawFeature implements DrawFeature {
         var texts = getTexts();
         for (var text : texts) {
             ctx.matrixStack().pushPose();
+            float xpMinimapScalar = (float) Globals.minimapScaleMultiplier / (float) Globals.minimapSizeMultiplier;
             float textScale = text.scale() * 2.0f * (float) Mth.clamp(
-                (ctx.worldmap() ? 1f : Globals.minimapScaleMultiplier) / ctx.fboScale(),
-                0.1f * (ctx.worldmap() ? 1.0f : Globals.minimapScaleMultiplier),
+                (ctx.worldmap() ? 1f : xpMinimapScalar) / ctx.fboScale(),
+                0.1f * (ctx.worldmap() ? 1.0f : xpMinimapScalar),
                 1000f
             );
             float width = font.width(text.value());

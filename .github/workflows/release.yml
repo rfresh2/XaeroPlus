@@ -190,8 +190,6 @@ jobs:
             fabric
             quilt
           game-versions: |
-            26.1
-            26.1.1
             ${{ env.MINECRAFT_VERSION }}
           dependencies: |
             xaerominimap@${{ needs.build.outputs.minimap_version_fabric }}(required){modrinth:1bokaNcj}{curseforge:263420}
@@ -220,8 +218,6 @@ jobs:
             fabric
             quilt
           game-versions: |
-            26.1
-            26.1.1
             ${{ env.MINECRAFT_VERSION }}
           dependencies: |
             xaerominimap@${{ needs.build.outputs.minimap_version_fabric }}(required){modrinth:1bokaNcj}{curseforge:263420}

@@ -169,6 +169,45 @@ jobs:
           path: fabric/build/runProdTest/screenshots/*.png
           if-no-files-found: error
 
+      - name: Upload Screenshots to Discord
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+        shell: bash
+        run: |
+          if [[ -z "$DISCORD_WEBHOOK_URL" ]]; then
+            echo "::notice::DISCORD_WEBHOOK_URL is unavailable; skipping Discord upload"
+            exit 0
+          fi
+
+          shopt -s nullglob
+          screenshots=(fabric/build/runProdTest/screenshots/*.png)
+          if (( ${#screenshots[@]} == 0 )); then
+            echo "::error::No screenshots found"
+            exit 1
+          fi
+
+          title="${BRANCH_NAME}-$(git rev-parse --short=8 HEAD)-${{ matrix.graphics_backend }}"
+          payload=$(jq -cn --arg title "$title" '{username: $title}')
+
+          for ((offset = 0; offset < ${#screenshots[@]}; offset += 10)); do
+            curl_args=(
+              --fail-with-body
+              --silent
+              --show-error
+              -F "payload_json=$payload"
+            )
+
+            batch=("${screenshots[@]:offset:10}")
+            for index in "${!batch[@]}"; do
+              curl_args+=(
+                -F "files[$index]=@${batch[$index]};type=image/png"
+              )
+            done
+
+            curl "${curl_args[@]}" "$DISCORD_WEBHOOK_URL"
+          done
+
   test-fabric:
     runs-on: ubuntu-latest
     needs:

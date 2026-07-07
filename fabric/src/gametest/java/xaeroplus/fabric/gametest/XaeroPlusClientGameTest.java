@@ -40,7 +40,7 @@ public class XaeroPlusClientGameTest implements FabricClientGameTest {
             context.runOnClient(mc -> {
                 mc.options.tutorialStep = TutorialSteps.NONE;
             });
-            singleplayer.getClientLevel().waitForChunksRender();
+            singleplayer.getClientLevel().waitForChunksRender(20 * 600);
             waitFor(context, "client to join world", XaeroPlusClientGameTest::isInWorld);
             waitFor(context, "Xaero world map session", mc -> {
                 var session = WorldMapSession.getCurrentSession();

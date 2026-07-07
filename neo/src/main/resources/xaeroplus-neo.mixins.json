@@ -6,7 +6,6 @@
     "defaultRequire": 1
   },
   "client": [
-    "MixinCommandSourceStack",
-    "MixinSodium6OptionsGUI"
+    "MixinCommandSourceStack"
   ]
 }

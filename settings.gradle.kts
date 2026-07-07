@@ -25,7 +25,7 @@ val xaerolib_version: String by ext.properties
 dependencyResolutionManagement {
 	versionCatalogs {
 		create("libs") {
-			library("fabric-loader", "net.fabricmc:fabric-loader:0.16.10")
+			library("fabric-loader", "net.fabricmc:fabric-loader:0.19.3")
 			library("forge", "net.minecraftforge:forge:$minecraft_version-52.1.2")
 			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.116.4+$minecraft_version")
 			library("neoforge", "net.neoforged:neoforge:21.1.196")
@@ -54,10 +54,8 @@ dependencyResolutionManagement {
 			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.6.6+$minecraft_version-fabric")
 			library("immediatelyfast-neo", "maven.modrinth:immediatelyfast:1.6.6+$minecraft_version-neoforge")
 			library("modmenu", "maven.modrinth:modmenu:11.0.3")
-			library("sodium-fabric", "maven.modrinth:sodium:mc$minecraft_version-0.6.13-fabric")
-			library("sodium8-fabric", "net.caffeinemc:sodium-fabric:0.8.12-alpha.3+mc$minecraft_version")
-			library("sodium-neoforge", "maven.modrinth:sodium:mc$minecraft_version-0.6.13-neoforge")
-			library("sodium8-neoforge", "net.caffeinemc:sodium-neoforge-api:0.8.12-alpha.3+mc$minecraft_version")
+			library("sodium-fabric", "net.caffeinemc:sodium-fabric:0.8.12+mc$minecraft_version")
+			library("sodium-neoforge", "net.caffeinemc:sodium-neoforge-api:0.8.12+mc$minecraft_version")
             library("spark-fabric", "maven.modrinth:spark:1.10.109-fabric")
 			library("fabric-permissions-api", "maven.modrinth:fabric-permissions-api:0.3.1")
             library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")

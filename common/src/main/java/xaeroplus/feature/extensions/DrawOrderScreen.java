@@ -244,9 +244,9 @@ public class DrawOrderScreen extends Screen {
         @Override
         public void extractContent(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, boolean isMouseOver, float partialTicks) {
             if (drawFeatureList.getSelected() != this) {
-                // todo: fix
-//                guiGraphics.fill(getContentX() - 2, getContentHeight(), getContentRight(), getContentBottom(), ColorHelper.getColor(0, 0, 0, 150));
-                guiGraphics.outline(getContentX() - 2, getContentY(), getContentWidth(), getContentHeight(), ColorHelper.getColor(68, 68, 68, 255));
+                // todo: alpha seems to be ignored, or transparency isn't working with this api
+                guiGraphics.fill(getContentX(), getContentY(), getContentX() + getContentWidth(), getContentY() + getContentHeight(), ColorHelper.getColor(68, 68, 68, 255));
+                guiGraphics.fill(getContentX() + 1, getContentY() + 1, getContentX() + getContentWidth() - 1, getContentY() + getContentHeight() - 1, ColorHelper.getColor(0, 0, 0, 150));
             }
             lastRenderX = getX();
             lastRenderY = getY();

@@ -68,12 +68,11 @@ public class XaeroPlusClientGameTest implements FabricClientGameTest {
             takeScreenshot(context, "world_join");
             context.runOnClient(mc -> {
                 HudMod.INSTANCE.getHudConfigs().getClientConfigManager().getCurrentProfile().set(MinimapProfiledConfigOptions.SIZE, 100);
-                Settings.REGISTRY.transparentMinimapBackground.setValue(true);
                 Settings.REGISTRY.minimapScaleMultiplierSetting.setValue(2);
                 Settings.REGISTRY.minimapSizeMultiplierSetting.setValue(2);
                 Settings.REGISTRY.minimapFpsLimiter.setValue(true);
             });
-            takeScreenshot(context, "minimap_transparent");
+            takeScreenshot(context, "minimap_resized");
 
             context.runOnClient(mc -> {
                 var session = WorldMapSession.getCurrentSession();

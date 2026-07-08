@@ -1,11 +1,14 @@
 package xaeroplus.feature.waypoint;
 
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.waypoint.set.WaypointSet;
+import xaero.hud.minimap.waypoint.thirdparty.ThirdPartyWaypointManager;
+import xaero.hud.minimap.waypoint.thirdparty.ThirdPartyWaypoints;
 import xaero.hud.minimap.world.MinimapWorld;
 import xaero.hud.path.XaeroPath;
 import xaeroplus.XaeroPlus;
@@ -119,5 +122,17 @@ public class WaypointAPI {
         } catch (final Exception e) {
             XaeroPlus.LOGGER.error("Failed switching waypoint dimension: {}", dimension, e);
         }
+    }
+
+    public static ThirdPartyWaypointManager getThirdPartyWaypointManager(final ResourceKey<Level> dimension) {
+        var minimapWorld = getMinimapWorld(dimension);
+        if (minimapWorld == null) return null;
+        return minimapWorld.getContainer().getThirdPartyWaypointManager();
+    }
+
+    public static ThirdPartyWaypoints getThirdPartyWaypoints(final ResourceKey<Level> dimension, Identifier origin) {
+        var manager = getThirdPartyWaypointManager(dimension);
+        if (manager == null) return null;
+        return manager.get(origin);
     }
 }

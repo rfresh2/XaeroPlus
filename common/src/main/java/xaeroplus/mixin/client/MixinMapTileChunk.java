@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import xaero.map.MapProcessor;
 import xaero.map.cache.BlockStateShortShapeCache;
 import xaero.map.region.MapRegion;
 import xaero.map.region.MapTile;
@@ -32,7 +33,7 @@ public abstract class MixinMapTileChunk implements SeenChunksTrackingMapTileChun
     }
 
     @Inject(method = "setTile", at = @At("HEAD"))
-    public void setTile(final int x, final int z, final MapTile tile, final BlockStateShortShapeCache blockStateShortShapeCache, final CallbackInfo ci) {
+    public void setTile(final int x, final int z, final MapTile tile, final BlockStateShortShapeCache blockStateShortShapeCache, final MapProcessor mapProcessor, final CallbackInfo ci) {
         xaeroPlus$seenTiles[x][z] = tile != null;
     }
 

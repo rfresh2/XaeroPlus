@@ -7,9 +7,9 @@ import xaeroplus.XaeroPlus;
 
 public class WaystonesHelper {
     private static boolean isWaystonesPresent = false;
-    private static boolean isFabricWaystonesPresent = false;
+    private static boolean isWraithWaystonesPresent = false;
     private static boolean checked = false;
-    private static boolean fabricChecked = false;
+    private static boolean wraithChecked = false;
 
     public static boolean isWaystonesPresent() {
         if (!checked) {
@@ -28,23 +28,23 @@ public class WaystonesHelper {
         return isWaystonesPresent;
     }
 
-    public static boolean isFabricWaystonesPresent() {
-        if (!fabricChecked) {
+    public static boolean isWraithWaystonesPresent() {
+        if (!wraithChecked) {
             try {
                 Class.forName(FabricWaystones.class.getName());
-                XaeroPlus.LOGGER.info("Found Fabric Waystones. Enabling Fabric Waystones support.");
-                isFabricWaystonesPresent = true;
+                XaeroPlus.LOGGER.info("Found Wraith Waystones. Enabling Wraith Waystones support.");
+                isWraithWaystonesPresent = true;
             } catch (final Throwable e) {
-                XaeroPlus.LOGGER.info("Fabric Waystones not found. Disabling Fabric Waystones support.");
-                isFabricWaystonesPresent = false;
+                XaeroPlus.LOGGER.info("Wraith Waystones not found. Disabling Wraith Waystones support.");
+                isWraithWaystonesPresent = false;
             }
-            fabricChecked = true;
+            wraithChecked = true;
         }
-        return isFabricWaystonesPresent;
+        return isWraithWaystonesPresent;
     }
 
     public static boolean isAnyWaystonesPresent() {
-        return isWaystonesPresent() || isFabricWaystonesPresent();
+        return isWaystonesPresent() || isWraithWaystonesPresent();
     }
 
 }

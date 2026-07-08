@@ -10,13 +10,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
@@ -145,27 +140,6 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
     ), remap = true)
     public Matrix4f correctPreRotationTranslationForSizeMult(final Matrix4fStack instance, final float x, final float y, final float z) {
         return instance.translate((x / Globals.minimapSizeMultiplier), (y / Globals.minimapSizeMultiplier), z);
-    }
-
-    @Inject(method = "renderChunksToFBO", at = @At(
-        value = "INVOKE",
-        target = "Lorg/joml/Matrix4fStack;translate(FFF)Lorg/joml/Matrix4f;",
-        ordinal = 1,
-        shift = At.Shift.BEFORE
-    ), slice = @Slice(
-        from = @At(
-            value = "INVOKE",
-            target = "Lxaero/common/graphics/ImprovedFramebuffer;bindRead()V"
-        )
-    ), remap = true)
-    public void correctPostRotationTranslationForSizeMult(
-        final CallbackInfo ci,
-        @Local(name = "halfWView") float halfWView,
-        @Local(name = "shaderMatrixStack") Matrix4fStack shaderMatrixStack
-    ) {
-        float sizeMult = Globals.minimapSizeMultiplier;
-        float sizeMultTranslation = halfWView * (sizeMult - 1.0f) / (sizeMult * sizeMult);
-        shaderMatrixStack.translate(sizeMultTranslation, sizeMultTranslation, 0f);
     }
 
     @WrapOperation(method = "renderChunksToFBO", at= @At(

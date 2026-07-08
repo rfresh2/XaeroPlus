@@ -7,29 +7,34 @@ import wraith.fwaystones.FabricWaystones;
 import wraith.fwaystones.access.WaystoneValue;
 import wraith.fwaystones.integration.event.WaystoneEvents;
 import xaeroplus.module.impl.WaystoneSync;
-import xaeroplus.util.FabricWaystonesHelper;
+import xaeroplus.util.IWraithWaystonesHelper;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class FabricWaystonesHelperInit {
+public class WraithWaystonesHelperImpl implements IWraithWaystonesHelper {
+    private volatile boolean shouldSync = false;
 
-    public static void doInit() {
-        FabricWaystonesHelper.waystoneProvider = FabricWaystonesHelperInit::getWaystones;
-        FabricWaystonesHelper.subcribeWaystonesEventsRunnable = FabricWaystonesHelperInit::subscribeWaystonesEvents;
+    public WraithWaystonesHelperImpl() {
+        WaystoneEvents.FORGET_ALL_WAYSTONES_EVENT.register((p) -> onWaystoneUpdate(null));
+        WaystoneEvents.DISCOVER_WAYSTONE_EVENT.register(this::onWaystoneUpdate);
+        WaystoneEvents.REMOVE_WAYSTONE_EVENT.register(this::onWaystoneUpdate);
+        WaystoneEvents.RENAME_WAYSTONE_EVENT.register(this::onWaystoneUpdate);
     }
 
-    public static void subscribeWaystonesEvents() {
-        if (FabricWaystonesHelper.subscribed) return;
-        WaystoneEvents.FORGET_ALL_WAYSTONES_EVENT.register((p) -> FabricWaystonesHelper.onWaystoneUpdate(null));
-        WaystoneEvents.DISCOVER_WAYSTONE_EVENT.register(FabricWaystonesHelper::onWaystoneUpdate);
-        WaystoneEvents.REMOVE_WAYSTONE_EVENT.register(FabricWaystonesHelper::onWaystoneUpdate);
-        WaystoneEvents.RENAME_WAYSTONE_EVENT.register(FabricWaystonesHelper::onWaystoneUpdate);
-        FabricWaystonesHelper.subscribed = true;
+    @Override
+    public boolean shouldSync() {
+        return shouldSync;
     }
 
-    public static List<WaystoneSync.Waystone> getWaystones() {
+    @Override
+    public void setShouldSync(final boolean shouldSync) {
+        this.shouldSync = shouldSync;
+    }
+
+    @Override
+    public List<WaystoneSync.Waystone> getWaystones() {
         var waystoneStorage = FabricWaystones.WAYSTONE_STORAGE;
         if (waystoneStorage == null) return Collections.emptyList();
         ConcurrentHashMap<String, WaystoneValue> waystones = waystoneStorage.WAYSTONES;
@@ -45,5 +50,9 @@ public class FabricWaystonesHelperInit {
 //                waystone.getColor()
             ))
             .toList();
+    }
+
+    void onWaystoneUpdate(final String hash) {
+        shouldSync = true;
     }
 }

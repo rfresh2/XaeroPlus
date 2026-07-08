@@ -12,6 +12,7 @@ plugins {
 architectury {
     platformSetupLoomIde()
     neoForge()
+    injectInjectables = false
 }
 
 val common = project(":common")
@@ -41,7 +42,7 @@ dependencies {
     modCompileOnly(libs.waystones.neoforge)
     modCompileOnly(libs.balm.neoforge)
     modCompileOnly(libs.worldtools)
-    modCompileOnly(libs.fabric.waystones)
+    modCompileOnly(libs.wraith.waystones)
     modCompileOnly(libs.sodium.neoforge)
     modRuntimeOnly(libs.immediatelyfast.neo)
     shadow(libs.sqlite)

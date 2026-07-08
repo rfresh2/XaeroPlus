@@ -20,7 +20,6 @@ public class XaeroPlusCompatibleMinimapMixinPlugin implements IMixinConfigPlugin
 
     @Override
     public void onLoad(final String mixinPackage) {
-        if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) return;
     }
 
     @Override

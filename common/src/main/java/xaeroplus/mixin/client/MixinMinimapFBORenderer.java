@@ -6,11 +6,9 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.renderer.MultiBufferSource;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -34,8 +32,6 @@ import xaero.hud.minimap.waypoint.render.WaypointMapRenderer;
 import xaeroplus.Globals;
 import xaeroplus.feature.extensions.CustomMinimapFBORenderer;
 import xaeroplus.feature.render.shaders.XaeroPlusShaders;
-import xaeroplus.settings.Settings;
-import xaeroplus.util.ColorHelper;
 
 @Mixin(value = MinimapFBORenderer.class, remap = false)
 public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements CustomMinimapFBORenderer {
@@ -120,24 +116,12 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         instance.translate(translate, translate, -2000.0F);
     }
 
-    @Redirect(method = "renderChunksToFBO", at = @At(
-        value = "INVOKE",
-        target = "Lnet/minecraft/client/gui/GuiComponent;fill(Lcom/mojang/blaze3d/vertex/PoseStack;IIIII)V"
-    ), remap = true)
-    public void modifyMMBackgroundFill(final PoseStack guiGraphics, final int x1, final int y1, final int x2, final int y2, final int color,
-                                       @Share("scaledSize") LocalIntRef scaledSize) {
-        if (!Settings.REGISTRY.transparentMinimapBackground.get())
-            GuiComponent.fill(guiGraphics, -scaledSize.get(), -scaledSize.get(), scaledSize.get(), scaledSize.get(), ColorHelper.getColor(0, 0, 0, 255));
-        else
-            GuiComponent.fill(guiGraphics, -scaledSize.get(), -scaledSize.get(), scaledSize.get(), scaledSize.get(), ColorHelper.getColor(0, 0, 0, 0));
-    }
-
-    @Redirect(method = "renderChunksToFBO", at = @At(
+    @ModifyArg(method = "renderChunksToFBO", at = @At(
         value = "INVOKE",
         target = "Lcom/mojang/blaze3d/systems/RenderSystem;lineWidth(F)V"
     ), remap = true)
-    public void modifyChunkGridLineWidth(final float original) {
-        RenderSystem.lineWidth(Math.max(1.0f, original * Globals.minimapScaleMultiplier / (float) Globals.minimapSizeMultiplier));
+    public float modifyChunkGridLineWidth(final float original) {
+        return Math.max(1.0f, original * Globals.minimapScaleMultiplier / (float) Globals.minimapSizeMultiplier);
     }
 
     @Redirect(method = "renderChunksToFBO", at = @At(
@@ -173,16 +157,6 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         float sizeMult = Globals.minimapSizeMultiplier;
         float sizeMultTranslation = halfWView * (sizeMult - 1.0f) / (sizeMult * sizeMult);
         shaderMatrixStack.translate(sizeMultTranslation, sizeMultTranslation, 0f);
-    }
-
-    @Redirect(method = "renderChunksToFBO", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/common/minimap/render/MinimapRendererHelper;drawMyTexturedModalRect(Lcom/mojang/blaze3d/vertex/PoseStack;FFIIFFFF)V"
-    ), remap = true) // $REMAP
-    public void redirectModelViewDraw(final MinimapRendererHelper instance, final PoseStack matrixStack, final float x, final float y, final int textureX, final int textureY, final float width, final float height, final float theight, final float factor,
-                                      @Share("scaledSize") LocalIntRef scaledSize) {
-        final float scaledSizeM = Globals.minimapScaleMultiplier * 512f;
-        this.helper.drawMyTexturedModalRect(matrixStack, -scaledSize.get(), -scaledSize.get(), 0, 0, scaledSizeM, scaledSizeM, scaledSizeM, scaledSizeM);
     }
 
     @WrapOperation(method = "renderChunksToFBO", at= @At(

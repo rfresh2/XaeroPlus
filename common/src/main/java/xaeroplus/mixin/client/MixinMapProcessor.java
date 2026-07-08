@@ -31,10 +31,7 @@ import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.DataFolderResolveUtil;
 
 import java.lang.ref.WeakReference;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Objects;
-import java.util.UUID;
 
 import static xaeroplus.event.XaeroWorldChangeEvent.WorldChangeType.*;
 
@@ -49,7 +46,6 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
     @Unique private String xaeroPlus$worldChange_prevCurrentMWId;
     @Unique private ResourceKey<Level> xaeroPlus$worldChange_prevMapWorldCurrentDimId;
     @Unique private boolean xaeroPlus$nextWorldChangeIsDimSwitch = false;
-    @Unique private final static String LOCK_ID = UUID.randomUUID().toString();
 
     @Shadow private ClientLevel world;
     @Shadow private MapWorld mapWorld;
@@ -107,14 +103,6 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
     ))
     public void decreaseThreadSleepTime(final long millis) throws InterruptedException {
         Thread.sleep(5L);
-    }
-
-    @Redirect(method = "updateWorldSynced", at = @At(
-        value = "INVOKE",
-        target = "Ljava/nio/file/Path;resolve(Ljava/lang/String;)Ljava/nio/file/Path;"
-    ))
-    public Path replaceLockPath(final Path instance, final String other) {
-        return Paths.get(System.getProperty("java.io.tmpdir")).resolve(LOCK_ID + ".lock");
     }
 
     @Inject(method = "updateWorldSynced", at = @At(

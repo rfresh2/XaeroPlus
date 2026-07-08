@@ -1,13 +1,8 @@
 package xaeroplus.mixin.client;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.injector.WrapWithCondition;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,12 +10,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xaero.common.HudMod;
 import xaero.common.minimap.MinimapProcessor;
-import xaero.common.minimap.render.MinimapFBORenderer;
 import xaero.common.minimap.render.MinimapRenderer;
 import xaero.hud.minimap.Minimap;
-import xaero.hud.minimap.common.config.option.MinimapProfiledConfigOptions;
 import xaeroplus.Globals;
 import xaeroplus.feature.extensions.CustomMinimapFBORenderer;
 import xaeroplus.settings.Settings;
@@ -135,34 +127,5 @@ public class MixinMinimapRenderer {
             return (zoom / Globals.minimapScaleMultiplier) * Globals.minimapSizeMultiplier;
         }
         return zoom;
-    }
-
-    /**
-     * Inspiration for the below mods came from: https://github.com/Abbie5/xaeroarrowfix
-     */
-    @WrapWithCondition(method = "renderMinimap", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/common/minimap/render/MinimapFBORenderer;renderMainEntityDot(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/entity/Entity;ZLnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)V"),
-        remap = true) // $REMAP
-    public boolean redirectRenderMainEntityDot(
-        final MinimapFBORenderer instance, final GuiGraphics guiGraphics, final Entity renderEntity, final boolean cave, final MultiBufferSource.BufferSource renderTypeBuffers,
-        @Local(name = "lockedNorth") boolean lockedNorth
-    ) {
-        if (Settings.REGISTRY.fixMainEntityDot.get()) {
-            return HudMod.INSTANCE.getHudConfigs().getClientConfigManager().getEffective(MinimapProfiledConfigOptions.RADAR_MAIN_ENTITY) != 2 && !lockedNorth;
-        }
-        return true;
-    }
-
-    @ModifyExpressionValue(
-        method = "drawArrow",
-        at = @At(
-            value = "CONSTANT",
-            args = "intValue=-6",
-            ordinal = 0
-        )
-    )
-    public int fixMainEntityDotOffset(final int original) {
-        return Settings.REGISTRY.fixMainEntityDot.get() ? -10 : original;
     }
 }

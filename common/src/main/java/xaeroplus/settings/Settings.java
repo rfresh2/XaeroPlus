@@ -10,7 +10,6 @@ import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.*;
 import xaeroplus.util.BaritoneHelper;
 import xaeroplus.util.ColorHelper;
-import xaeroplus.util.WaystonesHelper;
 import xaeroplus.util.WorldToolsHelper;
 
 import java.io.ByteArrayOutputStream;
@@ -35,28 +34,6 @@ public final class Settings extends SettingRegistry {
             "Transparent WorldMap Background",
             "xaeroplus.setting.transparent_worldmap_background",
             false),
-        SettingLocation.WORLD_MAP_MAIN);
-    public final BooleanSetting fastMapSetting = register(
-        BooleanSetting.create(
-            "Fast Mapping",
-            "xaeroplus.setting.fast_mapping",
-            false),
-        SettingLocation.WORLD_MAP_MAIN);
-    public final DoubleSetting fastMapWriterDelaySetting = register(
-        DoubleSetting.create(
-            "Fast Mapping Delay",
-            "xaeroplus.setting.fast_mapping_delay",
-            10, 1000, 10,
-            250,
-            fastMapSetting::get),
-        SettingLocation.WORLD_MAP_MAIN);
-    public final DoubleSetting fastMapMaxTilesPerCycle = register(
-        DoubleSetting.create(
-            "Fast Mapping Rate Limit",
-            "xaeroplus.setting.fast_mapping_rate_limit",
-            10, 120, 10,
-            25,
-            fastMapSetting::get),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting fastZipWrite = register(
         BooleanSetting.create(
@@ -83,63 +60,6 @@ public final class Settings extends SettingRegistry {
             },
             BaritoneHelper::isBaritonePresent),
         SettingLocation.WORLD_MAP_MAIN);
-    public final BooleanSetting waystonesWaypointSyncSetting = register(
-        BooleanSetting.create(
-            "Waystones Sync",
-            "xaeroplus.setting.waystones_sync",
-            true,
-            (b) -> {
-                if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setEnabled(b);
-            },
-            WaystonesHelper::isAnyWaystonesPresent),
-        SettingLocation.WORLD_MAP_MAIN);
-    public final EnumSetting<ColorHelper.WaystoneColor> waystoneColorSetting = register(
-        EnumSetting.create(
-            "Waystone Color",
-            "xaeroplus.setting.waystone_color",
-            ColorHelper.WaystoneColor.values(),
-            ColorHelper.WaystoneColor.RANDOM,
-            (b) -> {
-                if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setColor(b);
-            },
-            () -> WaystonesHelper.isAnyWaystonesPresent() && ModuleManager.getModule(WaystoneSync.class).isEnabled()),
-        SettingLocation.WORLD_MAP_MAIN);
-    public final BooleanSetting waystoneWaypointSetSetting = register(
-        BooleanSetting.create(
-            "Waystone Waypoint Set",
-            "xaeroplus.setting.waystone_waypoint_set",
-            false,
-            (b) -> {
-                if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setWaypointSet(b);
-            },
-            () -> WaystonesHelper.isAnyWaystonesPresent() && ModuleManager.getModule(WaystoneSync.class).isEnabled()),
-        SettingLocation.WORLD_MAP_MAIN);
-    public final EnumSetting<WaystoneWpVisibilityType> waystoneWaypointVisibilityModeSetting = register(
-        EnumSetting.create(
-            "Waystone WP Visibility Type",
-            "xaeroplus.setting.waystone_visibility_type",
-            WaystoneWpVisibilityType.values(),
-            WaystoneWpVisibilityType.LOCAL,
-            (mode) -> {
-                if (WaystonesHelper.isAnyWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setVisibilityType(mode);
-            },
-            () -> WaystonesHelper.isAnyWaystonesPresent() && ModuleManager.getModule(WaystoneSync.class).isEnabled()),
-        SettingLocation.WORLD_MAP_MAIN);
-    public enum WaystoneWpVisibilityType implements TranslatableSettingEnum {
-        // order here must mirror xaero's visibility enum
-        LOCAL("xaeroplus.gui.waystone_visibility_type.local"),
-        GLOBAL("xaeroplus.gui.waystone_visibility_type.global"),
-        WORLD_MAP_LOCAL("xaeroplus.gui.waystone_visibility_type.world_map_local"),
-        WORLD_MAP_GLOBAL("xaeroplus.gui.waystone_visibility_type.world_map_global");
-        private final String translationKey;
-        WaystoneWpVisibilityType(final String translationKey) {
-            this.translationKey = translationKey;
-        }
-        @Override
-        public String getTranslationKey() {
-            return translationKey;
-        }
-    }
     public final BooleanSetting spawnPointSetting = register(
         BooleanSetting.create(
             "Spawn Point Waypoint",
@@ -211,13 +131,6 @@ public final class Settings extends SettingRegistry {
             (v) -> markChunksDirtyInWriteDistance(),
             transparentObsidianRoofSetting::get),
         SettingLocation.WORLD_MAP_MAIN);
-    public final DoubleSetting worldMapMinZoomSetting = register(
-        DoubleSetting.create(
-            "Min WorldMap Zoom",
-            "xaeroplus.setting.min_zoom",
-            0, 0.625, 0.01,
-            0.1),
-        SettingLocation.WORLD_MAP_MAIN);
     public  final BooleanSetting crossDimensionCursorCoordinates = register(
         BooleanSetting.create(
             "Cross Dim Cursor Coords",
@@ -228,24 +141,6 @@ public final class Settings extends SettingRegistry {
         BooleanSetting.create(
             "Prefer Overworld Waypoints",
             "xaeroplus.setting.ow_auto_waypoint_dimension",
-            false),
-        SettingLocation.WORLD_MAP_MAIN);
-    public final BooleanSetting showWaypointDistances = register(
-        BooleanSetting.create(
-            "Show Waypoint Distances",
-            "xaeroplus.setting.show_waypoint_distances",
-            true),
-        SettingLocation.WORLD_MAP_MAIN);
-    public final BooleanSetting showCoordsInRightClickOptions = register(
-        BooleanSetting.create(
-            "Show Coords In Right Click Options",
-            "xaeroplus.setting.show_coords_in_right_click_options",
-            true),
-        SettingLocation.WORLD_MAP_MAIN);
-    public final BooleanSetting renderGameBehindWorldMap = register(
-        BooleanSetting.create(
-            "Render Game Behind WorldMap",
-            "xaeroplus.settings.render_game_behind_worldmap",
             false),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting nullOverworldDimensionFolder = register(
@@ -1077,12 +972,6 @@ public final class Settings extends SettingRegistry {
      * Minimap View
      */
 
-    public final BooleanSetting transparentMinimapBackground = register(
-        BooleanSetting.create(
-            "Transparent Background",
-            "xaeroplus.setting.transparent_background",
-            false),
-        SettingLocation.MINIMAP_VIEW);
     public final DoubleSetting minimapScaleMultiplierSetting = register(
         DoubleSetting.create(
             "Minimap Scaling Factor",
@@ -1121,12 +1010,6 @@ public final class Settings extends SettingRegistry {
         BooleanSetting.create(
             "Always Render Player Icon",
             "xaeroplus.setting.always_render_player_icon",
-            true),
-        SettingLocation.MINIMAP_ENTITY_RADAR);
-    public final BooleanSetting fixMainEntityDot = register(
-        BooleanSetting.create(
-            "Fix Main Entity Dot",
-            "xaeroplus.setting.fix_main_entity_dot",
             true),
         SettingLocation.MINIMAP_ENTITY_RADAR);
 

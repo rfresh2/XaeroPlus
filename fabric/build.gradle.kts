@@ -69,7 +69,7 @@ dependencies {
     modImplementation(libs.waystones.fabric)
     modImplementation(libs.balm.fabric)
 	modCompileOnly(libs.wraith.waystones)
-	modRuntimeOnly(libs.immediatelyfast)
+//	modRuntimeOnly(libs.immediatelyfast)
     runtimeOnly("net.lenni0451:Reflect:1.6.1") // immediatelyfast jij
     modImplementation(libs.modmenu)
     modImplementation(libs.sodium.fabric)

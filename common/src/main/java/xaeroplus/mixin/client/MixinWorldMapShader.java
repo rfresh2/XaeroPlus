@@ -1,6 +1,5 @@
 package xaeroplus.mixin.client;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mojang.blaze3d.shaders.Uniform;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.renderer.ShaderInstance;
@@ -19,29 +18,23 @@ import java.io.IOException;
 public class MixinWorldMapShader extends ShaderInstance implements CustomWorldMapShader {
 
     @Unique
-    final Uniform transparentBackgroundUniform = this.getUniform("TransparentBackground");
+    Uniform transparentBackgroundUniform;
 
     public MixinWorldMapShader(final ResourceProvider resourceProvider, final String name, final VertexFormat vertexFormat) throws IOException {
         super(resourceProvider, name, vertexFormat);
     }
 
-    @ModifyExpressionValue(
-        method = "<init>",
-        at = @At(
-            value = "CONSTANT",
-            args = "stringValue=xaerolib/map")
-    )
-    private static String editShader(final String constant) {
-        return "xaeroplus/custom_map";
-    }
-
     @Inject(method = "<init>", at = @At("RETURN"))
-    public void init(final CallbackInfo ci) {
-        setTransparentBackground(false);
+    public void init(final String path, final ResourceProvider factory, final CallbackInfo ci) {
+        if (path.contains("xaeroplus")) {
+            transparentBackgroundUniform = this.getUniform("TransparentBackground");
+            setTransparentBackground(false);
+        }
     }
 
     @Override
     public void setTransparentBackground(final boolean value) {
+        if (transparentBackgroundUniform == null) return;
         final int intValue = value ? 1 : 0;
         if (this.transparentBackgroundUniform.getIntBuffer().get(0) != intValue) {
             this.transparentBackgroundUniform.set(intValue);

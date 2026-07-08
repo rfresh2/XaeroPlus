@@ -2,10 +2,9 @@ package xaeroplus.mixin.client;
 
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
-import com.llamalad7.mixinextras.sugar.ref.LocalRef;
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,8 +16,6 @@ import xaero.common.mods.SupportXaeroWorldmap;
 import xaero.map.WorldMapSession;
 import xaero.map.region.MapTileChunk;
 import xaeroplus.Globals;
-import xaeroplus.feature.render.DrawHelper;
-import xaeroplus.settings.Settings;
 
 @Mixin(value = SupportXaeroWorldmap.class, remap = false)
 public abstract class MixinSupportXaeroWorldmap {
@@ -42,41 +39,6 @@ public abstract class MixinSupportXaeroWorldmap {
         maxZRef.set((mapZ >> 2) + scaledSize);
     }
 
-    @Inject(method = "renderChunks", at = @At("HEAD"), remap = false)
-    public void setupTransparentMMBgBuffer(
-        final CallbackInfo ci,
-        @Share("bgTesselator") LocalRef<Tesselator> bgTesselatorRef,
-        @Share("bgBufferBuilder") LocalRef<BufferBuilder> bgBufferBuilderRef
-    ) {
-        if (Settings.REGISTRY.transparentMinimapBackground.get()) {
-            var bgTesselator = Tesselator.getInstance();
-            bgTesselatorRef.set(bgTesselator);
-            var bgBufferBuilder = bgTesselator.getBuilder();
-            bgBufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-            bgBufferBuilderRef.set(bgBufferBuilder);
-        }
-    }
-
-    @Inject(method = "renderChunks", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/common/mods/SupportXaeroWorldmap;prepareMapTexturedRect(Lorg/joml/Matrix4f;FFIIFFLxaero/map/region/MapTileChunk;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRenderer;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRenderer;Lxaero/common/minimap/render/MinimapRendererHelper;)V"
-    ), remap = false)
-    public void buildTransparentMMBg(
-        final CallbackInfo ci,
-        @Share("bgBufferBuilder") LocalRef<BufferBuilder> bgBufferBuilderRef,
-        @Local(argsOnly = true) final PoseStack matrixStack,
-        @Local(name = "drawX") int drawX,
-        @Local(name = "drawZ") int drawZ,
-        @Local(name = "chunk") MapTileChunk chunk
-    ) {
-        if (Settings.REGISTRY.transparentMinimapBackground.get()) {
-            DrawHelper.addMMBackgroundToBuffer(matrixStack.last().pose(),
-                                               bgBufferBuilderRef.get(),
-                                               drawX,
-                                               drawZ,
-                                               chunk);
-        }
-    }
 
     @WrapWithCondition(method = "renderChunks", at = @At(
         value = "INVOKE",
@@ -84,14 +46,6 @@ public abstract class MixinSupportXaeroWorldmap {
     ), remap = true) // $REMAP
     public boolean hideSlimeChunksWhileDimSwitched(SupportXaeroWorldmap instance, MapTileChunk chunk, Long seed, int drawX, int drawZ, PoseStack matrixStack, MinimapRendererHelper helper, VertexConsumer overlayBufferBuilder) {
         return Globals.getCurrentDimensionId() == Minecraft.getInstance().level.dimension();
-    }
-
-    @Inject(method = "renderChunks", at = @At("RETURN"), remap = false)
-    public void drawTransparentMMBackground(
-        final CallbackInfo ci,
-        @Share("bgTesselator") LocalRef<Tesselator> bgTesselatorRef
-    ) {
-        if (Settings.REGISTRY.transparentMinimapBackground.get()) bgTesselatorRef.get().end();
     }
 
     @Inject(method = "tryToGetMultiworldId", at = @At(

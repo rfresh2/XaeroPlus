@@ -10,6 +10,7 @@ plugins {
 architectury {
 	platformSetupLoomIde()
 	fabric()
+	injectInjectables = false
 }
 
 fabricApi {
@@ -67,7 +68,7 @@ dependencies {
     modCompileOnly(libs.baritone.fabric)
 	modCompileOnly(libs.waystones.fabric)
 	modCompileOnly(libs.balm.fabric)
-	modCompileOnly(libs.fabric.waystones)
+	modCompileOnly(libs.wraith.waystones)
     modImplementation(libs.modmenu)
 	modCompileOnly(libs.sodium)
     implementation(shadow(libs.caffeine.get())!!)

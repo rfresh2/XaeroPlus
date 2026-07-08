@@ -34,7 +34,6 @@ public class ModuleManager {
             new SpawnPoint(),
             new TeleportFailNotifier(),
             new TickTaskExecutor(),
-            new WaystoneSync(),
             new WorldBorder(),
             new WorldTools()
         ).forEach(ModuleManager::addModule);

@@ -45,10 +45,7 @@ dependencies {
     modImplementation(libs.minimap.forge) { isTransitive = false }
     modImplementation(libs.xaerolib.forge)
     modImplementation(libs.baritone.forge)
-    modCompileOnly(libs.waystones.forge)
-    modCompileOnly(libs.balm.forge)
     modCompileOnly(libs.worldtools)
-    modCompileOnly(libs.wraith.waystones)
     shadow(libs.sqlite)
     forgeRuntimeLibrary(implementation(shadow(libs.oldbiomes.get())!!)!!)
     forgeRuntimeLibrary(implementation(shadow(libs.caffeine.get())!!)!!)

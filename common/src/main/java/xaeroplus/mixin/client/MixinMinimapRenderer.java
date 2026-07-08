@@ -128,25 +128,4 @@ public class MixinMinimapRenderer {
         }
         return zoom;
     }
-
-    // todo: verify
-//    @WrapOperation(method = "renderMinimap", at = @At(
-//        value = "INVOKE",
-//        target = "Lcom/mojang/blaze3d/systems/RenderSystem;blendFuncSeparate(Lcom/mojang/blaze3d/platform/GlStateManager$SourceFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DestFactor;Lcom/mojang/blaze3d/platform/GlStateManager$SourceFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DestFactor;)V"
-//    ), remap = true)
-//    public void correctBlendingForFpsLimiter(final GlStateManager.SourceFactor sourceFactor, final GlStateManager.DestFactor destFactor, final GlStateManager.SourceFactor sourceFactor2, final GlStateManager.DestFactor destFactor2, final Operation<Void> original) {
-//        if (Settings.REGISTRY.minimapFpsLimiter.get()) {
-//            // todo: when minimap opacity is not set to 100 this is slightly different than without fps limiter
-//            //  the minimap will appear more opaque and dim than it should be
-//            //  when we are rendering to our buffering render target the blending isn't exactly the same as our BG opacity is 0
-//            RenderSystem.blendFuncSeparate(
-//                GlStateManager.SourceFactor.SRC_ALPHA,
-//                GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
-//                GlStateManager.SourceFactor.SRC_COLOR,
-//                GlStateManager.DestFactor.ZERO
-//            );
-//        } else {
-//            original.call(sourceFactor, destFactor, sourceFactor2, destFactor2);
-//        }
-//    }
 }

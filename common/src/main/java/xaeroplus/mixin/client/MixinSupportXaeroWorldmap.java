@@ -25,6 +25,10 @@ public abstract class MixinSupportXaeroWorldmap {
     ), remap = false)
     public void overrideRegionRange(
         final CallbackInfo ci,
+        @Local(name = "minViewX") int minViewX,
+        @Local(name = "minViewZ") int minViewZ,
+        @Local(name = "maxViewX") int maxViewX,
+        @Local(name = "maxViewZ") int maxViewZ,
         @Local(name = "mapX") int mapX,
         @Local(name = "mapZ") int mapZ,
         @Local(name = "minX") LocalIntRef minXRef,
@@ -33,12 +37,11 @@ public abstract class MixinSupportXaeroWorldmap {
         @Local(name = "maxZ") LocalIntRef maxZRef
     ) {
         final int scaledSize = Globals.minimapScaleMultiplier * 4;
-        minXRef.set((mapX >> 2) - scaledSize);
-        maxXRef.set((mapX >> 2) + scaledSize);
-        minZRef.set((mapZ >> 2) - scaledSize);
-        maxZRef.set((mapZ >> 2) + scaledSize);
+        minXRef.set(Math.min(minViewX, (mapX >> 2) - scaledSize));
+        maxXRef.set(Math.max(maxViewX, (mapX >> 2) + scaledSize));
+        minZRef.set(Math.min(minViewZ, (mapZ >> 2) - scaledSize));
+        maxZRef.set(Math.max(maxViewZ, (mapZ >> 2) + scaledSize));
     }
-
 
     @WrapWithCondition(method = "renderChunks", at = @At(
         value = "INVOKE",

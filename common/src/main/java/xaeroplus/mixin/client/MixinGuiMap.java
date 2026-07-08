@@ -1,11 +1,9 @@
 package xaeroplus.mixin.client;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -15,7 +13,6 @@ import it.unimi.dsi.fastutil.longs.LongList;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -25,11 +22,9 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
@@ -48,14 +43,11 @@ import xaero.lib.client.graphics.util.TextureUtils;
 import xaero.lib.client.gui.ScreenBase;
 import xaero.lib.client.gui.widget.Tooltip;
 import xaero.lib.common.config.option.ConfigOption;
-import xaero.lib.common.config.single.SingleConfigManager;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMap;
 import xaero.map.animation.SlowingAnimation;
 import xaero.map.common.config.option.WorldMapProfiledConfigOptions;
 import xaero.map.config.util.WorldMapClientConfigUtils;
-import xaero.map.element.HoveredMapElementHolder;
-import xaero.map.element.MapElementRenderHandler;
 import xaero.map.graphics.ImprovedFramebuffer;
 import xaero.map.graphics.MapRenderHelper;
 import xaero.map.graphics.renderer.multitexture.MultiTextureRenderTypeRenderer;
@@ -81,27 +73,16 @@ import xaeroplus.util.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ForkJoinPool;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
-import static java.util.Objects.isNull;
 import static net.minecraft.world.level.Level.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static xaeroplus.Globals.getCurrentDimensionId;
-import static xaeroplus.util.ChunkUtils.getPlayerX;
-import static xaeroplus.util.ChunkUtils.getPlayerZ;
 
 @Mixin(value = GuiMap.class, remap = false)
 public abstract class MixinGuiMap extends ScreenBase implements IRightClickableElement {
-    @Unique private static boolean follow = false;
     @Unique boolean pan;
     @Unique double panMouseStartX;
     @Unique double panMouseStartY;
-    @Unique Button coordinateGotoButton;
-    @Unique EditBox xTextEntryField;
-    @Unique EditBox zTextEntryField;
-    @Unique Button followButton;
     @Unique Button switchToNetherButton;
     @Unique Button switchToOverworldButton;
     @Unique Button switchToEndButton;
@@ -134,6 +115,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Shadow private Button zoomOutButton;
     @Shadow private Button keybindingsButton;
     @Shadow private Button dimensionToggleButton;
+    @Shadow private Button attachedCameraButton;
     @Shadow private int rightClickX;
     @Shadow private int rightClickY;
     @Shadow private int rightClickZ;
@@ -142,6 +124,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Shadow private static double destScale;
     @Shadow private MapTileSelection mapTileSelection;
     @Shadow private double scale;
+    @Shadow public static boolean hiddenUI;
 
     protected MixinGuiMap(final Screen parent, final Screen escape, final Component titleIn) {
         super(parent, escape, titleIn);
@@ -152,14 +135,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Shadow
     private static ImprovedFramebuffer immediateRenderFBO;
-
-    @ModifyExpressionValue(method = "changeZoom",
-        at = @At(
-            value = "CONSTANT",
-            args = "doubleValue=0.0625"))
-    public double customMinZoom(final double original) {
-        return Settings.REGISTRY.worldMapMinZoomSetting.get() / 10.0f;
-    }
 
     @Unique
     private Component xaeroPlus$prefix(Component component) {
@@ -175,30 +150,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "init", at = @At(value = "RETURN"), remap = true)
     public void customInitGui(CallbackInfo ci) {
-        // left side
-        followButton = new GuiTexturedButton(
-            0, this.dimensionToggleButton.getY() - 20, 20, 20, this.follow ? 61 : 42, 19, 16, 16,
-            Globals.guiTextures,
-            this::onFollowButton,
-            () -> new Tooltip(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.toggle_follow_mode")
-                .append(" " + I18n.get(this.follow ? "xaeroplus.gui.off" : "xaeroplus.gui.on")))),
-            256, 256);
-        coordinateGotoButton = new GuiTexturedButton(
-            0, followButton.getY() - 20 , 20, 20, 23, 19, 16, 16,
-            Globals.guiTextures,
-            this::onGotoCoordinatesButton,
-            () -> new Tooltip(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.go_to_coordinates"))),
-            256, 256);
-        xTextEntryField = new EditBox(Minecraft.getInstance().font, 20, coordinateGotoButton.getY() - 10, 75, 20, Component.nullToEmpty("X:"));
-        xTextEntryField.setVisible(false);
-        xTextEntryField.setCursorPosition(0);
-        xTextEntryField.setHint(Component.literal("X:").withStyle(ChatFormatting.DARK_GRAY));
-        zTextEntryField = new EditBox(Minecraft.getInstance().font, 20, xTextEntryField.getY() + 20, 75, 20, Component.nullToEmpty("Z:"));
-        zTextEntryField.setVisible(false);
-        zTextEntryField.setCursorPosition(0);
-        zTextEntryField.setHint(Component.literal("Z:").withStyle(ChatFormatting.DARK_GRAY));
         startDrawingButton = new GuiTexturedButton(
-            0, this.coordinateGotoButton.getY() - 20, 20, 20, 47, 0, 16, 16,
+            0, this.attachedCameraButton.getY() - 20, 20, 20, 47, 0, 16, 16,
             Globals.guiTextures,
             (button -> onToggleDrawingButton()),
             () -> new Tooltip(
@@ -308,10 +261,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             this.switchToOverworldButton.setY(this.switchToEndButton.getY() - 20);
             this.switchToNetherButton.setY(this.switchToOverworldButton.getY() - 20);
         }
-        addButton(followButton);
-        addButton(coordinateGotoButton);
-        addWidget(xTextEntryField);
-        addWidget(zTextEntryField);
         addButton(startDrawingButton);
         addButton(switchToEndButton);
         addButton(switchToOverworldButton);
@@ -373,7 +322,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Inject(method = "extractRenderState", at = @At(
         value = "INVOKE",
         target = "Lxaero/map/gui/GuiMap;init(II)V",
-        ordinal = 0,
+        ordinal = 1,
         shift = At.Shift.AFTER
     ), remap = true)
     public void toggleRadarWhileDimensionSwitched(final CallbackInfo ci, @Local(name = "futureDimension") MapDimension futureDimension) {
@@ -398,31 +347,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Redirect(method = "extractRenderState", at = @At(value = "FIELD", target = "Lxaero/map/gui/GuiMap;cameraZ:D", opcode = Opcodes.PUTFIELD, ordinal = 1), remap = true)
     public void fixDimensionSwitchCameraCoordsZ(GuiMap owner, double value, @Local(name = "playerDimDiv") double playerDimDiv) {
         this.cameraZ *= prevPlayerDimDiv / playerDimDiv;
-    }
-
-    @Inject(method = "extractRenderState", at = @At(value = "FIELD", target = "Lxaero/map/gui/GuiMap;lastStartTime:J", opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER), remap = true)
-    public void injectFollowMode(final CallbackInfo ci) {
-        if (follow && isNull(this.cameraDestination) && isNull(this.cameraDestinationAnimX) && isNull(this.cameraDestinationAnimZ)) {
-            this.cameraDestinationAnimX = new SlowingAnimation(this.cameraX, getPlayerX(), 0.15, 0.5);
-            this.cameraDestinationAnimZ = new SlowingAnimation(this.cameraZ, getPlayerZ(), 0.15, 0.5);
-        }
-    }
-
-    @WrapOperation(method = "extractRenderState", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/lib/common/config/single/SingleConfigManager;getEffective(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;",
-        ordinal = 0
-    ),
-        slice = @Slice(
-            from = @At(
-                value = "FIELD",
-                target = "Lxaero/map/config/primary/option/WorldMapPrimaryClientConfigOptions;DEBUG:Lxaero/lib/common/config/option/BooleanConfigOption;",
-                opcode = Opcodes.GETSTATIC)
-        )
-    )
-    public Object hideDebugRenderingOnF1(final SingleConfigManager instance, final ConfigOption option, final Operation original) {
-        var value = original.call(instance, option);
-        return ((Boolean) value) && !Minecraft.getInstance().options.hideGui;
     }
 
     @WrapOperation(method = "extractRenderState",
@@ -451,7 +375,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                                      @Local(name = "fboScale") double fboScale
     ) {
         original.call(instance);
-        if (Minecraft.getInstance().options.hideGui) return;
+        if (hiddenUI) return;
         Globals.drawManager.drawWorldMapFeatures(
             flooredCameraX,
             flooredCameraZ,
@@ -459,60 +383,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             fboScale,
             renderTypeBuffers
         );
-    }
-
-    @WrapWithCondition(method = "extractRenderState", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/map/graphics/MapRenderHelper;renderDynamicHighlight(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;IIIIIIFFFFFFFF)V"
-    ), remap = true)
-    public boolean hideHighlightsOnF1(final PoseStack matrixStack, final VertexConsumer overlayBuffer, final int flooredCameraX, final int flooredCameraZ, final int leftX, final int rightX, final int topZ, final int bottomZ, final float sideR, final float sideG, final float sideB, final float sideA, final float centerR, final float centerG, final float centerB, final float centerA) {
-        return !Minecraft.getInstance().options.hideGui;
-    }
-
-    @WrapOperation(method = "extractRenderState", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/map/element/MapElementRenderHandler;render(Lxaero/map/gui/GuiMap;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lxaero/map/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;DDIIDDDDDFZLxaero/map/element/HoveredMapElementHolder;Lnet/minecraft/client/Minecraft;F)Lxaero/map/element/HoveredMapElementHolder;"
-    ), remap = true)
-    public HoveredMapElementHolder<?, ?> hideMapElementsOnF1(MapElementRenderHandler handler, GuiMap mapScreen, MultiBufferSource.BufferSource renderTypeBuffers, MultiTextureRenderTypeRendererProvider rendererProvider, double cameraX, double cameraZ, int width, int height, double screenSizeBasedScale, double scale, double playerDimDiv, double mouseX, double mouseZ, float brightness, boolean cave, HoveredMapElementHolder<?, ?> oldHovered, Minecraft mc, float partialTicks, Operation<HoveredMapElementHolder<?, ?>> original) {
-        if (!Minecraft.getInstance().options.hideGui) {
-            return original.call(handler, mapScreen, renderTypeBuffers, rendererProvider, cameraX, cameraZ, width, height, screenSizeBasedScale, scale, playerDimDiv, mouseX, mouseZ, brightness, cave, oldHovered, mc, partialTicks);
-        } else {
-            return null;
-        }
-    }
-
-    @WrapOperation(method = "extractRenderState", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/lib/client/config/ClientConfigManager;getEffective(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;",
-        ordinal = 0
-    ),
-        slice = @Slice(
-            from = @At(
-                value = "FIELD",
-                target = "Lxaero/map/common/config/option/WorldMapProfiledConfigOptions;FOOTSTEPS:Lxaero/lib/common/config/option/BooleanConfigOption;",
-                opcode = Opcodes.GETSTATIC)
-        )
-    )
-    public Object hideFootstepsOnF1(final ClientConfigManager instance, final ConfigOption option, final Operation original) {
-        var value = original.call(instance, option);
-        return ((Boolean) value) && !Minecraft.getInstance().options.hideGui;
-    }
-
-    @WrapOperation(method = "extractRenderState", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/lib/client/config/ClientConfigManager;getEffective(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;",
-        ordinal = 0
-    ),
-        slice = @Slice(
-            from = @At(
-                value = "FIELD",
-                target = "Lxaero/map/common/config/option/WorldMapProfiledConfigOptions;ARROW:Lxaero/lib/common/config/option/BooleanConfigOption;",
-                opcode = Opcodes.GETSTATIC)
-        )
-    )
-    public Object hideArrowOnF1(final ClientConfigManager instance, final ConfigOption option, final Operation original) {
-        var value = original.call(instance, option);
-        return ((Boolean) value) && !Minecraft.getInstance().options.hideGui;
     }
 
     @ModifyArg(method = "extractRenderState",
@@ -539,71 +409,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         int x = (int) (mouseBlockPosX / dimDiv);
         int z = (int) (mouseBlockPosZ / dimDiv);
         return original + " [" + x + ", " + z + "]";
-    }
-
-    @WrapWithCondition(method = "extractRenderState", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/map/graphics/MapRenderHelper;drawCenteredStringWithBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIFFFF)V"
-    ), remap = true)
-    public boolean hideRenderedStringsOnF1(final GuiGraphicsExtractor guiGraphics, final Font font, final String string, final int x, final int y, final int color, final float bgRed, final float bgGreen, final float bgBlue, final float bgAlpha) {
-        return !Minecraft.getInstance().options.hideGui;
-    }
-
-    @WrapWithCondition(method = "extractRenderState", at = @At(
-        value = "INVOKE",
-        target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blit(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIFFIIII)V"
-    ), remap = true)
-    public boolean hideCompassOnF1(final GuiGraphicsExtractor instance, final RenderPipeline renderPipeline, final Identifier arg, final int i, final int j, final float f, final float g, final int k, final int l, final int m, final int n) {
-        return !Minecraft.getInstance().options.hideGui;
-    }
-
-    @Inject(method = "extractRenderState", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/lib/client/gui/ScreenBase;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V"
-    ), remap = true)
-    public void hideButtonsOnF1(final CallbackInfo ci) {
-        if (Minecraft.getInstance().options.hideGui) {
-            List<Button> buttonList = getButtonList();
-            if (!buttonList.isEmpty()) {
-                this.guiMapButtonTempList.clear();
-                this.guiMapButtonTempList.addAll(buttonList);
-                xTextEntryField.setVisible(false);
-                zTextEntryField.setVisible(false);
-                clearButtons();
-            }
-        } else {
-            if (!this.guiMapButtonTempList.isEmpty()) {
-                clearButtons();
-                this.guiMapButtonTempList.forEach(this::addButton);
-                this.guiMapButtonTempList.clear();
-            }
-        }
-    }
-
-    @Inject(method = "extractRenderState", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/map/graphics/MapRenderHelper;restoreDefaultShaderBlendState()V"
-    ), remap = true)
-    public void renderCoordinatesGotoTextEntryFields(final GuiGraphicsExtractor guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci) {
-        if (!Settings.REGISTRY.worldMapUIAdditions.get()) return;
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.screen != null && mc.screen.getClass().equals(GuiMap.class)) {
-            if (xTextEntryField.isVisible() && zTextEntryField.isVisible()) {
-                xTextEntryField.extractRenderState(guiGraphics, scaledMouseX, scaledMouseY, partialTicks);
-                zTextEntryField.extractRenderState(guiGraphics, scaledMouseX, scaledMouseY, partialTicks);
-            }
-            if (drawing && drawTextEntryActive && drawingMode == DrawingMode.TEXT && drawTextEntryField.visible) {
-                drawTextEntryField.extractRenderState(guiGraphics, scaledMouseX, scaledMouseY, partialTicks);
-            }
-        }
-    }
-
-    @WrapWithCondition(method = "extractRenderState", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/map/graphics/MapRenderHelper;drawCenteredStringWithBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIFFFF)V"
-    ), remap = true)
-    public boolean hideMoreRenderedStringsOnF1(final GuiGraphicsExtractor guiGraphics, final Font font, final Component text, final int x, final int y, final int color, final float bgRed, final float bgGreen, final float bgBlue, final float bgAlpha) {
-        return !Minecraft.getInstance().options.hideGui;
     }
 
     @Inject(method = "onDimensionToggleButton", at = @At(value = "RETURN"))
@@ -800,12 +605,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         }
     }
 
-    @Inject(method = "shouldSkipWorldRender", at = @At("HEAD"), cancellable = true)
-    public void shouldRenderGameBehindWorldMap(final CallbackInfoReturnable<Boolean> cir) {
-        if (Settings.REGISTRY.renderGameBehindWorldMap.get()) {
-            cir.setReturnValue(false);
-        }
-    }
 
     // honestly no idea why xaero is doing here, its drawing 2 thin lines along the bottom and right side of the map
     // but it looks bad with transparent background, so bye
@@ -1111,64 +910,6 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true, remap = true)
     public void onInputPress(final KeyEvent event, final CallbackInfoReturnable<Boolean> cir) {
-        if (event.key() == GLFW_KEY_F1) {
-            Minecraft.getInstance().options.hideGui = !Minecraft.getInstance().options.hideGui;
-            cir.setReturnValue(true);
-            return;
-        }
-        if ((xTextEntryField.isVisible() && zTextEntryField.isVisible()) && (xTextEntryField.isFocused() || zTextEntryField.isFocused())) {
-            if (event.key() == GLFW_KEY_ENTER) {
-                onGotoCoordinatesButton(null);
-                cir.setReturnValue(true);
-                return;
-            } else if (event.key() == GLFW_KEY_TAB) {
-                if (xTextEntryField.isFocused()) {
-                    setFocused(zTextEntryField);
-                } else if (zTextEntryField.isFocused()) {
-                    setFocused(xTextEntryField);
-                }
-                cir.setReturnValue(true);
-                return;
-            } else if (event.isPaste() && xTextEntryField.isFocused()) {
-                var pasteText = Minecraft.getInstance().keyboardHandler.getClipboard().trim();
-                var xyzSpaces = Pattern.compile("(-?\\d+)\\s(-?\\d+)\\s(-?\\d+)").matcher(pasteText);
-                if (xyzSpaces.matches()) {
-                    String xText = xyzSpaces.group(1);
-                    String zText = xyzSpaces.group(3);
-                    xTextEntryField.setValue(xText);
-                    zTextEntryField.setValue(zText);
-                    cir.setReturnValue(true);
-                    return;
-                }
-                var xyzCommaSpaces = Pattern.compile("(-?\\d+),\\s(-?\\d+),\\s(-?\\d+)").matcher(pasteText);
-                if (xyzCommaSpaces.matches()) {
-                    String xText = xyzCommaSpaces.group(1);
-                    String zText = xyzCommaSpaces.group(3);
-                    xTextEntryField.setValue(xText);
-                    zTextEntryField.setValue(zText);
-                    cir.setReturnValue(true);
-                    return;
-                }
-                var xzSpaces = Pattern.compile("(-?\\d+)\\s(-?\\d+)").matcher(pasteText);
-                if (xzSpaces.matches()) {
-                    String xText = xzSpaces.group(1);
-                    String zText = xzSpaces.group(2);
-                    xTextEntryField.setValue(xText);
-                    zTextEntryField.setValue(zText);
-                    cir.setReturnValue(true);
-                    return;
-                }
-                var xzCommaSpaces = Pattern.compile("(-?\\d+),\\s(-?\\d+)").matcher(pasteText);
-                if (xzCommaSpaces.matches()) {
-                    String xText = xzCommaSpaces.group(1);
-                    String zText = xzCommaSpaces.group(2);
-                    xTextEntryField.setValue(xText);
-                    zTextEntryField.setValue(zText);
-                    cir.setReturnValue(true);
-                    return;
-                }
-            }
-        }
         if (BaritoneHelper.isBaritonePresent()) {
             if (Settings.REGISTRY.worldMapBaritoneGoalHereKeybindSetting.getKeyBinding().matches(event)) {
                 BaritoneExecutor.goal(mouseBlockPosX, mouseBlockPosZ);
@@ -1279,69 +1020,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             options.removeIf(option -> ((AccessorRightClickOption) option).getName().equals("gui.xaero_right_click_map_share_location"));
         }
 
-        if (!Settings.REGISTRY.showCoordsInRightClickOptions.get()) {
-            options.removeIf(option -> {
-                var name = ((AccessorRightClickOption) option).getName();
-                return name.startsWith("C: (") || name.startsWith("X: ");
-            });
-        }
-
         if (Settings.REGISTRY.disableTeleportation.get()) {
             options.removeIf(option -> ((AccessorRightClickOption) option).getName().equals("gui.xaero_wm_right_click_map_teleport_not_allowed"));
         }
     }
 
     @Unique
-    public void onFollowButton(final Button b) {
-        follow = !follow;
-        this.init(width, height);
-    }
-
-    @Unique
-    public void onGotoCoordinatesButton(final Button b) {
-        if (xTextEntryField.isVisible() && zTextEntryField.isVisible()) {
-            try {
-                int x = Integer.parseInt(xTextEntryField.getValue());
-                int z = Integer.parseInt(zTextEntryField.getValue());
-                cameraX = x;
-                cameraZ = z;
-                follow = false;
-                this.init(width, height);
-            } catch (final NumberFormatException e) {
-                xTextEntryField.setValue("");
-                zTextEntryField.setValue("");
-                xTextEntryField.visible = false;
-                zTextEntryField.visible = false;
-            }
-        } else {
-            this.init(width, height);
-            // on current tick, after this method, mouseClicked event is fired, triggering focus onto goto coords button
-            // so we schedule text box focus on following tick
-            ForkJoinPool.commonPool().execute(() -> {
-                Minecraft.getInstance().execute(() -> {
-                    xTextEntryField.setVisible(true);
-                    zTextEntryField.setVisible(true);
-                    setFocused(xTextEntryField);
-                });
-            });
-        }
-    }
-
-    @Unique
     private void onSwitchDimensionButton(final ResourceKey<Level> newDimId) {
         Globals.switchToDimension(newDimId);
-    }
-
-    @Unique
-    public List<Button> getButtonList() {
-        return children().stream()
-                .filter(child -> child instanceof Button)
-                .map(child -> (Button) child)
-                .collect(Collectors.toList());
-    }
-
-    @Unique
-    public void clearButtons() {
-        getButtonList().forEach(this::removeWidget);
     }
 }

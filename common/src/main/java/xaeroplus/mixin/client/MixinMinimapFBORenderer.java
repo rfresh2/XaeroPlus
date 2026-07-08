@@ -6,11 +6,9 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.rendertype.RenderSetup;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -33,12 +31,9 @@ import xaero.hud.minimap.compass.render.CompassRenderer;
 import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.waypoint.render.WaypointMapRenderer;
 import xaero.lib.client.graphics.XaeroBufferProvider;
-import xaero.lib.client.graphics.util.ImmediateRenderUtil;
 import xaeroplus.Globals;
 import xaeroplus.feature.extensions.CustomMinimapFBORenderer;
 import xaeroplus.feature.render.shaders.XaeroPlusShaders;
-import xaeroplus.settings.Settings;
-import xaeroplus.util.ColorHelper;
 
 @Mixin(value = MinimapFBORenderer.class, remap = false)
 public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements CustomMinimapFBORenderer {
@@ -122,17 +117,6 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         return instance.translate(translate, translate, -2000.0F);
     }
 
-    @Redirect(method = "renderChunksToFBO", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/common/minimap/render/MinimapRendererHelper;drawMyColoredRect(Lorg/joml/Matrix4f;FFFFI)V"
-    ), remap = true)
-    public void modifyMMBackgroundFill(final MinimapRendererHelper instance, final Matrix4f matrix, final float x1, final float y1, final float x2, final float y2, final int color, @Share("scaledSize") LocalIntRef scaledSize) {
-        if (!Settings.REGISTRY.transparentMinimapBackground.get())
-            instance.drawMyColoredRect(matrix, -scaledSize.get(), -scaledSize.get(), scaledSize.get(), scaledSize.get(), ColorHelper.getColor(0, 0, 0, 255));
-        else
-            instance.drawMyColoredRect(matrix, -scaledSize.get(), -scaledSize.get(), scaledSize.get(), scaledSize.get(), ColorHelper.getColor(0, 0, 0, 0));
-    }
-
     @ModifyArg(method = "renderChunksToFBO", at = @At(
         value = "INVOKE",
         target = "Lxaero/common/minimap/render/MinimapRendererHelper;addColoredLineToExistingBuffer(Lcom/mojang/blaze3d/vertex/PoseStack$Pose;Lcom/mojang/blaze3d/vertex/VertexConsumer;FFFFFFFFF)V"
@@ -156,37 +140,6 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
     ), remap = true)
     public Matrix4f correctPreRotationTranslationForSizeMult(final Matrix4fStack instance, final float x, final float y, final float z) {
         return instance.translate((x / Globals.minimapSizeMultiplier), (y / Globals.minimapSizeMultiplier), z);
-    }
-
-    @Inject(method = "renderChunksToFBO", at = @At(
-        value = "INVOKE",
-        target = "Lorg/joml/Matrix4fStack;translate(FFF)Lorg/joml/Matrix4f;",
-        ordinal = 1,
-        shift = At.Shift.BEFORE
-    ), slice = @Slice(
-        from = @At(
-            value = "INVOKE",
-            target = "Lxaero/common/graphics/ImprovedFramebuffer;getTas()Lnet/minecraft/client/renderer/rendertype/RenderSetup$TextureAndSampler;"
-        )
-    ), remap = true)
-    public void correctPostRotationTranslationForSizeMult(
-        final CallbackInfo ci,
-        @Local(name = "halfWView") float halfWView,
-        @Local(name = "shaderMatrixStack") Matrix4fStack shaderMatrixStack
-    ) {
-        float sizeMult = Globals.minimapSizeMultiplier;
-        float sizeMultTranslation = halfWView * (sizeMult - 1.0f) / (sizeMult * sizeMult);
-        shaderMatrixStack.translate(sizeMultTranslation, sizeMultTranslation, 0f);
-    }
-
-    @Redirect(method = "renderChunksToFBO", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/lib/client/graphics/util/ImmediateRenderUtil;texturedRect(Lcom/mojang/blaze3d/vertex/PoseStack;FFIIFFFFLcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/client/renderer/rendertype/RenderSetup$TextureAndSampler;)V"
-    ), remap = true) // $REMAP
-    public void redirectModelViewDraw(final PoseStack matrixStack, final float x, final float y, final int textureX, final int textureY, final float width, final float height, final float textureH, final float factor, final RenderPipeline renderPipeline, final RenderSetup.TextureAndSampler texture,
-                                      @Share("scaledSize") LocalIntRef scaledSize) {
-        final float scaledSizeM = Globals.minimapScaleMultiplier * 512f;
-        ImmediateRenderUtil.texturedRect(matrixStack, -scaledSize.get(), -scaledSize.get(), 0, 0, scaledSizeM, scaledSizeM, scaledSizeM, scaledSizeM, renderPipeline, texture);
     }
 
     @WrapOperation(method = "renderChunksToFBO", at= @At(

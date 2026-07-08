@@ -22,15 +22,31 @@ import xaeroplus.module.Module;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.BlayWaystonesHelper;
 import xaeroplus.util.ColorHelper.WaystoneColor;
+import xaeroplus.util.DefaultWraithWaystonesHelper;
+import xaeroplus.util.IWraithWaystonesHelper;
 import xaeroplus.util.WaystonesHelper;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.ServiceLoader;
 
 import static xaeroplus.event.XaeroWorldChangeEvent.WorldChangeType.EXIT_WORLD;
 
 public class WaystoneSync extends Module {
     private final BlayWaystonesHelper blayWaystonesHelper = new BlayWaystonesHelper();
+    private final IWraithWaystonesHelper wraithWaystonesHelper = initWraithWaystonesHelper();
+    private static IWraithWaystonesHelper initWraithWaystonesHelper() {
+        try {
+            if (WaystonesHelper.isWraithWaystonesPresent()) {
+                return ServiceLoader.load(IWraithWaystonesHelper.class).findFirst().get();
+            }
+        } catch (Exception e) {
+            // fall through
+            XaeroPlus.LOGGER.error("Error loading Wraith Waystones Helper, falling back to default", e);
+        }
+        return new DefaultWraithWaystonesHelper();
+    }
+
     private WaystoneColor color = WaystoneColor.RANDOM;
     private boolean separateWaypointSet = false;
     private WaypointVisibilityType visibilityType = WaypointVisibilityType.LOCAL;
@@ -39,9 +55,6 @@ public class WaystoneSync extends Module {
     public void onEnable() {
         if (WaystonesHelper.isWaystonesPresent()) {
             blayWaystonesHelper.subscribeWaystonesEvent();
-        }
-        if (WaystonesHelper.isFabricWaystonesPresent()) {
-//            FabricWaystonesHelper.subcribeWaystonesEventsRunnable.run();
         }
         reloadWaystones();
     }
@@ -68,16 +81,17 @@ public class WaystoneSync extends Module {
                     }
                 }
             }
-        } else if (WaystonesHelper.isFabricWaystonesPresent()) {
-//            if (FabricWaystonesHelper.shouldSync) {
-//                syncFabricWaystones();
-//                FabricWaystonesHelper.shouldSync = false;
-//            }
+        }
+        if (WaystonesHelper.isWraithWaystonesPresent()) {
+            if (wraithWaystonesHelper.shouldSync()) {
+                syncFabricWaystones();
+                wraithWaystonesHelper.setShouldSync(false);
+            }
         }
     }
 
     public void syncFabricWaystones() {
-//        commonWaystoneSync(FabricWaystonesHelper.getWaystones());
+        commonWaystoneSync(wraithWaystonesHelper.getWaystones());
     }
 
     public boolean syncBlayWaystones() {
@@ -184,7 +198,7 @@ public class WaystoneSync extends Module {
 
     public void reloadWaystones() {
         blayWaystonesHelper.shouldSync = true;
-//        FabricWaystonesHelper.shouldSync = true;
+        wraithWaystonesHelper.setShouldSync(true);
     }
 
     public record Waystone(String name, ResourceKey<Level> dimension, int x, int y, int z, @Nullable WaypointColor color) {

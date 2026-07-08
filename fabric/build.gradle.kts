@@ -9,6 +9,7 @@ plugins {
 architectury {
 	platformSetupLoomIde()
 	fabric()
+	injectInjectables = false
 }
 
 fabricApi {
@@ -67,7 +68,7 @@ dependencies {
 	modImplementation(libs.baritone.fabric)
 	modImplementation(libs.waystones.fabric)
 	modImplementation(libs.balm.fabric)
-//	modCompileOnly(libs.fabric.waystones)
+//	modCompileOnly(libs.wraith.waystones)
     modRuntimeOnly(libs.immediatelyfast)
     runtimeOnly("net.lenni0451:Reflect:1.6.1") // immediatelyfast jij
     modImplementation(libs.modmenu)

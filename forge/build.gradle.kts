@@ -12,6 +12,7 @@ plugins {
 architectury {
     platformSetupLoomIde()
     forge()
+    injectInjectables = false
 }
 
 val common = project(":common")
@@ -47,7 +48,7 @@ dependencies {
     modCompileOnly(libs.waystones.forge)
     modCompileOnly(libs.balm.forge)
     modCompileOnly(libs.worldtools)
-    modCompileOnly(libs.fabric.waystones)
+    modCompileOnly(libs.wraith.waystones)
     shadow(libs.sqlite)
     forgeRuntimeLibrary(implementation(shadow(libs.oldbiomes.get())!!)!!)
     forgeRuntimeLibrary(implementation(shadow(libs.caffeine.get())!!)!!)

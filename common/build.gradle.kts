@@ -7,6 +7,7 @@ plugins {
 
 architectury {
     common(providers.gradleProperty("enabled_platforms").get().split(","))
+    injectInjectables = false
 }
 
 loom {
@@ -23,7 +24,7 @@ dependencies {
     modCompileOnly(libs.baritone.fabric)
     modCompileOnly(libs.waystones.fabric)
     modCompileOnly(libs.balm.fabric)
-    modCompileOnly(libs.fabric.waystones)
+    modCompileOnly(libs.wraith.waystones)
     modCompileOnly(libs.worldtools)
     implementation(libs.oldbiomes)
     implementation(libs.sqlite)

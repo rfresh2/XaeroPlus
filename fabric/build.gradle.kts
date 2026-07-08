@@ -66,9 +66,6 @@ dependencies {
 	modImplementation(libs.minimap.fabric) { isTransitive = false }
     modImplementation(libs.xaerolib.fabric)
     modCompileOnly(libs.baritone.fabric)
-	modCompileOnly(libs.waystones.fabric)
-	modCompileOnly(libs.balm.fabric)
-	modCompileOnly(libs.wraith.waystones)
     modImplementation(libs.modmenu)
 	modCompileOnly(libs.sodium)
     implementation(shadow(libs.caffeine.get())!!)

@@ -42,13 +42,6 @@ dependencyResolutionManagement {
             library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.5.4")
             library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.4")
 			library("lambdaEvents", "net.lenni0451:LambdaEvents:2.4.2")
-			library("waystones-fabric", "maven.modrinth:waystones:21.4.16+fabric-$minecraft_version")
-			library("waystones-forge", "maven.modrinth:waystones:21.4.16+forge-$minecraft_version")
-			library("waystones-neoforge", "maven.modrinth:waystones:21.4.16+neoforge-$minecraft_version")
-			library("balm-fabric", "maven.modrinth:balm:21.4.36+fabric-$minecraft_version")
-			library("balm-forge", "maven.modrinth:balm:21.4.36+forge-$minecraft_version")
-			library("balm-neoforge", "maven.modrinth:balm:21.4.36+neoforge-$minecraft_version")
-			library("wraith-waystones", "maven.modrinth:fwaystones:3.3.5+mc$minecraft_version")
 			library("worldtools", "maven.modrinth:worldtools:1.2.8+$minecraft_version")
             library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.53.2.0") // relocated xerial sqlite to avoid conflicts with other mods
 			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.8.1+$minecraft_version-fabric")

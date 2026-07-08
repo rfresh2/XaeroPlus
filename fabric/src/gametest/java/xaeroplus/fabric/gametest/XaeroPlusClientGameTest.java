@@ -109,13 +109,12 @@ public class XaeroPlusClientGameTest implements ClientModInitializer {
             takeScreenshot("world_join");
             submit(mc -> {
                 HudMod.INSTANCE.getHudConfigs().getClientConfigManager().getCurrentProfile().set(MinimapProfiledConfigOptions.SIZE, 100);
-                Settings.REGISTRY.transparentMinimapBackground.setValue(true);
                 Settings.REGISTRY.minimapScaleMultiplierSetting.setValue(2);
                 Settings.REGISTRY.minimapSizeMultiplierSetting.setValue(2);
                 Settings.REGISTRY.minimapFpsLimiter.setValue(true);
                 return null;
             });
-            takeScreenshot("minimap_transparent");
+            takeScreenshot("minimap_resized");
 
             submit(mc -> {
                 var session = WorldMapSession.getCurrentSession();

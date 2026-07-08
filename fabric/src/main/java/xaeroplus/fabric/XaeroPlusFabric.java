@@ -12,7 +12,6 @@ import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.Minecraft;
 import xaeroplus.XaeroPlus;
 import xaeroplus.commands.XPClientCommandSource;
-import xaeroplus.fabric.util.FabricWaystonesHelperInit;
 import xaeroplus.fabric.util.compat.IncompatibleMinimapWarningScreen;
 import xaeroplus.fabric.util.compat.XaeroPlusMinimapCompatibilityChecker;
 import xaeroplus.settings.Settings;
@@ -35,7 +34,6 @@ public class XaeroPlusFabric implements ClientModInitializer {
 				.map(ModMetadata::getVersion)
 				.map(Version::getFriendlyString)
 				.orElse("2.x");
-			FabricWaystonesHelperInit.doInit();
 			XaeroPlus.initializeSettings();
 			Settings.REGISTRY.getKeybindings().forEach(KeyBindingHelper::registerKeyBinding);
 			if (System.getenv("XP_CI_TEST") != null || System.getProperty("XP_CI_TEST") != null)

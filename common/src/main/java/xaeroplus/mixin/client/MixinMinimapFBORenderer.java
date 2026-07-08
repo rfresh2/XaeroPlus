@@ -139,27 +139,6 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         instance.translate((x / Globals.minimapSizeMultiplier), (y / Globals.minimapSizeMultiplier), z);
     }
 
-    @Inject(method = "renderChunksToFBO", at = @At(
-        value = "INVOKE",
-        target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(DDD)V",
-        ordinal = 0,
-        shift = At.Shift.BEFORE
-    ), slice = @Slice(
-        from = @At(
-            value = "INVOKE",
-            target = "Lxaero/common/graphics/ImprovedFramebuffer;bindRead()V"
-        )
-    ), remap = true)
-    public void correctPostRotationTranslationForSizeMult(
-        final CallbackInfo ci,
-        @Local(name = "halfWView") float halfWView,
-        @Local(name = "shaderMatrixStack") PoseStack shaderMatrixStack
-    ) {
-        float sizeMult = Globals.minimapSizeMultiplier;
-        float sizeMultTranslation = halfWView * (sizeMult - 1.0f) / (sizeMult * sizeMult);
-        shaderMatrixStack.translate(sizeMultTranslation, sizeMultTranslation, 0f);
-    }
-
     @WrapOperation(method = "renderChunksToFBO", at= @At(
         value = "INVOKE",
         target = "Lxaero/common/mods/SupportXaeroWorldmap;drawMinimap(Lxaero/hud/minimap/module/MinimapSession;Lcom/mojang/blaze3d/vertex/PoseStack;Lxaero/common/minimap/render/MinimapRendererHelper;IIIIIIZDDLcom/mojang/blaze3d/vertex/VertexConsumer;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;)V"),

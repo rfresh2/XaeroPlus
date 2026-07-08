@@ -37,10 +37,7 @@ dependencies {
     modImplementation(libs.minimap.neo) { isTransitive = false }
     modImplementation(libs.xaerolib.neo)
     modImplementation(libs.baritone.neoforge)
-    modCompileOnly(libs.waystones.neoforge)
-    modCompileOnly(libs.balm.neoforge)
     modCompileOnly(libs.worldtools)
-    modCompileOnly(libs.wraith.waystones)
     modCompileOnly(libs.embeddium)
     shadow(libs.sqlite)
     forgeRuntimeLibrary(implementation(shadow(libs.caffeine.get())!!)!!)

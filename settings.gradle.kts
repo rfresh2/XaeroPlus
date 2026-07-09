@@ -36,7 +36,7 @@ dependencyResolutionManagement {
 			library("mixinextras-forge", "io.github.llamalad7:mixinextras-forge:0.5.4")
 			library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.4")
 			library("lambdaEvents", "net.lenni0451:LambdaEvents:2.4.2")
-			library("worldtools", "maven.modrinth:worldtools:1.2.4+$minecraft_version")
+			library("worldtools", "maven.modrinth:worldtools:1.2.0+1.20.1")
             library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.53.2.0") // relocated xerial sqlite to avoid conflicts with other mods
 			library("sodium", "maven.modrinth:sodium:mc$minecraft_version-0.4.4")
 			library("embeddium", "maven.modrinth:embeddium:0.3.18+mc$minecraft_version")

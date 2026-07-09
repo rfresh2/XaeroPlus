@@ -87,7 +87,6 @@ dependencies {
     implementation(modUtils.deobfuscate("maven.modrinth:xaeros-minimap:forge-1.12.2-$minimap_version"))
     implementation(modUtils.deobfuscate("maven.modrinth:xaerolib:forge-1.12.2-$xaerolib_version"))
     compileOnly(modUtils.deobfuscate("cabaletta:baritone-deobf-unoptimized-mcp-dev:1.2"))
-    compileOnly(modUtils.deobfuscate("curse.maven:waystones-245755:2859589"))
 }
 
 tasks {

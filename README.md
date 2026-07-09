@@ -68,47 +68,31 @@ You can find download links to Xaero's mods here:
 
 * [1.5-3x your FPS by limiting the framerate the minimap is rendered at!](https://youtu.be/hIG-VyGQLao)
   * Tip: For least visual impact, lock the minimap's north
+* Drawing Tool
 * [Adjustable minimap scaling that increases how many chunks are visible](https://youtu.be/dNqxGzGAHyk)
 * [NewChunks Highlighting in MiniMap and WorldMap.](https://youtu.be/n-Tf6TJSsiA)
 * [Baritone](https://github.com/cabaletta/baritone) integration
   * Baritone Goals synced as temporary waypoints
   * [Point and Click Travel](https://youtu.be/gbguyfXLgi0)
-* [Waystones](https://legacy.curseforge.com/minecraft/mc-mods/waystones) and [Fabric Waystones](https://legacy.curseforge.com/minecraft/mc-mods/fabric-waystones) integration
-  * Syncs Waystones as temporary waypoints
 * [WorldTools](https://modrinth.com/mod/worldtools/) World Downloader integration
   * [Highlights saved chunks while downloading](https://youtu.be/mtCqwJ_RGcc)
 * [Portals Highlighting in Minimap and WorldMap](https://youtu.be/zstGVfVRrAs)
 * [Portal Skip Highlighting in Minimap and WorldMap](https://youtu.be/g_yQ8D95RY0). Detects chunks where a portal could have been loaded.
 * OldChunks Highlighting in Minimap and WorldMap.
   * Intended for use on 2b2t. Highlights chunks that were generated in 1.12.2 or lower in the Overworld and Nether based on the natural blocks present in the chunk.
-* [Transparent minimap background instead of wasted black screen space.](https://imgur.com/a/jGgHqL4)
-* [Fast map region writes](https://youtu.be/B5d7FaHXDCk). Prevent missed chunks in map while traveling at very high speeds.
-* Allow multiple MC instances to read/write to the same map concurrently
 * Transparent obsidian roof. Useful for mapping 2b2t spawn.
 * Setting to always view and create waypoints in the Overworld when in Nether.
 * [Render server view distance square around the player.](https://youtu.be/iY_JTGFK6Yg)
 * [Dimension hot-switching on WorldMap and Minimap.](https://youtu.be/hXZQtX2df3I)
   * Recommended: Create keybinds for Minimap dimension switching.
-* WorldMap GUI:
-  * WorldMap zoom unlocked
-  * GUI on WorldMap to pan the map to user entered coordinates.
-  * WorldMap Follow mode and GUI button
-  * F1 on WorldMap hides GUI and overlays
 * Waypoints GUI:
-  * [Search](https://youtu.be/7DRMUsmZDxc)
-  * Display distance to waypoints on Waypoints GUI
-  * Always sort enabled waypoints before disabled waypoints
   * GUI button to enable/disable all waypoints
 * [Waypoint Beacons](https://imgur.com/a/jGgHqL4)
-* Minecraft world always renders in background while in a Xaero GUI for client travel mods compatibility
-* Minimap entity dot fix. Hides the entity dot when arrow mode is selected.
 * WorldMap and Waypoint directories optionally indexed by:
   * Multiplayer server list name.
   * Base Server Domain Name
   * Server IP (Xaero's default)
   * **Changing this setting requires you to manually rename existing folders in `.minecraft/xaero/minimap` and `.minecraft/xaero/world-map`**
-* Overworld dimension optionally stored in the "DIM0" directory instead of "null"
-  * **Changing this setting requires you to manually rename existing folders in `.minecraft/xaero/world-map/Multiplayer_<server name>/`**
 * WorldMap 1.30.0 added cave data saving and rendering. There is a setting on by default in XaeroPlus that changes how the nether is rendered with cave mode off to be as it was previously.
   * This removes the need to manually move existing world data files.
 

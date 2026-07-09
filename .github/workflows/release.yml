@@ -197,8 +197,6 @@ jobs:
             xaeroworldmap@${{ needs.build.outputs.worldmap_version_fabric }}(required){modrinth:NcUtCpym}{curseforge:317780}
             fabric-api(required){modrinth:P7dR8mSH}{curseforge:306612}
             worldtools(optional){modrinth:FlFKBOIX}{curseforge:909868}
-            waystones(optional){modrinth:LOpKHB2A}{curseforge:245755}
-            fwaystones(optional){modrinth:sTZr7NVo}{curseforge:410902}
           fail-mode: warn
           modrinth-retry-attempts: 0
 
@@ -226,8 +224,6 @@ jobs:
             xaeroworldmap@${{ needs.build.outputs.worldmap_version_fabric }}(required){modrinth:NcUtCpym}{curseforge:317780}
             fabric-api(required){modrinth:P7dR8mSH}{curseforge:306612}
             worldtools(optional){modrinth:FlFKBOIX}{curseforge:909868}
-            waystones(optional){modrinth:LOpKHB2A}{curseforge:245755}
-            fwaystones(optional){modrinth:sTZr7NVo}{curseforge:410902}
           fail-mode: warn
           modrinth-retry-attempts: 0
 
@@ -252,7 +248,6 @@ jobs:
             xaerominimap@${{ needs.build.outputs.minimap_version_forge }}(required){modrinth:1bokaNcj}{curseforge:263420}
             xaeroworldmap@${{ needs.build.outputs.worldmap_version_forge }}(required){modrinth:NcUtCpym}{curseforge:317780}
             worldtools(optional){modrinth:FlFKBOIX}{curseforge:909868}
-            waystones(optional){modrinth:LOpKHB2A}{curseforge:245755}
           fail-mode: warn
           modrinth-retry-attempts: 0
 
@@ -278,7 +273,6 @@ jobs:
             xaerominimap@${{ needs.build.outputs.minimap_version_forge }}(required){modrinth:1bokaNcj}{curseforge:263420}
             xaeroworldmap@${{ needs.build.outputs.worldmap_version_forge }}(required){modrinth:NcUtCpym}{curseforge:317780}
             worldtools(optional){modrinth:FlFKBOIX}{curseforge:909868}
-            waystones(optional){modrinth:LOpKHB2A}{curseforge:245755}
           fail-mode: warn
           modrinth-retry-attempts: 0
 
@@ -303,7 +297,6 @@ jobs:
             xaerominimap@${{ needs.build.outputs.minimap_version_neo }}(required){modrinth:1bokaNcj}{curseforge:263420}
             xaeroworldmap@${{ needs.build.outputs.worldmap_version_neo }}(required){modrinth:NcUtCpym}{curseforge:317780}
             worldtools(optional){modrinth:FlFKBOIX}{curseforge:909868}
-            waystones(optional){modrinth:LOpKHB2A}{curseforge:245755}
           fail-mode: warn
           modrinth-retry-attempts: 0
 
@@ -329,7 +322,6 @@ jobs:
             xaerominimap@${{ needs.build.outputs.minimap_version_neo }}(required){modrinth:1bokaNcj}{curseforge:263420}
             xaeroworldmap@${{ needs.build.outputs.worldmap_version_neo }}(required){modrinth:NcUtCpym}{curseforge:317780}
             worldtools(optional){modrinth:FlFKBOIX}{curseforge:909868}
-            waystones(optional){modrinth:LOpKHB2A}{curseforge:245755}
           fail-mode: warn
           modrinth-retry-attempts: 0
 

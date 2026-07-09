@@ -26,7 +26,7 @@ public class MixinMapTileChunk implements SeenChunksTrackingMapTileChunk {
     }
 
     @Inject(method = "setTile", at = @At("HEAD"))
-    public void setTile(final int x, final int z, final MapTile tile, final BlockStateShortShapeCache blockStateShortShapeCache, final CallbackInfo ci) {
+    public void setTile(final int x, final int z, final MapTile tile, final BlockStateShortShapeCache blockStateShortShapeCache, final MapProcessor mapProcessor, final CallbackInfo ci) {
         seenTiles[x][z] = tile != null;
     }
 

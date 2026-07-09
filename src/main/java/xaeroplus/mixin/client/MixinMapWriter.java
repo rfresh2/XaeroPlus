@@ -1,12 +1,5 @@
 package xaeroplus.mixin.client;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.llamalad7.mixinextras.sugar.Local;
-import com.llamalad7.mixinextras.sugar.ref.LocalLongRef;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockGlass;
@@ -20,7 +13,6 @@ import net.minecraft.world.DimensionType;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -31,18 +23,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.map.MapProcessor;
 import xaero.map.MapWriter;
-import xaero.map.biome.BiomeColorCalculator;
 import xaero.map.biome.WriterBiomeInfoSupplier;
 import xaero.map.cache.BlockStateColorTypeCache;
 import xaero.map.misc.Misc;
-import xaero.map.region.*;
+import xaero.map.region.MapBlock;
+import xaero.map.region.MapRegion;
+import xaero.map.region.OverlayBuilder;
 import xaeroplus.settings.Settings;
-import xaeroplus.util.ChunkUtils;
 
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
-
-import static java.util.Objects.nonNull;
 
 @Mixin(value = MapWriter.class, remap = false)
 public abstract class MixinMapWriter {
@@ -289,97 +278,6 @@ public abstract class MixinMapWriter {
 
         boolean glowing = this.isGlowing(state);
         pixel.write(stateId, h, this.topH, this.biomeBuffer, light, glowing, cave);
-    }
-
-    @Inject(method = "onRender", at = @At(
-        value = "FIELD",
-        target = "Lxaero/map/MapWriter;lastWrite:J",
-        opcode = Opcodes.GETFIELD,
-        ordinal = 2
-    ))
-    public void fastMapMaxTilesPerCycleSetting(final BiomeColorCalculator biomeColorCalculator, final OverlayManager overlayManager, final CallbackInfo ci,
-                                               @Local(name = "tilesToUpdate") LocalLongRef tilesToUpdateRef,
-                                               @Local(name = "sizeTiles") int sizeTiles) {
-        if (Settings.REGISTRY.fastMapSetting.getValue()) {
-            this.writeFreeSinceLastWrite = Math.max(1L, this.writeFreeSinceLastWrite);
-            if (this.mapProcessor.getCurrentCaveLayer() == Integer.MAX_VALUE) {
-                tilesToUpdateRef.set((long) Math.min(sizeTiles, Settings.REGISTRY.fastMapMaxTilesPerCycle.getValue()));
-            }
-        }
-    }
-
-    @ModifyExpressionValue(method = "onRender", at = @At(
-        value = "INVOKE",
-        target = "Ljava/lang/System;nanoTime()J",
-        ordinal = 2
-    ))
-    public long removeWriteTimeLimiterPerFrame(long original) {
-        if (Settings.REGISTRY.fastMapSetting.getValue()) {
-            if (this.mapProcessor.getCurrentCaveLayer() == Integer.MAX_VALUE) {
-                return 0;
-            }
-        }
-        return original;
-    }
-
-    // insert our own limiter on new tiles being written but this one's keyed on the actual chunk
-    // tile "writes" also include a lot of extra operations and lookups before any writing is actually done
-    // when we remove existing limiters those extra operations add up to a lot of unnecessary cpu time
-    private final Cache<Long, Long> tileUpdateCache = Caffeine.newBuilder()
-        // I would usually expect even second long expiration here to be fine
-        // but there are some operations that make repeat invocations actually required
-        // perhaps another time ill rewrite those. Or make the cache lock more aware of when we don't have any new updates to write/load
-        // there's still alot of performance and efficiency on the table to regain
-        // but i think this is a good middle ground for now
-        .maximumSize(10000)
-        .expireAfterWrite(5L, TimeUnit.SECONDS)
-        .<Long, Long>build();
-
-    @WrapOperation(method = "writeMap", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/map/MapWriter;writeChunk(Lnet/minecraft/world/World;IZLxaero/map/biome/BiomeColorCalculator;Lxaero/map/region/OverlayManager;ZZZZZLnet/minecraft/util/math/BlockPos$MutableBlockPos;IIIIIIIIILxaero/map/region/MapUpdateFastConfig;)Z"
-    ))
-    public boolean fastMap(final MapWriter instance,
-                           World world,
-                           int distance,
-                           boolean onlyLoad,
-                           BiomeColorCalculator biomeColorCalculator,
-                           OverlayManager overlayManager,
-                           boolean loadChunks,
-                           boolean updateChunks,
-                           boolean ignoreHeightmaps,
-                           boolean flowers,
-                           boolean detailedDebug,
-                           BlockPos.MutableBlockPos mutableBlockPos3,
-                           int caveDepth,
-                           int caveStart,
-                           int layerToWrite,
-                           int tileChunkX,
-                           int tileChunkZ,
-                           int tileChunkLocalX,
-                           int tileChunkLocalZ,
-                           int chunkX,
-                           int chunkZ,
-                           MapUpdateFastConfig config,
-                           final Operation<Boolean> original) {
-        if (Settings.REGISTRY.fastMapSetting.getValue()) {
-            if (this.mapProcessor.getCurrentCaveLayer() == Integer.MAX_VALUE) {
-                final Long cacheable = ChunkUtils.chunkPosToLong(chunkX, chunkZ);
-                final Long cacheValue = tileUpdateCache.getIfPresent(cacheable);
-                if (nonNull(cacheValue)) {
-                    if (cacheValue < System.currentTimeMillis() - 50L) {
-                        tileUpdateCache.put(cacheable, System.currentTimeMillis());
-                    } else {
-                        return false;
-                    }
-                } else {
-                    tileUpdateCache.put(cacheable, System.currentTimeMillis());
-                }
-            }
-        }
-        return original.call(instance, world, distance, onlyLoad, biomeColorCalculator, overlayManager, loadChunks, updateChunks,
-                             ignoreHeightmaps, flowers, detailedDebug, mutableBlockPos3, caveDepth, caveStart, layerToWrite, tileChunkX,
-                             tileChunkZ, tileChunkLocalX, tileChunkLocalZ, chunkX, chunkZ, config);
     }
 
     @Redirect(method = "writeChunk", at = @At(value = "INVOKE", target = "Lxaero/map/MapWriter;loadPixel(Lnet/minecraft/world/World;Lxaero/map/region/MapBlock;Lxaero/map/region/MapBlock;Lnet/minecraft/world/chunk/Chunk;IIIIZZIZZZLnet/minecraft/util/math/BlockPos$MutableBlockPos;)V"))

@@ -1,8 +1,5 @@
 package xaeroplus.mixin.client;
 
-import com.llamalad7.mixinextras.sugar.Local;
-import com.llamalad7.mixinextras.sugar.ref.LocalFloatRef;
-import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,16 +8,12 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xaero.common.minimap.element.render.MinimapElementReader;
 import xaero.common.minimap.element.render.MinimapElementRenderProvider;
 import xaero.common.minimap.element.render.MinimapElementRenderer;
-import xaero.hud.minimap.element.render.MinimapElementRenderInfo;
-import xaero.hud.minimap.element.render.MinimapElementRenderLocation;
 import xaero.hud.minimap.radar.render.element.RadarRenderContext;
 import xaero.hud.minimap.radar.render.element.RadarRenderer;
 import xaeroplus.settings.Settings;
-import xaeroplus.util.Globals;
 
 @Mixin(value = RadarRenderer.class, remap = false)
 public abstract class MixinRadarRenderer extends MinimapElementRenderer<Entity, RadarRenderContext> {
@@ -40,13 +33,6 @@ public abstract class MixinRadarRenderer extends MinimapElementRenderer<Entity, 
         }
         if (Settings.REGISTRY.alwaysRenderPlayerWithNameOnRadar.getValue()) {
             this.name = true;
-        }
-    }
-
-    @Inject(method = "renderElement(Lnet/minecraft/entity/Entity;ZZDFDDLxaero/hud/minimap/element/render/MinimapElementRenderInfo;)Z", at = @At("HEAD"))
-    public void adjustElementScaleForMinimapScaling(final CallbackInfoReturnable<Boolean> cir, @Local(argsOnly = true) LocalRef<MinimapElementRenderInfo> renderInfoRef, @Local(argsOnly = true) LocalFloatRef optionalScaleRef) {
-        if (renderInfoRef.get().location == MinimapElementRenderLocation.IN_MINIMAP) {
-            optionalScaleRef.set(optionalScaleRef.get() * Globals.minimapScalingFactor);
         }
     }
 }

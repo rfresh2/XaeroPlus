@@ -3,7 +3,6 @@ package xaeroplus.mixin.client;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -22,7 +21,6 @@ import xaero.common.IXaeroMinimap;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.mods.SupportXaeroWorldmap;
 import xaero.hud.minimap.common.config.option.MinimapProfiledConfigOptions;
-import xaero.hud.minimap.module.MinimapSession;
 import xaero.map.MapProcessor;
 import xaero.map.gui.GuiMap;
 import xaero.map.region.MapTileChunk;
@@ -49,30 +47,12 @@ public abstract class MixinSupportXaeroWorldmap {
     @Shadow
     public abstract float getMinimapBrightness();
 
-    @Inject(method = "drawMinimap", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/map/settings/ModSettings;getRegionCacheHashCode()I"
-    ), remap = false)
-    public void overrideRegionRange(MinimapSession minimapSession, MinimapRendererHelper helper, int xFloored, int zFloored, int minViewX, int minViewZ, int maxViewX, int maxViewZ, boolean zooming, double zoom, double mapDimensionScale, final CallbackInfo ci,
-                                    @Local(name = "mapX") int mapX,
-                                    @Local(name = "mapZ") int mapZ,
-                                    @Local(name = "minX") LocalIntRef minXRef,
-                                    @Local(name = "maxX") LocalIntRef maxXRef,
-                                    @Local(name = "minZ") LocalIntRef minZRef,
-                                    @Local(name = "maxZ") LocalIntRef maxZRef) {
-        final int scaledSize = Globals.minimapScalingFactor * 4;
-        minXRef.set((mapX >> 2) - scaledSize);
-        maxXRef.set((mapX >> 2) + scaledSize);
-        minZRef.set((mapZ >> 2) - scaledSize);
-        maxZRef.set((mapZ >> 2) + scaledSize);
-    }
-
     @Inject(method = "renderChunks", at = @At("RETURN"))
     public void drawRenderDistance(final int minX, final int maxX, final int minZ, final int maxZ, final int minViewX, final int maxViewX, final int minViewZ, final int maxViewZ, final MapProcessor mapProcessor, final int renderedCaveLayer, final boolean shouldRequestLoading, final boolean reloadEverything, final int globalReloadVersion, final int globalRegionCacheHashCode, final int globalCaveStart, final int globalCaveDepth, final boolean playerIsMoving, final boolean noCaveMaps, final boolean slimeChunks, final int chunkX, final int chunkZ, final int tileX, final int tileZ, final int insideX, final int insideZ, final Long seed, final boolean wmHasCaveLayers, final boolean wmUsesHashcodes, final float brightness, final boolean zooming, final MinimapRendererHelper helper, final CallbackInfo ci) {
         final boolean isDimensionSwitched = Globals.getCurrentDimensionId() != Minecraft.getMinecraft().player.dimension;
         if (Settings.REGISTRY.showRenderDistanceSetting.getValue() && !isDimensionSwitched) {
             GuiMap.restoreTextureStates();
-            if (compatibilityVersion >= 7) {
+            if (this.compatibilityVersion >= 7) {
                 GL14.glBlendFuncSeparate(770, 771, 1, 771);
             }
 
@@ -97,7 +77,7 @@ public abstract class MixinSupportXaeroWorldmap {
             Integer chunkGridLineWidth = HudMod.INSTANCE.getHudConfigs()
                 .getClientConfigManager()
                 .getEffective(MinimapProfiledConfigOptions.CHUNK_GRID_LINE_WIDTH);
-            GlStateManager.glLineWidth((float) chunkGridLineWidth * Globals.minimapScalingFactor);
+            GlStateManager.glLineWidth((float) chunkGridLineWidth);
             vertexBuffer.pos(x0, z0, 0.0).endVertex();
             vertexBuffer.pos(x1, z0, 0.0).endVertex();
             vertexBuffer.pos(x1, z1, 0.0).endVertex();
@@ -106,52 +86,17 @@ public abstract class MixinSupportXaeroWorldmap {
             GlStateManager.enableTexture2D();
             GlStateManager.disableBlend();
 
-            if (compatibilityVersion >= 6) {
+            if (this.compatibilityVersion >= 6) {
                 GuiMap.setupTextures(brightness);
+                GlStateManager.enableAlpha();
             }
 
-            if (compatibilityVersion >= 7) {
+            if (this.compatibilityVersion >= 7) {
                 GL14.glBlendFuncSeparate(1, 0, 0, 1);
                 GlStateManager.enableBlend();
             }
         }
         GuiMap.restoreTextureStates();
-    }
-
-    @Inject(method = "renderChunks", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/common/mods/SupportXaeroWorldmap;bindMapTextureWithLighting(IFLxaero/map/region/MapTileChunk;Z)V"
-    ))
-    public void drawTransparentMMBackground(final int minX, final int maxX, final int minZ, final int maxZ, final int minViewX, final int maxViewX, final int minViewZ, final int maxViewZ, final MapProcessor mapProcessor, final int renderedCaveLayer, final boolean shouldRequestLoading, final boolean reloadEverything, final int globalReloadVersion, final int globalRegionCacheHashCode, final int globalCaveStart, final int globalCaveDepth, final boolean playerIsMoving, final boolean noCaveMaps, final boolean slimeChunks, final int chunkX, final int chunkZ, final int tileX, final int tileZ, final int insideX, final int insideZ, final Long seed, final boolean wmHasCaveLayers, final boolean wmUsesHashcodes, final float brightness, final boolean zooming, final MinimapRendererHelper helper, final CallbackInfo ci,
-                                            @Local(name = "chunk") MapTileChunk chunk) {
-        int drawX = ((chunk.getX() - chunkX) << 6) - (tileX << 4) - insideX;
-        int drawZ = ((chunk.getZ() - chunkZ) << 6) - (tileZ << 4) - insideZ;
-        if (Settings.REGISTRY.transparentMinimapBackground.getValue()) {
-            GuiHelper.drawMMBackground(drawX, drawZ, brightness, chunk);
-            GuiMap.setupTextureMatricesAndTextures(brightness);
-        }
-    }
-
-    @WrapOperation(method = "renderChunks", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/map/gui/GuiMap;renderTexturedModalRectWithLighting(FFIIFF)V"
-    ))
-    public void finishTransparentMMBackgroundA(final float x, final float y, final int textureX, final int textureY, final float width, final float height, final Operation<Void> original) {
-        original.call(x, y, textureX, textureY, width, height);
-        if (Settings.REGISTRY.transparentMinimapBackground.getValue()) {
-            GuiHelper.finishMMSetup(compatibilityVersion, getMinimapBrightness(), null, false);
-        }
-    }
-
-    @WrapOperation(method = "renderChunks", at = @At(
-        value = "INVOKE",
-        target = "Lxaero/map/gui/GuiMap;renderTexturedModalRectWithLighting(FFFF)V"
-    ))
-    public void finishTransparentMMBackgroundB(final float x, final float y, final float width, final float height, final Operation<Void> original) {
-        original.call(x, y, width, height);
-        if (Settings.REGISTRY.transparentMinimapBackground.getValue()) {
-            GuiHelper.finishMMSetup(compatibilityVersion, getMinimapBrightness(), null, false);
-        }
     }
 
     @WrapOperation(method = "renderChunks", at = @At(
@@ -172,7 +117,7 @@ public abstract class MixinSupportXaeroWorldmap {
                                           @Local(name = "chunk") MapTileChunk chunk,
                                           @Local(name = "brightness") float brightness) {
         GuiMap.restoreTextureStates();
-        if (compatibilityVersion >= 7) {
+        if (this.compatibilityVersion >= 7) {
             GL14.glBlendFuncSeparate(770, 771, 1, 771);
         }
         final boolean isDimensionSwitched = Globals.getCurrentDimensionId() != Minecraft.getMinecraft().player.dimension;
@@ -221,11 +166,12 @@ public abstract class MixinSupportXaeroWorldmap {
                 WDLHelper.getWdlColor()
             );
         }
-        if (compatibilityVersion >= 6) {
+        if (this.compatibilityVersion >= 6) {
             GuiMap.setupTextures(brightness);
+            GlStateManager.enableAlpha();
         }
 
-        if (compatibilityVersion >= 7) {
+        if (this.compatibilityVersion >= 7) {
             GL14.glBlendFuncSeparate(1, 0, 0, 1);
             GlStateManager.enableBlend();
         }

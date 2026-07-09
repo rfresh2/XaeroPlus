@@ -1,7 +1,5 @@
 package xaeroplus.util;
 
-import com.google.common.collect.Lists;
-import net.minecraft.client.gui.GuiButton;
 import net.minecraft.util.ResourceLocation;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMapSession;
@@ -16,8 +14,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.zip.ZipInputStream;
@@ -32,9 +28,6 @@ public class Globals {
     // cache and only update this on new world loads
     public static boolean nullOverworldDimensionFolder = false;
     public static Settings.DataFolderResolutionMode dataFolderResolutionMode = Settings.DataFolderResolutionMode.IP;
-    public static int minimapScalingFactor = 1;
-    public static boolean shouldResetFBO = false;
-    public static String LOCK_ID = UUID.randomUUID().toString();
     public static int getCurrentDimensionId() {
         try {
             final Integer dim = XaeroWorldMapCore.currentSession.getMapProcessor().getMapWorld().getCurrentDimensionId();
@@ -45,8 +38,6 @@ public class Globals {
             return 0;
         }
     }
-    public static String waypointsSearchFilter = "";
-    public static List<GuiButton> guiMapButtonTempList = Lists.<GuiButton>newArrayList();
     public static ExecutorService cacheRefreshExecutorService = Executors.newFixedThreadPool(
             // limited benefits by refreshing on more threads as it will consume the entire CPU and start lagging the game
             Math.max(1, Math.min(Runtime.getRuntime().availableProcessors() / 2, 4)));
@@ -56,7 +47,6 @@ public class Globals {
         Settings.REGISTRY.getAllSettings().forEach(XaeroPlusSetting::init);
         nullOverworldDimensionFolder = Settings.REGISTRY.nullOverworldDimensionFolder.getValue();
         dataFolderResolutionMode = Settings.REGISTRY.dataFolderResolutionMode.getValue();
-        minimapScalingFactor = (int) Settings.REGISTRY.minimapScaling.getValue();
     }
 
     public static void switchToDimension(final int newDimId) {

@@ -1,8 +1,14 @@
 package xaeroplus.settings;
 
 import xaeroplus.module.ModuleManager;
-import xaeroplus.module.impl.*;
-import xaeroplus.util.*;
+import xaeroplus.module.impl.BaritoneGoalSync;
+import xaeroplus.module.impl.NewChunks;
+import xaeroplus.module.impl.PortalSkipDetection;
+import xaeroplus.module.impl.Portals;
+import xaeroplus.util.BaritoneHelper;
+import xaeroplus.util.ColorHelper;
+import xaeroplus.util.Globals;
+import xaeroplus.util.WDLHelper;
 
 import static xaeroplus.util.GuiMapHelper.markChunksDirtyInWriteDistance;
 
@@ -16,21 +22,6 @@ public final class Settings extends SettingRegistry {
      * The order settings are defined here determines the order in the settings GUI's.
      */
 
-    public final BooleanSetting fastMapSetting = register(
-        BooleanSetting.create(
-            "Fast Mapping",
-            "setting.world_map.fast_mapping",
-            "setting.world_map.fast_mapping.tooltip",
-            true
-        ), SettingLocation.WORLD_MAP_MAIN);
-    public final DoubleSetting fastMapMaxTilesPerCycle = register(
-        DoubleSetting.create(
-            "Fast Mapping Chunk Limit",
-            "setting.world_map.fast_mapping_rate_limit",
-            10, 120, 10,
-            "setting.world_map.fast_mapping_rate_limit.tooltip",
-            80),
-        SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting baritoneWaypointSyncSetting = register(
         BooleanSetting.create(
             "Baritone Goal Waypoint",
@@ -43,26 +34,7 @@ public final class Settings extends SettingRegistry {
             true),
         SettingLocation.WORLD_MAP_MAIN
     );
-    public final BooleanSetting waystonesWaypointSyncSetting = register(BooleanSetting.create(
-            "Waystones Waypoint Sync",
-            "setting.world_map.waystones_sync",
-            "setting.world_map.waystones_sync.tooltip",
-            WaystonesHelper::isWaystonesPresent,
-            (b) -> {
-                if (WaystonesHelper.isWaystonesPresent()) ModuleManager.getModule(WaystoneSync.class).setEnabled(b);
-            },
-            true),
-        SettingLocation.WORLD_MAP_MAIN
-    );
-    public final BooleanSetting waystonesCrossDimSyncSetting = register(
-        BooleanSetting.create(
-            "Waystones Dimension Sync",
-            "setting.world_map.cross_dim_waystones_sync",
-            "setting.world_map.cross_dim_waystones_sync.tooltip",
-            WaystonesHelper::isWaystonesPresent,
-            false),
-        SettingLocation.WORLD_MAP_MAIN
-    );
+
     public final BooleanSetting persistMapDimensionSwitchSetting = register(
         BooleanSetting.create(
             "Persist Dim Switch",
@@ -88,22 +60,6 @@ public final class Settings extends SettingRegistry {
             (v) -> markChunksDirtyInWriteDistance(),
             150),
         SettingLocation.WORLD_MAP_MAIN);
-    public final DoubleSetting worldMapMinZoomSetting = register(
-        DoubleSetting.create(
-            "Min WorldMap Zoom",
-            "setting.world_map.min_zoom",
-            0, 0.625f, 0.01f,
-            "setting.world_map.min_zoom.tooltip",
-            0.1f),
-        SettingLocation.WORLD_MAP_MAIN);
-    public final BooleanSetting skipWorldRenderSetting = register(
-        BooleanSetting.create(
-            "Skip Background Render",
-            "setting.world_map.skip_world_render",
-            "setting.world_map.skip_world_render.tooltip",
-            false),
-        SettingLocation.WORLD_MAP_MAIN
-    );
     public final BooleanSetting newChunksEnabledSetting = register(
         BooleanSetting.create(
             "NewChunks Highlighting",
@@ -289,23 +245,6 @@ public final class Settings extends SettingRegistry {
             return translationKey;
         }
     }
-    public final BooleanSetting transparentMinimapBackground = register(
-        BooleanSetting.create(
-            "Transparent Background",
-            "setting.minimap.transparent_background",
-            "setting.minimap.transparent_background.tooltip",
-            false),
-        SettingLocation.MINIMAP);
-    public final DoubleSetting minimapScaling = register(
-        DoubleSetting.create(
-            "Minimap Scaling Factor",
-            "setting.minimap.minimap_scaling",
-            // todo: increase max. need design improvements
-            1f, 2f, 1f,
-            "setting.minimap.minimap_scaling.tooltip",
-            (b) -> Globals.shouldResetFBO = true,
-            2f),
-        SettingLocation.MINIMAP);
     public final BooleanSetting switchToNetherSetting = register(
         BooleanSetting.create(
             "Switch to Nether",
@@ -351,14 +290,6 @@ public final class Settings extends SettingRegistry {
             "setting.minimap.always_render_player_icon.tooltip",
             true),
         SettingLocation.MINIMAP_ENTITY_RADAR);
-    public final BooleanSetting fixMainEntityDot = register(
-        BooleanSetting.create(
-            "Fix Main Entity Dot",
-            "setting.minimap.fix_main_entity_dot",
-            "setting.minimap.fix_main_entity_dot.tooltip",
-            true),
-        SettingLocation.MINIMAP_ENTITY_RADAR
-    );
     public final BooleanSetting waypointBeacons = register(
         BooleanSetting.create(
             "Waypoint Beacons",

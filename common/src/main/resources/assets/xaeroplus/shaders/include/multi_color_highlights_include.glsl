@@ -3,4 +3,6 @@
 
 layout(std140) uniform MultiColorHighlightTransforms {
     mat4 MapViewMatrix;
+	vec2 CameraChunk;
+	vec2 CameraInChunk;
 };

@@ -15,11 +15,13 @@ void main() {
     const float aaRadiusPx = 1.0;
 
     // Vertex packing contract:
-    // - Position.xy: segment start in map-space
-    // - UV0.xy: segment end in map-space
+    // - Position.xy: segment start relative to the buffer's block origin
+    // - UV0.xy: segment end relative to the buffer's block origin
     // - gl_VertexID % 4: logical quad corner selector
-    vec4 startPos = ProjMat * ModelViewMat * MapViewMatrix * vec4(Position, 1.0);
-    vec4 endPos = ProjMat * ModelViewMat * MapViewMatrix * vec4(UV0, Position.z, 1.0);
+    vec2 startRelative = Position.xy + CameraRelativeOrigin;
+    vec2 endRelative = UV0 + CameraRelativeOrigin;
+    vec4 startPos = ProjMat * ModelViewMat * MapViewMatrix * vec4(startRelative, Position.z, 1.0);
+    vec4 endPos = ProjMat * ModelViewMat * MapViewMatrix * vec4(endRelative, Position.z, 1.0);
 
     vec3 startNdc = startPos.xyz / startPos.w;
     vec3 endNdc = endPos.xyz / endPos.w;

@@ -7,11 +7,9 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import com.mojang.blaze3d.GpuFormat;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.rendertype.PreparedRenderType;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.HudMod;
 import xaero.common.graphics.ImprovedFramebuffer;
+import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRenderer;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
 import xaero.common.minimap.render.MinimapFBORenderer;
 import xaero.common.minimap.render.MinimapRenderer;
@@ -174,36 +173,36 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         );
     }
 
-//    @WrapOperation(method = "renderChunksToFBO", at = @At(
-//        value = "INVOKE",
-//        target = "Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;draw(Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRenderer;)V"
-//    ))
-//    public void drawMinimapFeaturesCaveMode(final MultiTextureRenderTypeRendererProvider instance, final MultiTextureRenderTypeRenderer renderer, final Operation<Void> original,
-//                                            @Local(name = "xFloored") int xFloored,
-//                                            @Local(name = "zFloored") int zFloored,
-//                                            @Local(name = "matrixStack") PoseStack matrixStack,
-//                                            @Local(name = "renderTypeBuffers") XaeroBufferProvider renderTypeBuffers
-//    ) {
-//        original.call(instance, renderer);
-//        XaeroPlusShaders.setLinesFrameSize((float)this.scalingFramebuffer.width, (float)this.scalingFramebuffer.height);
-//        int mapX = xFloored >> 4;
-//        int mapZ = zFloored >> 4;
-//        int chunkX = mapX >> 2;
-//        int chunkZ = mapZ >> 2;
-//        int tileX = mapX & 3;
-//        int tileZ = mapZ & 3;
-//        int insideX = xFloored & 15;
-//        int insideZ = zFloored & 15;
-//        Globals.drawManager.drawMinimapFeatures(
-//            chunkX,
-//            chunkZ,
-//            tileX,
-//            tileZ,
-//            insideX,
-//            insideZ,
-//            zoom,
-//            matrixStack,
-//            renderTypeBuffers
-//        );
-//    }
+    @WrapOperation(method = "renderChunksToFBO", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;draw(Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRenderer;)V"
+    ))
+    public void drawMinimapFeaturesCaveMode(final MultiTextureRenderTypeRendererProvider instance, final MultiTextureRenderTypeRenderer renderer, final Operation<Void> original,
+                                            @Local(name = "xFloored") int xFloored,
+                                            @Local(name = "zFloored") int zFloored,
+                                            @Local(name = "matrixStack") PoseStack matrixStack,
+                                            @Local(name = "renderTypeBuffers") XaeroBufferProvider renderTypeBuffers
+    ) {
+        original.call(instance, renderer);
+        XaeroPlusShaders.setLinesFrameSize((float)this.scalingFramebuffer.width, (float)this.scalingFramebuffer.height);
+        int mapX = xFloored >> 4;
+        int mapZ = zFloored >> 4;
+        int chunkX = mapX >> 2;
+        int chunkZ = mapZ >> 2;
+        int tileX = mapX & 3;
+        int tileZ = mapZ & 3;
+        int insideX = xFloored & 15;
+        int insideZ = zFloored & 15;
+        Globals.drawManager.drawMinimapFeatures(
+            chunkX,
+            chunkZ,
+            tileX,
+            tileZ,
+            insideX,
+            insideZ,
+            zoom,
+            matrixStack,
+            renderTypeBuffers
+        );
+    }
 }

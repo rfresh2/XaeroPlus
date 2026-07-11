@@ -12,6 +12,7 @@ import java.io.IOException;
 public class LinesShader extends ShaderInstance {
     private Uniform frameSize = this.getUniform("FrameSize");
     private Uniform mapViewMatrix = this.getUniform("MapViewMatrix");
+    private Uniform cameraRelativeOrigin = this.getUniform("CameraRelativeOrigin");
 
     public LinesShader(ResourceProvider factory) throws IOException {
         super(factory, "xaeroplus/lines", DefaultVertexFormat.POSITION_COLOR_TEX);
@@ -30,5 +31,21 @@ public class LinesShader extends ShaderInstance {
             return;
         }
         mapViewMatrix.set(transform);
+    }
+
+    public void setCameraRelativeOrigin(
+        final int bufferOriginBlockX,
+        final int bufferOriginBlockZ,
+        final int cameraBlockX,
+        final int cameraBlockZ
+    ) {
+        if (cameraRelativeOrigin == null) {
+            XaeroPlus.LOGGER.error("cameraRelativeOrigin is null");
+            return;
+        }
+        cameraRelativeOrigin.set(
+            (float) ((long) bufferOriginBlockX - cameraBlockX),
+            (float) ((long) bufferOriginBlockZ - cameraBlockZ)
+        );
     }
 }

@@ -61,20 +61,20 @@ public class MixinSodiumOptionsGUI {
                              config -> Settings.REGISTRY.minimapFpsLimit.getAsInt()
                          ))
                          .build())
-                .add(OptionImpl.createBuilder(int.class, XaeroPlusSodiumOptionStorage.INSTANCE)
-                         .setName(Component.translatable("xaeroplus.setting.minimap_scaling"))
-                         .setTooltip(Component.translatable("xaeroplus.setting.minimap_scaling.tooltip"))
-                         .setControl(option -> new SliderControl(
-                             option,
-                             (int) Settings.REGISTRY.minimapScaleMultiplierSetting.getValueMin(),
-                             (int) Settings.REGISTRY.minimapScaleMultiplierSetting.getValueMax(),
-                             (int) Settings.REGISTRY.minimapScaleMultiplierSetting.getValueStep(),
-                             ControlValueFormatter.number()))
-                         .setBinding(new GenericBinding<>(
-                             (config, value) -> Settings.REGISTRY.minimapScaleMultiplierSetting.setValue(value),
-                             config -> Settings.REGISTRY.minimapScaleMultiplierSetting.getAsInt()
-                         ))
-                         .build())
+//                .add(OptionImpl.createBuilder(int.class, XaeroPlusSodiumOptionStorage.INSTANCE)
+//                         .setName(Component.translatable("xaeroplus.setting.minimap_scaling"))
+//                         .setTooltip(Component.translatable("xaeroplus.setting.minimap_scaling.tooltip"))
+//                         .setControl(option -> new SliderControl(
+//                             option,
+//                             (int) Settings.REGISTRY.minimapScaleMultiplierSetting.getValueMin(),
+//                             (int) Settings.REGISTRY.minimapScaleMultiplierSetting.getValueMax(),
+//                             (int) Settings.REGISTRY.minimapScaleMultiplierSetting.getValueStep(),
+//                             ControlValueFormatter.number()))
+//                         .setBinding(new GenericBinding<>(
+//                             (config, value) -> Settings.REGISTRY.minimapScaleMultiplierSetting.setValue(value),
+//                             config -> Settings.REGISTRY.minimapScaleMultiplierSetting.getAsInt()
+//                         ))
+//                         .build())
                 .build()
         )));
     }

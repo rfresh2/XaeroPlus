@@ -1,8 +1,7 @@
 package xaeroplus.feature.render.text;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Vector3f;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
 import xaeroplus.Globals;
@@ -29,17 +28,19 @@ public abstract class AbstractTextDrawFeature implements DrawFeature {
             float width = font.width(text.value());
             var relativeX = (float) ((long) text.x() - ctx.cameraBlockX());
             var relativeZ = (float) ((long) text.z() - ctx.cameraBlockZ());
-            var textMatrix = new Matrix4f(ctx.untranslatedMapViewMatrix());
-            textMatrix.translate(new Vector3f(relativeX, relativeZ, 0.0f));
-            textMatrix.multiply(Matrix4f.createScaleMatrix(textScale, textScale, 1.0f));
-            textMatrix.translate(new Vector3f(-width / 2.0f, -font.lineHeight / 2.0f, 0.0f));
+            var textMatrixStack = new PoseStack();
+            textMatrixStack.pushPose();
+            textMatrixStack.last().pose().load(ctx.untranslatedMapViewMatrix());
+            textMatrixStack.translate(relativeX, relativeZ, 0.0f);
+            textMatrixStack.scale(textScale, textScale, 1.0f);
+            textMatrixStack.translate(-width / 2.0f, -font.lineHeight / 2.0f, 0.0f);
             font.drawInBatch(
                 text.value(),
                 0,
                 0,
                 text.color(),
                 false,
-                textMatrix,
+                textMatrixStack.last().pose(),
                 ctx.renderTypeBuffers(),
                 false,
                 0,

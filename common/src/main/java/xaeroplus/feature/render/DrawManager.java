@@ -35,6 +35,7 @@ public class DrawManager {
         int tileZ,
         int insideX,
         int insideZ,
+        final double zoom,
         final PoseStack matrixStack,
         final MultiBufferSource.BufferSource renderTypeBuffers
     ) {
@@ -44,7 +45,7 @@ public class DrawManager {
         var ctx = new DrawContext(
             matrixStack,
             renderTypeBuffers,
-            1.0,
+            zoom,
             false,
             new Matrix4f(matrixStack.last().pose()),
             cameraBlockX,

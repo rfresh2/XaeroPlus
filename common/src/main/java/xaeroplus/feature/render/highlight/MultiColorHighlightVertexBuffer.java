@@ -23,7 +23,8 @@ public class MultiColorHighlightVertexBuffer extends AbstractHighlightVertexBuff
     public void preRender(final DrawContext ctx, final Long2LongMap highlights, final int color) {
         super.preRender(ctx, highlights, color);
         var shader = XaeroPlusShaders.MULTI_COLOR_HIGHLIGHT_SHADER;
-        shader.setMapViewMatrix(ctx.matrixStack().last().pose());
+        shader.setMapViewMatrix(ctx.untranslatedMapViewMatrix());
+        shader.setCameraPosition(ctx.cameraBlockX(), ctx.cameraBlockZ());
     }
 
     public void refresh(DrawContext ctx, Long2LongMap highlights, int colorAlpha) {

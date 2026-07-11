@@ -2,6 +2,7 @@ package xaeroplus.feature.render.line;
 
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
@@ -75,8 +76,14 @@ public abstract class AbstractLineDrawFeature<T> implements DrawFeature {
         // VertexBuffer._drawWithShader() only updates line width uniform if mode is set to LINES or LINE_STRIP
         // so we have to set it ourselves
         XaeroPlusShaders.LINES_SHADER.LINE_WIDTH.set(lineWidthScale);
-        XaeroPlusShaders.LINES_SHADER.setMapViewMatrix(ctx.matrixStack().last().pose());
+        XaeroPlusShaders.LINES_SHADER.setMapViewMatrix(ctx.untranslatedMapViewMatrix());
         RenderSystem.enableBlend();
+        RenderSystem.blendFuncSeparate(
+            GlStateManager.SourceFactor.SRC_ALPHA,
+            GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
+            GlStateManager.SourceFactor.ONE,
+            GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA
+        );
         RenderSystem.disableCull();
     }
 

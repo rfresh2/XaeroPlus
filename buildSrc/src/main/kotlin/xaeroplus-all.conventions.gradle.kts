@@ -12,15 +12,27 @@ version = providers.gradleProperty("mod_version").get()
 group = "xaeroplus"
 
 repositories {
+    maven("https://maven.fabricmc.net/")
     maven("https://maven.neoforged.net/releases/")
-    maven("https://api.modrinth.com/maven")
+    maven("https://api.modrinth.com/maven") {
+        content {
+            includeGroup("maven.modrinth")
+        }
+    }
     maven("https://maven.2b2t.vc/releases")
     maven("https://maven.2b2t.vc/xaero")
-    maven("https://maven.parchmentmc.org")
-    maven("https://maven.shedaniel.me/")
+    maven("https://maven.parchmentmc.org") {
+        content {
+            includeGroup("org.parchmentmc.data")
+        }
+    }
     maven("https://maven.2b2t.vc/remote")
     maven("https://maven.caffeinemc.net/releases")
-    maven("https://cursemaven.com")
+    maven("https://cursemaven.com") {
+        content {
+            includeGroup("curse.maven")
+        }
+    }
 }
 
 tasks {

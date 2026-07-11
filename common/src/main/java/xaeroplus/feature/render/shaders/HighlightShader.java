@@ -13,6 +13,8 @@ import java.io.IOException;
 public class HighlightShader extends ShaderInstance {
     public final Uniform highlightColor = getUniform("HighlightColor");
     public final Uniform mapViewMatrix = getUniform("MapViewMatrix");
+    public final Uniform cameraChunk = getUniform("CameraChunk");
+    public final Uniform cameraInChunk = getUniform("CameraInChunk");
 
     public HighlightShader(final ResourceProvider resourceProvider) throws IOException {
         super(resourceProvider, "xaeroplus/highlights", DefaultVertexFormat.POSITION);
@@ -32,5 +34,20 @@ public class HighlightShader extends ShaderInstance {
             return;
         }
         mapViewMatrix.set(transform);
+    }
+
+    public void setCameraPosition(final int cameraBlockX, final int cameraBlockZ) {
+        if (cameraChunk == null || cameraInChunk == null) {
+            XaeroPlus.LOGGER.error("Highlight camera position uniform is null");
+            return;
+        }
+        cameraChunk.set(
+            (float) Math.floorDiv(cameraBlockX, 16),
+            (float) Math.floorDiv(cameraBlockZ, 16)
+        );
+        cameraInChunk.set(
+            (float) Math.floorMod(cameraBlockX, 16),
+            (float) Math.floorMod(cameraBlockZ, 16)
+        );
     }
 }

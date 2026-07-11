@@ -9,6 +9,8 @@ public abstract class AbstractLineVertexBuffer<T> {
     @Nullable protected GpuBuffer vertexBuffer = null;
     protected boolean flipped = false;
     protected int indexCount = 0;
+    protected int bufferOriginBlockX;
+    protected int bufferOriginBlockZ;
 
     public boolean needsRefresh(final DrawContext ctx) {
         return vertexBuffer == null || vertexBuffer.isClosed() || stale || flipped != ctx.worldmap();
@@ -18,6 +20,11 @@ public abstract class AbstractLineVertexBuffer<T> {
         if (needsRefresh(ctx)) {
             refresh(ctx, lines);
         }
+    }
+
+    protected void setBufferOrigin(final DrawContext ctx) {
+        bufferOriginBlockX = ctx.cameraBlockX();
+        bufferOriginBlockZ = ctx.cameraBlockZ();
     }
 
     protected abstract void refresh(DrawContext ctx, T lines);

@@ -32,6 +32,7 @@ public class MultiColorLineVertexBuffer extends AbstractLineVertexBuffer<Object2
             close();
             return;
         }
+        setBufferOrigin(ctx);
         var bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
         boolean hasVertices = false;
         var it = Object2IntMaps.fastIterator(lines);
@@ -48,7 +49,14 @@ public class MultiColorLineVertexBuffer extends AbstractLineVertexBuffer<Object2
             int z1 = flipped ? line.z2() : line.z1();
             int x2 = flipped ? line.x1() : line.x2();
             int z2 = flipped ? line.z1() : line.z2();
-            DrawHelper.addColoredLineQuadToExistingBuffer(bufferBuilder, x1, z1, x2, z2, r, g, b, alpha);
+            DrawHelper.addColoredLineQuadToExistingBuffer(
+                bufferBuilder,
+                x1 - bufferOriginBlockX,
+                z1 - bufferOriginBlockZ,
+                x2 - bufferOriginBlockX,
+                z2 - bufferOriginBlockZ,
+                r, g, b, alpha
+            );
             hasVertices = true;
         }
         if (!hasVertices) {
@@ -77,11 +85,12 @@ public class MultiColorLineVertexBuffer extends AbstractLineVertexBuffer<Object2
         try (final RenderPass pass = RenderSystem.getDevice().createCommandEncoder()
             .createRenderPass(Minecraft.getInstance().getMainRenderTarget().getColorTexture(), OptionalInt.empty())) {
             pass.setPipeline(XaeroPlusShaders.LINES_PIPELINE);
-            pass.setUniform("MapViewMatrix", ctx.matrixStack().last().pose());
+            pass.setUniform("MapViewMatrix", ctx.untranslatedMapViewMatrix());
             pass.setUniform("ModelViewMat", RenderSystem.getModelViewMatrix());
             pass.setUniform("ProjMat", RenderSystem.getProjectionMatrix());
             pass.setUniform("FrameSize", XaeroPlusShaders.LINES_FRAME_SIZE);
             pass.setUniform("ColorModulator", RenderSystem.getShaderColor());
+            pass.setUniform("CameraRelativeOrigin", (float) ((long) bufferOriginBlockX - ctx.cameraBlockX()), (float) ((long) bufferOriginBlockZ - ctx.cameraBlockZ()));
             pass.setUniform("LineWidth", lineWidthScale);
             pass.setIndexBuffer(indexBuffer, indexType);
             pass.setVertexBuffer(0, vertexBuffer);

@@ -22,13 +22,17 @@ public class MixinMinimapRenderer {
     @Shadow
     protected Minimap minimap;
 
+    @Shadow
+    protected double zoom;
+
     @Inject(method = "renderMinimap", at = @At("HEAD"))
     public void resetFBOSize(
         CallbackInfo ci,
         @Local(argsOnly = true) MinimapProcessor minimap
     ) {
         if (this.minimap.usingFBO() && Globals.shouldResetFBO) {
-            Globals.minimapScaleMultiplier = Settings.REGISTRY.minimapScaleMultiplierSetting.getAsInt();
+//            Globals.minimapScaleMultiplier = Settings.REGISTRY.minimapScaleMultiplierSetting.getAsInt();
+            Globals.minimapScaleMultiplier = 1; // temp disabled
             Globals.minimapSizeMultiplier = Settings.REGISTRY.minimapSizeMultiplierSetting.getAsInt();
             ((CustomMinimapFBORenderer) this.minimap.getMinimapFBORenderer()).reloadMapFrameBuffers();
             Globals.shouldResetFBO = false;

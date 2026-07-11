@@ -64,8 +64,10 @@ public class HighlightVertexBuffer extends AbstractHighlightVertexBuffer {
             .createRenderPass(Minecraft.getInstance().getMainRenderTarget().getColorTexture(),
                 OptionalInt.empty())) {
             pass.setPipeline(XaeroPlusShaders.HIGHLIGHT_PIPELINE);
-            pass.setUniform("MapViewMatrix", ctx.matrixStack().last().pose());
+            pass.setUniform("MapViewMatrix", ctx.untranslatedMapViewMatrix());
             pass.setUniform("ModelViewMat", RenderSystem.getModelViewMatrix());
+            pass.setUniform("CameraChunk", (float) Math.floorDiv(ctx.cameraBlockX(), 16), (float) Math.floorDiv(ctx.cameraBlockZ(), 16));
+            pass.setUniform("CameraInChunk", (float) Math.floorMod(ctx.cameraBlockX(), 16), (float) Math.floorMod(ctx.cameraBlockZ(), 16));
             pass.setUniform("ProjMat", RenderSystem.getProjectionMatrix());
             var a = ColorHelper.getA(color);
             var r = ColorHelper.getR(color);

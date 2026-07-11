@@ -33,31 +33,59 @@ public class XaeroPlusShaders {
     private static CompiledShaderProgram CACHED_LINES_SHADER_PROGRAM;
     private static Uniform HIGHLIGHT_COLOR_UNIFORM;
     private static Uniform HIGHLIGHT_MAP_VIEW_MATRIX_UNIFORM;
+    private static Uniform HIGHLIGHT_CAMERA_CHUNK_UNIFORM;
+    private static Uniform HIGHLIGHT_CAMERA_IN_CHUNK_UNIFORM;
     private static Uniform MULTI_COLOR_HIGHLIGHT_MAP_VIEW_MATRIX_UNIFORM;
+    private static Uniform MULTI_COLOR_HIGHLIGHT_CAMERA_CHUNK_UNIFORM;
+    private static Uniform MULTI_COLOR_HIGHLIGHT_CAMERA_IN_CHUNK_UNIFORM;
     private static Uniform TRANSPARENT_BACKGROUND_UNIFORM;
     private static Uniform LINES_FRAME_SIZE_UNIFORM;
     private static Uniform LINES_MAP_VIEW_MATRIX_UNIFORM;
+    private static Uniform LINES_CAMERA_RELATIVE_ORIGIN_UNIFORM;
 
     public static void setHighlightColor(float r, float g, float b, float a) {
         CompiledShaderProgram currentProgram = Minecraft.getInstance().getShaderManager().getProgram(HIGHLIGHT_SHADER_PROGRAM);
         if (currentProgram != CACHED_HIGHLIGHT_SHADER_PROGRAM) {
             CACHED_HIGHLIGHT_SHADER_PROGRAM = currentProgram;
             HIGHLIGHT_MAP_VIEW_MATRIX_UNIFORM = currentProgram.getUniform("MapViewMatrix");
+            HIGHLIGHT_CAMERA_CHUNK_UNIFORM = currentProgram.getUniform("CameraChunk");
+            HIGHLIGHT_CAMERA_IN_CHUNK_UNIFORM = currentProgram.getUniform("CameraInChunk");
             HIGHLIGHT_COLOR_UNIFORM = currentProgram.getUniform("HighlightColor");
         }
 
         HIGHLIGHT_COLOR_UNIFORM.set(r, g, b, a);
     }
 
-    public static void setMapViewMatrix(Matrix4f matrix) {
+    public static void setHighlightMapViewMatrix(Matrix4f matrix) {
         CompiledShaderProgram currentProgram = Minecraft.getInstance().getShaderManager().getProgram(HIGHLIGHT_SHADER_PROGRAM);
         if (currentProgram != CACHED_HIGHLIGHT_SHADER_PROGRAM) {
             CACHED_HIGHLIGHT_SHADER_PROGRAM = currentProgram;
             HIGHLIGHT_MAP_VIEW_MATRIX_UNIFORM = currentProgram.getUniform("MapViewMatrix");
+            HIGHLIGHT_CAMERA_CHUNK_UNIFORM = currentProgram.getUniform("CameraChunk");
+            HIGHLIGHT_CAMERA_IN_CHUNK_UNIFORM = currentProgram.getUniform("CameraInChunk");
             HIGHLIGHT_COLOR_UNIFORM = currentProgram.getUniform("HighlightColor");
         }
 
         HIGHLIGHT_MAP_VIEW_MATRIX_UNIFORM.set(matrix);
+    }
+
+    public static void setHighlightCameraPosition(final int cameraBlockX, final int cameraBlockZ) {
+        CompiledShaderProgram currentProgram = Minecraft.getInstance().getShaderManager().getProgram(HIGHLIGHT_SHADER_PROGRAM);
+        if (currentProgram != CACHED_HIGHLIGHT_SHADER_PROGRAM) {
+            CACHED_HIGHLIGHT_SHADER_PROGRAM = currentProgram;
+            HIGHLIGHT_MAP_VIEW_MATRIX_UNIFORM = currentProgram.getUniform("MapViewMatrix");
+            HIGHLIGHT_CAMERA_CHUNK_UNIFORM = currentProgram.getUniform("CameraChunk");
+            HIGHLIGHT_CAMERA_IN_CHUNK_UNIFORM = currentProgram.getUniform("CameraInChunk");
+            HIGHLIGHT_COLOR_UNIFORM = currentProgram.getUniform("HighlightColor");
+        }
+        HIGHLIGHT_CAMERA_CHUNK_UNIFORM.set(
+            (float) Math.floorDiv(cameraBlockX, 16),
+            (float) Math.floorDiv(cameraBlockZ, 16)
+        );
+        HIGHLIGHT_CAMERA_IN_CHUNK_UNIFORM.set(
+            (float) Math.floorMod(cameraBlockX, 16),
+            (float) Math.floorMod(cameraBlockZ, 16)
+        );
     }
 
     public static void setMultiColorMapViewMatrix(Matrix4f matrix) {
@@ -65,9 +93,29 @@ public class XaeroPlusShaders {
         if (currentProgram != CACHED_MULTI_COLOR_HIGHLIGHT_SHADER_PROGRAM) {
             CACHED_MULTI_COLOR_HIGHLIGHT_SHADER_PROGRAM = currentProgram;
             MULTI_COLOR_HIGHLIGHT_MAP_VIEW_MATRIX_UNIFORM = currentProgram.getUniform("MapViewMatrix");
+            MULTI_COLOR_HIGHLIGHT_CAMERA_CHUNK_UNIFORM = currentProgram.getUniform("CameraChunk");
+            MULTI_COLOR_HIGHLIGHT_CAMERA_IN_CHUNK_UNIFORM = currentProgram.getUniform("CameraInChunk");
         }
 
         MULTI_COLOR_HIGHLIGHT_MAP_VIEW_MATRIX_UNIFORM.set(matrix);
+    }
+
+    public static void setMultiColorHighlightCameraPosition(final int cameraBlockX, final int cameraBlockZ) {
+        CompiledShaderProgram currentProgram = Minecraft.getInstance().getShaderManager().getProgram(MULTI_COLOR_HIGHLIGHT_SHADER_PROGRAM);
+        if (currentProgram != CACHED_HIGHLIGHT_SHADER_PROGRAM) {
+            CACHED_HIGHLIGHT_SHADER_PROGRAM = currentProgram;
+            MULTI_COLOR_HIGHLIGHT_MAP_VIEW_MATRIX_UNIFORM = currentProgram.getUniform("MapViewMatrix");
+            MULTI_COLOR_HIGHLIGHT_CAMERA_CHUNK_UNIFORM = currentProgram.getUniform("CameraChunk");
+            MULTI_COLOR_HIGHLIGHT_CAMERA_IN_CHUNK_UNIFORM = currentProgram.getUniform("CameraInChunk");
+        }
+        MULTI_COLOR_HIGHLIGHT_CAMERA_CHUNK_UNIFORM.set(
+            (float) Math.floorDiv(cameraBlockX, 16),
+            (float) Math.floorDiv(cameraBlockZ, 16)
+        );
+        MULTI_COLOR_HIGHLIGHT_CAMERA_IN_CHUNK_UNIFORM.set(
+            (float) Math.floorMod(cameraBlockX, 16),
+            (float) Math.floorMod(cameraBlockZ, 16)
+        );
     }
 
     public static void ensureTransparentBackgroundUniforms() {
@@ -90,6 +138,7 @@ public class XaeroPlusShaders {
             CACHED_LINES_SHADER_PROGRAM = currentProgram;
             LINES_FRAME_SIZE_UNIFORM = currentProgram.getUniform("FrameSize");
             LINES_MAP_VIEW_MATRIX_UNIFORM = currentProgram.getUniform("MapViewMatrix");
+            LINES_CAMERA_RELATIVE_ORIGIN_UNIFORM = currentProgram.getUniform("CameraRelativeOrigin");
         }
         LINES_FRAME_SIZE_UNIFORM.set(width, height);
     }
@@ -99,6 +148,7 @@ public class XaeroPlusShaders {
         if (currentProgram != CACHED_LINES_SHADER_PROGRAM) {
             CACHED_LINES_SHADER_PROGRAM = currentProgram;
             LINES_MAP_VIEW_MATRIX_UNIFORM = currentProgram.getUniform("MapViewMatrix");
+            LINES_CAMERA_RELATIVE_ORIGIN_UNIFORM = currentProgram.getUniform("CameraRelativeOrigin");
         }
         CACHED_LINES_SHADER_PROGRAM.LINE_WIDTH.set(linesWidth);
     }
@@ -108,7 +158,26 @@ public class XaeroPlusShaders {
         if (currentProgram != CACHED_LINES_SHADER_PROGRAM) {
             CACHED_LINES_SHADER_PROGRAM = currentProgram;
             LINES_MAP_VIEW_MATRIX_UNIFORM = currentProgram.getUniform("MapViewMatrix");
+            LINES_CAMERA_RELATIVE_ORIGIN_UNIFORM = currentProgram.getUniform("CameraRelativeOrigin");
         }
         LINES_MAP_VIEW_MATRIX_UNIFORM.set(matrix);
+    }
+
+    public static void setLinesCameraRelative(
+        final int bufferOriginBlockX,
+        final int bufferOriginBlockZ,
+        final int cameraBlockX,
+        final int cameraBlockZ
+    ) {
+        CompiledShaderProgram currentProgram = Minecraft.getInstance().getShaderManager().getProgram(LINES_SHADER_PROGRAM);
+        if (currentProgram != CACHED_LINES_SHADER_PROGRAM) {
+            CACHED_LINES_SHADER_PROGRAM = currentProgram;
+            LINES_MAP_VIEW_MATRIX_UNIFORM = currentProgram.getUniform("MapViewMatrix");
+            LINES_CAMERA_RELATIVE_ORIGIN_UNIFORM = currentProgram.getUniform("CameraRelativeOrigin");
+        }
+        LINES_CAMERA_RELATIVE_ORIGIN_UNIFORM.set(
+            (float) ((long) bufferOriginBlockX - cameraBlockX),
+            (float) ((long) bufferOriginBlockZ - cameraBlockZ)
+        );
     }
 }

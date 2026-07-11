@@ -74,7 +74,7 @@ public abstract class AbstractLineDrawFeature<T> implements DrawFeature {
         // VertexBuffer._drawWithShader() only updates line width uniform if mode is set to LINES or LINE_STRIP
         // so we have to set it ourselves
         XaeroPlusShaders.setLinesWidth(lineWidthScale);
-        XaeroPlusShaders.setLinesMapViewMatrix(ctx.matrixStack().last().pose());
+        XaeroPlusShaders.setLinesMapViewMatrix(ctx.untranslatedMapViewMatrix());
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(
             GlStateManager.SourceFactor.SRC_ALPHA,

@@ -29,6 +29,7 @@ public class LineVertexBuffer extends AbstractLineVertexBuffer<List<Line>> {
             close();
             return;
         }
+        setBufferOrigin(ctx);
         var r = ColorHelper.getR(color);
         var g = ColorHelper.getG(color);
         var b = ColorHelper.getB(color);
@@ -41,7 +42,14 @@ public class LineVertexBuffer extends AbstractLineVertexBuffer<List<Line>> {
             int z1 = flipped ? line.z2() : line.z1();
             int x2 = flipped ? line.x1() : line.x2();
             int z2 = flipped ? line.z1() : line.z2();
-            DrawHelper.addColoredLineQuadToExistingBuffer(bufferBuilder, x1, z1, x2, z2, r, g, b, a);
+            DrawHelper.addColoredLineQuadToExistingBuffer(
+                bufferBuilder,
+                x1 - bufferOriginBlockX,
+                z1 - bufferOriginBlockZ,
+                x2 - bufferOriginBlockX,
+                z2 - bufferOriginBlockZ,
+                r, g, b, a
+            );
         }
         if (vertexBuffer == null || vertexBuffer.isInvalid()) {
             close();

@@ -12,6 +12,8 @@ public abstract class AbstractLineVertexBuffer<T> {
     protected boolean flipped = false;
     protected int indexCount = 0;
     public MappableRingBuffer uniformBuffer = null;
+    protected int bufferOriginBlockX;
+    protected int bufferOriginBlockZ;
 
     public boolean needsRefresh(final DrawContext ctx) {
         return vertexBuffer == null || vertexBuffer.isClosed() || stale || flipped != ctx.worldmap() || uniformBuffer == null;
@@ -28,9 +30,15 @@ public abstract class AbstractLineVertexBuffer<T> {
                 new Std140SizeCalculator()
                     .putMat4f()
                     .putVec2()
+                    .putVec2()
                     .get()
             );
         }
+    }
+
+    protected void setBufferOrigin(final DrawContext ctx) {
+        bufferOriginBlockX = ctx.cameraBlockX();
+        bufferOriginBlockZ = ctx.cameraBlockZ();
     }
 
     protected abstract void refresh(DrawContext ctx, T lines);

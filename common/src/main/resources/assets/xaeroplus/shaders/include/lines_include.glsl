@@ -4,4 +4,5 @@
 layout(std140) uniform LinesTransforms {
     mat4 MapViewMatrix;
     vec2 FrameSize;
+    vec2 CameraRelativeOrigin;
 };

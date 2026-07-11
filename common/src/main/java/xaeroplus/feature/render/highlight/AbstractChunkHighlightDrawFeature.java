@@ -13,16 +13,11 @@ public abstract class AbstractChunkHighlightDrawFeature implements DrawFeature {
     }
 
     public void preRender(final DrawContext ctx) {
-        var matrixStack = ctx.matrixStack();
         XaeroPlusShaders.ensureShaders();
         RenderSystem.enableBlend();
-        matrixStack.pushPose();
-        matrixStack.scale(16f, 16f, 1f);
     }
 
     public void postRender(final DrawContext ctx) {
-        var matrixStack = ctx.matrixStack();
-        matrixStack.popPose();
         RenderSystem.disableBlend();
     }
 

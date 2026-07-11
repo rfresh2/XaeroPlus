@@ -1,6 +1,8 @@
 package xaeroplus.feature.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
 import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.client.renderer.MultiBufferSource;
 import xaero.common.HudMod;
@@ -37,12 +39,19 @@ public class DrawManager {
         final MultiBufferSource.BufferSource renderTypeBuffers
     ) {
         if (HudMod.INSTANCE.isFairPlay()) return;
-        var ctx = new DrawContext(matrixStack, renderTypeBuffers, 1.0, false);
+        var cameraBlockX = chunkX * 64 + tileX * 16 + insideX;
+        var cameraBlockZ = chunkZ * 64 + tileZ * 16 + insideZ;
+        var ctx = new DrawContext(
+            matrixStack,
+            renderTypeBuffers,
+            1.0,
+            false,
+            new Matrix4f(matrixStack.last().pose()),
+            cameraBlockX,
+            cameraBlockZ
+        );
         matrixStack.pushPose();
-        matrixStack.translate(
-            -(chunkX * 64) - (tileX * 16) - insideX,
-            -(chunkZ * 64) - (tileZ * 16) - insideZ,
-            0);
+        matrixStack.translate(-cameraBlockX, -cameraBlockZ, 0);
         registry.forEach(feature -> {
             feature.render(ctx);
         });
@@ -57,7 +66,17 @@ public class DrawManager {
         final MultiBufferSource.BufferSource renderTypeBuffers
     ) {
         if (HudMod.INSTANCE.isFairPlay()) return;
-        var ctx = new DrawContext(matrixStack, renderTypeBuffers, fboScale, true);
+        var untranslatedMapViewMatrix = new Matrix4f(matrixStack.last().pose());
+        untranslatedMapViewMatrix.translate(new Vector3f(0.0f, 0.0f, 1.0f));
+        var ctx = new DrawContext(
+            matrixStack,
+            renderTypeBuffers,
+            fboScale,
+            true,
+            untranslatedMapViewMatrix,
+            flooredCameraX,
+            flooredCameraZ
+        );
         matrixStack.pushPose();
         matrixStack.translate(-flooredCameraX, -flooredCameraZ, 1.0f);
         registry.forEach(feature -> {

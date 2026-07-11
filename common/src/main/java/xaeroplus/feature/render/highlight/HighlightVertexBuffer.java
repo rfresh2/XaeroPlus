@@ -22,7 +22,8 @@ public class HighlightVertexBuffer extends AbstractHighlightVertexBuffer {
     public void preRender(final DrawContext ctx, final Long2LongMap highlights, final int color) {
         super.preRender(ctx, highlights, color);
         var shader = XaeroPlusShaders.HIGHLIGHT_SHADER;
-        shader.setMapViewMatrix(ctx.matrixStack().last().pose());
+        shader.setMapViewMatrix(ctx.untranslatedMapViewMatrix());
+        shader.setCameraPosition(ctx.cameraBlockX(), ctx.cameraBlockZ());
         var a = ColorHelper.getA(color);
         var r = ColorHelper.getR(color);
         var g = ColorHelper.getG(color);

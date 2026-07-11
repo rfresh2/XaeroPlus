@@ -25,6 +25,7 @@ public class MultiColorLineVertexBuffer extends AbstractLineVertexBuffer<Object2
             close();
             return;
         }
+        setBufferOrigin(ctx);
         var bufferBuilder = Tesselator.getInstance().getBuilder();
         bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR_TEX);
         boolean hasVertices = false;
@@ -42,7 +43,14 @@ public class MultiColorLineVertexBuffer extends AbstractLineVertexBuffer<Object2
             int z1 = flipped ? line.z2() : line.z1();
             int x2 = flipped ? line.x1() : line.x2();
             int z2 = flipped ? line.z1() : line.z2();
-            DrawHelper.addColoredLineQuadToExistingBuffer(bufferBuilder, x1, z1, x2, z2, r, g, b, alpha);
+            DrawHelper.addColoredLineQuadToExistingBuffer(
+                bufferBuilder,
+                x1 - bufferOriginBlockX,
+                z1 - bufferOriginBlockZ,
+                x2 - bufferOriginBlockX,
+                z2 - bufferOriginBlockZ,
+                r, g, b, alpha
+            );
             hasVertices = true;
         }
         if (!hasVertices) {

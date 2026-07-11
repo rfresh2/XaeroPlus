@@ -11,6 +11,8 @@ import java.io.IOException;
 
 public class MultiColorHighlightShader extends ShaderInstance {
     public final Uniform mapViewMatrix = getUniform("MapViewMatrix");
+    public final Uniform cameraChunk = getUniform("CameraChunk");
+    public final Uniform cameraInChunk = getUniform("CameraInChunk");
 
     public MultiColorHighlightShader(final ResourceProvider resourceProvider) throws IOException {
         super(resourceProvider, "xaeroplus/multi_color_highlights", DefaultVertexFormat.POSITION_COLOR);
@@ -22,5 +24,20 @@ public class MultiColorHighlightShader extends ShaderInstance {
             return;
         }
         mapViewMatrix.set(transform);
+    }
+
+    public void setCameraPosition(final int cameraBlockX, final int cameraBlockZ) {
+        if (cameraChunk == null || cameraInChunk == null) {
+            XaeroPlus.LOGGER.error("Multi-color highlight camera position uniform is null");
+            return;
+        }
+        cameraChunk.set(
+            (float) Math.floorDiv(cameraBlockX, 16),
+            (float) Math.floorDiv(cameraBlockZ, 16)
+        );
+        cameraInChunk.set(
+            (float) Math.floorMod(cameraBlockX, 16),
+            (float) Math.floorMod(cameraBlockZ, 16)
+        );
     }
 }

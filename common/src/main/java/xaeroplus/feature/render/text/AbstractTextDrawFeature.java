@@ -1,6 +1,8 @@
 package xaeroplus.feature.render.text;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
 import xaeroplus.Globals;
@@ -18,7 +20,6 @@ public abstract class AbstractTextDrawFeature implements DrawFeature {
         var font = Minecraft.getInstance().font;
         var texts = getTexts();
         for (var text : texts) {
-            ctx.matrixStack().pushPose();
             float xpMinimapScalar = (float) Globals.minimapScaleMultiplier / (float) Globals.minimapSizeMultiplier;
             float textScale = text.scale() * 2.0f * (float) Mth.clamp(
                 (ctx.worldmap() ? 1f : xpMinimapScalar) / ctx.fboScale(),
@@ -26,31 +27,25 @@ public abstract class AbstractTextDrawFeature implements DrawFeature {
                 1000f
             );
             float width = font.width(text.value());
-            ctx.matrixStack().scale(textScale, textScale, 1);
-            ctx.matrixStack().translate(
-                text.x() / textScale,
-                text.z() / textScale,
-                0
-            );
-            ctx.matrixStack().translate(
-                -width / 2,
-                -font.lineHeight / 2.0f,
-                0
-            );
+            var relativeX = (float) ((long) text.x() - ctx.cameraBlockX());
+            var relativeZ = (float) ((long) text.z() - ctx.cameraBlockZ());
+            var textMatrix = new Matrix4f(ctx.untranslatedMapViewMatrix());
+            textMatrix.translate(new Vector3f(relativeX, relativeZ, 0.0f));
+            textMatrix.multiply(Matrix4f.createScaleMatrix(textScale, textScale, 1.0f));
+            textMatrix.translate(new Vector3f(-width / 2.0f, -font.lineHeight / 2.0f, 0.0f));
             font.drawInBatch(
                 text.value(),
                 0,
                 0,
                 text.color(),
                 false,
-                ctx.matrixStack().last().pose(),
+                textMatrix,
                 ctx.renderTypeBuffers(),
                 false,
                 0,
                 15728880,
                 font.isBidirectional()
             );
-            ctx.matrixStack().popPose();
         }
         if (!texts.isEmpty()) {
             RenderSystem.disableCull();

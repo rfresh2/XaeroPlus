@@ -69,8 +69,10 @@ public class HighlightVertexBuffer extends AbstractHighlightVertexBuffer {
         uniformBuffer.rotate();
         try (var mappedView = uniformBuffer.currentBuffer().map(false, true)) {
             Std140Builder.intoBuffer(mappedView.data())
-                .putMat4f(ctx.matrixStack().last().pose())
-                .putVec4(new Vector4f(r, g, b, a));
+                .putMat4f(ctx.untranslatedMapViewMatrix())
+                .putVec4(new Vector4f(r, g, b, a))
+                .putVec2((float) Math.floorDiv(ctx.cameraBlockX(), 16), (float) Math.floorDiv(ctx.cameraBlockZ(), 16))
+                .putVec2((float) Math.floorMod(ctx.cameraBlockX(), 16), (float) Math.floorMod(ctx.cameraBlockZ(), 16));
         }
         dynamicTransformUniformBuffer.rotate();
         try (var mappedView = dynamicTransformUniformBuffer.currentBuffer().map(false, true)) {

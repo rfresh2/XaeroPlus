@@ -37,6 +37,7 @@ public class MultiColorLineVertexBuffer extends AbstractLineVertexBuffer<Object2
             close();
             return;
         }
+        setBufferOrigin(ctx);
         try (var byteBuffer = new ByteBufferBuilder(128)) {
             var bufferBuilder = new BufferBuilder(byteBuffer, PrimitiveTopology.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
             boolean hasVertices = false;
@@ -54,7 +55,14 @@ public class MultiColorLineVertexBuffer extends AbstractLineVertexBuffer<Object2
                 int z1 = flipped ? line.z2() : line.z1();
                 int x2 = flipped ? line.x1() : line.x2();
                 int z2 = flipped ? line.z1() : line.z2();
-                DrawHelper.addColoredLineQuadToExistingBuffer(bufferBuilder, x1, z1, x2, z2, r, g, b, alpha);
+            DrawHelper.addColoredLineQuadToExistingBuffer(
+                bufferBuilder,
+                x1 - bufferOriginBlockX,
+                z1 - bufferOriginBlockZ,
+                x2 - bufferOriginBlockX,
+                z2 - bufferOriginBlockZ,
+                r, g, b, alpha
+            );
                 hasVertices = true;
             }
             if (!hasVertices) {
@@ -80,9 +88,10 @@ public class MultiColorLineVertexBuffer extends AbstractLineVertexBuffer<Object2
         uniformBuffer.rotate();
         try (var mappedView = uniformBuffer.currentBuffer().map(false, true)) {
             Std140Builder.intoBuffer(mappedView.data())
-                .putMat4f(ctx.matrixStack().last().pose())
+                .putMat4f(ctx.untranslatedMapViewMatrix())
                 .putVec2(XaeroPlusShaders.LINES_FRAME_SIZE[0], XaeroPlusShaders.LINES_FRAME_SIZE[1])
-                .putFloat(lineWidthScale);
+                .putFloat(lineWidthScale)
+                .putVec2((float) ((long) bufferOriginBlockX - ctx.cameraBlockX()), (float) ((long) bufferOriginBlockZ - ctx.cameraBlockZ()));
         }
         dynamicTransformUniformBuffer.rotate();
         try (var mappedView = dynamicTransformUniformBuffer.currentBuffer().map(false, true)) {

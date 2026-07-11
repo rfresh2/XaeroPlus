@@ -414,6 +414,20 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         return original + " [" + x + ", " + z + "]";
     }
 
+    @Inject(method = "extractRenderState", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/map/graphics/MapRenderHelper;restoreDefaultShaderBlendState()V"
+    ), remap = true)
+    public void renderCoordinatesGotoTextEntryFields(final GuiGraphicsExtractor guiGraphics, final int scaledMouseX, final int scaledMouseY, final float partialTicks, final CallbackInfo ci) {
+        if (!Settings.REGISTRY.worldMapUIAdditions.get()) return;
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.gui.screen() != null && mc.gui.screen().getClass().equals(GuiMap.class)) {
+            if (drawing && drawTextEntryActive && drawingMode == DrawingMode.TEXT && drawTextEntryField.visible) {
+                drawTextEntryField.extractRenderState(guiGraphics, scaledMouseX, scaledMouseY, partialTicks);
+            }
+        }
+    }
+
     @Inject(method = "onDimensionToggleButton", at = @At(value = "RETURN"))
     public void onDimensionToggleAfter(final Button b, final CallbackInfo ci) {
         if (!Settings.REGISTRY.radarWhileDimensionSwitchedSetting.get()) {

@@ -36,6 +36,8 @@ public abstract class AbstractHighlightVertexBuffer {
                     .putMat4f()
                     .putMat4f()
                     .putVec4()
+                    .putVec2()
+                    .putVec2()
                     .get()
             );
         }

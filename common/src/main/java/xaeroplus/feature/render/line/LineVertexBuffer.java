@@ -36,6 +36,7 @@ public class LineVertexBuffer extends AbstractLineVertexBuffer<java.util.List<Li
             close();
             return;
         }
+        setBufferOrigin(ctx);
         var r = ColorHelper.getR(color);
         var g = ColorHelper.getG(color);
         var b = ColorHelper.getB(color);
@@ -47,7 +48,14 @@ public class LineVertexBuffer extends AbstractLineVertexBuffer<java.util.List<Li
             int z1 = flipped ? line.z2() : line.z1();
             int x2 = flipped ? line.x1() : line.x2();
             int z2 = flipped ? line.z1() : line.z2();
-            DrawHelper.addColoredLineQuadToExistingBuffer(bufferBuilder, x1, z1, x2, z2, r, g, b, a);
+            DrawHelper.addColoredLineQuadToExistingBuffer(
+                bufferBuilder,
+                x1 - bufferOriginBlockX,
+                z1 - bufferOriginBlockZ,
+                x2 - bufferOriginBlockX,
+                z2 - bufferOriginBlockZ,
+                r, g, b, a
+            );
         }
         try (var meshData = bufferBuilder.buildOrThrow()) {
             close();
@@ -62,8 +70,9 @@ public class LineVertexBuffer extends AbstractLineVertexBuffer<java.util.List<Li
         uniformBuffer.rotate();
         try (var mappedView = RenderSystem.getDevice().createCommandEncoder().mapBuffer(uniformBuffer.currentBuffer(), false, true)) {
             Std140Builder.intoBuffer(mappedView.data())
-                .putMat4f(ctx.matrixStack().last().pose())
-                .putVec2(XaeroPlusShaders.LINES_FRAME_SIZE[0], XaeroPlusShaders.LINES_FRAME_SIZE[1]);
+                .putMat4f(ctx.untranslatedMapViewMatrix())
+                .putVec2(XaeroPlusShaders.LINES_FRAME_SIZE[0], XaeroPlusShaders.LINES_FRAME_SIZE[1])
+                .putVec2((float) ((long) bufferOriginBlockX - ctx.cameraBlockX()), (float) ((long) bufferOriginBlockZ - ctx.cameraBlockZ()));
         }
         GpuBufferSlice dynamic = RenderSystem.getDynamicUniforms()
             .writeTransform(RenderSystem.getModelViewMatrix(), new Vector4f(1.0f, 1.0f, 1.0f, 1.0f), new Vector3f(), new Matrix4f(), lineWidthScale);

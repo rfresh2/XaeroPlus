@@ -168,6 +168,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             tileZ,
             insideX,
             insideZ,
+            zoom,
             matrixStack,
             renderTypeBuffers
         );
@@ -194,9 +195,13 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
 //        int insideX = xFloored & 15;
 //        int insideZ = zFloored & 15;
 //        Globals.drawManager.drawMinimapFeatures(
-//            chunkX, chunkZ,
-//            tileX, tileZ,
-//            insideX, insideZ,
+//            chunkX,
+//            chunkZ,
+//            tileX,
+//            tileZ,
+//            insideX,
+//            insideZ,
+//            zoom,
 //            matrixStack,
 //            renderTypeBuffers
 //        );

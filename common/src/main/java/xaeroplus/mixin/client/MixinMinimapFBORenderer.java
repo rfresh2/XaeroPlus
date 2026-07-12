@@ -142,6 +142,32 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         return instance.translate((x / Globals.minimapSizeMultiplier), (y / Globals.minimapSizeMultiplier), z);
     }
 
+    @WrapOperation(method = "renderChunksToFBO", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/common/minimap/render/MinimapRendererHelper;drawMyTexturedModalRectPre(Lcom/mojang/blaze3d/vertex/PoseStack;FFIIFFFFF)V",
+        ordinal = 0
+    ), slice = @Slice(
+        from = @At(
+            value = "INVOKE",
+            target = "Lxaero/common/graphics/ImprovedFramebuffer;bindRead()V"
+        )
+    ))
+    public void correctScaledFBO(final MinimapRendererHelper instance, final PoseStack matrixStack, final float x, final float y, final int textureX, final int textureY, final float width, final float height, final float theight, final float factor, final float discardAlpha, final Operation<Void> original) {
+        original.call(
+            instance,
+            matrixStack,
+            x * Globals.minimapScaleMultiplier,
+            y * Globals.minimapScaleMultiplier,
+            textureX,
+            textureY,
+            width * Globals.minimapScaleMultiplier,
+            height * Globals.minimapScaleMultiplier,
+            theight * Globals.minimapScaleMultiplier,
+            factor * Globals.minimapScaleMultiplier,
+            discardAlpha
+        );
+    }
+
     @WrapOperation(method = "renderChunksToFBO", at= @At(
         value = "INVOKE",
         target = "Lxaero/common/mods/SupportXaeroWorldmap;drawMinimap(Lxaero/hud/minimap/module/MinimapSession;Lcom/mojang/blaze3d/vertex/PoseStack;Lxaero/common/minimap/render/MinimapRendererHelper;IIIIIIZDDLcom/mojang/blaze3d/vertex/VertexConsumer;Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;)V"),

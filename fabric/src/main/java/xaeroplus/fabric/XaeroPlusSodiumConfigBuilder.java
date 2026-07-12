@@ -38,20 +38,20 @@ public class XaeroPlusSodiumConfigBuilder implements ConfigEntryPoint {
                         .setStorageHandler(SettingHooks::saveSettings)
                         .setValueFormatter(i -> Component.literal(String.valueOf(i)))
                         .setDefaultValue(60))
-//                    .addOption(builder.createIntegerOption(ResourceLocation.fromNamespaceAndPath("xaeroplus", "minimap_scaling"))
-//                        .setName(Component.translatable("xaeroplus.setting.minimap_scaling"))
-//                        .setTooltip(Component.translatable("xaeroplus.setting.minimap_scaling.tooltip"))
-//                        .setRange(
-//                            (int) Settings.REGISTRY.minimapScaleMultiplierSetting.getValueMin(),
-//                            (int) Settings.REGISTRY.minimapScaleMultiplierSetting.getValueMax(),
-//                            (int) Settings.REGISTRY.minimapScaleMultiplierSetting.getValueStep())
-//                        .setBinding(
-//                            Settings.REGISTRY.minimapScaleMultiplierSetting::setValue,
-//                            Settings.REGISTRY.minimapScaleMultiplierSetting::getAsInt
-//                        )
-//                        .setStorageHandler(SettingHooks::saveSettings)
-//                        .setValueFormatter(i -> Component.literal(String.valueOf(i)))
-//                        .setDefaultValue(1))
+                    .addOption(builder.createIntegerOption(ResourceLocation.fromNamespaceAndPath("xaeroplus", "minimap_scaling"))
+                        .setName(Component.translatable("xaeroplus.setting.minimap_scaling"))
+                        .setTooltip(Component.translatable("xaeroplus.setting.minimap_scaling.tooltip"))
+                        .setRange(
+                            (int) Settings.REGISTRY.minimapScaleMultiplierSetting.getValueMin(),
+                            (int) Settings.REGISTRY.minimapScaleMultiplierSetting.getValueMax(),
+                            (int) Settings.REGISTRY.minimapScaleMultiplierSetting.getValueStep())
+                        .setBinding(
+                            Settings.REGISTRY.minimapScaleMultiplierSetting::setValue,
+                            Settings.REGISTRY.minimapScaleMultiplierSetting::getAsInt
+                        )
+                        .setStorageHandler(SettingHooks::saveSettings)
+                        .setValueFormatter(i -> Component.literal(String.valueOf(i)))
+                        .setDefaultValue(1))
                     )
                 );
 

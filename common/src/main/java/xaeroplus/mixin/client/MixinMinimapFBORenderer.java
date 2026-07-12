@@ -6,6 +6,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -141,6 +142,31 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
     ), remap = true)
     public Matrix4f correctPreRotationTranslationForSizeMult(final Matrix4fStack instance, final float x, final float y, final float z) {
         return instance.translate((x / Globals.minimapSizeMultiplier), (y / Globals.minimapSizeMultiplier), z);
+    }
+
+    @WrapOperation(method = "renderChunksToFBO", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/lib/client/graphics/util/ImmediateRenderUtil;texturedRect(Lcom/mojang/blaze3d/vertex/PoseStack;FFIIFFFFLcom/mojang/blaze3d/pipeline/RenderPipeline;)V",
+        ordinal = 0
+    ), slice = @Slice(
+        from = @At(
+            value = "INVOKE",
+            target = "Lxaero/common/graphics/ImprovedFramebuffer;bindRead()V"
+        )
+    ))
+    public void correctScaledFBO(final PoseStack matrixStack, final float x, final float y, final int textureX, final int textureY, final float width, final float height, final float textureH, final float factor, final RenderPipeline renderPipeline, final Operation<Void> original) {
+        original.call(
+            matrixStack,
+            x * Globals.minimapScaleMultiplier,
+            y * Globals.minimapScaleMultiplier,
+            textureX,
+            textureY,
+            width * Globals.minimapScaleMultiplier,
+            height * Globals.minimapScaleMultiplier,
+            textureH * Globals.minimapScaleMultiplier,
+            factor * Globals.minimapScaleMultiplier,
+            renderPipeline
+        );
     }
 
     @WrapOperation(method = "renderChunksToFBO", at= @At(

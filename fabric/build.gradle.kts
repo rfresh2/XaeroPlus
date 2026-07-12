@@ -69,7 +69,7 @@ dependencies {
     modRuntimeOnly(libs.immediatelyfast)
     runtimeOnly("net.lenni0451:Reflect:1.6.1") // immediatelyfast jij
     modImplementation(libs.modmenu)
-    modImplementation(libs.sodium.fabric)
+    modCompileOnly(libs.sodium.fabric) // seems to cause issues with client gametest
     modRuntimeOnly(libs.spark.fabric)
 	modRuntimeOnly(libs.fabric.permissions.api)
     implementation(shadow(libs.caffeine.get())!!)

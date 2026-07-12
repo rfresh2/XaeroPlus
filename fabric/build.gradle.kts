@@ -69,7 +69,7 @@ dependencies {
     modRuntimeOnly(libs.immediatelyfast)
     runtimeOnly("net.lenni0451:Reflect:1.6.1") // immediatelyfast jij
 	modImplementation(libs.modmenu)
-	modImplementation(libs.sodium.fabric)
+    modCompileOnly(libs.sodium.fabric)
 //    modRuntimeOnly(libs.spark.fabric)
     implementation(shadow(libs.caffeine.get())!!)
 	implementation(shadow(libs.lambdaEvents.get())!!)

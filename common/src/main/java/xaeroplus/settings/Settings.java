@@ -978,8 +978,7 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.minimap_scaling",
             1, 5, 1,
             1,
-            (b) -> Globals.shouldResetFBO = true,
-            () -> false),
+            (b) -> Globals.shouldResetFBO = true),
         SettingLocation.MINIMAP_VIEW);
     public final DoubleSetting minimapSizeMultiplierSetting = register(
         DoubleSetting.create(

@@ -10,8 +10,6 @@ import xaeroplus.util.ColorHelper;
 import xaeroplus.util.Globals;
 import xaeroplus.util.WDLHelper;
 
-import static xaeroplus.util.GuiMapHelper.markChunksDirtyInWriteDistance;
-
 /**
  * Registry for XaeroPlus-specific settings
  */
@@ -43,23 +41,6 @@ public final class Settings extends SettingRegistry {
             false),
         SettingLocation.WORLD_MAP_MAIN
     );
-    public final BooleanSetting transparentObsidianRoofSetting = register(
-        BooleanSetting.create(
-            "Transparent Obsidian Roof",
-            "setting.world_map.transparent_obsidian_roof",
-            "setting.world_map.transparent_obsidian_roof.tooltip",
-            (v) -> markChunksDirtyInWriteDistance(),
-            true),
-        SettingLocation.WORLD_MAP_MAIN);
-    public final DoubleSetting transparentObsidianRoofDarkeningSetting = register(
-        DoubleSetting.create(
-            "Roof Obsidian Opacity",
-            "setting.world_map.transparent_obsidian_roof_darkening",
-            0, 255, 5,
-            "setting.world_map.transparent_obsidian_roof_darkening.tooltip",
-            (v) -> markChunksDirtyInWriteDistance(),
-            150),
-        SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting newChunksEnabledSetting = register(
         BooleanSetting.create(
             "NewChunks Highlighting",

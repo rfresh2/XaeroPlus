@@ -1,5 +1,6 @@
 package xaeroplus.fabric.gametest;
 
+import it.unimi.dsi.fastutil.longs.Long2LongArrayMap;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.loader.api.FabricLoader;
@@ -25,8 +26,10 @@ import xaero.lib.client.gui.config.context.BuiltInEditConfigScreenContexts;
 import xaero.map.WorldMapSession;
 import xaero.map.gui.GuiMap;
 import xaero.map.gui.GuiWorldMapSettings;
+import xaeroplus.Globals;
 import xaeroplus.feature.extensions.DrawOrderScreen;
 import xaeroplus.feature.extensions.SyncedWaypoint;
+import xaeroplus.feature.render.DrawFeatureFactory;
 import xaeroplus.feature.render.line.Line;
 import xaeroplus.feature.render.text.Text;
 import xaeroplus.feature.waypoint.WaypointAPI;
@@ -92,6 +95,14 @@ public class XaeroPlusClientGameTest implements ClientModInitializer {
                 var lz = ChunkUtils.chunkCoordToCoord(ChunkUtils.actualPlayerChunkZ());
                 ModuleManager.getModule(Drawing.class).addLine(new Line(lx - 128, lz - 128, lx + 128, lz + 128), ColorHelper.getColor(255, 0, 0, 200));
                 ModuleManager.getModule(Drawing.class).addText(new Text("bottom text", lx, lz + 64, ColorHelper.getColor(255, 255, 255, 255), 1f));
+                var testHighlights = new Long2LongArrayMap();
+                testHighlights.put(ChunkUtils.chunkPosToLong(ChunkUtils.actualPlayerChunkX() - 5, ChunkUtils.actualPlayerChunkZ() + 5), 0);
+                Globals.drawManager.registry().register(DrawFeatureFactory.chunkHighlights(
+                    "test",
+                    dim -> testHighlights,
+                    () -> ColorHelper.getColor(0, 255, 0, 150),
+                    50
+                ));
                 HudMod.INSTANCE.getHudConfigs().getClientConfigManager().getCurrentProfile().set(MinimapProfiledConfigOptions.SIZE, 200);
                 HudMod.INSTANCE.getHudConfigs().getClientConfigManager().getCurrentProfile().set(MinimapProfiledConfigOptions.NORTH_LOCKED, true);
                 HudMod.INSTANCE.getHudConfigs().getClientConfigManager().getCurrentProfile().set(MinimapProfiledConfigOptions.WAYPOINT_DISTANCE_IN_WORLD, 2);

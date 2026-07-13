@@ -69,7 +69,7 @@ dependencies {
 //	modRuntimeOnly(libs.immediatelyfast)
     runtimeOnly("net.lenni0451:Reflect:1.6.1") // immediatelyfast jij
     modImplementation(libs.modmenu)
-    modImplementation(libs.sodium.fabric)
+    modCompileOnly(libs.sodium.fabric) // todo: remove on next xaero update when he fixes sodium crash
     modRuntimeOnly(libs.spark.fabric)
 	modRuntimeOnly(libs.fabric.permissions.api)
     implementation(shadow(libs.caffeine.get())!!)

@@ -78,11 +78,11 @@ public class MixinWaypointReader {
         }
 
         if (Settings.REGISTRY.disableWaypointSharing.get()) {
-            options.removeIf(option -> ((AccessorRightClickOption) option).getName().equals("gui.xaero_right_click_waypoint_share"));
+            options.removeIf(option -> ((AccessorRightClickOption) option).invokeGetName().equals("gui.xaero_right_click_waypoint_share"));
         }
 
         if (Settings.REGISTRY.disableTeleportation.get()) {
-            options.removeIf(option -> ((AccessorRightClickOption) option).getName().equals("gui.xaero_right_click_waypoint_teleport"));
+            options.removeIf(option -> ((AccessorRightClickOption) option).invokeGetName().equals("gui.xaero_right_click_waypoint_teleport"));
         }
     }
 }

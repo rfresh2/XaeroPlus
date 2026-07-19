@@ -209,7 +209,7 @@ jobs:
           wget https://maven.meteordev.org/releases/meteordevelopment/meteor-client/0.5.4/meteor-client-0.5.4.jar -P run/mods
 
       - name: Fabric Test
-        uses: headlesshq/mc-runtime-test@4.4.0
+        uses: headlesshq/mc-runtime-test@4.5.1
         with:
           mc: ${{ env.MINECRAFT_VERSION }}
           modloader: fabric
@@ -250,7 +250,7 @@ jobs:
           && wget https://api.modrinth.com/maven/maven/modrinth/xaeros-world-map/forge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_fabric }}/xaeros-world-map-forge-${{ env.MINECRAFT_VERSION }}-${{ needs.build.outputs.worldmap_version_forge }}.jar -P run/mods/
 
       - name: Forge Test
-        uses: headlesshq/mc-runtime-test@4.4.0
+        uses: headlesshq/mc-runtime-test@4.5.1
         with:
           mc: ${{ env.MINECRAFT_VERSION }}
           modloader: forge

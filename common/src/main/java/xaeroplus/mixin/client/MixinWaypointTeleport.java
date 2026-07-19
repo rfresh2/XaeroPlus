@@ -38,8 +38,9 @@ public class MixinWaypointTeleport {
                 }
             }
             case CUSTOM -> {
-                teleportWithCustomCommand(waypoint, world);
-                ci.cancel();
+                if (teleportWithCustomCommand(waypoint, world)) {
+                    ci.cancel();
+                }
             }
         }
     }
@@ -81,14 +82,14 @@ public class MixinWaypointTeleport {
     }
 
     @Unique
-    private static void teleportWithCustomCommand(final Waypoint waypoint, final MinimapWorld world) {
+    private static boolean teleportWithCustomCommand(final Waypoint waypoint, final MinimapWorld world) {
         final String template = Settings.REGISTRY.minimapWaypointCustomTeleportCommand.get();
         if (template.isBlank()) {
-            return;
+            return false;
         }
         final Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || minecraft.level == null) {
-            return;
+            return false;
         }
         final ResourceKey<Level> dimension = world.getDimId() != null ? world.getDimId() : minecraft.level.dimension();
         final String command = template
@@ -98,15 +99,19 @@ public class MixinWaypointTeleport {
             .replace("{d}", dimension.location().toString())
             .replace("{name}", waypoint.getLocalizedName())
             .replace("{yaw}", Integer.toString(waypoint.getYaw()));
-        minecraft.setScreen(null);
-        XaeroPlus.EVENT_BUS.call(XaeroTeleportAttemptEvent.INSTANCE);
         if (command.startsWith("/")) {
             final String unsignedCommand = command.substring(1);
+            if (unsignedCommand.isBlank()) {
+                return false;
+            }
             if (!minecraft.player.connection.sendUnsignedCommand(unsignedCommand)) {
-                minecraft.player.connection.sendChat(unsignedCommand);
+                minecraft.player.connection.sendCommand(unsignedCommand);
             }
         } else {
             minecraft.player.connection.sendChat(command);
         }
+        minecraft.setScreen(null);
+        XaeroPlus.EVENT_BUS.call(XaeroTeleportAttemptEvent.INSTANCE);
+        return true;
     }
 }

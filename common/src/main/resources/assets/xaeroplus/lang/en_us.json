@@ -343,6 +343,15 @@
   "xaeroplus.gui.teleport_fail_notifier.message": "Looks like your teleport attempt failed :( \n Most likely you don't have permissions from the server to use /tp commands. \n Ask your server owner for help!",
   "xaeroplus.setting.disable_teleportation": "Disable Teleportation",
   "xaeroplus.setting.disable_teleportation.tooltip": "Disables Teleportation buttons globally",
+  "xaeroplus.setting.minimap_waypoint_teleport_mode": "Minimap Waypoint Teleport Mode",
+  "xaeroplus.setting.minimap_waypoint_teleport_mode.tooltip": "Choose how the minimap waypoint teleport button sends teleport commands.",
+  "xaeroplus.setting.minimap_waypoint_teleport_mode.unchanged": "Unchanged",
+  "xaeroplus.setting.minimap_waypoint_teleport_mode.world_map": "Use World Map",
+  "xaeroplus.setting.minimap_waypoint_teleport_mode.custom": "Custom Command",
+  "xaeroplus.gui.minimap_waypoint_teleport_command.settings": "Minimap Waypoint Teleport Command",
+  "xaeroplus.gui.minimap_waypoint_teleport_command.title": "Minimap Waypoint Teleport Command",
+  "xaeroplus.gui.minimap_waypoint_teleport_command.description": "Placeholders: {x} {y} {z} {d} {name} {yaw}",
+  "xaeroplus.gui.minimap_waypoint_teleport_command.input": "Teleport command",
   "xaeroplus.gui.toast.database_migration_in_progress": "%s database migration(s) in progress, %s completed, %s failed",
   "xaeroplus.gui.toast.database_migration_done": "%s database migration(s) completed, %s failed"
 }

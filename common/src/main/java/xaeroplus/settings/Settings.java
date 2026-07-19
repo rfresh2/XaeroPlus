@@ -214,6 +214,36 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.disable_teleportation",
             false),
         SettingLocation.WORLD_MAP_MAIN);
+    public final EnumSetting<MinimapWaypointTeleportMode> minimapWaypointTeleportMode = register(
+        EnumSetting.create(
+            "Minimap Waypoint Teleport Mode",
+            "xaeroplus.setting.minimap_waypoint_teleport_mode",
+            MinimapWaypointTeleportMode.values(),
+            MinimapWaypointTeleportMode.UNCHANGED),
+        SettingLocation.WORLD_MAP_MAIN);
+    public final StringSetting minimapWaypointCustomTeleportCommand = register(
+        StringSetting.create(
+            "Minimap Waypoint Custom Teleport Command",
+            "xaeroplus.setting.minimap_waypoint_custom_teleport_command",
+            "/tp @s {x} {y} {z} {yaw} ~"),
+        SettingLocation.WORLD_MAP_MAIN);
+
+    public enum MinimapWaypointTeleportMode implements TranslatableSettingEnum {
+        UNCHANGED("xaeroplus.setting.minimap_waypoint_teleport_mode.unchanged"),
+        WORLD_MAP("xaeroplus.setting.minimap_waypoint_teleport_mode.world_map"),
+        CUSTOM("xaeroplus.setting.minimap_waypoint_teleport_mode.custom");
+
+        private final String translationKey;
+
+        MinimapWaypointTeleportMode(final String translationKey) {
+            this.translationKey = translationKey;
+        }
+
+        @Override
+        public String getTranslationKey() {
+            return translationKey;
+        }
+    }
     public final BooleanSetting sodiumSettingIntegration = register(
         BooleanSetting.create(
             "Sodium/Embeddium Setting Integration",

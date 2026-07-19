@@ -76,6 +76,10 @@ public class StringSetting extends XaeroPlusSetting {
         }
     }
 
+    public String get() {
+        return value;
+    }
+
     public Consumer<String> getSettingChangeConsumer() {
         return settingChangeConsumer;
     }

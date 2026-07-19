@@ -10,19 +10,37 @@ import xaeroplus.settings.SettingLocation;
 import xaeroplus.settings.Settings;
 
 public class GuiXaeroPlusWorldMapSettings extends GuiSettings {
+    private final Screen parent;
 
     public GuiXaeroPlusWorldMapSettings(Screen parent, Screen escapeScreen) {
         super(Component.translatable("xaeroplus.gui.world_map_settings"), parent, escapeScreen);
+        this.parent = parent;
+        rebuildEntries();
+        this.canSkipWorldRender = true;
+    }
+
+    @Override
+    public void init() {
+        rebuildEntries();
+        super.init();
+    }
+
+    private void rebuildEntries() {
         var mainSettingsEntries = Settings.REGISTRY.getXaeroSettingEntries(SettingLocation.WORLD_MAP_MAIN);
         var chunkHighlightSettingSwitchEntry = GuiXaeroPlusChunkHighlightSettings.getScreenSwitchSettingEntry(parent);
         var overlaySettingSwitchEntry = GuiXaeroPlusOverlaySettings.getScreenSwitchSettingEntry(parent);
         var drawOrderSettingSwitchEntry = DrawOrderScreen.getScreenSwitchSettingEntry();
-        this.entries = new ISettingEntry[mainSettingsEntries.length + 3];
+        var customTeleportCommandEntry = GuiMinimapWaypointTeleportCommandSettings.getScreenSwitchSettingEntry();
+        boolean showCustomTeleportCommand = Settings.REGISTRY.minimapWaypointTeleportMode.get() == Settings.MinimapWaypointTeleportMode.CUSTOM;
+        int customEntryCount = showCustomTeleportCommand ? 1 : 0;
+        this.entries = new ISettingEntry[mainSettingsEntries.length + 3 + customEntryCount];
         this.entries[0] = chunkHighlightSettingSwitchEntry;
         this.entries[1] = overlaySettingSwitchEntry;
         this.entries[2] = drawOrderSettingSwitchEntry;
-        System.arraycopy(mainSettingsEntries, 0, this.entries, 3, mainSettingsEntries.length);
-        this.canSkipWorldRender = true;
+        if (showCustomTeleportCommand) {
+            this.entries[3] = customTeleportCommandEntry;
+        }
+        System.arraycopy(mainSettingsEntries, 0, this.entries, 3 + customEntryCount, mainSettingsEntries.length);
     }
 
     @Override

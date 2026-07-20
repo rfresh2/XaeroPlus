@@ -29,6 +29,9 @@ public class MixinWaypointTeleport {
         final boolean checkCoordinates,
         final CallbackInfo ci
     ) {
+        if (!isCrossDimension(world)) {
+            return;
+        }
         switch (Settings.REGISTRY.minimapWaypointTeleportMode.get()) {
             case UNCHANGED -> {
             }
@@ -43,6 +46,15 @@ public class MixinWaypointTeleport {
                 }
             }
         }
+    }
+
+    @Unique
+    private static boolean isCrossDimension(final MinimapWorld world) {
+        final Minecraft minecraft = Minecraft.getInstance();
+        return world != null
+            && world.getDimId() != null
+            && minecraft.level != null
+            && !world.getDimId().equals(minecraft.level.dimension());
     }
 
     @Inject(method = "teleportToWaypoint(Lxaero/common/minimap/waypoints/Waypoint;Lxaero/hud/minimap/world/MinimapWorld;Lnet/minecraft/client/gui/screens/Screen;Z)V", at = @At(
@@ -73,7 +85,7 @@ public class MixinWaypointTeleport {
             return false;
         }
         final ResourceKey<Level> waypointDimension = world.getDimId();
-        final ResourceKey<Level> teleportDimension = waypointDimension != null && waypointDimension != minecraft.level.dimension()
+        final ResourceKey<Level> teleportDimension = waypointDimension != null && !waypointDimension.equals(minecraft.level.dimension())
             ? waypointDimension
             : null;
         final int y = waypoint.isYIncluded() ? waypoint.getY() : 32767;

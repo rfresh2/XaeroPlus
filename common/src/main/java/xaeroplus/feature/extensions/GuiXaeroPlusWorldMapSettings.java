@@ -30,17 +30,11 @@ public class GuiXaeroPlusWorldMapSettings extends GuiSettings {
         var chunkHighlightSettingSwitchEntry = GuiXaeroPlusChunkHighlightSettings.getScreenSwitchSettingEntry(parent);
         var overlaySettingSwitchEntry = GuiXaeroPlusOverlaySettings.getScreenSwitchSettingEntry(parent);
         var drawOrderSettingSwitchEntry = DrawOrderScreen.getScreenSwitchSettingEntry();
-        var customTeleportCommandEntry = GuiMinimapWaypointTeleportCommandSettings.getScreenSwitchSettingEntry();
-        boolean showCustomTeleportCommand = Settings.REGISTRY.minimapWaypointTeleportMode.get() == Settings.MinimapWaypointTeleportMode.CUSTOM;
-        int customEntryCount = showCustomTeleportCommand ? 1 : 0;
-        this.entries = new ISettingEntry[mainSettingsEntries.length + 3 + customEntryCount];
+        this.entries = new ISettingEntry[mainSettingsEntries.length + 3];
         this.entries[0] = chunkHighlightSettingSwitchEntry;
         this.entries[1] = overlaySettingSwitchEntry;
         this.entries[2] = drawOrderSettingSwitchEntry;
-        if (showCustomTeleportCommand) {
-            this.entries[3] = customTeleportCommandEntry;
-        }
-        System.arraycopy(mainSettingsEntries, 0, this.entries, 3 + customEntryCount, mainSettingsEntries.length);
+        System.arraycopy(mainSettingsEntries, 0, this.entries, 3, mainSettingsEntries.length);
     }
 
     @Override

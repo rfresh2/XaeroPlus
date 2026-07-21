@@ -8,15 +8,18 @@ import net.minecraft.network.chat.Component;
 import xaero.map.gui.ScreenSwitchSettingEntry;
 import xaeroplus.settings.SettingHooks;
 import xaeroplus.settings.Settings;
+import xaeroplus.settings.StringSetting;
 
 public class GuiMinimapWaypointTeleportCommandSettings extends Screen {
     private final Screen parent;
+    private final StringSetting setting;
     private EditBox commandInput;
     private Button saveButton;
 
-    public GuiMinimapWaypointTeleportCommandSettings(final Screen parent, final Screen escapeScreen) {
-        super(Component.translatable("xaeroplus.gui.minimap_waypoint_teleport_command.title"));
+    public GuiMinimapWaypointTeleportCommandSettings(final Screen parent, final Screen escapeScreen, final StringSetting setting) {
+        super(Component.translatable(setting.getSettingNameTranslationKey()));
         this.parent = parent;
+        this.setting = setting;
     }
 
     @Override
@@ -27,10 +30,10 @@ public class GuiMinimapWaypointTeleportCommandSettings extends Screen {
             this.height / 2 - 10,
             300,
             20,
-            Component.translatable("xaeroplus.gui.minimap_waypoint_teleport_command.input")
+            Component.translatable("xaeroplus.gui.cross_dimension_waypoint_teleport_format.input")
         );
         this.commandInput.setMaxLength(256);
-        this.commandInput.setValue(Settings.REGISTRY.minimapWaypointCustomTeleportCommand.get());
+        this.commandInput.setValue(this.setting.get());
         this.commandInput.setResponder(value -> this.saveButton.active = !value.isBlank());
         this.addRenderableWidget(this.commandInput);
         this.saveButton = this.addRenderableWidget(
@@ -53,7 +56,7 @@ public class GuiMinimapWaypointTeleportCommandSettings extends Screen {
         guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, this.height / 2 - 42, 0xFFFFFF);
         guiGraphics.drawCenteredString(
             this.font,
-            Component.translatable("xaeroplus.gui.minimap_waypoint_teleport_command.description"),
+            Component.translatable("xaeroplus.gui.cross_dimension_waypoint_teleport_format.description"),
             this.width / 2,
             this.height / 2 - 28,
             0xA0A0A0
@@ -69,15 +72,22 @@ public class GuiMinimapWaypointTeleportCommandSettings extends Screen {
     private void save() {
         String command = this.commandInput.getValue();
         if (command.isBlank()) return;
-        Settings.REGISTRY.minimapWaypointCustomTeleportCommand.setValue(command);
+        this.setting.setValue(command);
         SettingHooks.saveSettings();
         onClose();
     }
 
-    public static ScreenSwitchSettingEntry getScreenSwitchSettingEntry() {
+    public static ScreenSwitchSettingEntry[] getScreenSwitchSettingEntries() {
+        return new ScreenSwitchSettingEntry[] {
+            getScreenSwitchSettingEntry(Settings.REGISTRY.crossDimensionWaypointTeleportFormat),
+            getScreenSwitchSettingEntry(Settings.REGISTRY.crossDimensionWaypointTeleportRotationFormat)
+        };
+    }
+
+    private static ScreenSwitchSettingEntry getScreenSwitchSettingEntry(final StringSetting setting) {
         return new ScreenSwitchSettingEntry(
-            "xaeroplus.gui.minimap_waypoint_teleport_command.settings",
-            GuiMinimapWaypointTeleportCommandSettings::new,
+            setting.getSettingNameTranslationKey(),
+            (parent, escapeScreen) -> new GuiMinimapWaypointTeleportCommandSettings(parent, escapeScreen, setting),
             null,
             true
         );

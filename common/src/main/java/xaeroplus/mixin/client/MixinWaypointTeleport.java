@@ -12,8 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.hud.minimap.world.MinimapWorld;
 import xaero.hud.minimap.waypoint.WaypointTeleport;
-import xaero.map.WorldMapSession;
-import xaero.map.teleport.MapTeleporter;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroTeleportAttemptEvent;
 import xaeroplus.settings.Settings;
@@ -29,22 +27,10 @@ public class MixinWaypointTeleport {
         final boolean checkCoordinates,
         final CallbackInfo ci
     ) {
-        if (!isCrossDimension(world)) {
-            return;
-        }
-        switch (Settings.REGISTRY.minimapWaypointTeleportMode.get()) {
-            case UNCHANGED -> {
-            }
-            case WORLD_MAP -> {
-                if (teleportWithWorldMap(waypoint, world, screen)) {
-                    ci.cancel();
-                }
-            }
-            case CUSTOM -> {
-                if (teleportWithCustomCommand(waypoint, world)) {
-                    ci.cancel();
-                }
-            }
+        if (Settings.REGISTRY.useCustomCrossDimensionWaypointTeleportFormat.get()
+            && isCrossDimension(world)
+            && teleportWithCustomFormat(waypoint, world)) {
+            ci.cancel();
         }
     }
 
@@ -74,28 +60,10 @@ public class MixinWaypointTeleport {
     }
 
     @Unique
-    private static boolean teleportWithWorldMap(final Waypoint waypoint, final MinimapWorld world, final Screen screen) {
-        final WorldMapSession session = WorldMapSession.getCurrentSession();
-        if (session == null || session.getMapProcessor() == null || !session.getMapProcessor().isMapWorldUsable()) {
-            return false;
-        }
-        final var mapWorld = session.getMapProcessor().getMapWorld();
-        final Minecraft minecraft = Minecraft.getInstance();
-        if (mapWorld == null || minecraft.level == null) {
-            return false;
-        }
-        final ResourceKey<Level> waypointDimension = world.getDimId();
-        final ResourceKey<Level> teleportDimension = waypointDimension != null && !waypointDimension.equals(minecraft.level.dimension())
-            ? waypointDimension
-            : null;
-        final int y = waypoint.isYIncluded() ? waypoint.getY() : 32767;
-        new MapTeleporter().teleport(screen, mapWorld, waypoint.getX(), y, waypoint.getZ(), teleportDimension);
-        return true;
-    }
-
-    @Unique
-    private static boolean teleportWithCustomCommand(final Waypoint waypoint, final MinimapWorld world) {
-        final String template = Settings.REGISTRY.minimapWaypointCustomTeleportCommand.get();
+    private static boolean teleportWithCustomFormat(final Waypoint waypoint, final MinimapWorld world) {
+        final String template = waypoint.isRotation()
+            ? Settings.REGISTRY.crossDimensionWaypointTeleportRotationFormat.get()
+            : Settings.REGISTRY.crossDimensionWaypointTeleportFormat.get();
         if (template.isBlank()) {
             return false;
         }

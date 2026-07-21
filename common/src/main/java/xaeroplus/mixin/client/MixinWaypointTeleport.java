@@ -1,13 +1,14 @@
 package xaeroplus.mixin.client;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.hud.minimap.world.MinimapWorld;
@@ -18,19 +19,25 @@ import xaeroplus.settings.Settings;
 
 @Mixin(value = WaypointTeleport.class, remap = false)
 public class MixinWaypointTeleport {
+    @Unique
+    private static final ThreadLocal<String> xaeroplus$customTeleportCommand = new ThreadLocal<>();
 
-    @Inject(method = "teleportToWaypoint(Lxaero/common/minimap/waypoints/Waypoint;Lxaero/hud/minimap/world/MinimapWorld;Lnet/minecraft/client/gui/screens/Screen;Z)V", at = @At("HEAD"), cancellable = true)
-    public void routeTeleport(
+    @Inject(method = "teleportToWaypoint(Lxaero/common/minimap/waypoints/Waypoint;Lxaero/hud/minimap/world/MinimapWorld;Lnet/minecraft/client/gui/screens/Screen;Z)V", at = @At("HEAD"))
+    public void prepareCustomTeleportCommand(
         final Waypoint waypoint,
         final MinimapWorld world,
-        final Screen screen,
+        final net.minecraft.client.gui.screens.Screen screen,
         final boolean checkCoordinates,
         final CallbackInfo ci
     ) {
+        xaeroplus$customTeleportCommand.remove();
         if (Settings.REGISTRY.useCustomCrossDimensionWaypointTeleportFormat.get()
             && isCrossDimension(world)
-            && teleportWithCustomFormat(waypoint, world)) {
-            ci.cancel();
+            && waypoint != null) {
+            final String command = getCustomTeleportCommand(waypoint, world);
+            if (command != null) {
+                xaeroplus$customTeleportCommand.set(command);
+            }
         }
     }
 
@@ -43,55 +50,76 @@ public class MixinWaypointTeleport {
             && !world.getDimId().equals(minecraft.level.dimension());
     }
 
-    @Inject(method = "teleportToWaypoint(Lxaero/common/minimap/waypoints/Waypoint;Lxaero/hud/minimap/world/MinimapWorld;Lnet/minecraft/client/gui/screens/Screen;Z)V", at = @At(
+    @Redirect(method = "teleportToWaypoint(Lxaero/common/minimap/waypoints/Waypoint;Lxaero/hud/minimap/world/MinimapWorld;Lnet/minecraft/client/gui/screens/Screen;Z)V", at = @At(
         value = "INVOKE",
         target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;sendUnsignedCommand(Ljava/lang/String;)Z"
     ), remap = true)
-    public void onTeleportAttemptA(CallbackInfo ci) {
+    private boolean sendTeleportCommand(final ClientPacketListener connection, final String originalCommand) {
+        final String customCommand = xaeroplus$customTeleportCommand.get();
+        if (customCommand != null && sendCustomCommand(connection, customCommand)) {
+            XaeroPlus.EVENT_BUS.call(XaeroTeleportAttemptEvent.INSTANCE);
+            return true;
+        }
         XaeroPlus.EVENT_BUS.call(XaeroTeleportAttemptEvent.INSTANCE);
+        return connection.sendUnsignedCommand(originalCommand);
     }
 
-    @Inject(method = "teleportToWaypoint(Lxaero/common/minimap/waypoints/Waypoint;Lxaero/hud/minimap/world/MinimapWorld;Lnet/minecraft/client/gui/screens/Screen;Z)V", at = @At(
+    @Redirect(method = "teleportToWaypoint(Lxaero/common/minimap/waypoints/Waypoint;Lxaero/hud/minimap/world/MinimapWorld;Lnet/minecraft/client/gui/screens/Screen;Z)V", at = @At(
         value = "INVOKE",
         target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;sendChat(Ljava/lang/String;)V"
     ), remap = true)
-    public void onTeleportAttemptB(CallbackInfo ci) {
+    private void sendTeleportChat(final ClientPacketListener connection, final String originalCommand) {
+        final String customCommand = xaeroplus$customTeleportCommand.get();
+        if (customCommand != null && sendCustomCommand(connection, customCommand)) {
+            XaeroPlus.EVENT_BUS.call(XaeroTeleportAttemptEvent.INSTANCE);
+            return;
+        }
         XaeroPlus.EVENT_BUS.call(XaeroTeleportAttemptEvent.INSTANCE);
+        connection.sendChat(originalCommand);
+    }
+
+    @Inject(method = "teleportToWaypoint(Lxaero/common/minimap/waypoints/Waypoint;Lxaero/hud/minimap/world/MinimapWorld;Lnet/minecraft/client/gui/screens/Screen;Z)V", at = @At("RETURN"))
+    private void clearCustomTeleportCommand(
+        final Waypoint waypoint,
+        final MinimapWorld world,
+        final net.minecraft.client.gui.screens.Screen screen,
+        final boolean checkCoordinates,
+        final CallbackInfo ci
+    ) {
+        xaeroplus$customTeleportCommand.remove();
     }
 
     @Unique
-    private static boolean teleportWithCustomFormat(final Waypoint waypoint, final MinimapWorld world) {
+    private static String getCustomTeleportCommand(final Waypoint waypoint, final MinimapWorld world) {
         final String template = waypoint.isRotation()
             ? Settings.REGISTRY.crossDimensionWaypointTeleportRotationFormat.get()
             : Settings.REGISTRY.crossDimensionWaypointTeleportFormat.get();
         if (template.isBlank()) {
-            return false;
+            return null;
         }
-        final Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.player == null || minecraft.level == null) {
-            return false;
-        }
-        final ResourceKey<Level> dimension = world.getDimId() != null ? world.getDimId() : minecraft.level.dimension();
-        final String command = template
+        final ResourceKey<Level> dimension = world.getDimId();
+        return template
             .replace("{x}", Integer.toString(waypoint.getX()))
             .replace("{y}", waypoint.isYIncluded() ? Integer.toString(waypoint.getY()) : "~")
             .replace("{z}", Integer.toString(waypoint.getZ()))
             .replace("{d}", dimension.location().toString())
             .replace("{name}", waypoint.getLocalizedName())
             .replace("{yaw}", Integer.toString(waypoint.getYaw()));
+    }
+
+    @Unique
+    private static boolean sendCustomCommand(final ClientPacketListener connection, final String command) {
         if (command.startsWith("/")) {
             final String unsignedCommand = command.substring(1);
             if (unsignedCommand.isBlank()) {
                 return false;
             }
-            if (!minecraft.player.connection.sendUnsignedCommand(unsignedCommand)) {
-                minecraft.player.connection.sendCommand(unsignedCommand);
+            if (!connection.sendUnsignedCommand(unsignedCommand)) {
+                connection.sendCommand(unsignedCommand);
             }
         } else {
-            minecraft.player.connection.sendChat(command);
+            connection.sendChat(command);
         }
-        minecraft.setScreen(null);
-        XaeroPlus.EVENT_BUS.call(XaeroTeleportAttemptEvent.INSTANCE);
         return true;
     }
 }

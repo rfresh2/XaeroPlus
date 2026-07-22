@@ -351,7 +351,8 @@
   "xaeroplus.setting.cross_dimension_waypoint_teleport_format.tooltip": "Définit le format de commande pour les téléportations de points de passage interdimensionnels",
   "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format": "Format de téléportation de point de passage interdimensionnel avec rotation",
   "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format.tooltip": "Définit le format de commande pour les téléportations de points de passage interdimensionnels avec rotation de lacet",
-  "xaeroplus.gui.cross_dimension_waypoint_teleport_format.description": "Variables: {x} {y} {z} {d} {name} {yaw}",
+  "xaeroplus.gui.cross_dimension_waypoint_teleport_format.description": "Variables: {x} {y} {z} {d} {name}",
+  "xaeroplus.gui.cross_dimension_waypoint_teleport_rotation_format.description": "Variables: {x} {y} {z} {d} {name} {yaw}",
   "xaeroplus.gui.cross_dimension_waypoint_teleport_format.input": "Format de téléportation",
   "xaeroplus.gui.toast.database_migration_in_progress": "%s migration(s) de base de données en cours, %s terminée(s), %s échouée(s)",
   "xaeroplus.gui.toast.database_migration_done": "%s migration(s) de base de données terminée(s), %s échouée(s)"

@@ -8,6 +8,7 @@ import net.minecraft.network.chat.Component;
 import xaero.lib.client.graphics.util.TextureUtils;
 import xaero.lib.client.render.util.GuiRenderUtil;
 import xaeroplus.settings.SettingHooks;
+import xaeroplus.settings.Settings;
 import xaeroplus.settings.StringSetting;
 import xaeroplus.util.ColorHelper;
 
@@ -70,9 +71,12 @@ public class GuiMinimapWaypointTeleportCommandSettings extends Screen {
             this.height / 2 - 42,
             ColorHelper.getColor(255, 255, 255, 255)
         );
+        var formatKey = setting == Settings.REGISTRY.crossDimensionWaypointTeleportRotationFormat
+            ? "xaeroplus.gui.cross_dimension_waypoint_teleport_rotation_format.description"
+            : "xaeroplus.gui.cross_dimension_waypoint_teleport_format.description";
         guiGraphics.drawCenteredString(
             this.font,
-            Component.translatable("xaeroplus.gui.cross_dimension_waypoint_teleport_format.description"),
+            Component.translatable(formatKey),
             this.width / 2,
             this.height / 2 - 28,
             ColorHelper.getColor(160, 160, 160, 255)

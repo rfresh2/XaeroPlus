@@ -351,7 +351,8 @@
   "xaeroplus.setting.cross_dimension_waypoint_teleport_format.tooltip": "設定跨維度路徑點傳送的指令格式",
   "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format": "帶旋轉的跨維度路徑點傳送格式",
   "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format.tooltip": "設定帶偏航角旋轉的跨維度路徑點傳送指令格式",
-  "xaeroplus.gui.cross_dimension_waypoint_teleport_format.description": "佔位符: {x} {y} {z} {d} {name} {yaw}",
+  "xaeroplus.gui.cross_dimension_waypoint_teleport_format.description": "佔位符: {x} {y} {z} {d} {name}",
+  "xaeroplus.gui.cross_dimension_waypoint_teleport_rotation_format.description": "佔位符: {x} {y} {z} {d} {name} {yaw}",
   "xaeroplus.gui.cross_dimension_waypoint_teleport_format.input": "傳送格式",
   "xaeroplus.gui.toast.database_migration_in_progress": "%s 個資料庫遷移正在進行，%s 個已完成，%s 個失敗",
   "xaeroplus.gui.toast.database_migration_done": "%s 個資料庫遷移已完成，%s 個失敗"

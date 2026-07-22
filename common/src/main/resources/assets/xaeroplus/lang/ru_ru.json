@@ -351,7 +351,8 @@
   "xaeroplus.setting.cross_dimension_waypoint_teleport_format.tooltip": "Задаёт формат команды для телепортации путевых точек между измерениями",
   "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format": "Формат телепортации межпространственных путевых точек с поворотом",
   "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format.tooltip": "Задаёт формат команды для телепортации путевых точек между измерениями с поворотом yaw",
-  "xaeroplus.gui.cross_dimension_waypoint_teleport_format.description": "Заполнители: {x} {y} {z} {d} {name} {yaw}",
+  "xaeroplus.gui.cross_dimension_waypoint_teleport_format.description": "Заполнители: {x} {y} {z} {d} {name}",
+  "xaeroplus.gui.cross_dimension_waypoint_teleport_rotation_format.description": "Заполнители: {x} {y} {z} {d} {name} {yaw}",
   "xaeroplus.gui.cross_dimension_waypoint_teleport_format.input": "Формат телепортации",
   "xaeroplus.gui.toast.database_migration_in_progress": "%s миграций базы данных выполняется, %s завершено, %s не удалось",
   "xaeroplus.gui.toast.database_migration_done": "%s миграций базы данных завершено, %s не удалось"

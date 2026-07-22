@@ -28,6 +28,8 @@ import xaero.map.WorldMapSession;
 import xaero.map.gui.GuiMap;
 import xaero.map.gui.GuiWorldMapSettings;
 import xaeroplus.Globals;
+import xaeroplus.feature.drawing.ColorPickerWidget;
+import xaeroplus.feature.drawing.DrawingColorPickerButton;
 import xaeroplus.feature.extensions.DrawOrderScreen;
 import xaeroplus.feature.extensions.GuiMinimapWaypointTeleportCommandSettings;
 import xaeroplus.feature.extensions.SyncedWaypoint;
@@ -147,6 +149,14 @@ public class XaeroPlusClientGameTest implements ClientModInitializer {
                 return null;
             });
             takeScreenshot("world_map");
+
+            clickButtonContaining("xaeroplus.gui.world_map.start_drawing");
+            clickButton(DrawingColorPickerButton.class);
+            waitFor("drawing color picker", mc -> mc.screen != null && mc.screen.children().stream()
+                .anyMatch(child -> child instanceof ColorPickerWidget colorPicker && colorPicker.visible));
+            takeScreenshot("world_map_drawing_color_picker");
+            clickButtonContaining("xaeroplus.gui.world_map.start_drawing");
+
             submit(mc -> {
                 Settings.REGISTRY.transparentWorldmapBackgroundSetting.setValue(true);
                 return null;
@@ -273,7 +283,6 @@ public class XaeroPlusClientGameTest implements ClientModInitializer {
     }
 
     private static void clickButton(String translationKey) {
-
         var expectedLabel = Component.translatable(translationKey).getString();
         waitFor("button " + expectedLabel, mc -> {
             var screen = mc.screen;
@@ -282,6 +291,37 @@ public class XaeroPlusClientGameTest implements ClientModInitializer {
             for (var child : screen.children()) {
                 if (child instanceof Button button && expectedLabel.equals(button.getMessage().getString())) {
                     button.onPress();
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+
+    private static void clickButtonContaining(String translationKey) {
+        var expectedLabel = Component.translatable(translationKey).getString();
+        waitFor("button containing " + expectedLabel, mc -> {
+            var screen = mc.screen;
+            if (screen == null) return false;
+
+            for (var child : screen.children()) {
+                if (child instanceof Button button && button.getMessage().getString().contains(expectedLabel)) {
+                    button.onPress();
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+
+    private static <T extends Button> void clickButton(Class<T> buttonClass) {
+        waitFor("button " + buttonClass.getSimpleName(), mc -> {
+            var screen = mc.screen;
+            if (screen == null) return false;
+
+            for (var child : screen.children()) {
+                if (buttonClass.isInstance(child)) {
+                    buttonClass.cast(child).onPress();
                     return true;
                 }
             }

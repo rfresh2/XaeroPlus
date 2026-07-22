@@ -10,7 +10,6 @@ import xaero.common.gui.GuiMinimapSettings;
 import xaero.common.gui.GuiWaypointSettings;
 import xaero.lib.client.gui.ISettingEntry;
 import xaero.lib.client.gui.config.context.IEditConfigScreenContext;
-import xaeroplus.feature.extensions.XaeroPlusSettingEntry;
 import xaeroplus.settings.SettingLocation;
 import xaeroplus.settings.Settings;
 
@@ -23,7 +22,7 @@ public class MixinGuiWaypointSettings extends GuiMinimapSettings {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     public void init(final CallbackInfo ci) {
-        final XaeroPlusSettingEntry[] configSettingEntries = Settings.REGISTRY.getXaeroSettingEntries(SettingLocation.MINIMAP_WAYPOINTS);
+        var configSettingEntries = Settings.REGISTRY.getXaeroSettingEntries(SettingLocation.MINIMAP_WAYPOINTS);
         final int oldLen = this.entries.length;
         final int newLen = configSettingEntries.length;
         final int totalNewLen = oldLen + configSettingEntries.length;

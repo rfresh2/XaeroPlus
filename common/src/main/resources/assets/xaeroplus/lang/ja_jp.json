@@ -331,6 +331,8 @@
   "xaeroplus.gui.world_map.drawing_mode_controls": "左クリック -> 描く \n 右クリック -> 消す \n 中クリック -> 移動",
   "xaeroplus.setting.drawing_opacity": "描画の不透明度",
   "xaeroplus.setting.drawing_opacity.tooltip": "描画の色の不透明度を設定します",
+  "xaeroplus.setting.draw_order": "描画順序",
+  "xaeroplus.setting.draw_order.tooltip": "オーバーレイやハイライトを含む、XaeroPlus が描画する要素の順序を設定します",
   "xaeroplus.gui.draw_order.title": "XaeroPlus 描画順",
   "xaeroplus.gui.draw_order.subtitle": "順番を変更するにはクリックしてドラッグしてください",
   "xaeroplus.gui.draw_order.reset": "リセット",
@@ -343,6 +345,14 @@
   "xaeroplus.gui.teleport_fail_notifier.message": "テレポートが失敗したようです :( \n サーバーで /tp コマンドを使う権限がない可能性があります。 \n サーバー管理者に問い合わせてください！",
   "xaeroplus.setting.disable_teleportation": "テレポートを無効にする",
   "xaeroplus.setting.disable_teleportation.tooltip": "テレポートボタンをグローバルに無効にします\n",
+  "xaeroplus.setting.use_custom_cross_dimension_waypoint_teleport_format": "カスタム異次元ウェイポイントテレポート形式を使用",
+  "xaeroplus.setting.use_custom_cross_dimension_waypoint_teleport_format.tooltip": "Xaero 組み込みの異次元テレポート形式の代わりに、XaeroPlus のテレポート形式を使用します。",
+  "xaeroplus.setting.cross_dimension_waypoint_teleport_format": "異次元ウェイポイントテレポート形式",
+  "xaeroplus.setting.cross_dimension_waypoint_teleport_format.tooltip": "異次元ウェイポイントテレポートのコマンド形式を設定します",
+  "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format": "回転付き異次元ウェイポイントテレポート形式",
+  "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format.tooltip": "ヨー回転付き異次元ウェイポイントテレポートのコマンド形式を設定します",
+  "xaeroplus.gui.cross_dimension_waypoint_teleport_format.description": "プレースホルダー: {x} {y} {z} {d} {name} {yaw}",
+  "xaeroplus.gui.cross_dimension_waypoint_teleport_format.input": "テレポート形式",
   "xaeroplus.gui.toast.database_migration_in_progress": "%s 件のデータベース移行が進行中、%s 件完了、%s 件失敗",
   "xaeroplus.gui.toast.database_migration_done": "%s 件のデータベース移行が完了、%s 件失敗"
 }

@@ -2,7 +2,7 @@ package xaeroplus.settings;
 
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.resources.language.I18n;
-import xaeroplus.feature.extensions.XaeroPlusSettingEntry;
+import xaeroplus.feature.extensions.IXaeroPlusSettingEntry;
 
 import java.util.function.BooleanSupplier;
 
@@ -37,7 +37,7 @@ public abstract class XaeroPlusSetting {
 
     public abstract void deserializeValue(String value);
 
-    public abstract XaeroPlusSettingEntry<?> toXaeroSettingEntry();
+    public abstract IXaeroPlusSettingEntry toXaeroSettingEntry();
 
     public String getSettingName() {
         return settingName;

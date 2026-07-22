@@ -331,6 +331,8 @@
   "xaeroplus.gui.world_map.drawing_mode_controls": "左鍵 -> 繪製 \n 右鍵 -> 擦除 \n 中鍵 -> 平移",
   "xaeroplus.setting.drawing_opacity": "繪圖不透明度",
   "xaeroplus.setting.drawing_opacity.tooltip": "設定繪圖顏色的不透明度",
+  "xaeroplus.setting.draw_order": "繪製順序",
+  "xaeroplus.setting.draw_order.tooltip": "設定 XaeroPlus 繪製元素的順序，包括覆蓋層和高亮",
   "xaeroplus.gui.draw_order.title": "XaeroPlus 繪製順序",
   "xaeroplus.gui.draw_order.subtitle": "點擊並拖動以更改順序",
   "xaeroplus.gui.draw_order.reset": "重設",
@@ -343,6 +345,14 @@
   "xaeroplus.gui.teleport_fail_notifier.message": "看起來你的傳送嘗試失敗了 :( \n 你可能沒有使用 /tp 指令的伺服器權限。 \n 請聯繫伺服器管理員！",
   "xaeroplus.setting.disable_teleportation": "停用傳送",
   "xaeroplus.setting.disable_teleportation.tooltip": "全域禁用傳送按鈕",
+  "xaeroplus.setting.use_custom_cross_dimension_waypoint_teleport_format": "使用自訂跨維度路徑點傳送格式",
+  "xaeroplus.setting.use_custom_cross_dimension_waypoint_teleport_format.tooltip": "使用 XaeroPlus 的傳送格式取代 Xaero 內建的跨維度傳送格式。",
+  "xaeroplus.setting.cross_dimension_waypoint_teleport_format": "跨維度路徑點傳送格式",
+  "xaeroplus.setting.cross_dimension_waypoint_teleport_format.tooltip": "設定跨維度路徑點傳送的指令格式",
+  "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format": "帶旋轉的跨維度路徑點傳送格式",
+  "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format.tooltip": "設定帶偏航角旋轉的跨維度路徑點傳送指令格式",
+  "xaeroplus.gui.cross_dimension_waypoint_teleport_format.description": "佔位符: {x} {y} {z} {d} {name} {yaw}",
+  "xaeroplus.gui.cross_dimension_waypoint_teleport_format.input": "傳送格式",
   "xaeroplus.gui.toast.database_migration_in_progress": "%s 個資料庫遷移正在進行，%s 個已完成，%s 個失敗",
   "xaeroplus.gui.toast.database_migration_done": "%s 個資料庫遷移已完成，%s 個失敗"
 }

@@ -59,7 +59,8 @@ import xaero.map.mods.SupportMods;
 import xaero.map.world.MapDimension;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
-import xaeroplus.feature.drawing.DrawingColorCyclerButton;
+import xaeroplus.feature.drawing.ColorPickerWidget;
+import xaeroplus.feature.drawing.DrawingColorPickerButton;
 import xaeroplus.feature.extensions.CustomWorldMapShader;
 import xaeroplus.feature.render.line.Line;
 import xaeroplus.feature.render.text.Text;
@@ -88,7 +89,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Unique Button drawInfiniteLineButton;
     @Unique Button drawHighlightsButton;
     @Unique Button drawTextButton;
-    @Unique Button drawColorCyclerButton;
+    @Unique DrawingColorPickerButton drawColorPickerButton;
+    @Unique ColorPickerWidget drawColorPicker;
     @Unique Button drawMeasurementToolButton;
     @Unique Button exitButton;
     @Unique boolean drawing = false;
@@ -177,13 +179,28 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             button -> setDrawingMode(DrawingMode.TEXT),
             () -> new Tooltip(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_text"))));
         drawTextButton.visible = false;
-        drawColorCyclerButton = new DrawingColorCyclerButton(
-            startDrawingButton.x + 16, drawTextButton.y + 20,
+        var drawingModule = ModuleManager.getModule(Drawing.class);
+        drawColorPickerButton = new DrawingColorPickerButton(
+            startDrawingButton.x + 16,
+            drawTextButton.y + 20,
             () -> new Tooltip(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_color"))),
-            ModuleManager.getModule(Drawing.class).getDrawingColorCycler());
-        drawColorCyclerButton.visible = false;
+            drawingModule::getDrawingColor,
+            button -> setDrawingMode(DrawingMode.COLOR_PICKER)
+        );
+        drawColorPickerButton.visible = false;
+        var colorPickerSize = 90;
+        var colorPickerX = drawColorPickerButton.x + drawColorPickerButton.getWidth() + 4;
+        var colorPickerY = startDrawingButton.y + 20;
+        drawColorPicker = new ColorPickerWidget(
+            colorPickerX,
+            colorPickerY,
+            colorPickerSize,
+            drawingModule.getDrawingColor(),
+            drawingModule::setDrawingColor
+        );
+        drawColorPicker.visible = false;
         drawMeasurementToolButton = new GuiTexturedButton(
-            startDrawingButton.x + 16, drawColorCyclerButton.y + 20, 20, 20, 135, 0, 16, 16,
+            startDrawingButton.x + 16, drawColorPickerButton.y + 20, 20, 20, 135, 0, 16, 16,
             Globals.guiTextures,
             button -> setDrawingMode(DrawingMode.MEASUREMENT),
             () -> new Tooltip(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_measurement_tool"))));
@@ -266,6 +283,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         drawingRightClickDown = false;
         drawTextEntryActive = false;
         this.drawingMode = drawingMode;
+        drawColorPicker.visible = drawingMode == DrawingMode.COLOR_PICKER;
     }
 
     @Unique
@@ -278,13 +296,15 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             addButton(drawInfiniteLineButton);
             addButton(drawHighlightsButton);
             addButton(drawTextButton);
-            addButton(drawColorCyclerButton);
+            addButton(drawColorPickerButton);
+            addButton(drawColorPicker);
             addButton(drawMeasurementToolButton);
             drawLineSegmentButton.visible = true;
             drawInfiniteLineButton.visible = true;
             drawHighlightsButton.visible = true;
             drawTextButton.visible = true;
-            drawColorCyclerButton.visible = true;
+            drawColorPickerButton.visible = true;
+            drawColorPicker.visible = drawingMode == DrawingMode.COLOR_PICKER;
             drawMeasurementToolButton.visible = true;
         } else {
             xaeroPlus$stopDrawing();
@@ -434,7 +454,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 xaeroPlus$setFocus(drawInfiniteLineButton, false);
                 xaeroPlus$setFocus(drawHighlightsButton, false);
                 xaeroPlus$setFocus(drawTextButton, false);
-                xaeroPlus$setFocus(drawColorCyclerButton, false);
+                xaeroPlus$setFocus(drawColorPickerButton, false);
                 xaeroPlus$setFocus(drawMeasurementToolButton, false);
             }
             case INFINITE_LINE -> {
@@ -443,7 +463,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 xaeroPlus$setFocus(drawInfiniteLineButton, true);
                 xaeroPlus$setFocus(drawHighlightsButton, false);
                 xaeroPlus$setFocus(drawTextButton, false);
-                xaeroPlus$setFocus(drawColorCyclerButton, false);
+                xaeroPlus$setFocus(drawColorPickerButton, false);
                 xaeroPlus$setFocus(drawMeasurementToolButton, false);
             } case HIGHLIGHT -> {
                 xaeroPlus$setFocus(startDrawingButton, false);
@@ -451,28 +471,36 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 xaeroPlus$setFocus(drawInfiniteLineButton, false);
                 xaeroPlus$setFocus(drawHighlightsButton, true);
                 xaeroPlus$setFocus(drawTextButton, false);
-                xaeroPlus$setFocus(drawColorCyclerButton, false);
+                xaeroPlus$setFocus(drawColorPickerButton, false);
                 xaeroPlus$setFocus(drawMeasurementToolButton, false);
             } case TEXT -> {
                 xaeroPlus$setFocus(startDrawingButton, false);
                 xaeroPlus$setFocus(drawLineSegmentButton, false);
                 xaeroPlus$setFocus(drawInfiniteLineButton, false);
                 xaeroPlus$setFocus(drawHighlightsButton, false);
-                xaeroPlus$setFocus(drawTextButton, false);
-                xaeroPlus$setFocus(drawColorCyclerButton, false);
+                xaeroPlus$setFocus(drawTextButton, true);
+                xaeroPlus$setFocus(drawColorPickerButton, false);
                 xaeroPlus$setFocus(drawMeasurementToolButton, false);
                 if (drawTextEntryActive) {
                     drawTextEntryField.setEditable(true);
                     xaeroPlus$setFocus(drawTextEntryField, true);
                     setFocused(drawTextEntryField);
                 }
+            } case COLOR_PICKER -> {
+                xaeroPlus$setFocus(startDrawingButton, false);
+                xaeroPlus$setFocus(drawLineSegmentButton, false);
+                xaeroPlus$setFocus(drawInfiniteLineButton, false);
+                xaeroPlus$setFocus(drawHighlightsButton, false);
+                xaeroPlus$setFocus(drawTextButton, false);
+                xaeroPlus$setFocus(drawColorPickerButton, true);
+                xaeroPlus$setFocus(drawMeasurementToolButton, false);
             } case MEASUREMENT -> {
                 xaeroPlus$setFocus(startDrawingButton, false);
                 xaeroPlus$setFocus(drawLineSegmentButton, false);
                 xaeroPlus$setFocus(drawInfiniteLineButton, false);
                 xaeroPlus$setFocus(drawHighlightsButton, false);
                 xaeroPlus$setFocus(drawTextButton, false);
-                xaeroPlus$setFocus(drawColorCyclerButton, false);
+                xaeroPlus$setFocus(drawColorPickerButton, false);
                 xaeroPlus$setFocus(drawMeasurementToolButton, true);
             }
         }
@@ -503,7 +531,11 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     if (drawingLeftClickDown) {
                         ModuleManager.getModule(Drawing.class).addHighlight(ChunkUtils.posToChunkPos(mouseBlockPosX), ChunkUtils.posToChunkPos(mouseBlockPosZ));
                     }
-                } case MEASUREMENT -> {
+                }
+                case COLOR_PICKER -> {
+                    ModuleManager.getModule(Drawing.class).removeInProgressLine();
+                }
+                case MEASUREMENT -> {
                     if (drawInProgressPos == null) {
                         ModuleManager.getModule(Drawing.class).removeInProgressLine();
                     } else {
@@ -710,6 +742,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             cir.setReturnValue(true);
             return;
         }
+        if (drawingMode == DrawingMode.COLOR_PICKER && (button == 0 || button == 1)) {
+            cir.setReturnValue(true);
+            return;
+        }
         if (button == 0) { // start drawing on left click
             drawingLeftClickDown = true;
             switch (drawingMode) {
@@ -746,6 +782,12 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if (!drawing) return;
         boolean toReturn = super.mouseReleased(par1, par2, par3);
         if (toReturn) {
+            cir.setReturnValue(true);
+            return;
+        }
+        if (drawingMode == DrawingMode.COLOR_PICKER && (par3 == 0 || par3 == 1)) {
+            drawingLeftClickDown = false;
+            drawingRightClickDown = false;
             cir.setReturnValue(true);
             return;
         }
@@ -795,14 +837,16 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         removeWidget(drawInfiniteLineButton);
         removeWidget(drawHighlightsButton);
         removeWidget(drawTextButton);
-        removeWidget(drawColorCyclerButton);
+        removeWidget(drawColorPickerButton);
+        removeWidget(drawColorPicker);
         removeWidget(drawTextEntryField);
         removeWidget(drawMeasurementToolButton);
         drawLineSegmentButton.visible = false;
         drawInfiniteLineButton.visible = false;
         drawHighlightsButton.visible = false;
         drawTextButton.visible = false;
-        drawColorCyclerButton.visible = false;
+        drawColorPickerButton.visible = false;
+        drawColorPicker.visible = false;
         drawTextEntryField.visible = false;
         drawMeasurementToolButton.visible = false;
         this.init(Minecraft.getInstance(), width, height);

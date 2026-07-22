@@ -5,5 +5,6 @@ public enum DrawingMode {
     INFINITE_LINE,
     HIGHLIGHT,
     TEXT,
+    COLOR_PICKER,
     MEASUREMENT
 }

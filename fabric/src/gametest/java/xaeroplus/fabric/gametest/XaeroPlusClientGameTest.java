@@ -4,7 +4,9 @@ import it.unimi.dsi.fastutil.longs.Long2LongArrayMap;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.tutorial.TutorialSteps;
+import net.minecraft.network.chat.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xaero.common.HudMod;
@@ -19,6 +21,8 @@ import xaero.map.WorldMapSession;
 import xaero.map.gui.GuiMap;
 import xaero.map.gui.GuiWorldMapSettings;
 import xaeroplus.Globals;
+import xaeroplus.feature.drawing.ColorPickerWidget;
+import xaeroplus.feature.drawing.DrawingColorPickerButton;
 import xaeroplus.feature.extensions.DrawOrderScreen;
 import xaeroplus.feature.extensions.GuiMinimapWaypointTeleportCommandSettings;
 import xaeroplus.feature.extensions.SyncedWaypoint;
@@ -101,6 +105,12 @@ public class XaeroPlusClientGameTest implements FabricClientGameTest {
                 }
             });
             takeScreenshot(context, "world_map");
+            clickButtonContaining(context, "xaeroplus.gui.world_map.start_drawing");
+            clickButton(context, DrawingColorPickerButton.class);
+            waitFor(context, "drawing color picker", mc -> mc.screen != null && mc.screen.children().stream()
+                .anyMatch(child -> child instanceof ColorPickerWidget colorPicker && colorPicker.visible));
+            takeScreenshot(context, "world_map_drawing_color_picker");
+            clickButtonContaining(context, "xaeroplus.gui.world_map.start_drawing");
             context.runOnClient(mc -> {
                 Settings.REGISTRY.transparentWorldmapBackgroundSetting.setValue(true);
             });
@@ -211,6 +221,37 @@ public class XaeroPlusClientGameTest implements FabricClientGameTest {
 
     private static boolean isWithinRenderDistance(int offsetX, int offsetZ, int radius) {
         return offsetX * offsetX + offsetZ * offsetZ <= radius * radius;
+    }
+
+    private static void clickButtonContaining(ClientGameTestContext context, String translationKey) {
+        var expectedLabel = Component.translatable(translationKey).getString();
+        waitFor(context, "button containing " + expectedLabel, mc -> {
+            var screen = mc.screen;
+            if (screen == null) return false;
+
+            for (var child : screen.children()) {
+                if (child instanceof Button button && button.getMessage().getString().contains(expectedLabel)) {
+                    button.onPress();
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+
+    private static <T extends Button> void clickButton(ClientGameTestContext context, Class<T> buttonClass) {
+        waitFor(context, "button " + buttonClass.getSimpleName(), mc -> {
+            var screen = mc.screen;
+            if (screen == null) return false;
+
+            for (var child : screen.children()) {
+                if (buttonClass.isInstance(child)) {
+                    buttonClass.cast(child).onPress();
+                    return true;
+                }
+            }
+            return false;
+        });
     }
 
     private static void waitFor(ClientGameTestContext context, String description, Predicate<Minecraft> condition) {

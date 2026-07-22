@@ -19,28 +19,26 @@ import xaeroplus.feature.render.DrawFeatureFactory;
 import xaeroplus.feature.render.line.Line;
 import xaeroplus.feature.render.text.Text;
 import xaeroplus.module.Module;
-import xaeroplus.util.ChunkUtils;
-import xaeroplus.util.ColorHelper;
-import xaeroplus.util.DrawingMode;
-import xaeroplus.util.GuiMapHelper;
+import xaeroplus.util.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingDeque;
 
 public class Drawing extends Module {
     public final DrawingCache drawingCache = new DrawingCache("XaeroPlusDrawing");
     private Line inProgressLine = null;
-    private int savedColorAlpha = 150;
-    private final DrawingColorCycler drawingColorCycler = new DrawingColorCycler();
-    private final int inProgressColorAlpha = 80;
+    private Color drawingColor = new Color(255, 0, 0, 200);
     private final Deque<DrawingOperation> operationStack = new LinkedBlockingDeque<>();
     private DrawingOperationCollector operationCollector = null;
-    public DrawingColorCycler getDrawingColorCycler() {
-        return drawingColorCycler;
+    private final int inProgressColorAlpha = 80;
+
+    public Color getDrawingColor() {
+        return drawingColor;
+    }
+
+    public void setDrawingColor(final Color drawingColor) {
+        this.drawingColor = Objects.requireNonNull(drawingColor);
     }
 
     // todo: wire in bulk selection delete undo?
@@ -73,7 +71,7 @@ public class Drawing extends Module {
             DrawFeatureFactory.multiColorLines(
                 "Drawing-lines-saved",
                 this::getSavedLines,
-                (line, v) -> ColorHelper.getColorWithAlpha(v, savedColorAlpha),
+                (line, v) -> v,
                 () -> 0.5f,
                 50
             )
@@ -82,7 +80,7 @@ public class Drawing extends Module {
             DrawFeatureFactory.lines(
                 "Drawing-lines-in-progress",
                 this::getInProgressLines,
-                () -> drawingColorCycler.getColorInt(inProgressColorAlpha),
+                () -> ColorHelper.getColorWithAlpha(drawingColor.getInt(), inProgressColorAlpha),
                 () -> 0.5f,
                 1
             )
@@ -91,7 +89,7 @@ public class Drawing extends Module {
             DrawFeatureFactory.multiColorChunkHighlights(
                 "Drawing-highlights",
                 drawingCache::getHighlights,
-                (pos, t) -> ColorHelper.getColorWithAlpha((int) t, savedColorAlpha),
+                (pos, t) -> (int) t,
                 50
             )
         );
@@ -158,7 +156,7 @@ public class Drawing extends Module {
     }
 
     public void addLine(final Line line) {
-        addLine(line, drawingColorCycler.getColorInt(inProgressColorAlpha));
+        addLine(line, drawingColor.getInt());
     }
 
     public void addInfiniteLine(final Line line, int color) {
@@ -171,7 +169,7 @@ public class Drawing extends Module {
     }
 
     public void addInfiniteLine(final Line line) {
-        addInfiniteLine(line, drawingColorCycler.getColorInt(inProgressColorAlpha));
+        addInfiniteLine(line, drawingColor.getInt());
     }
 
     public void addHighlight(int chunkX, int chunkZ, int color) {
@@ -182,7 +180,7 @@ public class Drawing extends Module {
     }
 
     public void addHighlight(int chunkX, int chunkZ) {
-        addHighlight(chunkX, chunkZ, drawingColorCycler.getColor().getColor());
+        addHighlight(chunkX, chunkZ, drawingColor.getInt());
     }
 
     public void removeHighlight(final int chunkX, final int chunkZ) {
@@ -303,10 +301,6 @@ public class Drawing extends Module {
         return u >= 0 && u <= 1;
     }
 
-    public void setOpacity(final int opacity) {
-        this.savedColorAlpha = opacity;
-    }
-
     private static final int SNAP_THRESHOLD = 10;
     public Line snap(int x1, int z1, int x2, int z2, double scale) {
         double scalar = 1.0 / scale;
@@ -388,10 +382,10 @@ public class Drawing extends Module {
             for (var chunkLong : chunks) {
                 var chunkX = ChunkUtils.longToChunkX(chunkLong);
                 var chunkZ = ChunkUtils.longToChunkZ(chunkLong);
-                drawing.drawingCache.addHighlight(chunkX, chunkZ, drawing.drawingColorCycler.getColor().getColor(), dimension);
+                drawing.drawingCache.addHighlight(chunkX, chunkZ, drawing.drawingColor.getInt(), dimension);
             }
             for (var line : lines) {
-                drawing.drawingCache.addLine(line, drawing.drawingColorCycler.getColorInt(150), dimension);
+                drawing.drawingCache.addLine(line, drawing.drawingColor.getInt(), dimension);
             }
             for (var text : texts) {
                 drawing.drawingCache.addText(text, dimension);
@@ -445,31 +439,4 @@ public class Drawing extends Module {
         }
     }
 
-    public static final class DrawingColorCycler {
-        private int index;
-
-        public DrawingColorCycler() {
-            index = 0;
-        }
-
-        public void setColor(ColorHelper.HighlightColor color) {
-            this.index = color.ordinal();
-        }
-
-        public ColorHelper.HighlightColor getColor() {
-            return ColorHelper.HighlightColor.fromIndex(index);
-        }
-
-        public int getColorInt(int alpha) {
-            int c = ColorHelper.HighlightColor.fromIndex(index).getColor();
-            return ColorHelper.getColorWithAlpha(c, alpha);
-        }
-
-        public void next() {
-            index++;
-            if (index >= ColorHelper.HighlightColor.VALUES.length) {
-                index = 0;
-            }
-        }
-    }
 }

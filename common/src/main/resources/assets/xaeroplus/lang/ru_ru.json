@@ -331,6 +331,8 @@
   "xaeroplus.gui.world_map.drawing_mode_controls": "Левая кнопка -> Рисовать \n Правая кнопка -> Стереть \n Средняя кнопка -> Переместить",
   "xaeroplus.setting.drawing_opacity": "Прозрачность рисования",
   "xaeroplus.setting.drawing_opacity.tooltip": "Устанавливает прозрачность цвета рисунков",
+  "xaeroplus.setting.draw_order": "Порядок отрисовки",
+  "xaeroplus.setting.draw_order.tooltip": "Задаёт порядок элементов, отрисовываемых XaeroPlus, включая оверлеи и подсветки",
   "xaeroplus.gui.draw_order.title": "Порядок Отрисовки XaeroPlus",
   "xaeroplus.gui.draw_order.subtitle": "Щёлкните и перетащите, чтобы изменить порядок",
   "xaeroplus.gui.draw_order.reset": "Перезагрузить",
@@ -343,6 +345,14 @@
   "xaeroplus.gui.teleport_fail_notifier.message": "Похоже, ваша попытка телепортации не удалась :( \n Скорее всего, у вас нет прав на использование команд /tp на сервере. \n Обратитесь к администратору сервера!",
   "xaeroplus.setting.disable_teleportation": "Отключить телепортацию",
   "xaeroplus.setting.disable_teleportation.tooltip": "Глобально отключает кнопки телепортации.",
+  "xaeroplus.setting.use_custom_cross_dimension_waypoint_teleport_format": "Использовать свой формат телепортации межпространственных путевых точек",
+  "xaeroplus.setting.use_custom_cross_dimension_waypoint_teleport_format.tooltip": "Использует форматы телепортации XaeroPlus вместо встроенного в Xaero формата межпространственной телепортации.",
+  "xaeroplus.setting.cross_dimension_waypoint_teleport_format": "Формат телепортации межпространственных путевых точек",
+  "xaeroplus.setting.cross_dimension_waypoint_teleport_format.tooltip": "Задаёт формат команды для телепортации путевых точек между измерениями",
+  "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format": "Формат телепортации межпространственных путевых точек с поворотом",
+  "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format.tooltip": "Задаёт формат команды для телепортации путевых точек между измерениями с поворотом yaw",
+  "xaeroplus.gui.cross_dimension_waypoint_teleport_format.description": "Заполнители: {x} {y} {z} {d} {name} {yaw}",
+  "xaeroplus.gui.cross_dimension_waypoint_teleport_format.input": "Формат телепортации",
   "xaeroplus.gui.toast.database_migration_in_progress": "%s миграций базы данных выполняется, %s завершено, %s не удалось",
   "xaeroplus.gui.toast.database_migration_done": "%s миграций базы данных завершено, %s не удалось"
 }

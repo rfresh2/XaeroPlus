@@ -331,6 +331,8 @@
   "xaeroplus.gui.world_map.drawing_mode_controls": "Clic gauche -> Dessiner \n Clic droit -> Effacer \n Clic milieu -> Déplacer",
   "xaeroplus.setting.drawing_opacity": "Opacité du dessin",
   "xaeroplus.setting.drawing_opacity.tooltip": "Définit l'opacité des couleurs des dessins",
+  "xaeroplus.setting.draw_order": "Ordre de dessin",
+  "xaeroplus.setting.draw_order.tooltip": "Définit l'ordre des éléments dessinés par XaeroPlus, y compris les superpositions et les surbrillances",
   "xaeroplus.gui.draw_order.title": "Ordre de Dessin XaeroPlus",
   "xaeroplus.gui.draw_order.subtitle": "Cliquez et faites glisser pour changer l'ordre",
   "xaeroplus.gui.draw_order.reset": "Réinitialiser",
@@ -343,6 +345,14 @@
   "xaeroplus.gui.teleport_fail_notifier.message": "Il semble que votre tentative de téléportation ait échoué :( \n Vous n'avez probablement pas les permissions du serveur pour utiliser les commandes /tp. \n Demandez de l'aide à l'administrateur du serveur !",
   "xaeroplus.setting.disable_teleportation": "Désactiver la téléportation",
   "xaeroplus.setting.disable_teleportation.tooltip": "Désactive les boutons de téléportation pour l'ensemble du système.",
+  "xaeroplus.setting.use_custom_cross_dimension_waypoint_teleport_format": "Utiliser un format de téléportation de point de passage interdimensionnel personnalisé",
+  "xaeroplus.setting.use_custom_cross_dimension_waypoint_teleport_format.tooltip": "Utilise les formats de téléportation de XaeroPlus au lieu du format de téléportation interdimensionnelle intégré de Xaero.",
+  "xaeroplus.setting.cross_dimension_waypoint_teleport_format": "Format de téléportation de point de passage interdimensionnel",
+  "xaeroplus.setting.cross_dimension_waypoint_teleport_format.tooltip": "Définit le format de commande pour les téléportations de points de passage interdimensionnels",
+  "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format": "Format de téléportation de point de passage interdimensionnel avec rotation",
+  "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format.tooltip": "Définit le format de commande pour les téléportations de points de passage interdimensionnels avec rotation de lacet",
+  "xaeroplus.gui.cross_dimension_waypoint_teleport_format.description": "Variables: {x} {y} {z} {d} {name} {yaw}",
+  "xaeroplus.gui.cross_dimension_waypoint_teleport_format.input": "Format de téléportation",
   "xaeroplus.gui.toast.database_migration_in_progress": "%s migration(s) de base de données en cours, %s terminée(s), %s échouée(s)",
   "xaeroplus.gui.toast.database_migration_done": "%s migration(s) de base de données terminée(s), %s échouée(s)"
 }

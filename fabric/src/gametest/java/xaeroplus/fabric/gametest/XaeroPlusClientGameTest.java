@@ -20,6 +20,7 @@ import xaero.map.gui.GuiMap;
 import xaero.map.gui.GuiWorldMapSettings;
 import xaeroplus.Globals;
 import xaeroplus.feature.extensions.DrawOrderScreen;
+import xaeroplus.feature.extensions.GuiMinimapWaypointTeleportCommandSettings;
 import xaeroplus.feature.extensions.SyncedWaypoint;
 import xaeroplus.feature.render.DrawFeatureFactory;
 import xaeroplus.feature.render.line.Line;
@@ -125,6 +126,11 @@ public class XaeroPlusClientGameTest implements FabricClientGameTest {
                 mc.setScreen(new DrawOrderScreen(null, null));
             });
             takeScreenshot(context, "draw_order_screen");
+
+            context.runOnClient(mc -> {
+                mc.setScreen(new GuiMinimapWaypointTeleportCommandSettings(null, null, Settings.REGISTRY.crossDimensionWaypointTeleportFormat));
+            });
+            takeScreenshot(context, "minimap_waypoint_teleport_screen");
 
             LOGGER.info("XaeroPlus client GameTest passed");
         }

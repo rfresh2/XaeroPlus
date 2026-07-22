@@ -3,8 +3,9 @@ package xaeroplus.settings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import xaero.map.WorldMapSession;
-import xaeroplus.feature.extensions.WaypointSettingsEntryRefresher;
 import xaeroplus.Globals;
+import xaeroplus.feature.extensions.DrawOrderScreen;
+import xaeroplus.feature.extensions.GuiMinimapWaypointTeleportCommandSettings;
 import xaeroplus.feature.waypoint.WaypointAPI;
 import xaeroplus.feature.waypoint.eta.WaypointEtaManager;
 import xaeroplus.module.ModuleManager;
@@ -30,6 +31,15 @@ public final class Settings extends SettingRegistry {
     /**
      * WorldMap Main
      */
+    public final StringSetting drawOrderSetting = register(
+        StringSetting.create(
+            "Draw Order",
+            "xaeroplus.setting.draw_order",
+            "",
+            (s) -> Globals.drawManager.registry().loadOrder(s),
+            (parent, escape, setting) -> new DrawOrderScreen(parent, escape)
+        ),
+        SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting transparentWorldmapBackgroundSetting = register(
         BooleanSetting.create(
             "Transparent WorldMap Background",
@@ -215,32 +225,6 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.disable_teleportation",
             false),
         SettingLocation.WORLD_MAP_MAIN);
-    public final BooleanSetting useCustomCrossDimensionWaypointTeleportFormat = register(
-        BooleanSetting.create(
-            "Use Custom Cross-Dim Waypoint Teleport Format",
-            "xaeroplus.setting.use_custom_cross_dimension_waypoint_teleport_format",
-            false,
-            (enabled) -> refreshWaypointSettingsScreen()),
-        SettingLocation.MINIMAP_WAYPOINTS);
-    public final StringSetting crossDimensionWaypointTeleportFormat = register(
-        StringSetting.create(
-            "Cross-Dim Waypoint Teleport Format",
-            "xaeroplus.setting.cross_dimension_waypoint_teleport_format",
-            "/execute as @s in {d} run tp {x} {y} {z}"),
-        SettingLocation.MINIMAP_WAYPOINTS);
-    public final StringSetting crossDimensionWaypointTeleportRotationFormat = register(
-        StringSetting.create(
-            "Cross-Dim Waypoint Teleport Rotation Format",
-            "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format",
-            "/execute as @s in {d} run tp {x} {y} {z} {yaw} ~"),
-        SettingLocation.MINIMAP_WAYPOINTS);
-
-    private static void refreshWaypointSettingsScreen() {
-        final Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.screen instanceof WaypointSettingsEntryRefresher waypointSettings) {
-            waypointSettings.xaeroplus$refreshEntries();
-        }
-    }
     public final BooleanSetting sodiumSettingIntegration = register(
         BooleanSetting.create(
             "Sodium/Embeddium Setting Integration",
@@ -1117,6 +1101,28 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.waypoint_set_change_tooltip",
             false),
         SettingLocation.MINIMAP_WAYPOINTS);
+    public final BooleanSetting useCustomCrossDimensionWaypointTeleportFormat = register(
+        BooleanSetting.create(
+            "Use Custom Cross-Dim Waypoint Teleport Format",
+            "xaeroplus.setting.use_custom_cross_dimension_waypoint_teleport_format",
+            false),
+        SettingLocation.MINIMAP_WAYPOINTS);
+    public final StringSetting crossDimensionWaypointTeleportFormat = register(
+        StringSetting.create(
+            "Cross-Dim Waypoint Teleport Format",
+            "xaeroplus.setting.cross_dimension_waypoint_teleport_format",
+            "/execute as @s in {d} run tp {x} {y} {z}",
+            GuiMinimapWaypointTeleportCommandSettings::new,
+            useCustomCrossDimensionWaypointTeleportFormat::get),
+        SettingLocation.MINIMAP_WAYPOINTS);
+    public final StringSetting crossDimensionWaypointTeleportRotationFormat = register(
+        StringSetting.create(
+            "Cross-Dim Waypoint Teleport Rotation Format",
+            "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format",
+            "/execute as @s in {d} run tp {x} {y} {z} {yaw} ~",
+            GuiMinimapWaypointTeleportCommandSettings::new,
+            useCustomCrossDimensionWaypointTeleportFormat::get),
+        SettingLocation.MINIMAP_WAYPOINTS);
 
     /**
      * Keybinds (hidden toggles)
@@ -1198,16 +1204,4 @@ public final class Settings extends SettingRegistry {
             false,
             true),
         SettingLocation.KEYBINDS);
-
-    /**
-     * Special String Settings (not shown in regular settings UI)
-     */
-
-    public final StringSetting drawOrderSetting = register(
-        StringSetting.create(
-            "Draw Order",
-            "xaeroplus.setting.draw_order",
-            "",
-            (s) -> Globals.drawManager.registry().loadOrder(s)),
-        SettingLocation.CHUNK_HIGHLIGHTS);
 }

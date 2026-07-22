@@ -1,8 +1,11 @@
 package xaeroplus.settings;
 
+import net.minecraft.client.gui.screens.Screen;
 import xaeroplus.XaeroPlus;
-import xaeroplus.feature.extensions.XaeroPlusSettingEntry;
+import xaeroplus.feature.extensions.IXaeroPlusSettingEntry;
+import xaeroplus.feature.extensions.XaeroPlusScreenSwitchSettingEntry;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 import static java.util.Objects.nonNull;
@@ -10,40 +13,69 @@ import static java.util.Objects.nonNull;
 public class StringSetting extends XaeroPlusSetting {
     private String value;
     private Consumer<String> settingChangeConsumer;
+    private ScreenSupplier screenSupplier;
 
     public StringSetting(
         final String settingName,
         final String settingNameTranslationKey,
         final String tooltipTranslationKey,
         final String defaultValue,
-        final Consumer<String> settingChangeConsumer
+        final Consumer<String> settingChangeConsumer,
+        final BooleanSupplier visibilitySupplier,
+        final ScreenSupplier screenSupplier
     ) {
-        super(settingName, settingNameTranslationKey, tooltipTranslationKey, null, () -> true);
+        super(settingName, settingNameTranslationKey, tooltipTranslationKey, null, visibilitySupplier);
         this.value = defaultValue;
         this.settingChangeConsumer = settingChangeConsumer;
+        this.screenSupplier = screenSupplier;
     }
 
     public static StringSetting create(
         String settingName,
         String settingNameTranslationKey,
         String defaultValue,
-        Consumer<String> settingChangeConsumer
+        Consumer<String> settingChangeConsumer,
+        ScreenSupplier screenSupplier,
+        BooleanSupplier visibilitySupplier
     ) {
         return new StringSetting(
             SETTING_PREFIX + settingName,
             settingNameTranslationKey,
             buildTooltipTranslationKey(settingNameTranslationKey),
             defaultValue,
-            settingChangeConsumer
+            settingChangeConsumer,
+            visibilitySupplier,
+            screenSupplier
         );
     }
 
     public static StringSetting create(
         String settingName,
         String settingNameTranslationKey,
-        String defaultValue
+        String defaultValue,
+        Consumer<String> settingChangeConsumer,
+        ScreenSupplier screenSupplier
     ) {
-        return create(settingName, settingNameTranslationKey, defaultValue, null);
+        return create(settingName, settingNameTranslationKey, defaultValue, settingChangeConsumer, screenSupplier, () -> true);
+    }
+
+    public static StringSetting create(
+        String settingName,
+        String settingNameTranslationKey,
+        String defaultValue,
+        ScreenSupplier screenSupplier
+    ) {
+        return create(settingName, settingNameTranslationKey, defaultValue, null, screenSupplier, () -> true);
+    }
+
+    public static StringSetting create(
+        String settingName,
+        String settingNameTranslationKey,
+        String defaultValue,
+        ScreenSupplier screenSupplier,
+        BooleanSupplier visibilitySupplier
+    ) {
+        return create(settingName, settingNameTranslationKey, defaultValue, null, screenSupplier, visibilitySupplier);
     }
 
     @Override
@@ -88,8 +120,16 @@ public class StringSetting extends XaeroPlusSetting {
         this.settingChangeConsumer = settingChangeConsumer;
     }
 
+    public ScreenSupplier getScreenSupplier() {
+        return screenSupplier;
+    }
+
     @Override
-    public XaeroPlusSettingEntry<?> toXaeroSettingEntry() {
-        return null;
+    public IXaeroPlusSettingEntry toXaeroSettingEntry() {
+        return new XaeroPlusScreenSwitchSettingEntry(this);
+    }
+
+    public interface ScreenSupplier {
+        Screen getScreen(Screen parent, Screen escape, StringSetting setting);
     }
 }

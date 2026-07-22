@@ -5,10 +5,9 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import xaero.map.gui.ScreenSwitchSettingEntry;
 import xaeroplus.settings.SettingHooks;
-import xaeroplus.settings.Settings;
 import xaeroplus.settings.StringSetting;
+import xaeroplus.util.ColorHelper;
 
 public class GuiMinimapWaypointTeleportCommandSettings extends Screen {
     private final Screen parent;
@@ -32,7 +31,7 @@ public class GuiMinimapWaypointTeleportCommandSettings extends Screen {
             20,
             Component.translatable("xaeroplus.gui.cross_dimension_waypoint_teleport_format.input")
         );
-        this.commandInput.setMaxLength(256);
+        this.commandInput.setMaxLength(512);
         this.commandInput.setValue(this.setting.get());
         this.commandInput.setResponder(value -> this.saveButton.active = !value.isBlank());
         this.addRenderableWidget(this.commandInput);
@@ -59,7 +58,7 @@ public class GuiMinimapWaypointTeleportCommandSettings extends Screen {
             Component.translatable("xaeroplus.gui.cross_dimension_waypoint_teleport_format.description"),
             this.width / 2,
             this.height / 2 - 28,
-            0xA0A0A0
+            ColorHelper.getColor(160, 160, 160, 255)
         );
         super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
@@ -75,21 +74,5 @@ public class GuiMinimapWaypointTeleportCommandSettings extends Screen {
         this.setting.setValue(command);
         SettingHooks.saveSettings();
         onClose();
-    }
-
-    public static ScreenSwitchSettingEntry[] getScreenSwitchSettingEntries() {
-        return new ScreenSwitchSettingEntry[] {
-            getScreenSwitchSettingEntry(Settings.REGISTRY.crossDimensionWaypointTeleportFormat),
-            getScreenSwitchSettingEntry(Settings.REGISTRY.crossDimensionWaypointTeleportRotationFormat)
-        };
-    }
-
-    private static ScreenSwitchSettingEntry getScreenSwitchSettingEntry(final StringSetting setting) {
-        return new ScreenSwitchSettingEntry(
-            setting.getSettingNameTranslationKey(),
-            (parent, escapeScreen) -> new GuiMinimapWaypointTeleportCommandSettings(parent, escapeScreen, setting),
-            null,
-            true
-        );
     }
 }

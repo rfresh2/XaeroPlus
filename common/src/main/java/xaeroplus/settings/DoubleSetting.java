@@ -5,7 +5,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import xaero.lib.common.gui.widget.TooltipInfo;
 import xaeroplus.XaeroPlus;
-import xaeroplus.feature.extensions.XaeroPlusSettingEntry;
+import xaeroplus.feature.extensions.IXaeroPlusSettingEntry;
+import xaeroplus.feature.extensions.XaeroPlusCustomSettingEntry;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleConsumer;
@@ -113,9 +114,9 @@ public class DoubleSetting extends XaeroPlusSetting {
     }
 
     @Override
-    public XaeroPlusSettingEntry<?> toXaeroSettingEntry() {
+    public IXaeroPlusSettingEntry toXaeroSettingEntry() {
         int numIndeces = (int) ((valueMax - valueMin) / valueStep);
-        return new XaeroPlusSettingEntry<Double>(
+        return new XaeroPlusCustomSettingEntry<Double>(
             this,
             Component.literal(getTranslatedName()),
             new TooltipInfo(getTooltipTranslationKey()),

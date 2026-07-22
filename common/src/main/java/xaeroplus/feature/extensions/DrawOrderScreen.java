@@ -7,7 +7,6 @@ import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
-import xaero.map.gui.ScreenSwitchSettingEntry;
 import xaeroplus.module.impl.TickTaskExecutor;
 import xaeroplus.settings.SettingHooks;
 import xaeroplus.settings.Settings;
@@ -71,8 +70,8 @@ public class DrawOrderScreen extends Screen {
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         drawFeatureList.render(poseStack, mouseX, mouseY, partialTick);
-        drawCenteredString(poseStack, mc.font, title, width / 2, 5, -1);
-        drawCenteredString(poseStack, mc.font, Component.translatable("xaeroplus.gui.draw_order.subtitle"), width / 2, height - 52, -1);
+        drawCenteredString(poseStack, mc.font, title, width / 2, 5, ColorHelper.getColor(255, 255, 255, 255));
+        drawCenteredString(poseStack, mc.font, Component.translatable("xaeroplus.gui.draw_order.subtitle"), width / 2, height - 52, ColorHelper.getColor(255, 255, 255, 255));
         super.render(poseStack, mouseX, mouseY, partialTick);
     }
 
@@ -87,15 +86,6 @@ public class DrawOrderScreen extends Screen {
 
     public void saveEntries(List<String> entries) {
         Settings.REGISTRY.drawOrderSetting.setValue(DrawOrderHelper.serialize(entries));
-    }
-
-    public static ScreenSwitchSettingEntry getScreenSwitchSettingEntry() {
-        return new ScreenSwitchSettingEntry(
-            "Draw Order",
-            DrawOrderScreen::new,
-            null,
-            true
-        );
     }
 
     public static class DrawFeatureList extends ObjectSelectionList<DrawFeatureEntry> {
@@ -210,7 +200,7 @@ public class DrawOrderScreen extends Screen {
 
         public void renderEntryText(PoseStack poseStack, int x, int y) {
             String id = drawOrderScreen.drawFeatureIdOrder.get(index);
-            drawString(poseStack, mc.font, id, x + 6, y + 6, -1);
+            drawString(poseStack, mc.font, id, x + 6, y + 6, ColorHelper.getColor(255, 255, 255, 255));
         }
 
         @Override

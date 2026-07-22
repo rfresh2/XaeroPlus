@@ -331,6 +331,8 @@
   "xaeroplus.gui.world_map.drawing_mode_controls": "Lewy przycisk -> Rysuj \n Prawy przycisk -> Usuń \n Środkowy przycisk -> Przesuń",
   "xaeroplus.setting.drawing_opacity": "Przezroczystość rysunku",
   "xaeroplus.setting.drawing_opacity.tooltip": "Ustawia przezroczystość koloru rysunków",
+  "xaeroplus.setting.draw_order": "Kolejność rysowania",
+  "xaeroplus.setting.draw_order.tooltip": "Ustawia kolejność elementów rysowanych przez XaeroPlus, w tym nakładek i podświetleń",
   "xaeroplus.gui.draw_order.title": "Kolejność Rysowania XaeroPlus",
   "xaeroplus.gui.draw_order.subtitle": "Kliknij i przeciągnij, aby zmienić kolejność",
   "xaeroplus.gui.draw_order.reset": "Nastawić",
@@ -343,6 +345,14 @@
   "xaeroplus.gui.teleport_fail_notifier.message": "Wygląda na to, że twoja próba teleportacji się nie powiodła :( \n Prawdopodobnie nie masz uprawnień serwera do używania komend /tp. \n Poproś administratora serwera o pomoc!",
   "xaeroplus.setting.disable_teleportation": "Wyłącz teleportację",
   "xaeroplus.setting.disable_teleportation.tooltip": "Globalnie wyłącza przyciski teleportacji",
+  "xaeroplus.setting.use_custom_cross_dimension_waypoint_teleport_format": "Użyj własnego formatu teleportacji punktów między wymiarami",
+  "xaeroplus.setting.use_custom_cross_dimension_waypoint_teleport_format.tooltip": "Używa formatów teleportacji XaeroPlus zamiast wbudowanego formatu teleportacji między wymiarami Xaero.",
+  "xaeroplus.setting.cross_dimension_waypoint_teleport_format": "Format teleportacji punktów między wymiarami",
+  "xaeroplus.setting.cross_dimension_waypoint_teleport_format.tooltip": "Ustawia format komendy dla teleportacji punktów między wymiarami",
+  "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format": "Format teleportacji punktów między wymiarami z obrotem",
+  "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format.tooltip": "Ustawia format komendy dla teleportacji punktów między wymiarami z obrotem yaw",
+  "xaeroplus.gui.cross_dimension_waypoint_teleport_format.description": "Symbole zastępcze: {x} {y} {z} {d} {name} {yaw}",
+  "xaeroplus.gui.cross_dimension_waypoint_teleport_format.input": "Format teleportacji",
   "xaeroplus.gui.toast.database_migration_in_progress": "%s migracji bazy danych w toku, %s ukończono, %s nieudanych",
   "xaeroplus.gui.toast.database_migration_done": "%s migracji bazy danych ukończono, %s nieudanych"
 }

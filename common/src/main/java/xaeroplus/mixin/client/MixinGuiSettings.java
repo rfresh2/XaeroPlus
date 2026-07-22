@@ -22,7 +22,7 @@ import xaero.lib.client.gui.ISettingEntry;
 import xaero.lib.client.gui.ScreenBase;
 import xaero.lib.client.gui.widget.MyTinyButton;
 import xaero.lib.common.util.KeySortableByOther;
-import xaeroplus.feature.extensions.XaeroPlusSettingEntry;
+import xaeroplus.feature.extensions.IXaeroPlusSettingEntry;
 import xaeroplus.settings.Settings;
 
 import java.util.ArrayList;
@@ -81,7 +81,7 @@ public abstract class MixinGuiSettings extends ScreenBase {
     public boolean settingListToRenderRedirect(final ArrayList instance, final Object entryObject) {
         final KeySortableByOther<ISettingEntry> entry = (KeySortableByOther<ISettingEntry>) entryObject;
         ISettingEntry settingEntry = entry.getKey();
-        if (settingEntry instanceof XaeroPlusSettingEntry<?> xaeroPlusSettingEntry) {
+        if (settingEntry instanceof IXaeroPlusSettingEntry xaeroPlusSettingEntry) {
             if (!xaeroPlusSettingEntry.getXaeroPlusSetting().isVisible()) {
                 return false;
             }

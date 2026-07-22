@@ -1,8 +1,7 @@
 package xaeroplus.settings;
 
 import net.minecraft.client.KeyMapping;
-import xaero.lib.client.gui.CustomSettingEntry;
-import xaeroplus.feature.extensions.XaeroPlusSettingEntry;
+import xaeroplus.feature.extensions.IXaeroPlusSettingEntry;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -62,17 +61,17 @@ public abstract class SettingRegistry {
         return new ArrayList<>(settingNameMap.values());
     }
 
-    public synchronized XaeroPlusSettingEntry[] getXaeroSettingEntries(SettingLocation settingLocation) {
+    public synchronized IXaeroPlusSettingEntry[] getXaeroSettingEntries(SettingLocation settingLocation) {
         var settingList = this.settingLocationMap.get(settingLocation);
         if (settingList != null) {
-            List<CustomSettingEntry<?>> entries = new ArrayList<>(settingList.size());
+            List<IXaeroPlusSettingEntry> entries = new ArrayList<>(settingList.size());
             for (int i = 0; i < settingList.size(); i++) {
                 final XaeroPlusSetting xaeroPlusSetting = settingList.get(i);
                 var entry = xaeroPlusSetting.toXaeroSettingEntry();
                 if (entry != null) entries.add(entry);
             }
-            return entries.toArray(new XaeroPlusSettingEntry[0]);
+            return entries.toArray(new IXaeroPlusSettingEntry[0]);
         }
-        return new XaeroPlusSettingEntry[0];
+        return new IXaeroPlusSettingEntry[0];
     }
 }

@@ -28,6 +28,7 @@ import xaero.map.gui.GuiMap;
 import xaero.map.gui.GuiWorldMapSettings;
 import xaeroplus.Globals;
 import xaeroplus.feature.extensions.DrawOrderScreen;
+import xaeroplus.feature.extensions.GuiMinimapWaypointTeleportCommandSettings;
 import xaeroplus.feature.extensions.SyncedWaypoint;
 import xaeroplus.feature.render.DrawFeatureFactory;
 import xaeroplus.feature.render.line.Line;
@@ -172,6 +173,12 @@ public class XaeroPlusClientGameTest implements ClientModInitializer {
                 return null;
             });
             takeScreenshot("draw_order_screen");
+
+            submit(mc -> {
+                mc.setScreen(new GuiMinimapWaypointTeleportCommandSettings(null, null, Settings.REGISTRY.crossDimensionWaypointTeleportFormat));
+                return null;
+            });
+            takeScreenshot("minimap_waypoint_teleport_screen");
 
             LOGGER.info("XaeroPlus client GameTest passed");
             submit(mc -> {

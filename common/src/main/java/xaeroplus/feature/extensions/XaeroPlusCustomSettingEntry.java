@@ -7,9 +7,9 @@ import xaeroplus.settings.XaeroPlusSetting;
 
 import java.util.function.*;
 
-public class XaeroPlusSettingEntry<T> extends CustomSettingEntry<T> {
+public class XaeroPlusCustomSettingEntry<T> extends CustomSettingEntry<T> implements IXaeroPlusSettingEntry {
     private final XaeroPlusSetting xaeroPlusSetting;
-    public XaeroPlusSettingEntry(
+    public XaeroPlusCustomSettingEntry(
         final XaeroPlusSetting xaeroPlusSetting,
         final Component name,
         final TooltipInfo tooltipInfo,

@@ -351,7 +351,8 @@
   "xaeroplus.setting.cross_dimension_waypoint_teleport_format.tooltip": "Establece el formato del comando para teletransportes de waypoint entre dimensiones",
   "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format": "Formato de teletransporte de waypoint entre dimensiones con rotación",
   "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format.tooltip": "Establece el formato del comando para teletransportes de waypoint entre dimensiones con rotación de guiñada",
-  "xaeroplus.gui.cross_dimension_waypoint_teleport_format.description": "Marcadores: {x} {y} {z} {d} {name} {yaw}",
+  "xaeroplus.gui.cross_dimension_waypoint_teleport_format.description": "Marcadores: {x} {y} {z} {d} {name}",
+  "xaeroplus.gui.cross_dimension_waypoint_teleport_rotation_format.description": "Marcadores: {x} {y} {z} {d} {name} {yaw}",
   "xaeroplus.gui.cross_dimension_waypoint_teleport_format.input": "Formato de teletransporte",
   "xaeroplus.gui.toast.database_migration_in_progress": "%s migración(es) de base de datos en curso, %s completadas, %s fallidas",
   "xaeroplus.gui.toast.database_migration_done": "%s migración(es) de base de datos completadas, %s fallidas"

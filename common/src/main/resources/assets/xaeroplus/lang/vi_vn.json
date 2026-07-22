@@ -351,7 +351,8 @@
   "xaeroplus.setting.cross_dimension_waypoint_teleport_format.tooltip": "Thiết lập định dạng lệnh cho dịch chuyển waypoint xuyên chiều",
   "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format": "Định dạng dịch chuyển waypoint xuyên chiều có xoay",
   "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format.tooltip": "Thiết lập định dạng lệnh cho dịch chuyển waypoint xuyên chiều kèm xoay yaw",
-  "xaeroplus.gui.cross_dimension_waypoint_teleport_format.description": "Phần giữ chỗ: {x} {y} {z} {d} {name} {yaw}",
+  "xaeroplus.gui.cross_dimension_waypoint_teleport_format.description": "Phần giữ chỗ: {x} {y} {z} {d} {name}",
+  "xaeroplus.gui.cross_dimension_waypoint_teleport_rotation_format.description": "Phần giữ chỗ: {x} {y} {z} {d} {name} {yaw}",
   "xaeroplus.gui.cross_dimension_waypoint_teleport_format.input": "Định dạng dịch chuyển",
   "xaeroplus.gui.toast.database_migration_in_progress": "%s lần di chuyển cơ sở dữ liệu đang diễn ra, %s hoàn tất, %s thất bại",
   "xaeroplus.gui.toast.database_migration_done": "%s lần di chuyển cơ sở dữ liệu đã hoàn tất, %s thất bại"

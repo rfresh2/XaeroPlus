@@ -351,7 +351,8 @@
   "xaeroplus.setting.cross_dimension_waypoint_teleport_format.tooltip": "異次元ウェイポイントテレポートのコマンド形式を設定します",
   "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format": "回転付き異次元ウェイポイントテレポート形式",
   "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format.tooltip": "ヨー回転付き異次元ウェイポイントテレポートのコマンド形式を設定します",
-  "xaeroplus.gui.cross_dimension_waypoint_teleport_format.description": "プレースホルダー: {x} {y} {z} {d} {name} {yaw}",
+  "xaeroplus.gui.cross_dimension_waypoint_teleport_format.description": "プレースホルダー: {x} {y} {z} {d} {name}",
+  "xaeroplus.gui.cross_dimension_waypoint_teleport_rotation_format.description": "プレースホルダー: {x} {y} {z} {d} {name} {yaw}",
   "xaeroplus.gui.cross_dimension_waypoint_teleport_format.input": "テレポート形式",
   "xaeroplus.gui.toast.database_migration_in_progress": "%s 件のデータベース移行が進行中、%s 件完了、%s 件失敗",
   "xaeroplus.gui.toast.database_migration_done": "%s 件のデータベース移行が完了、%s 件失敗"

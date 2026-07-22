@@ -11,7 +11,6 @@ import xaero.common.gui.GuiMinimapMain;
 import xaero.common.gui.GuiMinimapSettings;
 import xaero.lib.client.gui.ISettingEntry;
 import xaero.lib.client.gui.config.context.IEditConfigScreenContext;
-import xaeroplus.feature.extensions.XaeroPlusSettingEntry;
 import xaeroplus.settings.SettingLocation;
 import xaeroplus.settings.Settings;
 
@@ -29,7 +28,7 @@ public abstract class MixinGuiMinimapMain extends GuiMinimapSettings {
         at = @At("RETURN"),
         remap = true) // $REMAP
     public void init(final CallbackInfo ci) {
-        final XaeroPlusSettingEntry[] configSettingEntries = Settings.REGISTRY.getXaeroSettingEntries(SettingLocation.MINIMAP_MAIN);
+        var configSettingEntries = Settings.REGISTRY.getXaeroSettingEntries(SettingLocation.MINIMAP_MAIN);
         final int oldLen = this.mainEntries.length;
         final int newLen = configSettingEntries.length;
         final int totalNewLen = oldLen + configSettingEntries.length;

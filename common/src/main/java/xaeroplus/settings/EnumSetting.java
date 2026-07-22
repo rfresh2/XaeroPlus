@@ -6,7 +6,8 @@ import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.ArrayUtils;
 import xaero.lib.common.gui.widget.TooltipInfo;
 import xaeroplus.XaeroPlus;
-import xaeroplus.feature.extensions.XaeroPlusSettingEntry;
+import xaeroplus.feature.extensions.IXaeroPlusSettingEntry;
+import xaeroplus.feature.extensions.XaeroPlusCustomSettingEntry;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -95,8 +96,8 @@ public class EnumSetting<T extends Enum<T>> extends XaeroPlusSetting {
     }
 
     @Override
-    public XaeroPlusSettingEntry<?> toXaeroSettingEntry() {
-        return new XaeroPlusSettingEntry<T>(
+    public IXaeroPlusSettingEntry toXaeroSettingEntry() {
+        return new XaeroPlusCustomSettingEntry<T>(
             this,
             Component.literal(getTranslatedName()),
             new TooltipInfo(getTooltipTranslationKey()),

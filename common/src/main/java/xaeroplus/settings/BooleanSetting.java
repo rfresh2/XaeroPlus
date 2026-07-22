@@ -7,7 +7,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import xaero.lib.common.gui.widget.TooltipInfo;
 import xaeroplus.XaeroPlus;
-import xaeroplus.feature.extensions.XaeroPlusSettingEntry;
+import xaeroplus.feature.extensions.IXaeroPlusSettingEntry;
+import xaeroplus.feature.extensions.XaeroPlusCustomSettingEntry;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -134,8 +135,8 @@ public class BooleanSetting extends XaeroPlusSetting {
     }
 
     @Override
-    public XaeroPlusSettingEntry<?> toXaeroSettingEntry() {
-        return new XaeroPlusSettingEntry<Boolean>(
+    public IXaeroPlusSettingEntry toXaeroSettingEntry() {
+        return new XaeroPlusCustomSettingEntry<Boolean>(
             this,
             Component.literal(getTranslatedName()),
             new TooltipInfo(getTooltipTranslationKey()),

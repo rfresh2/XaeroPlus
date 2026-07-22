@@ -8,7 +8,6 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
-import xaero.map.gui.ScreenSwitchSettingEntry;
 import xaeroplus.module.impl.TickTaskExecutor;
 import xaeroplus.settings.SettingHooks;
 import xaeroplus.settings.Settings;
@@ -72,8 +71,8 @@ public class DrawOrderScreen extends Screen {
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         drawFeatureList.render(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.drawCenteredString(mc.font, title, width / 2, 5, -1);
-        guiGraphics.drawCenteredString(mc.font, Component.translatable("xaeroplus.gui.draw_order.subtitle"), width / 2, height - 52, -1);
+        guiGraphics.drawCenteredString(mc.font, title, width / 2, 5, ColorHelper.getColor(255, 255, 255, 255));
+        guiGraphics.drawCenteredString(mc.font, Component.translatable("xaeroplus.gui.draw_order.subtitle"), width / 2, height - 52, ColorHelper.getColor(255, 255, 255, 255));
         super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
@@ -88,15 +87,6 @@ public class DrawOrderScreen extends Screen {
 
     public void saveEntries(List<String> entries) {
         Settings.REGISTRY.drawOrderSetting.setValue(DrawOrderHelper.serialize(entries));
-    }
-
-    public static ScreenSwitchSettingEntry getScreenSwitchSettingEntry() {
-        return new ScreenSwitchSettingEntry(
-            "Draw Order",
-            DrawOrderScreen::new,
-            null,
-            true
-        );
     }
 
     public static class DrawFeatureList extends ObjectSelectionList<DrawFeatureEntry> {

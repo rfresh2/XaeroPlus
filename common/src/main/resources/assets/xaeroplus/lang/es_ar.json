@@ -331,6 +331,8 @@
   "xaeroplus.gui.world_map.drawing_mode_controls": "Clic izquierdo -> Dibujar \n Clic derecho -> Borrar \n Clic medio -> Mover",
   "xaeroplus.setting.drawing_opacity": "Opacidad del dibujo",
   "xaeroplus.setting.drawing_opacity.tooltip": "Establece la opacidad del color de los dibujos",
+  "xaeroplus.setting.draw_order": "Orden de dibujo",
+  "xaeroplus.setting.draw_order.tooltip": "Establece el orden de los elementos dibujados por XaeroPlus, incluidas las superposiciones y los resaltados",
   "xaeroplus.gui.draw_order.title": "Orden de Dibujo de XaeroPlus",
   "xaeroplus.gui.draw_order.subtitle": "Haz clic y arrastra para cambiar el orden",
   "xaeroplus.gui.draw_order.reset": "Reiniciar",
@@ -343,6 +345,14 @@
   "xaeroplus.gui.teleport_fail_notifier.message": "Parece que tu intento de teletransporte falló :( \n Probablemente no tengas permisos del servidor para usar los comandos /tp. \n ¡Pide ayuda al administrador del servidor!",
   "xaeroplus.setting.disable_teleportation": "Desactivar la teletransportación",
   "xaeroplus.setting.disable_teleportation.tooltip": "Desactiva los botones de teletransportación globalmente.",
+  "xaeroplus.setting.use_custom_cross_dimension_waypoint_teleport_format": "Usar formato personalizado de teletransporte de waypoint entre dimensiones",
+  "xaeroplus.setting.use_custom_cross_dimension_waypoint_teleport_format.tooltip": "Usa los formatos de teletransporte de XaeroPlus en lugar del formato de teletransporte entre dimensiones integrado de Xaero.",
+  "xaeroplus.setting.cross_dimension_waypoint_teleport_format": "Formato de teletransporte de waypoint entre dimensiones",
+  "xaeroplus.setting.cross_dimension_waypoint_teleport_format.tooltip": "Establece el formato del comando para teletransportes de waypoint entre dimensiones",
+  "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format": "Formato de teletransporte de waypoint entre dimensiones con rotación",
+  "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format.tooltip": "Establece el formato del comando para teletransportes de waypoint entre dimensiones con rotación de guiñada",
+  "xaeroplus.gui.cross_dimension_waypoint_teleport_format.description": "Marcadores: {x} {y} {z} {d} {name} {yaw}",
+  "xaeroplus.gui.cross_dimension_waypoint_teleport_format.input": "Formato de teletransporte",
   "xaeroplus.gui.toast.database_migration_in_progress": "%s migración(es) de base de datos en curso, %s completadas, %s fallidas",
   "xaeroplus.gui.toast.database_migration_done": "%s migración(es) de base de datos completadas, %s fallidas"
 }

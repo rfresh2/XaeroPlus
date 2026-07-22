@@ -951,14 +951,6 @@ public final class Settings extends SettingRegistry {
             true,
             (b) -> ModuleManager.getModule(Beacons.class).setEnabled(b)
         ), SettingLocation.OVERLAYS);
-    public final DoubleSetting drawingOpacitySetting = register(
-        DoubleSetting.create(
-            "Drawing Opacity",
-            "xaeroplus.setting.drawing_opacity",
-            0, 255, 10,
-            150,
-            (b) -> ModuleManager.getModule(Drawing.class).setOpacity((int) b)),
-        SettingLocation.OVERLAYS);
 
     /**
      * Minimap Main

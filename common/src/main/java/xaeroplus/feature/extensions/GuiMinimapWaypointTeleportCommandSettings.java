@@ -52,7 +52,13 @@ public class GuiMinimapWaypointTeleportCommandSettings extends Screen {
     @Override
     public void render(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
         this.renderBackground(guiGraphics);
-        guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, this.height / 2 - 42, 0xFFFFFF);
+        guiGraphics.drawCenteredString(
+            this.font,
+            this.title,
+            this.width / 2,
+            this.height / 2 - 42,
+            ColorHelper.getColor(255, 255, 255, 255)
+        );
         guiGraphics.drawCenteredString(
             this.font,
             Component.translatable("xaeroplus.gui.cross_dimension_waypoint_teleport_format.description"),

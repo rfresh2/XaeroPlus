@@ -8,6 +8,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.multiplayer.WarningScreen;
 import net.minecraft.network.chat.Component;
+import xaeroplus.util.ColorHelper;
 
 import java.util.Optional;
 
@@ -58,7 +59,7 @@ public class IncompatibleMinimapWarningScreen extends WarningScreen {
 
     @Override
     protected void renderTitle(GuiGraphics guiGraphics) {
-        guiGraphics.drawCenteredString(this.font, this.title, width / 2, 30, 16777215);
+        guiGraphics.drawCenteredString(this.font, this.title, width / 2, 30, ColorHelper.getColor(255, 255, 255, 255));
     }
 
     @Override

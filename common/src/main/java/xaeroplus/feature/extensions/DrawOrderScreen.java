@@ -200,7 +200,7 @@ public class DrawOrderScreen extends Screen {
 
         public void renderEntryText(GuiGraphics guiGraphics, int x, int y) {
             String id = drawOrderScreen.drawFeatureIdOrder.get(index);
-            guiGraphics.drawString(mc.font, id, x + 6, y + 6, -1);
+            guiGraphics.drawString(mc.font, id, x + 6, y + 6, ColorHelper.getColor(255, 255, 255, 255));
         }
 
         @Override

@@ -88,6 +88,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Unique Button drawLineSegmentButton;
     @Unique Button drawInfiniteLineButton;
     @Unique Button drawHighlightsButton;
+    @Unique Button drawEllipseButton;
     @Unique Button drawTextButton;
     @Unique DrawingColorPickerButton drawColorPickerButton;
     @Unique ColorPickerWidget drawColorPicker;
@@ -173,8 +174,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             button -> setDrawingMode(DrawingMode.HIGHLIGHT),
             () -> new Tooltip(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_highlights"))));
         drawHighlightsButton.visible = false;
+        drawEllipseButton = new GuiTexturedButton(
+            startDrawingButton.x + 16, drawHighlightsButton.y + 20, 20, 20, 137, 19, 16, 16,
+            Globals.guiTextures,
+            button -> setDrawingMode(DrawingMode.ELLIPSE),
+            () -> new Tooltip(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_ellipse"))));
+        drawEllipseButton.visible = false;
         drawTextButton = new GuiTexturedButton(
-            startDrawingButton.x + 16, drawHighlightsButton.y + 20, 20, 20, 118, 0, 16, 16,
+            startDrawingButton.x + 16, drawEllipseButton.y + 20, 20, 20, 118, 0, 16, 16,
             Globals.guiTextures,
             button -> setDrawingMode(DrawingMode.TEXT),
             () -> new Tooltip(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_text"))));
@@ -279,6 +286,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     private void setDrawingMode(DrawingMode drawingMode) {
         drawInProgressPos = null;
         ModuleManager.getModule(Drawing.class).removeInProgressLine();
+        ModuleManager.getModule(Drawing.class).removeInProgressEllipse();
         drawingLeftClickDown = false;
         drawingRightClickDown = false;
         drawTextEntryActive = false;
@@ -295,6 +303,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             addButton(drawLineSegmentButton);
             addButton(drawInfiniteLineButton);
             addButton(drawHighlightsButton);
+            addButton(drawEllipseButton);
             addButton(drawTextButton);
             addButton(drawColorPickerButton);
             addButton(drawColorPicker);
@@ -302,6 +311,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             drawLineSegmentButton.visible = true;
             drawInfiniteLineButton.visible = true;
             drawHighlightsButton.visible = true;
+            drawEllipseButton.visible = true;
             drawTextButton.visible = true;
             drawColorPickerButton.visible = true;
             drawColorPicker.visible = drawingMode == DrawingMode.COLOR_PICKER;
@@ -447,62 +457,18 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if (!Settings.REGISTRY.worldMapUIAdditions.get()) return;
         drawTextEntryField.tick();
         if (!drawing) return;
-        switch (drawingMode) {
-            case LINE_SEGMENT -> {
-                xaeroPlus$setFocus(startDrawingButton, false);
-                xaeroPlus$setFocus(drawLineSegmentButton, true);
-                xaeroPlus$setFocus(drawInfiniteLineButton, false);
-                xaeroPlus$setFocus(drawHighlightsButton, false);
-                xaeroPlus$setFocus(drawTextButton, false);
-                xaeroPlus$setFocus(drawColorPickerButton, false);
-                xaeroPlus$setFocus(drawMeasurementToolButton, false);
-            }
-            case INFINITE_LINE -> {
-                xaeroPlus$setFocus(startDrawingButton, false);
-                xaeroPlus$setFocus(drawLineSegmentButton, false);
-                xaeroPlus$setFocus(drawInfiniteLineButton, true);
-                xaeroPlus$setFocus(drawHighlightsButton, false);
-                xaeroPlus$setFocus(drawTextButton, false);
-                xaeroPlus$setFocus(drawColorPickerButton, false);
-                xaeroPlus$setFocus(drawMeasurementToolButton, false);
-            } case HIGHLIGHT -> {
-                xaeroPlus$setFocus(startDrawingButton, false);
-                xaeroPlus$setFocus(drawLineSegmentButton, false);
-                xaeroPlus$setFocus(drawInfiniteLineButton, false);
-                xaeroPlus$setFocus(drawHighlightsButton, true);
-                xaeroPlus$setFocus(drawTextButton, false);
-                xaeroPlus$setFocus(drawColorPickerButton, false);
-                xaeroPlus$setFocus(drawMeasurementToolButton, false);
-            } case TEXT -> {
-                xaeroPlus$setFocus(startDrawingButton, false);
-                xaeroPlus$setFocus(drawLineSegmentButton, false);
-                xaeroPlus$setFocus(drawInfiniteLineButton, false);
-                xaeroPlus$setFocus(drawHighlightsButton, false);
-                xaeroPlus$setFocus(drawTextButton, true);
-                xaeroPlus$setFocus(drawColorPickerButton, false);
-                xaeroPlus$setFocus(drawMeasurementToolButton, false);
-                if (drawTextEntryActive) {
-                    drawTextEntryField.setEditable(true);
-                    xaeroPlus$setFocus(drawTextEntryField, true);
-                    setFocused(drawTextEntryField);
-                }
-            } case COLOR_PICKER -> {
-                xaeroPlus$setFocus(startDrawingButton, false);
-                xaeroPlus$setFocus(drawLineSegmentButton, false);
-                xaeroPlus$setFocus(drawInfiniteLineButton, false);
-                xaeroPlus$setFocus(drawHighlightsButton, false);
-                xaeroPlus$setFocus(drawTextButton, false);
-                xaeroPlus$setFocus(drawColorPickerButton, true);
-                xaeroPlus$setFocus(drawMeasurementToolButton, false);
-            } case MEASUREMENT -> {
-                xaeroPlus$setFocus(startDrawingButton, false);
-                xaeroPlus$setFocus(drawLineSegmentButton, false);
-                xaeroPlus$setFocus(drawInfiniteLineButton, false);
-                xaeroPlus$setFocus(drawHighlightsButton, false);
-                xaeroPlus$setFocus(drawTextButton, false);
-                xaeroPlus$setFocus(drawColorPickerButton, false);
-                xaeroPlus$setFocus(drawMeasurementToolButton, true);
-            }
+        xaeroPlus$setFocus(startDrawingButton, false);
+        xaeroPlus$setFocus(drawLineSegmentButton, drawingMode == DrawingMode.LINE_SEGMENT);
+        xaeroPlus$setFocus(drawInfiniteLineButton, drawingMode == DrawingMode.INFINITE_LINE);
+        xaeroPlus$setFocus(drawHighlightsButton, drawingMode == DrawingMode.HIGHLIGHT);
+        xaeroPlus$setFocus(drawEllipseButton, drawingMode == DrawingMode.ELLIPSE);
+        xaeroPlus$setFocus(drawTextButton, drawingMode == DrawingMode.TEXT);
+        xaeroPlus$setFocus(drawColorPickerButton, drawingMode == DrawingMode.COLOR_PICKER);
+        xaeroPlus$setFocus(drawMeasurementToolButton, drawingMode == DrawingMode.MEASUREMENT);
+        if (drawingMode == DrawingMode.TEXT && drawTextEntryActive) {
+            drawTextEntryField.setEditable(true);
+            xaeroPlus$setFocus(drawTextEntryField, true);
+            setFocused(drawTextEntryField);
         }
     }
 
@@ -517,19 +483,34 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Inject(method = "render", at = @At("RETURN"))
     public void updateInProgressLine(CallbackInfo ci) {
         if (drawing) {
+            var drawingModule = ModuleManager.getModule(Drawing.class);
+            if (drawingMode != DrawingMode.ELLIPSE) drawingModule.removeInProgressEllipse();
             switch (drawingMode) {
                 case LINE_SEGMENT, INFINITE_LINE -> {
                     if (drawInProgressPos == null) {
-                        ModuleManager.getModule(Drawing.class).removeInProgressLine();
+                        drawingModule.removeInProgressLine();
                     } else {
-                        var inProgress = ModuleManager.getModule(Drawing.class).snap(drawInProgressPos.getX(), drawInProgressPos.getZ(), mouseBlockPosX, mouseBlockPosZ, destScale);
-                        ModuleManager.getModule(Drawing.class).setInProgressLine(inProgress, drawingMode);
+                        var inProgress = drawingModule.snap(drawInProgressPos.getX(), drawInProgressPos.getZ(), mouseBlockPosX, mouseBlockPosZ, destScale);
+                        drawingModule.setInProgressLine(inProgress, drawingMode);
                     }
                 }
                 case HIGHLIGHT -> {
-                    ModuleManager.getModule(Drawing.class).removeInProgressLine();
+                    drawingModule.removeInProgressLine();
                     if (drawingLeftClickDown) {
-                        ModuleManager.getModule(Drawing.class).addHighlight(ChunkUtils.posToChunkPos(mouseBlockPosX), ChunkUtils.posToChunkPos(mouseBlockPosZ));
+                        drawingModule.addHighlight(ChunkUtils.posToChunkPos(mouseBlockPosX), ChunkUtils.posToChunkPos(mouseBlockPosZ));
+                    }
+                }
+                case ELLIPSE -> {
+                    drawingModule.removeInProgressLine();
+                    if (drawInProgressPos == null) {
+                        drawingModule.removeInProgressEllipse();
+                    } else {
+                        var ellipse = drawingModule.ellipseFromCenterAndRadii(drawInProgressPos.getX(), drawInProgressPos.getZ(), mouseBlockPosX, mouseBlockPosZ);
+                        if (ellipse == null) {
+                            drawingModule.removeInProgressEllipse();
+                        } else {
+                            drawingModule.setInProgressEllipse(ellipse);
+                        }
                     }
                 }
                 case COLOR_PICKER -> {
@@ -537,16 +518,17 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 }
                 case MEASUREMENT -> {
                     if (drawInProgressPos == null) {
-                        ModuleManager.getModule(Drawing.class).removeInProgressLine();
+                        drawingModule.removeInProgressLine();
                     } else {
-                        ModuleManager.getModule(Drawing.class).setInProgressLine(new Line(drawInProgressPos.getX(), drawInProgressPos.getZ(), mouseBlockPosX, mouseBlockPosZ), drawingMode);
+                        drawingModule.setInProgressLine(new Line(drawInProgressPos.getX(), drawInProgressPos.getZ(), mouseBlockPosX, mouseBlockPosZ), drawingMode);
                     }
                 }
             }
             if (drawingRightClickDown) {
-                ModuleManager.getModule(Drawing.class).removeHighlight(ChunkUtils.posToChunkPos(mouseBlockPosX), ChunkUtils.posToChunkPos(mouseBlockPosZ));
-                ModuleManager.getModule(Drawing.class).removeLine(mouseBlockPosX, mouseBlockPosZ);
-                ModuleManager.getModule(Drawing.class).removeText(mouseBlockPosX, mouseBlockPosZ, getFboScale());
+                drawingModule.removeHighlight(ChunkUtils.posToChunkPos(mouseBlockPosX), ChunkUtils.posToChunkPos(mouseBlockPosZ));
+                drawingModule.removeLine(mouseBlockPosX, mouseBlockPosZ);
+                drawingModule.removeEllipse(mouseBlockPosX, mouseBlockPosZ);
+                drawingModule.removeText(mouseBlockPosX, mouseBlockPosZ, getFboScale());
             }
         }
     }
@@ -749,7 +731,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if (button == 0) { // start drawing on left click
             drawingLeftClickDown = true;
             switch (drawingMode) {
-                case LINE_SEGMENT, INFINITE_LINE, TEXT, MEASUREMENT -> {
+                case LINE_SEGMENT, INFINITE_LINE, ELLIPSE, TEXT, MEASUREMENT -> {
                     drawInProgressPos = new BlockPos(mouseBlockPosX, 0, mouseBlockPosZ);
                 }
             }
@@ -808,6 +790,16 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 case MEASUREMENT -> {
                     drawInProgressPos = null;
                 }
+                case ELLIPSE -> {
+                    if (drawInProgressPos != null) {
+                        var drawingModule = ModuleManager.getModule(Drawing.class);
+                        var ellipse = drawingModule.ellipseFromCenterAndRadii(drawInProgressPos.getX(), drawInProgressPos.getZ(), mouseBlockPosX, mouseBlockPosZ);
+                        if (ellipse != null) drawingModule.addEllipse(ellipse);
+                        drawInProgressPos = null;
+                        drawingModule.removeInProgressEllipse();
+                        drawingModule.endOperation();
+                    }
+                }
                 case HIGHLIGHT -> {
                     ModuleManager.getModule(Drawing.class).endOperation();
                 }
@@ -818,6 +810,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             drawingRightClickDown = false;
             if (drawInProgressPos != null) return;
             ModuleManager.getModule(Drawing.class).removeLine(mouseBlockPosX, mouseBlockPosZ);
+            ModuleManager.getModule(Drawing.class).removeEllipse(mouseBlockPosX, mouseBlockPosZ);
             ModuleManager.getModule(Drawing.class).removeText(mouseBlockPosX, mouseBlockPosZ, getFboScale());
             ModuleManager.getModule(Drawing.class).endOperation();
             cir.setReturnValue(true);
@@ -830,12 +823,14 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         drawInProgressPos = null;
         ModuleManager.getModule(Drawing.class).endOperation();
         ModuleManager.getModule(Drawing.class).removeInProgressLine();
+        ModuleManager.getModule(Drawing.class).removeInProgressEllipse();
         drawingLeftClickDown = false;
         drawingRightClickDown = false;
         drawTextEntryActive = false;
         removeWidget(drawLineSegmentButton);
         removeWidget(drawInfiniteLineButton);
         removeWidget(drawHighlightsButton);
+        removeWidget(drawEllipseButton);
         removeWidget(drawTextButton);
         removeWidget(drawColorPickerButton);
         removeWidget(drawColorPicker);
@@ -844,6 +839,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         drawLineSegmentButton.visible = false;
         drawInfiniteLineButton.visible = false;
         drawHighlightsButton.visible = false;
+        drawEllipseButton.visible = false;
         drawTextButton.visible = false;
         drawColorPickerButton.visible = false;
         drawColorPicker.visible = false;
@@ -1014,6 +1010,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     for (int z = delHighlightMinZ; z <= delHighlightMaxZ; z++) {
                         toRemove.add(ChunkUtils.chunkPosToLong(x, z));
                         ModuleManager.getModule(Drawing.class).removeLine(ChunkUtils.chunkCoordToCoord(x), ChunkUtils.chunkCoordToCoord(z));
+                        ModuleManager.getModule(Drawing.class).removeEllipse(ChunkUtils.chunkCoordToCoord(x), ChunkUtils.chunkCoordToCoord(z));
                         ModuleManager.getModule(Drawing.class).removeText(ChunkUtils.chunkCoordToCoord(x), ChunkUtils.chunkCoordToCoord(z), 1);
                     }
                 }

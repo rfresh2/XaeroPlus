@@ -179,7 +179,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
         int tileZ = mapZ & 3;
         int insideX = xFloored & 15;
         int insideZ = zFloored & 15;
-        XaeroPlusShaders.LINES_SHADER.setFrameSize((float)this.scalingFramebuffer.viewWidth, (float)this.scalingFramebuffer.viewHeight);
+        XaeroPlusShaders.setFrameSize((float)this.scalingFramebuffer.viewWidth, (float)this.scalingFramebuffer.viewHeight);
         Globals.drawManager.drawMinimapFeatures(
             chunkX,
             chunkZ,
@@ -204,7 +204,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
                                             @Local(name = "renderTypeBuffers") MultiBufferSource.BufferSource renderTypeBuffers
     ) {
         original.call(instance, renderer);
-        XaeroPlusShaders.LINES_SHADER.setFrameSize((float)this.scalingFramebuffer.viewWidth, (float)this.scalingFramebuffer.viewHeight);
+        XaeroPlusShaders.setFrameSize((float)this.scalingFramebuffer.viewWidth, (float)this.scalingFramebuffer.viewHeight);
         int mapX = xFloored >> 4;
         int mapZ = zFloored >> 4;
         int chunkX = mapX >> 2;

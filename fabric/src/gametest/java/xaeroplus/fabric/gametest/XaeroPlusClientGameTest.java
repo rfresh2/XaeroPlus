@@ -98,6 +98,15 @@ public class XaeroPlusClientGameTest implements ClientModInitializer {
                 var lz = ChunkUtils.chunkCoordToCoord(ChunkUtils.actualPlayerChunkZ());
                 ModuleManager.getModule(Drawing.class).addLine(new Line(lx - 128, lz - 128, lx + 128, lz + 128), ColorHelper.getColor(255, 0, 0, 200));
                 ModuleManager.getModule(Drawing.class).addText(new Text("bottom text", lx, lz + 64, ColorHelper.getColor(255, 255, 255, 255), 1f));
+                var drawing = ModuleManager.getModule(Drawing.class);
+                drawing.addEllipse(
+                    drawing.ellipseFromCenterAndRadii(lx + 52, lz, lx + 80, lz + 28),
+                    ColorHelper.getColor(0, 255, 255, 230)
+                );
+                drawing.addEllipse(
+                    drawing.ellipseFromCenterAndRadii(lx - 52, lz, lx - 12, lz - 20),
+                    ColorHelper.getColor(255, 128, 0, 230)
+                );
                 var testHighlights = new Long2LongArrayMap();
                 testHighlights.put(ChunkUtils.chunkPosToLong(ChunkUtils.actualPlayerChunkX() - 5, ChunkUtils.actualPlayerChunkZ() + 5), 0);
                 Globals.drawManager.registry().register(DrawFeatureFactory.chunkHighlights(

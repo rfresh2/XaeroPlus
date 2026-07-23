@@ -1,5 +1,6 @@
 package xaeroplus.feature.render;
 
+import xaeroplus.feature.render.ellipse.*;
 import xaeroplus.feature.render.highlight.*;
 import xaeroplus.feature.render.line.*;
 import xaeroplus.feature.render.text.AsyncTextDrawFeature;
@@ -10,6 +11,52 @@ import xaeroplus.util.FloatSupplier;
 import java.util.function.IntSupplier;
 
 public interface DrawFeatureFactory {
+
+    /**
+     * Refreshed on MC render thread
+     * Single color across all ellipses
+     * Color function is called each frame
+     */
+    static DrawFeature ellipses(
+        String id,
+        EllipseSupplier ellipseSupplier,
+        IntSupplier colorSupplier,
+        FloatSupplier thicknessSupplier,
+        int refreshIntervalMs
+    ) {
+        return new EllipseDrawFeature(
+            id,
+            new EllipseProvider(
+                ellipseSupplier,
+                colorSupplier,
+                thicknessSupplier
+            ),
+            refreshIntervalMs
+        );
+    }
+
+    /**
+     * Refreshed on MC render thread
+     * Color function per-ellipse
+     * Color function is called only on refresh
+     */
+    static DrawFeature multiColorEllipses(
+        String id,
+        MultiColorEllipseSupplier ellipseSupplier,
+        MultiColorEllipseColorFunction colorFunction,
+        FloatSupplier thicknessSupplier,
+        int refreshIntervalMs
+    ) {
+        return new MultiColorEllipseDrawFeature(
+            id,
+            new MultiColorEllipseProvider(
+                ellipseSupplier,
+                colorFunction,
+                thicknessSupplier
+            ),
+            refreshIntervalMs
+        );
+    }
 
     /**
      * Refreshed on MC render thread

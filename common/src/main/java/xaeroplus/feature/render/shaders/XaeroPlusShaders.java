@@ -57,6 +57,23 @@ public class XaeroPlusShaders {
         .withCull(false)
         .build();
 
+    public static final RenderPipeline ELLIPSES_PIPELINE = RenderPipeline.builder()
+        .withLocation(ResourceLocation.fromNamespaceAndPath("xaeroplus", "pipeline/ellipses"))
+        .withVertexShader(ResourceLocation.fromNamespaceAndPath("xaeroplus", "ellipses"))
+        .withFragmentShader(ResourceLocation.fromNamespaceAndPath("xaeroplus", "ellipses"))
+        .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS)
+        .withPolygonMode(PolygonMode.FILL)
+        .withUniform("ModelViewMat", UniformType.MATRIX4X4)
+        .withUniform("ProjMat", UniformType.MATRIX4X4)
+        .withUniform("ColorModulator", UniformType.VEC4)
+        .withUniform("Thickness", UniformType.FLOAT)
+        .withUniform("FrameSize", UniformType.VEC2)
+        .withUniform("MapViewMatrix", UniformType.MATRIX4X4)
+        .withUniform("CameraRelativeOrigin", UniformType.VEC2)
+        .withBlend(new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ONE_MINUS_SRC_ALPHA))
+        .withCull(false)
+        .build();
+
     public static final int[] TRANSPARENT_WM_BACKGROUND_UNIFORM_VALUE = new int[1];
     public static final RenderPipeline.UniformDescription TRANSPARENT_WM_BACKGROUND_UNIFORM = new RenderPipeline.UniformDescription("TransparentBackground", UniformType.INT);
 
@@ -66,9 +83,20 @@ public class XaeroPlusShaders {
     }
 
     public static final float[] LINES_FRAME_SIZE = new float[2];
+    public static final float[] ELLIPSES_FRAME_SIZE = new float[2];
 
     public static void setLinesFrameSize(float width, float height) {
         LINES_FRAME_SIZE[0] = width;
         LINES_FRAME_SIZE[1] = height;
+    }
+
+    public static void setEllipsesFrameSize(final float width, final float height) {
+        ELLIPSES_FRAME_SIZE[0] = width;
+        ELLIPSES_FRAME_SIZE[1] = height;
+    }
+
+    public static void setFrameSize(final float width, final float height) {
+        setLinesFrameSize(width, height);
+        setEllipsesFrameSize(width, height);
     }
 }

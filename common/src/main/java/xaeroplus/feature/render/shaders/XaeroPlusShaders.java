@@ -8,6 +8,7 @@ public class XaeroPlusShaders {
     public static HighlightShader HIGHLIGHT_SHADER = null;
     public static MultiColorHighlightShader MULTI_COLOR_HIGHLIGHT_SHADER = null;
     public static LinesShader LINES_SHADER = null;
+    public static EllipsesShader ELLIPSES_SHADER = null;
     private static boolean firstReload = true;
 
     public static void onResourceReload(ResourceManager resourceManager) {
@@ -21,13 +22,17 @@ public class XaeroPlusShaders {
             if (LINES_SHADER != null) {
                 LINES_SHADER.close();
             }
+            if (ELLIPSES_SHADER != null) {
+                ELLIPSES_SHADER.close();
+            }
             HIGHLIGHT_SHADER = new HighlightShader(resourceManager);
             MULTI_COLOR_HIGHLIGHT_SHADER = new MultiColorHighlightShader(resourceManager);
             LINES_SHADER = new LinesShader(resourceManager);
+            ELLIPSES_SHADER = new EllipsesShader(resourceManager);
             XaeroPlus.LOGGER.info("Reloaded Shaders");
         } catch (final Exception e) {
             if (firstReload) {
-                throw new RuntimeException("Failed reloading shaders");
+                throw new RuntimeException("Failed reloading shaders", e);
             }
             XaeroPlus.LOGGER.error("Error in shader reloader", e);
         }
@@ -35,8 +40,18 @@ public class XaeroPlusShaders {
     }
 
     public static void ensureShaders() {
-        if ((HIGHLIGHT_SHADER == null || MULTI_COLOR_HIGHLIGHT_SHADER == null || LINES_SHADER == null) && firstReload) {
+        if ((HIGHLIGHT_SHADER == null || MULTI_COLOR_HIGHLIGHT_SHADER == null || LINES_SHADER == null || ELLIPSES_SHADER == null) && firstReload) {
             onResourceReload(Minecraft.getInstance().getResourceManager());
+        }
+    }
+
+    public static void setFrameSize(final float width, final float height) {
+        ensureShaders();
+        if (LINES_SHADER != null) {
+            LINES_SHADER.setFrameSize(width, height);
+        }
+        if (ELLIPSES_SHADER != null) {
+            ELLIPSES_SHADER.setFrameSize(width, height);
         }
     }
 }

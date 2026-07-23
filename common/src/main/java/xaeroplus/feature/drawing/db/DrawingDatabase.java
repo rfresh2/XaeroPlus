@@ -12,6 +12,7 @@ import xaero.map.WorldMap;
 import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.db.DatabaseMigrator;
+import xaeroplus.feature.render.ellipse.Ellipse;
 import xaeroplus.feature.render.line.Line;
 import xaeroplus.feature.render.text.Text;
 import xaeroplus.module.impl.TickTaskExecutor;
@@ -38,13 +39,15 @@ public class DrawingDatabase implements Closeable {
     public static final int MAX_HIGHLIGHTS_LIST = 25000;
     public static final String HIGHLIGHTS_TABLE = "highlights";
     public static final String LINES_TABLE = "lines";
+    public static final String ELLIPSES_TABLE = "ellipses";
     public static final String TEXTS_TABLE = "texts";
     private Connection connection;
     public final String databaseName;
     protected final Path dbPath;
     private static final DatabaseMigrator MIGRATOR = new DatabaseMigrator(
         List.of(
-            new V0Migration()
+            new V0Migration(),
+            new V1Migration()
         )
     );
     boolean recoveryAttempted = false;
@@ -125,6 +128,30 @@ public class DrawingDatabase implements Closeable {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS \"" + getTableName(dimension, LINES_TABLE) + "\" (x1 INTEGER, z1 INTEGER, x2 INTEGER, z2 INTEGER, color INTEGER, PRIMARY KEY (x1, z1, x2, z2))");
         } catch (SQLException e) {
             XaeroPlus.LOGGER.error("Error creating lines table for db: {}", databaseName, e);
+            return false;
+        }
+        return true;
+    }
+
+    private void createEllipsesTable(final String databaseName, final Connection connection, final ResourceKey<Level> dimension) {
+        var tryCount = 0;
+        while (tryCount++ < MAX_RETRIES) {
+            if (createEllipsesTable0(databaseName, connection, dimension)) return;
+            XaeroPlus.LOGGER.info("Retrying creating ellipses table for db: {} (attempt {}/{})", databaseName, tryCount, MAX_RETRIES);
+            Wait.waitMs(50);
+        }
+        throw new RuntimeException("Failed to create ellipses table for db: " + databaseName);
+    }
+
+    private boolean createEllipsesTable0(final String databaseName, final Connection connection, final ResourceKey<Level> dimension) {
+        try (var statement = connection.createStatement()) {
+            statement.executeUpdate(
+                "CREATE TABLE IF NOT EXISTS \"" + getTableName(dimension, ELLIPSES_TABLE)
+                    + "\" (centerX INTEGER, centerZ INTEGER, radiusX INTEGER, radiusZ INTEGER, color INTEGER,"
+                    + " PRIMARY KEY (centerX, centerZ, radiusX, radiusZ))"
+            );
+        } catch (final SQLException e) {
+            XaeroPlus.LOGGER.error("Error creating ellipses table for db: {}", databaseName, e);
             return false;
         }
         return true;
@@ -223,6 +250,7 @@ public class DrawingDatabase implements Closeable {
     public void initializeDimension(final ResourceKey<Level> dimension) {
         createHighlightsTable(databaseName, connection, dimension);
         createLinesTable(databaseName, connection, dimension);
+        createEllipsesTable(databaseName, connection, dimension);
         createTextsTable(databaseName, connection, dimension);
     }
 
@@ -266,6 +294,42 @@ public class DrawingDatabase implements Closeable {
             XaeroPlus.LOGGER.error("Error getting lines from {} database in dimension: {}", databaseName, dimension.location(), e);
             if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
+                recoverCorruptDatabase();
+            }
+            return false;
+        }
+        return true;
+    }
+
+    @FunctionalInterface
+    public interface EllipseConsumer {
+        void accept(int centerX, int centerZ, int radiusX, int radiusZ, int color);
+    }
+
+    public void getEllipsesInDimension(final ResourceKey<Level> dimension, final EllipseConsumer consumer) {
+        var tryCount = 0;
+        while (tryCount++ < MAX_RETRIES) {
+            if (getEllipsesInDimension0(dimension, consumer)) return;
+            XaeroPlus.LOGGER.info("Retrying getting ellipses from {} database in dimension: {} (attempt {}/{})", databaseName, dimension.location(), tryCount, MAX_RETRIES);
+            Wait.waitMs(50);
+        }
+    }
+
+    private boolean getEllipsesInDimension0(final ResourceKey<Level> dimension, final EllipseConsumer consumer) {
+        try (var statement = connection.createStatement();
+             var resultSet = statement.executeQuery("SELECT * FROM \"" + getTableName(dimension, ELLIPSES_TABLE) + "\"")) {
+            while (resultSet.next()) {
+                consumer.accept(
+                    resultSet.getInt("centerX"),
+                    resultSet.getInt("centerZ"),
+                    resultSet.getInt("radiusX"),
+                    resultSet.getInt("radiusZ"),
+                    resultSet.getInt("color")
+                );
+            }
+        } catch (final SQLException e) {
+            XaeroPlus.LOGGER.error("Error getting ellipses from {} database in dimension: {}", databaseName, dimension.location(), e);
+            if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
                 recoverCorruptDatabase();
             }
             return false;
@@ -421,6 +485,50 @@ public class DrawingDatabase implements Closeable {
         return true;
     }
 
+    public void insertEllipsesList(final Object2IntMap<Ellipse> ellipses, final ResourceKey<Level> dimension) {
+        var tryCount = 0;
+        while (tryCount++ < MAX_RETRIES) {
+            if (insertEllipsesList0(ellipses, dimension)) return;
+            XaeroPlus.LOGGER.info("Retrying inserting {} ellipses into {} database in dimension: {} (attempt {}/{})", ellipses.size(), databaseName, dimension.location(), tryCount, MAX_RETRIES);
+            Wait.waitMs(50);
+        }
+    }
+
+    private boolean insertEllipsesList0(final Object2IntMap<Ellipse> ellipses, final ResourceKey<Level> dimension) {
+        if (ellipses.isEmpty()) return true;
+        try {
+            createEllipsesTable(databaseName, connection, dimension);
+            var batchSize = MAX_HIGHLIGHTS_LIST;
+            var sql = new StringBuilder(60 * Math.min(batchSize, ellipses.size()) + 75);
+            var iterator = Object2IntMaps.fastIterator(ellipses);
+            while (iterator.hasNext()) {
+                sql.setLength(0);
+                sql.append("INSERT OR REPLACE INTO \"").append(getTableName(dimension, ELLIPSES_TABLE)).append("\" VALUES ");
+                for (var i = 0; i < batchSize && iterator.hasNext(); i++) {
+                    var entry = iterator.next();
+                    var ellipse = entry.getKey();
+                    sql.append("(")
+                        .append(ellipse.centerX()).append(", ")
+                        .append(ellipse.centerZ()).append(", ")
+                        .append(ellipse.radiusX()).append(", ")
+                        .append(ellipse.radiusZ()).append(", ")
+                        .append(entry.getIntValue()).append("), ");
+                }
+                sql.setLength(sql.length() - 2);
+                try (var statement = connection.createStatement()) {
+                    statement.executeUpdate(sql.toString());
+                }
+            }
+        } catch (final SQLException e) {
+            XaeroPlus.LOGGER.error("Error inserting {} ellipses into {} database in dimension: {}", ellipses.size(), databaseName, dimension.location(), e);
+            if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
+                recoverCorruptDatabase();
+            }
+            return false;
+        }
+        return true;
+    }
+
     public void insertHighlightList(final Long2LongMap chunks, final ResourceKey<Level> dimension) {
         int tryCount = 0;
         while (tryCount++ < MAX_RETRIES) {
@@ -569,6 +677,55 @@ public class DrawingDatabase implements Closeable {
             XaeroPlus.LOGGER.error("Error while removing all lines from {} database in dimension: {}", databaseName, dimension.location(), e);
             if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
                 XaeroPlus.LOGGER.error("Corruption detected in {} database", databaseName, e);
+                recoverCorruptDatabase();
+            }
+            return false;
+        }
+        return true;
+    }
+
+    public void removeEllipse(final Ellipse ellipse, final ResourceKey<Level> dimension) {
+        var tryCount = 0;
+        while (tryCount++ < MAX_RETRIES) {
+            if (removeEllipse0(ellipse, dimension)) return;
+            XaeroPlus.LOGGER.info("Retrying removing ellipse from {} database in dimension: {} (attempt {}/{})", databaseName, dimension.location(), tryCount, MAX_RETRIES);
+            Wait.waitMs(50);
+        }
+    }
+
+    private boolean removeEllipse0(final Ellipse ellipse, final ResourceKey<Level> dimension) {
+        try (var statement = connection.createStatement()) {
+            statement.executeUpdate(
+                "DELETE FROM \"" + getTableName(dimension, ELLIPSES_TABLE) + "\" WHERE centerX = " + ellipse.centerX()
+                    + " AND centerZ = " + ellipse.centerZ()
+                    + " AND radiusX = " + ellipse.radiusX()
+                    + " AND radiusZ = " + ellipse.radiusZ()
+            );
+        } catch (final SQLException e) {
+            XaeroPlus.LOGGER.error("Error removing ellipse from {} database in dimension: {}", databaseName, dimension.location(), e);
+            if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
+                recoverCorruptDatabase();
+            }
+            return false;
+        }
+        return true;
+    }
+
+    public void removeAllEllipses(final ResourceKey<Level> dimension) {
+        var tryCount = 0;
+        while (tryCount++ < MAX_RETRIES) {
+            if (removeAllEllipses0(dimension)) return;
+            XaeroPlus.LOGGER.info("Retrying removing all ellipses from {} database in dimension: {} (attempt {}/{})", databaseName, dimension.location(), tryCount, MAX_RETRIES);
+            Wait.waitMs(50);
+        }
+    }
+
+    private boolean removeAllEllipses0(final ResourceKey<Level> dimension) {
+        try (var statement = connection.createStatement()) {
+            statement.executeUpdate("DELETE FROM \"" + getTableName(dimension, ELLIPSES_TABLE) + "\"");
+        } catch (final SQLException e) {
+            XaeroPlus.LOGGER.error("Error removing all ellipses from {} database in dimension: {}", databaseName, dimension.location(), e);
+            if (e.getErrorCode() == SQLiteErrorCode.SQLITE_CORRUPT.code) {
                 recoverCorruptDatabase();
             }
             return false;

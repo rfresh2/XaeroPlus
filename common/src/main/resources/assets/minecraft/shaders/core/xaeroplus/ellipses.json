@@ -1,0 +1,26 @@
+{
+    "blend": {
+        "func": "add",
+        "srcrgb": "srcalpha",
+        "dstrgb": "1-srcalpha",
+        "srcalpha": "1",
+        "dstalpha": "1-srcalpha"
+    },
+    "vertex": "xaeroplus/ellipses",
+    "fragment": "xaeroplus/ellipses",
+    "attributes": [
+        "Position",
+        "UV0",
+        "Color"
+    ],
+    "samplers": [
+    ],
+    "uniforms": [
+        { "name": "ModelViewMat", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+        { "name": "ProjMat", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+        { "name": "MapViewMatrix", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+        { "name": "CameraRelativeOrigin", "type": "float", "count": 2, "values": [ 0.0, 0.0 ] },
+        { "name": "Thickness", "type": "float", "count": 1, "values": [ 1.0 ] },
+        { "name": "FrameSize", "type": "float", "count": 2, "values": [ 1.0, 1.0 ] }
+    ]
+}

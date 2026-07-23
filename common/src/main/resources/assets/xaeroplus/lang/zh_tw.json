@@ -325,6 +325,7 @@
   "xaeroplus.gui.world_map.draw_line_segment": "線段",
   "xaeroplus.gui.world_map.draw_infinite_line": "無限線",
   "xaeroplus.gui.world_map.draw_highlights": "區塊高亮",
+  "xaeroplus.gui.world_map.draw_ellipse": "橢圓",
   "xaeroplus.gui.world_map.draw_text": "文字",
   "xaeroplus.gui.world_map.draw_color": "繪圖顏色",
   "xaeroplus.gui.world_map.draw_measurement_tool": "測量工具",

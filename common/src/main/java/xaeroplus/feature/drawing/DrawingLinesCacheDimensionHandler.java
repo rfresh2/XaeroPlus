@@ -159,9 +159,8 @@ public class DrawingLinesCacheDimensionHandler {
         Object2IntMap<Line> linesToWrite = new Object2IntOpenHashMap<>(staleLines.size());
         for (var it = staleLines.iterator(); it.hasNext(); ) {
             Line line = it.next();
-            var color = lines.getOrDefault(line, Integer.MIN_VALUE);
-            if (color != Integer.MIN_VALUE) {
-                linesToWrite.put(line, color);
+            if (lines.containsKey(line)) {
+                linesToWrite.put(line, lines.getInt(line));
             }
             it.remove();
         }

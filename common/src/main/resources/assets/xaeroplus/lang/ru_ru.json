@@ -325,6 +325,7 @@
   "xaeroplus.gui.world_map.draw_line_segment": "Отрезок линии",
   "xaeroplus.gui.world_map.draw_infinite_line": "Бесконечная линия",
   "xaeroplus.gui.world_map.draw_highlights": "Выделение чанка",
+  "xaeroplus.gui.world_map.draw_ellipse": "Эллипс",
   "xaeroplus.gui.world_map.draw_text": "Текст",
   "xaeroplus.gui.world_map.draw_color": "Цвет рисования",
   "xaeroplus.gui.world_map.draw_measurement_tool": "Инструмент измерения",

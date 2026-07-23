@@ -124,9 +124,8 @@ public class DrawingHighlightCacheDimensionHandler extends ChunkHighlightBaseCac
         Long2LongMap chunksToWrite = new Long2LongOpenHashMap(staleChunks.size());
         for (var it = staleChunks.longIterator(); it.hasNext(); ) {
             long chunkPos = it.nextLong();
-            long foundTime = chunks.get(chunkPos);
-            if (foundTime != chunks.defaultReturnValue()) {
-                chunksToWrite.put(chunkPos, foundTime);
+            if (chunks.containsKey(chunkPos)) {
+                chunksToWrite.put(chunkPos, chunks.get(chunkPos));
             }
             it.remove();
         }

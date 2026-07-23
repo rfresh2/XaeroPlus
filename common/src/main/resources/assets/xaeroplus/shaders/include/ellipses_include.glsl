@@ -1,0 +1,8 @@
+#moj_import <minecraft:projection.glsl>
+#moj_import <minecraft:dynamictransforms.glsl>
+
+layout(std140) uniform EllipsesTransforms {
+    mat4 MapViewMatrix;
+    vec2 FrameSize;
+    vec2 CameraRelativeOrigin;
+};

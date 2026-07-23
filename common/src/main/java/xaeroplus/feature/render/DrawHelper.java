@@ -15,4 +15,14 @@ public class DrawHelper {
         vertexBuffer.addVertex(x1, y1, 0.0F).setColor(r, g, b, a).setUv(x2, y2);
         vertexBuffer.addVertex(x1, y1, 0.0F).setColor(r, g, b, a).setUv(x2, y2);
     }
+
+    public static void addColoredEllipseQuadToExistingBuffer(
+        VertexConsumer vertexBuffer, float centerX, float centerZ, float radiusX, float radiusZ,
+        float r, float g, float b, float a
+    ) {
+        // The ellipse shader expands this packed center and radii into a screen-space quad.
+        for (var i = 0; i < 4; i++) {
+            vertexBuffer.addVertex(centerX, centerZ, 0.0F).setUv(radiusX, radiusZ).setColor(r, g, b, a);
+        }
+    }
 }

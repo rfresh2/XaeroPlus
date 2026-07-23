@@ -26,11 +26,17 @@ public class XaeroPlusShaders {
         DefaultVertexFormat.POSITION_TEX_COLOR,
         ShaderDefines.EMPTY
     );
+    public static final ShaderProgram ELLIPSES_SHADER_PROGRAM = new ShaderProgram(
+        ResourceLocation.fromNamespaceAndPath("xaeroplus", "ellipses"),
+        DefaultVertexFormat.POSITION_TEX_COLOR,
+        ShaderDefines.EMPTY
+    );
 
     private static CompiledShaderProgram CACHED_HIGHLIGHT_SHADER_PROGRAM;
     private static CompiledShaderProgram CACHED_MULTI_COLOR_HIGHLIGHT_SHADER_PROGRAM;
     private static CompiledShaderProgram CACHED_CUSTOM_MAP_SHADER_PROGRAM;
     private static CompiledShaderProgram CACHED_LINES_SHADER_PROGRAM;
+    private static CompiledShaderProgram CACHED_ELLIPSES_SHADER_PROGRAM;
     private static Uniform HIGHLIGHT_COLOR_UNIFORM;
     private static Uniform HIGHLIGHT_MAP_VIEW_MATRIX_UNIFORM;
     private static Uniform HIGHLIGHT_CAMERA_CHUNK_UNIFORM;
@@ -42,6 +48,10 @@ public class XaeroPlusShaders {
     private static Uniform LINES_FRAME_SIZE_UNIFORM;
     private static Uniform LINES_MAP_VIEW_MATRIX_UNIFORM;
     private static Uniform LINES_CAMERA_RELATIVE_ORIGIN_UNIFORM;
+    private static Uniform ELLIPSES_FRAME_SIZE_UNIFORM;
+    private static Uniform ELLIPSES_MAP_VIEW_MATRIX_UNIFORM;
+    private static Uniform ELLIPSES_CAMERA_RELATIVE_ORIGIN_UNIFORM;
+    private static Uniform ELLIPSES_THICKNESS_UNIFORM;
 
     public static void setHighlightColor(float r, float g, float b, float a) {
         CompiledShaderProgram currentProgram = Minecraft.getInstance().getShaderManager().getProgram(HIGHLIGHT_SHADER_PROGRAM);
@@ -179,5 +189,49 @@ public class XaeroPlusShaders {
             (float) ((long) bufferOriginBlockX - cameraBlockX),
             (float) ((long) bufferOriginBlockZ - cameraBlockZ)
         );
+    }
+
+    private static void ensureEllipsesUniforms() {
+        var currentProgram = Minecraft.getInstance().getShaderManager().getProgram(ELLIPSES_SHADER_PROGRAM);
+        if (currentProgram != CACHED_ELLIPSES_SHADER_PROGRAM) {
+            CACHED_ELLIPSES_SHADER_PROGRAM = currentProgram;
+            ELLIPSES_FRAME_SIZE_UNIFORM = currentProgram.getUniform("FrameSize");
+            ELLIPSES_MAP_VIEW_MATRIX_UNIFORM = currentProgram.getUniform("MapViewMatrix");
+            ELLIPSES_CAMERA_RELATIVE_ORIGIN_UNIFORM = currentProgram.getUniform("CameraRelativeOrigin");
+            ELLIPSES_THICKNESS_UNIFORM = currentProgram.getUniform("Thickness");
+        }
+    }
+
+    public static void setEllipsesFrameSize(final float width, final float height) {
+        ensureEllipsesUniforms();
+        ELLIPSES_FRAME_SIZE_UNIFORM.set(width, height);
+    }
+
+    public static void setEllipsesThickness(final float thickness) {
+        ensureEllipsesUniforms();
+        ELLIPSES_THICKNESS_UNIFORM.set(thickness);
+    }
+
+    public static void setEllipsesMapViewMatrix(final Matrix4f matrix) {
+        ensureEllipsesUniforms();
+        ELLIPSES_MAP_VIEW_MATRIX_UNIFORM.set(matrix);
+    }
+
+    public static void setEllipsesCameraRelative(
+        final int bufferOriginBlockX,
+        final int bufferOriginBlockZ,
+        final int cameraBlockX,
+        final int cameraBlockZ
+    ) {
+        ensureEllipsesUniforms();
+        ELLIPSES_CAMERA_RELATIVE_ORIGIN_UNIFORM.set(
+            (float) ((long) bufferOriginBlockX - cameraBlockX),
+            (float) ((long) bufferOriginBlockZ - cameraBlockZ)
+        );
+    }
+
+    public static void setFrameSize(final float width, final float height) {
+        setLinesFrameSize(width, height);
+        setEllipsesFrameSize(width, height);
     }
 }

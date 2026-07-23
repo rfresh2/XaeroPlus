@@ -6,6 +6,5 @@ public enum DrawingMode {
     HIGHLIGHT,
     ELLIPSE,
     TEXT,
-    COLOR_PICKER,
     MEASUREMENT
 }

@@ -16,6 +16,7 @@ import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.feature.drawing.db.DrawingDatabase;
+import xaeroplus.feature.render.ellipse.Ellipse;
 import xaeroplus.feature.render.line.Line;
 import xaeroplus.feature.render.text.Text;
 import xaeroplus.module.impl.TickTaskExecutor;
@@ -44,6 +45,7 @@ public class DrawingCache implements Closeable {
     private final ListeningExecutorService parentExecutor;
     private final Map<ResourceKey<Level>, DrawingHighlightCacheDimensionHandler> highlightsCacheMap = new ConcurrentHashMap<>(3);
     private final Map<ResourceKey<Level>, DrawingLinesCacheDimensionHandler> linesCacheMap = new ConcurrentHashMap<>(3);
+    private final Map<ResourceKey<Level>, DrawingEllipseCacheDimensionHandler> ellipsesCacheMap = new ConcurrentHashMap<>(3);
     private final Map<ResourceKey<Level>, DrawingTextCacheDimensionHandler> textsCacheMap = new ConcurrentHashMap<>(3);
     private final Queue<Runnable> initializeTaskQueue = new ConcurrentLinkedQueue<>();
     Minecraft mc = Minecraft.getInstance();
@@ -87,6 +89,19 @@ public class DrawingCache implements Closeable {
             cacheForActualDimension.addLine(line, color);
         } catch (final Exception e) {
             XaeroPlus.LOGGER.warn("Error adding line to {} disk cache: {}, {}", databaseName, line, e);
+        }
+    }
+
+    public void addEllipse(final Ellipse ellipse, final int color, final ResourceKey<Level> dimension) {
+        try {
+            var cache = getEllipseCacheForDimension(dimension, true);
+            if (cache == null) {
+                initializeTaskQueue.add(() -> addEllipse(ellipse, color, dimension));
+                return;
+            }
+            cache.addEllipse(ellipse, color);
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.warn("Error adding ellipse to {} disk cache: {}, {}", databaseName, ellipse, e);
         }
     }
 
@@ -146,6 +161,19 @@ public class DrawingCache implements Closeable {
         }
     }
 
+    public void removeEllipse(final Ellipse ellipse, final ResourceKey<Level> dimension) {
+        try {
+            var cache = getEllipseCacheForDimension(dimension, true);
+            if (cache == null) {
+                initializeTaskQueue.add(() -> removeEllipse(ellipse, dimension));
+                return;
+            }
+            cache.removeEllipse(ellipse);
+        } catch (final Exception e) {
+            XaeroPlus.LOGGER.warn("Error removing ellipse from {} disk cache: {}, {}", databaseName, ellipse, e);
+        }
+    }
+
     public void removeText(final int x, final int z, ResourceKey<Level> dimension) {
         try {
             DrawingTextCacheDimensionHandler cacheForActualDimension = getTextCacheForDimension(dimension, true);
@@ -174,6 +202,13 @@ public class DrawingCache implements Closeable {
         return cacheForDimension.getLines();
     }
 
+    public Object2IntMap<Ellipse> getEllipses(final ResourceKey<Level> dimension) {
+        if (dimension == null) return Object2IntMaps.emptyMap();
+        var cacheForDimension = getEllipseCacheForDimension(dimension, false);
+        if (cacheForDimension == null) return Object2IntMaps.emptyMap();
+        return cacheForDimension.getEllipses();
+    }
+
     public Long2ObjectMap<Text> getTexts(final ResourceKey<Level> dimensionId) {
         if (dimensionId == null) return Long2ObjectMaps.emptyMap();
         var cacheForDimension = getTextCacheForDimension(dimensionId, false);
@@ -191,6 +226,7 @@ public class DrawingCache implements Closeable {
                             submitTickTask(() -> {
                                 loadHighlightsInViewedDimension();
                                 loadLinesInViewedDimension();
+                                loadEllipsesInViewedDimension();
                                 loadTextsInViewedDimension();
                             });
                         }
@@ -205,6 +241,7 @@ public class DrawingCache implements Closeable {
                             List<CompletableFuture<?>> tasks = new ArrayList<>();
                             tasks.addAll(flushAllChunks());
                             tasks.addAll(flushAllLines());
+                            tasks.addAll(flushAllEllipses());
                             tasks.addAll(flushAllTexts());
                             var future = CompletableFuture.allOf(tasks.toArray(CompletableFuture[]::new));
                             Wait.waitUntil(() -> !mc.isRunning() || future.isDone(), 30);
@@ -219,11 +256,13 @@ public class DrawingCache implements Closeable {
                 case VIEWED_DIMENSION_SWITCH -> {
                     submitTickTask(this::loadHighlightsInViewedDimension);
                     submitTickTask(this::loadLinesInViewedDimension);
+                    submitTickTask(this::loadEllipsesInViewedDimension);
                     submitTickTask(this::loadTextsInViewedDimension);
                 }
                 case ACTUAL_DIMENSION_SWITCH -> {
                     submitTickTask(this::loadChunksOnActualDimensionSwitch);
                     submitTickTask(this::loadLinesOnActualDimensionSwitch);
+                    submitTickTask(this::loadEllipsesOnActualDimensionSwitch);
                     submitTickTask(this::loadTextsOnActualDimensionSwitch);
                 }
             }
@@ -259,6 +298,7 @@ public class DrawingCache implements Closeable {
         // dimension cache instances will be GC'd, no need to explicitly clear them
         this.highlightsCacheMap.clear();
         this.linesCacheMap.clear();
+        this.ellipsesCacheMap.clear();
         this.textsCacheMap.clear();
         this.database = null;
         this.initializeTaskQueue.clear();
@@ -274,6 +314,12 @@ public class DrawingCache implements Closeable {
     private List<CompletableFuture<?>> flushAllLines() {
         return getAllLinesCaches().stream()
             .map(cache -> submitTickTask(cache::writeStaleLinesToDatabase))
+            .collect(Collectors.toList());
+    }
+
+    private List<CompletableFuture<?>> flushAllEllipses() {
+        return getAllEllipseCaches().stream()
+            .map(cache -> submitTickTask(cache::writeStaleEllipsesToDatabase))
             .collect(Collectors.toList());
     }
 
@@ -319,6 +365,20 @@ public class DrawingCache implements Closeable {
         db.initializeDimension(dimension);
         this.linesCacheMap.put(dimension, linesCacheHandler);
         return linesCacheHandler;
+    }
+
+    private DrawingEllipseCacheDimensionHandler initializeEllipseCacheHandler(final ResourceKey<Level> dimension) {
+        if (dimension == null) return null;
+        var db = database;
+        var executor = dbExecutor;
+        if (db == null || executor == null) {
+            XaeroPlus.LOGGER.error("[{}] Unable to initialize {} ellipse disk cache handler for: {}", Thread.currentThread().getName(), databaseName, dimension.identifier());
+            return null;
+        }
+        var ellipsesCacheHandler = new DrawingEllipseCacheDimensionHandler(dimension, db, executor);
+        db.initializeDimension(dimension);
+        ellipsesCacheMap.put(dimension, ellipsesCacheHandler);
+        return ellipsesCacheHandler;
     }
 
     private DrawingTextCacheDimensionHandler initializeTextDimensionCacheHandler(final ResourceKey<Level> dimension) {
@@ -371,12 +431,26 @@ public class DrawingCache implements Closeable {
         return linesCache;
     }
 
+    public DrawingEllipseCacheDimensionHandler getEllipseCacheForDimension(final ResourceKey<Level> dimension, final boolean create) {
+        if (!cacheReady.get() || dimension == null) return null;
+        var cache = ellipsesCacheMap.get(dimension);
+        if (cache == null && create) {
+            XaeroPlus.LOGGER.info("Initializing {} disk ellipse cache for dimension: {}", databaseName, dimension.identifier());
+            cache = initializeEllipseCacheHandler(dimension);
+        }
+        return cache;
+    }
+
     public List<DrawingHighlightCacheDimensionHandler> getAllHighlightCaches() {
         return List.copyOf(highlightsCacheMap.values());
     }
 
     public List<DrawingLinesCacheDimensionHandler> getAllLinesCaches() {
         return List.copyOf(linesCacheMap.values());
+    }
+
+    public List<DrawingEllipseCacheDimensionHandler> getAllEllipseCaches() {
+        return List.copyOf(ellipsesCacheMap.values());
     }
 
     public List<DrawingTextCacheDimensionHandler> getAllTextsCaches() {
@@ -443,6 +517,22 @@ public class DrawingCache implements Closeable {
         return caches;
     }
 
+    public List<DrawingEllipseCacheDimensionHandler> getEllipseCachesExceptDimension(final ResourceKey<Level> dimension) {
+        var caches = new ArrayList<DrawingEllipseCacheDimensionHandler>(ellipsesCacheMap.size());
+        for (var entry : ellipsesCacheMap.entrySet()) {
+            if (!entry.getKey().equals(dimension)) caches.add(entry.getValue());
+        }
+        return caches;
+    }
+
+    public List<DrawingEllipseCacheDimensionHandler> getEllipseCachesExceptDimensions(final List<ResourceKey<Level>> dimensions) {
+        var caches = new ArrayList<DrawingEllipseCacheDimensionHandler>(ellipsesCacheMap.size());
+        for (var entry : ellipsesCacheMap.entrySet()) {
+            if (!dimensions.contains(entry.getKey())) caches.add(entry.getValue());
+        }
+        return caches;
+    }
+
     // returns false if we were not able to get to a ready state
     // will happen if we are disconnecting from a server where the mc world is not loaded
     private synchronized boolean initializeWorld() {
@@ -467,6 +557,9 @@ public class DrawingCache implements Closeable {
             initializeLinesCacheHandler(OVERWORLD);
             initializeLinesCacheHandler(NETHER);
             initializeLinesCacheHandler(END);
+            initializeEllipseCacheHandler(OVERWORLD);
+            initializeEllipseCacheHandler(NETHER);
+            initializeEllipseCacheHandler(END);
             initializeTextDimensionCacheHandler(OVERWORLD);
             initializeTextDimensionCacheHandler(NETHER);
             initializeTextDimensionCacheHandler(END);
@@ -494,6 +587,13 @@ public class DrawingCache implements Closeable {
         if (linesCacheForActualDimension == null) return;
         linesCacheForActualDimension
             .setWindow(ChunkUtils.actualPlayerRegionX(), ChunkUtils.actualPlayerRegionZ(), getMinimapRegionWindowSize());
+    }
+
+    private void loadEllipsesOnActualDimensionSwitch() {
+        var cache = getEllipseCacheForDimension(ChunkUtils.getActualDimension(), true);
+        if (cache != null) {
+            cache.setWindow(ChunkUtils.actualPlayerRegionX(), ChunkUtils.actualPlayerRegionZ(), getMinimapRegionWindowSize());
+        }
     }
 
     private void loadTextsOnActualDimensionSwitch() {
@@ -546,6 +646,26 @@ public class DrawingCache implements Closeable {
         linesCacheForCurrentDimension.setWindow(windowCenterX, windowCenterZ, windowSize);
     }
 
+    private void loadEllipsesInViewedDimension() {
+        var viewedDimension = Globals.getCurrentDimensionId();
+        var cache = getEllipseCacheForDimension(viewedDimension, true);
+        if (cache == null) return;
+        final int windowSize;
+        final int windowCenterX;
+        final int windowCenterZ;
+        var guiMap = getGuiMap();
+        if (guiMap.isPresent()) {
+            windowSize = getGuiMapRegionSize(guiMap.get());
+            windowCenterX = getGuiMapCenterRegionX(guiMap.get());
+            windowCenterZ = getGuiMapCenterRegionZ(guiMap.get());
+        } else {
+            windowSize = getMinimapRegionWindowSize();
+            windowCenterX = ChunkUtils.getPlayerRegionX();
+            windowCenterZ = ChunkUtils.getPlayerRegionZ();
+        }
+        cache.setWindow(windowCenterX, windowCenterZ, windowSize);
+    }
+
     private void loadTextsInViewedDimension() {
         var viewedDim = Globals.getCurrentDimensionId();
         var cacheForCurrentDimension = getTextCacheForDimension(viewedDim, true);
@@ -579,6 +699,7 @@ public class DrawingCache implements Closeable {
                 List<CompletableFuture<?>> tasks = new ArrayList<>();
                 tasks.addAll(flushAllChunks());
                 tasks.addAll(flushAllLines());
+                tasks.addAll(flushAllEllipses());
                 tasks.addAll(flushAllTexts());
                 var future = CompletableFuture.allOf(tasks.toArray(CompletableFuture[]::new));
                 Wait.waitUntil(() -> !mc.isRunning() || future.isDone(), 30);
@@ -600,6 +721,9 @@ public class DrawingCache implements Closeable {
         }
         for (var cache : getAllLinesCaches()) {
             cache.writeStaleLinesToDatabase();
+        }
+        for (var cache : getAllEllipseCaches()) {
+            cache.writeStaleEllipsesToDatabase();
         }
         for (var cache : getAllTextsCaches()) {
             cache.writeStaleTextsToDatabase();
@@ -627,6 +751,7 @@ public class DrawingCache implements Closeable {
             // in case player is not moving, so window is not changing
             flushAllChunks();
             flushAllLines();
+            flushAllEllipses();
             flushAllTexts();
         }
         // only update window on an interval
@@ -660,12 +785,16 @@ public class DrawingCache implements Closeable {
         if (textCacheForDimension != null) textCacheForDimension.setWindow(windowCenterX, windowCenterZ, windowSize);
         var lineCacheForDimension = getLinesCacheForDimension(mapDimension, true);
         if (lineCacheForDimension != null) lineCacheForDimension.setWindow(windowCenterX, windowCenterZ, windowSize);
+        var ellipseCacheForDimension = getEllipseCacheForDimension(mapDimension, true);
+        if (ellipseCacheForDimension != null) ellipseCacheForDimension.setWindow(windowCenterX, windowCenterZ, windowSize);
         if (mapDimension == actualDimension) {
             getHighlightCachesExceptDimension(mapDimension)
                 .forEach(cache -> cache.setWindow(0, 0, 0));
             getTextCachesExceptDimension(mapDimension)
                 .forEach(cache -> cache.setWindow(0, 0, 0));
             getLineCachesExceptDimension(mapDimension)
+                .forEach(cache -> cache.setWindow(0, 0, 0));
+            getEllipseCachesExceptDimension(mapDimension)
                 .forEach(cache -> cache.setWindow(0, 0, 0));
         } else {
             var actualDimHighlightCache = getHighlightCacheForDimension(actualDimension, true);
@@ -680,12 +809,18 @@ public class DrawingCache implements Closeable {
             if (actualDimLinesCache != null) {
                 actualDimLinesCache.setWindow(actualPlayerRegionX, actualPlayerRegionZ, windowSize);
             }
+            var actualDimEllipseCache = getEllipseCacheForDimension(actualDimension, true);
+            if (actualDimEllipseCache != null) {
+                actualDimEllipseCache.setWindow(actualPlayerRegionX, actualPlayerRegionZ, windowSize);
+            }
             getHighlightCachesExceptDimensions(List.of(mapDimension, actualDimension))
                 .forEach(cache -> cache.setWindow(0, 0, 0));
             getTextCachesExceptDimensions(List.of(mapDimension, actualDimension))
                 .forEach(cache -> cache.setWindow(0, 0, 0));
             getLineCachesExceptDimensions(List.of(mapDimension, actualDimension))
                 .forEach((cache -> cache.setWindow(0, 0, 0)));
+            getEllipseCachesExceptDimensions(List.of(mapDimension, actualDimension))
+                .forEach(cache -> cache.setWindow(0, 0, 0));
         }
     }
 

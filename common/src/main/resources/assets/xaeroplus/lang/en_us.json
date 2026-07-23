@@ -325,6 +325,7 @@
   "xaeroplus.gui.world_map.draw_line_segment": "Line Segment",
   "xaeroplus.gui.world_map.draw_infinite_line": "Infinite Line",
   "xaeroplus.gui.world_map.draw_highlights": "Chunk Highlight",
+  "xaeroplus.gui.world_map.draw_ellipse": "Ellipse",
   "xaeroplus.gui.world_map.draw_text": "Text",
   "xaeroplus.gui.world_map.draw_color": "Drawing Color",
   "xaeroplus.gui.world_map.draw_measurement_tool": "Measurement Tool",

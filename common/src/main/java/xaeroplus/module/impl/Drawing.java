@@ -1,11 +1,9 @@
 package xaeroplus.module.impl;
 
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.LongArrayList;
-import it.unimi.dsi.fastutil.longs.LongCollection;
-import it.unimi.dsi.fastutil.longs.LongList;
+import it.unimi.dsi.fastutil.longs.*;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.lenni0451.lambdaevents.EventHandler;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
@@ -16,6 +14,7 @@ import xaeroplus.event.ClientTickEvent;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.feature.drawing.DrawingCache;
 import xaeroplus.feature.render.DrawFeatureFactory;
+import xaeroplus.feature.render.ellipse.Ellipse;
 import xaeroplus.feature.render.line.Line;
 import xaeroplus.feature.render.text.Text;
 import xaeroplus.module.Module;
@@ -28,6 +27,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 public class Drawing extends Module {
     public final DrawingCache drawingCache = new DrawingCache("XaeroPlusDrawing");
     private Line inProgressLine = null;
+    private Ellipse inProgressEllipse = null;
     private Color drawingColor = new Color(255, 0, 0, 200);
     private final Deque<DrawingOperation> operationStack = new LinkedBlockingDeque<>();
     private DrawingOperationCollector operationCollector = null;
@@ -86,6 +86,24 @@ public class Drawing extends Module {
             )
         );
         Globals.drawManager.registry().register(
+            DrawFeatureFactory.multiColorEllipses(
+                "Drawing-ellipses-saved",
+                this::getSavedEllipses,
+                (ellipse, color) -> color,
+                () -> 0.25f,
+                50
+            )
+        );
+        Globals.drawManager.registry().register(
+            DrawFeatureFactory.ellipses(
+                "Drawing-ellipses-in-progress",
+                this::getInProgressEllipses,
+                () -> drawingColor.getInt(),
+                () -> 0.25f,
+                1
+            )
+        );
+        Globals.drawManager.registry().register(
             DrawFeatureFactory.multiColorChunkHighlights(
                 "Drawing-highlights",
                 drawingCache::getHighlights,
@@ -134,6 +152,10 @@ public class Drawing extends Module {
         return drawingCache.getLines(dimension);
     }
 
+    private Object2IntMap<Ellipse> getSavedEllipses(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
+        return drawingCache.getEllipses(dimension);
+    }
+
     public Line getInProgressLine() {
         return inProgressLine;
     }
@@ -147,11 +169,19 @@ public class Drawing extends Module {
         }
     }
 
+    private List<Ellipse> getInProgressEllipses(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final ResourceKey<Level> dimension) {
+        var ellipse = inProgressEllipse;
+        return ellipse == null ? Collections.emptyList() : List.of(ellipse);
+    }
+
     public void addLine(final Line line, int color) {
         if (line.length() < 2) return;
-        drawingCache.addLine(line, color, Globals.getCurrentDimensionId());
+        var dimension = Globals.getCurrentDimensionId();
+        var savedLines = drawingCache.getLines(dimension);
+        var previousColor = savedLines.containsKey(line) ? savedLines.getInt(line) : null;
+        drawingCache.addLine(line, color, dimension);
         if (operationCollector != null) {
-            operationCollector.addLine(line);
+            operationCollector.addLine(line, previousColor);
         }
     }
 
@@ -162,9 +192,12 @@ public class Drawing extends Module {
     public void addInfiniteLine(final Line line, int color) {
         if (line.length() < 2) return;
         var infLine = line.extrapolateToWorldBorder();
-        drawingCache.addLine(infLine, color, Globals.getCurrentDimensionId());
+        var dimension = Globals.getCurrentDimensionId();
+        var savedLines = drawingCache.getLines(dimension);
+        var previousColor = savedLines.containsKey(infLine) ? savedLines.getInt(infLine) : null;
+        drawingCache.addLine(infLine, color, dimension);
         if (operationCollector != null) {
-            operationCollector.addLine(infLine);
+            operationCollector.addLine(infLine, previousColor);
         }
     }
 
@@ -172,10 +205,28 @@ public class Drawing extends Module {
         addInfiniteLine(line, drawingColor.getInt());
     }
 
-    public void addHighlight(int chunkX, int chunkZ, int color) {
-        drawingCache.addHighlight(chunkX, chunkZ, color, Globals.getCurrentDimensionId());
+    public void addEllipse(final Ellipse ellipse, final int color) {
+        var dimension = Globals.getCurrentDimensionId();
+        var savedEllipses = drawingCache.getEllipses(dimension);
+        var previousColor = savedEllipses.containsKey(ellipse) ? savedEllipses.getInt(ellipse) : null;
+        drawingCache.addEllipse(ellipse, color, dimension);
         if (operationCollector != null) {
-            operationCollector.addHighlight(chunkX, chunkZ);
+            operationCollector.addEllipse(ellipse, previousColor);
+        }
+    }
+
+    public void addEllipse(final Ellipse ellipse) {
+        addEllipse(ellipse, drawingColor.getInt());
+    }
+
+    public void addHighlight(int chunkX, int chunkZ, int color) {
+        var dimension = Globals.getCurrentDimensionId();
+        var key = ChunkUtils.chunkPosToLong(chunkX, chunkZ);
+        var savedHighlights = drawingCache.getHighlights(dimension);
+        Long previousColor = savedHighlights.containsKey(key) ? savedHighlights.get(key) : null;
+        drawingCache.addHighlight(chunkX, chunkZ, color, dimension);
+        if (operationCollector != null) {
+            operationCollector.addHighlight(key, previousColor);
         }
     }
 
@@ -184,33 +235,42 @@ public class Drawing extends Module {
     }
 
     public void removeHighlight(final int chunkX, final int chunkZ) {
-        if (!drawingCache.getHighlights(Globals.getCurrentDimensionId()).containsKey(ChunkUtils.chunkPosToLong(chunkX, chunkZ))) return;
-        drawingCache.removeHighlight(chunkX, chunkZ, Globals.getCurrentDimensionId());
+        var dimension = Globals.getCurrentDimensionId();
+        var key = ChunkUtils.chunkPosToLong(chunkX, chunkZ);
+        var highlights = drawingCache.getHighlights(dimension);
+        if (!highlights.containsKey(key)) return;
+        var color = highlights.get(key);
+        drawingCache.removeHighlight(chunkX, chunkZ, dimension);
         if (operationCollector != null) {
-            operationCollector.addHighlight(chunkX, chunkZ);
+            operationCollector.addErasedHighlight(key, color);
         }
     }
 
     public void removeHighlights(final LongCollection toRemove) {
-        LongCollection matched = new LongArrayList();
+        var matched = new Long2LongOpenHashMap();
         var it = toRemove.longIterator();
         var existingCache = drawingCache.getHighlights(Globals.getCurrentDimensionId());
         while (it.hasNext()) {
             long chunkLong = it.nextLong();
             if (existingCache.containsKey(chunkLong)) {
-                matched.add(chunkLong);
+                matched.put(chunkLong, existingCache.get(chunkLong));
             }
         }
-        drawingCache.removeHighlights(matched, Globals.getCurrentDimensionId());
+        drawingCache.removeHighlights(matched.keySet(), Globals.getCurrentDimensionId());
         if (operationCollector != null) {
-            operationCollector.addHighlights(matched);
+            operationCollector.addErasedHighlights(matched);
         }
     }
 
     public void addText(final Text text) {
-        drawingCache.addText(text, Globals.getCurrentDimensionId());
+        if (text.value().isBlank()) return;
+        var dimension = Globals.getCurrentDimensionId();
+        var key = ChunkUtils.chunkPosToLong(text.x(), text.z());
+        var savedTexts = drawingCache.getTexts(dimension);
+        var previousText = savedTexts.get(key);
+        drawingCache.addText(text, dimension);
         if (operationCollector != null) {
-            operationCollector.addText(text);
+            operationCollector.addText(text, previousText);
         }
     }
 
@@ -240,7 +300,7 @@ public class Drawing extends Module {
         for (Text text : toRemove) {
             drawingCache.removeText(text.x(), text.z(), Globals.getCurrentDimensionId());
             if (operationCollector != null) {
-                operationCollector.addText(text);
+                operationCollector.addErasedText(text);
             }
         }
     }
@@ -256,6 +316,21 @@ public class Drawing extends Module {
         inProgressLine = null;
     }
 
+    public void setInProgressEllipse(final Ellipse ellipse) {
+        inProgressEllipse = ellipse;
+    }
+
+    public void removeInProgressEllipse() {
+        inProgressEllipse = null;
+    }
+
+    public Ellipse ellipseFromCenterAndRadii(final int centerX, final int centerZ, final int radiusPointX, final int radiusPointZ) {
+        var radiusX = Math.abs(radiusPointX - centerX);
+        var radiusZ = Math.abs(radiusPointZ - centerZ);
+        if (radiusX == 0 || radiusZ == 0) return null;
+        return new Ellipse(centerX, centerZ, radiusX, radiusZ);
+    }
+
     public void removeLine(final int x, final int z) {
         Object2IntMap<Line> lines = drawingCache.getLines(Globals.getCurrentDimensionId());
         int maxX = x + 16;
@@ -264,7 +339,7 @@ public class Drawing extends Module {
         Line sqLine2 = new Line(x, z, x, maxZ);
         Line sqLine3 = new Line(maxX, z, maxX, maxZ);
         Line sqLine4 = new Line(x, maxZ, maxX, maxZ);
-        List<Line> toRemove = new ArrayList<>();
+        var toRemove = new Object2IntOpenHashMap<Line>();
         // find lines which intersect with square (x, z, maxX, maxZ)
         var it = Object2IntMaps.fastIterator(lines);
         while (it.hasNext()) {
@@ -278,12 +353,59 @@ public class Drawing extends Module {
                 || linesIntersect(line, sqLine2)
                 || linesIntersect(line, sqLine3)
                 || linesIntersect(line, sqLine4)) {
-                toRemove.add(line);
+                toRemove.put(line, entry.getIntValue());
             }
         }
-        for (Line line : toRemove) {
+        for (var entry : toRemove.object2IntEntrySet()) {
+            var line = entry.getKey();
             drawingCache.removeLine(line, Globals.getCurrentDimensionId());
+            if (operationCollector != null) {
+                operationCollector.addErasedLine(line, entry.getIntValue());
+            }
         }
+    }
+
+    public void removeEllipse(final int x, final int z) {
+        var maxX = x + 16;
+        var maxZ = z + 16;
+        var ellipses = drawingCache.getEllipses(Globals.getCurrentDimensionId());
+        var toRemove = new Object2IntOpenHashMap<Ellipse>();
+        for (var entry : ellipses.object2IntEntrySet()) {
+            var ellipse = entry.getKey();
+            if (ellipseOutlineIntersectsRectangle(ellipse, x, maxX, z, maxZ)) {
+                toRemove.put(ellipse, entry.getIntValue());
+            }
+        }
+        for (var entry : toRemove.object2IntEntrySet()) {
+            var ellipse = entry.getKey();
+            drawingCache.removeEllipse(ellipse, Globals.getCurrentDimensionId());
+            if (operationCollector != null) {
+                operationCollector.addErasedEllipse(ellipse, entry.getIntValue());
+            }
+        }
+    }
+
+    private boolean ellipseOutlineIntersectsRectangle(
+        final Ellipse ellipse,
+        final int minX,
+        final int maxX,
+        final int minZ,
+        final int maxZ
+    ) {
+        if (!ellipse.intersects(minX, maxX, minZ, maxZ)) return false;
+        var closestX = Mth.clamp(ellipse.centerX(), minX, maxX);
+        var closestZ = Mth.clamp(ellipse.centerZ(), minZ, maxZ);
+        var furthestX = Math.max(Math.abs((long) minX - ellipse.centerX()), Math.abs((long) maxX - ellipse.centerX()));
+        var furthestZ = Math.max(Math.abs((long) minZ - ellipse.centerZ()), Math.abs((long) maxZ - ellipse.centerZ()));
+        var minNormalizedDistance = normalizedEllipseDistance(ellipse, closestX - ellipse.centerX(), closestZ - ellipse.centerZ());
+        var maxNormalizedDistance = normalizedEllipseDistance(ellipse, furthestX, furthestZ);
+        return minNormalizedDistance <= 1.0 && maxNormalizedDistance >= 1.0;
+    }
+
+    private double normalizedEllipseDistance(final Ellipse ellipse, final long deltaX, final long deltaZ) {
+        var normalizedX = (double) deltaX / ellipse.radiusX();
+        var normalizedZ = (double) deltaZ / ellipse.radiusZ();
+        return normalizedX * normalizedX + normalizedZ * normalizedZ;
     }
 
     private boolean linesIntersect(Line line1, Line line2) {
@@ -340,6 +462,9 @@ public class Drawing extends Module {
         drawingCache.getAllLinesCaches().forEach(c -> {
             c.removeAllLines();
         });
+        drawingCache.getAllEllipseCaches().forEach(c -> {
+            c.removeAllEllipses();
+        });
         drawingCache.getAllTextsCaches().forEach(c -> {
             c.removeAllTexts();
         });
@@ -351,41 +476,68 @@ public class Drawing extends Module {
         void revert(Drawing drawing);
     }
 
-    public record HighlightDrawingOperation(LongList chunks, ResourceKey<Level> dimension) implements DrawingOperation {
+    public record HighlightDrawingOperation(Long2LongMap replacedHighlights, LongSet addedHighlights, ResourceKey<Level> dimension) implements DrawingOperation {
         @Override
         public void revert(Drawing drawing) {
-            for (var chunkLong : chunks) {
+            for (var chunkLong : addedHighlights) {
                 var chunkX = ChunkUtils.longToChunkX(chunkLong);
                 var chunkZ = ChunkUtils.longToChunkZ(chunkLong);
                 drawing.drawingCache.removeHighlight(chunkX, chunkZ, dimension);
             }
-        }
-    }
-
-    public record LineDrawingOperation(Line line, ResourceKey<Level> dimension) implements DrawingOperation {
-        @Override
-        public void revert(Drawing drawing) {
-            drawing.drawingCache.removeLine(line, dimension);
-        }
-    }
-
-    public record TextDrawingOperation(Text text, ResourceKey<Level> dimension) implements DrawingOperation {
-        @Override
-        public void revert(Drawing drawing) {
-            drawing.drawingCache.removeText(text.x(), text.z(), dimension);
-        }
-    }
-
-    public record EraseOperation(LongList chunks, List<Line> lines, List<Text> texts, ResourceKey<Level> dimension) implements DrawingOperation {
-        @Override
-        public void revert(Drawing drawing) {
-            for (var chunkLong : chunks) {
-                var chunkX = ChunkUtils.longToChunkX(chunkLong);
-                var chunkZ = ChunkUtils.longToChunkZ(chunkLong);
-                drawing.drawingCache.addHighlight(chunkX, chunkZ, drawing.drawingColor.getInt(), dimension);
+            for (var entry : replacedHighlights.long2LongEntrySet()) {
+                var chunkX = ChunkUtils.longToChunkX(entry.getLongKey());
+                var chunkZ = ChunkUtils.longToChunkZ(entry.getLongKey());
+                drawing.drawingCache.addHighlight(chunkX, chunkZ, (int) entry.getLongValue(), dimension);
             }
-            for (var line : lines) {
-                drawing.drawingCache.addLine(line, drawing.drawingColor.getInt(), dimension);
+        }
+    }
+
+    public record LineDrawingOperation(Line line, Integer previousColor, ResourceKey<Level> dimension) implements DrawingOperation {
+        @Override
+        public void revert(Drawing drawing) {
+            if (previousColor == null) {
+                drawing.drawingCache.removeLine(line, dimension);
+            } else {
+                drawing.drawingCache.addLine(line, previousColor, dimension);
+            }
+        }
+    }
+
+    public record EllipseDrawingOperation(Ellipse ellipse, Integer previousColor, ResourceKey<Level> dimension) implements DrawingOperation {
+        @Override
+        public void revert(Drawing drawing) {
+            if (previousColor == null) {
+                drawing.drawingCache.removeEllipse(ellipse, dimension);
+            } else {
+                drawing.drawingCache.addEllipse(ellipse, previousColor, dimension);
+            }
+        }
+    }
+
+    public record TextDrawingOperation(Text text, Text previousText, ResourceKey<Level> dimension) implements DrawingOperation {
+        @Override
+        public void revert(Drawing drawing) {
+            if (previousText == null) {
+                drawing.drawingCache.removeText(text.x(), text.z(), dimension);
+            } else {
+                drawing.drawingCache.addText(previousText, dimension);
+            }
+        }
+    }
+
+    public record EraseOperation(Long2LongMap highlights, Object2IntMap<Line> lines, Object2IntMap<Ellipse> ellipses, List<Text> texts, ResourceKey<Level> dimension) implements DrawingOperation {
+        @Override
+        public void revert(Drawing drawing) {
+            for (var entry : highlights.long2LongEntrySet()) {
+                var chunkX = ChunkUtils.longToChunkX(entry.getLongKey());
+                var chunkZ = ChunkUtils.longToChunkZ(entry.getLongKey());
+                drawing.drawingCache.addHighlight(chunkX, chunkZ, (int) entry.getLongValue(), dimension);
+            }
+            for (var entry : lines.object2IntEntrySet()) {
+                drawing.drawingCache.addLine(entry.getKey(), entry.getIntValue(), dimension);
+            }
+            for (var entry : ellipses.object2IntEntrySet()) {
+                drawing.drawingCache.addEllipse(entry.getKey(), entry.getIntValue(), dimension);
             }
             for (var text : texts) {
                 drawing.drawingCache.addText(text, dimension);
@@ -394,9 +546,18 @@ public class Drawing extends Module {
     }
 
     public static class DrawingOperationCollector {
-        private final LongList chunks = new LongArrayList();
-        private final List<Line> lines = new ArrayList<>();
-        private final List<Text> texts = new ArrayList<>();
+        private final Long2LongMap replacedHighlights = new Long2LongOpenHashMap();
+        private final LongSet addedHighlights = new LongOpenHashSet();
+        private final Long2LongMap erasedHighlights = new Long2LongOpenHashMap();
+        private Line line;
+        private Integer replacedLineColor;
+        private final Object2IntMap<Line> erasedLines = new Object2IntOpenHashMap<>();
+        private Ellipse ellipse;
+        private Integer replacedEllipseColor;
+        private final Object2IntMap<Ellipse> erasedEllipses = new Object2IntOpenHashMap<>();
+        private Text text;
+        private Text replacedText;
+        private final List<Text> erasedTexts = new ArrayList<>();
         private final ResourceKey<Level> dimension;
         public boolean erase;
 
@@ -405,35 +566,66 @@ public class Drawing extends Module {
             this.erase = erase;
         }
 
-        public void addHighlight(int chunkX, int chunkZ) {
-            long chunkLong = ChunkUtils.chunkPosToLong(chunkX, chunkZ);
-            chunks.add(chunkLong);
+        public void addHighlight(final long chunkPos, final Long previousColor) {
+            if (replacedHighlights.containsKey(chunkPos) || addedHighlights.contains(chunkPos)) return;
+            if (previousColor == null) {
+                addedHighlights.add(chunkPos);
+            } else {
+                replacedHighlights.put(chunkPos, previousColor.longValue());
+            }
         }
 
-        public void addHighlights(LongCollection toAdd) {
-            chunks.addAll(toAdd);
+        public void addErasedHighlight(final long chunkPos, final long color) {
+            erasedHighlights.put(chunkPos, color);
         }
 
-        public void addLine(Line line) {
-            lines.add(line);
+        public void addErasedHighlights(final Long2LongMap highlights) {
+            erasedHighlights.putAll(highlights);
         }
 
-        public void addText(Text text) {
-            texts.add(text);
+        public void addLine(final Line line, final Integer previousColor) {
+            this.line = line;
+            this.replacedLineColor = previousColor;
+        }
+
+        public void addErasedLine(final Line line, final int color) {
+            erasedLines.put(line, color);
+        }
+
+        public void addEllipse(final Ellipse ellipse, final Integer previousColor) {
+            this.ellipse = ellipse;
+            this.replacedEllipseColor = previousColor;
+        }
+
+        public void addErasedEllipse(final Ellipse ellipse, final int color) {
+            erasedEllipses.put(ellipse, color);
+        }
+
+        public void addText(final Text text, final Text previousText) {
+            this.text = text;
+            this.replacedText = previousText;
+        }
+
+        public void addErasedText(final Text text) {
+            erasedTexts.add(text);
         }
 
         public DrawingOperation collect() {
             if (erase) {
-                return new EraseOperation(chunks, lines, texts, dimension);
+                if (erasedHighlights.isEmpty() && erasedLines.isEmpty() && erasedEllipses.isEmpty() && erasedTexts.isEmpty()) return null;
+                return new EraseOperation(erasedHighlights, erasedLines, erasedEllipses, erasedTexts, dimension);
             }
-            if (!chunks.isEmpty()) {
-                return new HighlightDrawingOperation(chunks, dimension);
-            } else if (!lines.isEmpty()) {
+            if (!replacedHighlights.isEmpty() || !addedHighlights.isEmpty()) {
+                return new HighlightDrawingOperation(replacedHighlights, addedHighlights, dimension);
+            } else if (line != null) {
                 // only one line at a time
-                return new LineDrawingOperation(lines.get(0), dimension);
-            } else if (!texts.isEmpty()) {
+                return new LineDrawingOperation(line, replacedLineColor, dimension);
+            } else if (ellipse != null) {
+                // only one ellipse at a time
+                return new EllipseDrawingOperation(ellipse, replacedEllipseColor, dimension);
+            } else if (text != null) {
                 // only one text at a time
-                return new TextDrawingOperation(texts.get(0), dimension);
+                return new TextDrawingOperation(text, replacedText, dimension);
             }
             return null;
         }

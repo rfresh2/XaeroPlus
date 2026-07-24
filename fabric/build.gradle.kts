@@ -44,6 +44,9 @@ afterEvaluate {
 //			"-Dmixin.debug.export=true"
 		)
 	}
+//	tasks.named("runClientGameTest", RunGameTask::class) {
+//		useXvfb = true
+//	}
 }
 
 val worldmap_version_fabric = providers.gradleProperty("worldmap_version_fabric").get()

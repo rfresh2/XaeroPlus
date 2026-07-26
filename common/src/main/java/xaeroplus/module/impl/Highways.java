@@ -41,6 +41,7 @@ public class Highways extends Module {
         2000,
         2500,
         5000,
+        6250,
         7500,
         10000,
         15000,
@@ -66,6 +67,7 @@ public class Highways extends Module {
     private static final IntList diamonds = IntList.of(
         2500,
         5000,
+        10000,
         25000,
         50000,
         125000,

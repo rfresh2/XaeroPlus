@@ -331,6 +331,29 @@ public class Drawing extends Module {
         return new Ellipse(centerX, centerZ, radiusX, radiusZ);
     }
 
+    public Ellipse snapEllipse(
+        final int centerX,
+        final int centerZ,
+        final int radiusPointX,
+        final int radiusPointZ,
+        final double scale
+    ) {
+        var ellipse = ellipseFromCenterAndRadii(centerX, centerZ, radiusPointX, radiusPointZ);
+        if (ellipse == null) return null;
+        var threshold = getSnapThreshold(scale);
+        var dragLength = Mth.floor(Math.sqrt(
+            Math.pow(radiusPointX - centerX, 2)
+                + Math.pow(radiusPointZ - centerZ, 2)
+        ));
+        if (dragLength <= threshold) return ellipse;
+        var radiusDelta = Math.abs(ellipse.radiusX() - ellipse.radiusZ());
+        if (radiusDelta != 0 && radiusDelta < threshold) {
+            var radius = Math.min(ellipse.radiusX(), ellipse.radiusZ());
+            return new Ellipse(centerX, centerZ, radius, radius);
+        }
+        return ellipse;
+    }
+
     public void removeLine(final int x, final int z) {
         Object2IntMap<Line> lines = drawingCache.getLines(Globals.getCurrentDimensionId());
         int maxX = x + 16;
@@ -425,8 +448,7 @@ public class Drawing extends Module {
 
     private static final int SNAP_THRESHOLD = 10;
     public Line snap(int x1, int z1, int x2, int z2, double scale) {
-        double scalar = 1.0 / scale;
-        int threshold = Mth.clamp(Mth.floor(SNAP_THRESHOLD * scalar), 10, 1000);
+        int threshold = getSnapThreshold(scale);
         int len = Mth.floor(Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(z2 - z1, 2)));
         if (len <= threshold) {
             return new Line(x1, z1, x2, z2);
@@ -453,6 +475,11 @@ public class Drawing extends Module {
         }
 
         return new Line(x1, z1, x2, z2);
+    }
+
+    private int getSnapThreshold(final double scale) {
+        var scalar = 1.0 / scale;
+        return Mth.clamp(Mth.floor(SNAP_THRESHOLD * scalar), 10, 1000);
     }
 
     public void clearAll() {

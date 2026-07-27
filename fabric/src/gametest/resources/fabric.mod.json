@@ -8,5 +8,8 @@
     "client": [
       "xaeroplus.fabric.gametest.XaeroPlusClientGameTest"
     ]
-  }
+  },
+  "mixins": [
+    "xaeroplus-fabric-gametest.mixins.json"
+  ]
 }

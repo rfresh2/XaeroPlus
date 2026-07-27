@@ -470,7 +470,7 @@ public class Drawing extends Module {
                 return new Line(x1, z1, x1 + zDelta * xSignum, z2);
             } else if (xDelta < zDelta) {
                 int zSignum = z2 - z1 >= 0 ? 1 : -1;
-                return new Line(x1, z1, x2, z1 + zDelta * zSignum);
+                return new Line(x1, z1, x2, z1 + xDelta * zSignum);
             }
         }
 

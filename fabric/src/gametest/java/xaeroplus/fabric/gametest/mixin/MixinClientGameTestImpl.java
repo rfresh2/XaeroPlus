@@ -1,4 +1,4 @@
-package xaeroplus.fabric.gametest.mixin.client;
+package xaeroplus.fabric.gametest.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.fabricmc.fabric.impl.client.gametest.util.ClientGameTestImpl;

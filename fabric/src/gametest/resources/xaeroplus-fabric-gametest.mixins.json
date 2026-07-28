@@ -1,12 +1,14 @@
 {
   "required": true,
-  "package": "xaeroplus.fabric.gametest.mixin.client",
+  "package": "xaeroplus.fabric.gametest.mixin",
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "injectors": {
     "defaultRequire": 1
   },
   "client": [
-    "MixinClientGameTestImpl"
+    "MixinClientGameTestImpl",
+    "MixinNarrator",
+    "MixinSoundEngine"
   ]
 }

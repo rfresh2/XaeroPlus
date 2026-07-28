@@ -43,12 +43,12 @@ dependencyResolutionManagement {
             library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.4")
 			library("lambdaEvents", "net.lenni0451:LambdaEvents:2.4.2")
 			library("worldtools", "maven.modrinth:worldtools:1.2.8+1.21.4")
-            library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.53.2.0") // relocated xerial sqlite to avoid conflicts with other mods
+            library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.53.2.1") // relocated xerial sqlite to avoid conflicts with other mods
 			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.14.3+$minecraft_version-fabric")
 			library("immediatelyfast-neo", "maven.modrinth:immediatelyfast:1.14.3+$minecraft_version-neoforge")
 			library("modmenu", "maven.modrinth:modmenu:17.0.0")
-			library("sodium-fabric", "net.caffeinemc:sodium-fabric:0.8.12+mc$minecraft_version")
-            library("sodium-neoforge", "net.caffeinemc:sodium-neoforge-mod:0.8.12+mc$minecraft_version")
+			library("sodium-fabric", "net.caffeinemc:sodium-fabric:0.8.13+mc$minecraft_version")
+            library("sodium-neoforge", "net.caffeinemc:sodium-neoforge-mod:0.8.13+mc$minecraft_version")
             library("spark-fabric", "maven.modrinth:spark:1.10.170-fabric")
             library("fabric-permissions-api", "maven.modrinth:fabric-permissions-api:0.6.1")
             library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")

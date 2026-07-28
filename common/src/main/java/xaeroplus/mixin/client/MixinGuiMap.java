@@ -511,7 +511,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     if (drawInProgressPos == null) {
                         drawingModule.removeInProgressEllipse();
                     } else {
-                        var ellipse = drawingModule.ellipseFromCenterAndRadii(drawInProgressPos.getX(), drawInProgressPos.getZ(), mouseBlockPosX, mouseBlockPosZ);
+                        var ellipse = drawingModule.snapEllipse(
+                            drawInProgressPos.getX(),
+                            drawInProgressPos.getZ(),
+                            mouseBlockPosX,
+                            mouseBlockPosZ,
+                            destScale
+                        );
                         if (ellipse == null) {
                             drawingModule.removeInProgressEllipse();
                         } else {
@@ -797,7 +803,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 case ELLIPSE -> {
                     if (drawInProgressPos != null) {
                         var drawingModule = ModuleManager.getModule(Drawing.class);
-                        var ellipse = drawingModule.ellipseFromCenterAndRadii(drawInProgressPos.getX(), drawInProgressPos.getZ(), mouseBlockPosX, mouseBlockPosZ);
+                        var ellipse = drawingModule.snapEllipse(
+                            drawInProgressPos.getX(),
+                            drawInProgressPos.getZ(),
+                            mouseBlockPosX,
+                            mouseBlockPosZ,
+                            destScale
+                        );
                         if (ellipse != null) drawingModule.addEllipse(ellipse);
                         drawInProgressPos = null;
                         drawingModule.removeInProgressEllipse();

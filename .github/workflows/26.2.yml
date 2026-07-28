@@ -244,11 +244,11 @@ jobs:
           mc: ${{ env.MINECRAFT_VERSION }}
           modloader: fabric
           regex: .*fabric.*
-          mc-runtime-test: none
-          fabric-api: 0.154.0
+          mc-runtime-test: fabric
+          fabric-api: 0.156.0
           java: 25
           xvfb: true
-          headlessmc-command: --jvm -Djava.awt.headless=true
+          headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
           cache-mc: github
 
 #  test-forge:
@@ -330,8 +330,8 @@ jobs:
           mc: ${{ env.MINECRAFT_VERSION }}
           modloader: neoforge
           regex: .*neoforge.*
-          mc-runtime-test: none
+          mc-runtime-test: neoforge
           java: 25
           xvfb: true
-          headlessmc-command: --jvm -Djava.awt.headless=true
+          headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
           cache-mc: github

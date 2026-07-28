@@ -28,8 +28,8 @@ dependencyResolutionManagement {
 		create("libs") {
 			library("fabric-loader", "net.fabricmc:fabric-loader:0.19.3")
 			library("forge", "net.minecraftforge:forge:$minecraft_version-64.0.8")
-			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.154.2+$minecraft_version")
-			library("neoforge", "net.neoforged:neoforge:$minecraft_version.0.11-beta")
+			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.156.0+$minecraft_version")
+			library("neoforge", "net.neoforged:neoforge:$minecraft_version.0.37-beta")
             library("worldmap-fabric", "maven.modrinth:xaeros-world-map:fabric-$minecraft_version-$worldmap_version_fabric")
             library("worldmap-forge", "maven.modrinth:xaeros-world-map:forge-$minecraft_version-$worldmap_version_forge")
             library("worldmap-neo", "maven.modrinth:xaeros-world-map:neoforge-$minecraft_version-$worldmap_version_neo")
@@ -44,7 +44,7 @@ dependencyResolutionManagement {
             library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.4")
 			library("lambdaEvents", "net.lenni0451:LambdaEvents:2.4.2")
 			library("worldtools", "maven.modrinth:worldtools:1.2.8+1.21.4")
-            library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.53.2.0") // relocated xerial sqlite to avoid conflicts with other mods
+            library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.53.2.1") // relocated xerial sqlite to avoid conflicts with other mods
 			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.16.2+$minecraft_version-fabric")
 			library("immediatelyfast-neo", "maven.modrinth:immediatelyfast:1.16.2+$minecraft_version-neoforge")
 			library("modmenu", "maven.modrinth:modmenu:20.0.1")

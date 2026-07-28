@@ -49,7 +49,7 @@ public class XaeroPlusClientGameTest implements FabricClientGameTest {
             context.runOnClient(mc -> {
                 mc.options.tutorialStep = TutorialSteps.NONE;
             });
-            singleplayer.getClientLevel().waitForChunksRender(20 * 600);
+            singleplayer.getConnection().waitForChunksRender(20 * 600);
             waitFor(context, "client to join world", XaeroPlusClientGameTest::isInWorld);
             waitFor(context, "Xaero world map session", mc -> {
                 var session = WorldMapSession.getCurrentSession();
@@ -67,7 +67,7 @@ public class XaeroPlusClientGameTest implements FabricClientGameTest {
                 ModuleManager.getModule(Drawing.class).addText(new Text("bottom text", lx, lz + 64, ColorHelper.getColor(255, 255, 255, 255), 1f));
                 var drawing = ModuleManager.getModule(Drawing.class);
                 drawing.addEllipse(
-                    drawing.ellipseFromCenterAndRadii(lx + 52, lz, lx + 80, lz + 28),
+                    drawing.snapEllipse(lx + 52, lz, lx + 80, lz + 33, 1.0),
                     ColorHelper.getColor(0, 255, 255, 230)
                 );
                 drawing.addEllipse(

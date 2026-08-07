@@ -72,6 +72,8 @@ import xaeroplus.module.impl.*;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.*;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 
 import static net.minecraft.world.level.Level.*;
@@ -357,6 +359,57 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             }
         }
         super.onExit(screen);
+    }
+
+    @WrapOperation(method = "changeZoom", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/map/gui/GuiMap;applyZoomLimits()V"
+    ))
+    public void trulyUnlimitedWorldMapZoom0(final GuiMap instance, final Operation<Void> original) {
+        if (Settings.REGISTRY.trulyUnlimitedWorldMapZoom.get()) {
+            return;
+        }
+        original.call(instance);
+    }
+
+    @WrapOperation(method = "extractRenderState", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/map/gui/GuiMap;applyZoomLimits()V"
+    ))
+    public void trulyUnlimitedWorldMapZoom1(final GuiMap instance, final Operation<Void> original) {
+        if (Settings.REGISTRY.trulyUnlimitedWorldMapZoom.get()) {
+            return;
+        }
+        original.call(instance);
+    }
+
+    @ModifyArg(method = "extractRenderState", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/map/graphics/MapRenderHelper;drawCenteredStringWithBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIFFFF)V",
+        ordinal = 0
+    ),
+        slice = @Slice(
+            from = @At(
+                value = "FIELD",
+                opcode = Opcodes.GETSTATIC,
+                target = "Lxaero/map/common/config/option/WorldMapProfiledConfigOptions;DISPLAY_ZOOM:Lxaero/lib/common/config/option/BooleanConfigOption;"
+            )
+        ),
+        index = 2
+    )
+    public String trulyUnlimitedWorldMapZoomStrPrecisionFix2(final String zoomString) {
+        if (Settings.REGISTRY.trulyUnlimitedWorldMapZoom.get()) {
+            if (destScale < 0.0005 && destScale > 0) {
+                int decimalPlaces = Math.max(
+                    3,
+                    2 - (int) Math.floor(Math.log10(destScale))
+                );
+                return BigDecimal.valueOf(destScale)
+                    .setScale(decimalPlaces, RoundingMode.HALF_UP)
+                    .toPlainString() + "x";
+            }
+        }
+        return zoomString;
     }
 
     @Inject(method = "extractRenderState", at = @At(

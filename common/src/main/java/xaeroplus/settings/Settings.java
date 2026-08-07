@@ -154,6 +154,12 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.ow_auto_waypoint_dimension",
             false),
         SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting trulyUnlimitedWorldMapZoom = register(
+        BooleanSetting.create(
+            "Truly Unlimited WorldMap Zoom",
+            "xaeroplus.setting.truly_unlimited_worldmap_zoom",
+            false),
+        SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting nullOverworldDimensionFolder = register(
         BooleanSetting.create(
             "null OW Dim Dir",

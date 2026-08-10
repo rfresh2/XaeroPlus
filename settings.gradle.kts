@@ -29,7 +29,7 @@ dependencyResolutionManagement {
 			library("fabric-loader", "net.fabricmc:fabric-loader:0.19.3")
 			library("forge", "net.minecraftforge:forge:$minecraft_version-64.0.8")
 			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.156.0+$minecraft_version")
-			library("neoforge", "net.neoforged:neoforge:$minecraft_version.0.52-beta")
+			library("neoforge", "net.neoforged:neoforge:$minecraft_version.0.57")
             library("worldmap-fabric", "maven.modrinth:xaeros-world-map:fabric-$minecraft_version-$worldmap_version_fabric")
             library("worldmap-forge", "maven.modrinth:xaeros-world-map:forge-$minecraft_version-$worldmap_version_forge")
             library("worldmap-neo", "maven.modrinth:xaeros-world-map:neoforge-$minecraft_version-$worldmap_version_neo")

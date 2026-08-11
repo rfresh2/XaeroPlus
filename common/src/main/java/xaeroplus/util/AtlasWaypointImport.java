@@ -5,14 +5,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.hud.minimap.BuiltInHudModules;
-import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.waypoint.WaypointColor;
 import xaero.hud.minimap.waypoint.WaypointPurpose;
-import xaero.hud.minimap.waypoint.set.WaypointSet;
-import xaero.hud.minimap.world.MinimapWorld;
 import xaero.map.mods.SupportMods;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.waypoint.WaypointAPI;
@@ -23,7 +19,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
@@ -41,20 +40,24 @@ public final class AtlasWaypointImport {
             }, TickTaskExecutor.INSTANCE);
     }
 
-    private static int importAtlasWaypoints(List<AtlasWaypoint> atlasWaypoints) {
-        MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
+    public static int importAtlasWaypoints(List<AtlasWaypoint> atlasWaypoints) {
+        var minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
         if (minimapSession == null) return 0;
-        MinimapWorld currentWorld = minimapSession.getWorldManager().getCurrentWorld();
+        var currentWorld = minimapSession.getWorldManager().getCurrentWorld();
         if (currentWorld == null) return 0;
-        WaypointSet currentWpSet = currentWorld.getCurrentWaypointSet();
+        var currentWpSet = currentWorld.getCurrentWaypointSet();
         if (currentWpSet == null) return 0;
         if (atlasWaypoints.isEmpty()) return 0;
         Map<ResourceKey<Level>, ArrayList<AtlasWaypoint>> atlasByDimension = atlasWaypoints.stream()
             .filter(AtlasWaypoint::isValid)
             .collect(Collectors.toMap(
-                k -> Objects.equals(0, k.end_dimension)
+                k -> k.dimension == 0
                     ? Level.OVERWORLD
-                    : Level.END,
+                    : k.dimension == 1
+                        ? Level.NETHER
+                        : k.dimension == 2
+                            ? Level.END
+                            : null,
                 v -> {
                     var l = new ArrayList<AtlasWaypoint>();
                     l.add(v);
@@ -65,18 +68,14 @@ public final class AtlasWaypointImport {
                     return v1;
                 }
             ));
-        MinimapWorld owMinimapWorld = WaypointAPI.getMinimapWorld(Level.OVERWORLD);
-        MinimapWorld endMinimapWorld = WaypointAPI.getMinimapWorld(Level.END);
-        WaypointSet owAtlasSet = WaypointAPI.getOrCreateWaypointSetInWorld(owMinimapWorld, "atlas");
-        WaypointSet endAtlasSet = WaypointAPI.getOrCreateWaypointSetInWorld(endMinimapWorld, "atlas");
-        owAtlasSet.clear();
-        endAtlasSet.clear();
 
         int addedWaypoints = 0;
-        for (var atlasWp : atlasByDimension.entrySet()) {
-            ResourceKey<Level> dim = atlasWp.getKey();
-            List<AtlasWaypoint> waypoints = atlasWp.getValue();
-            WaypointSet waypointSet = dim == Level.OVERWORLD ? owAtlasSet : endAtlasSet;
+        for (var dim : List.of(Level.OVERWORLD, Level.NETHER, Level.END)) {
+            var minimapWorld = WaypointAPI.getMinimapWorld(dim);
+            var waypointSet = WaypointAPI.getOrCreateWaypointSetInWorld(minimapWorld, "atlas");
+            waypointSet.clear();
+            var waypoints = atlasByDimension.get(dim);
+            if (waypoints == null) continue;
             for (var waypoint : waypoints) {
                 int index = Math.abs(
                     Hashing.murmur3_128().hashUnencodedChars(waypoint.name).asInt())
@@ -99,14 +98,15 @@ public final class AtlasWaypointImport {
         return addedWaypoints;
     }
 
-    private static List<AtlasWaypoint> getAtlasApiResponse() {
-        HttpClient client = HttpClient.newBuilder()
+    public static List<AtlasWaypoint> getAtlasApiResponse() {
+        var client = HttpClient.newBuilder()
             .followRedirects(HttpClient.Redirect.ALWAYS)
             .connectTimeout(Duration.ofSeconds(2))
             .build();
         try {
-            HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create("https://2b2tAtlas.com/api/locations.php"))
+            var req = HttpRequest.newBuilder()
+                // docs: https://2b2tatlas.com/api
+                .uri(URI.create("https://api.blackportal.cloud/api/locations"))
                 .headers("User-Agent", "XaeroPlus/" + XaeroPlus.XP_VERSION + "+" + XaeroPlus.MC_VERSION)
                 .timeout(Duration.ofSeconds(10))
                 .GET()
@@ -123,15 +123,15 @@ public final class AtlasWaypointImport {
         }
     }
 
-    public static class AtlasWaypoint {
-        public String name;
-        public Integer x;
-        @Nullable public Integer y;
-        public Integer z;
-        public Integer end_dimension;
-
+    public record AtlasWaypoint(
+        String name,
+        Integer x,
+        Integer y, // nullable
+        Integer z,
+        Integer dimension
+    ) {
         public boolean isValid() {
-            return name != null && x != null && z != null && end_dimension != null;
+            return name != null && x != null && z != null && dimension != null && dimension >= 0 && dimension <= 2;
         }
     }
 }

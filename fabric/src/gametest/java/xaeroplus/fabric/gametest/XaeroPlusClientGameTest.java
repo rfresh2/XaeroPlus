@@ -97,7 +97,7 @@ public class XaeroPlusClientGameTest implements ClientModInitializer {
                 var lx = ChunkUtils.chunkCoordToCoord(ChunkUtils.actualPlayerChunkX());
                 var lz = ChunkUtils.chunkCoordToCoord(ChunkUtils.actualPlayerChunkZ());
                 ModuleManager.getModule(Drawing.class).addLine(new Line(lx - 128, lz - 128, lx + 128, lz + 128), ColorHelper.getColor(255, 0, 0, 200));
-                ModuleManager.getModule(Drawing.class).addText(new Text("bottom text", lx, lz + 64, ColorHelper.getColor(255, 255, 255, 255), 1f));
+                ModuleManager.getModule(Drawing.class).addText(new Text("bottom text", lx, lz - 96, ColorHelper.getColor(255, 255, 255, 255), 1f));
                 var drawing = ModuleManager.getModule(Drawing.class);
                 drawing.addEllipse(
                     drawing.snapEllipse(lx + 52, lz, lx + 80, lz + 33, 1.0),
@@ -118,10 +118,11 @@ public class XaeroPlusClientGameTest implements ClientModInitializer {
                 HudMod.INSTANCE.getHudConfigs().getClientConfigManager().getCurrentProfile().set(MinimapProfiledConfigOptions.SIZE, 200);
                 HudMod.INSTANCE.getHudConfigs().getClientConfigManager().getCurrentProfile().set(MinimapProfiledConfigOptions.NORTH_LOCKED, true);
                 HudMod.INSTANCE.getHudConfigs().getClientConfigManager().getCurrentProfile().set(MinimapProfiledConfigOptions.WAYPOINT_DISTANCE_IN_WORLD, 2);
-                WaypointAPI.getCurrentWaypointSet().add(SyncedWaypoint.create((int) ChunkUtils.getPlayerX() - 32, (int) ChunkUtils.getPlayerZ() + 32, "Test", "T", WaypointColor.AQUA));
+                WaypointAPI.getCurrentWaypointSet().add(SyncedWaypoint.create((int) ChunkUtils.getPlayerX() - 64, (int) ChunkUtils.getPlayerZ() + 64, "Test", "long initials", WaypointColor.AQUA));
                 Settings.REGISTRY.waypointBeacons.setValue(true);
                 Settings.REGISTRY.waypointEta.setValue(true);
                 Settings.REGISTRY.showRenderDistanceSetting.setValue(true);
+                Settings.REGISTRY.longWaypointInitials.setValue(true);
                 return null;
             });
             waitForStable("minimap textures", XaeroPlusClientGameTest::isMinimapReady, 20);

@@ -106,6 +106,7 @@ public interface DrawFeatureFactory {
      * Refreshed async, not on the MC render thread
      * Single color across all highlights
      * Color function is called each frame
+     * Use this if your chunk highlight supplier is costly in terms of time and can be called off the MC render thread
      */
     static DrawFeature asyncChunkHighlights(
         String id,
@@ -126,6 +127,7 @@ public interface DrawFeatureFactory {
      * Refreshed async, not on the MC render thread
      * Color function per-chunk
      * Color function is called only on refresh
+     * Use this if your chunk highlight supplier is costly in terms of time and can be called off the MC render thread
      */
     static DrawFeature multiColorAsyncChunkHighlights(
         String id,

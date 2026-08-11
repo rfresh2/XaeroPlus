@@ -125,7 +125,7 @@ jobs:
       xp_neo: ${{ env.XP_NEO_OUT }}
 
   test-fabric-gametest:
-    runs-on: ubuntu-latest
+    runs-on: ubicloud-standard-8
     needs:
       - build
     steps:

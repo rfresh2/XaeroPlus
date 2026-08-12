@@ -162,6 +162,8 @@
   "xaeroplus.setting.map_art_grid.tooltip": "渲染地图艺术将被创建的区域",
   "xaeroplus.setting.map_art_grid_color": "地图艺术颜色",
   "xaeroplus.setting.map_art_grid_color.tooltip": "设置网格的颜色",
+  "xaeroplus.setting.map_art_grid_zoom": "地图艺术缩放",
+  "xaeroplus.setting.map_art_grid_zoom.tooltip": "设置地图艺术网格的缩放级别",
   "xaeroplus.setting.region_grid": "区域网格",
   "xaeroplus.setting.region_grid.tooltip": "在区域边界周围渲染网格",
   "xaeroplus.setting.region_grid_color": "区域网格颜色",

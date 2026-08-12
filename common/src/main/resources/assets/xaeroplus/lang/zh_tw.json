@@ -162,6 +162,8 @@
   "xaeroplus.setting.map_art_grid.tooltip": "渲染地圖藝術將被創建的區域",
   "xaeroplus.setting.map_art_grid_color": "地圖藝術顏色",
   "xaeroplus.setting.map_art_grid_color.tooltip": "設置網格的顏色",
+  "xaeroplus.setting.map_art_grid_zoom": "地圖藝術縮放",
+  "xaeroplus.setting.map_art_grid_zoom.tooltip": "設定地圖藝術網格的縮放級別",
   "xaeroplus.setting.region_grid": "區域網格",
   "xaeroplus.setting.region_grid.tooltip": "在區域邊界周圍渲染網格",
   "xaeroplus.setting.region_grid_color": "區域網格顏色",

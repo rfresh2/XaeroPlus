@@ -162,6 +162,8 @@
   "xaeroplus.setting.map_art_grid.tooltip": "Renderiza áreas onde as artes do mapa serão criadas",
   "xaeroplus.setting.map_art_grid_color": "Cor da Arte do Mapa",
   "xaeroplus.setting.map_art_grid_color.tooltip": "Define a cor da grade",
+  "xaeroplus.setting.map_art_grid_zoom": "Zoom da Arte do Mapa",
+  "xaeroplus.setting.map_art_grid_zoom.tooltip": "Define o nível de zoom da grelha de arte do mapa",
   "xaeroplus.setting.region_grid": "Regiões",
   "xaeroplus.setting.region_grid.tooltip": "Renderiza uma grelha em torno dos limites da região",
   "xaeroplus.setting.region_grid_color": "Cor das Regiões",

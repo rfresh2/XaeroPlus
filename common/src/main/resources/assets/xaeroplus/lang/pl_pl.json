@@ -162,6 +162,8 @@
   "xaeroplus.setting.map_art_grid.tooltip": "Renderuje obszary, gdzie będą tworzone sztuki mapy",
   "xaeroplus.setting.map_art_grid_color": "Kolor Sztuki Mapy",
   "xaeroplus.setting.map_art_grid_color.tooltip": "Ustawia kolor siatki",
+  "xaeroplus.setting.map_art_grid_zoom": "Powiększenie Sztuki Mapy",
+  "xaeroplus.setting.map_art_grid_zoom.tooltip": "Ustawia poziom powiększenia siatki sztuki mapy",
   "xaeroplus.setting.region_grid": "Regiony",
   "xaeroplus.setting.region_grid.tooltip": "Wyświetla siatkę wokół granic regionów",
   "xaeroplus.setting.region_grid_color": "Kolor Regionów",

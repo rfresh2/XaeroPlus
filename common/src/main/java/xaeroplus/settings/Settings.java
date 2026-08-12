@@ -923,6 +923,15 @@ public final class Settings extends SettingRegistry {
             (b) -> ModuleManager.getModule(MapArtGrid.class).setRgbColor(b.getColor()),
             () -> ModuleManager.getModule(MapArtGrid.class).isEnabled()),
         SettingLocation.OVERLAYS);
+    public final DoubleSetting mapArtGridZoomSetting = register(
+        DoubleSetting.create(
+            "Map Art Grid Zoom",
+            "xaeroplus.setting.map_art_grid_zoom",
+            0.0, 4.0, 1.0,
+            0.0,
+            (v) -> ModuleManager.getModule(MapArtGrid.class).setZoom((int) v),
+            () -> ModuleManager.getModule(MapArtGrid.class).isEnabled()
+        ), SettingLocation.OVERLAYS);
     public final BooleanSetting regionGridEnabledSetting = register(
         BooleanSetting.create(
             "Region Grid",

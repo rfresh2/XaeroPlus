@@ -162,6 +162,8 @@
   "xaeroplus.setting.map_art_grid.tooltip": "Отображает области создания карт 1х1",
   "xaeroplus.setting.map_art_grid_color": "Цвет сетки мапартов",
   "xaeroplus.setting.map_art_grid_color.tooltip": "Задает цвет сетки",
+  "xaeroplus.setting.map_art_grid_zoom": "Масштаб сетки мапартов",
+  "xaeroplus.setting.map_art_grid_zoom.tooltip": "Задает уровень масштаба сетки мапартов",
   "xaeroplus.setting.region_grid": "Регионы",
   "xaeroplus.setting.region_grid.tooltip": "Отображает сетку вокруг границ региона",
   "xaeroplus.setting.region_grid_color": "Цвет регионов",

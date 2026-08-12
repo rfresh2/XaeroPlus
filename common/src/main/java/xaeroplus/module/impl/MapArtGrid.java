@@ -1,6 +1,7 @@
 package xaeroplus.module.impl;
 
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import xaeroplus.Globals;
 import xaeroplus.feature.render.DrawFeatureFactory;
@@ -16,6 +17,7 @@ public class MapArtGrid extends Module {
     private int alpha = 255;
     private int color = ColorHelper.getColor(255, 0, 0, alpha);
     private float lineWidth = 0.1f;
+    private int zoom = 0;
 
     @Override
     public void onEnable() {
@@ -49,10 +51,10 @@ public class MapArtGrid extends Module {
         int maxXGridPos = maxBlockX - (maxBlockX % 128) + 64;
         int maxZGridPos = maxBlockZ - (maxBlockZ % 128) + 64;
 
-        for (int x = minXGridPos; x <= maxXGridPos; x += 128) {
+        for (int x = minXGridPos; x <= maxXGridPos; x += 128 * (int) Math.pow(2, zoom)) {
             lines.add(new Line(x, minBlockZ, x, maxBlockZ));
         }
-        for (int z = minZGridPos; z <= maxZGridPos; z += 128) {
+        for (int z = minZGridPos; z <= maxZGridPos; z += 128 * (int) Math.pow(2, zoom)) {
             lines.add(new Line(minBlockX, z, maxBlockX, z));
         }
 
@@ -78,5 +80,9 @@ public class MapArtGrid extends Module {
 
     public void setLineWidth(final float lineWidth) {
         this.lineWidth = lineWidth;
+    }
+
+    public void setZoom(final int zoom) {
+        this.zoom = Mth.clamp(zoom, 0, 4);
     }
 }

@@ -162,6 +162,8 @@
   "xaeroplus.setting.map_art_grid.tooltip": "Renderiza áreas donde se crearán artes de mapa",
   "xaeroplus.setting.map_art_grid_color": "Color de Arte de Mapa",
   "xaeroplus.setting.map_art_grid_color.tooltip": "Establece el color de la cuadrícula",
+  "xaeroplus.setting.map_art_grid_zoom": "Zoom del Arte de Mapa",
+  "xaeroplus.setting.map_art_grid_zoom.tooltip": "Establece el nivel de zoom de la cuadrícula de arte de mapa",
   "xaeroplus.setting.region_grid": "Regiones",
   "xaeroplus.setting.region_grid.tooltip": "Renderiza una cuadrícula alrededor de los bordes de región",
   "xaeroplus.setting.region_grid_color": "Color de Regiones",

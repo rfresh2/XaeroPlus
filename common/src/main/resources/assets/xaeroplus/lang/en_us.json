@@ -162,6 +162,8 @@
   "xaeroplus.setting.map_art_grid.tooltip": "Renders areas where map arts will be created",
   "xaeroplus.setting.map_art_grid_color": "Map Art Color",
   "xaeroplus.setting.map_art_grid_color.tooltip": "Sets the color of the grid",
+  "xaeroplus.setting.map_art_grid_zoom": "Map Art Zoom",
+  "xaeroplus.setting.map_art_grid_zoom.tooltip": "Sets the zoom level of the map grid",
   "xaeroplus.setting.region_grid": "Regions",
   "xaeroplus.setting.region_grid.tooltip": "Renders a grid around region borders",
   "xaeroplus.setting.region_grid_color": "Regions Color",

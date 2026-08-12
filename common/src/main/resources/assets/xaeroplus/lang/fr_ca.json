@@ -162,6 +162,8 @@
   "xaeroplus.setting.map_art_grid.tooltip": "Affiche les zones où les arts de carte seront créés",
   "xaeroplus.setting.map_art_grid_color": "Couleur d'Art de Carte",
   "xaeroplus.setting.map_art_grid_color.tooltip": "Définit la couleur de la grille",
+  "xaeroplus.setting.map_art_grid_zoom": "Zoom d'Art de Carte",
+  "xaeroplus.setting.map_art_grid_zoom.tooltip": "Définit le niveau de zoom de la grille d'art de carte",
   "xaeroplus.setting.region_grid": "Régions",
   "xaeroplus.setting.region_grid.tooltip": "Affiche une grille autour des bordures de région",
   "xaeroplus.setting.region_grid_color": "Couleur des Régions",

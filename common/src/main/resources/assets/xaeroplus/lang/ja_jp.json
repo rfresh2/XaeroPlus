@@ -162,6 +162,8 @@
   "xaeroplus.setting.map_art_grid.tooltip": "マップアートが作成されるエリアを表示する",
   "xaeroplus.setting.map_art_grid_color": "マップアートカラー",
   "xaeroplus.setting.map_art_grid_color.tooltip": "グリッドの色を設定する",
+  "xaeroplus.setting.map_art_grid_zoom": "マップアートズーム",
+  "xaeroplus.setting.map_art_grid_zoom.tooltip": "マップアートグリッドのズームレベルを設定する",
   "xaeroplus.setting.region_grid": "リージョン",
   "xaeroplus.setting.region_grid.tooltip": "リージョンの境界線の周りにグリッドを表示",
   "xaeroplus.setting.region_grid_color": "リージョンの色",

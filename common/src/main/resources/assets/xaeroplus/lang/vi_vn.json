@@ -162,6 +162,8 @@
   "xaeroplus.setting.map_art_grid.tooltip": "Hiển thị các khu vực nơi nghệ thuật bản đồ sẽ được tạo ra",
   "xaeroplus.setting.map_art_grid_color": "Màu Nghệ Thuật Bản Đồ",
   "xaeroplus.setting.map_art_grid_color.tooltip": "Thiết lập màu sắc của lưới",
+  "xaeroplus.setting.map_art_grid_zoom": "Thu Phóng Nghệ Thuật Bản Đồ",
+  "xaeroplus.setting.map_art_grid_zoom.tooltip": "Đặt mức thu phóng của lưới nghệ thuật bản đồ",
   "xaeroplus.setting.region_grid": "Vùng",
   "xaeroplus.setting.region_grid.tooltip": "Hiển thị lưới xung quanh ranh giới vùng",
   "xaeroplus.setting.region_grid_color": "Màu Vùng",

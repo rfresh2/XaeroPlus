@@ -72,11 +72,12 @@ public class LineVertexBuffer extends AbstractLineVertexBuffer<List<Line>> {
         try (final RenderPass pass = RenderSystem.getDevice().createCommandEncoder()
             .createRenderPass(Minecraft.getInstance().getMainRenderTarget().getColorTexture(), OptionalInt.empty())) {
             pass.setPipeline(XaeroPlusShaders.LINES_PIPELINE);
-            pass.setUniform("MapViewMatrix", ctx.matrixStack().last().pose());
+            pass.setUniform("MapViewMatrix", ctx.untranslatedMapViewMatrix());
             pass.setUniform("ModelViewMat", RenderSystem.getModelViewMatrix());
             pass.setUniform("ProjMat", RenderSystem.getProjectionMatrix());
             pass.setUniform("FrameSize", XaeroPlusShaders.LINES_FRAME_SIZE);
             pass.setUniform("ColorModulator", RenderSystem.getShaderColor());
+            pass.setUniform("CameraRelativeOrigin", (float) ((long) bufferOriginBlockX - ctx.cameraBlockX()), (float) ((long) bufferOriginBlockZ - ctx.cameraBlockZ()));
             pass.setUniform("LineWidth", lineWidthScale);
             pass.setIndexBuffer(indexBuffer, indexType);
             pass.setVertexBuffer(0, vertexBuffer);

@@ -49,8 +49,16 @@ repositories {
     }
     maven("https://maven.2b2t.vc/releases")
     maven("https://maven.2b2t.vc/remote")
-    maven("https://api.modrinth.com/maven")
-    maven("https://cursemaven.com")
+    maven("https://api.modrinth.com/maven") {
+        content {
+            includeGroup("maven.modrinth")
+        }
+    }
+    maven("https://cursemaven.com") {
+        content {
+            includeGroup("curse.maven")
+        }
+    }
     maven("https://jitpack.io")
     maven("https://impactdevelopment.github.io/maven/")
     maven("https://maven.cleanroommc.com")

@@ -43,7 +43,7 @@ dependencyResolutionManagement {
             library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.4")
 			library("lambdaEvents", "net.lenni0451:LambdaEvents:2.4.2")
 			library("worldtools", "maven.modrinth:worldtools:1.2.8+1.21.4")
-            library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.53.2.1") // relocated xerial sqlite to avoid conflicts with other mods
+            library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.53.4.0") // relocated xerial sqlite to avoid conflicts with other mods
 			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.13.6+$minecraft_version-fabric")
 			library("immediatelyfast-neo", "maven.modrinth:immediatelyfast:1.13.6+$minecraft_version-neoforge")
 			library("modmenu", "maven.modrinth:modmenu:16.0.1")

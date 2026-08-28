@@ -119,6 +119,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Shadow private int rightClickY;
     @Shadow private int rightClickZ;
     @Shadow private int mouseBlockPosX;
+    @Shadow private int mouseBlockPosY;
     @Shadow private int mouseBlockPosZ;
     @Shadow private static double destScale;
     @Shadow private MapTileSelection mapTileSelection;
@@ -1022,7 +1023,18 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if (Settings.REGISTRY.worldMapToggleDrawingKeybindSetting.getKeyBinding().matches(code, scanCode)) {
             onToggleDrawingButton();
             cir.setReturnValue(true);
-            return;
+        }
+        if (Settings.REGISTRY.worldMapRotateHereKeybindSetting.getKeyBinding().matches(code, scanCode)) {
+            var mc = Minecraft.getInstance();
+            mc.execute(() -> {
+                if (mc.player == null) return;
+                if (mc.player.isFallFlying()) {
+                    PlayerRotationHelper.rotatePlayerTo(mouseBlockPosX, mouseBlockPosZ);
+                } else {
+                    PlayerRotationHelper.rotatePlayerTo(mouseBlockPosX, mouseBlockPosY, mouseBlockPosZ);
+                }
+            });
+            cir.setReturnValue(true);
         }
     }
 
@@ -1061,6 +1073,20 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     }.setNameFormatArgs(KeyMappingUtils.getKeyName(Settings.REGISTRY.worldMapBaritoneElytraHereKeybindSetting.getKeyBinding())));
             }
         }
+        options.add(index++, new RightClickOption("xaeroplus.gui.world_map.rotate_here", options.size(), this) {
+            @Override
+            public void onAction(Screen screen) {
+                var mc = Minecraft.getInstance();
+                mc.execute(() -> {
+                    if (mc.player == null) return;
+                    if (mc.player.isFallFlying()) {
+                        PlayerRotationHelper.rotatePlayerTo(rightClickX, rightClickZ);
+                    } else {
+                        PlayerRotationHelper.rotatePlayerTo(rightClickX, rightClickY, rightClickZ);
+                    }
+                });
+            }
+        }.setNameFormatArgs(KeyMappingUtils.getKeyName(Settings.REGISTRY.worldMapRotateHereKeybindSetting.getKeyBinding())));
         boolean tileSelPresent = this.mapTileSelection != null;
         final int delHighlightMinX = tileSelPresent ? mapTileSelection.getLeft() : rightClickX;
         final int delHighlightMaxX = tileSelPresent ? mapTileSelection.getRight() : rightClickX;

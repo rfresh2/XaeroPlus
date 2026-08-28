@@ -15,6 +15,7 @@ import xaero.map.mods.gui.WaypointReader;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.BaritoneExecutor;
 import xaeroplus.util.BaritoneHelper;
+import xaeroplus.util.PlayerRotationHelper;
 
 import java.util.ArrayList;
 
@@ -62,7 +63,7 @@ public class MixinWaypointReader {
                     }
                 }.setNameFormatArgs(KeyMappingUtils.getKeyName(Settings.REGISTRY.worldMapBaritonePathHereKeybindSetting.getKeyBinding())));
             if (BaritoneHelper.isBaritoneElytraPresent()) {
-                options.addAll(5, asList(
+                options.addAll(index++, asList(
                     new RightClickOption("xaeroplus.gui.world_map.baritone_elytra_here", options.size(), target) {
                         @Override
                         public void onAction(Screen screen) {
@@ -76,6 +77,20 @@ public class MixinWaypointReader {
                 ));
             }
         }
+        options.add(index++, new RightClickOption("xaeroplus.gui.world_map.rotate_here", options.size(), target) {
+            @Override
+            public void onAction(Screen screen) {
+                var mc = Minecraft.getInstance();
+                mc.execute(() -> {
+                    if (mc.player == null) return;
+                    if (mc.player.isFallFlying()) {
+                        PlayerRotationHelper.rotatePlayerTo(element.getX(), element.getZ());
+                    } else {
+                        PlayerRotationHelper.rotatePlayerTo(element.getX(), element.isyIncluded() ? element.getY() : Mth.floor(mc.player.getY()), element.getZ());
+                    }
+                });
+            }
+        }.setNameFormatArgs(KeyMappingUtils.getKeyName(Settings.REGISTRY.worldMapRotateHereKeybindSetting.getKeyBinding())));
 
         if (Settings.REGISTRY.disableWaypointSharing.get()) {
             options.removeIf(option -> ((AccessorRightClickOption) option).invokeGetName().equals("gui.xaero_right_click_waypoint_share"));

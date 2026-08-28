@@ -1211,4 +1211,11 @@ public final class Settings extends SettingRegistry {
             false,
             true),
         SettingLocation.KEYBINDS);
+    public final BooleanSetting worldMapRotateHereKeybindSetting = register(
+        BooleanSetting.create(
+            "WorldMap Rotate Here",
+            "xaeroplus.keybind.world_map_rotate_here",
+            false,
+            true),
+        SettingLocation.KEYBINDS);
 }

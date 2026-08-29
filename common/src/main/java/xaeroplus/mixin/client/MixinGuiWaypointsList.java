@@ -8,8 +8,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import xaero.common.gui.GuiWaypoints;
 import xaero.common.minimap.waypoints.Waypoint;
+import xaero.hud.minimap.BuiltInHudModules;
 import xaeroplus.feature.extensions.SyncedWaypoint;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.ColorHelper;
@@ -44,18 +44,26 @@ public abstract class MixinGuiWaypointsList {
         if (w == null || !Settings.REGISTRY.waypointsListUIAdditions.get() || !Settings.REGISTRY.waypointsListDistanceColumn.get()) {
             return original.call(w);
         }
-        var renderViewEntity = Minecraft.getInstance().getCameraEntity();
-        var playerX = renderViewEntity.getX();
-        var playerZ = renderViewEntity.getZ();
-        var playerY = renderViewEntity.getY();
-        var dimensionDivision = GuiWaypoints.distanceDivided;
-        var wpX = w.getX(dimensionDivision);
-        var wpY = w.getY();
-        var wpZ = w.getZ(dimensionDivision);
-        var distance = Math.sqrt(Math.pow(playerX - wpX, 2) + Math.pow(playerY - wpY, 2) + Math.pow(playerZ - wpZ, 2));
-        var text = NumberFormat.getIntegerInstance().format(distance) + "m";
-        var fontRenderer = Minecraft.getInstance().font;
-        guiGraphics.drawString(fontRenderer, text, x + 250, y + 1, ColorHelper.getColor(255, 255, 255, 255));
-        return false;
+        try {
+            var renderViewEntity = Minecraft.getInstance().getCameraEntity();
+            var playerX = renderViewEntity.getX();
+            var playerZ = renderViewEntity.getZ();
+            var playerY = renderViewEntity.getY();
+            // GuiWaypoints.distanceDivided is not necessarily initialized or updated, so calc it ourselves to be safe
+            var minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
+            if (minimapSession == null) return original.call(w);
+            var minimapWorld = minimapSession.getWorldManager().getCurrentWorld(minimapSession.getWorldState().getAutoWorldPath());
+            var dimensionDivision = minimapSession.getDimensionHelper().getDimensionDivision(minimapWorld);
+            var wpX = w.getX(dimensionDivision);
+            var wpY = w.getY();
+            var wpZ = w.getZ(dimensionDivision);
+            var distance = Math.sqrt(Math.pow(playerX - wpX, 2) + Math.pow(playerY - wpY, 2) + Math.pow(playerZ - wpZ, 2));
+            var text = NumberFormat.getIntegerInstance().format(distance) + "m";
+            var fontRenderer = Minecraft.getInstance().font;
+            guiGraphics.drawString(fontRenderer, text, x + 250, y + 1, ColorHelper.getColor(255, 255, 255, 255));
+            return false;
+        } catch (Exception e) {
+            return original.call(w);
+        }
     }
 }

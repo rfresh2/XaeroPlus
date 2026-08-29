@@ -269,6 +269,8 @@
   "xaeroplus.setting.world_map_ui_additions.tooltip": "Переключает добавление дополнительных кнопок и элементов XaeroPlus в интерфейс карты мира",
   "xaeroplus.setting.waypoints_list_ui_additions": "Дополнения интерфейса списка путевых точек",
   "xaeroplus.setting.waypoints_list_ui_additions.tooltip": "Переключает добавление дополнительных кнопок и элементов XaeroPlus в интерфейс списка путевых точек",
+  "xaeroplus.setting.waypoints_gui_distance_column": "Столбец расстояния в списке путевых точек",
+  "xaeroplus.setting.waypoints_gui_distance_column.tooltip": "Отображает расстояние до каждой путевой точки в столбце справа, заменяя текст о её происхождении из стороннего мода, если он существует",
   "xaeroplus.gui.world_map.toggle_follow_mode": "Переключить режим следования",
   "xaeroplus.gui.on": "Вкл",
   "xaeroplus.gui.off": "Выкл",

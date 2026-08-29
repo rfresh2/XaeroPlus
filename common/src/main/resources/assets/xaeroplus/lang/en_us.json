@@ -269,6 +269,8 @@
   "xaeroplus.setting.world_map_ui_additions.tooltip": "Toggles whether additional XaeroPlus buttons and elements are added to the WorldMap GUI",
   "xaeroplus.setting.waypoints_list_ui_additions": "Waypoints List UI Additions",
   "xaeroplus.setting.waypoints_list_ui_additions.tooltip": "Toggles whether additional XaeroPlus buttons and elements are added to the Waypoints List GUI",
+  "xaeroplus.setting.waypoints_gui_distance_column": "Waypoints List Distance Column",
+  "xaeroplus.setting.waypoints_gui_distance_column.tooltip": "Renders the distance to each waypoint as a column on the right-side, replacing the waypoint's third party origin text if one exists",
   "xaeroplus.gui.world_map.toggle_follow_mode": "Toggle Follow Mode",
   "xaeroplus.gui.on": "On",
   "xaeroplus.gui.off": "Off",

@@ -197,9 +197,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             button -> onColorPickerButton()
         );
         drawColorPickerButton.visible = false;
-        var colorPickerSize = 90;
+        var colorPickerSize = 108;
         var colorPickerX = drawColorPickerButton.getX() + drawColorPickerButton.getWidth() + 4;
-        var colorPickerY = startDrawingButton.getY() + 20;
+        var colorPickerY = startDrawingButton.getY() - 22;
         drawColorPicker = new ColorPickerWidget(
             colorPickerX,
             colorPickerY,

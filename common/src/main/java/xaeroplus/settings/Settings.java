@@ -231,6 +231,12 @@ public final class Settings extends SettingRegistry {
             "xaeroplus.setting.disable_teleportation",
             false),
         SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting waypointsListDistanceColumn = register(
+        BooleanSetting.create(
+            "Waypoints List Distance Column",
+            "xaeroplus.setting.waypoints_gui_distance_column",
+            false),
+        SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting sodiumSettingIntegration = register(
         BooleanSetting.create(
             "Sodium/Embeddium Setting Integration",

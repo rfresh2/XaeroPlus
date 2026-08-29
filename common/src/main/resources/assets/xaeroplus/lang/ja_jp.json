@@ -269,6 +269,8 @@
   "xaeroplus.setting.world_map_ui_additions.tooltip": "XaeroPlusの追加ボタンや要素をワールドマップGUIに追加するかを切り替えます",
   "xaeroplus.setting.waypoints_list_ui_additions": "ウェイポイント一覧UIの追加機能",
   "xaeroplus.setting.waypoints_list_ui_additions.tooltip": "XaeroPlusの追加ボタンや要素をウェイポイント一覧GUIに追加するかを切り替えます",
+  "xaeroplus.setting.waypoints_gui_distance_column": "ウェイポイント一覧の距離列",
+  "xaeroplus.setting.waypoints_gui_distance_column.tooltip": "各ウェイポイントまでの距離を右側の列に表示し、サードパーティー由来のテキストがある場合は置き換えます",
   "xaeroplus.gui.world_map.toggle_follow_mode": "フォローモードの切り替え",
   "xaeroplus.gui.on": "On",
   "xaeroplus.gui.off": "Off",

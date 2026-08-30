@@ -176,13 +176,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             () -> new Tooltip(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_highlights"))));
         drawHighlightsButton.visible = false;
         drawEllipseButton = new GuiTexturedButton(
-            startDrawingButton.getX() + 16, drawHighlightsButton.getY() + 20, 20, 20, 137, 19, 16, 16,
+            startDrawingButton.getX() + 16, drawHighlightsButton.getY() + 20, 20, 20, 137, 19, 17, 17,
             Globals.guiTextures,
             button -> setDrawingMode(DrawingMode.ELLIPSE),
             () -> new Tooltip(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_ellipse"))));
         drawEllipseButton.visible = false;
         drawTextButton = new GuiTexturedButton(
-            startDrawingButton.getX() + 16, drawEllipseButton.getY() + 20, 20, 20, 118, 0, 16, 16,
+            startDrawingButton.getX() + 16, drawEllipseButton.getY() + 20, 20, 20, 119, 0, 16, 16,
             Globals.guiTextures,
             button -> setDrawingMode(DrawingMode.TEXT),
             () -> new Tooltip(xaeroPlus$prefix(Component.translatable("xaeroplus.gui.world_map.draw_text"))));
@@ -196,9 +196,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             button -> onColorPickerButton()
         );
         drawColorPickerButton.visible = false;
-        var colorPickerSize = 90;
+        var colorPickerSize = 108;
         var colorPickerX = drawColorPickerButton.getX() + drawColorPickerButton.getWidth() + 4;
-        var colorPickerY = startDrawingButton.getY() + 20;
+        var colorPickerY = startDrawingButton.getY() - 46;
         drawColorPicker = new ColorPickerWidget(
             colorPickerX,
             colorPickerY,

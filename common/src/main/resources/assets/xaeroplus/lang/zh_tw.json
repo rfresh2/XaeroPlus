@@ -269,6 +269,8 @@
   "xaeroplus.setting.world_map_ui_additions.tooltip": "切換是否向世界地圖介面添加額外的XaeroPlus按鈕和元素",
   "xaeroplus.setting.waypoints_list_ui_additions": "航點清單介面附加功能",
   "xaeroplus.setting.waypoints_list_ui_additions.tooltip": "切換是否向航點清單介面添加額外的XaeroPlus按鈕和元素",
+  "xaeroplus.setting.waypoints_gui_distance_column": "航點清單距離欄",
+  "xaeroplus.setting.waypoints_gui_distance_column.tooltip": "在右側以欄的形式顯示與各航點的距離，並取代該航點現有的第三方來源文字",
   "xaeroplus.gui.world_map.toggle_follow_mode": "切換追蹤模式",
   "xaeroplus.gui.on": "開啟",
   "xaeroplus.gui.off": "關閉",

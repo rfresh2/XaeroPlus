@@ -269,6 +269,8 @@
   "xaeroplus.setting.world_map_ui_additions.tooltip": "Bật hoặc tắt việc thêm các nút và thành phần bổ sung của XaeroPlus vào giao diện bản đồ thế giới",
   "xaeroplus.setting.waypoints_list_ui_additions": "Bổ sung giao diện danh sách điểm đánh dấu",
   "xaeroplus.setting.waypoints_list_ui_additions.tooltip": "Bật hoặc tắt việc thêm các nút và thành phần bổ sung của XaeroPlus vào giao diện danh sách điểm đánh dấu",
+  "xaeroplus.setting.waypoints_gui_distance_column": "Cột khoảng cách trong danh sách điểm đánh dấu",
+  "xaeroplus.setting.waypoints_gui_distance_column.tooltip": "Hiển thị khoảng cách đến từng điểm đánh dấu dưới dạng một cột ở bên phải, thay thế văn bản nguồn từ bên thứ ba nếu có",
   "xaeroplus.gui.world_map.toggle_follow_mode": "Chuyển Chế Độ Theo Dõi",
   "xaeroplus.gui.on": "Bật",
   "xaeroplus.gui.off": "Tắt",

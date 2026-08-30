@@ -269,6 +269,8 @@
   "xaeroplus.setting.world_map_ui_additions.tooltip": "Przełącza, czy do interfejsu mapy świata są dodawane dodatkowe przyciski i elementy XaeroPlus",
   "xaeroplus.setting.waypoints_list_ui_additions": "Dodatki interfejsu listy punktów nawigacyjnych",
   "xaeroplus.setting.waypoints_list_ui_additions.tooltip": "Przełącza, czy do interfejsu listy punktów nawigacyjnych są dodawane dodatkowe przyciski i elementy XaeroPlus",
+  "xaeroplus.setting.waypoints_gui_distance_column": "Kolumna odległości na liście punktów nawigacyjnych",
+  "xaeroplus.setting.waypoints_gui_distance_column.tooltip": "Wyświetla odległość do każdego punktu nawigacyjnego w kolumnie po prawej stronie, zastępując tekst pochodzenia z zewnętrznego dodatku, jeśli taki istnieje",
   "xaeroplus.gui.world_map.toggle_follow_mode": "Przełącz Tryb Podążąnia",
   "xaeroplus.gui.on": "Włączony",
   "xaeroplus.gui.off": "Wyłączony",

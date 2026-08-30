@@ -139,6 +139,7 @@ public class XaeroPlusClientGameTest implements FabricClientGameTest {
             takeScreenshot(context, "minimap_settings");
 
             context.runOnClient(mc -> {
+                Settings.REGISTRY.waypointsListDistanceColumn.setValue(true);
                 mc.setScreen(new GuiWaypoints(HudMod.INSTANCE, BuiltInHudModules.MINIMAP.getCurrentSession(), null, null));
             });
             takeScreenshot(context, "waypoints_list");

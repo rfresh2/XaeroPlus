@@ -55,6 +55,7 @@ import xaero.map.gui.GuiTexturedButton;
 import xaero.map.gui.IRightClickableElement;
 import xaero.map.gui.MapTileSelection;
 import xaero.map.gui.dropdown.rightclick.RightClickOption;
+import xaero.map.gui.util.GuiUtils;
 import xaero.map.misc.Misc;
 import xaero.map.mods.SupportMods;
 import xaero.map.world.MapDimension;
@@ -1068,20 +1069,20 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                         public void onAction(Screen screen) {
                             BaritoneExecutor.goal(goalX, goalZ);
                         }
-                    }.setNameFormatArgs(KeyMappingUtils.getKeyName(Settings.REGISTRY.worldMapBaritoneGoalHereKeybindSetting.getKeyBinding())));
+                    }.setNameFormatArgs(GuiUtils.getBoundKeyComponent(Settings.REGISTRY.worldMapBaritoneGoalHereKeybindSetting.getKeyBinding())));
             options.add(index++, new RightClickOption("xaeroplus.gui.world_map.baritone_path_here", options.size(), this) {
                         @Override
                         public void onAction(Screen screen) {
                             BaritoneExecutor.path(goalX, goalZ);
                         }
-                    }.setNameFormatArgs(KeyMappingUtils.getKeyName(Settings.REGISTRY.worldMapBaritonePathHereKeybindSetting.getKeyBinding())));
+                    }.setNameFormatArgs(GuiUtils.getBoundKeyComponent(Settings.REGISTRY.worldMapBaritonePathHereKeybindSetting.getKeyBinding())));
             if (BaritoneHelper.isBaritoneElytraPresent()) {
                 options.add(index++, new RightClickOption("xaeroplus.gui.world_map.baritone_elytra_here", options.size(), this) {
                         @Override
                         public void onAction(Screen screen) {
                             BaritoneExecutor.elytra(goalX, goalZ);
                         }
-                    }.setNameFormatArgs(KeyMappingUtils.getKeyName(Settings.REGISTRY.worldMapBaritoneElytraHereKeybindSetting.getKeyBinding())));
+                    }.setNameFormatArgs(GuiUtils.getBoundKeyComponent(Settings.REGISTRY.worldMapBaritoneElytraHereKeybindSetting.getKeyBinding())));
             }
         }
         options.add(index++, new RightClickOption("xaeroplus.gui.world_map.rotate_here", options.size(), this) {
@@ -1097,7 +1098,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                     }
                 });
             }
-        }.setNameFormatArgs(KeyMappingUtils.getKeyName(Settings.REGISTRY.worldMapRotateHereKeybindSetting.getKeyBinding())));
+        }.setNameFormatArgs(GuiUtils.getBoundKeyComponent(Settings.REGISTRY.worldMapRotateHereKeybindSetting.getKeyBinding())));
         boolean tileSelPresent = this.mapTileSelection != null;
         final int delHighlightMinX = tileSelPresent ? mapTileSelection.getLeft() : rightClickX;
         final int delHighlightMaxX = tileSelPresent ? mapTileSelection.getRight() : rightClickX;

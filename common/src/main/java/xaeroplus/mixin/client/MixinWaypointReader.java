@@ -7,9 +7,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import xaero.lib.client.controls.util.KeyMappingUtils;
 import xaero.map.gui.IRightClickableElement;
 import xaero.map.gui.dropdown.rightclick.RightClickOption;
+import xaero.map.gui.util.GuiUtils;
 import xaero.map.mods.gui.Waypoint;
 import xaero.map.mods.gui.WaypointReader;
 import xaeroplus.settings.Settings;
@@ -49,7 +49,7 @@ public class MixinWaypointReader {
                             BaritoneExecutor.goal(goalX, goalZ);
                         }
                     }
-                }.setNameFormatArgs(KeyMappingUtils.getKeyName(Settings.REGISTRY.worldMapBaritoneGoalHereKeybindSetting.getKeyBinding())));
+                }.setNameFormatArgs(GuiUtils.getBoundKeyComponent(Settings.REGISTRY.worldMapBaritoneGoalHereKeybindSetting.getKeyBinding())));
             options.add(index++, new RightClickOption("xaeroplus.gui.world_map.baritone_path_here", options.size(), target) {
                     @Override
                     public void onAction(Screen screen) {
@@ -59,7 +59,7 @@ public class MixinWaypointReader {
                             BaritoneExecutor.path(goalX, goalZ);
                         }
                     }
-                }.setNameFormatArgs(KeyMappingUtils.getKeyName(Settings.REGISTRY.worldMapBaritonePathHereKeybindSetting.getKeyBinding())));
+                }.setNameFormatArgs(GuiUtils.getBoundKeyComponent(Settings.REGISTRY.worldMapBaritonePathHereKeybindSetting.getKeyBinding())));
             if (BaritoneHelper.isBaritoneElytraPresent()) {
                 options.add(index++, new RightClickOption("xaeroplus.gui.world_map.baritone_elytra_here", options.size(), target) {
                     @Override
@@ -70,7 +70,7 @@ public class MixinWaypointReader {
                             BaritoneExecutor.elytra(goalX, goalZ);
                         }
                     }
-                }.setNameFormatArgs(KeyMappingUtils.getKeyName(Settings.REGISTRY.worldMapBaritoneElytraHereKeybindSetting.getKeyBinding())));
+                }.setNameFormatArgs(GuiUtils.getBoundKeyComponent(Settings.REGISTRY.worldMapBaritoneElytraHereKeybindSetting.getKeyBinding())));
             }
         }
         options.add(index++, new RightClickOption("xaeroplus.gui.world_map.rotate_here", options.size(), target) {
@@ -86,7 +86,7 @@ public class MixinWaypointReader {
                     }
                 });
             }
-        }.setNameFormatArgs(KeyMappingUtils.getKeyName(Settings.REGISTRY.worldMapRotateHereKeybindSetting.getKeyBinding())));
+        }.setNameFormatArgs(GuiUtils.getBoundKeyComponent(Settings.REGISTRY.worldMapRotateHereKeybindSetting.getKeyBinding())));
 
         if (Settings.REGISTRY.disableWaypointSharing.get()) {
             options.removeIf(option -> ((AccessorRightClickOption) option).invokeGetName().equals("gui.xaero_right_click_waypoint_share"));

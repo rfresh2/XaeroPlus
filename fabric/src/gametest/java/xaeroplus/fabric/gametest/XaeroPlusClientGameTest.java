@@ -187,6 +187,7 @@ public class XaeroPlusClientGameTest implements ClientModInitializer {
             takeScreenshot("minimap_settings");
 
             submit(mc -> {
+                Settings.REGISTRY.waypointsListDistanceColumn.setValue(true);
                 mc.setScreen(new GuiWaypoints(HudMod.INSTANCE, BuiltInHudModules.MINIMAP.getCurrentSession(), null, null));
                 return null;
             });

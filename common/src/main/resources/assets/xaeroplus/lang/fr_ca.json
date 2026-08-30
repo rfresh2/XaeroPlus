@@ -269,6 +269,8 @@
   "xaeroplus.setting.world_map_ui_additions.tooltip": "Active ou désactive l’ajout de boutons et d’éléments supplémentaires de XaeroPlus à l’interface de la carte du monde",
   "xaeroplus.setting.waypoints_list_ui_additions": "Ajouts à l’interface de la liste des points de passage",
   "xaeroplus.setting.waypoints_list_ui_additions.tooltip": "Active ou désactive l’ajout de boutons et d’éléments supplémentaires de XaeroPlus à l’interface de la liste des points de passage",
+  "xaeroplus.setting.waypoints_gui_distance_column": "Colonne de distance de la liste des points de passage",
+  "xaeroplus.setting.waypoints_gui_distance_column.tooltip": "Affiche la distance de chaque point de passage dans une colonne à droite, en remplaçant son texte d’origine tierce s’il existe",
   "xaeroplus.gui.world_map.toggle_follow_mode": "Basculer le mode suivi",
   "xaeroplus.gui.on": "On",
   "xaeroplus.gui.off": "Off",

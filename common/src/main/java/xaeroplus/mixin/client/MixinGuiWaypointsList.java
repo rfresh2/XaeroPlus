@@ -1,12 +1,20 @@
 package xaeroplus.mixin.client;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import xaero.common.minimap.waypoints.Waypoint;
+import xaero.hud.minimap.BuiltInHudModules;
 import xaeroplus.feature.extensions.SyncedWaypoint;
 import xaeroplus.settings.Settings;
+import xaeroplus.util.ColorHelper;
+
+import java.text.NumberFormat;
 
 @Mixin(targets = "xaero.common.gui.GuiWaypoints$List", remap = false)
 public abstract class MixinGuiWaypointsList {
@@ -22,27 +30,40 @@ public abstract class MixinGuiWaypointsList {
         return original;
     }
 
-//    @Inject(method = "drawWaypointSlot", at = @At(
-//        value = "RETURN"
-//    ), remap = true)
-//    public void drawWaypointDistances(final GuiGraphics guiGraphics, final Waypoint w, final int x, final int y, final CallbackInfo ci) {
-//        if (!Settings.REGISTRY.waypointsListUIAdditions.get()) return;
-//        if (Settings.REGISTRY.showWaypointDistances.get() && w != null) {
-//            Entity renderViewEntity = Minecraft.getInstance().getCameraEntity();
-//            if (renderViewEntity == null) {
-//                renderViewEntity = Minecraft.getInstance().player;
-//            }
-//            final double playerX = renderViewEntity.getX();
-//            final double playerZ = renderViewEntity.getZ();
-//            final double playerY = renderViewEntity.getY();
-//            final double dimensionDivision = GuiWaypoints.distanceDivided;
-//            final int wpX = w.getX(dimensionDivision);
-//            final int wpY = w.getY();
-//            final int wpZ = w.getZ(dimensionDivision);
-//            final double distance = Math.sqrt(Math.pow(playerX - wpX, 2) + Math.pow(playerY - wpY, 2) + Math.pow(playerZ - wpZ, 2));
-//            final String text = NumberFormat.getIntegerInstance().format(distance) + "m";
-//            final Font fontRenderer = Minecraft.getInstance().font;
-//            guiGraphics.drawString(fontRenderer, text, x + 250, y + 1, -1);
-//        }
-//    }
+    @WrapOperation(method = "drawWaypointSlot", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/common/minimap/waypoints/Waypoint;isThirdParty()Z"
+    ), remap = true)
+    public boolean drawWaypointDistances(
+        final Waypoint w,
+        final Operation<Boolean> original,
+        @Local(argsOnly = true) GuiGraphics guiGraphics,
+        @Local(argsOnly = true, index = 3) int x,
+        @Local(argsOnly = true, index = 4) int y
+    ) {
+        if (w == null || !Settings.REGISTRY.waypointsListUIAdditions.get() || !Settings.REGISTRY.waypointsListDistanceColumn.get()) {
+            return original.call(w);
+        }
+        try {
+            var renderViewEntity = Minecraft.getInstance().getCameraEntity();
+            var playerX = renderViewEntity.getX();
+            var playerZ = renderViewEntity.getZ();
+            var playerY = renderViewEntity.getY();
+            // GuiWaypoints.distanceDivided is not necessarily initialized or updated, so calc it ourselves to be safe
+            var minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
+            if (minimapSession == null) return original.call(w);
+            var minimapWorld = minimapSession.getWorldManager().getCurrentWorld(minimapSession.getWorldState().getAutoWorldPath());
+            var dimensionDivision = minimapSession.getDimensionHelper().getDimensionDivision(minimapWorld);
+            var wpX = w.getX(dimensionDivision);
+            var wpY = w.getY();
+            var wpZ = w.getZ(dimensionDivision);
+            var distance = Math.sqrt(Math.pow(playerX - wpX, 2) + Math.pow(playerY - wpY, 2) + Math.pow(playerZ - wpZ, 2));
+            var text = NumberFormat.getIntegerInstance().format(distance) + "m";
+            var fontRenderer = Minecraft.getInstance().font;
+            guiGraphics.drawString(fontRenderer, text, x + 250, y + 1, ColorHelper.getColor(255, 255, 255, 255));
+            return false;
+        } catch (Exception e) {
+            return original.call(w);
+        }
+    }
 }

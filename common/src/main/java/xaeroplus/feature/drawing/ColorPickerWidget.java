@@ -1,12 +1,17 @@
 package xaeroplus.feature.drawing;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+import org.lwjgl.glfw.GLFW;
 import xaeroplus.util.Color;
 import xaeroplus.util.ColorHelper;
 
@@ -16,6 +21,16 @@ import java.util.function.Consumer;
 // with inspiration from future client's lovely design
 public class ColorPickerWidget extends AbstractWidget {
     private static final float HEIGHT_PROPORTION = 8.0f / 9.0f;
+    private static final int ENTRY_LABEL_HEIGHT = 9;
+    private static final int ENTRY_HEIGHT = 18;
+    private static final int ENTRY_GAP = 1;
+    private static final int ENTRY_SECTION_GAP = 3;
+    private static final int PRESET_COLUMNS = 7;
+    private static final int PRESET_ROWS = 2;
+    private static final int PRESET_HEIGHT = 10;
+    private static final int PRESET_GAP = 1;
+    private static final int PRESET_SECTION_GAP = 3;
+    private static final int PRESET_GRID_HEIGHT = PRESET_ROWS * PRESET_HEIGHT + (PRESET_ROWS - 1) * PRESET_GAP;
     private static final float PADDING_PROPORTION = 1.0f / 90.0f;
     private static final float SELECTOR_GAP_PROPORTION = 1.0f / 45.0f;
     private static final float HUE_BAR_PROPORTION = 1.0f / 15.0f;
@@ -27,6 +42,7 @@ public class ColorPickerWidget extends AbstractWidget {
     private static final float SELECTOR_EXTENSION_PROPORTION = 1.0f / 90.0f;
 
     private final Consumer<Color> onColorChanged;
+    private final int pickerHeight;
     private final int padding;
     private final int selectorGap;
     private final int hueBarHeight;
@@ -36,10 +52,12 @@ public class ColorPickerWidget extends AbstractWidget {
     private final int colorSelectorInnerSize;
     private final int barSelectorThickness;
     private final int selectorExtension;
+    private final EditBox[] colorEntryBoxes;
     private float hue;
     private float saturation;
     private float brightness;
     private int colorAlpha;
+    private boolean updatingEntries;
     private Selector activeSelector = Selector.NONE;
 
     public ColorPickerWidget(final int x, final int y, final int size, final Color color, final Consumer<Color> onColorChanged) {
@@ -47,10 +65,16 @@ public class ColorPickerWidget extends AbstractWidget {
             x,
             y,
             size,
-            Math.round(size * HEIGHT_PROPORTION),
+            Math.round(size * HEIGHT_PROPORTION)
+                + PRESET_SECTION_GAP
+                + PRESET_GRID_HEIGHT
+                + ENTRY_SECTION_GAP
+                + ENTRY_LABEL_HEIGHT
+                + ENTRY_HEIGHT,
             Component.translatable("xaeroplus.gui.world_map.draw_color")
         );
         this.onColorChanged = Objects.requireNonNull(onColorChanged);
+        pickerHeight = Math.round(size * HEIGHT_PROPORTION);
         padding = scaled(size, PADDING_PROPORTION);
         selectorGap = scaled(size, SELECTOR_GAP_PROPORTION);
         hueBarHeight = scaled(size, HUE_BAR_PROPORTION);
@@ -60,7 +84,56 @@ public class ColorPickerWidget extends AbstractWidget {
         colorSelectorInnerSize = Math.min(colorSelectorOuterSize - 2, scaled(size, COLOR_SELECTOR_INNER_PROPORTION));
         barSelectorThickness = Math.max(3, scaled(size, BAR_SELECTOR_THICKNESS_PROPORTION));
         selectorExtension = scaled(size, SELECTOR_EXTENSION_PROPORTION);
+        colorEntryBoxes = createColorEntryBoxes();
         setColor(color, false);
+    }
+
+    private EditBox[] createColorEntryBoxes() {
+        var entries = new EditBox[ColorChannel.values().length];
+        var availableWidth = width - ENTRY_GAP * (entries.length - 1);
+        var entryY = presetY() + PRESET_GRID_HEIGHT + ENTRY_SECTION_GAP + ENTRY_LABEL_HEIGHT;
+        var consumedWidth = 0;
+        for (var channel : ColorChannel.values()) {
+            var remainingEntries = entries.length - channel.ordinal();
+            var entryWidth = (availableWidth - consumedWidth) / remainingEntries;
+            var entryX = getX() + consumedWidth + ENTRY_GAP * channel.ordinal();
+            var entry = new EditBox(
+                Minecraft.getInstance().font,
+                entryX,
+                entryY,
+                entryWidth,
+                ENTRY_HEIGHT,
+                Component.literal(channel.label)
+            );
+            entry.setMaxLength(3);
+            entry.setFilter(ColorPickerWidget::isValidEntryText);
+            entry.setResponder(value -> updateColorFromEntry(channel, value));
+            entries[channel.ordinal()] = entry;
+            consumedWidth += entryWidth;
+        }
+        return entries;
+    }
+
+    private static boolean isValidEntryText(final String value) {
+        if (value.isEmpty()) return true;
+        if (!value.chars().allMatch(Character::isDigit)) return false;
+        try {
+            return Integer.parseInt(value) <= 255;
+        } catch (final NumberFormatException ignored) {
+            return false;
+        }
+    }
+
+    private void updateColorFromEntry(final ColorChannel channel, final String value) {
+        if (updatingEntries || value.isEmpty()) return;
+        var channelValue = Integer.parseInt(value);
+        var color = getColor();
+        setColor(switch (channel) {
+            case RED -> new Color(channelValue, color.g(), color.b(), color.a());
+            case GREEN -> new Color(color.r(), channelValue, color.b(), color.a());
+            case BLUE -> new Color(color.r(), color.g(), channelValue, color.a());
+            case ALPHA -> new Color(color.r(), color.g(), color.b(), channelValue);
+        }, true);
     }
 
     private static int scaled(final int size, final float proportion) {
@@ -79,9 +152,19 @@ public class ColorPickerWidget extends AbstractWidget {
         saturation = hsb[1];
         brightness = hsb[2];
         colorAlpha = color.a();
+        updateEntryValues(color);
         if (notify) {
             onColorChanged.accept(getColor());
         }
+    }
+
+    private void updateEntryValues(final Color color) {
+        updatingEntries = true;
+        colorEntryBoxes[ColorChannel.RED.ordinal()].setValue(Integer.toString(color.r()));
+        colorEntryBoxes[ColorChannel.GREEN.ordinal()].setValue(Integer.toString(color.g()));
+        colorEntryBoxes[ColorChannel.BLUE.ordinal()].setValue(Integer.toString(color.b()));
+        colorEntryBoxes[ColorChannel.ALPHA.ordinal()].setValue(Integer.toString(color.a()));
+        updatingEntries = false;
     }
 
     @Override
@@ -91,6 +174,50 @@ public class ColorPickerWidget extends AbstractWidget {
         renderHueBar(guiGraphics);
         renderAlphaBar(guiGraphics);
         renderSelectors(guiGraphics);
+        renderColorPresets(guiGraphics, mouseX, mouseY);
+        renderColorEntries(guiGraphics, mouseX, mouseY, partialTick);
+    }
+
+    private void renderColorPresets(final GuiGraphics guiGraphics, final int mouseX, final int mouseY) {
+        var currentColor = getColor();
+        for (var i = 0; i < ColorHelper.HighlightColor.VALUES.length; i++) {
+            var preset = ColorHelper.HighlightColor.VALUES[i];
+            var presetColor = preset.getColor();
+            var x = presetX(i);
+            var y = presetY(i);
+            var presetWidth = presetWidth(i);
+            guiGraphics.fill(
+                x,
+                y,
+                x + presetWidth,
+                y + PRESET_HEIGHT,
+                ColorHelper.getColorWithAlpha(presetColor, 255)
+            );
+            var selected = currentColor.r() == ColorHelper.getIntR(presetColor)
+                && currentColor.g() == ColorHelper.getIntG(presetColor)
+                && currentColor.b() == ColorHelper.getIntB(presetColor);
+            if (selected || contains(mouseX, mouseY, x, y, presetWidth, PRESET_HEIGHT)) {
+                renderOutline(guiGraphics, x, y, presetWidth, PRESET_HEIGHT, ColorHelper.getColor(255, 255, 255, 255));
+            } else if (preset == ColorHelper.HighlightColor.BLACK) {
+                renderOutline(guiGraphics, x, y, presetWidth, PRESET_HEIGHT, ColorHelper.getColor(128, 128, 128, 255));
+            }
+        }
+    }
+
+    private void renderColorEntries(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
+        var font = Minecraft.getInstance().font;
+        var labelY = presetY() + PRESET_GRID_HEIGHT + ENTRY_SECTION_GAP;
+        for (var channel : ColorChannel.values()) {
+            var entry = colorEntryBoxes[channel.ordinal()];
+            guiGraphics.drawCenteredString(
+                font,
+                channel.label,
+                entry.getX() + entry.getWidth() / 2,
+                labelY,
+                channel.labelColor
+            );
+            entry.render(guiGraphics, mouseX, mouseY, partialTick);
+        }
     }
 
     void renderColorGradient(final GuiGraphics guiGraphics) {
@@ -220,8 +347,49 @@ public class ColorPickerWidget extends AbstractWidget {
 
     @Override
     public void onClick(final MouseButtonEvent event, final boolean doubleClick) {
-        activeSelector = selectorAt(event.x(), event.y());
-        updateSelection(event.x(), event.y());
+        var mouseX = event.x();
+        var mouseY = event.y();
+        var preset = presetAt(mouseX, mouseY);
+        if (preset != null) {
+            activeSelector = Selector.NONE;
+            clearEntryFocus();
+            var presetColor = preset.getColor();
+            var currentColor = getColor();
+            setColor(new Color(
+                ColorHelper.getIntR(presetColor),
+                ColorHelper.getIntG(presetColor),
+                ColorHelper.getIntB(presetColor),
+                currentColor.a()
+            ), true);
+            return;
+        }
+        for (int i = 0; i < colorEntryBoxes.length; i++) {
+            final var entry = colorEntryBoxes[i];
+            if (entry.isMouseOver(mouseX, mouseY)) {
+                activeSelector = Selector.NONE;
+                focusEntry(entry);
+                entry.mouseClicked(event, doubleClick);
+                entry.setCursorPosition(entry.getValue().length());
+                entry.setHighlightPos(0);
+                return;
+            }
+        }
+        clearEntryFocus();
+        activeSelector = selectorAt(mouseX, mouseY);
+        updateSelection(mouseX, mouseY);
+    }
+
+    private ColorHelper.HighlightColor presetAt(final double mouseX, final double mouseY) {
+        for (var i = 0; i < ColorHelper.HighlightColor.VALUES.length; i++) {
+            if (contains(mouseX, mouseY, presetX(i), presetY(i), presetWidth(i), PRESET_HEIGHT)) {
+                return ColorHelper.HighlightColor.VALUES[i];
+            }
+        }
+        return null;
+    }
+
+    public void clickedOutside() {
+        clearEntryFocus();
     }
 
     @Override
@@ -261,8 +429,66 @@ public class ColorPickerWidget extends AbstractWidget {
             case ALPHA -> colorAlpha = Math.round((1.0f - normalized(mouseY, gradientY(), gradientHeight())) * 255.0f);
         }
         if (activeSelector != Selector.NONE) {
-            onColorChanged.accept(getColor());
+            var color = getColor();
+            updateEntryValues(color);
+            onColorChanged.accept(color);
         }
+    }
+
+    @Override
+    public boolean keyPressed(KeyEvent event) {
+        var focusedEntry = focusedEntry();
+        if (focusedEntry == null) return false;
+        if (event.key() == GLFW.GLFW_KEY_TAB) {
+            var direction = event.hasShiftDown() ? -1 : 1;
+            var nextIndex = Math.floorMod(indexOf(focusedEntry) + direction, colorEntryBoxes.length);
+            focusEntry(colorEntryBoxes[nextIndex]);
+            return true;
+        }
+        return focusedEntry.keyPressed(event);
+    }
+
+    @Override
+    public boolean charTyped(CharacterEvent event) {
+        var focusedEntry = focusedEntry();
+        return focusedEntry != null && focusedEntry.charTyped(event);
+    }
+
+    private void focusEntry(final EditBox selectedEntry) {
+        for (int i = 0; i < colorEntryBoxes.length; i++) {
+            final var entry = colorEntryBoxes[i];
+            if (entry == selectedEntry) {
+                entry.setFocused(true);
+            } else {
+                entry.setFocused(false);
+                entry.setHighlightPos(entry.getValue().length());
+            }
+        }
+    }
+
+    private void clearEntryFocus() {
+        for (int i = 0; i < colorEntryBoxes.length; i++) {
+            final var entry = colorEntryBoxes[i];
+            if (entry.getValue().isEmpty()) updateEntryValues(getColor());
+            entry.setFocused(false);
+            entry.setHighlightPos(entry.getValue().length());
+        }
+    }
+
+    private EditBox focusedEntry() {
+        for (int i = 0; i < colorEntryBoxes.length; i++) {
+            final var entry = colorEntryBoxes[i];
+            if (entry.isFocused()) return entry;
+        }
+        return null;
+    }
+
+    private int indexOf(final EditBox selectedEntry) {
+        for (var i = 0; i < colorEntryBoxes.length; i++) {
+            var entry = colorEntryBoxes[i];
+            if (entry == selectedEntry) return i;
+        }
+        return 0;
     }
 
     float normalized(final double position, final int start, final int length) {
@@ -282,7 +508,7 @@ public class ColorPickerWidget extends AbstractWidget {
     }
 
     int gradientHeight() {
-        return height - (padding * 2) - selectorGap - hueBarHeight;
+        return pickerHeight - (padding * 2) - selectorGap - hueBarHeight;
     }
 
     int hueY() {
@@ -291,6 +517,29 @@ public class ColorPickerWidget extends AbstractWidget {
 
     int alphaX() {
         return gradientX() + gradientWidth() + selectorGap;
+    }
+
+    int presetX(final int index) {
+        var column = index % PRESET_COLUMNS;
+        var availableWidth = width - (PRESET_COLUMNS - 1) * PRESET_GAP;
+        var baseWidth = availableWidth / PRESET_COLUMNS;
+        var widerPresetCount = availableWidth % PRESET_COLUMNS;
+        return getX() + column * (baseWidth + PRESET_GAP) + Math.min(column, widerPresetCount);
+    }
+
+    int presetY() {
+        return getY() + pickerHeight + PRESET_SECTION_GAP;
+    }
+
+    int presetY(final int index) {
+        return presetY() + (index / PRESET_COLUMNS) * (PRESET_HEIGHT + PRESET_GAP);
+    }
+
+    int presetWidth(final int index) {
+        var column = index % PRESET_COLUMNS;
+        var availableWidth = width - (PRESET_COLUMNS - 1) * PRESET_GAP;
+        var baseWidth = availableWidth / PRESET_COLUMNS;
+        return baseWidth + (column < availableWidth % PRESET_COLUMNS ? 1 : 0);
     }
 
     @Override
@@ -308,5 +557,20 @@ public class ColorPickerWidget extends AbstractWidget {
         COLOR,
         HUE,
         ALPHA
+    }
+
+    enum ColorChannel {
+        RED("R", ColorHelper.getColor(255, 0, 0, 255)),
+        GREEN("G", ColorHelper.getColor(0, 255, 0, 255)),
+        BLUE("B", ColorHelper.getColor(0, 0, 255, 255)),
+        ALPHA("A", ColorHelper.getColor(255, 255, 255, 255));
+
+        private final String label;
+        private final int labelColor;
+
+        ColorChannel(final String label, final int labelColor) {
+            this.label = label;
+            this.labelColor = labelColor;
+        }
     }
 }

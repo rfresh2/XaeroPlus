@@ -19,8 +19,6 @@ import xaeroplus.util.PlayerRotationHelper;
 
 import java.util.ArrayList;
 
-import static java.util.Arrays.asList;
-
 @Mixin(value = WaypointReader.class, remap = false)
 public class MixinWaypointReader {
 
@@ -63,18 +61,16 @@ public class MixinWaypointReader {
                     }
                 }.setNameFormatArgs(KeyMappingUtils.getKeyName(Settings.REGISTRY.worldMapBaritonePathHereKeybindSetting.getKeyBinding())));
             if (BaritoneHelper.isBaritoneElytraPresent()) {
-                options.addAll(index++, asList(
-                    new RightClickOption("xaeroplus.gui.world_map.baritone_elytra_here", options.size(), target) {
-                        @Override
-                        public void onAction(Screen screen) {
-                            if (isYPresent) {
-                                BaritoneExecutor.elytra(goalX, goalY, goalZ);
-                            } else {
-                                BaritoneExecutor.elytra(goalX, goalZ);
-                            }
+                options.add(index++, new RightClickOption("xaeroplus.gui.world_map.baritone_elytra_here", options.size(), target) {
+                    @Override
+                    public void onAction(Screen screen) {
+                        if (isYPresent) {
+                            BaritoneExecutor.elytra(goalX, goalY, goalZ);
+                        } else {
+                            BaritoneExecutor.elytra(goalX, goalZ);
                         }
-                    }.setNameFormatArgs(KeyMappingUtils.getKeyName(Settings.REGISTRY.worldMapBaritoneElytraHereKeybindSetting.getKeyBinding()))
-                ));
+                    }
+                }.setNameFormatArgs(KeyMappingUtils.getKeyName(Settings.REGISTRY.worldMapBaritoneElytraHereKeybindSetting.getKeyBinding())));
             }
         }
         options.add(index++, new RightClickOption("xaeroplus.gui.world_map.rotate_here", options.size(), target) {

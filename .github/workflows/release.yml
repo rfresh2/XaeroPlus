@@ -119,7 +119,7 @@ jobs:
 
       - name: Generate changelog
         id: changelog
-        uses: metcalfc/changelog-generator@v5.0.1
+        uses: metcalfc/changelog-generator@v5
         with:
           myToken: ${{ secrets.GITHUB_TOKEN }}
           base-ref: ${{ inputs.baseRef }}

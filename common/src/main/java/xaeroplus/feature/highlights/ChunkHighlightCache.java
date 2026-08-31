@@ -20,6 +20,7 @@ public interface ChunkHighlightCache {
     void removeHighlights(final LongCollection toRemove);
     void removeHighlights(final LongCollection toRemove, ResourceKey<Level> dimensionId);
     boolean isHighlighted(final int x, final int z, ResourceKey<Level> dimensionId);
+    String name();
     /**
      * retrieves the current cache map for the given dimension. Database data is loaded in a window around the current view asynchronously
      *

@@ -37,7 +37,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     @Nullable private ChunkHighlightDatabase database = null;
     @Nullable private String currentWorldId;
     private final AtomicBoolean cacheReady = new AtomicBoolean(false);
-    @Nullable private final String databaseName;
+    @Nullable private final String name;
     // Executor used for db read/writes
     @Nullable private ListeningExecutorService dbExecutor;
     // executor used for single threaded tasks that involve changing worlds and preparing the cache for operations
@@ -47,16 +47,21 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
     private final Queue<QueuedInitOperation> initOperationQueue = new ConcurrentLinkedQueue<>();
     Minecraft mc = Minecraft.getInstance();
 
-    public ChunkHighlightSavingCache(final @NotNull String databaseName) {
-        this.databaseName = databaseName;
+    public ChunkHighlightSavingCache(final @NotNull String name) {
+        this.name = name;
         this.parentExecutor = MoreExecutors.listeningDecorator(
             Executors.newSingleThreadExecutor(
                 new ThreadFactoryBuilder()
-                    .setNameFormat(databaseName + "-Manager")
+                    .setNameFormat(name + "-Manager")
                     .setUncaughtExceptionHandler((t, e) -> {
                         XaeroPlus.LOGGER.error("Uncaught exception in {}", t.getName(), e);
                     })
                     .build()));
+    }
+
+    @Override
+    public String name() {
+        return name;
     }
 
     @Override
@@ -75,7 +80,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
             }
             cacheForActualDimension.addHighlight(x, z);
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.warn("Error adding highlight to {} disk cache: {}, {}", databaseName, x, z, e);
+            XaeroPlus.LOGGER.warn("Error adding highlight to {} disk cache: {}, {}", name, x, z, e);
         }
     }
 
@@ -95,7 +100,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
             }
             cacheForActualDimension.addHighlight(x, z, foundTime);
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.warn("Error adding highlight to {} disk cache: {}, {}", databaseName, x, z, e);
+            XaeroPlus.LOGGER.warn("Error adding highlight to {} disk cache: {}, {}", name, x, z, e);
         }
     }
 
@@ -115,7 +120,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
             }
             cacheForActualDimension.removeHighlight(x, z);
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.warn("Error removing highlight from {} disk cache: {}, {}", databaseName, x, z, e);
+            XaeroPlus.LOGGER.warn("Error removing highlight from {} disk cache: {}, {}", name, x, z, e);
         }
     }
 
@@ -134,7 +139,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
             }
             cacheForActualDimension.removeHighlights(toRemove);
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.warn("Error removing highlights from {} disk cache: {}, {}", databaseName, toRemove, dimension, e);
+            XaeroPlus.LOGGER.warn("Error removing highlights from {} disk cache: {}, {}", name, toRemove, dimension, e);
         }
     }
 
@@ -181,16 +186,16 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
                             @Override
                             public void onFailure(@NotNull final Throwable t) {
                                 if (t instanceof CancellationException) {
-                                    XaeroPlus.LOGGER.warn("{} disk cache initialization cancelled", databaseName);
+                                    XaeroPlus.LOGGER.warn("{} disk cache initialization cancelled", name);
                                 } else {
-                                    XaeroPlus.LOGGER.error("Error initializing {} disk cache", databaseName, t);
+                                    XaeroPlus.LOGGER.error("Error initializing {} disk cache", name, t);
                                 }
                                 cacheReady.set(false);
                                 reset();
                             }
                         }, parentExecutor);
                     } else {
-                        XaeroPlus.LOGGER.warn("[{}] Entered world when cache was already initialized", databaseName);
+                        XaeroPlus.LOGGER.warn("[{}] Entered world when cache was already initialized", name);
                     }
                 }
                 case EXIT_WORLD -> {
@@ -206,7 +211,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
                             XaeroPlus.LOGGER.error("Error saving all chunks before disabling", e);
                         }
                     } else {
-                        XaeroPlus.LOGGER.warn("[{}] Exited world when cache was already uninitialized", databaseName);
+                        XaeroPlus.LOGGER.warn("[{}] Exited world when cache was already uninitialized", name);
                     }
                     reset();
                 }
@@ -229,15 +234,16 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
                     throw new RuntimeException("Timed out awaiting shutdown termination");
                 }
             } catch (final Throwable e) {
-                XaeroPlus.LOGGER.error("Timed out waiting for {} executor to shutdown", databaseName, e);
+                XaeroPlus.LOGGER.error("Timed out waiting for {} executor to shutdown", name, e);
                 try {
                     var droppedTasks = this.dbExecutor.shutdownNow();
                     if (!this.dbExecutor.awaitTermination(4L, TimeUnit.SECONDS)) {
                         throw new RuntimeException("Timed out awaiting force shutdown termination");
                     }
-                    XaeroPlus.LOGGER.error("Forcibly shut down {} executor with {} tasks remaining", databaseName, droppedTasks.size());
+                    XaeroPlus.LOGGER.error("Forcibly shut down {} executor with {} tasks remaining",
+                        name, droppedTasks.size());
                 } catch (final Throwable e2) {
-                    XaeroPlus.LOGGER.error("Error force shutting down {} executor", databaseName, e2);
+                    XaeroPlus.LOGGER.error("Error force shutting down {} executor", name, e2);
                 }
             }
         }
@@ -268,10 +274,11 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         var db = this.database;
         var executor = this.dbExecutor;
         if (db == null || executor == null) {
-            XaeroPlus.LOGGER.error("[{}] Unable to initialize {} disk cache handler for: {}, database: {} or executor: {} is null", Thread.currentThread().getName(), databaseName, dimension.location(), db, executor);
+            XaeroPlus.LOGGER.error("[{}] Unable to initialize {} disk cache handler for: {}, database: {} or executor: {} is null", Thread.currentThread().getName(),
+                name, dimension.location(), db, executor);
             return null;
         }
-        var cacheHandler = new ChunkHighlightCacheDimensionHandler(dimension, db, executor);
+        var cacheHandler = new ChunkHighlightCacheDimensionHandler(name, dimension, db, executor);
         db.initializeDimension(dimension);
         this.dimensionCacheMap.put(dimension, cacheHandler);
         return cacheHandler;
@@ -283,7 +290,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         var dimensionCache = dimensionCacheMap.get(dimension);
         if (dimensionCache == null) {
             if (!create) return null;
-            XaeroPlus.LOGGER.info("Initializing {} disk cache for dimension: {}", databaseName, dimension.location());
+            XaeroPlus.LOGGER.info("Initializing {} disk cache for dimension: {}", name, dimension.location());
             dimensionCache = initializeDimensionCacheHandler(dimension);
         }
         return dimensionCache;
@@ -327,19 +334,20 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
             this.dbExecutor = MoreExecutors.listeningDecorator(
                 Executors.newSingleThreadExecutor(
                     new ThreadFactoryBuilder()
-                        .setNameFormat(databaseName + "-Worker")
+                        .setNameFormat(name + "-Worker")
                         .setUncaughtExceptionHandler((t, e) -> {
                             XaeroPlus.LOGGER.error("Uncaught exception handler in {}", t.getName(), e);
                         })
                         .build()));
             return this.dbExecutor.submit(() -> {
-                this.database = new ChunkHighlightDatabase(worldId, databaseName);
+                this.database = new ChunkHighlightDatabase(worldId, name);
                 this.database.initializeDb();
                 initializeDimensionCacheHandler(OVERWORLD);
                 initializeDimensionCacheHandler(NETHER);
                 initializeDimensionCacheHandler(END);
                 loadChunksInViewedDimension();
-                if (!initOperationQueue.isEmpty()) XaeroPlus.LOGGER.info("[{}] Running {} queued tasks", databaseName, initOperationQueue.size());
+                if (!initOperationQueue.isEmpty()) XaeroPlus.LOGGER.info("[{}] Running {} queued tasks",
+                    name, initOperationQueue.size());
                 while (!this.initOperationQueue.isEmpty()) {
                     var op = this.initOperationQueue.poll();
                     if (op == null || op.task() == null) continue;
@@ -504,7 +512,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
                         throw new RuntimeException("Timed out awaiting shutdown termination");
                     }
                 } catch (Exception e) {
-                    XaeroPlus.LOGGER.error("Error waiting for {} db executor to shutdown", databaseName, e);
+                    XaeroPlus.LOGGER.error("Error waiting for {} db executor to shutdown", name, e);
                 }
             }
         });
@@ -514,7 +522,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
                 throw new RuntimeException("Timed out awaiting shutdown termination");
             }
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error waiting for {} executor to shutdown", databaseName, e);
+            XaeroPlus.LOGGER.error("Error waiting for {} executor to shutdown", name, e);
         }
     }
 

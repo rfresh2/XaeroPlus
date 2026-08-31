@@ -12,9 +12,15 @@ import java.util.concurrent.CompletableFuture;
 
 public class ChunkHighlightLocalCache extends ChunkHighlightBaseCacheHandler {
     private static final int maxNumber = 5000;
+    private final String name;
 
-    public ChunkHighlightLocalCache() {
-        super();
+    public ChunkHighlightLocalCache(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String name() {
+        return name;
     }
 
     @Override

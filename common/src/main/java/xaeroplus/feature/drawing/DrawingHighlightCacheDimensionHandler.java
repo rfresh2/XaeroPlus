@@ -21,6 +21,7 @@ import static xaeroplus.util.ChunkUtils.regionCoordToChunkCoord;
 // todo: extract out common interface for database class
 //   only thing different between normal highlight db is database type
 public class DrawingHighlightCacheDimensionHandler extends ChunkHighlightBaseCacheHandler {
+    private final String name;
     private final ResourceKey<Level> dimension;
     private int windowRegionX = 0;
     private int windowRegionZ = 0;
@@ -31,14 +32,20 @@ public class DrawingHighlightCacheDimensionHandler extends ChunkHighlightBaseCac
     ListenableFuture<?> windowMoveFuture = Futures.immediateVoidFuture();
 
     public DrawingHighlightCacheDimensionHandler(
+        String name,
         ResourceKey<Level> dimension,
         DrawingDatabase database,
         ListeningExecutorService dbExecutor
     ) {
-        super();
+        this.name = name;
         this.dimension = dimension;
         this.database = database;
         this.dbExecutor = dbExecutor;
+    }
+
+    @Override
+    public String name() {
+        return name;
     }
 
     public synchronized void setWindow(int regionX, int regionZ, int regionSize) {

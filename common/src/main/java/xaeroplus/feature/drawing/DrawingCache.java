@@ -347,7 +347,7 @@ public class DrawingCache implements Closeable {
             XaeroPlus.LOGGER.error("[{}] Unable to initialize {} disk cache handler for: {}, database: {} or executor: {} is null", Thread.currentThread().getName(), databaseName, dimension.location(), db, executor);
             return null;
         }
-        var cacheHandler = new DrawingHighlightCacheDimensionHandler(dimension, db, executor);
+        var cacheHandler = new DrawingHighlightCacheDimensionHandler(databaseName, dimension, db, executor);
         db.initializeDimension(dimension);
         this.highlightsCacheMap.put(dimension, cacheHandler);
         return cacheHandler;

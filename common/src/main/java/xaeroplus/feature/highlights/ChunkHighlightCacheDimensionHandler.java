@@ -18,6 +18,7 @@ import static xaeroplus.util.ChunkUtils.chunkPosToLong;
 import static xaeroplus.util.ChunkUtils.regionCoordToChunkCoord;
 
 public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCacheHandler {
+    private final String name;
     @NotNull private final ResourceKey<Level> dimension;
     private int windowRegionX = 0;
     private int windowRegionZ = 0;
@@ -33,13 +34,20 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
     ListenableFuture<?> windowMoveFuture = Futures.immediateVoidFuture();
 
     public ChunkHighlightCacheDimensionHandler(
+        String name,
         @NotNull ResourceKey<Level> dimension,
         @NotNull ChunkHighlightDatabase database,
-        @NotNull ListeningExecutorService dbExecutor) {
-        super();
+        @NotNull ListeningExecutorService dbExecutor
+    ) {
+        this.name = name;
         this.dimension = dimension;
         this.database = database;
         this.dbExecutor = dbExecutor;
+    }
+
+    @Override
+    public String name() {
+        return name;
     }
 
     public synchronized void setWindow(int regionX, int regionZ, int regionSize) {

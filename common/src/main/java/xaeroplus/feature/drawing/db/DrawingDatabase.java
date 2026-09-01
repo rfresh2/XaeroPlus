@@ -37,6 +37,7 @@ import static xaeroplus.util.ChunkUtils.regionCoordToCoord;
 
 public class DrawingDatabase implements Closeable {
     public static final int MAX_HIGHLIGHTS_LIST = 25000;
+    private static final int DATABASE_VERSION = 1;
     public static final String HIGHLIGHTS_TABLE = "highlights";
     public static final String LINES_TABLE = "lines";
     public static final String ELLIPSES_TABLE = "ellipses";
@@ -66,6 +67,7 @@ public class DrawingDatabase implements Closeable {
             connection = DriverManager.getConnection("jdbc:rfresh_sqlite:" + dbPath);
             ((SQLiteConnection) connection).setBusyTimeout(5000);
             connection = MIGRATOR.migrate(dbPath, databaseName, connection, init);
+            validateDbVersion();
             setPragmas();
         } catch (Exception e) {
             if (!nativeLibraryErrorSent && e.getCause() instanceof NativeLibraryNotFoundException nativeException) {
@@ -77,6 +79,26 @@ public class DrawingDatabase implements Closeable {
             }
             XaeroPlus.LOGGER.error("Error while creating drawing database: {} for worldId: {}", databaseName, worldId, e);
             throw new RuntimeException(e);
+        }
+    }
+
+    int getDatabaseMetadataVersion() {
+        var version = DATABASE_VERSION;
+        try (var statement = connection.createStatement()) {
+            try (var rs = statement.executeQuery("select version from metadata order by time desc limit 1")) {
+                rs.next();
+                version = rs.getInt("version");
+            }
+        } catch (Exception e) {
+            XaeroPlus.LOGGER.error("Error reading {} database version: {}", databaseName, DATABASE_VERSION, e);
+        }
+        return version;
+    }
+
+    void validateDbVersion() {
+        var version = getDatabaseMetadataVersion();
+        if (version != DATABASE_VERSION) {
+            throw new IllegalStateException(databaseName + " version mismatch: expected " + DATABASE_VERSION + ", found " + version);
         }
     }
 
@@ -279,7 +301,7 @@ public class DrawingDatabase implements Closeable {
     ) {
         try (var statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery(
-                "SELECT * FROM \"" + getTableName(dimension, LINES_TABLE) + "\"")) {
+                "SELECT x1, z1, x2, z2, color FROM \"" + getTableName(dimension, LINES_TABLE) + "\"")) {
                 while (resultSet.next()) {
                     consumer.accept(
                         resultSet.getInt("x1"),
@@ -317,7 +339,7 @@ public class DrawingDatabase implements Closeable {
 
     private boolean getEllipsesInDimension0(final ResourceKey<Level> dimension, final EllipseConsumer consumer) {
         try (var statement = connection.createStatement();
-             var resultSet = statement.executeQuery("SELECT * FROM \"" + getTableName(dimension, ELLIPSES_TABLE) + "\"")) {
+             var resultSet = statement.executeQuery("SELECT centerX, centerZ, radiusX, radiusZ, color FROM \"" + getTableName(dimension, ELLIPSES_TABLE) + "\"")) {
             while (resultSet.next()) {
                 consumer.accept(
                     resultSet.getInt("centerX"),
@@ -361,7 +383,7 @@ public class DrawingDatabase implements Closeable {
     ) {
         try (var statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery(
-                "SELECT * FROM \"" + getTableName(dimension, TEXTS_TABLE) + "\" "
+                "SELECT value, x, z, color, scale FROM \"" + getTableName(dimension, TEXTS_TABLE) + "\" "
                     + "WHERE x >= " + regionCoordToCoord(regionXMin) + " AND x <= " + regionCoordToCoord(regionXMax)
                     + " AND z >= " + regionCoordToCoord(regionZMin) + " AND z <= " + regionCoordToCoord(regionZMax))) {
                 while (resultSet.next()) {
@@ -415,7 +437,7 @@ public class DrawingDatabase implements Closeable {
     ) {
         try (var statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery(
-                "SELECT * FROM \"" + getTableName(dimension, HIGHLIGHTS_TABLE) + "\" "
+                "SELECT x, z, color FROM \"" + getTableName(dimension, HIGHLIGHTS_TABLE) + "\" "
                     + "WHERE x >= " + regionCoordToChunkCoord(regionXMin) + " AND x <= " + regionCoordToChunkCoord(regionXMax)
                     + " AND z >= " + regionCoordToChunkCoord(regionZMin) + " AND z <= " + regionCoordToChunkCoord(regionZMax))) {
                 while (resultSet.next()) {
@@ -460,7 +482,7 @@ public class DrawingDatabase implements Closeable {
             var it = Object2IntMaps.fastIterator(lines);
             while (it.hasNext()) {
                 sb.setLength(0);
-                sb.append("INSERT OR REPLACE INTO \"").append(getTableName(dimension, LINES_TABLE)).append("\" VALUES ");
+                sb.append("INSERT OR REPLACE INTO \"").append(getTableName(dimension, LINES_TABLE)).append("\" (x1, z1, x2, z2, color) VALUES ");
                 boolean trailingComma = false;
                 for (int i = 0; i < batchSize && it.hasNext(); i++) {
                     var entry = it.next();
@@ -503,7 +525,7 @@ public class DrawingDatabase implements Closeable {
             var iterator = Object2IntMaps.fastIterator(ellipses);
             while (iterator.hasNext()) {
                 sql.setLength(0);
-                sql.append("INSERT OR REPLACE INTO \"").append(getTableName(dimension, ELLIPSES_TABLE)).append("\" VALUES ");
+                sql.append("INSERT OR REPLACE INTO \"").append(getTableName(dimension, ELLIPSES_TABLE)).append("\" (centerX, centerZ, radiusX, radiusZ, color) VALUES ");
                 for (var i = 0; i < batchSize && iterator.hasNext(); i++) {
                     var entry = iterator.next();
                     var ellipse = entry.getKey();
@@ -552,7 +574,7 @@ public class DrawingDatabase implements Closeable {
             StringBuilder sb = new StringBuilder(50 * Math.min(batchSize, chunks.size()) + 75);
             while (it.hasNext()) {
                 sb.setLength(0);
-                sb.append("INSERT OR REPLACE INTO \"").append(getTableName(dimension, HIGHLIGHTS_TABLE)).append("\" VALUES ");
+                sb.append("INSERT OR REPLACE INTO \"").append(getTableName(dimension, HIGHLIGHTS_TABLE)).append("\" (x, z, color) VALUES ");
                 boolean trailingComma = false;
                 for (int i = 0; i < batchSize && it.hasNext(); i++) {
                     var entry = it.next();
@@ -603,7 +625,7 @@ public class DrawingDatabase implements Closeable {
             StringBuilder sb = new StringBuilder(50 * Math.min(batchSize, texts.size()) + 75);
             while (it.hasNext()) {
                 sb.setLength(0);
-                sb.append("INSERT OR REPLACE INTO \"").append(getTableName(dimension, TEXTS_TABLE)).append("\" VALUES ");
+                sb.append("INSERT OR REPLACE INTO \"").append(getTableName(dimension, TEXTS_TABLE)).append("\" (value, x, z, color, scale) VALUES ");
                 boolean trailingComma = false;
                 for (int i = 0; i < batchSize && it.hasNext(); i++) {
                     var entry = it.next().getValue();

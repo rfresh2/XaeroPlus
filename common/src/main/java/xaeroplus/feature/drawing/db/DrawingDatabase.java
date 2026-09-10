@@ -85,7 +85,7 @@ public class DrawingDatabase implements Closeable {
     int getDatabaseMetadataVersion() {
         var version = DATABASE_VERSION;
         try (var statement = connection.createStatement()) {
-            try (var rs = statement.executeQuery("select version from metadata order by time desc limit 1")) {
+            try (var rs = statement.executeQuery("select version from metadata order by rowid desc limit 1")) {
                 rs.next();
                 version = rs.getInt("version");
             }

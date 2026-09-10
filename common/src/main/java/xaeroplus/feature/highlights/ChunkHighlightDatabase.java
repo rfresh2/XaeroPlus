@@ -86,7 +86,7 @@ public class ChunkHighlightDatabase implements Closeable {
     void validateDbVersion() {
         var version = getDatabaseMetadataVersion();
         if (version < DATABASE_VERSION) {
-            XaeroPlus.LOGGER.error("Database version mismatch: expected {} found {}", DATABASE_VERSION, version);
+            XaeroPlus.LOGGER.error("{} version mismatch: expected {} found {}", databaseName, DATABASE_VERSION, version);
             // we do want to throw an exception here
             // but we can get into a state where this would cause us to get stuck otherwise
             // sequence:
@@ -98,7 +98,7 @@ public class ChunkHighlightDatabase implements Closeable {
 //            throw new IllegalStateException("Database version mismatch: expected " + DATABASE_VERSION + ", found " + version);
         }
         if (version > DATABASE_VERSION) {
-            throw new IllegalStateException("Database version mismatch: expected " + DATABASE_VERSION + ", found " + version);
+            throw new IllegalStateException(databaseName + " database version mismatch: expected " + DATABASE_VERSION + ", found " + version);
         }
         writeDbVersion();
     }

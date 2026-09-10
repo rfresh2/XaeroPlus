@@ -12,13 +12,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SavableHighlightCacheInstance {
     private static final Set<SavableHighlightCacheInstance> INSTANCES = ConcurrentHashMap.newKeySet();
     private ChunkHighlightCache cache;
-    private final String dbName;
+    private final String name;
 
-    public SavableHighlightCacheInstance(String dbName) {
-        this.dbName = dbName;
+    public SavableHighlightCacheInstance(String name) {
+        this.name = name;
         // always starts as a local cache
         // to switch to disk cache call setDiskCache
-        this.cache = new ChunkHighlightLocalCache();
+        this.cache = new ChunkHighlightLocalCache(name);
     }
 
     public static Set<SavableHighlightCacheInstance> instances() {
@@ -27,6 +27,10 @@ public class SavableHighlightCacheInstance {
 
     public ChunkHighlightCache get() {
         return cache;
+    }
+
+    public String getName() {
+        return name;
     }
 
     /**
@@ -52,15 +56,15 @@ public class SavableHighlightCacheInstance {
                 savingCache.close();
             }
             if (disk) {
-                cache = new ChunkHighlightSavingCache(dbName);
+                cache = new ChunkHighlightSavingCache(name);
             } else {
-                cache = new ChunkHighlightLocalCache();
+                cache = new ChunkHighlightLocalCache(name);
             }
             if (enabled) {
                 cache.onEnable();
             }
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error setting {} cache [{} {}]", dbName, disk, enabled, e);
+            XaeroPlus.LOGGER.error("Error setting {} cache [{} {}]", name, disk, enabled, e);
         }
     }
 
@@ -69,7 +73,7 @@ public class SavableHighlightCacheInstance {
         try {
             cache.handleWorldChange(event);
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error handling world change event for cache: {} event: {}", dbName, event, e);
+            XaeroPlus.LOGGER.error("Error handling world change event for cache: {} event: {}", name, event, e);
         }
     }
 
@@ -78,7 +82,7 @@ public class SavableHighlightCacheInstance {
         try {
             cache.handleTick();
         } catch (final Exception e) {
-            XaeroPlus.LOGGER.error("Error handling tick event for cache: {}", dbName, e);
+            XaeroPlus.LOGGER.error("Error handling tick event for cache: {}", name, e);
         }
     }
 

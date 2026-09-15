@@ -1,5 +1,6 @@
 package xaeroplus.settings;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -72,7 +73,7 @@ public class BooleanSetting extends XaeroPlusSetting {
                 SETTING_PREFIX + name,
                 translationKey,
                 buildTooltipTranslationKey(translationKey),
-                keybind ? new KeyMapping(translationKey, -1, KEYBIND_CATEGORY) : null,
+                keybind ? new KeyMapping(translationKey, InputConstants.UNKNOWN.getValue(), KEYBIND_CATEGORY) : null,
                 requireNonNull(defaultValue, "defaultValue"),
                 settingChangeConsumer,
                 visibilitySupplier

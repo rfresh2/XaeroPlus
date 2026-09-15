@@ -32,71 +32,78 @@ public final class Settings extends SettingRegistry {
      * WorldMap Main
      */
     public final StringSetting drawOrderSetting = register(
-        StringSetting.create(
-            "Draw Order",
-            "xaeroplus.setting.draw_order",
-            "",
-            (s) -> Globals.drawManager.registry().loadOrder(s),
-            (parent, escape, setting) -> new DrawOrderScreen(parent, escape)
-        ),
+        StringSetting.builder()
+            .name("Draw Order")
+            .translationKey("xaeroplus.setting.draw_order")
+            .defaultValue("")
+            .onChange((s) -> Globals.drawManager.registry().loadOrder(s))
+            .screen((parent, escape, setting) -> new DrawOrderScreen(parent, escape))
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting transparentWorldmapBackgroundSetting = register(
-        BooleanSetting.create(
-            "Transparent WorldMap Background",
-            "xaeroplus.setting.transparent_worldmap_background",
-            false),
+        BooleanSetting.builder()
+            .name("Transparent WorldMap Background")
+            .translationKey("xaeroplus.setting.transparent_worldmap_background")
+            .defaultValue(false)
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting fastZipWrite = register(
-        BooleanSetting.create(
-            "Fast Zip Writes",
-            "xaeroplus.setting.fast_zip_writes",
-            true,
-            (b) -> {
+        BooleanSetting.builder()
+            .name("Fast Zip Writes")
+            .translationKey("xaeroplus.setting.fast_zip_writes")
+            .defaultValue(true)
+            .onChange((b) -> {
                 if (!b) Globals.zipFastByteBuffer = new ByteArrayOutputStream(); // release any existing sized buffer to gc
-            }),
+            })
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting writesWhileDimSwitched = register(
-        BooleanSetting.create(
-            "Region Writes While Dim Switched",
-            "xaeroplus.setting.region_write_while_dimension_switched",
-            false),
+        BooleanSetting.builder()
+            .name("Region Writes While Dim Switched")
+            .translationKey("xaeroplus.setting.region_write_while_dimension_switched")
+            .defaultValue(false)
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting baritoneWaypointSyncSetting = register(
-        BooleanSetting.create(
-            "Baritone Goal Waypoint",
-            "xaeroplus.setting.baritone_waypoint",
-            true,
-            (b) -> {
+        BooleanSetting.builder()
+            .name("Baritone Goal Waypoint")
+            .translationKey("xaeroplus.setting.baritone_waypoint")
+            .defaultValue(true)
+            .onChange((b) -> {
                 if (BaritoneHelper.isBaritonePresent()) ModuleManager.getModule(BaritoneGoalSync.class).setEnabled(b);
-            },
-            BaritoneHelper::isBaritonePresent),
+            })
+            .visibleWhen(BaritoneHelper::isBaritonePresent)
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting spawnPointSetting = register(
-        BooleanSetting.create(
-            "Spawn Point Waypoint",
-            "xaeroplus.setting.spawn_point_waypoint",
-            false,
-            (b) -> ModuleManager.getModule(SpawnPoint.class).setEnabled(b)
-        ),
+        BooleanSetting.builder()
+            .name("Spawn Point Waypoint")
+            .translationKey("xaeroplus.setting.spawn_point_waypoint")
+            .defaultValue(false)
+            .onChange((b) -> ModuleManager.getModule(SpawnPoint.class).setEnabled(b))
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting pearlWaypointsSetting = register(
-        BooleanSetting.create(
-            "Pearl Waypoints",
-            "xaeroplus.setting.pearl_waypoints",
-            false,
-            (b) -> ModuleManager.getModule(Pearls.class).setEnabled(b)),
+        BooleanSetting.builder()
+            .name("Pearl Waypoints")
+            .translationKey("xaeroplus.setting.pearl_waypoints")
+            .defaultValue(false)
+            .onChange((b) -> ModuleManager.getModule(Pearls.class).setEnabled(b))
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting persistMapDimensionSwitchSetting = register(
-        BooleanSetting.create(
-            "Persist Dim Switch",
-            "xaeroplus.setting.persist_dimension_switch",
-            true),
+        BooleanSetting.builder()
+            .name("Persist Dim Switch")
+            .translationKey("xaeroplus.setting.persist_dimension_switch")
+            .defaultValue(true)
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting radarWhileDimensionSwitchedSetting = register(
-        BooleanSetting.create(
-            "Radar While Dim Switched",
-            "xaeroplus.setting.radar_while_dimension_switched",
-            true),
+        BooleanSetting.builder()
+            .name("Radar While Dim Switched")
+            .translationKey("xaeroplus.setting.radar_while_dimension_switched")
+            .defaultValue(true)
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     static void markChunksDirtyInWriteDistance() {
         Minecraft mc = Minecraft.getInstance();
@@ -109,72 +116,81 @@ public final class Settings extends SettingRegistry {
         }
     }
     public final BooleanSetting transparentObsidianRoofSetting = register(
-        BooleanSetting.create(
-            "Transparent Obsidian Roof",
-            "xaeroplus.setting.transparent_obsidian_roof",
-            false,
-            (v) -> markChunksDirtyInWriteDistance()),
+        BooleanSetting.builder()
+            .name("Transparent Obsidian Roof")
+            .translationKey("xaeroplus.setting.transparent_obsidian_roof")
+            .defaultValue(false)
+            .onChange((v) -> markChunksDirtyInWriteDistance())
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     public final DoubleSetting transparentObsidianRoofYSetting = register(
-        DoubleSetting.create(
-            "Roof Y Level",
-            "xaeroplus.setting.transparent_obsidian_roof_y",
-            0, 320, 1,
-            250,
-            (v) -> markChunksDirtyInWriteDistance(),
-            transparentObsidianRoofSetting::get),
+        DoubleSetting.builder()
+            .name("Roof Y Level")
+            .translationKey("xaeroplus.setting.transparent_obsidian_roof_y")
+            .range(0, 320, 1)
+            .defaultValue(250)
+            .onChange((v) -> markChunksDirtyInWriteDistance())
+            .visibleWhen(transparentObsidianRoofSetting::get)
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     public final DoubleSetting transparentObsidianRoofDarkeningSetting = register(
-        DoubleSetting.create(
-            "Roof Obsidian Opacity",
-            "xaeroplus.setting.transparent_obsidian_roof_darkening",
-            0, 255, 5,
-            150,
-            (v) -> markChunksDirtyInWriteDistance(),
-            transparentObsidianRoofSetting::get),
+        DoubleSetting.builder()
+            .name("Roof Obsidian Opacity")
+            .translationKey("xaeroplus.setting.transparent_obsidian_roof_darkening")
+            .range(0, 255, 5)
+            .defaultValue(150)
+            .onChange((v) -> markChunksDirtyInWriteDistance())
+            .visibleWhen(transparentObsidianRoofSetting::get)
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     public final DoubleSetting transparentObsidianRoofSnowOpacitySetting = register(
-        DoubleSetting.create(
-            "Roof Snow Opacity",
-            "xaeroplus.setting.transparent_obsidian_roof_snow_opacity",
-            0, 255, 5,
-            10,
-            (v) -> markChunksDirtyInWriteDistance(),
-            transparentObsidianRoofSetting::get),
+        DoubleSetting.builder()
+            .name("Roof Snow Opacity")
+            .translationKey("xaeroplus.setting.transparent_obsidian_roof_snow_opacity")
+            .range(0, 255, 5)
+            .defaultValue(10)
+            .onChange((v) -> markChunksDirtyInWriteDistance())
+            .visibleWhen(transparentObsidianRoofSetting::get)
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     public  final BooleanSetting crossDimensionCursorCoordinates = register(
-        BooleanSetting.create(
-            "Cross Dim Cursor Coords",
-            "xaeroplus.setting.cross_dimension_cursor_coordinates",
-            false),
+        BooleanSetting.builder()
+            .name("Cross Dim Cursor Coords")
+            .translationKey("xaeroplus.setting.cross_dimension_cursor_coordinates")
+            .defaultValue(false)
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting owAutoWaypointDimension = register(
-        BooleanSetting.create(
-            "Prefer Overworld Waypoints",
-            "xaeroplus.setting.ow_auto_waypoint_dimension",
-            false),
+        BooleanSetting.builder()
+            .name("Prefer Overworld Waypoints")
+            .translationKey("xaeroplus.setting.ow_auto_waypoint_dimension")
+            .defaultValue(false)
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting trulyUnlimitedWorldMapZoom = register(
-        BooleanSetting.create(
-            "Truly Unlimited WorldMap Zoom",
-            "xaeroplus.setting.truly_unlimited_worldmap_zoom",
-            false),
+        BooleanSetting.builder()
+            .name("Truly Unlimited WorldMap Zoom")
+            .translationKey("xaeroplus.setting.truly_unlimited_worldmap_zoom")
+            .defaultValue(false)
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting nullOverworldDimensionFolder = register(
-        BooleanSetting.create(
-            "null OW Dim Dir",
-            "xaeroplus.setting.null_overworld_dimension_folder",
-            true,
-            Globals::setNullOverworldDimFolderIfAble,
-            () -> false),
+        BooleanSetting.builder()
+            .name("null OW Dim Dir")
+            .translationKey("xaeroplus.setting.null_overworld_dimension_folder")
+            .defaultValue(true)
+            .onChange(Globals::setNullOverworldDimFolderIfAble)
+            .visibleWhen(() -> false)
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     public final EnumSetting<DataFolderResolutionMode> dataFolderResolutionMode = register(
-        EnumSetting.create(
-            "Data Dir Mode",
-            "xaeroplus.setting.data_folder_resolution_mode",
-            DataFolderResolutionMode.values(),
-            DataFolderResolutionMode.IP,
-            Globals::setDataFolderResolutionModeIfAble),
+        EnumSetting.<DataFolderResolutionMode>builder()
+            .name("Data Dir Mode")
+            .translationKey("xaeroplus.setting.data_folder_resolution_mode")
+            .values(DataFolderResolutionMode.values())
+            .defaultValue(DataFolderResolutionMode.IP)
+            .onChange(Globals::setDataFolderResolutionModeIfAble)
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     public enum DataFolderResolutionMode implements TranslatableSettingEnum {
         IP("xaeroplus.setting.data_folder_resolution_mode.ip"),
@@ -193,83 +209,89 @@ public final class Settings extends SettingRegistry {
         }
     }
     public final BooleanSetting netherCaveFix = register(
-        BooleanSetting.create(
-            "Nether Cave Fix",
-            "xaeroplus.setting.nether_cave_fix",
-            true),
+        BooleanSetting.builder()
+            .name("Nether Cave Fix")
+            .translationKey("xaeroplus.setting.nether_cave_fix")
+            .defaultValue(true)
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting disableXaeroInternetAccess = register(
-        BooleanSetting.create(
-            "Disable Xaero Internet Access",
-            "xaeroplus.setting.disable_internet",
-            false),
+        BooleanSetting.builder()
+            .name("Disable Xaero Internet Access")
+            .translationKey("xaeroplus.setting.disable_internet")
+            .defaultValue(false)
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting expandSettingEntries = register(
-        BooleanSetting.create(
-            "Expanded Setting Entries",
-            "xaeroplus.setting.expanded_settings",
-            false),
+        BooleanSetting.builder()
+            .name("Expanded Setting Entries")
+            .translationKey("xaeroplus.setting.expanded_settings")
+            .defaultValue(false)
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting teleportFailNotifier = register(
-        BooleanSetting.create(
-            "Teleport Fail Notifier",
-            "xaeroplus.setting.teleport_fail_notifier",
-            true,
-            (b) -> ModuleManager.getModule(TeleportFailNotifier.class).setEnabled(b)
-        ), SettingLocation.WORLD_MAP_MAIN);
+        BooleanSetting.builder()
+            .name("Teleport Fail Notifier")
+            .translationKey("xaeroplus.setting.teleport_fail_notifier")
+            .defaultValue(true)
+            .onChange((b) -> ModuleManager.getModule(TeleportFailNotifier.class).setEnabled(b))
+            .build(), SettingLocation.WORLD_MAP_MAIN);
     public final DoubleSetting teleportFailNotifierDelay = register(
-        DoubleSetting.create(
-            "Teleport Fail Delay",
-            "xaeroplus.setting.teleport_fail_notifier_delay",
-            1, 120, 1,
-            30, // 1.5 seconds
-            () -> ModuleManager.getModule(TeleportFailNotifier.class).isEnabled()
-        ), SettingLocation.WORLD_MAP_MAIN);
+        DoubleSetting.builder()
+            .name("Teleport Fail Delay")
+            .translationKey("xaeroplus.setting.teleport_fail_notifier_delay")
+            .range(1, 120, 1)
+            .defaultValue(30) // 1.5 seconds
+            .visibleWhen(() -> ModuleManager.getModule(TeleportFailNotifier.class).isEnabled())
+            .build(), SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting disableTeleportation = register(
-        BooleanSetting.create(
-            "Disable Teleportation",
-            "xaeroplus.setting.disable_teleportation",
-            false),
+        BooleanSetting.builder()
+            .name("Disable Teleportation")
+            .translationKey("xaeroplus.setting.disable_teleportation")
+            .defaultValue(false)
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting waypointsListDistanceColumn = register(
-        BooleanSetting.create(
-            "Waypoints List Distance Column",
-            "xaeroplus.setting.waypoints_gui_distance_column",
-            false),
+        BooleanSetting.builder()
+            .name("Waypoints List Distance Column")
+            .translationKey("xaeroplus.setting.waypoints_gui_distance_column")
+            .defaultValue(false)
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting sodiumSettingIntegration = register(
-        BooleanSetting.create(
-            "Sodium/Embeddium Setting Integration",
-            "xaeroplus.setting.sodium_embeddium_integration",
-            true),
+        BooleanSetting.builder()
+            .name("Sodium/Embeddium Setting Integration")
+            .translationKey("xaeroplus.setting.sodium_embeddium_integration")
+            .defaultValue(true)
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting worldMapUIAdditions = register(
-        BooleanSetting.create(
-            "WorldMap UI Additions",
-            "xaeroplus.setting.world_map_ui_additions",
-            true,
-            false),
+        BooleanSetting.builder()
+            .name("WorldMap UI Additions")
+            .translationKey("xaeroplus.setting.world_map_ui_additions")
+            .defaultValue(true)
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting waypointsListUIAdditions = register(
-        BooleanSetting.create(
-            "Waypoints List UI Additions",
-            "xaeroplus.setting.waypoints_list_ui_additions",
-            true,
-            false),
+        BooleanSetting.builder()
+            .name("Waypoints List UI Additions")
+            .translationKey("xaeroplus.setting.waypoints_list_ui_additions")
+            .defaultValue(true)
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting atomicMoveAndReplace = register(
-        BooleanSetting.create(
-            "Atomic File Move And Replace",
-            "Atomic File Move And Replace",
-            true,
-            false),
+        BooleanSetting.builder()
+            .name("Atomic File Move And Replace")
+            .translationKey("Atomic File Move And Replace")
+            .defaultValue(true)
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting optimizeRegionDetectionLookups = register(
-        BooleanSetting.create(
-            "Optimize Region Detection Lookups",
-            "Optimize Region Detection Lookups",
-            true,
-            false),
+        BooleanSetting.builder()
+            .name("Optimize Region Detection Lookups")
+            .translationKey("Optimize Region Detection Lookups")
+            .defaultValue(true)
+            .build(),
         SettingLocation.WORLD_MAP_MAIN);
 
     /**
@@ -277,61 +299,68 @@ public final class Settings extends SettingRegistry {
      */
 
     public final BooleanSetting paletteNewChunksEnabledSetting = register(
-        BooleanSetting.create(
-            "Palette NewChunks",
-            "xaeroplus.setting.palette_new_chunks_highlighting",
-            false,
-            true,
-            (b) -> ModuleManager.getModule(PaletteNewChunks.class).setEnabled(b)),
+        BooleanSetting.builder()
+            .name("Palette NewChunks")
+            .translationKey("xaeroplus.setting.palette_new_chunks_highlighting")
+            .defaultValue(false)
+            .keybind()
+            .onChange((b) -> ModuleManager.getModule(PaletteNewChunks.class).setEnabled(b))
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting paletteNewChunksVersionUpgradedChunks = register(
-        BooleanSetting.create(
-            "Palette NewChunks Version Upgraded",
-            "xaeroplus.setting.palette_new_chunks_version_upgraded",
-            true,
-            () -> ModuleManager.getModule(PaletteNewChunks.class).isEnabled()),
+        BooleanSetting.builder()
+            .name("Palette NewChunks Version Upgraded")
+            .translationKey("xaeroplus.setting.palette_new_chunks_version_upgraded")
+            .defaultValue(true)
+            .visibleWhen(() -> ModuleManager.getModule(PaletteNewChunks.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting paletteNewChunksSaveLoadToDisk = register(
-        BooleanSetting.create(
-            "Save/Load Palette NewChunks to Disk",
-            "xaeroplus.setting.palette_new_chunks_save_load_to_disk",
-            true,
-            (b) -> ModuleManager.getModule(PaletteNewChunks.class).setDiskCache(b),
-            () -> ModuleManager.getModule(PaletteNewChunks.class).isEnabled()),
+        BooleanSetting.builder()
+            .name("Save/Load Palette NewChunks to Disk")
+            .translationKey("xaeroplus.setting.palette_new_chunks_save_load_to_disk")
+            .defaultValue(true)
+            .onChange((b) -> ModuleManager.getModule(PaletteNewChunks.class).setDiskCache(b))
+            .visibleWhen(() -> ModuleManager.getModule(PaletteNewChunks.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final DoubleSetting paletteNewChunksAlphaSetting = register(
-        DoubleSetting.create(
-            "Palette NewChunks Opacity",
-            "xaeroplus.setting.palette_new_chunks_opacity",
-            0, 255, 10,
-            100,
-            (b) -> ModuleManager.getModule(PaletteNewChunks.class).setAlpha(b),
-            () -> ModuleManager.getModule(PaletteNewChunks.class).isEnabled()),
+        DoubleSetting.builder()
+            .name("Palette NewChunks Opacity")
+            .translationKey("xaeroplus.setting.palette_new_chunks_opacity")
+            .range(0, 255, 10)
+            .defaultValue(100)
+            .onChange((b) -> ModuleManager.getModule(PaletteNewChunks.class).setAlpha(b))
+            .visibleWhen(() -> ModuleManager.getModule(PaletteNewChunks.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final EnumSetting<ColorHelper.HighlightColor> paletteNewChunksColorSetting = register(
-        EnumSetting.create(
-            "Palette NewChunks Color",
-            "xaeroplus.setting.palette_new_chunks_color",
-            ColorHelper.HighlightColor.values(),
-            ColorHelper.HighlightColor.RED,
-            (b) -> ModuleManager.getModule(PaletteNewChunks.class).setRgbColor(b.getColor()),
-            () -> ModuleManager.getModule(PaletteNewChunks.class).isEnabled()),
+        EnumSetting.<ColorHelper.HighlightColor>builder()
+            .name("Palette NewChunks Color")
+            .translationKey("xaeroplus.setting.palette_new_chunks_color")
+            .values(ColorHelper.HighlightColor.values())
+            .defaultValue(ColorHelper.HighlightColor.RED)
+            .onChange((b) -> ModuleManager.getModule(PaletteNewChunks.class).setRgbColor(b.getColor()))
+            .visibleWhen(() -> ModuleManager.getModule(PaletteNewChunks.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting paletteNewChunksRenderInverse = register(
-        BooleanSetting.create(
-            "Palette NewChunks Inverse",
-            "xaeroplus.setting.palette_new_chunks_inverse",
-            false,
-            (b) -> ModuleManager.getModule(PaletteNewChunks.class).setInverse(b),
-            () -> ModuleManager.getModule(PaletteNewChunks.class).isEnabled()),
+        BooleanSetting.builder()
+            .name("Palette NewChunks Inverse")
+            .translationKey("xaeroplus.setting.palette_new_chunks_inverse")
+            .defaultValue(false)
+            .onChange((b) -> ModuleManager.getModule(PaletteNewChunks.class).setInverse(b))
+            .visibleWhen(() -> ModuleManager.getModule(PaletteNewChunks.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting paletteNewChunksRescan = register(
-        BooleanSetting.create(
-            "Palette NewChunks Rescan",
-            "xaeroplus.setting.palette_new_chunks_rescan",
-            false,
-            (b) -> ModuleManager.getModule(PaletteNewChunks.class).setRescan(b),
-            () -> ModuleManager.getModule(PaletteNewChunks.class).isEnabled()),
+        BooleanSetting.builder()
+            .name("Palette NewChunks Rescan")
+            .translationKey("xaeroplus.setting.palette_new_chunks_rescan")
+            .defaultValue(false)
+            .onChange((b) -> ModuleManager.getModule(PaletteNewChunks.class).setRescan(b))
+            .visibleWhen(() -> ModuleManager.getModule(PaletteNewChunks.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public enum PaletteNewChunksRescanAge implements TranslatableSettingEnum {
         ZERO(Duration.ZERO, "xaeroplus.setting.palette_new_chunks_rescan_age.zero"),
@@ -354,337 +383,374 @@ public final class Settings extends SettingRegistry {
         }
     }
     public final EnumSetting<PaletteNewChunksRescanAge> paletteNewChunksMinRescanAge = register(
-        EnumSetting.create(
-            "Palette NewChunks Min Rescan Age",
-            "xaeroplus.setting.palette_new_chunks_min_rescan_age",
-            PaletteNewChunksRescanAge.values(),
-            PaletteNewChunksRescanAge.ONE_WEEK,
-            (v) -> ModuleManager.getModule(PaletteNewChunks.class).setMinRescanAge(v.getDuration()),
-            () -> ModuleManager.getModule(PaletteNewChunks.class).isEnabled() && paletteNewChunksRescan.get()
-        ),
+        EnumSetting.<PaletteNewChunksRescanAge>builder()
+            .name("Palette NewChunks Min Rescan Age")
+            .translationKey("xaeroplus.setting.palette_new_chunks_min_rescan_age")
+            .values(PaletteNewChunksRescanAge.values())
+            .defaultValue(PaletteNewChunksRescanAge.ONE_WEEK)
+            .onChange((v) -> ModuleManager.getModule(PaletteNewChunks.class).setMinRescanAge(v.getDuration()))
+            .visibleWhen(() -> ModuleManager.getModule(PaletteNewChunks.class).isEnabled() && paletteNewChunksRescan.get())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting oldChunksEnabledSetting = register(
-        BooleanSetting.create(
-            "OldChunks Highlighting",
-            "xaeroplus.setting.old_chunks_highlighting",
-            false,
-            true,
-            (b) -> ModuleManager.getModule(OldChunks.class).setEnabled(b)),
+        BooleanSetting.builder()
+            .name("OldChunks Highlighting")
+            .translationKey("xaeroplus.setting.old_chunks_highlighting")
+            .defaultValue(false)
+            .keybind()
+            .onChange((b) -> ModuleManager.getModule(OldChunks.class).setEnabled(b))
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting oldChunksInverse = register(
-        BooleanSetting.create(
-            "OldChunks Inverse",
-            "xaeroplus.setting.old_chunks_inverse",
-            false,
-            (b) -> ModuleManager.getModule(OldChunks.class).setInverse(b),
-            () -> ModuleManager.getModule(OldChunks.class).isEnabled()),
+        BooleanSetting.builder()
+            .name("OldChunks Inverse")
+            .translationKey("xaeroplus.setting.old_chunks_inverse")
+            .defaultValue(false)
+            .onChange((b) -> ModuleManager.getModule(OldChunks.class).setInverse(b))
+            .visibleWhen(() -> ModuleManager.getModule(OldChunks.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting oldChunksSaveLoadToDisk = register(
-        BooleanSetting.create(
-            "Save/Load OldChunks to Disk",
-            "xaeroplus.setting.old_chunks_save_load_to_disk",
-            true,
-            (b) -> ModuleManager.getModule(OldChunks.class).setDiskCache(b),
-            () -> ModuleManager.getModule(OldChunks.class).isEnabled()),
+        BooleanSetting.builder()
+            .name("Save/Load OldChunks to Disk")
+            .translationKey("xaeroplus.setting.old_chunks_save_load_to_disk")
+            .defaultValue(true)
+            .onChange((b) -> ModuleManager.getModule(OldChunks.class).setDiskCache(b))
+            .visibleWhen(() -> ModuleManager.getModule(OldChunks.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final DoubleSetting oldChunksAlphaSetting = register(
-        DoubleSetting.create(
-            "Old Chunks Opacity",
-            "xaeroplus.setting.old_chunks_opacity",
-            0, 255, 10,
-            100,
-            (b) -> ModuleManager.getModule(OldChunks.class).setAlpha(b),
-            () -> ModuleManager.getModule(OldChunks.class).isEnabled()),
+        DoubleSetting.builder()
+            .name("Old Chunks Opacity")
+            .translationKey("xaeroplus.setting.old_chunks_opacity")
+            .range(0, 255, 10)
+            .defaultValue(100)
+            .onChange((b) -> ModuleManager.getModule(OldChunks.class).setAlpha(b))
+            .visibleWhen(() -> ModuleManager.getModule(OldChunks.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final EnumSetting<ColorHelper.HighlightColor> oldChunksColorSetting = register(
-        EnumSetting.create(
-            "Old Chunks Color",
-            "xaeroplus.setting.old_chunks_color",
-            ColorHelper.HighlightColor.values(),
-            ColorHelper.HighlightColor.YELLOW,
-            (b) -> ModuleManager.getModule(OldChunks.class).setRgbColor(b.getColor()),
-            () -> ModuleManager.getModule(OldChunks.class).isEnabled()),
+        EnumSetting.<ColorHelper.HighlightColor>builder()
+            .name("Old Chunks Color")
+            .translationKey("xaeroplus.setting.old_chunks_color")
+            .values(ColorHelper.HighlightColor.values())
+            .defaultValue(ColorHelper.HighlightColor.YELLOW)
+            .onChange((b) -> ModuleManager.getModule(OldChunks.class).setRgbColor(b.getColor()))
+            .visibleWhen(() -> ModuleManager.getModule(OldChunks.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting portalsEnabledSetting = register(
-        BooleanSetting.create(
-            "Portal Highlights",
-            "xaeroplus.setting.portals",
-            false,
-            true,
-            (b) -> ModuleManager.getModule(Portals.class).setEnabled(b)),
+        BooleanSetting.builder()
+            .name("Portal Highlights")
+            .translationKey("xaeroplus.setting.portals")
+            .defaultValue(false)
+            .keybind()
+            .onChange((b) -> ModuleManager.getModule(Portals.class).setEnabled(b))
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting portalsSaveLoadToDisk = register(
-        BooleanSetting.create(
-            "Save/Load Portals to Disk",
-            "xaeroplus.setting.portals_save_load_to_disk",
-            true,
-            (b) -> ModuleManager.getModule(Portals.class).setDiskCache(b),
-            () -> ModuleManager.getModule(Portals.class).isEnabled()),
+        BooleanSetting.builder()
+            .name("Save/Load Portals to Disk")
+            .translationKey("xaeroplus.setting.portals_save_load_to_disk")
+            .defaultValue(true)
+            .onChange((b) -> ModuleManager.getModule(Portals.class).setDiskCache(b))
+            .visibleWhen(() -> ModuleManager.getModule(Portals.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final DoubleSetting portalsAlphaSetting = register(
-        DoubleSetting.create(
-            "Portal Highlights Opacity",
-            "xaeroplus.setting.portals_opacity",
-            0, 255, 10,
-            100,
-            (b) -> ModuleManager.getModule(Portals.class).setAlpha(b),
-            () -> ModuleManager.getModule(Portals.class).isEnabled()),
+        DoubleSetting.builder()
+            .name("Portal Highlights Opacity")
+            .translationKey("xaeroplus.setting.portals_opacity")
+            .range(0, 255, 10)
+            .defaultValue(100)
+            .onChange((b) -> ModuleManager.getModule(Portals.class).setAlpha(b))
+            .visibleWhen(() -> ModuleManager.getModule(Portals.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final EnumSetting<ColorHelper.HighlightColor> portalsColorSetting = register(
-        EnumSetting.create(
-            "Portal Highlights Color",
-            "xaeroplus.setting.portals_color",
-            ColorHelper.HighlightColor.values(),
-            ColorHelper.HighlightColor.MAGENTA,
-            (b) -> ModuleManager.getModule(Portals.class).setRgbColor(b.getColor()),
-            () -> ModuleManager.getModule(Portals.class).isEnabled()),
+        EnumSetting.<ColorHelper.HighlightColor>builder()
+            .name("Portal Highlights Color")
+            .translationKey("xaeroplus.setting.portals_color")
+            .values(ColorHelper.HighlightColor.values())
+            .defaultValue(ColorHelper.HighlightColor.MAGENTA)
+            .onChange((b) -> ModuleManager.getModule(Portals.class).setRgbColor(b.getColor()))
+            .visibleWhen(() -> ModuleManager.getModule(Portals.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting lavaColumnsEnabledSetting = register(
-        BooleanSetting.create(
-            "Lava Columns",
-            "xaeroplus.setting.lava_columns",
-            false,
-            true,
-            (b) -> ModuleManager.getModule(LavaColumns.class).setEnabled(b)),
+        BooleanSetting.builder()
+            .name("Lava Columns")
+            .translationKey("xaeroplus.setting.lava_columns")
+            .defaultValue(false)
+            .keybind()
+            .onChange((b) -> ModuleManager.getModule(LavaColumns.class).setEnabled(b))
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final DoubleSetting lavaColumnsMinHeight = register(
-        DoubleSetting.create(
-            "Min Lava Column Height",
-            "xaeroplus.setting.lava_columns_min_height",
-            0, 20, 1,
-            5,
-            (b) -> ModuleManager.getModule(LavaColumns.class).setMinColumnHeight((int) b),
-            () -> ModuleManager.getModule(LavaColumns.class).isEnabled()),
+        DoubleSetting.builder()
+            .name("Min Lava Column Height")
+            .translationKey("xaeroplus.setting.lava_columns_min_height")
+            .range(0, 20, 1)
+            .defaultValue(5)
+            .onChange((b) -> ModuleManager.getModule(LavaColumns.class).setMinColumnHeight((int) b))
+            .visibleWhen(() -> ModuleManager.getModule(LavaColumns.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final DoubleSetting lavaColumnsAlphaShift = register(
-        DoubleSetting.create(
-            "Lava Columns Base Alpha Shift",
-            "xaeroplus.setting.lava_columns_alpha_shift",
-            -200, 200, 1,
-            0,
-            (b) -> ModuleManager.getModule(LavaColumns.class).setAlphaShift((int) b),
-            () -> ModuleManager.getModule(LavaColumns.class).isEnabled()),
+        DoubleSetting.builder()
+            .name("Lava Columns Base Alpha Shift")
+            .translationKey("xaeroplus.setting.lava_columns_alpha_shift")
+            .range(-200, 200, 1)
+            .defaultValue(0)
+            .onChange((b) -> ModuleManager.getModule(LavaColumns.class).setAlphaShift((int) b))
+            .visibleWhen(() -> ModuleManager.getModule(LavaColumns.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final DoubleSetting lavaColumnsAlphaStep = register(
-        DoubleSetting.create(
-            "Lava Columns Alpha Step",
-            "xaeroplus.setting.lava_columns_alpha_step",
-            1, 30, 1,
-            8,
-            (b) -> ModuleManager.getModule(LavaColumns.class).setAlphaStep((int) b),
-            () -> ModuleManager.getModule(LavaColumns.class).isEnabled()),
+        DoubleSetting.builder()
+            .name("Lava Columns Alpha Step")
+            .translationKey("xaeroplus.setting.lava_columns_alpha_step")
+            .range(1, 30, 1)
+            .defaultValue(8)
+            .onChange((b) -> ModuleManager.getModule(LavaColumns.class).setAlphaStep((int) b))
+            .visibleWhen(() -> ModuleManager.getModule(LavaColumns.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final EnumSetting<ColorHelper.HighlightColor> lavaColumnsColor = register(
-        EnumSetting.create(
-            "Lava Columns Color",
-            "xaeroplus.setting.lava_columns_color",
-            ColorHelper.HighlightColor.values(),
-            ColorHelper.HighlightColor.GREEN,
-            (b) -> ModuleManager.getModule(LavaColumns.class).setRgbColor(b.getColor()),
-            () -> ModuleManager.getModule(LavaColumns.class).isEnabled()),
+        EnumSetting.<ColorHelper.HighlightColor>builder()
+            .name("Lava Columns Color")
+            .translationKey("xaeroplus.setting.lava_columns_color")
+            .values(ColorHelper.HighlightColor.values())
+            .defaultValue(ColorHelper.HighlightColor.GREEN)
+            .onChange((b) -> ModuleManager.getModule(LavaColumns.class).setRgbColor(b.getColor()))
+            .visibleWhen(() -> ModuleManager.getModule(LavaColumns.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting lavaColumnsSaveLoadToDisk = register(
-        BooleanSetting.create(
-            "Save/Load Lava Columns to Disk",
-            "xaeroplus.setting.lava_columns_save_load_to_disk",
-            true,
-            (b) -> ModuleManager.getModule(LavaColumns.class).setDiskCache(b),
-            () -> ModuleManager.getModule(LavaColumns.class).isEnabled()),
+        BooleanSetting.builder()
+            .name("Save/Load Lava Columns to Disk")
+            .translationKey("xaeroplus.setting.lava_columns_save_load_to_disk")
+            .defaultValue(true)
+            .onChange((b) -> ModuleManager.getModule(LavaColumns.class).setDiskCache(b))
+            .visibleWhen(() -> ModuleManager.getModule(LavaColumns.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting oldBiomesSetting = register(
-        BooleanSetting.create(
-            "Old Biomes",
-            "xaeroplus.setting.old_biomes_enabled",
-            false,
-            true,
-            (b) -> ModuleManager.getModule(OldBiomes.class).setEnabled(b)),
+        BooleanSetting.builder()
+            .name("Old Biomes")
+            .translationKey("xaeroplus.setting.old_biomes_enabled")
+            .defaultValue(false)
+            .keybind()
+            .onChange((b) -> ModuleManager.getModule(OldBiomes.class).setEnabled(b))
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting oldBiomesSaveToDiskSetting = register(
-        BooleanSetting.create(
-            "Save/Load OldBiomes To Disk",
-            "xaeroplus.setting.old_biomes_save_load_to_disk",
-            true,
-            (b) -> ModuleManager.getModule(OldBiomes.class).setDiskCache(b),
-            () -> ModuleManager.getModule(OldBiomes.class).isEnabled()),
+        BooleanSetting.builder()
+            .name("Save/Load OldBiomes To Disk")
+            .translationKey("xaeroplus.setting.old_biomes_save_load_to_disk")
+            .defaultValue(true)
+            .onChange((b) -> ModuleManager.getModule(OldBiomes.class).setDiskCache(b))
+            .visibleWhen(() -> ModuleManager.getModule(OldBiomes.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final DoubleSetting oldBiomesAlphaSetting = register(
-        DoubleSetting.create(
-            "OldBiomes Opacity",
-            "xaeroplus.setting.old_biomes_opacity",
-            0, 255, 10,
-            100,
-            (b) -> ModuleManager.getModule(OldBiomes.class).setAlpha(b),
-            () -> ModuleManager.getModule(OldBiomes.class).isEnabled()),
+        DoubleSetting.builder()
+            .name("OldBiomes Opacity")
+            .translationKey("xaeroplus.setting.old_biomes_opacity")
+            .range(0, 255, 10)
+            .defaultValue(100)
+            .onChange((b) -> ModuleManager.getModule(OldBiomes.class).setAlpha(b))
+            .visibleWhen(() -> ModuleManager.getModule(OldBiomes.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final EnumSetting<ColorHelper.HighlightColor> oldBiomesColorSetting = register(
-        EnumSetting.create(
-            "OldBiomes Color",
-            "xaeroplus.setting.old_biomes_color",
-            ColorHelper.HighlightColor.values(),
-            ColorHelper.HighlightColor.GREEN,
-            (b) -> ModuleManager.getModule(OldBiomes.class).setRgbColor(b.getColor()),
-            () -> ModuleManager.getModule(OldBiomes.class).isEnabled()),
+        EnumSetting.<ColorHelper.HighlightColor>builder()
+            .name("OldBiomes Color")
+            .translationKey("xaeroplus.setting.old_biomes_color")
+            .values(ColorHelper.HighlightColor.values())
+            .defaultValue(ColorHelper.HighlightColor.GREEN)
+            .onChange((b) -> ModuleManager.getModule(OldBiomes.class).setRgbColor(b.getColor()))
+            .visibleWhen(() -> ModuleManager.getModule(OldBiomes.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting liquidNewChunksEnabledSetting = register(
-        BooleanSetting.create(
-            "NewChunks Highlighting",
-            "xaeroplus.setting.new_chunks_highlighting",
-            false,
-            true,
-            (b) -> ModuleManager.getModule(LiquidNewChunks.class).setEnabled(b)),
+        BooleanSetting.builder()
+            .name("NewChunks Highlighting")
+            .translationKey("xaeroplus.setting.new_chunks_highlighting")
+            .defaultValue(false)
+            .keybind()
+            .onChange((b) -> ModuleManager.getModule(LiquidNewChunks.class).setEnabled(b))
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting liquidNewChunksSaveLoadToDisk = register(
-        BooleanSetting.create(
-            "Save/Load NewChunks to Disk",
-            "xaeroplus.setting.new_chunks_save_load_to_disk",
-            true,
-            (b) -> ModuleManager.getModule(LiquidNewChunks.class).setDiskCache(b),
-            () -> ModuleManager.getModule(LiquidNewChunks.class).isEnabled()),
+        BooleanSetting.builder()
+            .name("Save/Load NewChunks to Disk")
+            .translationKey("xaeroplus.setting.new_chunks_save_load_to_disk")
+            .defaultValue(true)
+            .onChange((b) -> ModuleManager.getModule(LiquidNewChunks.class).setDiskCache(b))
+            .visibleWhen(() -> ModuleManager.getModule(LiquidNewChunks.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final DoubleSetting liquidNewChunksAlphaSetting = register(
-        DoubleSetting.create(
-            "New Chunks Opacity",
-            "xaeroplus.setting.new_chunks_opacity",
-            0, 255, 10,
-            100,
-            (b) -> ModuleManager.getModule(LiquidNewChunks.class).setAlpha(b),
-            () -> ModuleManager.getModule(LiquidNewChunks.class).isEnabled()),
+        DoubleSetting.builder()
+            .name("New Chunks Opacity")
+            .translationKey("xaeroplus.setting.new_chunks_opacity")
+            .range(0, 255, 10)
+            .defaultValue(100)
+            .onChange((b) -> ModuleManager.getModule(LiquidNewChunks.class).setAlpha(b))
+            .visibleWhen(() -> ModuleManager.getModule(LiquidNewChunks.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final EnumSetting<ColorHelper.HighlightColor> liquidNewChunksColorSetting = register(
-        EnumSetting.create(
-            "New Chunks Color",
-            "xaeroplus.setting.new_chunks_color",
-            ColorHelper.HighlightColor.values(),
-            ColorHelper.HighlightColor.RED,
-            (b) -> ModuleManager.getModule(LiquidNewChunks.class).setRgbColor(b.getColor()),
-            () -> ModuleManager.getModule(LiquidNewChunks.class).isEnabled()),
+        EnumSetting.<ColorHelper.HighlightColor>builder()
+            .name("New Chunks Color")
+            .translationKey("xaeroplus.setting.new_chunks_color")
+            .values(ColorHelper.HighlightColor.values())
+            .defaultValue(ColorHelper.HighlightColor.RED)
+            .onChange((b) -> ModuleManager.getModule(LiquidNewChunks.class).setRgbColor(b.getColor()))
+            .visibleWhen(() -> ModuleManager.getModule(LiquidNewChunks.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting liquidNewChunksInverseHighlightsSetting = register(
-        BooleanSetting.create(
-            "New Chunks Render Inverse",
-            "xaeroplus.setting.new_chunks_inverse_enabled",
-            false,
-            (b) -> ModuleManager.getModule(LiquidNewChunks.class).setInverseRenderEnabled(b),
-            () -> ModuleManager.getModule(LiquidNewChunks.class).isEnabled()),
+        BooleanSetting.builder()
+            .name("New Chunks Render Inverse")
+            .translationKey("xaeroplus.setting.new_chunks_inverse_enabled")
+            .defaultValue(false)
+            .onChange((b) -> ModuleManager.getModule(LiquidNewChunks.class).setInverseRenderEnabled(b))
+            .visibleWhen(() -> ModuleManager.getModule(LiquidNewChunks.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final EnumSetting<ColorHelper.HighlightColor> liquidNewChunksInverseColorSetting = register(
-        EnumSetting.create(
-            "New Chunks Inverse Color",
-            "xaeroplus.setting.new_chunks_inverse_color",
-            ColorHelper.HighlightColor.values(),
-            ColorHelper.HighlightColor.GREEN,
-            (b) -> ModuleManager.getModule(LiquidNewChunks.class).setInverseRgbColor(b.getColor()),
-            () -> ModuleManager.getModule(LiquidNewChunks.class).isEnabled()),
+        EnumSetting.<ColorHelper.HighlightColor>builder()
+            .name("New Chunks Inverse Color")
+            .translationKey("xaeroplus.setting.new_chunks_inverse_color")
+            .values(ColorHelper.HighlightColor.values())
+            .defaultValue(ColorHelper.HighlightColor.GREEN)
+            .onChange((b) -> ModuleManager.getModule(LiquidNewChunks.class).setInverseRgbColor(b.getColor()))
+            .visibleWhen(() -> ModuleManager.getModule(LiquidNewChunks.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting liquidNewChunksOnlyAboveY0Setting = register(
-        BooleanSetting.create(
-            "Liquid NewChunks Only Y > 0",
-            "xaeroplus.setting.new_chunks_only_above_y0",
-            false,
-            () -> ModuleManager.getModule(LiquidNewChunks.class).isEnabled()),
+        BooleanSetting.builder()
+            .name("Liquid NewChunks Only Y > 0")
+            .translationKey("xaeroplus.setting.new_chunks_only_above_y0")
+            .defaultValue(false)
+            .visibleWhen(() -> ModuleManager.getModule(LiquidNewChunks.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting worldToolsEnabledSetting = register(
-        BooleanSetting.create(
-            "WorldTools Highlights",
-            "xaeroplus.setting.world_tools",
-            true,
-            true,
-            (b) -> ModuleManager.getModule(WorldTools.class).setEnabled(b),
-            WorldToolsHelper::isWorldToolsPresent),
+        BooleanSetting.builder()
+            .name("WorldTools Highlights")
+            .translationKey("xaeroplus.setting.world_tools")
+            .defaultValue(true)
+            .keybind()
+            .onChange((b) -> ModuleManager.getModule(WorldTools.class).setEnabled(b))
+            .visibleWhen(WorldToolsHelper::isWorldToolsPresent)
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public DoubleSetting worldToolsAlphaSetting = register(
-        DoubleSetting.create(
-            "WorldTools Highlights Opacity",
-            "xaeroplus.setting.world_tools_opacity",
-            0, 255, 10,
-            100,
-            (b) -> ModuleManager.getModule(WorldTools.class).setAlpha(b),
-            () -> WorldToolsHelper.isWorldToolsPresent() && ModuleManager.getModule(WorldTools.class).isEnabled()),
+        DoubleSetting.builder()
+            .name("WorldTools Highlights Opacity")
+            .translationKey("xaeroplus.setting.world_tools_opacity")
+            .range(0, 255, 10)
+            .defaultValue(100)
+            .onChange((b) -> ModuleManager.getModule(WorldTools.class).setAlpha(b))
+            .visibleWhen(() -> WorldToolsHelper.isWorldToolsPresent() && ModuleManager.getModule(WorldTools.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final EnumSetting<ColorHelper.HighlightColor> worldToolsColorSetting = register(
-        EnumSetting.create(
-            "WorldTools Highlights Color",
-            "xaeroplus.setting.world_tools_color",
-            ColorHelper.HighlightColor.values(),
-            ColorHelper.HighlightColor.GREEN,
-            (b) -> ModuleManager.getModule(WorldTools.class).setRgbColor(b.getColor()),
-            () -> WorldToolsHelper.isWorldToolsPresent() && ModuleManager.getModule(WorldTools.class).isEnabled()),
+        EnumSetting.<ColorHelper.HighlightColor>builder()
+            .name("WorldTools Highlights Color")
+            .translationKey("xaeroplus.setting.world_tools_color")
+            .values(ColorHelper.HighlightColor.values())
+            .defaultValue(ColorHelper.HighlightColor.GREEN)
+            .onChange((b) -> ModuleManager.getModule(WorldTools.class).setRgbColor(b.getColor()))
+            .visibleWhen(() -> WorldToolsHelper.isWorldToolsPresent() && ModuleManager.getModule(WorldTools.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting portalSkipDetectionEnabledSetting = register(
-        BooleanSetting.create(
-            "PortalSkip Detection",
-            "xaeroplus.setting.portal_skip_detection",
-            false,
-            true,
-            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setEnabled(b)),
+        BooleanSetting.builder()
+            .name("PortalSkip Detection")
+            .translationKey("xaeroplus.setting.portal_skip_detection")
+            .defaultValue(false)
+            .keybind()
+            .onChange((b) -> ModuleManager.getModule(PortalSkipDetection.class).setEnabled(b))
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final DoubleSetting portalSkipDetectionAlphaSetting = register(
-        DoubleSetting.create(
-            "PortalSkip Opacity",
-            "xaeroplus.setting.portal_skip_opacity",
-            0, 255, 10,
-            100,
-            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setAlpha(b),
-            () -> ModuleManager.getModule(PortalSkipDetection.class).isEnabled()),
+        DoubleSetting.builder()
+            .name("PortalSkip Opacity")
+            .translationKey("xaeroplus.setting.portal_skip_opacity")
+            .range(0, 255, 10)
+            .defaultValue(100)
+            .onChange((b) -> ModuleManager.getModule(PortalSkipDetection.class).setAlpha(b))
+            .visibleWhen(() -> ModuleManager.getModule(PortalSkipDetection.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final EnumSetting<ColorHelper.HighlightColor> portalSkipDetectionColorSetting = register(
-        EnumSetting.create(
-            "PortalSkip Color",
-            "xaeroplus.setting.portal_skip_color",
-            ColorHelper.HighlightColor.values(),
-            ColorHelper.HighlightColor.WHITE,
-            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setRgbColor(b.getColor()),
-            () -> ModuleManager.getModule(PortalSkipDetection.class).isEnabled()),
+        EnumSetting.<ColorHelper.HighlightColor>builder()
+            .name("PortalSkip Color")
+            .translationKey("xaeroplus.setting.portal_skip_color")
+            .values(ColorHelper.HighlightColor.values())
+            .defaultValue(ColorHelper.HighlightColor.WHITE)
+            .onChange((b) -> ModuleManager.getModule(PortalSkipDetection.class).setRgbColor(b.getColor()))
+            .visibleWhen(() -> ModuleManager.getModule(PortalSkipDetection.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final DoubleSetting portalSkipPortalRadius = register(
-        DoubleSetting.create(
-            "PortalSkip Portal Radius",
-            "xaeroplus.setting.portal_skip_portal_radius",
-            0, 32, 1,
-            15,
-            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setPortalRadius(b),
-            () -> ModuleManager.getModule(PortalSkipDetection.class).isEnabled()),
+        DoubleSetting.builder()
+            .name("PortalSkip Portal Radius")
+            .translationKey("xaeroplus.setting.portal_skip_portal_radius")
+            .range(0, 32, 1)
+            .defaultValue(15)
+            .onChange((b) -> ModuleManager.getModule(PortalSkipDetection.class).setPortalRadius(b))
+            .visibleWhen(() -> ModuleManager.getModule(PortalSkipDetection.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final DoubleSetting portalSkipDetectionSearchDelayTicksSetting = register(
-        DoubleSetting.create(
-            "PortalSkip Search Delay",
-            "xaeroplus.setting.portal_skip_search_delay",
-            0, 100, 1,
-            10,
-            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setSearchDelayTicks(b),
-            () -> ModuleManager.getModule(PortalSkipDetection.class).isEnabled()),
+        DoubleSetting.builder()
+            .name("PortalSkip Search Delay")
+            .translationKey("xaeroplus.setting.portal_skip_search_delay")
+            .range(0, 100, 1)
+            .defaultValue(10)
+            .onChange((b) -> ModuleManager.getModule(PortalSkipDetection.class).setSearchDelayTicks(b))
+            .visibleWhen(() -> ModuleManager.getModule(PortalSkipDetection.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting portalSkipNewChunksSetting = register(
-        BooleanSetting.create(
-            "PortalSkip NewChunks",
-            "xaeroplus.setting.portal_skip_new_chunks",
-            true,
-            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setNewChunks(b),
-            () -> ModuleManager.getModule(PortalSkipDetection.class).isEnabled()),
+        BooleanSetting.builder()
+            .name("PortalSkip NewChunks")
+            .translationKey("xaeroplus.setting.portal_skip_new_chunks")
+            .defaultValue(true)
+            .onChange((b) -> ModuleManager.getModule(PortalSkipDetection.class).setNewChunks(b))
+            .visibleWhen(() -> ModuleManager.getModule(PortalSkipDetection.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting portalSkipOldChunkInverseSetting = register(
-        BooleanSetting.create(
-            "PortalSkip OldChunks Inverse",
-            "xaeroplus.setting.portal_skip_old_chunks_inverse",
-            true,
-            (b) -> ModuleManager.getModule(PortalSkipDetection.class).setOldChunksInverse(b),
-            () -> ModuleManager.getModule(PortalSkipDetection.class).isEnabled()),
+        BooleanSetting.builder()
+            .name("PortalSkip OldChunks Inverse")
+            .translationKey("xaeroplus.setting.portal_skip_old_chunks_inverse")
+            .defaultValue(true)
+            .onChange((b) -> ModuleManager.getModule(PortalSkipDetection.class).setOldChunksInverse(b))
+            .visibleWhen(() -> ModuleManager.getModule(PortalSkipDetection.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting breadcrumbsEnabledSetting = register(
-        BooleanSetting.create(
-            "Breadcrumbs",
-            "xaeroplus.setting.breadcrumbs",
-            false,
-            (b) -> ModuleManager.getModule(Breadcrumbs.class).setEnabled(b)
-        ),
+        BooleanSetting.builder()
+            .name("Breadcrumbs")
+            .translationKey("xaeroplus.setting.breadcrumbs")
+            .defaultValue(false)
+            .onChange((b) -> ModuleManager.getModule(Breadcrumbs.class).setEnabled(b))
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting breadcrumbsSaveLoadToDiskSetting = register(
-        BooleanSetting.create(
-            "Save/Load Breadcrumbs to Disk",
-            "xaeroplus.setting.breadcrumbs_save_load_to_disk",
-            true,
-            (b) -> ModuleManager.getModule(Breadcrumbs.class).setDiskCache(b),
-            () -> ModuleManager.getModule(Breadcrumbs.class).isEnabled()),
+        BooleanSetting.builder()
+            .name("Save/Load Breadcrumbs to Disk")
+            .translationKey("xaeroplus.setting.breadcrumbs_save_load_to_disk")
+            .defaultValue(true)
+            .onChange((b) -> ModuleManager.getModule(Breadcrumbs.class).setDiskCache(b))
+            .visibleWhen(() -> ModuleManager.getModule(Breadcrumbs.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public enum BreadcrumbsMode implements TranslatableSettingEnum {
         CHUNK_RADIUS("xaeroplus.setting.breadcrumbs_mode.chunk_radius"),
@@ -699,38 +765,41 @@ public final class Settings extends SettingRegistry {
         }
     }
     public final EnumSetting<BreadcrumbsMode> breadcrumbsModeSetting = register(
-        EnumSetting.create(
-            "Breadcrumbs Mode",
-            "xaeroplus.setting.breadcrumbs_mode",
-            BreadcrumbsMode.values(),
-            BreadcrumbsMode.CHUNK_RADIUS
-        ), SettingLocation.CHUNK_HIGHLIGHTS);
+        EnumSetting.<BreadcrumbsMode>builder()
+            .name("Breadcrumbs Mode")
+            .translationKey("xaeroplus.setting.breadcrumbs_mode")
+            .values(BreadcrumbsMode.values())
+            .defaultValue(BreadcrumbsMode.CHUNK_RADIUS)
+            .build(), SettingLocation.CHUNK_HIGHLIGHTS);
     public final DoubleSetting breadcrumbsChunkRadiusSetting = register(
-        DoubleSetting.create(
-            "Breadcrumbs Chunk Radius",
-            "xaeroplus.setting.breadcrumbs_chunk_radius",
-            0, 16, 1,
-            0,
-            (d) -> ModuleManager.getModule(Breadcrumbs.class).setChunkRadius(d),
-            () -> ModuleManager.getModule(Breadcrumbs.class).isEnabled() && breadcrumbsModeSetting.get() == BreadcrumbsMode.CHUNK_RADIUS),
+        DoubleSetting.builder()
+            .name("Breadcrumbs Chunk Radius")
+            .translationKey("xaeroplus.setting.breadcrumbs_chunk_radius")
+            .range(0, 16, 1)
+            .defaultValue(0)
+            .onChange((d) -> ModuleManager.getModule(Breadcrumbs.class).setChunkRadius(d))
+            .visibleWhen(() -> ModuleManager.getModule(Breadcrumbs.class).isEnabled() && breadcrumbsModeSetting.get() == BreadcrumbsMode.CHUNK_RADIUS)
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final EnumSetting<ColorHelper.HighlightColor> breadcrumbsColorSetting = register(
-        EnumSetting.create(
-            "Breadcrumbs Color",
-            "xaeroplus.setting.breadcrumbs_color",
-            ColorHelper.HighlightColor.values(),
-            ColorHelper.HighlightColor.CYAN,
-            (b) -> ModuleManager.getModule(Breadcrumbs.class).setRgbColor(b.getColor()),
-            () -> ModuleManager.getModule(Breadcrumbs.class).isEnabled()),
+        EnumSetting.<ColorHelper.HighlightColor>builder()
+            .name("Breadcrumbs Color")
+            .translationKey("xaeroplus.setting.breadcrumbs_color")
+            .values(ColorHelper.HighlightColor.values())
+            .defaultValue(ColorHelper.HighlightColor.CYAN)
+            .onChange((b) -> ModuleManager.getModule(Breadcrumbs.class).setRgbColor(b.getColor()))
+            .visibleWhen(() -> ModuleManager.getModule(Breadcrumbs.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final DoubleSetting breadcrumbsOpacitySetting = register(
-        DoubleSetting.create(
-            "Breadcrumbs Opacity",
-            "xaeroplus.setting.breadcrumbs_opacity",
-            0, 255, 10,
-            100,
-            (b) -> ModuleManager.getModule(Breadcrumbs.class).setAlpha(b),
-            () -> ModuleManager.getModule(Breadcrumbs.class).isEnabled()),
+        DoubleSetting.builder()
+            .name("Breadcrumbs Opacity")
+            .translationKey("xaeroplus.setting.breadcrumbs_opacity")
+            .range(0, 255, 10)
+            .defaultValue(100)
+            .onChange((b) -> ModuleManager.getModule(Breadcrumbs.class).setAlpha(b))
+            .visibleWhen(() -> ModuleManager.getModule(Breadcrumbs.class).isEnabled())
+            .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
 
     /**
@@ -738,40 +807,44 @@ public final class Settings extends SettingRegistry {
      */
 
     public final BooleanSetting baritonePathSyncSetting = register(
-        BooleanSetting.create(
-            "Baritone Path",
-            "xaeroplus.setting.baritone_path",
-            true,
-            (b) -> {
+        BooleanSetting.builder()
+            .name("Baritone Path")
+            .translationKey("xaeroplus.setting.baritone_path")
+            .defaultValue(true)
+            .onChange((b) -> {
                 if (BaritoneHelper.isBaritonePresent()) ModuleManager.getModule(BaritonePathSync.class).setEnabled(b);
-            },
-            BaritoneHelper::isBaritonePresent),
+            })
+            .visibleWhen(BaritoneHelper::isBaritonePresent)
+            .build(),
         SettingLocation.OVERLAYS);
     public final EnumSetting<ColorHelper.HighlightColor> baritonePathSyncColorSetting = register(
-        EnumSetting.create(
-            "Baritone Path Color",
-            "xaeroplus.setting.baritone_path_color",
-            ColorHelper.HighlightColor.values(),
-            ColorHelper.HighlightColor.RED,
-            (b) -> ModuleManager.getModule(BaritonePathSync.class).setColor(b.getColor()),
-            () -> ModuleManager.getModule(BaritonePathSync.class).isEnabled()),
+        EnumSetting.<ColorHelper.HighlightColor>builder()
+            .name("Baritone Path Color")
+            .translationKey("xaeroplus.setting.baritone_path_color")
+            .values(ColorHelper.HighlightColor.values())
+            .defaultValue(ColorHelper.HighlightColor.RED)
+            .onChange((b) -> ModuleManager.getModule(BaritonePathSync.class).setColor(b.getColor()))
+            .visibleWhen(() -> ModuleManager.getModule(BaritonePathSync.class).isEnabled())
+            .build(),
         SettingLocation.OVERLAYS);
     public final DoubleSetting baritonePathSyncOpacity = register(
-        DoubleSetting.create(
-            "Baritone Path Opacity",
-            "xaeroplus.setting.baritone_path_opacity",
-            0, 255, 5,
-            150,
-            (v) -> ModuleManager.getModule(BaritonePathSync.class).setOpacity((int) v),
-            () -> ModuleManager.getModule(BaritonePathSync.class).isEnabled()),
+        DoubleSetting.builder()
+            .name("Baritone Path Opacity")
+            .translationKey("xaeroplus.setting.baritone_path_opacity")
+            .range(0, 255, 5)
+            .defaultValue(150)
+            .onChange((v) -> ModuleManager.getModule(BaritonePathSync.class).setOpacity((int) v))
+            .visibleWhen(() -> ModuleManager.getModule(BaritonePathSync.class).isEnabled())
+            .build(),
         SettingLocation.OVERLAYS);
     public final BooleanSetting highwayHighlightsSetting = register(
-        BooleanSetting.create(
-            "2b2t Highways",
-            "xaeroplus.setting.2b2t_highways_enabled",
-            false,
-            true,
-            (b) -> ModuleManager.getModule(Highways.class).setEnabled(b)),
+        BooleanSetting.builder()
+            .name("2b2t Highways")
+            .translationKey("xaeroplus.setting.2b2t_highways_enabled")
+            .defaultValue(false)
+            .keybind()
+            .onChange((b) -> ModuleManager.getModule(Highways.class).setEnabled(b))
+            .build(),
         SettingLocation.OVERLAYS);
     public enum HighwayWidth implements TranslatableSettingEnum {
         // Must be odd numbers for the center to be aligned correctly
@@ -791,205 +864,222 @@ public final class Settings extends SettingRegistry {
         }
     }
     public final EnumSetting<HighwayWidth> highwayWidthSetting = register(
-        EnumSetting.create(
-            "2b2t Highways Width",
-            "xaeroplus.setting.2b2t_highways_width",
-            HighwayWidth.values(),
-            HighwayWidth.ONE,
-            (v) -> ModuleManager.getModule(Highways.class).setWidth(v),
-            () -> ModuleManager.getModule(Highways.class).isEnabled()),
+        EnumSetting.<HighwayWidth>builder()
+            .name("2b2t Highways Width")
+            .translationKey("xaeroplus.setting.2b2t_highways_width")
+            .values(HighwayWidth.values())
+            .defaultValue(HighwayWidth.ONE)
+            .onChange((v) -> ModuleManager.getModule(Highways.class).setWidth(v))
+            .visibleWhen(() -> ModuleManager.getModule(Highways.class).isEnabled())
+            .build(),
         SettingLocation.OVERLAYS);
     public final EnumSetting<ColorHelper.HighlightColor> highwaysColorSetting = register(
-        EnumSetting.create(
-            "2b2t Highways Color",
-            "xaeroplus.setting.2b2t_highways_color",
-            ColorHelper.HighlightColor.values(),
-            ColorHelper.HighlightColor.BLUE,
-            (b) -> ModuleManager.getModule(Highways.class).setRgbColor(b.getColor()),
-            () -> ModuleManager.getModule(Highways.class).isEnabled()),
+        EnumSetting.<ColorHelper.HighlightColor>builder()
+            .name("2b2t Highways Color")
+            .translationKey("xaeroplus.setting.2b2t_highways_color")
+            .values(ColorHelper.HighlightColor.values())
+            .defaultValue(ColorHelper.HighlightColor.BLUE)
+            .onChange((b) -> ModuleManager.getModule(Highways.class).setRgbColor(b.getColor()))
+            .visibleWhen(() -> ModuleManager.getModule(Highways.class).isEnabled())
+            .build(),
         SettingLocation.OVERLAYS);
     public final DoubleSetting highwaysColorAlphaSetting = register(
-        DoubleSetting.create(
-            "2b2t Highways Opacity",
-            "xaeroplus.setting.2b2t_highways_opacity",
-            0, 255, 10,
-            100,
-            (b) -> ModuleManager.getModule(Highways.class).setAlpha(b),
-            () -> ModuleManager.getModule(Highways.class).isEnabled()),
+        DoubleSetting.builder()
+            .name("2b2t Highways Opacity")
+            .translationKey("xaeroplus.setting.2b2t_highways_opacity")
+            .range(0, 255, 10)
+            .defaultValue(100)
+            .onChange((b) -> ModuleManager.getModule(Highways.class).setAlpha(b))
+            .visibleWhen(() -> ModuleManager.getModule(Highways.class).isEnabled())
+            .build(),
         SettingLocation.OVERLAYS);
     public final BooleanSetting showRenderDistanceSetting = register(
-        BooleanSetting.create(
-            "Show Render Distance",
-            "xaeroplus.setting.show_render_distance",
-            false,
-            true,
-            (b) -> ModuleManager.getModule(RenderDistance.class).setEnabled(b)
-        ),
+        BooleanSetting.builder()
+            .name("Show Render Distance")
+            .translationKey("xaeroplus.setting.show_render_distance")
+            .defaultValue(false)
+            .keybind()
+            .onChange((b) -> ModuleManager.getModule(RenderDistance.class).setEnabled(b))
+            .build(),
         SettingLocation.OVERLAYS);
     public final BooleanSetting showWorldBorderSetting = register(
-        BooleanSetting.create(
-            "Show World Border",
-            "xaeroplus.setting.show_world_border",
-            false,
-            (b) -> ModuleManager.getModule(WorldBorder.class).setEnabled(b)
-        ),
+        BooleanSetting.builder()
+            .name("Show World Border")
+            .translationKey("xaeroplus.setting.show_world_border")
+            .defaultValue(false)
+            .onChange((b) -> ModuleManager.getModule(WorldBorder.class).setEnabled(b))
+            .build(),
         SettingLocation.OVERLAYS);
     public final BooleanSetting spawnChunksEnabledSetting = register(
-        BooleanSetting.create(
-            "Spawn Chunks",
-            "xaeroplus.setting.spawn_chunks",
-            false,
-            true,
-            (b) -> ModuleManager.getModule(SpawnChunks.class).setEnabled(b)),
+        BooleanSetting.builder()
+            .name("Spawn Chunks")
+            .translationKey("xaeroplus.setting.spawn_chunks")
+            .defaultValue(false)
+            .keybind()
+            .onChange((b) -> ModuleManager.getModule(SpawnChunks.class).setEnabled(b))
+            .build(),
         SettingLocation.OVERLAYS);
     public final BooleanSetting playerSpawnChunksEnabledSetting = register(
-        BooleanSetting.create(
-            "Player Spawn Chunks",
-            "xaeroplus.setting.player_spawn_chunks",
-            false,
-            true,
-            (b) -> ModuleManager.getModule(SpawnChunksPlayer.class).setEnabled(b)),
+        BooleanSetting.builder()
+            .name("Player Spawn Chunks")
+            .translationKey("xaeroplus.setting.player_spawn_chunks")
+            .defaultValue(false)
+            .keybind()
+            .onChange((b) -> ModuleManager.getModule(SpawnChunksPlayer.class).setEnabled(b))
+            .build(),
         SettingLocation.OVERLAYS);
     public final BooleanSetting spawnChunksRedstoneProcessingEnabled = register(
-        BooleanSetting.create(
-            "Spawn Chunks Redstone Processing",
-            "xaeroplus.setting.spawn_chunks_redstone_processing",
-            false,
-            () -> ModuleManager.getModule(SpawnChunks.class).isEnabled() || ModuleManager.getModule(SpawnChunksPlayer.class).isEnabled()),
+        BooleanSetting.builder()
+            .name("Spawn Chunks Redstone Processing")
+            .translationKey("xaeroplus.setting.spawn_chunks_redstone_processing")
+            .defaultValue(false)
+            .visibleWhen(() -> ModuleManager.getModule(SpawnChunks.class).isEnabled() || ModuleManager.getModule(SpawnChunksPlayer.class).isEnabled())
+            .build(),
         SettingLocation.OVERLAYS);
     public final BooleanSetting spawnChunksOuterChunksEnabled = register(
-        BooleanSetting.create(
-            "Spawn Chunks Outer Chunks",
-            "xaeroplus.setting.spawn_chunks_outer_chunks",
-            false,
-            () -> ModuleManager.getModule(SpawnChunks.class).isEnabled() || ModuleManager.getModule(SpawnChunksPlayer.class).isEnabled()),
+        BooleanSetting.builder()
+            .name("Spawn Chunks Outer Chunks")
+            .translationKey("xaeroplus.setting.spawn_chunks_outer_chunks")
+            .defaultValue(false)
+            .visibleWhen(() -> ModuleManager.getModule(SpawnChunks.class).isEnabled() || ModuleManager.getModule(SpawnChunksPlayer.class).isEnabled())
+            .build(),
         SettingLocation.OVERLAYS);
     public final EnumSetting<ColorHelper.HighlightColor> spawnChunksEntityProcessingColor = register(
-        EnumSetting.create(
-            "Spawn Chunks Entity Processing Color",
-            "xaeroplus.setting.spawn_chunks_entity_processing_color",
-            ColorHelper.HighlightColor.values(),
-            ColorHelper.HighlightColor.GREEN,
-            (b) -> {
+        EnumSetting.<ColorHelper.HighlightColor>builder()
+            .name("Spawn Chunks Entity Processing Color")
+            .translationKey("xaeroplus.setting.spawn_chunks_entity_processing_color")
+            .values(ColorHelper.HighlightColor.values())
+            .defaultValue(ColorHelper.HighlightColor.GREEN)
+            .onChange((b) -> {
                 ModuleManager.getModule(SpawnChunks.class).setEntityProcessingColor(b.getColor());
                 ModuleManager.getModule(SpawnChunksPlayer.class).setEntityProcessingColor(b.getColor());
-            },
-            () -> ModuleManager.getModule(SpawnChunks.class).isEnabled() || ModuleManager.getModule(SpawnChunksPlayer.class).isEnabled()),
+            })
+            .visibleWhen(() -> ModuleManager.getModule(SpawnChunks.class).isEnabled() || ModuleManager.getModule(SpawnChunksPlayer.class).isEnabled())
+            .build(),
         SettingLocation.OVERLAYS);
     public final EnumSetting<ColorHelper.HighlightColor> spawnChunksRedstoneProcessingColor = register(
-        EnumSetting.create(
-            "Spawn Chunks Redstone Processing Color",
-            "xaeroplus.setting.spawn_chunks_redstone_processing_color",
-            ColorHelper.HighlightColor.values(),
-            ColorHelper.HighlightColor.RED,
-            (b) -> {
+        EnumSetting.<ColorHelper.HighlightColor>builder()
+            .name("Spawn Chunks Redstone Processing Color")
+            .translationKey("xaeroplus.setting.spawn_chunks_redstone_processing_color")
+            .values(ColorHelper.HighlightColor.values())
+            .defaultValue(ColorHelper.HighlightColor.RED)
+            .onChange((b) -> {
                 ModuleManager.getModule(SpawnChunks.class).setRedstoneProcessingColor(b.getColor());
                 ModuleManager.getModule(SpawnChunksPlayer.class).setRedstoneProcessingColor(b.getColor());
-            },
-            () -> ModuleManager.getModule(SpawnChunks.class).isEnabled() || ModuleManager.getModule(SpawnChunksPlayer.class).isEnabled()),
+            })
+            .visibleWhen(() -> ModuleManager.getModule(SpawnChunks.class).isEnabled() || ModuleManager.getModule(SpawnChunksPlayer.class).isEnabled())
+            .build(),
         SettingLocation.OVERLAYS);
     public final EnumSetting<ColorHelper.HighlightColor> spawnChunksLazyChunksColor = register(
-        EnumSetting.create(
-            "Spawn Chunks Lazy Chunks Color",
-            "xaeroplus.setting.spawn_chunks_lazy_chunks_color",
-            ColorHelper.HighlightColor.values(),
-            ColorHelper.HighlightColor.BLUE,
-            (b) -> {
+        EnumSetting.<ColorHelper.HighlightColor>builder()
+            .name("Spawn Chunks Lazy Chunks Color")
+            .translationKey("xaeroplus.setting.spawn_chunks_lazy_chunks_color")
+            .values(ColorHelper.HighlightColor.values())
+            .defaultValue(ColorHelper.HighlightColor.BLUE)
+            .onChange((b) -> {
                 ModuleManager.getModule(SpawnChunks.class).setLazyChunksColor(b.getColor());
                 ModuleManager.getModule(SpawnChunksPlayer.class).setLazyChunksColor(b.getColor());
-            },
-            () -> ModuleManager.getModule(SpawnChunks.class).isEnabled() || ModuleManager.getModule(SpawnChunksPlayer.class).isEnabled()),
+            })
+            .visibleWhen(() -> ModuleManager.getModule(SpawnChunks.class).isEnabled() || ModuleManager.getModule(SpawnChunksPlayer.class).isEnabled())
+            .build(),
         SettingLocation.OVERLAYS);
     public final EnumSetting<ColorHelper.HighlightColor> spawnChunksOuterChunksColor = register(
-        EnumSetting.create(
-            "Spawn Chunks Outer Chunks Color",
-            "xaeroplus.setting.spawn_chunks_outer_chunks_color",
-            ColorHelper.HighlightColor.values(),
-            ColorHelper.HighlightColor.YELLOW,
-            (b) -> {
+        EnumSetting.<ColorHelper.HighlightColor>builder()
+            .name("Spawn Chunks Outer Chunks Color")
+            .translationKey("xaeroplus.setting.spawn_chunks_outer_chunks_color")
+            .values(ColorHelper.HighlightColor.values())
+            .defaultValue(ColorHelper.HighlightColor.YELLOW)
+            .onChange((b) -> {
                 ModuleManager.getModule(SpawnChunks.class).setOuterChunksColor(b.getColor());
                 ModuleManager.getModule(SpawnChunksPlayer.class).setOuterChunksColor(b.getColor());
-            },
-            () -> ModuleManager.getModule(SpawnChunks.class).isEnabled() || ModuleManager.getModule(SpawnChunksPlayer.class).isEnabled()),
+            })
+            .visibleWhen(() -> ModuleManager.getModule(SpawnChunks.class).isEnabled() || ModuleManager.getModule(SpawnChunksPlayer.class).isEnabled())
+            .build(),
         SettingLocation.OVERLAYS);
     public final BooleanSetting mapArtGridEnabledSetting = register(
-        BooleanSetting.create(
-            "Map Art Grid",
-            "xaeroplus.setting.map_art_grid",
-            false,
-            true,
-            (b) -> ModuleManager.getModule(MapArtGrid.class).setEnabled(b)),
+        BooleanSetting.builder()
+            .name("Map Art Grid")
+            .translationKey("xaeroplus.setting.map_art_grid")
+            .defaultValue(false)
+            .keybind()
+            .onChange((b) -> ModuleManager.getModule(MapArtGrid.class).setEnabled(b))
+            .build(),
         SettingLocation.OVERLAYS);
     public final EnumSetting<ColorHelper.HighlightColor> mapArtGridColorSetting = register(
-        EnumSetting.create(
-            "Map Art Grid Color",
-            "xaeroplus.setting.map_art_grid_color",
-            ColorHelper.HighlightColor.values(),
-            ColorHelper.HighlightColor.RED,
-            (b) -> ModuleManager.getModule(MapArtGrid.class).setRgbColor(b.getColor()),
-            () -> ModuleManager.getModule(MapArtGrid.class).isEnabled()),
+        EnumSetting.<ColorHelper.HighlightColor>builder()
+            .name("Map Art Grid Color")
+            .translationKey("xaeroplus.setting.map_art_grid_color")
+            .values(ColorHelper.HighlightColor.values())
+            .defaultValue(ColorHelper.HighlightColor.RED)
+            .onChange((b) -> ModuleManager.getModule(MapArtGrid.class).setRgbColor(b.getColor()))
+            .visibleWhen(() -> ModuleManager.getModule(MapArtGrid.class).isEnabled())
+            .build(),
         SettingLocation.OVERLAYS);
     public final DoubleSetting mapArtGridZoomSetting = register(
-        DoubleSetting.create(
-            "Map Art Grid Zoom",
-            "xaeroplus.setting.map_art_grid_zoom",
-            0.0, 4.0, 1.0,
-            0.0,
-            (v) -> ModuleManager.getModule(MapArtGrid.class).setZoom((int) v),
-            () -> ModuleManager.getModule(MapArtGrid.class).isEnabled()
-        ), SettingLocation.OVERLAYS);
+        DoubleSetting.builder()
+            .name("Map Art Grid Zoom")
+            .translationKey("xaeroplus.setting.map_art_grid_zoom")
+            .range(0.0, 4.0, 1.0)
+            .defaultValue(0.0)
+            .onChange((v) -> ModuleManager.getModule(MapArtGrid.class).setZoom((int) v))
+            .visibleWhen(() -> ModuleManager.getModule(MapArtGrid.class).isEnabled())
+            .build(), SettingLocation.OVERLAYS);
     public final BooleanSetting regionGridEnabledSetting = register(
-        BooleanSetting.create(
-            "Region Grid",
-            "xaeroplus.setting.region_grid",
-            false,
-            true,
-            (b) -> ModuleManager.getModule(RegionGrid.class).setEnabled(b)),
+        BooleanSetting.builder()
+            .name("Region Grid")
+            .translationKey("xaeroplus.setting.region_grid")
+            .defaultValue(false)
+            .keybind()
+            .onChange((b) -> ModuleManager.getModule(RegionGrid.class).setEnabled(b))
+            .build(),
         SettingLocation.OVERLAYS);
     public final EnumSetting<ColorHelper.HighlightColor> regionGridColorSetting = register(
-        EnumSetting.create(
-            "Region Grid Color",
-            "xaeroplus.setting.region_grid_color",
-            ColorHelper.HighlightColor.values(),
-            ColorHelper.HighlightColor.RED,
-            (b) -> ModuleManager.getModule(RegionGrid.class).setRgbColor(b.getColor()),
-            () -> ModuleManager.getModule(RegionGrid.class).isEnabled()),
+        EnumSetting.<ColorHelper.HighlightColor>builder()
+            .name("Region Grid Color")
+            .translationKey("xaeroplus.setting.region_grid_color")
+            .values(ColorHelper.HighlightColor.values())
+            .defaultValue(ColorHelper.HighlightColor.RED)
+            .onChange((b) -> ModuleManager.getModule(RegionGrid.class).setRgbColor(b.getColor()))
+            .visibleWhen(() -> ModuleManager.getModule(RegionGrid.class).isEnabled())
+            .build(),
         SettingLocation.OVERLAYS);
     public final BooleanSetting regionGridTextSetting = register(
-        BooleanSetting.create(
-            "Region Grid Text",
-            "xaeroplus.setting.region_grid_text",
-            false,
-            false,
-            (b) -> ModuleManager.getModule(RegionGrid.class).setTextEnabled(b),
-            () -> ModuleManager.getModule(RegionGrid.class).isEnabled()),
+        BooleanSetting.builder()
+            .name("Region Grid Text")
+            .translationKey("xaeroplus.setting.region_grid_text")
+            .defaultValue(false)
+            .onChange((b) -> ModuleManager.getModule(RegionGrid.class).setTextEnabled(b))
+            .visibleWhen(() -> ModuleManager.getModule(RegionGrid.class).isEnabled())
+            .build(),
         SettingLocation.OVERLAYS);
     public final BooleanSetting beaconsOverlaySetting = register(
-        BooleanSetting.create(
-            "Beacons Overlay",
-            "xaeroplus.setting.beacons_overlay",
-            false,
-            true,
-            (b) -> ModuleManager.getModule(Beacons.class).setEnabled(b)
-        ), SettingLocation.OVERLAYS);
+        BooleanSetting.builder()
+            .name("Beacons Overlay")
+            .translationKey("xaeroplus.setting.beacons_overlay")
+            .defaultValue(false)
+            .keybind()
+            .onChange((b) -> ModuleManager.getModule(Beacons.class).setEnabled(b))
+            .build(), SettingLocation.OVERLAYS);
 
     /**
      * Minimap Main
      */
 
     public final BooleanSetting minimapFpsLimiter = register(
-        BooleanSetting.create(
-            "Minimap FPS Limiter",
-            "xaeroplus.setting.fps_limiter",
-            false,
-            (b) -> ModuleManager.getModule(FpsLimiter.class).setEnabled(b)),
+        BooleanSetting.builder()
+            .name("Minimap FPS Limiter")
+            .translationKey("xaeroplus.setting.fps_limiter")
+            .defaultValue(false)
+            .onChange((b) -> ModuleManager.getModule(FpsLimiter.class).setEnabled(b))
+            .build(),
         SettingLocation.MINIMAP_MAIN);
     public final DoubleSetting minimapFpsLimit = register(
-        DoubleSetting.create(
-            "Minimap FPS Limit",
-            "xaeroplus.setting.fps_limiter_limit",
-            5, 120, 5,
-            60),
+        DoubleSetting.builder()
+            .name("Minimap FPS Limit")
+            .translationKey("xaeroplus.setting.fps_limiter_limit")
+            .range(5, 120, 5)
+            .defaultValue(60)
+            .build(),
         SettingLocation.MINIMAP_MAIN);
 
     /**
@@ -997,27 +1087,30 @@ public final class Settings extends SettingRegistry {
      */
 
     public final DoubleSetting minimapScaleMultiplierSetting = register(
-        DoubleSetting.create(
-            "Minimap Scaling Factor",
-            "xaeroplus.setting.minimap_scaling",
-            1, 5, 1,
-            1,
-            (b) -> Globals.shouldResetFBO = true),
+        DoubleSetting.builder()
+            .name("Minimap Scaling Factor")
+            .translationKey("xaeroplus.setting.minimap_scaling")
+            .range(1, 5, 1)
+            .defaultValue(1)
+            .onChange((b) -> Globals.shouldResetFBO = true)
+            .build(),
         SettingLocation.MINIMAP_VIEW);
     public final DoubleSetting minimapSizeMultiplierSetting = register(
-        DoubleSetting.create(
-            "Minimap Size Multiplier",
-            "xaeroplus.setting.minimap_size_multiplier",
-            1, 4, 1,
-            1,
-            (b) -> Globals.shouldResetFBO = true),
+        DoubleSetting.builder()
+            .name("Minimap Size Multiplier")
+            .translationKey("xaeroplus.setting.minimap_size_multiplier")
+            .range(1, 4, 1)
+            .defaultValue(1)
+            .onChange((b) -> Globals.shouldResetFBO = true)
+            .build(),
         SettingLocation.MINIMAP_VIEW);
     public final DoubleSetting minimapRenderZOffsetSetting = register(
-        DoubleSetting.create(
-            "Minimap Render Z",
-            "xaeroplus.setting.minimap_render_z_offset",
-            -1000, 1000, 50,
-            0),
+        DoubleSetting.builder()
+            .name("Minimap Render Z")
+            .translationKey("xaeroplus.setting.minimap_render_z_offset")
+            .range(-1000, 1000, 50)
+            .defaultValue(0)
+            .build(),
         SettingLocation.MINIMAP_VIEW);
 
     /**
@@ -1025,16 +1118,18 @@ public final class Settings extends SettingRegistry {
      */
 
     public final BooleanSetting alwaysRenderPlayerWithNameOnRadar = register(
-        BooleanSetting.create(
-            "Always Render Player Name",
-            "xaeroplus.setting.always_render_player_name",
-            true),
+        BooleanSetting.builder()
+            .name("Always Render Player Name")
+            .translationKey("xaeroplus.setting.always_render_player_name")
+            .defaultValue(true)
+            .build(),
         SettingLocation.MINIMAP_ENTITY_RADAR);
     public final BooleanSetting alwaysRenderPlayerIconOnRadar = register(
-        BooleanSetting.create(
-            "Always Render Player Icon",
-            "xaeroplus.setting.always_render_player_icon",
-            true),
+        BooleanSetting.builder()
+            .name("Always Render Player Icon")
+            .translationKey("xaeroplus.setting.always_render_player_icon")
+            .defaultValue(true)
+            .build(),
         SettingLocation.MINIMAP_ENTITY_RADAR);
 
     /**
@@ -1042,99 +1137,112 @@ public final class Settings extends SettingRegistry {
      */
 
     public final BooleanSetting waypointBeacons = register(
-        BooleanSetting.create(
-            "Waypoint Beacons",
-            "xaeroplus.setting.waypoint_beacons",
-            false),
+        BooleanSetting.builder()
+            .name("Waypoint Beacons")
+            .translationKey("xaeroplus.setting.waypoint_beacons")
+            .defaultValue(false)
+            .build(),
         SettingLocation.MINIMAP_WAYPOINTS);
     public final DoubleSetting waypointBeaconScaleMin = register(
-        DoubleSetting.create(
-            "Waypoint Beacon Scale Min",
-            "xaeroplus.setting.waypoint_beacon_scale_min",
-            0, 30, 1,
-            0,
-            waypointBeacons::get),
+        DoubleSetting.builder()
+            .name("Waypoint Beacon Scale Min")
+            .translationKey("xaeroplus.setting.waypoint_beacon_scale_min")
+            .range(0, 30, 1)
+            .defaultValue(0)
+            .visibleWhen(waypointBeacons::get)
+            .build(),
         SettingLocation.MINIMAP_WAYPOINTS);
     public final DoubleSetting waypointBeaconDistanceMin = register(
-        DoubleSetting.create(
-            "Waypoint Beacon Distance Min",
-            "xaeroplus.setting.waypoint_beacon_distance_min",
-            0, 512, 8,
-            0,
-            waypointBeacons::get),
+        DoubleSetting.builder()
+            .name("Waypoint Beacon Distance Min")
+            .translationKey("xaeroplus.setting.waypoint_beacon_distance_min")
+            .range(0, 512, 8)
+            .defaultValue(0)
+            .visibleWhen(waypointBeacons::get)
+            .build(),
         SettingLocation.MINIMAP_WAYPOINTS);
     public final BooleanSetting waypointEta = register(
-        BooleanSetting.create(
-            "Waypoint ETA",
-            "xaeroplus.setting.waypoint_eta",
-            false),
+        BooleanSetting.builder()
+            .name("Waypoint ETA")
+            .translationKey("xaeroplus.setting.waypoint_eta")
+            .defaultValue(false)
+            .build(),
         SettingLocation.MINIMAP_WAYPOINTS);
     public final DoubleSetting waypointEtaMeasurementInterval = register(
-        DoubleSetting.create(
-            "Waypoint ETA Measurement Interval",
-            "xaeroplus.setting.waypoint_eta_measurement_interval",
-            0, 120, 2,
-            10,
-            (v) -> WaypointEtaManager.INSTANCE.updateMeasurementInterval((int) v),
-            waypointEta::get
-        ), SettingLocation.MINIMAP_WAYPOINTS);
+        DoubleSetting.builder()
+            .name("Waypoint ETA Measurement Interval")
+            .translationKey("xaeroplus.setting.waypoint_eta_measurement_interval")
+            .range(0, 120, 2)
+            .defaultValue(10)
+            .onChange((v) -> WaypointEtaManager.INSTANCE.updateMeasurementInterval((int) v))
+            .visibleWhen(waypointEta::get)
+            .build(), SettingLocation.MINIMAP_WAYPOINTS);
     public final BooleanSetting longWaypointInitials = register(
-        BooleanSetting.create(
-            "Long Waypoint Initials",
-            "xaeroplus.setting.allow_longer_waypoint_initials",
-            false),
+        BooleanSetting.builder()
+            .name("Long Waypoint Initials")
+            .translationKey("xaeroplus.setting.allow_longer_waypoint_initials")
+            .defaultValue(false)
+            .build(),
         SettingLocation.MINIMAP_WAYPOINTS);
     public final BooleanSetting disableWaypointSharing = register(
-        BooleanSetting.create(
-            "Disable Waypoint Sharing",
-            "xaeroplus.setting.disable_waypoint_sharing",
-            false),
+        BooleanSetting.builder()
+            .name("Disable Waypoint Sharing")
+            .translationKey("xaeroplus.setting.disable_waypoint_sharing")
+            .defaultValue(false)
+            .build(),
         SettingLocation.MINIMAP_WAYPOINTS);
     public final BooleanSetting plainWaypointSharing = register(
-        BooleanSetting.create(
-            "Plain Waypoint Sharing",
-            "xaeroplus.setting.plain_waypoint_sharing",
-            false),
+        BooleanSetting.builder()
+            .name("Plain Waypoint Sharing")
+            .translationKey("xaeroplus.setting.plain_waypoint_sharing")
+            .defaultValue(false)
+            .build(),
         SettingLocation.MINIMAP_WAYPOINTS);
     public final BooleanSetting disableReceivingWaypoints = register(
-        BooleanSetting.create(
-            "Disable Receiving Waypoints",
-            "xaeroplus.setting.disable_receiving_waypoints",
-            false),
+        BooleanSetting.builder()
+            .name("Disable Receiving Waypoints")
+            .translationKey("xaeroplus.setting.disable_receiving_waypoints")
+            .defaultValue(false)
+            .build(),
         SettingLocation.MINIMAP_WAYPOINTS);
     public final BooleanSetting limitDeathpointsRenderDistance = register(
-        BooleanSetting.create(
-            "Deathpoints Render Distance",
-            "xaeroplus.setting.deathpoints_render_distance",
-            false),
+        BooleanSetting.builder()
+            .name("Deathpoints Render Distance")
+            .translationKey("xaeroplus.setting.deathpoints_render_distance")
+            .defaultValue(false)
+            .build(),
         SettingLocation.MINIMAP_WAYPOINTS);
     public final BooleanSetting disableWaypointSetChangeTooltip = register(
-        BooleanSetting.create(
-            "Disable Waypoint Set Change Tooltip",
-            "xaeroplus.setting.waypoint_set_change_tooltip",
-            false),
+        BooleanSetting.builder()
+            .name("Disable Waypoint Set Change Tooltip")
+            .translationKey("xaeroplus.setting.waypoint_set_change_tooltip")
+            .defaultValue(false)
+            .build(),
         SettingLocation.MINIMAP_WAYPOINTS);
     public final BooleanSetting useCustomCrossDimensionWaypointTeleportFormat = register(
-        BooleanSetting.create(
-            "Use Custom Cross-Dim Waypoint Teleport Format",
-            "xaeroplus.setting.use_custom_cross_dimension_waypoint_teleport_format",
-            false),
+        BooleanSetting.builder()
+            .name("Use Custom Cross-Dim Waypoint Teleport Format")
+            .translationKey("xaeroplus.setting.use_custom_cross_dimension_waypoint_teleport_format")
+            .defaultValue(false)
+            .build(),
         SettingLocation.MINIMAP_WAYPOINTS);
     public final StringSetting crossDimensionWaypointTeleportFormat = register(
-        StringSetting.create(
-            "Cross-Dim Waypoint Teleport Format",
-            "xaeroplus.setting.cross_dimension_waypoint_teleport_format",
-            "/execute as @s in {d} run tp {x} {y} {z}",
-            GuiMinimapWaypointTeleportCommandSettings::new,
-            useCustomCrossDimensionWaypointTeleportFormat::get),
+        StringSetting.builder()
+            .name("Cross-Dim Waypoint Teleport Format")
+            .translationKey("xaeroplus.setting.cross_dimension_waypoint_teleport_format")
+            .defaultValue("/execute as @s in {d} run tp {x} {y} {z}")
+            .screen(GuiMinimapWaypointTeleportCommandSettings::new)
+            .visibleWhen(useCustomCrossDimensionWaypointTeleportFormat::get)
+            .build(),
         SettingLocation.MINIMAP_WAYPOINTS);
     public final StringSetting crossDimensionWaypointTeleportRotationFormat = register(
-        StringSetting.create(
-            "Cross-Dim Waypoint Teleport Rotation Format",
-            "xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format",
-            "/execute as @s in {d} run tp {x} {y} {z} {yaw} ~",
-            GuiMinimapWaypointTeleportCommandSettings::new,
-            useCustomCrossDimensionWaypointTeleportFormat::get),
+        StringSetting.builder()
+            .name("Cross-Dim Waypoint Teleport Rotation Format")
+            .translationKey("xaeroplus.setting.cross_dimension_waypoint_teleport_rotation_format")
+            .defaultValue("/execute as @s in {d} run tp {x} {y} {z} {yaw} ~")
+            .screen(GuiMinimapWaypointTeleportCommandSettings::new)
+            .visibleWhen(useCustomCrossDimensionWaypointTeleportFormat::get)
+            .build(),
         SettingLocation.MINIMAP_WAYPOINTS);
 
     /**
@@ -1142,86 +1250,97 @@ public final class Settings extends SettingRegistry {
      */
 
     public final BooleanSetting switchToNetherSetting = register(
-        BooleanSetting.create(
-            "Switch to Nether",
-            "xaeroplus.keybind.switch_to_nether",
-            false,
-            true,
-            (b) -> Globals.switchToDimension(NETHER)),
+        BooleanSetting.builder()
+            .name("Switch to Nether")
+            .translationKey("xaeroplus.keybind.switch_to_nether")
+            .defaultValue(false)
+            .keybind()
+            .onChange((b) -> Globals.switchToDimension(NETHER))
+            .build(),
         SettingLocation.KEYBINDS);
     public final BooleanSetting switchToOverworldSetting = register(
-        BooleanSetting.create(
-            "Switch to Overworld",
-            "xaeroplus.keybind.switch_to_overworld",
-            false,
-            true,
-            (b) -> Globals.switchToDimension(OVERWORLD)),
+        BooleanSetting.builder()
+            .name("Switch to Overworld")
+            .translationKey("xaeroplus.keybind.switch_to_overworld")
+            .defaultValue(false)
+            .keybind()
+            .onChange((b) -> Globals.switchToDimension(OVERWORLD))
+            .build(),
         SettingLocation.KEYBINDS);
     public final BooleanSetting switchToEndSetting = register(
-        BooleanSetting.create(
-            "Switch to End",
-            "xaeroplus.keybind.switch_to_end",
-            false,
-            true,
-            (b) -> Globals.switchToDimension(END)),
+        BooleanSetting.builder()
+            .name("Switch to End")
+            .translationKey("xaeroplus.keybind.switch_to_end")
+            .defaultValue(false)
+            .keybind()
+            .onChange((b) -> Globals.switchToDimension(END))
+            .build(),
         SettingLocation.KEYBINDS);
     public final BooleanSetting switchWaypointsToNetherSetting = register(
-        BooleanSetting.create(
-            "Switch Waypoints to Nether",
-            "xaeroplus.keybind.switch_waypoints_to_nether",
-            false,
-            true,
-            (b) -> WaypointAPI.switchWaypointDimension(NETHER)),
+        BooleanSetting.builder()
+            .name("Switch Waypoints to Nether")
+            .translationKey("xaeroplus.keybind.switch_waypoints_to_nether")
+            .defaultValue(false)
+            .keybind()
+            .onChange((b) -> WaypointAPI.switchWaypointDimension(NETHER))
+            .build(),
         SettingLocation.KEYBINDS);
     public final BooleanSetting switchWaypointsToOverworldSetting = register(
-        BooleanSetting.create(
-            "Switch Waypoints to Overworld",
-            "xaeroplus.keybind.switch_waypoints_to_overworld",
-            false,
-            true,
-            (b) -> WaypointAPI.switchWaypointDimension(OVERWORLD)),
+        BooleanSetting.builder()
+            .name("Switch Waypoints to Overworld")
+            .translationKey("xaeroplus.keybind.switch_waypoints_to_overworld")
+            .defaultValue(false)
+            .keybind()
+            .onChange((b) -> WaypointAPI.switchWaypointDimension(OVERWORLD))
+            .build(),
         SettingLocation.KEYBINDS);
     public final BooleanSetting switchWaypointsToEndSetting = register(
-        BooleanSetting.create(
-            "Switch Waypoints to End",
-            "xaeroplus.keybind.switch_waypoints_to_end",
-            false,
-            true,
-            (b) -> WaypointAPI.switchWaypointDimension(END)),
+        BooleanSetting.builder()
+            .name("Switch Waypoints to End")
+            .translationKey("xaeroplus.keybind.switch_waypoints_to_end")
+            .defaultValue(false)
+            .keybind()
+            .onChange((b) -> WaypointAPI.switchWaypointDimension(END))
+            .build(),
         SettingLocation.KEYBINDS);
     public final BooleanSetting worldMapBaritoneGoalHereKeybindSetting = register(
-        BooleanSetting.create(
-            "WorldMap Baritone Goal Here",
-            "xaeroplus.keybind.world_map_baritone_goal_here",
-            false,
-            true),
+        BooleanSetting.builder()
+            .name("WorldMap Baritone Goal Here")
+            .translationKey("xaeroplus.keybind.world_map_baritone_goal_here")
+            .defaultValue(false)
+            .keybind()
+            .build(),
         SettingLocation.KEYBINDS);
     public final BooleanSetting worldMapBaritonePathHereKeybindSetting = register(
-        BooleanSetting.create(
-            "WorldMap Baritone Path Here",
-            "xaeroplus.keybind.world_map_baritone_path_here",
-            false,
-            true),
+        BooleanSetting.builder()
+            .name("WorldMap Baritone Path Here")
+            .translationKey("xaeroplus.keybind.world_map_baritone_path_here")
+            .defaultValue(false)
+            .keybind()
+            .build(),
         SettingLocation.KEYBINDS);
     public final BooleanSetting worldMapBaritoneElytraHereKeybindSetting = register(
-        BooleanSetting.create(
-            "WorldMap Baritone Elytra Here",
-            "xaeroplus.keybind.world_map_baritone_elytra_here",
-            false,
-            true),
+        BooleanSetting.builder()
+            .name("WorldMap Baritone Elytra Here")
+            .translationKey("xaeroplus.keybind.world_map_baritone_elytra_here")
+            .defaultValue(false)
+            .keybind()
+            .build(),
         SettingLocation.KEYBINDS);
     public final BooleanSetting worldMapToggleDrawingKeybindSetting = register(
-        BooleanSetting.create(
-            "WorldMap Toggle Drawing",
-            "xaeroplus.gui.world_map.start_drawing",
-            false,
-            true),
+        BooleanSetting.builder()
+            .name("WorldMap Toggle Drawing")
+            .translationKey("xaeroplus.gui.world_map.start_drawing")
+            .defaultValue(false)
+            .keybind()
+            .build(),
         SettingLocation.KEYBINDS);
     public final BooleanSetting worldMapRotateHereKeybindSetting = register(
-        BooleanSetting.create(
-            "WorldMap Rotate Here",
-            "xaeroplus.keybind.world_map_rotate_here",
-            false,
-            true),
+        BooleanSetting.builder()
+            .name("WorldMap Rotate Here")
+            .translationKey("xaeroplus.keybind.world_map_rotate_here")
+            .defaultValue(false)
+            .keybind()
+            .build(),
         SettingLocation.KEYBINDS);
 }

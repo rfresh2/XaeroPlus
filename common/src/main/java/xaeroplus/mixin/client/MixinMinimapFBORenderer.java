@@ -8,6 +8,7 @@ import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import com.mojang.blaze3d.GpuFormat;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
@@ -34,6 +35,7 @@ import xaero.hud.minimap.compass.render.CompassRenderer;
 import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.waypoint.render.WaypointMapRenderer;
 import xaero.lib.client.graphics.XaeroBufferProvider;
+import xaero.lib.client.graphics.XaeroRenderType;
 import xaeroplus.Globals;
 import xaeroplus.feature.extensions.CustomMinimapFBORenderer;
 import xaeroplus.feature.render.shaders.XaeroPlusShaders;
@@ -45,6 +47,8 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
     private ImprovedFramebuffer scalingFramebuffer;
     @Shadow
     private ImprovedFramebuffer rotationFramebuffer;
+    @Shadow
+    private PreparedRenderType.Texture scalingFramebufferNearestTAS;
     @Shadow
     private boolean loadedFBO;
 
@@ -76,6 +80,13 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             this.scalingFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, true, GpuFormat.RGBA8_UNORM);
             this.rotationFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, true, GpuFormat.RGBA8_UNORM);
             this.loadedFBO = this.scalingFramebuffer.getColorTexture() != null;
+            if (this.loadedFBO) {
+                this.scalingFramebuffer.setSampler(XaeroRenderType.getSimpleSampler(FilterMode.LINEAR));
+                this.scalingFramebufferNearestTAS = new PreparedRenderType.Texture(
+                    "Sampler0", this.scalingFramebuffer.getColorTextureView(), XaeroRenderType.getSimpleSampler(FilterMode.NEAREST)
+                );
+                this.rotationFramebuffer.setSampler(XaeroRenderType.getSimpleSampler(FilterMode.LINEAR));
+            }
         }
     }
 

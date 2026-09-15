@@ -760,9 +760,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         int len = Mth.floor(line.length());
         int dx = line.x2() - line.x1();
         int dz = line.z2() - line.z1();
-        MapRenderHelper.drawCenteredStringWithBackground(guiGraphics, font, len + " blocks [" + dx + " x " + dz + "]", scaledMouseX, scaledMouseY - font.lineHeight, -1, 0.0f, 0.0f, 0.0f, 0.4f);
+        MapRenderHelper.drawCenteredStringWithBackground(guiGraphics, font, len + " blocks [" + dx + " x " + dz + "]", scaledMouseX, scaledMouseY - font.lineHeight, ColorHelper.getColor(255, 255, 255, 255), 0.0f, 0.0f, 0.0f, 0.4f);
         var degreeStr = String.format("%.2f", line.angle());
-        MapRenderHelper.drawCenteredStringWithBackground(guiGraphics, font, degreeStr + "°", scaledMouseX, scaledMouseY + font.lineHeight, -1, 0.0f, 0.0f, 0.0f, 0.4f);
+        MapRenderHelper.drawCenteredStringWithBackground(guiGraphics, font, degreeStr + "°", scaledMouseX, scaledMouseY + font.lineHeight, ColorHelper.getColor(255, 255, 255, 255), 0.0f, 0.0f, 0.0f, 0.4f);
     }
 
     @Unique
@@ -1037,7 +1037,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         if (sideLen <= 1 && heightLen <= 1) return;
         // todo: it'd be better if we could render this directly on the highlight
         //  but we need a function for map -> screen coordinates translation
-        MapRenderHelper.drawCenteredStringWithBackground(guiGraphics, font, sideLen + " x " + heightLen, scaledMouseX, scaledMouseY - font.lineHeight, -1, 0.0f, 0.0f, 0.0f, 0.4f);
+        MapRenderHelper.drawCenteredStringWithBackground(guiGraphics, font, sideLen + " x " + heightLen, scaledMouseX, scaledMouseY - font.lineHeight, ColorHelper.getColor(255, 255, 255, 255), 0.0f, 0.0f, 0.0f, 0.4f);
     }
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true, remap = true)

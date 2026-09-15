@@ -1,5 +1,6 @@
 package xaeroplus.feature.drawing;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -11,7 +12,6 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
-import org.lwjgl.sdl.SDLKeycode;
 import xaeroplus.util.Color;
 import xaeroplus.util.ColorHelper;
 
@@ -459,7 +459,7 @@ public class ColorPickerWidget extends AbstractWidget {
     public boolean keyPressed(KeyEvent event) {
         var focusedEntry = focusedEntry();
         if (focusedEntry == null) return false;
-        if (event.key() == SDLKeycode.SDLK_TAB) {
+        if (event.key() == InputConstants.KEY_TAB) {
             var direction = event.hasShiftDown() ? -1 : 1;
             var nextIndex = Math.floorMod(indexOf(focusedEntry) + direction, colorEntryBoxes.length);
             focusEntry(colorEntryBoxes[nextIndex]);

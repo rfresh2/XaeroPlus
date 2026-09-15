@@ -32,9 +32,6 @@ import net.minecraft.world.level.Level;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.joml.Vector4fc;
-import org.lwjgl.sdl.SDLKeycode;
-import org.lwjgl.sdl.SDLMouse;
-import org.lwjgl.sdl.SDLScancode;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -823,7 +820,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             cir.setReturnValue(true);
             return;
         }
-        if (colorPickerActive && (event.button() == SDLMouse.SDL_BUTTON_LEFT || event.button() == SDLMouse.SDL_BUTTON_RIGHT)) {
+        if (colorPickerActive && (event.button() == InputConstants.MOUSE_BUTTON_LEFT || event.button() == InputConstants.MOUSE_BUTTON_RIGHT)) {
             if (drawColorPicker.isMouseOver(event.x(), event.y())) {
                 cir.setReturnValue(true);
                 return;
@@ -831,7 +828,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
                 drawColorPicker.clickedOutside();
             }
         }
-        if (event.button() == SDLMouse.SDL_BUTTON_LEFT) { // start drawing on left click
+        if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) { // start drawing on left click
             drawingLeftClickDown = true;
             switch (drawingMode) {
                 case LINE_SEGMENT, INFINITE_LINE, ELLIPSE, TEXT, MEASUREMENT -> {
@@ -856,7 +853,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             }
             ModuleManager.getModule(Drawing.class).startOperation(Globals.getCurrentDimensionId(), false);
             cir.setReturnValue(true);
-        } else if (event.button() == SDLMouse.SDL_BUTTON_RIGHT) {
+        } else if (event.button() == InputConstants.MOUSE_BUTTON_RIGHT) {
             drawingRightClickDown = true;
             ModuleManager.getModule(Drawing.class).startOperation(Globals.getCurrentDimensionId(), true);
             cir.setReturnValue(true);
@@ -866,7 +863,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Inject(method = "mouseReleased", at = @At("HEAD"), cancellable = true, remap = true)
     public void drawingClickReleasedHandler(final MouseButtonEvent event, final CallbackInfoReturnable<Boolean> cir) {
         if (!drawing) return;
-        if (colorPickerActive && (event.button() == SDLMouse.SDL_BUTTON_LEFT || event.button() == SDLMouse.SDL_BUTTON_RIGHT) && drawColorPicker.isMouseOver(event.x(), event.y())) {
+        if (colorPickerActive && (event.button() == InputConstants.MOUSE_BUTTON_LEFT || event.button() == InputConstants.MOUSE_BUTTON_RIGHT) && drawColorPicker.isMouseOver(event.x(), event.y())) {
             drawingLeftClickDown = false;
             drawingRightClickDown = false;
             drawInProgressPos = null;
@@ -876,7 +873,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             cir.setReturnValue(true);
             return;
         }
-        if (event.button() == SDLMouse.SDL_BUTTON_LEFT) { // stop drawing on left click release
+        if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) { // stop drawing on left click release
             switch (drawingMode) {
                 case LINE_SEGMENT, INFINITE_LINE -> {
                     if (drawInProgressPos != null) {
@@ -915,7 +912,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             }
             drawingLeftClickDown = false;
             cir.setReturnValue(true);
-        } else if (event.button() == SDLMouse.SDL_BUTTON_RIGHT) { // clear drawing on right click
+        } else if (event.button() == InputConstants.MOUSE_BUTTON_RIGHT) { // clear drawing on right click
             drawingRightClickDown = false;
             if (drawInProgressPos != null) return;
             ModuleManager.getModule(Drawing.class).removeLine(mouseBlockPosX, mouseBlockPosZ);
@@ -960,7 +957,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "keyPressed", at = @At("RETURN"), remap = true)
     public void xaeroplus$drawingModeUndo(final KeyEvent event, final CallbackInfoReturnable<Boolean> cir) {
-        if (event.hasControlDown() && event.key() == SDLKeycode.SDLK_Z) {
+        if (event.hasControlDown() && event.key() == InputConstants.KEY_Z) {
             ModuleManager.getModule(Drawing.class).undoLastOperation();
         }
     }
@@ -968,7 +965,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Inject(method = "onInputPress", at = @At("HEAD"))
     public void panMouseButtonClick(final InputConstants.Type type, final int code, final CallbackInfoReturnable<Boolean> cir) {
         if (type != InputConstants.Type.MOUSE) return;
-        if (code != SDLMouse.SDL_BUTTON_MIDDLE) return;
+        if (code != InputConstants.MOUSE_BUTTON_MIDDLE) return;
         if (!Settings.REGISTRY.worldMapUIAdditions.get()) return;
         pan = true;
         var mc = Minecraft.getInstance();
@@ -979,13 +976,13 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Inject(method = "onInputRelease", at = @At("HEAD"), cancellable = true)
     public void panMouseButtonRelease(final InputConstants.Type type, final int code, final CallbackInfoReturnable<Boolean> cir) {
         if (drawing) {
-            if (type == InputConstants.Type.KEYBOARD && code == SDLScancode.SDL_SCANCODE_ESCAPE) {
+            if (type == InputConstants.Type.KEYBOARD && code == InputConstants.KEY_ESCAPE) {
                 xaeroPlus$stopDrawing();
                 cir.setReturnValue(true);
                 return;
             }
             if (drawTextEntryActive) {
-                if (type == InputConstants.Type.KEYBOARD && code == SDLScancode.SDL_SCANCODE_RETURN) {
+                if (type == InputConstants.Type.KEYBOARD && code == InputConstants.KEY_RETURN) {
                     String value = drawTextEntryField.getValue();
                     if (!value.isEmpty()) {
                         var text = new Text(value, drawInProgressPos.getX(), drawInProgressPos.getZ(), ColorHelper.getColor(255, 255, 255, 255), 1f);
@@ -999,7 +996,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             }
         }
         if (type != InputConstants.Type.MOUSE) return;
-        if (code != SDLMouse.SDL_BUTTON_MIDDLE) return;
+        if (code != InputConstants.MOUSE_BUTTON_MIDDLE) return;
         pan = false;
     }
 

@@ -8,6 +8,7 @@ import xaeroplus.XaeroPlus;
 import xaeroplus.feature.extensions.IXaeroPlusSettingEntry;
 import xaeroplus.feature.extensions.XaeroPlusCustomSettingEntry;
 
+import java.util.Objects;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleConsumer;
 
@@ -19,6 +20,72 @@ public class DoubleSetting extends XaeroPlusSetting {
     private final double valueStep;
     private double value;
     private DoubleConsumer settingChangeConsumer;
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static final class Builder {
+        private String settingName;
+        private String settingNameTranslationKey;
+        private Double valueMin;
+        private Double valueMax;
+        private Double valueStep;
+        private Double defaultValue;
+        private DoubleConsumer settingChangeConsumer;
+        private BooleanSupplier visibilitySupplier;
+
+        private Builder() {}
+
+        public Builder name(String settingName) {
+            this.settingName = Objects.requireNonNull(settingName, "settingName");
+            return this;
+        }
+
+        public Builder translationKey(String settingNameTranslationKey) {
+            this.settingNameTranslationKey = Objects.requireNonNull(settingNameTranslationKey, "settingNameTranslationKey");
+            return this;
+        }
+
+        public Builder range(double valueMin, double valueMax, double valueStep) {
+            this.valueMin = valueMin;
+            this.valueMax = valueMax;
+            this.valueStep = valueStep;
+            return this;
+        }
+
+        public Builder defaultValue(double defaultValue) {
+            this.defaultValue = defaultValue;
+            return this;
+        }
+
+        public Builder onChange(DoubleConsumer settingChangeConsumer) {
+            this.settingChangeConsumer = Objects.requireNonNull(settingChangeConsumer, "settingChangeConsumer");
+            return this;
+        }
+
+        public Builder visibleWhen(BooleanSupplier visibilitySupplier) {
+            this.visibilitySupplier = Objects.requireNonNull(visibilitySupplier, "visibilitySupplier");
+            return this;
+        }
+
+        public DoubleSetting build() {
+            var name = Objects.requireNonNull(settingName, "settingName");
+            var translationKey = Objects.requireNonNull(settingNameTranslationKey, "settingNameTranslationKey");
+            return new DoubleSetting(
+                SETTING_PREFIX + name,
+                translationKey,
+                buildTooltipTranslationKey(translationKey),
+                null,
+                Objects.requireNonNull(valueMin, "valueMin"),
+                Objects.requireNonNull(valueMax, "valueMax"),
+                Objects.requireNonNull(valueStep, "valueStep"),
+                Objects.requireNonNull(defaultValue, "defaultValue"),
+                settingChangeConsumer,
+                visibilitySupplier
+            );
+        }
+    }
 
     private DoubleSetting(final String settingName,
                           final String settingNameTranslationKey,
@@ -36,70 +103,6 @@ public class DoubleSetting extends XaeroPlusSetting {
         this.valueStep = valueStep;
         this.value = defaultValue;
         this.settingChangeConsumer = settingChangeConsumer;
-    }
-
-    public static DoubleSetting create(String settingName,
-                                       String settingNameTranslationKey,
-                                       double valueMin,
-                                       double valueMax,
-                                       double valueStep,
-                                       double defaultValue) {
-        return new DoubleSetting(
-            SETTING_PREFIX + settingName,
-            settingNameTranslationKey,
-            buildTooltipTranslationKey(settingNameTranslationKey),
-            null,
-            valueMin, valueMax, valueStep, defaultValue, null, null
-        );
-    }
-
-    public static DoubleSetting create(String settingName,
-                                       String settingNameTranslationKey,
-                                       double valueMin,
-                                       double valueMax,
-                                       double valueStep,
-                                       double defaultValue,
-                                       DoubleConsumer changeConsumer) {
-        return new DoubleSetting(
-            SETTING_PREFIX + settingName,
-            settingNameTranslationKey,
-            buildTooltipTranslationKey(settingNameTranslationKey),
-            null,
-            valueMin, valueMax, valueStep, defaultValue, changeConsumer, null
-        );
-    }
-
-    public static DoubleSetting create(String settingName,
-                                       String settingNameTranslationKey,
-                                       double valueMin,
-                                       double valueMax,
-                                       double valueStep,
-                                       double defaultValue,
-                                       BooleanSupplier visibilitySupplier) {
-        return new DoubleSetting(
-            SETTING_PREFIX + settingName,
-            settingNameTranslationKey,
-            buildTooltipTranslationKey(settingNameTranslationKey),
-            null,
-            valueMin, valueMax, valueStep, defaultValue, null, visibilitySupplier
-        );
-    }
-
-    public static DoubleSetting create(String settingName,
-                                       String settingNameTranslationKey,
-                                       double valueMin,
-                                       double valueMax,
-                                       double valueStep,
-                                       double defaultValue,
-                                       DoubleConsumer changeConsumer,
-                                       BooleanSupplier visibilitySupplier) {
-        return new DoubleSetting(
-            SETTING_PREFIX + settingName,
-            settingNameTranslationKey,
-            buildTooltipTranslationKey(settingNameTranslationKey),
-            null,
-            valueMin, valueMax, valueStep, defaultValue, changeConsumer, visibilitySupplier
-        );
     }
 
     @Override

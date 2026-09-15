@@ -1,14 +1,15 @@
 #version 330
+#extension GL_ARB_separate_shader_objects : require
 
-#moj_import <xaeroplus:lines_include.glsl>
+#include <xaeroplus:lines_include.glsl>
 
-in vec3 Position;
-in vec4 Color;
-in vec2 UV0;
+layout(location = 0) in vec3 Position;
+layout(location = 1) in vec4 Color;
+layout(location = 2) in vec2 UV0;
 
-out vec4 vertexColor;
-out vec2 segmentLocalPx;
-out float segmentLengthPx;
+layout(location = 0) out vec4 vertexColor;
+layout(location = 1) out vec2 segmentLocalPx;
+layout(location = 2) out float segmentLengthPx;
 
 void main() {
 	// can be tuned: higher radius = softer edges
@@ -17,7 +18,7 @@ void main() {
     // Vertex packing contract:
     // - Position.xy: segment start relative to the buffer's block origin
     // - UV0.xy: segment end relative to the buffer's block origin
-    // - gl_VertexID % 4: logical quad corner selector
+    // - gl_VertexIndex % 4: logical quad corner selector
     vec2 startRelative = Position.xy + CameraRelativeOrigin;
     vec2 endRelative = UV0 + CameraRelativeOrigin;
     vec4 startPos = ProjMat * ModelViewMat * MapViewMatrix * vec4(startRelative, Position.z, 1.0);
@@ -37,9 +38,9 @@ void main() {
     float expandPx = halfWidthPx + aaRadiusPx;
     float lineLength = 0.5 * lineLengthDoubledPx;
 
-    // In this indexed QUADS path, gl_VertexID is the element index value.
+    // In this indexed QUADS path, gl_VertexIndex is the element index value.
     // Indices are emitted as 0,1,2,2,3,0 so `% 4` recovers the logical quad corner.
-    int corner = gl_VertexID % 4;
+    int corner = gl_VertexIndex % 4;
     bool isStart = corner == 0 || corner == 3;
     bool isTop = corner == 0 || corner == 1;
     float endpointT = isStart ? 0.0 : 1.0;

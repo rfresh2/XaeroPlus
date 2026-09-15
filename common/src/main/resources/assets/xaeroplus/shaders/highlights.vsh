@@ -1,7 +1,9 @@
 #version 330
-#moj_import <xaeroplus:highlights_include.glsl>
+#extension GL_ARB_separate_shader_objects : require
 
-in vec3 Position;
+#include <xaeroplus:highlights_include.glsl>
+
+layout(location = 0) in vec3 Position;
 
 void main() {
     // Subtract in chunk space before converting to blocks so large common coordinates cancel exactly.

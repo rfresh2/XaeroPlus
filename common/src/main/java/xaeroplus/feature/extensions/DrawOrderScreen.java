@@ -8,7 +8,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLMouse;
 import xaero.map.gui.ScreenSwitchSettingEntry;
 import xaeroplus.module.impl.TickTaskExecutor;
 import xaeroplus.settings.SettingHooks;
@@ -258,7 +258,7 @@ public class DrawOrderScreen extends Screen {
 
         @Override
         public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-            if (event.button() == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+            if (event.button() == SDLMouse.SDL_BUTTON_LEFT) {
                 drawFeatureList.dragging = false;
                 drawFeatureList.dragged = index;
                 drawFeatureList.draggedOffsetX = (int) (lastRenderX - event.x());

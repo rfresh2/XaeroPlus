@@ -1,7 +1,7 @@
 package xaeroplus.feature.render.ellipse;
 
-import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.Std140SizeCalculator;
+import com.mojang.renderpearl.api.buffers.GpuBuffer;
 import net.minecraft.client.renderer.MappableRingBuffer;
 import org.jetbrains.annotations.Nullable;
 import xaeroplus.feature.render.DrawContext;

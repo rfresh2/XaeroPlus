@@ -11,7 +11,7 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLKeycode;
 import xaeroplus.util.Color;
 import xaeroplus.util.ColorHelper;
 
@@ -459,7 +459,7 @@ public class ColorPickerWidget extends AbstractWidget {
     public boolean keyPressed(KeyEvent event) {
         var focusedEntry = focusedEntry();
         if (focusedEntry == null) return false;
-        if (event.key() == GLFW.GLFW_KEY_TAB) {
+        if (event.key() == SDLKeycode.SDLK_TAB) {
             var direction = event.hasShiftDown() ? -1 : 1;
             var nextIndex = Math.floorMod(indexOf(focusedEntry) + direction, colorEntryBoxes.length);
             focusEntry(colorEntryBoxes[nextIndex]);

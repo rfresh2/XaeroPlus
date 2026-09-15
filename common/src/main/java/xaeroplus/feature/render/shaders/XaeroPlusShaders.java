@@ -1,18 +1,12 @@
 package xaeroplus.feature.render.shaders;
 
-import com.mojang.blaze3d.PrimitiveTopology;
-import com.mojang.blaze3d.pipeline.*;
-import com.mojang.blaze3d.platform.BlendFactor;
-import com.mojang.blaze3d.platform.CompareOp;
-import com.mojang.blaze3d.platform.PolygonMode;
-import com.mojang.blaze3d.shaders.UniformType;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.AddressMode;
-import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.renderpearl.api.pipeline.*;
+import com.mojang.renderpearl.api.textures.AddressMode;
+import com.mojang.renderpearl.api.textures.FilterMode;
 import net.minecraft.client.renderer.BindGroupLayouts;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.rendertype.OutputTarget;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
@@ -28,7 +22,8 @@ import java.util.OptionalDouble;
 public class XaeroPlusShaders {
     public static final RenderPipeline HIGHLIGHT_PIPELINE = RenderPipeline.builder()
         .withBindGroupLayout(BindGroupLayouts.GLOBALS)
-        .withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION)
+        .withBindGroupLayout(BindGroupLayouts.PROJECTION)
+        .withBindGroupLayout(BindGroupLayouts.DYNAMIC_TRANSFORMS)
         .withBindGroupLayout(BindGroupLayout.builder().withUniform("HighlightTransforms", UniformType.UNIFORM_BUFFER).build())
         .withLocation(Identifier.fromNamespaceAndPath("xaeroplus", "pipeline/highlights"))
         .withVertexShader(Identifier.fromNamespaceAndPath("xaeroplus", "highlights"))
@@ -41,7 +36,8 @@ public class XaeroPlusShaders {
 
     public static final RenderPipeline MULTI_COLOR_HIGHLIGHT_PIPELINE = RenderPipeline.builder()
         .withBindGroupLayout(BindGroupLayouts.GLOBALS)
-        .withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION)
+        .withBindGroupLayout(BindGroupLayouts.PROJECTION)
+        .withBindGroupLayout(BindGroupLayouts.DYNAMIC_TRANSFORMS)
         .withBindGroupLayout(BindGroupLayout.builder().withUniform("MultiColorHighlightTransforms", UniformType.UNIFORM_BUFFER).build())
         .withLocation(Identifier.fromNamespaceAndPath("xaeroplus", "pipeline/multi_color_highlights"))
         .withVertexShader(Identifier.fromNamespaceAndPath("xaeroplus", "multi_color_highlights"))
@@ -54,7 +50,8 @@ public class XaeroPlusShaders {
 
     public static final RenderPipeline LINES_PIPELINE = RenderPipeline.builder()
         .withBindGroupLayout(BindGroupLayouts.GLOBALS)
-        .withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION)
+        .withBindGroupLayout(BindGroupLayouts.PROJECTION)
+        .withBindGroupLayout(BindGroupLayouts.DYNAMIC_TRANSFORMS)
         .withBindGroupLayout(BindGroupLayout.builder().withUniform("LinesTransforms", UniformType.UNIFORM_BUFFER).build())
         .withLocation(Identifier.fromNamespaceAndPath("xaeroplus", "pipeline/lines"))
         .withVertexShader(Identifier.fromNamespaceAndPath("xaeroplus", "lines"))
@@ -68,7 +65,8 @@ public class XaeroPlusShaders {
 
     public static final RenderPipeline ELLIPSES_PIPELINE = RenderPipeline.builder()
         .withBindGroupLayout(BindGroupLayouts.GLOBALS)
-        .withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION)
+        .withBindGroupLayout(BindGroupLayouts.PROJECTION)
+        .withBindGroupLayout(BindGroupLayouts.DYNAMIC_TRANSFORMS)
         .withBindGroupLayout(BindGroupLayout.builder().withUniform("EllipsesTransforms", UniformType.UNIFORM_BUFFER).build())
         .withLocation(Identifier.fromNamespaceAndPath("xaeroplus", "pipeline/ellipses"))
         .withVertexShader(Identifier.fromNamespaceAndPath("xaeroplus", "ellipses"))
@@ -117,6 +115,7 @@ public class XaeroPlusShaders {
         .withVertexShader("core/text")
         .withFragmentShader("core/text")
         .withCull(false)
+        .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
         .build();
 
     public static final RenderType TEXT_NO_CULL = XaeroRenderType.createRenderType(
@@ -125,7 +124,7 @@ public class XaeroPlusShaders {
             // todo: does this need to change when language/font is switched?
             .withTexture("Sampler0", Identifier.withDefaultNamespace("default/0"))
             .useLightmap()
-            .setOutputTarget(OutputTarget.MAIN_TARGET));
+    );
 
     public static final RenderPipeline CUSTOM_MAP_RP = RenderPipeline.builder()
         .withBindGroupLayout(
@@ -138,7 +137,7 @@ public class XaeroPlusShaders {
         .withPrimitiveTopology(PrimitiveTopology.QUADS)
         .withBindGroupLayout(
             BindGroupLayout.builder()
-                .withSampler("Sampler0")
+                .withUniform("Sampler0", UniformType.COMBINED_IMAGE_SAMPLER)
                 .withUniform(BuiltInCustomUniforms.BRIGHTNESS.name(), BuiltInCustomUniforms.BRIGHTNESS.type())
                 .withUniform(BuiltInCustomUniforms.WITH_LIGHT.name(), BuiltInCustomUniforms.WITH_LIGHT.type())
                 .withUniform(XaeroPlusShaders.TRANSPARENT_WM_BACKGROUND_UNIFORM.name(), XaeroPlusShaders.TRANSPARENT_WM_BACKGROUND_UNIFORM.type())
@@ -153,7 +152,6 @@ public class XaeroPlusShaders {
         "xaeroplus_custom_map",
         RenderSetup.builder(CUSTOM_MAP_RP)
             .withTexture("Sampler0", WorldMap.guiTextures, () -> RenderSystem.getDevice().createSampler(AddressMode.CLAMP_TO_EDGE, AddressMode.CLAMP_TO_EDGE, FilterMode.LINEAR, FilterMode.NEAREST, 1, OptionalDouble.of(1.0)))
-            .setOutputTarget(OutputTarget.MAIN_TARGET)
     );
 
     public static final RenderPipeline CUSTOM_MAP_FRAME_RP = RenderPipeline.builder()
@@ -164,7 +162,9 @@ public class XaeroPlusShaders {
         .withFragmentShader(LibShaders.POSITION_COLOR_TEX)
         .withVertexBinding(0, XaeroRenderType.POSITION_COLOR_TEX)
         .withPrimitiveTopology(PrimitiveTopology.QUADS)
-        .withBindGroupLayout(BindGroupLayout.builder().withSampler("Sampler0").build())
+        .withBindGroupLayout(BindGroupLayout.builder()
+            .withUniform("Sampler0", UniformType.COMBINED_IMAGE_SAMPLER)
+            .build())
         .withLocation(Identifier.fromNamespaceAndPath("xaeroplus", "pipeline/custom_map_frame"))
         .withColorTargetState(new ColorTargetState(new BlendFunction(BlendFactor.ONE, BlendFactor.ZERO, BlendFactor.ONE, BlendFactor.ZERO)))
         .withCull(false)
@@ -176,6 +176,5 @@ public class XaeroPlusShaders {
         RenderSetup.builder(CUSTOM_MAP_FRAME_RP)
             .withTexture("Sampler0", WorldMap.guiTextures, () -> RenderSystem.getDevice()
                 .createSampler(AddressMode.CLAMP_TO_EDGE, AddressMode.CLAMP_TO_EDGE, FilterMode.LINEAR, FilterMode.LINEAR, 1, OptionalDouble.of(1.0)))
-            .setOutputTarget(OutputTarget.MAIN_TARGET)
     );
 }

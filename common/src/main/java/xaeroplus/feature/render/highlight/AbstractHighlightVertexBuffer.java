@@ -1,7 +1,7 @@
 package xaeroplus.feature.render.highlight;
 
-import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.Std140SizeCalculator;
+import com.mojang.renderpearl.api.buffers.GpuBuffer;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import net.minecraft.client.renderer.MappableRingBuffer;
 import org.jetbrains.annotations.Nullable;

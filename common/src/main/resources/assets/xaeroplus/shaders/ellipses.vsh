@@ -1,14 +1,15 @@
-#version 150
+#version 330
+#extension GL_ARB_separate_shader_objects : require
 
-#moj_import <xaeroplus:ellipses_include.glsl>
+#include <xaeroplus:ellipses_include.glsl>
 
-in vec3 Position;
-in vec4 Color;
-in vec2 UV0;
+layout(location = 0) in vec3 Position;
+layout(location = 1) in vec4 Color;
+layout(location = 2) in vec2 UV0;
 
-out vec4 vertexColor;
-out vec2 ellipseLocalPx;
-out vec2 ellipseRadiiPx;
+layout(location = 0) out vec4 vertexColor;
+layout(location = 1) out vec2 ellipseLocalPx;
+layout(location = 2) out vec2 ellipseRadiiPx;
 
 void main() {
     const float aaRadiusPx = 1.0;
@@ -16,7 +17,7 @@ void main() {
     // Vertex packing contract:
     // - Position.xy: center relative to the buffer's block origin
     // - UV0.xy: X/Z radii in blocks
-    // - gl_VertexID % 4: logical quad corner selector
+    // - gl_VertexIndex % 4: logical quad corner selector
     vec2 centerRelative = Position.xy + CameraRelativeOrigin;
     vec4 centerPos = ProjMat * ModelViewMat * MapViewMatrix * vec4(centerRelative, Position.z, 1.0);
     vec4 xRadiusPos = ProjMat * ModelViewMat * MapViewMatrix
@@ -36,7 +37,7 @@ void main() {
     vec2 xDirection = length(xAxisDoubledPx) > 0.0001 ? normalize(xAxisDoubledPx) : vec2(1.0, 0.0);
     vec2 zDirection = length(zAxisDoubledPx) > 0.0001 ? normalize(zAxisDoubledPx) : vec2(0.0, 1.0);
 
-    int corner = gl_VertexID % 4;
+    int corner = gl_VertexIndex % 4;
     float xSign = corner == 0 || corner == 3 ? -1.0 : 1.0;
     float zSign = corner == 0 || corner == 1 ? 1.0 : -1.0;
     float expansionPx = 0.5 * LineWidth + aaRadiusPx;

@@ -1,12 +1,13 @@
-#version 150
+#version 330
+#extension GL_ARB_separate_shader_objects : require
 
-#moj_import <xaeroplus:ellipses_include.glsl>
+#include <xaeroplus:ellipses_include.glsl>
 
-in vec4 vertexColor;
-in vec2 ellipseLocalPx;
-in vec2 ellipseRadiiPx;
+layout(location = 0) in vec4 vertexColor;
+layout(location = 1) in vec2 ellipseLocalPx;
+layout(location = 2) in vec2 ellipseRadiiPx;
 
-out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
 
 float ellipseSignedDistance(vec2 point, vec2 radii) {
     // This approximation is exact for circles and at the ellipse boundary. Keeping the signed

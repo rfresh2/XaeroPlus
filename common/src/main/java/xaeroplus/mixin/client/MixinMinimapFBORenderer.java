@@ -6,11 +6,11 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
-import com.mojang.blaze3d.GpuFormat;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.renderpearl.api.GpuFormat;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.textures.FilterMode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.rendertype.PreparedRenderType;
 import org.joml.Matrix4f;
@@ -77,13 +77,14 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
             if (this.rotationFramebuffer != null)
                 this.rotationFramebuffer.destroyBuffers();
             final int scaledSize = Globals.minimapScaleMultiplier * 512;
-            this.scalingFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, true, GpuFormat.RGBA8_UNORM);
-            this.rotationFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, true, GpuFormat.RGBA8_UNORM);
+            this.scalingFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, GpuFormat.RGBA8_UNORM, GpuFormat.D32_FLOAT);
+            this.rotationFramebuffer = new ImprovedFramebuffer(scaledSize, scaledSize, GpuFormat.RGBA8_UNORM, GpuFormat.D32_FLOAT);
             this.loadedFBO = this.scalingFramebuffer.getColorTexture() != null;
             if (this.loadedFBO) {
                 this.scalingFramebuffer.setSampler(XaeroRenderType.getSimpleSampler(FilterMode.LINEAR));
                 this.scalingFramebufferNearestTAS = new PreparedRenderType.Texture(
-                    "Sampler0", this.scalingFramebuffer.getColorTextureView(), XaeroRenderType.getSimpleSampler(FilterMode.NEAREST)
+                    "Sampler0", this.scalingFramebuffer.getColorTextureView(), XaeroRenderType.getSimpleSampler(
+                    FilterMode.NEAREST)
                 );
                 this.rotationFramebuffer.setSampler(XaeroRenderType.getSimpleSampler(FilterMode.LINEAR));
             }
@@ -158,7 +159,7 @@ public abstract class MixinMinimapFBORenderer extends MinimapRenderer implements
 
     @WrapOperation(method = "renderChunksToFBO", at = @At(
         value = "INVOKE",
-        target = "Lxaero/lib/client/graphics/util/ImmediateRenderUtil;texturedRect(Lcom/mojang/blaze3d/vertex/PoseStack;FFIIFFFFLcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/client/renderer/rendertype/PreparedRenderType$Texture;)V",
+        target = "Lxaero/lib/client/graphics/util/ImmediateRenderUtil;texturedRect(Lcom/mojang/blaze3d/vertex/PoseStack;FFIIFFFFLcom/mojang/renderpearl/api/pipeline/RenderPipeline;Lnet/minecraft/client/renderer/rendertype/PreparedRenderType$Texture;)V",
         ordinal = 0
     ), slice = @Slice(
         from = @At(

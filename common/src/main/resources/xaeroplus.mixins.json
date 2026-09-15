@@ -47,6 +47,7 @@
     "MixinMinimapConfigClientUtils",
     "MixinMinimapFBORenderer",
     "MixinMinimapModuleRenderer",
+    "MixinMinimapPipRenderer",
     "MixinMinimapRenderer",
     "MixinMinimapViewSettings",
     "MixinMinimapWorldManagerIO",
@@ -68,11 +69,10 @@
     "MixinWMBuiltInCustomUniforms",
     "MixinWorldDataReader",
     "MixinWorldMapInternet",
-    "mc.MixinBedBlock",
+    "mc.MixinAbstractBedBlock",
     "mc.MixinBufferBuilder",
     "mc.MixinClientPlayNetworkHandler",
     "mc.MixinMinecraft",
-    "mc.MixinPictureInPictureRenderer",
     "mc.MixinRespawnAnchor"
   ]
 }

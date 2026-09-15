@@ -1,17 +1,17 @@
 package xaeroplus.feature.render.line;
 
-import com.mojang.blaze3d.PrimitiveTopology;
-import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.Std140Builder;
-import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.renderpearl.api.buffers.GpuBuffer;
+import com.mojang.renderpearl.api.commands.RenderPass;
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.DynamicUniforms;
+import net.minecraft.client.renderer.DynamicGpuData;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -95,7 +95,7 @@ public class MultiColorLineVertexBuffer extends AbstractLineVertexBuffer<Object2
         }
         dynamicTransformUniformBuffer.rotate();
         try (var mappedView = dynamicTransformUniformBuffer.currentBuffer().map(false, true)) {
-            var transform = new DynamicUniforms.Transform(RenderSystem.getModelViewStack(), new Vector4f(1.0f, 1.0f, 1.0f, 1.0f), new Vector3f(), new Matrix4f());
+            var transform = new DynamicGpuData.Transform(RenderSystem.getModelViewStack(), new Vector4f(1.0f, 1.0f, 1.0f, 1.0f), new Vector3f(), new Matrix4f());
             transform.write(mappedView.data());
         }
         var autoIndexBuffer = RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS);
@@ -103,7 +103,7 @@ public class MultiColorLineVertexBuffer extends AbstractLineVertexBuffer<Object2
         var indexBuffer = autoIndexBuffer.getBuffer(indexCount);
         try (final RenderPass pass = RenderSystem.getDevice().createCommandEncoder()
             .createRenderPass(() -> "XaeroPlus Lines",  Minecraft.getInstance().gameRenderer.mainRenderTarget().getColorTextureView(), Optional.empty())) {
-            pass.setPipeline(XaeroPlusShaders.LINES_PIPELINE);
+            pass.setPipeline(RenderSystem.getCompiledPipeline(XaeroPlusShaders.LINES_PIPELINE));
             RenderSystem.bindDefaultUniforms(pass);
             pass.setUniform("DynamicTransforms", dynamicTransformUniformBuffer.currentBuffer());
             pass.setUniform("LinesTransforms", uniformBuffer.currentBuffer());

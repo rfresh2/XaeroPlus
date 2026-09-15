@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  MINECRAFT_VERSION: "26.2"
+  MINECRAFT_VERSION: "26.3"
 
 jobs:
   build:

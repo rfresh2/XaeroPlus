@@ -1,5 +1,5 @@
-#moj_import <minecraft:projection.glsl>
-#moj_import <minecraft:dynamictransforms.glsl>
+#include <minecraft:projection.glsl>
+#include <minecraft:dynamictransforms.glsl>
 
 layout(std140) uniform EllipsesTransforms {
     mat4 MapViewMatrix;

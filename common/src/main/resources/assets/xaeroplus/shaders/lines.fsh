@@ -1,12 +1,13 @@
 #version 330
+#extension GL_ARB_separate_shader_objects : require
 
-#moj_import <xaeroplus:lines_include.glsl>
+#include <xaeroplus:lines_include.glsl>
 
-in vec4 vertexColor;
-in vec2 segmentLocalPx;
-in float segmentLengthPx;
+layout(location = 0) in vec4 vertexColor;
+layout(location = 1) in vec2 segmentLocalPx;
+layout(location = 2) in float segmentLengthPx;
 
-out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
 
 void main() {
     // can be tuned: higher radius = softer edges

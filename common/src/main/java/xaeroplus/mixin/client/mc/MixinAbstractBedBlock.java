@@ -5,7 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BedBlock;
+import net.minecraft.world.level.block.AbstractBedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,8 +17,8 @@ import xaeroplus.event.RespawnPointSetEvent;
 
 import static net.minecraft.world.level.block.BedBlock.OCCUPIED;
 
-@Mixin(BedBlock.class)
-public abstract class MixinBedBlock {
+@Mixin(AbstractBedBlock.class)
+public abstract class MixinAbstractBedBlock {
     @Inject(method = "useWithoutItem", at = @At("HEAD"))
     public void checkBedSpawnPointSet(final BlockState state, final Level level, final BlockPos pos, final Player player, final BlockHitResult hitResult, final CallbackInfoReturnable<InteractionResult> cir) {
         if (player != Minecraft.getInstance().player) return;

@@ -1,5 +1,6 @@
 package xaeroplus.fabric.util.compat;
 
+import com.mojang.blaze3d.Blaze3D;
 import net.fabricmc.loader.api.Version;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -9,9 +10,9 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Util;
 import xaeroplus.util.ColorHelper;
 
+import java.net.URI;
 import java.util.Optional;
 
 public class IncompatibleMinimapWarningScreen extends Screen {
@@ -49,7 +50,7 @@ public class IncompatibleMinimapWarningScreen extends Screen {
         this.message = MultiLineLabel.create(this.font, this.messageComponent, this.width - 100);
         addRenderableWidget(
             Button.builder(Component.translatable("xaeroplus.gui.minimap_incompatible.download_minimap"), button -> {
-                    Util.getPlatform().openUri("https://modrinth.com/mod/xaeros-minimap/versions");
+                    Blaze3D.openUri(URI.create("https://modrinth.com/mod/xaeros-minimap/versions"));
                     Minecraft.getInstance().close();
             })
             .bounds(width / 2 - 100 - 75, 150, 150, 20)

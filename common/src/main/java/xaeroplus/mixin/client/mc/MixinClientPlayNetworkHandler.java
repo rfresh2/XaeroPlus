@@ -27,13 +27,13 @@ public class MixinClientPlayNetworkHandler {
 
     @Inject(method = "handleLevelChunkWithLight", at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;updateLevelChunk(IILnet/minecraft/network/protocol/game/ClientboundLevelChunkPacketData;)V"
+        target = "Lnet/minecraft/client/multiplayer/ClientChunkCache;replaceWithPacketData(IILnet/minecraft/network/protocol/game/ClientboundLevelChunkPacketData;)Lnet/minecraft/world/level/chunk/LevelChunk;"
     )) // on main thread before chunk data buf is read
     public void onChunkDataPacket(
         final ClientboundLevelChunkWithLightPacket packet,
         final CallbackInfo ci,
         @Share("seenChunk") LocalBooleanRef seenChunkRef) {
-        seenChunkRef.set(level.getChunk(packet.getX(), packet.getZ(), ChunkStatus.FULL, false) != null);
+        seenChunkRef.set(level.getChunk(packet.x(), packet.z(), ChunkStatus.FULL, false) != null);
     }
 
     @Inject(method = "handleLevelChunkWithLight", at = @At("RETURN"))
@@ -41,7 +41,7 @@ public class MixinClientPlayNetworkHandler {
         final ClientboundLevelChunkWithLightPacket packet,
         final CallbackInfo ci,
         @Share("seenChunk") LocalBooleanRef seenChunkRef) {
-        XaeroPlus.EVENT_BUS.call(new ChunkDataEvent(level.getChunk(packet.getX(), packet.getZ()), seenChunkRef.get()));
+        XaeroPlus.EVENT_BUS.call(new ChunkDataEvent(level.getChunk(packet.x(), packet.z()), seenChunkRef.get()));
     }
 
     @WrapOperation(method = "handleChunkBlocksUpdate", at = @At(

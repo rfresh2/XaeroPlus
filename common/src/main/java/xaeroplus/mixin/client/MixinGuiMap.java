@@ -736,9 +736,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         int len = Mth.floor(line.length());
         int dx = line.x2() - line.x1();
         int dz = line.z2() - line.z1();
-        MapRenderHelper.drawCenteredStringWithBackground(guiGraphics, font, len + " blocks [" + dx + " x " + dz + "]", scaledMouseX, scaledMouseY - font.lineHeight, -1, 0.0f, 0.0f, 0.0f, 0.4f, backgroundVertexBuffer);
+        MapRenderHelper.drawCenteredStringWithBackground(guiGraphics, font, len + " blocks [" + dx + " x " + dz + "]", scaledMouseX, scaledMouseY - font.lineHeight, ColorHelper.getColor(255, 255, 255, 255), 0.0f, 0.0f, 0.0f, 0.4f, backgroundVertexBuffer);
         var degreeStr = String.format("%.2f", line.angle());
-        MapRenderHelper.drawCenteredStringWithBackground(guiGraphics, font, degreeStr + "°", scaledMouseX, scaledMouseY + font.lineHeight, -1, 0.0f, 0.0f, 0.0f, 0.4f, backgroundVertexBuffer);
+        MapRenderHelper.drawCenteredStringWithBackground(guiGraphics, font, degreeStr + "°", scaledMouseX, scaledMouseY + font.lineHeight, ColorHelper.getColor(255, 255, 255, 255), 0.0f, 0.0f, 0.0f, 0.4f, backgroundVertexBuffer);
     }
 
     @Unique

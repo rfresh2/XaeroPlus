@@ -11,22 +11,7 @@ public abstract class SettingRegistry {
     private final Map<String, XaeroPlusSetting> settingNameMap = new ConcurrentHashMap<>();
     private final Map<KeyMapping, BooleanSetting> keybindingMap = new ConcurrentHashMap<>();
 
-    public BooleanSetting register(BooleanSetting setting, SettingLocation settingLocation) {
-        register0(settingLocation, setting);
-        return setting;
-    }
-
-    public DoubleSetting register(DoubleSetting setting, SettingLocation settingLocation) {
-        register0(settingLocation, setting);
-        return setting;
-    }
-
-    public <E extends Enum<E>> EnumSetting<E> register(EnumSetting<E> setting, SettingLocation settingLocation) {
-        register0(settingLocation, setting);
-        return setting;
-    }
-
-    public StringSetting register(StringSetting setting, SettingLocation settingLocation) {
+    public <T extends XaeroPlusSetting> T register(T setting, SettingLocation settingLocation) {
         register0(settingLocation, setting);
         return setting;
     }

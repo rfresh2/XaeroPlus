@@ -14,11 +14,71 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 
 public class BooleanSetting extends XaeroPlusSetting {
     public static final KeyMapping.Category KEYBIND_CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("xaeroplus", "keybindings"));
     private boolean value;
     private BooleanConsumer settingChangeConsumer;
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static final class Builder {
+        private String settingName;
+        private String settingNameTranslationKey;
+        private Boolean defaultValue;
+        private boolean keybind;
+        private BooleanConsumer settingChangeConsumer;
+        private BooleanSupplier visibilitySupplier;
+
+        private Builder() {}
+
+        public Builder name(String settingName) {
+            this.settingName = requireNonNull(settingName, "settingName");
+            return this;
+        }
+
+        public Builder translationKey(String settingNameTranslationKey) {
+            this.settingNameTranslationKey = requireNonNull(settingNameTranslationKey, "settingNameTranslationKey");
+            return this;
+        }
+
+        public Builder defaultValue(boolean defaultValue) {
+            this.defaultValue = defaultValue;
+            return this;
+        }
+
+        public Builder keybind() {
+            this.keybind = true;
+            return this;
+        }
+
+        public Builder onChange(BooleanConsumer settingChangeConsumer) {
+            this.settingChangeConsumer = requireNonNull(settingChangeConsumer, "settingChangeConsumer");
+            return this;
+        }
+
+        public Builder visibleWhen(BooleanSupplier visibilitySupplier) {
+            this.visibilitySupplier = requireNonNull(visibilitySupplier, "visibilitySupplier");
+            return this;
+        }
+
+        public BooleanSetting build() {
+            var name = requireNonNull(settingName, "settingName");
+            var translationKey = requireNonNull(settingNameTranslationKey, "settingNameTranslationKey");
+            return new BooleanSetting(
+                SETTING_PREFIX + name,
+                translationKey,
+                buildTooltipTranslationKey(translationKey),
+                keybind ? new KeyMapping(translationKey, -1, KEYBIND_CATEGORY) : null,
+                requireNonNull(defaultValue, "defaultValue"),
+                settingChangeConsumer,
+                visibilitySupplier
+            );
+        }
+    }
 
     private BooleanSetting(final String settingName,
                            final String settingNameTranslationKey,
@@ -30,97 +90,6 @@ public class BooleanSetting extends XaeroPlusSetting {
         super(settingName, settingNameTranslationKey, tooltipTranslationKey, keyBinding, visibilitySupplier);
         this.value = value;
         this.settingChangeConsumer = settingChangeConsumer;
-    }
-
-    public static BooleanSetting create(String settingName,
-                                        String settingNameTranslationKey,
-                                        boolean defaultValue) {
-        return create(settingName, settingNameTranslationKey, defaultValue, false);
-    }
-
-    public static BooleanSetting create(String settingName,
-                                        String settingNameTranslationKey,
-                                        boolean defaultValue,
-                                        boolean keybind
-    ) {
-        return new BooleanSetting(
-            SETTING_PREFIX + settingName,
-            settingNameTranslationKey,
-            buildTooltipTranslationKey(settingNameTranslationKey),
-            keybind ? new KeyMapping(settingNameTranslationKey, -1, KEYBIND_CATEGORY) : null,
-            defaultValue,
-            null, null
-        );
-    }
-
-    public static BooleanSetting create(String settingName,
-                                        String settingNameTranslationKey,
-                                        boolean defaultValue,
-                                        BooleanConsumer settingChangeConsumer) {
-        return create(settingName, settingNameTranslationKey, defaultValue, false, settingChangeConsumer);
-    }
-
-    public static BooleanSetting create(String settingName,
-                                        String settingNameTranslationKey,
-                                        boolean defaultValue,
-                                        boolean keybind,
-                                        BooleanConsumer settingChangeConsumer) {
-        return new BooleanSetting(
-            SETTING_PREFIX + settingName,
-            settingNameTranslationKey,
-            buildTooltipTranslationKey(settingNameTranslationKey),
-            keybind ? new KeyMapping(settingNameTranslationKey, -1, KEYBIND_CATEGORY) : null,
-            defaultValue,
-            settingChangeConsumer, null
-        );
-    }
-
-    public static BooleanSetting create(String settingName,
-                                        String settingNameTranslationKey,
-                                        boolean defaultValue,
-                                        BooleanSupplier visibilitySupplier) {
-        return create(settingName, settingNameTranslationKey, defaultValue, false, visibilitySupplier);
-    }
-
-    public static BooleanSetting create(String settingName,
-                                        String settingNameTranslationKey,
-                                        boolean defaultValue,
-                                        boolean keybind,
-                                        BooleanSupplier visibilitySupplier
-    ) {
-        return new BooleanSetting(
-            SETTING_PREFIX + settingName,
-            settingNameTranslationKey,
-            buildTooltipTranslationKey(settingNameTranslationKey),
-            keybind ? new KeyMapping(settingNameTranslationKey, -1, KEYBIND_CATEGORY) : null,
-            defaultValue,
-            null, visibilitySupplier
-        );
-    }
-
-    public static BooleanSetting create(String settingName,
-                                        String settingNameTranslationKey,
-                                        boolean defaultValue,
-                                        BooleanConsumer settingChangeConsumer,
-                                        BooleanSupplier visibilitySupplier) {
-        return create(settingName, settingNameTranslationKey, defaultValue, false, settingChangeConsumer, visibilitySupplier);
-    }
-
-    public static BooleanSetting create(String settingName,
-                                        String settingNameTranslationKey,
-                                        boolean defaultValue,
-                                        boolean keybind,
-                                        BooleanConsumer settingChangeConsumer,
-                                        BooleanSupplier visibilitySupplier
-    ) {
-        return new BooleanSetting(
-            SETTING_PREFIX + settingName,
-            settingNameTranslationKey,
-            buildTooltipTranslationKey(settingNameTranslationKey),
-            keybind ? new KeyMapping(settingNameTranslationKey, -1, KEYBIND_CATEGORY) : null,
-            defaultValue,
-            settingChangeConsumer, visibilitySupplier
-        );
     }
 
     @Override

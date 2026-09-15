@@ -9,6 +9,7 @@ import xaeroplus.XaeroPlus;
 import xaeroplus.feature.extensions.IXaeroPlusSettingEntry;
 import xaeroplus.feature.extensions.XaeroPlusCustomSettingEntry;
 
+import java.util.Objects;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
@@ -18,6 +19,66 @@ public class EnumSetting<T extends Enum<T>> extends XaeroPlusSetting {
     private final T[] enumValues;
     private T value;
     private Consumer<T> settingChangeConsumer;
+
+    public static <E extends Enum<E>> Builder<E> builder() {
+        return new Builder<>();
+    }
+
+    public static final class Builder<E extends Enum<E>> {
+        private String settingName;
+        private String settingNameTranslationKey;
+        private E[] values;
+        private E defaultValue;
+        private Consumer<E> settingChangeConsumer;
+        private BooleanSupplier visibilitySupplier;
+
+        private Builder() {}
+
+        public Builder<E> name(String settingName) {
+            this.settingName = Objects.requireNonNull(settingName, "settingName");
+            return this;
+        }
+
+        public Builder<E> translationKey(String settingNameTranslationKey) {
+            this.settingNameTranslationKey = Objects.requireNonNull(settingNameTranslationKey, "settingNameTranslationKey");
+            return this;
+        }
+
+        public Builder<E> values(E[] values) {
+            this.values = Objects.requireNonNull(values, "values");
+            return this;
+        }
+
+        public Builder<E> defaultValue(E defaultValue) {
+            this.defaultValue = Objects.requireNonNull(defaultValue, "defaultValue");
+            return this;
+        }
+
+        public Builder<E> onChange(Consumer<E> settingChangeConsumer) {
+            this.settingChangeConsumer = Objects.requireNonNull(settingChangeConsumer, "settingChangeConsumer");
+            return this;
+        }
+
+        public Builder<E> visibleWhen(BooleanSupplier visibilitySupplier) {
+            this.visibilitySupplier = Objects.requireNonNull(visibilitySupplier, "visibilitySupplier");
+            return this;
+        }
+
+        public EnumSetting<E> build() {
+            var name = Objects.requireNonNull(settingName, "settingName");
+            var translationKey = Objects.requireNonNull(settingNameTranslationKey, "settingNameTranslationKey");
+            return new EnumSetting<>(
+                SETTING_PREFIX + name,
+                translationKey,
+                buildTooltipTranslationKey(translationKey),
+                null,
+                Objects.requireNonNull(values, "values"),
+                Objects.requireNonNull(defaultValue, "defaultValue"),
+                settingChangeConsumer,
+                visibilitySupplier
+            );
+        }
+    }
 
     private EnumSetting(final String settingName,
                         final String settingNameTranslationKey,
@@ -31,57 +92,6 @@ public class EnumSetting<T extends Enum<T>> extends XaeroPlusSetting {
         this.enumValues = enumValues;
         this.value = defaultValue;
         this.settingChangeConsumer = settingChangeConsumer;
-    }
-
-    public static <E extends Enum<E>> EnumSetting<E> create(
-        String settingName,
-        String settingNameTranslationKey,
-        E[] values,
-        E defaultValue) {
-        return new EnumSetting<>(
-            SETTING_PREFIX + settingName,
-            settingNameTranslationKey,
-            buildTooltipTranslationKey(settingNameTranslationKey),
-            null,
-            values, defaultValue, null, null
-        );
-    }
-
-    public static <E extends Enum<E>> EnumSetting<E> create(
-        String settingName,
-        String settingNameTranslationKey,
-        E[] values,
-        E defaultValue,
-        Consumer<E> settingChangeConsumer) {
-        return new EnumSetting<>(
-            SETTING_PREFIX + settingName,
-            settingNameTranslationKey,
-            buildTooltipTranslationKey(settingNameTranslationKey),
-            null,
-            values,
-            defaultValue,
-            settingChangeConsumer,
-            null
-        );
-    }
-
-    public static <E extends Enum<E>> EnumSetting<E> create(
-        String settingName,
-        String settingNameTranslationKey,
-        E[] values,
-        E defaultValue,
-        Consumer<E> settingChangeConsumer,
-        BooleanSupplier visibilitySupplier) {
-        return new EnumSetting<>(
-            SETTING_PREFIX + settingName,
-            settingNameTranslationKey,
-            buildTooltipTranslationKey(settingNameTranslationKey),
-            null,
-            values,
-            defaultValue,
-            settingChangeConsumer,
-            visibilitySupplier
-        );
     }
 
     @Override

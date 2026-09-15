@@ -73,8 +73,8 @@ public class DrawOrderScreen extends Screen {
     @Override
     public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         drawFeatureList.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.centeredText(mc.font, title, width / 2, 5, -1);
-        guiGraphics.centeredText(mc.font, Component.translatable("xaeroplus.gui.draw_order.subtitle"), width / 2, height - 52, -1);
+        guiGraphics.centeredText(mc.font, title, width / 2, 5, ColorHelper.getColor(255, 255, 255, 255));
+        guiGraphics.centeredText(mc.font, Component.translatable("xaeroplus.gui.draw_order.subtitle"), width / 2, height - 52, ColorHelper.getColor(255, 255, 255, 255));
         super.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
     }
 

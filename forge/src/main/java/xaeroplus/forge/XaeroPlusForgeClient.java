@@ -15,7 +15,10 @@ import xaeroplus.XaeroPlus;
 import xaeroplus.commands.XPClientCommandSource;
 import xaeroplus.feature.extensions.GuiXaeroPlusWorldMapSettings;
 import xaeroplus.settings.Settings;
+import xaeroplus.util.Wait;
 import xaeroplus.util.XaeroPlusGameTest;
+
+import java.util.concurrent.ForkJoinPool;
 
 public class XaeroPlusForgeClient {
     public void init(final FMLJavaModLoadingContext context, final IEventBus modEventBus, final IEventBus forgeEventBus) {
@@ -35,8 +38,13 @@ public class XaeroPlusForgeClient {
             XaeroPlus.XP_VERSION = FMLLoader.getLoadingModList().getModFileById("xaeroplus").versionString();
             XaeroPlus.initializeSettings();
             Settings.REGISTRY.getKeybindings().forEach(event::register);
-            if (System.getenv("XP_CI_TEST") != null) {
+            if (System.getenv("XP_CI_TEST") != null || System.getProperty("XP_CI_TEST") != null) {
                 Minecraft.getInstance().execute(XaeroPlusGameTest::applyMixinsTest);
+                ForkJoinPool.commonPool().execute(() -> {
+                    // todo: variable or event to signal client and mods were fully initialized
+                    Wait.wait(20);
+                    Minecraft.getInstance().stop();
+                });
             }
         }
     }

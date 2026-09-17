@@ -43,8 +43,10 @@ public class XaeroPlusNeo {
             XaeroPlus.XP_VERSION = FMLLoader.getLoadingModList().getModFileById("xaeroplus").versionString();
             XaeroPlus.initializeSettings();
             Settings.REGISTRY.getKeybindings().forEach(event::register);
-            if (System.getenv("XP_CI_TEST") != null)
+            if (System.getenv("XP_CI_TEST") != null || System.getProperty("XP_CI_TEST") != null) {
                 Minecraft.getInstance().execute(XaeroPlusGameTest::applyMixinsTest);
+                Minecraft.getInstance().stop();
+            }
         }
     }
 

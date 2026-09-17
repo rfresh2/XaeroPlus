@@ -16,7 +16,10 @@ import xaeroplus.XaeroPlus;
 import xaeroplus.commands.XPClientCommandSource;
 import xaeroplus.feature.extensions.GuiXaeroPlusWorldMapSettings;
 import xaeroplus.settings.Settings;
+import xaeroplus.util.Wait;
 import xaeroplus.util.XaeroPlusGameTest;
+
+import java.util.concurrent.ForkJoinPool;
 
 public class XaeroPlusForgeClient {
     public void init(final IEventBus modEventBus, final IEventBus forgeEventBus) {
@@ -40,7 +43,11 @@ public class XaeroPlusForgeClient {
             Settings.REGISTRY.getKeybindings().forEach(event::register);
             if (System.getenv("XP_CI_TEST") != null || System.getProperty("XP_CI_TEST") != null) {
                 Minecraft.getInstance().execute(XaeroPlusGameTest::applyMixinsTest);
-                Minecraft.getInstance().stop();
+                ForkJoinPool.commonPool().execute(() -> {
+                    // todo: variable or event to signal client and mods were fully initialized
+                    Wait.wait(20);
+                    Minecraft.getInstance().stop();
+                });
             }
         }
     }

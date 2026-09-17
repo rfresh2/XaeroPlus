@@ -17,7 +17,10 @@ import net.neoforged.neoforge.common.NeoForge;
 import xaeroplus.XaeroPlus;
 import xaeroplus.commands.XPClientCommandSource;
 import xaeroplus.settings.Settings;
+import xaeroplus.util.Wait;
 import xaeroplus.util.XaeroPlusGameTest;
+
+import java.util.concurrent.ForkJoinPool;
 
 @Mod(value = "xaeroplus", dist = Dist.CLIENT)
 public class XaeroPlusNeo {
@@ -44,8 +47,13 @@ public class XaeroPlusNeo {
     }
 
     public void onClientStartedEvent(final ClientStartedEvent event) {
-        if (System.getenv("XP_CI_TEST") != null) {
+        if (System.getenv("XP_CI_TEST") != null || System.getProperty("XP_CI_TEST") != null) {
             Minecraft.getInstance().execute(XaeroPlusGameTest::applyMixinsTest);
+            ForkJoinPool.commonPool().execute(() -> {
+                // todo: variable or event to signal client and mods were fully initialized
+                Wait.wait(20);
+                Minecraft.getInstance().stop();
+            });
         }
     }
 

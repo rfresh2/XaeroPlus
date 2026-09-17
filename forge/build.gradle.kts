@@ -3,6 +3,7 @@ import dev.architectury.plugin.transformers.AddRefmapName
 import dev.architectury.transformer.transformers.FixForgeMixin
 import dev.architectury.transformer.transformers.TransformForgeAnnotations
 import dev.architectury.transformer.transformers.TransformForgeEnvironment
+import xaeroplus.loom.prod.XPClientProductionRunTask
 
 plugins {
     id("xaeroplus-all.conventions")
@@ -37,6 +38,11 @@ val destArchiveClassifier = "WM${worldmap_version_forge}-MM${minimap_version_for
 sourceSets.main.get().java.srcDir(common.layout.buildDirectory.get().asFile.path + "/remappedSources/forge/java")
 sourceSets.main.get().resources.srcDir(common.layout.buildDirectory.get().asFile.path + "/remappedSources/forge/resources")
 
+val productionRuntimeMods = configurations.getByName("productionRuntimeMods")
+productionRuntimeMods.extendsFrom(configurations.getByName("modRuntimeOnly"))
+productionRuntimeMods.extendsFrom(configurations.getByName("modImplementation"))
+productionRuntimeMods.extendsFrom(configurations.getByName("modApi"))
+
 dependencies {
     forge(libs.forge)
     compileOnly(annotationProcessor(libs.mixinextras.common.get())!!)
@@ -46,7 +52,7 @@ dependencies {
     modImplementation(libs.xaerolib.forge)
     modImplementation(libs.baritone.forge)
     modCompileOnly(libs.worldtools)
-    shadow(libs.sqlite)
+    forgeRuntimeLibrary(implementation(shadow(libs.sqlite.get())!!)!!)
     forgeRuntimeLibrary(implementation(shadow(libs.oldbiomes.get())!!)!!)
     forgeRuntimeLibrary(implementation(shadow(libs.caffeine.get())!!)!!)
     forgeRuntimeLibrary(implementation(shadow(libs.lambdaEvents.get())!!)!!)
@@ -100,5 +106,21 @@ tasks {
 
     compileJava {
         dependsOn(common.tasks.getByName("remapForge"))
+    }
+
+    register<XPClientProductionRunTask>("runProdTest") {
+        jvmArgs = listOf("-DXP_CI_TEST", "-Dsodium.checks.issue2561=false")
+        runDir = file("build/runProdTest")
+        useXVFB = true
+        doFirst {
+            runDir.get().asFile.deleteRecursively()
+        }
+        outputs.upToDateWhen { false }
+    }
+
+    register<XPClientProductionRunTask>("runProd") {
+        jvmArgs = listOf("-Dsodium.checks.issue2561=false")
+        runDir = file("build/runProd")
+        outputs.upToDateWhen { false }
     }
 }

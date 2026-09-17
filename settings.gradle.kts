@@ -45,8 +45,8 @@ dependencyResolutionManagement {
 			library("lambdaEvents", "net.lenni0451:LambdaEvents:2.4.2")
 			library("worldtools", "maven.modrinth:worldtools:1.2.8+1.21.4")
             library("sqlite", "org.rfresh.xerial:sqlite-jdbc:3.53.4.0") // relocated xerial sqlite to avoid conflicts with other mods
-			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.16.2+26.2-fabric")
-			library("immediatelyfast-neo", "maven.modrinth:immediatelyfast:1.16.2+26.2-neoforge")
+			library("immediatelyfast", "maven.modrinth:immediatelyfast:1.17.0+$minecraft_version-fabric")
+			library("immediatelyfast-neo", "maven.modrinth:immediatelyfast:1.17.0+$minecraft_version-neoforge")
 			library("modmenu", "maven.modrinth:modmenu:21.0.0-beta.1")
 			library("sodium-fabric", "net.caffeinemc:sodium-fabric:0.9.2+mc$minecraft_version")
             library("sodium-neoforge", "net.caffeinemc:sodium-neoforge-mod:0.9.2+mc$minecraft_version")

@@ -3,6 +3,7 @@ import dev.architectury.plugin.TransformingTask
 import dev.architectury.transformer.transformers.TransformNeoForgeAnnotations
 import dev.architectury.transformer.transformers.TransformNeoForgeEnvironment
 import dev.architectury.transformer.transformers.TransformPlatformOnly
+import xaeroplus.loom.prod.XPClientProductionRunTask
 
 plugins {
     id("xaeroplus-all.conventions")
@@ -32,6 +33,11 @@ val destArchiveClassifier = "WM${worldmap_version_neo}-MM${minimap_version_neo}"
 
 sourceSets.main.get().java.srcDir(common.layout.buildDirectory.get().asFile.path + "/remappedSources/forge/java")
 sourceSets.main.get().resources.srcDir(common.layout.buildDirectory.get().asFile.path + "/remappedSources/forge/resources")
+
+val productionRuntimeMods = configurations.getByName("productionRuntimeMods")
+productionRuntimeMods.extendsFrom(configurations.getByName("modRuntimeOnly"))
+productionRuntimeMods.extendsFrom(configurations.getByName("modImplementation"))
+productionRuntimeMods.extendsFrom(configurations.getByName("modApi"))
 
 dependencies {
     neoForge(libs.neoforge)
@@ -84,5 +90,23 @@ tasks {
 
     compileJava {
         dependsOn(common.tasks.getByName("remapForge"))
+    }
+
+    register<XPClientProductionRunTask>("runProdTest") {
+        jvmArgs = listOf("-DXP_CI_TEST", "-Dsodium.checks.issue2561=false")
+        mods.setFrom(shadowJar.get().archiveFile, productionRuntimeMods)
+        runDir = file("build/runProdTest")
+        useXVFB = true
+        doFirst {
+            runDir.get().asFile.deleteRecursively()
+        }
+        outputs.upToDateWhen { false }
+    }
+
+    register<XPClientProductionRunTask>("runProd") {
+        jvmArgs = listOf("-Dsodium.checks.issue2561=false")
+        mods.setFrom(shadowJar.get().archiveFile, productionRuntimeMods)
+        runDir = file("build/runProd")
+        outputs.upToDateWhen { false }
     }
 }

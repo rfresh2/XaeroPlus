@@ -244,7 +244,7 @@ jobs:
 #          modloader: fabric
 #          regex: .*fabric.*
 #          mc-runtime-test: fabric
-#          fabric-api: 0.160.7
+#          fabric-api: 0.161.0
 #          java: 25
 #          xvfb: true
 #          headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true

@@ -68,7 +68,7 @@ dependencies {
 	modImplementation(libs.worldmap.fabric) { isTransitive = false }
 	modImplementation(libs.minimap.fabric) { isTransitive = false }
 	modImplementation(libs.xaerolib.fabric)
-	modCompileOnly(libs.baritone.fabric)
+	modImplementation(libs.baritone.fabric)
     modRuntimeOnly(libs.immediatelyfast)
     runtimeOnly("net.lenni0451:Reflect:1.6.1") // immediatelyfast jij
 	modImplementation(libs.modmenu)

@@ -44,10 +44,10 @@ dependencies {
     modImplementation(libs.worldmap.neo) { isTransitive = false }
     modImplementation(libs.minimap.neo) { isTransitive = false }
     modImplementation(libs.xaerolib.neo)
-    modCompileOnly(libs.baritone.neoforge)
+    modImplementation(libs.baritone.neoforge)
     modCompileOnly(libs.worldtools)
     modCompileOnly(libs.sodium.neoforge)
-//    modRuntimeOnly(libs.immediatelyfast.neo)
+    modRuntimeOnly(libs.immediatelyfast.neo)
     forgeRuntimeLibrary(implementation(shadow(libs.sqlite.get())!!)!!)
     forgeRuntimeLibrary(implementation(shadow(libs.caffeine.get())!!)!!)
     forgeRuntimeLibrary(implementation(shadow(libs.lambdaEvents.get())!!)!!)

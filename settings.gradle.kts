@@ -52,9 +52,9 @@ dependencyResolutionManagement {
             library("sodium-neoforge", "net.caffeinemc:sodium-neoforge-mod:0.9.2+mc$minecraft_version")
             library("spark-fabric", "maven.modrinth:spark:1.10.173-fabric")
             library("oldbiomes", "com.github.rfresh2:OldBiomes:1.0.0")
-            library("baritone-fabric", "com.github.rfresh2:baritone-fabric:26.2-SNAPSHOT")
-            library("baritone-forge", "com.github.rfresh2:baritone-forge:26.2-SNAPSHOT")
-            library("baritone-neoforge", "com.github.rfresh2:baritone-neoforge:26.2-SNAPSHOT")
+            library("baritone-fabric", "com.github.rfresh2:baritone-fabric:$minecraft_version-SNAPSHOT")
+            library("baritone-forge", "com.github.rfresh2:baritone-forge:$minecraft_version-SNAPSHOT")
+            library("baritone-neoforge", "com.github.rfresh2:baritone-neoforge:$minecraft_version-SNAPSHOT")
 		}
 	}
 }

@@ -204,7 +204,7 @@ public interface DrawFeatureFactory {
     }
 
     /**
-     * Refreshed async, not on the MC render thread
+     * Refreshed on the MC render thread at a set interval
      */
     static DrawFeature asyncText(
         String id,

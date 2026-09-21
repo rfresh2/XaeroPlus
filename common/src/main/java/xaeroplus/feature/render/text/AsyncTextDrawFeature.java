@@ -18,7 +18,7 @@ import static xaeroplus.util.GuiMapHelper.*;
 public class AsyncTextDrawFeature extends AbstractTextDrawFeature {
     private final TextSupplier textSupplier;
     private final String id;
-    private final AsyncLoadingCache<Long, List<Text>> textRenderCache;
+    private final AsyncLoadingCache<Boolean, List<Text>> textRenderCache;
 
     public AsyncTextDrawFeature(String id, TextSupplier textSupplier, final int refreshIntervalMs) {
         this.id = id;
@@ -59,7 +59,7 @@ public class AsyncTextDrawFeature extends AbstractTextDrawFeature {
 
     @Override
     public List<Text> getTexts() {
-        return textRenderCache.get(0L).getNow(Collections.emptyList());
+        return textRenderCache.get(true).getNow(Collections.emptyList());
     }
 
     @Override

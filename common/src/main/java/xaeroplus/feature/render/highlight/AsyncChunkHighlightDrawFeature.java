@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 public class AsyncChunkHighlightDrawFeature extends AbstractChunkHighlightDrawFeature {
     private final String id;
-    private final AsyncLoadingCache<Long, Long2LongMap> chunkRenderCache;
+    private final AsyncLoadingCache<Boolean, Long2LongMap> chunkRenderCache;
     private final AsyncChunkHighlightProvider chunkHighlightProvider;
 
     public AsyncChunkHighlightDrawFeature(String id, AbstractHighlightVertexBuffer drawBuffer, AsyncChunkHighlightProvider chunkHighlightProvider) {
@@ -40,7 +40,7 @@ public class AsyncChunkHighlightDrawFeature extends AbstractChunkHighlightDrawFe
     }
 
     public Long2LongMap chunkHighlights() {
-        return chunkRenderCache.get(0L).getNow(Long2LongMaps.EMPTY_MAP);
+        return chunkRenderCache.get(true).getNow(Long2LongMaps.EMPTY_MAP);
     }
 
     public int color() {

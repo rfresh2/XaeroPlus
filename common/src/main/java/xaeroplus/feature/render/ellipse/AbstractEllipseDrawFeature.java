@@ -17,7 +17,7 @@ import xaeroplus.module.impl.TickTaskExecutor;
 import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractEllipseDrawFeature<T> implements DrawFeature {
-    public final AsyncLoadingCache<Long, T> ellipseRenderCache;
+    public final AsyncLoadingCache<Boolean, T> ellipseRenderCache;
 
     protected AbstractEllipseDrawFeature(final int refreshIntervalMs) {
         ellipseRenderCache = Caffeine.newBuilder()
@@ -57,7 +57,7 @@ public abstract class AbstractEllipseDrawFeature<T> implements DrawFeature {
     protected abstract void closeDrawBuffer();
 
     public T getEllipses() {
-        return ellipseRenderCache.get(0L).getNow(emptyEllipses());
+        return ellipseRenderCache.get(true).getNow(emptyEllipses());
     }
 
     public void preRender(final DrawContext ctx) {

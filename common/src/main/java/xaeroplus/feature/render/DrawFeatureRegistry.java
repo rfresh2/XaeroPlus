@@ -21,6 +21,10 @@ public class DrawFeatureRegistry {
         return Pattern.compile("[a-zA-Z0-9_-]+").matcher(id).find();
     }
 
+    /**
+     * Registers a draw feature.
+     * Use {@link DrawFeatureFactory} to create the DrawFeature
+     */
     public synchronized void register(DrawFeature feature) {
         assertOnMainThread();
         var id = feature.id();
@@ -51,6 +55,9 @@ public class DrawFeatureRegistry {
         Settings.REGISTRY.drawOrderSetting.setValue(serialized);
     }
 
+    /**
+     * Unregisters a draw feature by id
+     */
     public synchronized void unregister(String id) {
         assertOnMainThread();
         var it = Int2ObjectMaps.fastIterator(features);

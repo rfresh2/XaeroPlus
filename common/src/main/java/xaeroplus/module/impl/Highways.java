@@ -89,9 +89,14 @@ public class Highways extends Module {
                 this::getHighwayLines,
                 this::getHighwayColor,
                 this::getLineWidth,
-                50
+                1000
             )
         );
+    }
+
+    @Override
+    public void onDisable() {
+        Globals.drawManager.registry().unregister("Highways");
     }
 
     private List<Line> getHighwayLines(int windowRegionX, int windowRegionZ, int windowSize, ResourceKey<Level> dimension) {
@@ -106,9 +111,9 @@ public class Highways extends Module {
 
     private List<Line> generateHighwayLines(ResourceKey<Level> dimension) {
         var lines = new ArrayList<Line>(500);
-        // if a line is too long we will start hitting floating point precision errors in opengl
-        // as the lines are translated to map and screen space
-        // so we break these up into smaller lines
+        // xaeroplus's render system internally breaks lines down into multiple lines if their length is greater than 500k
+        // i.e. a 1m length line gets processed into two 500k length lines
+        // we don't technically need to break these lines down in the module, but it helps with performance
         int stride = 500_000;
 
         // cardinals
@@ -164,11 +169,6 @@ public class Highways extends Module {
             lines.add(new Line(50000, 125000, 50000, 50000));
         }
         return lines;
-    }
-
-    @Override
-    public void onDisable() {
-        Globals.drawManager.registry().unregister("Highways");
     }
 
     public int getHighwayColor() {

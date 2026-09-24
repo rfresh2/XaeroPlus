@@ -4,8 +4,8 @@ import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
+import net.minecraft.util.Mth;
 import xaeroplus.Globals;
-import xaeroplus.module.impl.TickTaskExecutor;
 import xaeroplus.util.ChunkUtils;
 
 import java.util.ArrayList;
@@ -18,15 +18,15 @@ import static xaeroplus.util.GuiMapHelper.*;
 public class AsyncTextDrawFeature extends AbstractTextDrawFeature {
     private final TextSupplier textSupplier;
     private final String id;
-    private final AsyncLoadingCache<Long, List<Text>> textRenderCache;
+    private final AsyncLoadingCache<Boolean, List<Text>> textRenderCache;
 
     public AsyncTextDrawFeature(String id, TextSupplier textSupplier, final int refreshIntervalMs) {
         this.id = id;
         this.textSupplier = textSupplier;
         this.textRenderCache = Caffeine.newBuilder()
-            .expireAfterWrite(10, TimeUnit.SECONDS)
+            .expireAfterWrite(Math.max(10, Mth.ceil(refreshIntervalMs / 1000.0) * 2), TimeUnit.SECONDS)
             .refreshAfterWrite(refreshIntervalMs, TimeUnit.MILLISECONDS)
-            .executor(TickTaskExecutor.INSTANCE)
+            .executor(Globals.cacheRefreshExecutorService.get())
             .buildAsync(k -> loadTextInWindow());
     }
 
@@ -59,7 +59,7 @@ public class AsyncTextDrawFeature extends AbstractTextDrawFeature {
 
     @Override
     public List<Text> getTexts() {
-        return textRenderCache.get(0L).getNow(Collections.emptyList());
+        return textRenderCache.get(true).getNow(Collections.emptyList());
     }
 
     @Override

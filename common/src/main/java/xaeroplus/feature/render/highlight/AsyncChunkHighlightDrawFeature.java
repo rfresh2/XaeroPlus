@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.longs.Long2LongMaps;
+import net.minecraft.util.Mth;
 import xaeroplus.Globals;
 import xaeroplus.feature.render.DrawContext;
 import xaeroplus.feature.render.MapRenderWindow;
@@ -12,16 +13,21 @@ import java.util.concurrent.TimeUnit;
 
 public class AsyncChunkHighlightDrawFeature extends AbstractChunkHighlightDrawFeature {
     private final String id;
-    private final AsyncLoadingCache<Long, Long2LongMap> chunkRenderCache;
+    private final AsyncLoadingCache<Boolean, Long2LongMap> chunkRenderCache;
     private final AsyncChunkHighlightProvider chunkHighlightProvider;
 
-    public AsyncChunkHighlightDrawFeature(String id, AbstractHighlightVertexBuffer drawBuffer, AsyncChunkHighlightProvider chunkHighlightProvider) {
+    public AsyncChunkHighlightDrawFeature(
+        String id,
+        AbstractHighlightVertexBuffer drawBuffer,
+        AsyncChunkHighlightProvider chunkHighlightProvider,
+        int refreshIntervalMs
+    ) {
         super(drawBuffer);
         this.id = id;
         this.chunkHighlightProvider = chunkHighlightProvider;
         this.chunkRenderCache = Caffeine.newBuilder()
-            .expireAfterWrite(10, TimeUnit.SECONDS)
-            .refreshAfterWrite(500, TimeUnit.MILLISECONDS)
+            .expireAfterWrite(Math.max(10, Mth.ceil(refreshIntervalMs / 1000.0) * 2), TimeUnit.SECONDS)
+            .refreshAfterWrite(refreshIntervalMs, TimeUnit.MILLISECONDS)
             .executor(Globals.cacheRefreshExecutorService.get())
             .removalListener((k, v, cause) -> drawBuffer.markStale())
             // only one key
@@ -40,7 +46,7 @@ public class AsyncChunkHighlightDrawFeature extends AbstractChunkHighlightDrawFe
     }
 
     public Long2LongMap chunkHighlights() {
-        return chunkRenderCache.get(0L).getNow(Long2LongMaps.EMPTY_MAP);
+        return chunkRenderCache.get(true).getNow(Long2LongMaps.EMPTY_MAP);
     }
 
     public int color() {

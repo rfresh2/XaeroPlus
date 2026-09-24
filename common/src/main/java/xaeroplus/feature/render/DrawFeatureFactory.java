@@ -103,7 +103,19 @@ public interface DrawFeatureFactory {
     }
 
     /**
-     * Refreshed async, not on the MC render thread
+     * @deprecated Use {@link #asyncChunkHighlights(String, AsyncChunkHighlightSupplier, IntSupplier, int)} instead
+     */
+    @Deprecated(since = "2.36.4")
+    static DrawFeature asyncChunkHighlights(
+        String id,
+        AsyncChunkHighlightSupplier chunkHighlightSupplier,
+        IntSupplier colorSupplier
+    ) {
+        return asyncChunkHighlights(id, chunkHighlightSupplier, colorSupplier, 500);
+    }
+
+    /**
+     * Refreshed async, off the MC render thread
      * Single color across all highlights
      * Color function is called each frame
      * Use this if your chunk highlight supplier is costly in terms of time and can be called off the MC render thread
@@ -111,7 +123,8 @@ public interface DrawFeatureFactory {
     static DrawFeature asyncChunkHighlights(
         String id,
         AsyncChunkHighlightSupplier chunkHighlightSupplier,
-        IntSupplier colorSupplier
+        IntSupplier colorSupplier,
+        int refreshIntervalMs
     ) {
         return new AsyncChunkHighlightDrawFeature(
             id,
@@ -119,12 +132,25 @@ public interface DrawFeatureFactory {
             new AsyncChunkHighlightProvider(
                 chunkHighlightSupplier,
                 colorSupplier
-            )
+            ),
+            refreshIntervalMs
         );
     }
 
     /**
-     * Refreshed async, not on the MC render thread
+     * @deprecated Use {@link #multiColorAsyncChunkHighlights(String, AsyncChunkHighlightSupplier, MultiColorHighlightColorFunction, int)} instead
+     */
+    @Deprecated(since = "2.36.4")
+    static DrawFeature multiColorAsyncChunkHighlights(
+        String id,
+        AsyncChunkHighlightSupplier chunkHighlightSupplier,
+        MultiColorHighlightColorFunction colorFunction
+    ) {
+        return multiColorAsyncChunkHighlights(id, chunkHighlightSupplier, colorFunction, 500);
+    }
+
+    /**
+     * Refreshed async, off the MC render thread
      * Color function per-chunk
      * Color function is called only on refresh
      * Use this if your chunk highlight supplier is costly in terms of time and can be called off the MC render thread
@@ -132,7 +158,8 @@ public interface DrawFeatureFactory {
     static DrawFeature multiColorAsyncChunkHighlights(
         String id,
         AsyncChunkHighlightSupplier chunkHighlightSupplier,
-        MultiColorHighlightColorFunction colorFunction
+        MultiColorHighlightColorFunction colorFunction,
+        int refreshIntervalMs
     ) {
         return new AsyncChunkHighlightDrawFeature(
             id,
@@ -140,7 +167,8 @@ public interface DrawFeatureFactory {
             new AsyncChunkHighlightProvider(
                 chunkHighlightSupplier,
                 () -> 0
-            )
+            ),
+            refreshIntervalMs
         );
     }
 
@@ -204,7 +232,7 @@ public interface DrawFeatureFactory {
     }
 
     /**
-     * Refreshed async, not on the MC render thread
+     * Refreshed async off the MC render thread at a set interval
      */
     static DrawFeature asyncText(
         String id,

@@ -4,8 +4,8 @@ import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
+import net.minecraft.util.Mth;
 import xaeroplus.Globals;
-import xaeroplus.module.impl.TickTaskExecutor;
 import xaeroplus.util.ChunkUtils;
 
 import java.util.ArrayList;
@@ -24,9 +24,9 @@ public class AsyncTextDrawFeature extends AbstractTextDrawFeature {
         this.id = id;
         this.textSupplier = textSupplier;
         this.textRenderCache = Caffeine.newBuilder()
-            .expireAfterWrite(10, TimeUnit.SECONDS)
+            .expireAfterWrite(Math.max(10, Mth.ceil(refreshIntervalMs / 1000.0) * 2), TimeUnit.SECONDS)
             .refreshAfterWrite(refreshIntervalMs, TimeUnit.MILLISECONDS)
-            .executor(TickTaskExecutor.INSTANCE)
+            .executor(Globals.cacheRefreshExecutorService.get())
             .buildAsync(k -> loadTextInWindow());
     }
 

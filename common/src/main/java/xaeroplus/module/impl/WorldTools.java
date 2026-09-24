@@ -25,7 +25,8 @@ public class WorldTools extends Module {
             DrawFeatureFactory.asyncChunkHighlights(
                 "WorldTools",
                 this::getWindowedHighlightsSnapshot,
-                this::getWorldToolsColor
+                this::getWorldToolsColor,
+                500
             )
         );
     }

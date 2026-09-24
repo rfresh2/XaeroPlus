@@ -21,7 +21,7 @@ public abstract class AbstractLineDrawFeature<T> implements DrawFeature {
 
     protected AbstractLineDrawFeature(int refreshIntervalMs) {
         this.lineRenderCache = Caffeine.newBuilder()
-            .expireAfterWrite(10, TimeUnit.SECONDS)
+            .expireAfterWrite(Math.max(10, Mth.ceil(refreshIntervalMs / 1000.0) * 2), TimeUnit.SECONDS)
             .refreshAfterWrite(refreshIntervalMs, TimeUnit.MILLISECONDS)
             .executor(TickTaskExecutor.INSTANCE)
             .removalListener((k, v, cause) -> markDrawBufferStale())

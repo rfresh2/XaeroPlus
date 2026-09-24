@@ -38,7 +38,7 @@ public class RegionGrid extends Module {
             DrawFeatureFactory.asyncText(
                 "RegionGridText",
                 this::getText,
-                250
+                1000
             )
         );
     }

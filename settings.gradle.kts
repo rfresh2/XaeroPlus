@@ -26,10 +26,10 @@ val xaerolib_version: String by ext.properties
 dependencyResolutionManagement {
 	versionCatalogs {
 		create("libs") {
-			library("fabric-loader", "net.fabricmc:fabric-loader:0.19.3")
+			library("fabric-loader", "net.fabricmc:fabric-loader:0.19.5")
 			library("forge", "net.minecraftforge:forge:26.2-64.0.8")
 			library("fabric-api", "net.fabricmc.fabric-api:fabric-api:0.161.0+$minecraft_version")
-			library("neoforge", "net.neoforged:neoforge:26.3.0.6-beta")
+			library("neoforge", "net.neoforged:neoforge:26.3.0.16-beta")
 			library("worldmap-fabric", "maven.modrinth:xaeros-world-map:fabric-$minecraft_version-$worldmap_version_fabric")
 			library("worldmap-forge", "maven.modrinth:xaeros-world-map:forge-$minecraft_version-$worldmap_version_forge")
 			library("worldmap-neo", "maven.modrinth:xaeros-world-map:neoforge-$minecraft_version-$worldmap_version_neo")

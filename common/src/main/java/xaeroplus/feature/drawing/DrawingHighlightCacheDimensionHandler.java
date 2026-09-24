@@ -28,7 +28,7 @@ public class DrawingHighlightCacheDimensionHandler extends ChunkHighlightBaseCac
     private int windowRegionSize = 0;
     private final DrawingDatabase database;
     private final ListeningExecutorService dbExecutor;
-    public final LongSet staleChunks = new LongOpenHashSet();
+    public final LongOpenHashSet staleChunks = new LongOpenHashSet();
     ListenableFuture<?> windowMoveFuture = Futures.immediateVoidFuture();
 
     public DrawingHighlightCacheDimensionHandler(
@@ -120,6 +120,7 @@ public class DrawingHighlightCacheDimensionHandler extends ChunkHighlightBaseCac
                 it.remove();
             }
         }
+        chunks.trim(64);
         return dbExecutor.submit(() -> database.insertHighlightList(dataBuf, dimension));
     }
 
@@ -136,6 +137,7 @@ public class DrawingHighlightCacheDimensionHandler extends ChunkHighlightBaseCac
             }
             it.remove();
         }
+        staleChunks.trim(64);
         return chunksToWrite;
     }
 
@@ -206,7 +208,9 @@ public class DrawingHighlightCacheDimensionHandler extends ChunkHighlightBaseCac
             throw new RuntimeException("removeAllHighlights must be called on the main thread!");
         }
         staleChunks.clear();
+        staleChunks.trim(64);
         chunks.clear();
+        chunks.trim(64);
         dbExecutor.execute(() -> database.removeAllHighlights(dimension));
     }
 

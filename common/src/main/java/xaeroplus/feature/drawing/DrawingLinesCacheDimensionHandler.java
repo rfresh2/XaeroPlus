@@ -25,7 +25,7 @@ public class DrawingLinesCacheDimensionHandler {
     private int windowRegionSize = 0;
     private final DrawingDatabase database;
     private final ListeningExecutorService dbExecutor;
-    private final Object2IntMap<Line> lines = new Object2IntOpenHashMap<>();
+    private final Object2IntOpenHashMap<Line> lines = new Object2IntOpenHashMap<>();
     public final Set<Line> staleLines = new HashSet<>();
     ListenableFuture<?> windowMoveFuture = Futures.immediateVoidFuture();
     Minecraft mc = Minecraft.getInstance();
@@ -65,6 +65,7 @@ public class DrawingLinesCacheDimensionHandler {
             throw new RuntimeException("removeAllLines must be called on the main thread!");
         }
         lines.clear();
+        lines.trim(64);
         staleLines.clear();
         dbExecutor.execute(() -> database.removeAllLines(dimension));
     }
@@ -138,6 +139,7 @@ public class DrawingLinesCacheDimensionHandler {
                 it.remove();
             }
         }
+        lines.trim(64);
         return dbExecutor.submit(() -> database.insertLinesList(dataBuf, dimension));
     }
 

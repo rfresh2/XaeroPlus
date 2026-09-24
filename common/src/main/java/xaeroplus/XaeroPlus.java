@@ -34,7 +34,6 @@ public class XaeroPlus {
 	public static final File configFile = Services.PLATFORM.getConfigDir().resolve("xaeroplus.txt").toFile();
 	public static String XP_VERSION = "2";
 	public static final String MC_VERSION = DetectedVersion.BUILT_IN.getName();
-	public static final KeybindListener KEYBIND_LISTENER = new KeybindListener();
 
 	public static void initializeSettings() {
 		loadXPSettings();
@@ -42,10 +41,9 @@ public class XaeroPlus {
 		Globals.initStickySettings();
 		ModuleManager.getModule(Drawing.class).enable();
 		XaeroPlus.EVENT_BUS.registerConsumer(o -> {
-			if (Globals.minimapSettingsInitialized) return;
 			Globals.minimapSettingsInitialized = true;
 		}, MinimapInitCompletedEvent.class);
-		XaeroPlus.EVENT_BUS.register(KEYBIND_LISTENER);
+		XaeroPlus.EVENT_BUS.register(KeybindListener.INSTANCE);
 		XaeroPlus.EVENT_BUS.registerConsumer(o -> {
 			try {
 				var futures = new ArrayList<CompletableFuture<Void>>();

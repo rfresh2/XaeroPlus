@@ -18,11 +18,11 @@ import xaeroplus.module.impl.TickTaskExecutor;
 import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractLineDrawFeature<T> implements DrawFeature {
-    public final AsyncLoadingCache<Long, T> lineRenderCache;
+    public final AsyncLoadingCache<Boolean, T> lineRenderCache;
 
     protected AbstractLineDrawFeature(int refreshIntervalMs) {
         this.lineRenderCache = Caffeine.newBuilder()
-            .expireAfterWrite(10, TimeUnit.SECONDS)
+            .expireAfterWrite(Math.max(10, Mth.ceil(refreshIntervalMs / 1000.0) * 2), TimeUnit.SECONDS)
             .refreshAfterWrite(refreshIntervalMs, TimeUnit.MILLISECONDS)
             .executor(TickTaskExecutor.INSTANCE)
             .removalListener((k, v, cause) -> markDrawBufferStale())
@@ -58,7 +58,7 @@ public abstract class AbstractLineDrawFeature<T> implements DrawFeature {
     protected abstract void closeDrawBuffer();
 
     public T getLines() {
-        return lineRenderCache.get(0L).getNow(emptyLines());
+        return lineRenderCache.get(true).getNow(emptyLines());
     }
 
     public void preRender(DrawContext ctx) {

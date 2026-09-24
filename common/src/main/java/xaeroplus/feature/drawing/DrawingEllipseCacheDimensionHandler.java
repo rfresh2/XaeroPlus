@@ -25,7 +25,7 @@ public class DrawingEllipseCacheDimensionHandler {
     private int windowRegionSize;
     private final DrawingDatabase database;
     private final ListeningExecutorService dbExecutor;
-    private final Object2IntMap<Ellipse> ellipses = new Object2IntOpenHashMap<>();
+    private final Object2IntOpenHashMap<Ellipse> ellipses = new Object2IntOpenHashMap<>(64);
     private final Set<Ellipse> staleEllipses = new HashSet<>();
     private ListenableFuture<?> windowMoveFuture = Futures.immediateVoidFuture();
     private final Minecraft mc = Minecraft.getInstance();
@@ -59,6 +59,7 @@ public class DrawingEllipseCacheDimensionHandler {
     public void removeAllEllipses() {
         checkMainThread("removeAllEllipses");
         ellipses.clear();
+        ellipses.trim(64);
         staleEllipses.clear();
         dbExecutor.execute(() -> database.removeAllEllipses(dimension));
     }
@@ -117,15 +118,16 @@ public class DrawingEllipseCacheDimensionHandler {
         var minZ = ChunkUtils.regionCoordToCoord(regionZ - regionSize);
         var maxX = ChunkUtils.regionCoordToCoord(regionX + regionSize);
         var maxZ = ChunkUtils.regionCoordToCoord(regionZ + regionSize);
-        for (var iterator = ellipses.keySet().iterator(); iterator.hasNext();) {
-            var ellipse = iterator.next();
+        for (var it = ellipses.keySet().iterator(); it.hasNext();) {
+            var ellipse = it.next();
             if (!ellipse.intersects(minX, maxX, minZ, maxZ)) {
                 if (staleEllipses.remove(ellipse)) {
                     toWrite.put(ellipse, ellipses.getInt(ellipse));
                 }
-                iterator.remove();
+                it.remove();
             }
         }
+        ellipses.trim(64);
         return dbExecutor.submit(() -> database.insertEllipsesList(toWrite, dimension));
     }
 
@@ -139,12 +141,12 @@ public class DrawingEllipseCacheDimensionHandler {
     private Object2IntMap<Ellipse> collectStaleEllipsesToWrite() {
         if (staleEllipses.isEmpty()) return Object2IntMaps.emptyMap();
         var toWrite = new Object2IntOpenHashMap<Ellipse>(staleEllipses.size());
-        for (var iterator = staleEllipses.iterator(); iterator.hasNext();) {
-            var ellipse = iterator.next();
+        for (var it = staleEllipses.iterator(); it.hasNext();) {
+            var ellipse = it.next();
             if (ellipses.containsKey(ellipse)) {
                 toWrite.put(ellipse, ellipses.getInt(ellipse));
             }
-            iterator.remove();
+            it.remove();
         }
         return toWrite;
     }

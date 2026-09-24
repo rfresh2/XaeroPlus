@@ -29,8 +29,8 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
     // newly added highlights we need to write back to the database
     // if a highlight is not in this set, we do not write it to the database
     // helps performance at very low zoom levels as most data is old and does not need to be rewritten constantly
-    public final LongSet staleChunks = new LongOpenHashSet();
-    public final LongSet staleToRemoveChunks = new LongOpenHashSet();
+    public final LongOpenHashSet staleChunks = new LongOpenHashSet();
+    public final LongOpenHashSet staleToRemoveChunks = new LongOpenHashSet();
     ListenableFuture<?> windowMoveFuture = Futures.immediateVoidFuture();
 
     public ChunkHighlightCacheDimensionHandler(
@@ -87,7 +87,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
 
     private Long2LongMap loadUpdatedWindowFromDatabase(final int windowRegionX, final int windowRegionZ, final int windowRegionSize, final int prevWindowRegionX, final int prevWindowRegionZ, final int prevWindowRegionSize) {
         // load new data
-        Long2LongMap dataBuf = new Long2LongOpenHashMap();
+        Long2LongMap dataBuf = new Long2LongOpenHashMap(64);
         database.getHighlightsInWindowAndOutsidePrevWindow(
             dimension,
             windowRegionX - windowRegionSize, windowRegionX + windowRegionSize,
@@ -103,7 +103,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
         if (!mc.isSameThread()) {
             throw new RuntimeException("removeChunksOutsideWindow must be called on the main thread");
         }
-        Long2LongMap dataBuf = new Long2LongOpenHashMap();
+        Long2LongMap dataBuf = new Long2LongOpenHashMap(64);
         // write to db and remove data from local cache outside window
         var chunkXMin = regionCoordToChunkCoord(windowRegionX - windowRegionSize);
         var chunkXMax = regionCoordToChunkCoord(windowRegionX + windowRegionSize);
@@ -128,6 +128,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
             }
         }
         if (dataBuf.isEmpty()) return Futures.immediateVoidFuture();
+        chunks.trim(defaultCapacity);
         return dbExecutor.submit(() -> database.insertHighlightList(dataBuf, dimension));
     }
 
@@ -155,6 +156,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
             }
             it.remove();
         }
+        staleToRemoveChunks.trim(defaultCapacity);
         return chunksToRemove;
     }
 
@@ -172,6 +174,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
             }
             it.remove();
         }
+        staleChunks.trim(defaultCapacity);
         return chunksToWrite;
     }
 
@@ -246,7 +249,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
                 int regionZMin = windowRegionZ - windowRegionSize;
                 int regionXMax = windowRegionX + windowRegionSize;
                 int regionZMax = windowRegionZ + windowRegionSize;
-                var resultMap = new Long2LongOpenHashMap();
+                var resultMap = new Long2LongOpenHashMap(64);
                 ListenableFuture<?> dbLoadFuture = dbExecutor.submit(() -> database.getHighlightsInWindow(
                     dimension,
                     regionXMin, regionXMax,

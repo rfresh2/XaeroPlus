@@ -43,7 +43,6 @@ dependencies {
     modImplementation(libs.minimap.neo) { isTransitive = false }
     modImplementation(libs.xaerolib.neo)
     modImplementation(libs.baritone.neoforge)
-    modCompileOnly(libs.worldtools)
     modCompileOnly(libs.sodium.neoforge)
     modRuntimeOnly(libs.immediatelyfast.neo)
     forgeRuntimeLibrary(implementation(shadow(libs.sqlite.get())!!)!!)

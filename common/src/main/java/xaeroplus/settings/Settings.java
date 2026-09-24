@@ -12,7 +12,6 @@ import xaeroplus.module.ModuleManager;
 import xaeroplus.module.impl.*;
 import xaeroplus.util.BaritoneHelper;
 import xaeroplus.util.ColorHelper;
-import xaeroplus.util.WorldToolsHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.time.Duration;
@@ -636,36 +635,6 @@ public final class Settings extends SettingRegistry {
             .translationKey("xaeroplus.setting.new_chunks_only_above_y0")
             .defaultValue(false)
             .visibleWhen(() -> ModuleManager.getModule(LiquidNewChunks.class).isEnabled())
-            .build(),
-        SettingLocation.CHUNK_HIGHLIGHTS);
-    public final BooleanSetting worldToolsEnabledSetting = register(
-        BooleanSetting.builder()
-            .name("WorldTools Highlights")
-            .translationKey("xaeroplus.setting.world_tools")
-            .defaultValue(true)
-            .keybind()
-            .onChange((b) -> ModuleManager.getModule(WorldTools.class).setEnabled(b))
-            .visibleWhen(WorldToolsHelper::isWorldToolsPresent)
-            .build(),
-        SettingLocation.CHUNK_HIGHLIGHTS);
-    public DoubleSetting worldToolsAlphaSetting = register(
-        DoubleSetting.builder()
-            .name("WorldTools Highlights Opacity")
-            .translationKey("xaeroplus.setting.world_tools_opacity")
-            .range(0, 255, 10)
-            .defaultValue(100)
-            .onChange((b) -> ModuleManager.getModule(WorldTools.class).setAlpha(b))
-            .visibleWhen(() -> WorldToolsHelper.isWorldToolsPresent() && ModuleManager.getModule(WorldTools.class).isEnabled())
-            .build(),
-        SettingLocation.CHUNK_HIGHLIGHTS);
-    public final EnumSetting<ColorHelper.HighlightColor> worldToolsColorSetting = register(
-        EnumSetting.<ColorHelper.HighlightColor>builder()
-            .name("WorldTools Highlights Color")
-            .translationKey("xaeroplus.setting.world_tools_color")
-            .values(ColorHelper.HighlightColor.values())
-            .defaultValue(ColorHelper.HighlightColor.GREEN)
-            .onChange((b) -> ModuleManager.getModule(WorldTools.class).setRgbColor(b.getColor()))
-            .visibleWhen(() -> WorldToolsHelper.isWorldToolsPresent() && ModuleManager.getModule(WorldTools.class).isEnabled())
             .build(),
         SettingLocation.CHUNK_HIGHLIGHTS);
     public final BooleanSetting portalSkipDetectionEnabledSetting = register(

@@ -49,13 +49,6 @@ versionRange = "[${worldmap_version}]"
 ordering = "BEFORE"
 side = "CLIENT"
 
-[[dependencies.xaeroplus]]
-modId = "worldtools"
-type = "optional"
-versionRange = "[1.2.0,)"
-ordering = "BEFORE"
-side = "CLIENT"
-
 [mods."lithium:options"]
 "mixin.chunk.palette" = false
 

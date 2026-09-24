@@ -3,6 +3,7 @@ package xaeroplus.feature.render;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
 import net.minecraft.client.Minecraft;
+import org.jspecify.annotations.Nullable;
 import xaeroplus.Globals;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.DrawOrderHelper;
@@ -53,6 +54,15 @@ public class DrawFeatureRegistry {
         features.put(features.isEmpty() ? 0 : features.lastIntKey() + 1, feature);
         String serialized = DrawOrderHelper.serialize(drawOrder);
         Settings.REGISTRY.drawOrderSetting.setValue(serialized);
+    }
+
+    public synchronized @Nullable DrawFeature get(String id) {
+        for (var entry : Int2ObjectMaps.fastIterable(features)) {
+            if (entry.getValue().id().equals(id)) {
+                return entry.getValue();
+            }
+        }
+        return null;
     }
 
     /**

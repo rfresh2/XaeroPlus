@@ -10,7 +10,8 @@ import net.minecraft.world.level.Level;
 import static xaeroplus.util.ChunkUtils.chunkPosToLong;
 
 public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCache {
-    public final Long2LongMap chunks = new Long2LongOpenHashMap();
+    public int defaultCapacity = 1024;
+    public final Long2LongOpenHashMap chunks = new Long2LongOpenHashMap(defaultCapacity);
     public Minecraft mc = Minecraft.getInstance();
 
     public ChunkHighlightBaseCacheHandler() {
@@ -85,6 +86,7 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
             throw new RuntimeException("replaceState must be called on the main thread!");
         }
         this.chunks.clear();
+        this.chunks.trim(defaultCapacity);
         this.chunks.putAll(state);
     }
 
@@ -93,5 +95,6 @@ public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCa
             throw new RuntimeException("reset must be called on the main thread!");
         }
         chunks.clear();
+        chunks.trim(defaultCapacity);
     }
 }

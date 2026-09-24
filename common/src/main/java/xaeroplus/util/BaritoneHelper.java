@@ -19,6 +19,8 @@ public final class BaritoneHelper {
     private static boolean checkedDeobf = false;
     private static boolean elytraBehavior = false;
     private static boolean checkedElytraBehavior = false;
+    private static boolean checkedElytraPathAPI = false;
+    private static boolean elytraPathAPIPresent = false;
 
     public static boolean isBaritonePresent() {
         if (!checkedBaritone) {
@@ -65,7 +67,26 @@ public final class BaritoneHelper {
         return deobf;
     }
 
-    public static boolean isElytraPathAccessible() {
+    public static boolean isElytraPathAPIPresent() {
+        if (!checkedElytraPathAPI) {
+            try {
+                var getPathMethod = IElytraProcess.class.getDeclaredMethod("getPath");
+                if (getPathMethod.getReturnType() != List.class) {
+                    throw new RuntimeException("Bad return type: " + getPathMethod.getReturnType().getName());
+                }
+                elytraPathAPIPresent = true;
+                XaeroPlus.LOGGER.info("Baritone elytra path API found");
+
+            } catch (Throwable e) {
+                XaeroPlus.LOGGER.error("Baritone elytra path API not found, pls update baritone to fix!", e);
+                elytraPathAPIPresent = false;
+            }
+            checkedElytraPathAPI = true;
+        }
+        return elytraPathAPIPresent;
+    }
+
+    public static boolean isElytraPathReflectionAccessible() {
         if (!checkedElytraBehavior) {
             try {
                 var elytraProcessClass = Class.forName(ElytraProcess.class.getName());
@@ -89,10 +110,10 @@ public final class BaritoneHelper {
                 }
                 var pathListGetMethod = NetherPath.class.getDeclaredMethod("get", int.class);
                 var pathSizeMethod = NetherPath.class.getDeclaredMethod("size");
-                XaeroPlus.LOGGER.info("Baritone elytra path accessible");
+                XaeroPlus.LOGGER.info("Baritone elytra path reflection accessible");
                 elytraBehavior = true;
             } catch (Exception e) {
-                XaeroPlus.LOGGER.error("Baritone elytra path not accessible", e);
+                XaeroPlus.LOGGER.error("Baritone elytra path reflection not accessible", e);
                 elytraBehavior = false;
             }
             checkedElytraBehavior = true;

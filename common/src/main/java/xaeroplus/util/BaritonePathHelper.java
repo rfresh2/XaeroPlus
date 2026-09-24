@@ -13,21 +13,24 @@ import java.util.List;
 public class BaritonePathHelper {
 
     public static List<BlockPos> getBaritonePath() {
-        if (BaritoneHelper.isBaritoneElytraPresent() && BaritoneHelper.isBaritoneDeobf() && BaritoneHelper.isElytraPathAccessible()) {
+        if (BaritoneHelper.isBaritoneElytraPresent()) {
             var iElytraProcess = BaritoneAPI.getProvider().getPrimaryBaritone().getElytraProcess();
             var elytraGoalPos = iElytraProcess.currentDestination();
             if (elytraGoalPos != null) {
-                return getElytraPath();
+                if (BaritoneHelper.isElytraPathAPIPresent()) {
+                    return (List<BlockPos>) (List) iElytraProcess.getPath();
+                } else if (BaritoneHelper.isBaritoneDeobf() && BaritoneHelper.isElytraPathReflectionAccessible()) {
+                    return getElytraPathReflection();
+                }
             }
         }
-
         return BaritoneAPI.getProvider().getPrimaryBaritone().getPathingBehavior().getPath()
             .map(IPath::positions)
             .map(bpsList -> (List<BlockPos>) ((List) bpsList))
             .orElse(Collections.emptyList());
     }
 
-    static List<BlockPos> getElytraPath() {
+    static List<BlockPos> getElytraPathReflection() {
         try {
             var elytraProcess = (ElytraProcess) BaritoneAPI.getProvider().getPrimaryBaritone().getElytraProcess();
             var behaviorField = elytraProcess.getClass().getDeclaredField("behavior");

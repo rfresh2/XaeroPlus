@@ -22,7 +22,6 @@ dependencies {
     implementation(libs.caffeine)
     implementation(libs.lambdaEvents)
     modCompileOnly(libs.baritone.fabric)
-    modCompileOnly(libs.worldtools)
     implementation(libs.oldbiomes)
     implementation(libs.sqlite)
 }

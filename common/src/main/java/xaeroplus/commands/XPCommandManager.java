@@ -1,5 +1,6 @@
 package xaeroplus.commands;
 
+import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -34,15 +35,19 @@ public class XPCommandManager {
     }
 
     public static void registerCommands(CommandDispatcher<XPClientCommandSource> dispatcher, CommandBuildContext context) {
-        dispatcher.register(literal("xaeroDataDir").executes(c -> {
+        Command<XPClientCommandSource> dataDirCmd = c -> {
             c.getSource().xaeroplus$sendSuccess(DataFolderResolveUtil.getCurrentDataDirPath());
             return 1;
-        }));
-        dispatcher.register(literal("xaeroWaypointDir").executes(c -> {
+        };
+        dispatcher.register(literal("xaeroplus:dataDir").executes(dataDirCmd));
+        dispatcher.register(literal("xaeroDataDir").executes(dataDirCmd));
+        Command<XPClientCommandSource> wpDirCmd = c -> {
             c.getSource().xaeroplus$sendSuccess(DataFolderResolveUtil.getCurrentWaypointDataDirPath());
             return 1;
-        }));
-        dispatcher.register(literal("xaero2b2tAtlasImport").executes(c -> {
+        };
+        dispatcher.register(literal("xaeroplus:waypointDir").executes(wpDirCmd));
+        dispatcher.register(literal("xaeroWaypointDir").executes(wpDirCmd));
+        Command<XPClientCommandSource> atlasCmd = c -> {
             c.getSource().xaeroplus$sendSuccess(Component.literal("Atlas import started..."));
             AtlasWaypointImport.importAtlasWaypoints()
                 .whenCompleteAsync((addedCount, e) -> {
@@ -64,7 +69,9 @@ public class XPCommandManager {
                     c.getSource().xaeroplus$sendSuccess(Component.literal("Atlas Import Complete!"));
                 }, TickTaskExecutor.INSTANCE);
             return 1;
-        }));
+        };
+        dispatcher.register(literal("xaeroplus:2b2tAtlasImport").executes(atlasCmd));
+        dispatcher.register(literal("xaero2b2tAtlasImport").executes(atlasCmd));
         dispatcher.register(literal("xaeroplus:clearDrawings").executes(c -> {
             TickTaskExecutor.INSTANCE.submit(() -> {
                 ModuleManager.getModule(Drawing.class).clearAll();

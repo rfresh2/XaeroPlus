@@ -22,7 +22,7 @@ public class DrawingTextCacheDimensionHandler {
     private int windowRegionSize = 0;
     private final DrawingDatabase database;
     private final ListeningExecutorService dbExecutor;
-    private final Long2ObjectMap<Text> texts = new Long2ObjectOpenHashMap<>();
+    private final Long2ObjectOpenHashMap<Text> texts = new Long2ObjectOpenHashMap<>();
     public final LongSet staleTexts = new LongOpenHashSet();
     Minecraft mc = Minecraft.getInstance();
     ListenableFuture<?> windowMoveFuture = Futures.immediateVoidFuture();
@@ -64,6 +64,7 @@ public class DrawingTextCacheDimensionHandler {
             throw new RuntimeException("removeAllTexts must be called on the main thread!");
         }
         texts.clear();
+        texts.trim(64);
         staleTexts.clear();
         dbExecutor.execute(() -> database.removeAllTexts(dimension));
     }
@@ -142,6 +143,7 @@ public class DrawingTextCacheDimensionHandler {
                 it.remove();
             }
         }
+        texts.trim(64);
         return dbExecutor.submit(() -> database.insertTextsList(dataBuf, dimension));
     }
 

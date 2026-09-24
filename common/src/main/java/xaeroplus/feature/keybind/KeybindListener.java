@@ -12,6 +12,8 @@ import xaeroplus.settings.Settings;
 import java.util.concurrent.ForkJoinPool;
 
 public class KeybindListener {
+    public static final KeybindListener INSTANCE = new KeybindListener();
+    private KeybindListener() {}
     // prevents repeat events if keybind is held down
     private final Object2BooleanMap<KeyMapping> prevKeybindState = new Object2BooleanOpenHashMap<>();
 

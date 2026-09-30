@@ -526,7 +526,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         }
     }
 
-    private synchronized void addInitOperation(final Runnable task) {
+    private void addInitOperation(final Runnable task) {
         if (!initOperationQueue.isEmpty()) {
             var cutoff = Instant.now().minusSeconds(10);
             while (true) {

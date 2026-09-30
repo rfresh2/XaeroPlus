@@ -52,4 +52,9 @@ public class Wait {
     public static void waitRandomMs(final int ms) {
         Wait.waitMs((int) (ThreadLocalRandom.current().nextDouble(ms)));
     }
+
+    public static void busyWait(int ms) {
+        long before = System.nanoTime();
+        while (TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - before) < ms) {}
+    }
 }

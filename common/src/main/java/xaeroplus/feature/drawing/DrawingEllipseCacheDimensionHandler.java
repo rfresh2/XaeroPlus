@@ -68,7 +68,10 @@ public class DrawingEllipseCacheDimensionHandler {
         return ellipses;
     }
 
-    public synchronized void setWindow(final int regionX, final int regionZ, final int regionSize) {
+    public void setWindow(final int regionX, final int regionZ, final int regionSize) {
+        if (!mc.isSameThread()) {
+            throw new RuntimeException("setWindow must be called on the main thread");
+        }
         var windowChanged = regionX != windowRegionX || regionZ != windowRegionZ || regionSize != windowRegionSize;
         if (windowChanged && !windowMoveFuture.isDone() && (regionX != 0 || regionZ != 0 || regionSize != 0)) {
             XaeroPlus.LOGGER.debug(

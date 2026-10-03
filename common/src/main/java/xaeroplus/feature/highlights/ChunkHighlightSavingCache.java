@@ -59,6 +59,14 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
                     .build()));
     }
 
+    boolean isInParentThread() {
+        return Thread.currentThread().getName().equals(name + "-Manager");
+    }
+
+    boolean isInDbThread() {
+        return Thread.currentThread().getName().equals(name + "-Worker");
+    }
+
     @Override
     public String name() {
         return name;
@@ -115,7 +123,7 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
             ChunkHighlightCacheDimensionHandler cacheForActualDimension = getCacheForDimension(dimension, true);
             if (cacheForActualDimension == null) {
                 // if the cache is not ready yet, queue the highlight to be removed
-                initOperationQueue.add(new QueuedInitOperation(() -> removeHighlight(x, z, dimension)));
+                addInitOperation(() -> removeHighlight(x, z, dimension));
                 return;
             }
             cacheForActualDimension.removeHighlight(x, z);
@@ -180,13 +188,24 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
                         Futures.addCallback(initializeTask, new FutureCallback() {
                             @Override
                             public void onSuccess(@Nullable final Object result) {
-                                cacheReady.compareAndSet(false, true);
+                                if (cacheReady.compareAndSet(false, true)) {
+                                    submitTickTask(() -> loadChunksInViewedDimension());
+                                    submitTickTask(() -> {
+                                        if (!initOperationQueue.isEmpty()) XaeroPlus.LOGGER.info("[{}] Running {} queued tasks", name, initOperationQueue.size());
+                                        while (!initOperationQueue.isEmpty() && cacheReady.get()) {
+                                            var op = initOperationQueue.poll();
+                                            if (op == null || op.task() == null) continue;
+                                            op.task().run();
+                                        }
+                                    });
+                                }
                             }
 
                             @Override
                             public void onFailure(@NotNull final Throwable t) {
                                 if (t instanceof CancellationException) {
                                     XaeroPlus.LOGGER.warn("{} disk cache initialization cancelled", name);
+                                    return; // racey with EXIT_WORLD, defer to its reset path
                                 } else {
                                     XaeroPlus.LOGGER.error("Error initializing {} disk cache", name, t);
                                 }
@@ -225,7 +244,10 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
         });
     }
 
-    private synchronized void reset() {
+    private void reset() {
+        if (!isInParentThread()) {
+            throw new RuntimeException("initializeWorld must be called on the manager thread");
+        }
         this.currentWorldId = null;
         if (this.dbExecutor != null) {
             try {
@@ -279,7 +301,11 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
             return null;
         }
         var cacheHandler = new ChunkHighlightCacheDimensionHandler(name, dimension, db, executor);
-        db.initializeDimension(dimension);
+        if (!isInDbThread()) {
+            executor.execute(() -> {
+                db.initializeDimension(dimension);
+            });
+        }
         this.dimensionCacheMap.put(dimension, cacheHandler);
         return cacheHandler;
     }
@@ -322,8 +348,11 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
 
     // returns false if we were not able to get to a ready state
     // will happen if we are disconnecting from a server where the mc world is not loaded
-    private synchronized ListenableFuture<?> initializeWorld() {
+    private ListenableFuture<?> initializeWorld() {
         try {
+            if (!isInParentThread()) {
+                return Futures.immediateFailedFuture(new IllegalStateException("initializeWorld must be called from the manager thread"));
+            }
             var currentSession = XaeroWorldMapCore.currentSession;
             if (currentSession == null) return Futures.immediateFailedFuture(new IllegalStateException("WorldMapSession is null"));
             MapProcessor mapProcessor = currentSession.getMapProcessor();
@@ -345,14 +374,6 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
                 initializeDimensionCacheHandler(OVERWORLD);
                 initializeDimensionCacheHandler(NETHER);
                 initializeDimensionCacheHandler(END);
-                loadChunksInViewedDimension();
-                if (!initOperationQueue.isEmpty()) XaeroPlus.LOGGER.info("[{}] Running {} queued tasks",
-                    name, initOperationQueue.size());
-                while (!this.initOperationQueue.isEmpty()) {
-                    var op = this.initOperationQueue.poll();
-                    if (op == null || op.task() == null) continue;
-                    submitTickTask(op.task());
-                }
             });
         } catch (final Exception e) {
             reset(); // ensure we don't leave ourselves in a half init state somehow
@@ -430,6 +451,9 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
 
     @Override
     public void handleTick() {
+        if (!mc.isSameThread()) {
+            throw new RuntimeException("handleTick must be called on the main thread");
+        }
         if (!cacheReady.get()) return;
         if (XaeroWorldMapCore.currentSession == null) return;
         // reduce likelihood of all caches updating at the same time

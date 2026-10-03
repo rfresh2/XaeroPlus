@@ -73,7 +73,7 @@ dependencies {
     runtimeOnly("net.lenni0451:Reflect:1.6.1") // immediatelyfast jij
 	modImplementation(libs.modmenu)
     modCompileOnly(libs.sodium.fabric)
-//    modRuntimeOnly(libs.spark.fabric)
+    modRuntimeOnly(libs.spark.fabric)
     implementation(shadow(libs.caffeine.get())!!)
 	implementation(shadow(libs.lambdaEvents.get())!!)
 	implementation(shadow(libs.oldbiomes.get())!!)

@@ -48,7 +48,10 @@ public class DrawingHighlightCacheDimensionHandler extends ChunkHighlightBaseCac
         return name;
     }
 
-    public synchronized void setWindow(int regionX, int regionZ, int regionSize) {
+    public void setWindow(int regionX, int regionZ, int regionSize) {
+        if (!mc.isSameThread()) {
+            throw new RuntimeException("setWindow must be called on the main thread");
+        }
         boolean windowChanged = regionX != windowRegionX || regionZ != windowRegionZ || regionSize != windowRegionSize;
         if (windowChanged
             && !windowMoveFuture.isDone()

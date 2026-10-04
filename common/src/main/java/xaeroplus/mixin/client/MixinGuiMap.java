@@ -1140,7 +1140,10 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         }
 
         if (Settings.REGISTRY.disableTeleportation.get()) {
+            options.removeIf(option -> ((AccessorRightClickOption) option).invokeGetName().equals("gui.xaero_right_click_map_cant_teleport_world"));
             options.removeIf(option -> ((AccessorRightClickOption) option).invokeGetName().equals("gui.xaero_wm_right_click_map_teleport_not_allowed"));
+            options.removeIf(option -> ((AccessorRightClickOption) option).invokeGetName().equals("gui.xaero_right_click_map_cant_teleport"));
+            options.removeIf(option -> ((AccessorRightClickOption) option).invokeGetName().equals("gui.xaero_right_click_map_teleport"));
         }
     }
 

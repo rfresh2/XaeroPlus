@@ -305,6 +305,8 @@ public class ChunkHighlightSavingCache implements ChunkHighlightCache, Closeable
             executor.execute(() -> {
                 db.initializeDimension(dimension);
             });
+        } else {
+            db.initializeDimension(dimension);
         }
         this.dimensionCacheMap.put(dimension, cacheHandler);
         return cacheHandler;

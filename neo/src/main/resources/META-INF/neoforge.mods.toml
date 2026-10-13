@@ -18,7 +18,7 @@ displayTest="IGNORE_ALL_VERSION"
 [[dependencies.xaeroplus]]
 modId = "neoforge"
 type = "required"
-versionRange = "[1,)"
+versionRange = "[26.3.0.76,)"
 ordering = "NONE"
 side = "CLIENT"
 

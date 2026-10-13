@@ -364,6 +364,9 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         shift = At.Shift.AFTER
     ))
     public void lockedMapSettingHelp(final CallbackInfo ci, @Local(argsOnly = true) GuiGraphics guiGraphics) {
+        var matrixStack = guiGraphics.pose();
+        matrixStack.pushPose();
+        matrixStack.translate(0.0F, 0.0F, 500.0F);
         guiGraphics.drawCenteredString(
             this.minecraft.font,
             I18n.get("xaeroplus.gui.world_map.locked_map_help"),
@@ -371,6 +374,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             (this.minecraft.getWindow().getGuiScaledHeight() / 2) + 20,
             ColorHelper.getColor(255, 255, 255, 255)
         );
+        matrixStack.popPose();
     }
 
     @WrapOperation(method = "render", at = @At(

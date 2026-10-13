@@ -333,5 +333,6 @@
   "xaeroplus.gui.cross_dimension_waypoint_teleport_rotation_format.description": "Symbole zastępcze: {x} {y} {z} {d} {name} {yaw}",
   "xaeroplus.gui.cross_dimension_waypoint_teleport_format.input": "Format teleportacji",
   "xaeroplus.gui.toast.database_migration_in_progress": "%s migracji bazy danych w toku, %s ukończono, %s nieudanych",
-  "xaeroplus.gui.toast.database_migration_done": "%s migracji bazy danych ukończono, %s nieudanych"
+  "xaeroplus.gui.toast.database_migration_done": "%s migracji bazy danych ukończono, %s nieudanych",
+  "xaeroplus.gui.world_map.locked_map_help": "Or enable \"Ignore Map File Locks\" in WorldMap Settings"
 }

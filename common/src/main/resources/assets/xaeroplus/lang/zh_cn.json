@@ -333,5 +333,6 @@
   "xaeroplus.gui.cross_dimension_waypoint_teleport_rotation_format.description": "仅用于跨维度路径点传送。可用占位符：{x} {y} {z} {d} {name} {yaw}",
   "xaeroplus.gui.cross_dimension_waypoint_teleport_format.input": "传送格式",
   "xaeroplus.gui.toast.database_migration_in_progress": "%s 个数据库迁移正在进行，%s 个已完成，%s 个失败",
-  "xaeroplus.gui.toast.database_migration_done": "%s 个数据库迁移已完成，%s 个失败"
+  "xaeroplus.gui.toast.database_migration_done": "%s 个数据库迁移已完成，%s 个失败",
+  "xaeroplus.gui.world_map.locked_map_help": "Or enable \"Ignore Map File Locks\" in WorldMap Settings"
 }

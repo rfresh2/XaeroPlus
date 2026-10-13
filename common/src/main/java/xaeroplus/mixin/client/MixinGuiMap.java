@@ -374,6 +374,22 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
         original.call(instance);
     }
 
+    @Inject(method = "extractRenderState", at = @At(
+        value = "INVOKE",
+        target = "Lxaero/map/gui/GuiMap;renderMessageScreen(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Ljava/lang/String;Ljava/lang/String;)V",
+        ordinal = 0,
+        shift = At.Shift.AFTER
+    ))
+    public void lockedMapSettingHelp(final CallbackInfo ci, @Local(argsOnly = true) GuiGraphicsExtractor guiGraphics) {
+        guiGraphics.centeredText(
+            this.minecraft.font,
+            Component.translatable("xaeroplus.gui.world_map.locked_map_help"),
+            this.minecraft.getWindow().getGuiScaledWidth() / 2,
+            (this.minecraft.getWindow().getGuiScaledHeight() / 2) + 20,
+            ColorHelper.getColor(255, 255, 255, 255)
+        );
+    }
+
     @WrapOperation(method = "extractRenderState", at = @At(
         value = "INVOKE",
         target = "Lxaero/map/gui/GuiMap;applyZoomLimits()V"

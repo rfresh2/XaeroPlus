@@ -27,7 +27,8 @@
   },
   "mixins": [
     "xaeroplus.mixins.json",
-    "xaeroplus-fabric.mixins.json"
+    "xaeroplus-fabric.mixins.json",
+    "xaeroplus-asmworkaround.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.19.2",

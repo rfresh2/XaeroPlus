@@ -22,7 +22,7 @@ val shadowCommon = configurations.create("shadowCommon")
 loom {
     accessWidenerPath = common.loom.accessWidenerPath
     forge {
-        mixinConfigs.set(listOf("xaeroplus.mixins.json", "xaeroplus-forge.mixins.json"))
+        mixinConfigs.set(listOf("xaeroplus.mixins.json", "xaeroplus-asmworkaround.mixins.json", "xaeroplus-forge.mixins.json"))
         convertAccessWideners = true
         extraAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
         useCustomMixin = false

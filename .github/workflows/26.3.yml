@@ -243,7 +243,7 @@ jobs:
 #          mc: ${{ env.MINECRAFT_VERSION }}
 #          modloader: fabric
 #          mc-runtime-test: fabric
-#          fabric-api: 0.162.0
+#          fabric-api: 0.163.0
 #          java: 25
 #          xvfb: true
 #          headlessmc-command: --jvm -Djava.awt.headless=true

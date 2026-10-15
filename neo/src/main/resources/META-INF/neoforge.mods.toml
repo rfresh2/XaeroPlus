@@ -60,4 +60,7 @@ side = "CLIENT"
 config = "xaeroplus.mixins.json"
 
 [[mixins]]
+config = "xaeroplus-asmworkaround.mixins.json"
+
+[[mixins]]
 config = "xaeroplus-neo.mixins.json"

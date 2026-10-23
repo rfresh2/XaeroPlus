@@ -13,7 +13,7 @@ import xaeroplus.util.timer.Timers;
 
 public class TeleportFailNotifier extends Module {
     boolean awaitingTeleport = false;
-    Timer timer = Timers.timer();
+    Timer timer = Timers.tickTimer();
 
     @EventHandler
     public void onTeleportAttempt(XaeroTeleportAttemptEvent event) {

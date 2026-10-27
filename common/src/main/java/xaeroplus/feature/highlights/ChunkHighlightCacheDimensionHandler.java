@@ -4,12 +4,17 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.SettableFuture;
 import it.unimi.dsi.fastutil.longs.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
+import xaeroplus.feature.render.async.AsyncTileBuffers;
+import xaeroplus.feature.render.async.FrameBudgetQueue;
+import xaeroplus.feature.render.async.HighlightMeshes;
+import xaeroplus.feature.render.async.WorldMapScreenState;
 import xaeroplus.util.ChunkUtils;
 
 import java.util.concurrent.CompletableFuture;
@@ -106,6 +111,7 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
         if (!mc.isSameThread()) {
             throw new RuntimeException("removeChunksOutsideWindow must be called on the main thread");
         }
+        if (WorldMapScreenState.isOpen()) return flushChunksOutsideWindowAsync(windowRegionX, windowRegionZ, windowRegionSize);
         Long2LongMap dataBuf = new Long2LongOpenHashMap(64);
         // write to db and remove data from local cache outside window
         var chunkXMin = regionCoordToChunkCoord(windowRegionX - windowRegionSize);
@@ -133,6 +139,57 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
         if (dataBuf.isEmpty()) return Futures.immediateVoidFuture();
         chunks.trim(defaultCapacity);
         return dbExecutor.submit(() -> database.insertHighlightList(dataBuf, dimension));
+    }
+
+    /**
+     * Async world map rendering: the same flush as {@link #flushChunksOutsideWindow}, but the scan runs on a worker
+     * and the removals, which must stay on the main thread, are spread over frames.
+     * The returned future still gates the next window move.
+     */
+    private ListenableFuture<?> flushChunksOutsideWindowAsync(final int windowRegionX, final int windowRegionZ, final int windowRegionSize) {
+        var chunkXMin = regionCoordToChunkCoord(windowRegionX - windowRegionSize);
+        var chunkXMax = regionCoordToChunkCoord(windowRegionX + windowRegionSize);
+        var chunkZMin = regionCoordToChunkCoord(windowRegionZ - windowRegionSize);
+        var chunkZMax = regionCoordToChunkCoord(windowRegionZ + windowRegionSize);
+        var snapshot = HighlightMeshes.Snapshot.of(chunks);
+        SettableFuture<Object> result = SettableFuture.create();
+        CompletableFuture.supplyAsync(() -> HighlightMeshes.keysOutside(snapshot, chunkXMin, chunkXMax, chunkZMin, chunkZMax), AsyncTileBuffers.executor())
+            .thenAcceptAsync(outside -> FrameBudgetQueue.submit(removeChunksOutsideWindowStep(outside, chunkXMin, chunkXMax, chunkZMin, chunkZMax, result)), mc)
+            .exceptionally(t -> {
+                result.setException(t);
+                return null;
+            });
+        return result;
+    }
+
+    // the body of the flushChunksOutsideWindow loop, applied to the scanned candidates a few at a time
+    private FrameBudgetQueue.Step removeChunksOutsideWindowStep(final LongArrayList outside, final int chunkXMin, final int chunkXMax,
+                                                                final int chunkZMin, final int chunkZMax, final SettableFuture<Object> result) {
+        Long2LongMap dataBuf = new Long2LongOpenHashMap(64);
+        int[] next = {0};
+        return deadline -> {
+            for (; next[0] < outside.size(); next[0]++) {
+                if (FrameBudgetQueue.outOfTime(next[0], deadline)) return false;
+                long chunkPos = outside.getLong(next[0]);
+                final int chunkX = ChunkUtils.longToChunkX(chunkPos);
+                final int chunkZ = ChunkUtils.longToChunkZ(chunkPos);
+                if (!chunks.containsKey(chunkPos)
+                    || (chunkX >= chunkXMin && chunkX <= chunkXMax && chunkZ >= chunkZMin && chunkZ <= chunkZMax)) {
+                    continue;
+                }
+                if (staleChunks.contains(chunkPos)) {
+                    dataBuf.put(chunkPos, chunks.get(chunkPos));
+                }
+                chunks.remove(chunkPos);
+            }
+            if (dataBuf.isEmpty()) {
+                result.set(null);
+            } else {
+                chunks.trim(defaultCapacity);
+                result.setFuture(dbExecutor.submit(() -> database.insertHighlightList(dataBuf, dimension)));
+            }
+            return true;
+        };
     }
 
     public ListenableFuture<?> flushStaleToRemoveChunks() {
@@ -291,8 +348,31 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
                 XaeroPlus.LOGGER.error("WindowDataLoadFutureCallback must be called on the main thread");
             }
             if (dataBuf.isEmpty()) return;
+            if (WorldMapScreenState.isOpen() && mc.isSameThread()) {
+                putAllOverFrames(dataBuf);
+                return;
+            }
             // write new data to local cache
             chunks.putAll(dataBuf);
+        }
+
+        /**
+         * Async world map rendering: inserting a grown window's highlights all in one frame stalls zooming out.
+         * They are inserted over a few frames instead, still on the main thread and in order with other changes.
+         */
+        private void putAllOverFrames(Long2LongMap dataBuf) {
+            var entries = Long2LongMaps.fastIterator(dataBuf);
+            // Grow once up front, as putAll does. Inserting another hash map's entries in its iteration order
+            // into a smaller, growing table piles them into ever longer probe runs.
+            chunks.ensureCapacity(chunks.size() + dataBuf.size());
+            FrameBudgetQueue.submit(deadline -> {
+                for (int i = 1; entries.hasNext(); i++) {
+                    var entry = entries.next();
+                    chunks.put(entry.getLongKey(), entry.getLongValue());
+                    if (FrameBudgetQueue.outOfTime(i, deadline)) return !entries.hasNext();
+                }
+                return true;
+            });
         }
 
         @Override

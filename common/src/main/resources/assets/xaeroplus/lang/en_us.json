@@ -7,6 +7,8 @@
   "xaeroplus.setting.fps_limiter_limit.tooltip": "The FPS limit to set. Lower FPS limit = higher game FPS.",
   "xaeroplus.setting.fast_zip_writes": "Fast Zip Writes",
   "xaeroplus.setting.fast_zip_writes.tooltip": "Writes Map tile zip files faster but uses more RAM. Disable this if you have low RAM available.",
+  "xaeroplus.setting.async_worldmap_rendering": "Async WorldMap Rendering",
+  "xaeroplus.setting.async_worldmap_rendering.tooltip": "While the WorldMap is open, builds map tiles and chunk highlights on background threads instead of the render thread. Reduces stutter when panning and zooming out.",
   "xaeroplus.setting.region_write_while_dimension_switched": "Region Writes While Dim Switched",
   "xaeroplus.setting.region_write_while_dimension_switched.tooltip": "Fixes Xaero's WorldMap not writing/loading chunks you load while viewing another dimension.",
   "xaeroplus.setting.baritone_waypoint": "Baritone Goal Waypoint",

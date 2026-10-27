@@ -16,12 +16,17 @@ import xaero.map.region.MapTileChunk;
 import xaero.map.region.texture.LeafRegionTexture;
 import xaero.map.world.MapDimension;
 import xaero.map.world.MapWorld;
+import xaeroplus.feature.extensions.AsyncBufferedMapTileChunk;
 import xaeroplus.feature.extensions.SeenChunksTrackingMapTileChunk;
+import xaeroplus.feature.render.async.AsyncTileBuffers;
 import xaeroplus.settings.Settings;
 
 @Mixin(value = MapTileChunk.class, remap = false)
-public abstract class MixinMapTileChunk implements SeenChunksTrackingMapTileChunk {
+public abstract class MixinMapTileChunk implements SeenChunksTrackingMapTileChunk, AsyncBufferedMapTileChunk {
     @Unique private final boolean[][] xaeroPlus$seenTiles = new boolean[4][4];
+    @Unique private volatile int xaeroPlus$generation;
+    @Unique private volatile AsyncTileBuffers.Job xaeroPlus$job;
+    @Unique private boolean xaeroPlus$syncFallback;
 
     @Shadow private LeafRegionTexture leafTexture;
 
@@ -35,6 +40,36 @@ public abstract class MixinMapTileChunk implements SeenChunksTrackingMapTileChun
     @Inject(method = "setTile", at = @At("HEAD"))
     public void setTile(final int x, final int z, final MapTile tile, final BlockStateShortShapeCache blockStateShortShapeCache, final MapProcessor mapProcessor, final CallbackInfo ci) {
         xaeroPlus$seenTiles[x][z] = tile != null;
+    }
+
+    @Inject(method = {"setToUpdateBuffers", "setTile", "clean"}, at = @At("HEAD"))
+    public void invalidateAsyncBufferJob(final CallbackInfo ci) {
+        xaeroPlus$generation++;
+    }
+
+    @Override
+    public int xaeroPlus$generation() {
+        return xaeroPlus$generation;
+    }
+
+    @Override
+    public AsyncTileBuffers.Job xaeroPlus$job() {
+        return xaeroPlus$job;
+    }
+
+    @Override
+    public void xaeroPlus$setJob(final AsyncTileBuffers.Job job) {
+        xaeroPlus$job = job;
+    }
+
+    @Override
+    public boolean xaeroPlus$syncFallback() {
+        return xaeroPlus$syncFallback;
+    }
+
+    @Override
+    public void xaeroPlus$setSyncFallback(final boolean syncFallback) {
+        xaeroPlus$syncFallback = syncFallback;
     }
 
     @Inject(method = "readCacheData", at = @At("RETURN"))

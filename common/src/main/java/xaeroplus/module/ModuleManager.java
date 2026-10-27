@@ -11,6 +11,7 @@ public class ModuleManager {
 
     static {
         asList(
+            new AsyncWorldMapRendering(),
             new BaritoneGoalSync(),
             new BaritonePathSync(),
             new Beacons(),

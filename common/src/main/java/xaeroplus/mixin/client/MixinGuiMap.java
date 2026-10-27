@@ -63,6 +63,7 @@ import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.feature.drawing.ColorPickerWidget;
 import xaeroplus.feature.drawing.DrawingColorPickerButton;
+import xaeroplus.feature.render.async.WorldMapScreenState;
 import xaeroplus.feature.render.line.Line;
 import xaeroplus.feature.render.shaders.XaeroPlusShaders;
 import xaeroplus.feature.render.text.Text;
@@ -81,6 +82,7 @@ import static xaeroplus.Globals.getCurrentDimensionId;
 
 @Mixin(value = GuiMap.class, remap = false)
 public abstract class MixinGuiMap extends ScreenBase implements IRightClickableElement {
+    @Unique private static final int xaeroPlus$ASYNC_REGIONS_PER_REQUEST = 4;
     @Unique boolean pan;
     @Unique double panMouseStartX;
     @Unique double panMouseStartY;
@@ -558,6 +560,35 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
             drawTextEntryField.setFocused(true);
             setFocused(drawTextEntryField);
         }
+    }
+
+    /**
+     * Publishes the visible block area for async world map rendering; the camera has settled for this frame by the end of render.
+     */
+    @Inject(method = "render", at = @At("RETURN"))
+    public void publishAsyncRenderingView(CallbackInfo ci) {
+        var window = Minecraft.getInstance().getWindow();
+        WorldMapScreenState.setView(cameraX, cameraZ, window.getWidth() / 2.0 / scale, window.getHeight() / 2.0 / scale);
+    }
+
+    /**
+     * Each time the previously requested region has loaded, the map screen requests the next few from the closest
+     * unloaded ones it found this frame: 2 zoomed-out (branch) regions and 1 leaf region. The map thread finishes those
+     * long before the next frame, so the screen fills in at about one region per frame. With async world map rendering,
+     * requesting a few more per round keeps it busy; Xaero's own cap on regions in flight still applies.
+     */
+    @ModifyConstant(method = "render", constant = @Constant(intValue = 2, ordinal = 0), slice = @Slice(
+        from = @At(value = "INVOKE", target = "Lxaero/map/MapProcessor;getAffectingLoadingFrequencyCount()I")
+    ))
+    public int asyncRenderingBranchRegionRequests(final int original) {
+        return WorldMapScreenState.isOpen() ? xaeroPlus$ASYNC_REGIONS_PER_REQUEST : original;
+    }
+
+    @ModifyConstant(method = "render", constant = @Constant(intValue = 1, ordinal = 0), slice = @Slice(
+        from = @At(value = "INVOKE", target = "Lxaero/map/file/MapSaveLoad;requestBranchCache(Lxaero/map/region/BranchLeveledRegion;Ljava/lang/String;)V")
+    ))
+    public int asyncRenderingLeafRegionRequests(final int original) {
+        return WorldMapScreenState.isOpen() ? xaeroPlus$ASYNC_REGIONS_PER_REQUEST : original;
     }
 
     @Inject(method = "render", at = @At("RETURN"))

@@ -34,6 +34,7 @@ public class MultiColorHighlightVertexBuffer extends AbstractHighlightVertexBuff
     }
 
     public void refresh(DrawContext ctx, Long2LongMap highlights, int colorAlpha) {
+        if (refreshAsync(ctx, highlights, colorAlpha, colorFunction)) return;
         stale = false;
         lastRefreshed = System.currentTimeMillis();
         flipped = ctx.worldmap();

@@ -1,5 +1,6 @@
 package xaeroplus.mixin.client;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.Minecraft;
@@ -27,6 +28,7 @@ import xaeroplus.Globals;
 import xaeroplus.XaeroPlus;
 import xaeroplus.event.XaeroWorldChangeEvent;
 import xaeroplus.feature.extensions.CustomMapProcessor;
+import xaeroplus.feature.render.async.WorldMapScreenState;
 import xaeroplus.settings.Settings;
 import xaeroplus.util.ChunkUtils;
 import xaeroplus.util.DataFolderResolveUtil;
@@ -239,6 +241,20 @@ public abstract class MixinMapProcessor implements CustomMapProcessor {
             this.xaeroPlus$prevMWId = this.currentMWId;
         }
         original.call(instance, value);
+    }
+
+    /**
+     * While the map camera is still, Xaero drops the per-frame upload budget and processes every pending texture
+     * in one frame, which stalls the render thread on a zoomed-out map.
+     * With async world map rendering the buffers are built off-thread, so the regular budget keeps up.
+     */
+    @ModifyExpressionValue(method = "onRenderProcess", at = @At(
+        value = "FIELD",
+        target = "Lxaero/map/gui/GuiMap;noUploadingLimits:Z",
+        opcode = Opcodes.GETFIELD
+    ))
+    public boolean keepUploadBudgetWithAsyncBuffers(final boolean noUploadingLimits) {
+        return noUploadingLimits && !WorldMapScreenState.isOpen();
     }
 
     @Unique

@@ -56,6 +56,14 @@ public final class Settings extends SettingRegistry {
             })
             .build(),
         SettingLocation.WORLD_MAP_MAIN);
+    public final BooleanSetting asyncWorldMapRendering = register(
+        BooleanSetting.builder()
+            .name("Async WorldMap Rendering")
+            .translationKey("xaeroplus.setting.async_worldmap_rendering")
+            .defaultValue(true)
+            .onChange((b) -> ModuleManager.getModule(AsyncWorldMapRendering.class).setEnabled(b))
+            .build(),
+        SettingLocation.WORLD_MAP_MAIN);
     public final BooleanSetting writesWhileDimSwitched = register(
         BooleanSetting.builder()
             .name("Region Writes While Dim Switched")

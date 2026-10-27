@@ -28,6 +28,7 @@ public class HighlightVertexBuffer extends AbstractHighlightVertexBuffer {
 
     @Override
     public void refresh(final DrawContext ctx, final Long2LongMap highlights, final int color) {
+        if (refreshAsync(ctx, highlights, color, null)) return;
         stale = false;
         lastRefreshed = System.currentTimeMillis();
         flipped = ctx.worldmap();

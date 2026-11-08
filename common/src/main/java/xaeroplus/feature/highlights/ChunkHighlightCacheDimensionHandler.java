@@ -130,8 +130,8 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
                 it.remove();
             }
         }
+        chunks.trim(Math.max(defaultCapacity, chunks.size()));
         if (dataBuf.isEmpty()) return Futures.immediateVoidFuture();
-        chunks.trim(defaultCapacity);
         return dbExecutor.submit(() -> database.insertHighlightList(dataBuf, dimension));
     }
 

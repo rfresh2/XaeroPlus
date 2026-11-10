@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
+import it.unimi.dsi.fastutil.HashCommon;
 import it.unimi.dsi.fastutil.longs.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -130,9 +131,24 @@ public class ChunkHighlightCacheDimensionHandler extends ChunkHighlightBaseCache
                 it.remove();
             }
         }
+        chunks.trim(calcTrimCapacity());
         if (dataBuf.isEmpty()) return Futures.immediateVoidFuture();
-        chunks.trim(defaultCapacity);
         return dbExecutor.submit(() -> database.insertHighlightList(dataBuf, dimension));
+    }
+
+    int calcTrimCapacity() {
+        var size = chunks.size();
+        if (size < defaultCapacity) {
+            return defaultCapacity;
+        }
+        // trim to size if >=4 powers of 2 smaller than current n
+        var nLog2 = Math.log(chunks.n()) / Math.log(2);
+        var rehashSize = HashCommon.nextPowerOfTwo((int)Math.ceil(size / chunks.f()));
+        var sizeLog2 = Math.log(rehashSize) / Math.log(2);
+        if (nLog2 - sizeLog2 >= 4) {
+            return size;
+        }
+        return defaultCapacity;
     }
 
     public ListenableFuture<?> flushStaleToRemoveChunks() {

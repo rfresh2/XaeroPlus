@@ -6,12 +6,13 @@ import it.unimi.dsi.fastutil.longs.LongCollection;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import xaeroplus.util.XPLong2LongOpenHashMap;
 
 import static xaeroplus.util.ChunkUtils.chunkPosToLong;
 
 public abstract class ChunkHighlightBaseCacheHandler implements ChunkHighlightCache {
     public int defaultCapacity = 1024;
-    public final Long2LongOpenHashMap chunks = new Long2LongOpenHashMap(defaultCapacity);
+    public final XPLong2LongOpenHashMap chunks = new XPLong2LongOpenHashMap(defaultCapacity);
     public Minecraft mc = Minecraft.getInstance();
 
     public ChunkHighlightBaseCacheHandler() {
